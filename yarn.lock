@@ -2778,11 +2778,6 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-use-sync-external-store@^1.0.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
-  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
-
 util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -2849,13 +2844,6 @@ word-wrap@^1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.3.tgz#610636f6b1f703891bd34771ccb17fb93b47079c"
   integrity sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==
-
-wouter@^2.10.0-alpha.4:
-  version "2.10.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/wouter/-/wouter-2.10.0-alpha.4.tgz#2579eac8005efa7913af457ec43cbed001a989f9"
-  integrity sha512-bD65aN3tgAayk6MDd4XJpcJYKBqp9DxgLufpEKBueWoDq+8smyYPewbjzSRXZ9uWFiqQ0/y/rCpttGr7hY680g==
-  dependencies:
-    use-sync-external-store "^1.0.0"
 
 wrappy@1:
   version "1.0.2"
