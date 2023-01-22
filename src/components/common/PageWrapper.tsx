@@ -13,9 +13,7 @@ export const PageWrapper: FC<PageWrapperProps> = ({
 
   return (
     <div className={contentClassName || defaultContentClassName}>
-      <div className="max-w-3xl w-full mx-auto text-center  md:px-10">
-        {children}
-      </div>
+      <div className="max-w-3xl w-full mx-auto md:px-10">{children}</div>
     </div>
   );
 };
