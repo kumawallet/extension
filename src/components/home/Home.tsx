@@ -6,20 +6,21 @@ export const Home = () => {
   const navigate = useNavigate();
 
   const goToAccounts = () => {
+    localStorage.setItem("welcome", String(true));
     navigate("/add-account");
   };
 
   return (
     <PageWrapper>
       <img src={logo} className="mx-auto mt-10 mb-5 w-36 md:w-40" />
-      <p className="font-medium text-2xl md:text-3xl mb-2">
+      <p className="font-medium text-2xl md:text-3xl mb-2 text-center">
         Welcome to XCM Wallet
       </p>
-      <p className="font-light text-xs md:text-sm mb-12">
+      <p className="font-light text-xs md:text-sm mb-12 text-center">
         EVM and WASM accounts in one place
       </p>
       <button
-        className="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
+        className="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mx-auto"
         onClick={goToAccounts}
       >
         continue

@@ -7,10 +7,6 @@ import { OptionButton } from "./OptionButton";
 export const AddAccount = () => {
   const navigate = useNavigate();
 
-  const goToBalance = () => {
-    navigate("/balance");
-  };
-
   return (
     <PageWrapper>
       <div className="flex justify-between items-center mb-14">
@@ -18,11 +14,11 @@ export const AddAccount = () => {
         <RxCross2 size={20} />
       </div>
       <div className="flex flex-col gap-8">
-        <OptionButton onClick={goToBalance}>
+        <OptionButton onClick={() => navigate("/import-account")}>
           <p className="font-normal text-xl">Import wallet</p>
           <BsChevronRight size={24} />
         </OptionButton>
-        <OptionButton onClick={goToBalance}>
+        <OptionButton onClick={() => navigate("/create-account")}>
           <p className="font-normal text-xl">Create wallet</p>
           <BsChevronRight size={24} />
         </OptionButton>
