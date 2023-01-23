@@ -4,7 +4,7 @@ const storage = chrome.storage.local;
 
 export default class WASMHandler implements AccountManager {
 
-  create(password: string, seed: string) {
+  create(password: string, seed: string, name: string) {
     // validate allready exists
     // validate password
     // validate seed

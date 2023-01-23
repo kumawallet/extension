@@ -4,29 +4,51 @@ import { ethers } from "ethers";
 import Storage from "../storage/Storage";
 
 export default class EVMHandler implements AccountManager {
-
   #storage: Storage;
 
   constructor() {
     this.#storage = new Storage();
   }
 
-  create(password: string, seed: string) {
-    // validate allready exists
-    // validate password
-    // validate seed
+  formatAddress(address: string) {
+    return `EVM-${address}`;
+  }
+
+  getKeyFromSeed(seed: string) {
     const wallet = ethers.Wallet.fromMnemonic(seed);
+    const { address } = wallet || {};
+    return this.formatAddress(address);
+  }
+
+  create(password: string, seed: string, name: string) {
+    const key = this.getKeyFromSeed(seed);
+
     const account = {
+      name,
       password,
-      seed,
-      address: wallet.address,
-    }
-    const key = `EVM-${wallet.address}`;
-    this.#storage.saveAccount(key,account, () =>
+    };
+
+    this.#storage.saveAccount(key, account, () =>
       console.log("Account created")
     );
   }
-  import(password: string, seed: string) {}
+
+  async import(password: string, seed: string) {
+    const key = this.getKeyFromSeed(seed);
+    const exists = await this.#storage.getAccount(key);
+    if (exists) {
+      throw new Error("Account already exists");
+    }
+
+    const account = {
+      password,
+    };
+
+    this.#storage.saveAccount(key, account, () =>
+      console.log("Account imported")
+    );
+  }
+
   changeName() {}
   changePassword() {}
   signIn() {}
