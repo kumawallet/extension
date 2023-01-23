@@ -3,10 +3,10 @@ export default class Storage {
   constructor() {
     this.#storage = chrome.storage.local;
   }
-  set(key: string, value: any) {
-    this.#storage.set({ [key]: value }, () => console.log({ key, value }));
+  saveAccount(key: string, value: any, callback?: () => void) {
+    this.#storage.set({ [key]: value }, callback);
   }
-  get(key: string) {
-    this;
+  getStorage(): chrome.storage.StorageArea {
+    return this.#storage;
   }
 }

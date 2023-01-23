@@ -1,4 +1,3 @@
-import { BrowserStore } from "./BrowserStore";
 
 export default class Keyring {
   #accounts;
