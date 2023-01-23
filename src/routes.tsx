@@ -7,6 +7,7 @@ import { CreateAccount } from "./components/createAccount";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { AccountStore } from "./stores/accounts";
+import { FullScreenFAB } from "./components/common/FullScreenFAB";
 
 cryptoWaitReady()
   .then((): void => {
@@ -30,6 +31,7 @@ export const Routes = () => {
         <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
       </RRoutes>
+      <FullScreenFAB />
     </MemoryRouter>
   );
 };

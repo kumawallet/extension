@@ -4,11 +4,13 @@ import { mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { PageWrapper } from "../common/PageWrapper";
 import { BiLeftArrowAlt } from "react-icons/bi";
+import Extension, { AccountType } from "@src/utils/Extension";
 
 export const CreateAccount = () => {
   const [address, setAddress] = useState<null | string>(null);
   const [seed, setSeed] = useState<null | string>(null);
   const [password, setPassword] = useState("");
+  const ext = new Extension({}, AccountType.WASM);
 
   useEffect(() => {
     try {
@@ -21,6 +23,10 @@ export const CreateAccount = () => {
     }
   }, []);
 
+  const getAllAccounts = () => {
+    console.log(ext.getAllAccounts());
+  };
+
   const createAccount = () => {
     console.log({
       address,
@@ -30,17 +36,15 @@ export const CreateAccount = () => {
 
     if (seed && address && password) {
       try {
-        keyring.addUri(seed, password);
+        // keyring.addUri(seed, password);
+
+        ext.createAccount({ password, seed });
+
         console.log("created");
       } catch (error) {
         console.log(error);
       }
     }
-  };
-
-  const openWindow = () => {
-    const url = chrome.extension.getURL("index.html");
-    chrome.tabs.create({ url });
   };
 
   return (
@@ -49,7 +53,6 @@ export const CreateAccount = () => {
         <BiLeftArrowAlt size={26} />
         <p className="text-xl">create account</p>
       </div>
-      <button onClick={openWindow}>full screen</button>
       <div className="flex flex-col gap-6 mt-5">
         <div>
           <label

@@ -3,11 +3,10 @@ import AccountManager from "./handlers/AccountManagerInterface";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
 
-enum AccountType {
-  EVM = 'EVM',
-  WASM = 'WASM',
+export enum AccountType {
+  EVM = "EVM",
+  WASM = "WASM",
 }
-
 
 export default class Extension {
   readonly #state: State;
@@ -29,15 +28,15 @@ export default class Extension {
       case AccountType.WASM:
         return new WASMHandler();
       default:
-        throw new Error('Invalid account type');
+        throw new Error("Invalid account type");
     }
   }
 
-  createAccount() {
+  createAccount({ password, seed }: any) {
     this.accountManager.create(password, seed);
   }
 
-  importAccount() {
+  importAccount({ password, seed }: any) {
     this.accountManager.import(password, seed);
   }
 
@@ -66,6 +65,6 @@ export default class Extension {
   }
 
   getAllAccounts() {
-    this.accountManager.getAll();
+    return this.accountManager.getAll();
   }
 }

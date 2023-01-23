@@ -1,10 +1,14 @@
 import store from "store";
 
 export class BrowserStore {
-  all(fn: (...params: any) => void) {
+  all(fn?: (...params: any) => void) {
+    const items: any[] = [];
     store.each((value, key) => {
-      fn(key, value);
+      items.push({
+        [key]: value,
+      });
     });
+    fn?.(items);
   }
   get(key: string, fn: (...params: any) => void) {
     fn(store.get(key));
@@ -13,7 +17,7 @@ export class BrowserStore {
     store.remove(key);
     fn && fn();
   }
-  set(key: string, value: any, fn: (...params: any) => void) {
+  set(key: string, value: any, fn?: (...params: any) => void) {
     store.set(key, value);
     fn && fn();
   }
