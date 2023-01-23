@@ -1,43 +1,27 @@
-// import { accounts } from "@polkadot/ui-keyring/observable/accounts";
 import { useEffect, useState } from "react";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
-import keyring from "@polkadot/ui-keyring";
 import { PageWrapper } from "../common/PageWrapper";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import Extension, { AccountType } from "@src/utils/Extension";
 
 export const CreateAccount = () => {
-  const [address, setAddress] = useState<null | string>(null);
   const [seed, setSeed] = useState<null | string>(null);
   const [password, setPassword] = useState("");
-  const ext = new Extension({}, AccountType.EVM);
+  const [accountType, setAccountType] = useState(AccountType.EVM);
 
   useEffect(() => {
     try {
       const seed = mnemonicGenerate(12);
-      const address = keyring.createFromUri(seed, {}).address;
       setSeed(seed);
-      setAddress(address);
     } catch (error) {
       console.log(error);
     }
   }, []);
 
-  const getAllAccounts = () => {
-    console.log(ext.getAllAccounts());
-  };
-
   const createAccount = () => {
-    console.log({
-      address,
-      seed,
-      password,
-    });
-
-    if (seed && address && password) {
+    if (seed && password) {
       try {
-        // keyring.addUri(seed, password);
-
+        const ext = new Extension({}, accountType);
         ext.createAccount({ password, seed });
 
         console.log("created");
@@ -54,20 +38,20 @@ export const CreateAccount = () => {
         <p className="text-xl">create account</p>
       </div>
       <div className="flex flex-col gap-6 mt-5">
-        <div>
-          <label
-            htmlFor="first_name"
-            className="block text-sm font-medium text-gray-900 dark:text-gray-300"
-          >
-            Address
-          </label>
-          <input
-            disabled
-            id="first_name"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            value={address || ""}
-          />
-        </div>
+        <label
+          htmlFor="first_name"
+          className="block text-sm font-medium text-gray-900 dark:text-gray-300"
+        >
+          Account type
+        </label>
+        <select
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          value={accountType}
+          onChange={({ target }) => setAccountType(target.value as AccountType)}
+        >
+          <option value={AccountType.EVM}>evm</option>
+          <option value={AccountType.WASM}>wasm</option>
+        </select>
         <div>
           <label
             htmlFor="first_name"
