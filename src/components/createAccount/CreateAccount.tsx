@@ -10,7 +10,7 @@ export const CreateAccount = () => {
   const [address, setAddress] = useState<null | string>(null);
   const [seed, setSeed] = useState<null | string>(null);
   const [password, setPassword] = useState("");
-  const ext = new Extension({}, AccountType.WASM);
+  const ext = new Extension({}, AccountType.EVM);
 
   useEffect(() => {
     try {

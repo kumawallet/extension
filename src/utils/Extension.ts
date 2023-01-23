@@ -10,15 +10,19 @@ export enum AccountType {
 
 export default class Extension {
   readonly #state: State;
-  readonly #accountType: AccountType;
+  #accountType: AccountType;
 
-  constructor(state: State, accountType: AccountType) {
+  constructor(state: State, accountType: AccountType = AccountType.EVM) {
     this.#state = state;
     this.#accountType = accountType;
   }
 
   get accountType(): AccountType {
     return this.#accountType;
+  }
+
+  set accountType(accountType: AccountType) {
+    this.#accountType = accountType;
   }
 
   get accountManager(): AccountManager {

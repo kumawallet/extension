@@ -1,17 +1,15 @@
 import AccountManager from "./AccountManagerInterface";
-import { BrowserStore } from "../storage/BrowserStore";
+
+const storage = chrome.storage.local;
 
 export default class WASMHandler implements AccountManager {
-  private readonly store: BrowserStore = new BrowserStore();
-
-  constructor() {}
 
   create(password: string, seed: string) {
     // validate allready exists
     // validate password
     // validate seed
     // keyring.addFromUri(seed, { name: 'default' });
-    this.store.set(password, seed);
+    storage.set({ password, seed }, () => console.log("Account created"));
   }
   import(password: string, seed: string) {}
   changeName() {}

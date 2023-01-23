@@ -38,6 +38,11 @@ const manifest: ManifestType = {
   content_security_policy: {
     extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
   },
+  permissions: [
+    "storage",
+    "activeTab", // REVIEW: Is this needed?
+    "tabs", // REVIEW: Is this needed?
+  ],
 };
 
 export default manifest;
