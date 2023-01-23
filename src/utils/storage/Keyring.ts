@@ -4,14 +4,11 @@ export default class Keyring {
   #accounts;
   #addresses;
   #contracts;
-  #keyring;
-  #store;
 
   constructor() {
-    this.#accounts = accounts;
-    this.#addresses = addresses;
-    this.#contracts = contracts;
-    this.#store = new BrowserStore();
+    this.#accounts = new BrowserStore();
+    this.#addresses = new BrowserStore();
+    this.#contracts = new BrowserStore();
   }
   get accounts() {
     return this.#accounts;
@@ -28,6 +25,4 @@ export default class Keyring {
     }
     throw new Error("Keyring should be initialised before use");
   }
-
-
 }

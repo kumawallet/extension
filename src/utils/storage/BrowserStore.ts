@@ -1,20 +1,20 @@
-import store from 'store';
+import store from "store";
 
 export class BrowserStore {
-    all(fn) {
-      store.each((value, key) => {
-        fn(key, value);
-      });
-    }
-    get(key, fn) {
-      fn(store.get(key));
-    }
-    remove(key, fn) {
-      store.remove(key);
-      fn && fn();
-    }
-    set(key, value, fn) {
-      store.set(key, value);
-      fn && fn();
-    }
+  all(fn: (...params: any) => void) {
+    store.each((value, key) => {
+      fn(key, value);
+    });
   }
+  get(key: string, fn: (...params: any) => void) {
+    fn(store.get(key));
+  }
+  remove(key: string, fn: (...params: any) => void) {
+    store.remove(key);
+    fn && fn();
+  }
+  set(key: string, value: any, fn: (...params: any) => void) {
+    store.set(key, value);
+    fn && fn();
+  }
+}

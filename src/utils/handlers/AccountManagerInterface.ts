@@ -1,6 +1,6 @@
 export default interface AccountManager {
-  create(): void;
-  import(): void;
+  create(password: string, seed: string): void;
+  import(password: string, seed: string): void;
   changeName(): void;
   changePassword(): void;
   signIn(): void;

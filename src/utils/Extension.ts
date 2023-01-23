@@ -34,11 +34,11 @@ export default class Extension {
   }
 
   createAccount() {
-    this.accountManager.create();
+    this.accountManager.create(password, seed);
   }
 
   importAccount() {
-    this.accountManager.import();
+    this.accountManager.import(password, seed);
   }
 
   changeAccountName() {
