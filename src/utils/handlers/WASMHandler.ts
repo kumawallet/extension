@@ -1,7 +1,7 @@
 import keyring from "@polkadot/ui-keyring";
 import AccountManager from "./AccountManagerInterface";
 
-const storage = chrome.storage.local;
+import Storage from "../storage/Storage";
 
 export default class WASMHandler implements AccountManager {
   #storage: Storage;
@@ -11,7 +11,7 @@ export default class WASMHandler implements AccountManager {
   }
 
   formatAddress(address: string) {
-    return `EVM-${address}`;
+    return `WASM-${address}`;
   }
 
   getKeyFromSeed(seed: string, password: string) {
