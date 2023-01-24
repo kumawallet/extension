@@ -7,16 +7,20 @@ import { CreateAccount } from "./components/createAccount";
 import { FullScreenFAB } from "./components/common/FullScreenFAB";
 import { Accounts } from "./components/accounts";
 import { ImportAccount } from "./components/importAccount/ImportAccount";
+import { useAccountContext } from "./providers/AccountProvider";
+import { useMemo } from "react";
 
 export const Routes = () => {
-  const homeRoute = () => {
+  const {
+    state: { accounts, isLoadingAccounts },
+  } = useAccountContext();
+
+  const homeRoute = useMemo(() => {
     const isFirstTime = !localStorage.getItem("welcome");
 
     if (isFirstTime) {
       return <Home />;
     }
-
-    const accounts = [];
     const haveAccounts = accounts.length > 0;
 
     if (!haveAccounts) {
@@ -24,16 +28,18 @@ export const Routes = () => {
     }
 
     return <Balance />;
-  };
+  }, [accounts, isLoadingAccounts]);
+
+  if (isLoadingAccounts) return <p>loading...</p>;
 
   return (
     <MemoryRouter>
       <RRoutes>
-        <Route path="/" element={homeRoute()} />
+        <Route path="/" element={homeRoute} />
         <Route path="/account" element={<Accounts />} />
         <Route path="/import-account" element={<ImportAccount />} />
         <Route path="/create-account" element={<CreateAccount />} />
-        <Route path="/" element={<AddAccount />} />
+        <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
       </RRoutes>
       <FullScreenFAB />

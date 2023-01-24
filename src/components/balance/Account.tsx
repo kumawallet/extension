@@ -3,15 +3,19 @@ import { accountAddressMock } from "../../mocks/account-mocks";
 import logo from "../../assets/img/logo.svg";
 import { cropAccount } from "../../utils/account-utils";
 import { useNavigate } from "react-router-dom";
+import { useAccountContext } from "../../providers/AccountProvider";
 
 export const Account = () => {
   const navigate = useNavigate();
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
-  const account = cropAccount(accountAddressMock);
+  const account = cropAccount(selectedAccount.address);
 
   const copyAccount = () => {
     // TODO: fire popup
-    navigator.clipboard.writeText(accountAddressMock);
+    navigator.clipboard.writeText(selectedAccount.address);
   };
 
   const goToAccounts = () => {

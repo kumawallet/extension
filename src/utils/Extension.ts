@@ -8,6 +8,8 @@ export enum AccountType {
   WASM = "WASM",
 }
 
+const storage = chrome.storage.local;
+
 export default class Extension {
   readonly #state: State;
   #accountType: AccountType;
@@ -68,7 +70,19 @@ export default class Extension {
     this.accountManager.get();
   }
 
-  getAllAccounts() {
-    return this.accountManager.getAll();
+  async getAllAccounts() {
+    const accouts: any[] = [];
+
+    const accountsInStorage = await storage.get(null);
+
+    Object.keys(accountsInStorage).forEach((key) => {
+      if (key.includes("WASM") || key.includes("EVM")) {
+        accouts.push({
+          [key]: accountsInStorage[key],
+        });
+      }
+    });
+
+    return accouts;
   }
 }
