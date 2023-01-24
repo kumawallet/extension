@@ -26,7 +26,7 @@ export default abstract class AccountManager {
     this.#storage.saveAccount(key, value, callback);
   }
 
-  async getAccount(key: AccountKey): Promise<Account> {
+  async getAccount(key: AccountKey): Promise<Account|undefined> {
     if (!key) throw new Error("Account key is required");
     return this.#storage.getAccount(key);
   }
@@ -35,14 +35,14 @@ export default abstract class AccountManager {
     const { key } = account;
     const exists = await this.getAccount(key);
     if (exists) {
-      console.log("EXISTS", exists)
-      //throw new Error("Account already exists");
+      throw new Error("Account already exists");
     }
     this.saveAccount(account, callback);
   }
 
   async changeName(key: AccountKey, newName: string) {
     const account = await this.getAccount(key);
+    if (!account) throw new Error("Account not found");
     account.value.name = newName;
     this.saveAccount(account);
   }

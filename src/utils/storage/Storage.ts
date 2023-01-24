@@ -1,4 +1,4 @@
-import Account, { AccountKey } from "./Account";
+import Account, { AccountKey, AccountValue } from "./Account";
 
 export default class Storage {
   #storage: chrome.storage.StorageArea;
@@ -10,14 +10,15 @@ export default class Storage {
     return this.#storage;
   }
 
-  saveAccount(key: AccountKey, value: any, callback?: () => void) {
+  saveAccount(key: AccountKey, value: AccountValue, callback?: () => void) {
     this.#storage.set({ [key]: value }, callback);
   }
 
-  async getAccount(key: AccountKey): Promise<Account> {
+  async getAccount(key: AccountKey): Promise<Account|undefined> {
     const value = await this.#storage.get(key);
-    if (!value) throw new Error("Account not found");
-    return new Account(key, value);
+    // improve this validation
+    if (!value?.address) return undefined;
+    return new Account(key, value as AccountValue);
   }
 
   removeAccount(key: string, callback?: () => void) {
