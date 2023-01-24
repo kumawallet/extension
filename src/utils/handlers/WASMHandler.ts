@@ -1,16 +1,53 @@
+import keyring from "@polkadot/ui-keyring";
 import AccountManager from "./AccountManagerInterface";
 
 const storage = chrome.storage.local;
 
 export default class WASMHandler implements AccountManager {
-  create(password: string, seed: string, name: string) {
-    // validate allready exists
-    // validate password
-    // validate seed
-    // keyring.addFromUri(seed, { name: 'default' });
-    storage.set({ password, seed }, () => console.log("Account created"));
+  #storage: Storage;
+
+  constructor() {
+    this.#storage = new Storage();
   }
-  import(password: string, seed: string) {}
+
+  formatAddress(address: string) {
+    return `EVM-${address}`;
+  }
+
+  getKeyFromSeed(seed: string, password: string) {
+    const wallet = keyring.addUri(seed, password);
+    const { address } = wallet.json || {};
+    return this.formatAddress(address);
+  }
+
+  create(password: string, seed: string, name: string) {
+    const key = this.getKeyFromSeed(seed, password);
+
+    const account = {
+      name,
+      password,
+    };
+
+    this.#storage.saveAccount(key, account, () =>
+      console.log("Account created")
+    );
+  }
+
+  async import(password: string, seed: string) {
+    const key = this.getKeyFromSeed(seed, password);
+    const exists = await this.#storage.getAccount(key);
+    if (exists) {
+      throw new Error("Account already exists");
+    }
+
+    const account = {
+      password,
+    };
+
+    this.#storage.saveAccount(key, account, () =>
+      console.log("Account imported")
+    );
+  }
   changeName() {
     //
   }
