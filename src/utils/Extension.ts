@@ -39,8 +39,8 @@ export default class Extension {
     }
   }
 
-  createAccount({ password, seed }: any) {
-    this.accountManager.create(password, seed);
+  createAccount({ password, seed, name }: any) {
+    this.accountManager.create(password, seed, name);
   }
 
   importAccount({ password, seed }: any) {

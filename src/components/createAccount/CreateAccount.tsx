@@ -27,7 +27,7 @@ export const CreateAccount = () => {
     const { name, password, accounType } = data;
     try {
       const ext = new Extension({}, accounType);
-      ext.createAccount({ password, seed });
+      ext.createAccount({ password, seed, name });
       setIsCreated(true);
     } catch (error) {
       console.log(error);
@@ -44,9 +44,10 @@ export const CreateAccount = () => {
           className="cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <p className="text-xl">create account</p>
+        <p className="text-xl">Create Account</p>
       </div>
       <div className="flex flex-col gap-6 mt-5">
+        <CreateAccountForm onSubmit={createAccount} />
         <div>
           <label
             htmlFor="seed"
@@ -61,7 +62,6 @@ export const CreateAccount = () => {
             value={seed || ""}
           />
         </div>
-        <CreateAccountForm onSubmit={createAccount} />
       </div>
     </PageWrapper>
   );

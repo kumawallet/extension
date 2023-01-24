@@ -23,7 +23,7 @@ export const Home = () => {
         className="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mx-auto"
         onClick={goToAccounts}
       >
-        continue
+        Continue
       </button>
     </PageWrapper>
   );
