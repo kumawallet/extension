@@ -6,8 +6,10 @@ import Extension from "@src/utils/Extension";
 import { CreateAccountForm } from "./CreateAccountForm";
 import { AccountForm } from "./createAccount-interfaces";
 import { CreateAccountMessage } from "./CreateAccountMessage";
+import { useNavigate } from "react-router-dom";
 
 export const CreateAccount = () => {
+  const navigate = useNavigate();
   const [seed, setSeed] = useState<null | string>(null);
   const [isCreated, setIsCreated] = useState(false);
 
@@ -37,7 +39,11 @@ export const CreateAccount = () => {
   return (
     <PageWrapper>
       <div className="flex gap-3 items-center">
-        <BiLeftArrowAlt size={26} />
+        <BiLeftArrowAlt
+          size={26}
+          className="cursor-pointer"
+          onClick={() => navigate(-1)}
+        />
         <p className="text-xl">create account</p>
       </div>
       <div className="flex flex-col gap-6 mt-5">

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import Extension from "../utils/Extension";
-import { formatAccount } from "../utils/account-utils";
 import {
   createContext,
   FC,
@@ -60,9 +59,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       const accounts = await ext.getAllAccounts();
 
       //TODO: get selected account from localstorage
-      const _account = Object.keys(accounts[0])[0];
-
-      const { address, type } = formatAccount(_account);
+      const address = Object.keys(accounts[0])[0];
+      const accountType = accounts[0][address];
 
       dispatch({
         type: "load-accounts",
@@ -70,7 +68,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           accounts,
           selectedAccount: {
             address,
-            accountType: type,
+            accountType,
           },
         },
       });

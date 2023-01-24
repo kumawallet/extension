@@ -2,6 +2,7 @@ import State from "./storage/State";
 import AccountManager from "./handlers/AccountManagerInterface";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
+import { formatAccount } from "./account-utils";
 
 export enum AccountType {
   EVM = "EVM",
@@ -77,8 +78,12 @@ export default class Extension {
 
     Object.keys(accountsInStorage).forEach((key) => {
       if (key.includes("WASM") || key.includes("EVM")) {
+        const { address, type } = formatAccount(key);
         accouts.push({
-          [key]: accountsInStorage[key],
+          [address]: {
+            ...accountsInStorage[key],
+            accountType: type,
+          },
         });
       }
     });

@@ -1,5 +1,4 @@
 import { FiCopy } from "react-icons/fi";
-import { accountAddressMock } from "../../mocks/account-mocks";
 import logo from "../../assets/img/logo.svg";
 import { cropAccount } from "../../utils/account-utils";
 import { useNavigate } from "react-router-dom";
