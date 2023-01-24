@@ -34,16 +34,13 @@ export default class Extension {
     }
   }
 
-  createAccount({ password, seed, name }: any) {
-    this.accountManager.create(password, seed, name);
+  addAccount({ seed, name }: any) {
+
+    this.accountManager.add(seed, name);
   }
 
-  importAccount({ password, seed }: any) {
-    this.accountManager.import(password, seed);
-  }
-
-  changeAccountName() {
-    this.accountManager.changeName();
+  changeAccountName({ key, newName }: any) {
+    this.accountManager.changeName(key, newName);
   }
 
   changeAccountPassword() {
