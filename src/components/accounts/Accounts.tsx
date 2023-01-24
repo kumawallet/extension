@@ -38,8 +38,8 @@ export const Accounts = () => {
       </div>
       <div>
         {accounts.map((account, index) => {
-          const address = Object.keys(account)[0];
-          const type = account[address].accountType;
+          const address = account.value["address"];
+          const type = account.type;
           return (
             <div
               key={index.toString()}

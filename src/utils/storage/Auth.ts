@@ -1,17 +1,28 @@
-import Storage from './Storage';
+import Storage from "./Storage";
 
 export default class Auth {
-    #storage: Storage;
-    constructor() {
-        this.#storage = new Storage();
-    }
+  #storage: Storage;
+  constructor() {
+    this.#storage = new Storage();
+  }
 
-    savePassword(password: string, callback?: () => void) {
-        // validate password
-        // encrypt password
-        const encryptedPassword = password;
-        this.#storage.savePassword(encryptedPassword, callback);
-    }
+  changePassword(
+    seedOrPrivateKey: string,
+    newPassword: string,
+    callback?: () => void
+  ) {
+    //
+    //(newPassword, callback)
+  }
 
+  signIn(password: string, callback?: () => void) {
+    //
+    //isUnlocked = true;
+    // save on storage the decrypted PK
+  }
 
+  signOut() {
+    //
+    //isUnLocked = false;
+  }
 }

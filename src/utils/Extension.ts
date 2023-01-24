@@ -2,7 +2,8 @@ import State from "./storage/State";
 import AccountManager, { AccountType } from "./handlers/AccountManager";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
-import { formatAccount } from "./account-utils";
+import Account, { AccountKey } from "./storage/Account";
+import Auth from "./storage/Auth";
 
 const storage = chrome.storage.local;
 
@@ -34,52 +35,47 @@ export default class Extension {
     }
   }
 
-  addAccount({ seed, name }: any) {
+  get auth(): Auth {
+    return new Auth();
+  }
 
+  addAccount({ seed, name }: any) {
     this.accountManager.add(seed, name);
+  }
+
+  removeAccount(key: AccountKey) {
+    this.accountManager.forget(key);
   }
 
   changeAccountName({ key, newName }: any) {
     this.accountManager.changeName(key, newName);
   }
 
-  changeAccountPassword() {
-    this.accountManager.changePassword();
+  changePassword(seedOrPrivateKey: string, newPassword: string) {
+    this.auth.changePassword(seedOrPrivateKey, newPassword);
   }
 
-  signInAccount() {
-    this.accountManager.signIn();
-  }
-
-  forgetAccount() {
-    this.accountManager.forget();
+  signIn(password: string) {
+    this.auth.signIn(password);
   }
 
   exportAccount() {
-    this.accountManager.export();
+    //this.accountManager.export();
   }
 
-  getAccount() {
-    this.accountManager.get();
+  async getAccount(key: AccountKey): Promise<Account> {
+    return this.accountManager.getAccount(key);
   }
 
-  async getAllAccounts() {
-    const accouts: any[] = [];
-
+  async getAllAccounts(): Promise<Account[]> {
+    const accounts: Account[] = [];
     const accountsInStorage = await storage.get(null);
-
     Object.keys(accountsInStorage).forEach((key) => {
       if (key.includes("WASM") || key.includes("EVM")) {
-        const { address, type } = formatAccount(key);
-        accouts.push({
-          [address]: {
-            ...accountsInStorage[key],
-            accountType: type,
-          },
-        });
+        accounts.push(new Account(key as AccountKey, accountsInStorage[key]));
       }
     });
 
-    return accouts;
+    return accounts;
   }
 }
