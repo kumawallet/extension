@@ -1,3 +1,5 @@
+import Account, { AccountKey } from "./Account";
+
 export default class Storage {
   #storage: chrome.storage.StorageArea;
   constructor() {
@@ -8,11 +10,17 @@ export default class Storage {
     return this.#storage;
   }
 
-  saveAccount(key: string, value: any, callback?: () => void) {
+  saveAccount(key: AccountKey, value: any, callback?: () => void) {
     this.#storage.set({ [key]: value }, callback);
   }
 
-  getAccount(key: string) {
-    return this.#storage.get(key);
+  async getAccount(key: AccountKey): Promise<Account> {
+    const value = await this.#storage.get(key);
+    if (!value) throw new Error("Account not found");
+    return new Account(key, value);
+  }
+
+  removeAccount(key: string, callback?: () => void) {
+    this.#storage.remove(key, callback);
   }
 }

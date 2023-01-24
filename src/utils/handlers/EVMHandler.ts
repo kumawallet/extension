@@ -1,60 +1,35 @@
-import AccountManager from "./AccountManagerInterface";
+import AccountManager, { AccountType } from "./AccountManager";
 import { ethers } from "ethers";
+import Account, { AccountKey } from "../storage/Account";
 
-import Storage from "../storage/Storage";
+export default class EVMHandler extends AccountManager {
+  type = AccountType.EVM;
 
-export default class EVMHandler implements AccountManager {
-  #storage: Storage;
-
-  constructor() {
-    this.#storage = new Storage();
-  }
-
-  formatAddress(address: string) {
-    return `EVM-${address}`;
-  }
-
-  getKeyFromSeed(seed: string) {
+  private getKeyFromSeed(seed: string): AccountKey {
     const wallet = ethers.Wallet.fromMnemonic(seed);
     const { address } = wallet || {};
     return this.formatAddress(address);
   }
 
-  create(password: string, seed: string, name: string) {
+  addAccount(seed: string, name: string) {
     const key = this.getKeyFromSeed(seed);
-
-    const account = {
-      name,
-      password,
-    };
-
-    this.#storage.saveAccount(key, account, () =>
-      console.log("Account created")
-    );
+    const account = new Account(key, { name });
+    const callback = () => console.log("Account created");
+    this.add(account, callback);
   }
 
-  async import(password: string, seed: string) {
-    const key = this.getKeyFromSeed(seed);
-    const exists = await this.#storage.getAccount(key);
-    if (exists) {
-      throw new Error("Account already exists");
-    }
-
-    const account = {
-      password,
-    };
-
-    this.#storage.saveAccount(key, account, () =>
-      console.log("Account imported")
-    );
+  changePassword() {
+    //
+  }
+  signIn() {
+    //
   }
 
-  changeName() {}
-  changePassword() {}
-  signIn() {}
-  forget() {}
-  export() {}
-  get() {}
-  getAll() {}
-  derive() {}
+  export() {
+    //
+  }
+
+  derive() {
+    //
+  }
 }

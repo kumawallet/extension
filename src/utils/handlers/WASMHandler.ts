@@ -1,76 +1,36 @@
 import keyring from "@polkadot/ui-keyring";
-import AccountManager from "./AccountManagerInterface";
+import Account, { AccountKey } from "../storage/Account";
+import AccountManager, { AccountType } from "./AccountManager";
 
-import Storage from "../storage/Storage";
+export default class WASMHandler extends AccountManager {
+  type = AccountType.WASM;
 
-export default class WASMHandler implements AccountManager {
-  #storage: Storage;
-
-  constructor() {
-    this.#storage = new Storage();
-  }
-
-  formatAddress(address: string) {
-    return `WASM-${address}`;
-  }
-
-  getKeyFromSeed(seed: string, password: string) {
+  private getKeyFromSeed(seed: string, password: string): AccountKey {
     const wallet = keyring.addUri(seed, password);
     const { address } = wallet.json || {};
     return this.formatAddress(address);
   }
 
-  create(password: string, seed: string, name: string) {
+  addAccount(seed: string, name: string) {
+    // get password from storage
+    const password = "password";
     const key = this.getKeyFromSeed(seed, password);
-
-    const account = {
-      name,
-      password,
-    };
-
-    this.#storage.saveAccount(key, account, () =>
-      console.log("Account created")
-    );
+    const account = new Account(key, { name });
+    const callback = () => console.log("Account created");
+    this.add(account, callback);
   }
 
-  async import(password: string, seed: string) {
-    const key = this.getKeyFromSeed(seed, password);
-    const exists = await this.#storage.getAccount(key);
-    if (exists) {
-      throw new Error("Account already exists");
-    }
-
-    const account = {
-      password,
-    };
-
-    this.#storage.saveAccount(key, account, () =>
-      console.log("Account imported")
-    );
-  }
-  changeName() {
-    //
-  }
   changePassword() {
     //
   }
   signIn() {
     //
   }
-  forget() {
-    //
-  }
+
   export() {
     //
   }
-  get() {
-    //
-  }
-  getAll(): any[] {
-    // let accounts: any[] = [];
-    // this.store.all((items) => (accounts = items));
-    // return accounts;
-  }
+
   derive() {
     //
   }

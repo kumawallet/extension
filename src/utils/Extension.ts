@@ -1,13 +1,8 @@
 import State from "./storage/State";
-import AccountManager from "./handlers/AccountManagerInterface";
+import AccountManager, { AccountType } from "./handlers/AccountManager";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
 import { formatAccount } from "./account-utils";
-
-export enum AccountType {
-  EVM = "EVM",
-  WASM = "WASM",
-}
 
 const storage = chrome.storage.local;
 

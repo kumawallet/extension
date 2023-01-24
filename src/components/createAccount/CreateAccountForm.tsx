@@ -1,5 +1,5 @@
+import { AccountType } from "@src/utils/handlers/AccountManager";
 import { FC } from "react";
-import { AccountType } from "../../utils/Extension";
 import { useForm } from "react-hook-form";
 import { AccountForm } from "./createAccount-interfaces";
 
