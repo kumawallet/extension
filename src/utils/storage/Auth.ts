@@ -6,5 +6,12 @@ export default class Auth {
         this.#storage = new Storage();
     }
 
-    
+    savePassword(password: string, callback?: () => void) {
+        // validate password
+        // encrypt password
+        const encryptedPassword = password;
+        this.#storage.savePassword(encryptedPassword, callback);
+    }
+
+
 }

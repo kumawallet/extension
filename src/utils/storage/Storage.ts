@@ -23,4 +23,8 @@ export default class Storage {
   removeAccount(key: string, callback?: () => void) {
     this.#storage.remove(key, callback);
   }
+
+  savePassword(password: string, callback?: () => void) {
+    this.#storage.set({ password }, callback);
+  }
 }
