@@ -40,7 +40,7 @@ export default class Extension {
   }
 
   addAccount({ seed, name }: any) {
-    this.accountManager.add(seed, name);
+    this.accountManager.addAccount(seed, name);
   }
 
   removeAccount(key: AccountKey) {

@@ -24,10 +24,10 @@ export const CreateAccount = () => {
 
   const createAccount = (data: AccountForm) => {
     console.log(data);
-    const { name, password, accounType } = data;
+    const { name, accounType } = data;
     try {
       const ext = new Extension({}, accounType);
-      ext.createAccount({ password, seed, name });
+      ext.addAccount({ seed, name });
       setIsCreated(true);
     } catch (error) {
       console.log(error);

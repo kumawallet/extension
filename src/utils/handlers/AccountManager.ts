@@ -35,7 +35,8 @@ export default abstract class AccountManager {
     const { key } = account;
     const exists = await this.getAccount(key);
     if (exists) {
-      throw new Error("Account already exists");
+      console.log("EXISTS", exists)
+      //throw new Error("Account already exists");
     }
     this.saveAccount(account, callback);
   }
@@ -50,6 +51,7 @@ export default abstract class AccountManager {
     this.#storage.removeAccount(key, callback);
   }
 
+  abstract addAccount(seed: string, name: string): Promise<void>;
 
   //async getAll(): Promise<Account[]> {
     //let accounts: Account[] = [];
