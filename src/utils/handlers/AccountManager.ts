@@ -14,10 +14,6 @@ export default abstract class AccountManager {
     this.#storage = storage;
   }
 
-  getEncryptedVault(): Promise<string> {
-    return this.#storage.getStorage().get("vault");
-  }
-
   formatAddress(address: string): AccountKey {
     if (address.startsWith("WASM") || address.startsWith("EVM")) {
       return address as AccountKey;
@@ -29,7 +25,7 @@ export default abstract class AccountManager {
     this.#storage.saveAccount(account, callback);
   }
 
-  async getAccount(key: AccountKey): Promise<Account|undefined> {
+  async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("Account key is required");
     return this.#storage.getAccount(key);
   }
@@ -56,10 +52,8 @@ export default abstract class AccountManager {
 
   abstract addAccount(seed: string, name: string): Promise<void>;
 
-  //async getAll(): Promise<Account[]> {
-    //let accounts: Account[] = [];
-    //this.#storage.all()
-    // this.store.all((items) => (accounts = items));
-    //return accounts;
-  //}
+  async getAll(): Promise<Account[]> {
+    const { accounts } = await this.#storage.getVault();
+    return Object.keys(accounts).map((key) => accounts[key as AccountKey]);
+  }
 }

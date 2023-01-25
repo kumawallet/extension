@@ -46,7 +46,6 @@ export default class Extension {
   }
 
   addAccount({ seed, name }: any) {
-    this.#storage.getVault()
     this.accountManager.addAccount(seed, name);
   }
 
@@ -58,13 +57,13 @@ export default class Extension {
     this.accountManager.changeName(key, newName);
   }
 
-  changePassword(seedOrPrivateKey: string, newPassword: string) {
-    this.auth.changePassword(seedOrPrivateKey, newPassword);
-  }
-
   async signIn(password: string) {
-    const vault = await this.accountManager.getEncryptedVault();
-    this.auth.signIn(password, vault);
+    const vault = await this.#storage.getStorage().get("vault");
+    if (Object.keys(vault).length === 0 || !vault.vault) {
+      throw new Error("Vault not found");
+    }
+    const toDecrypt: string = vault.vault;
+    this.#auth.signIn(password, toDecrypt);
   }
 
   exportAccount() {
@@ -76,14 +75,6 @@ export default class Extension {
   }
 
   async getAllAccounts(): Promise<Account[]> {
-    const accounts: Account[] = [];
-    const accountsInStorage = await storage.get(null);
-    Object.keys(accountsInStorage).forEach((key) => {
-      if (key.includes("WASM") || key.includes("EVM")) {
-        accounts.push(new Account(key as AccountKey, accountsInStorage[key]));
-      }
-    });
-
-    return accounts;
+    return this.accountManager.getAll();
   }
 }
