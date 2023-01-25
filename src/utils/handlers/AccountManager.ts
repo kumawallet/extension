@@ -10,8 +10,8 @@ export default abstract class AccountManager {
   #storage: Storage;
   abstract type: AccountType;
 
-  constructor() {
-    this.#storage = new Storage();
+  constructor(storage: Storage) {
+    this.#storage = storage;
   }
 
   getEncryptedVault(): Promise<string> {

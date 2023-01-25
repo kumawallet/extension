@@ -8,13 +8,20 @@ export default class Storage {
   #storage: chrome.storage.StorageArea;
   #auth: Auth;
 
-  constructor() {
+  constructor(auth: Auth) {
     this.#storage = chrome.storage.local;
-    this.#auth = new Auth();
+    this.#auth = auth;
   }
 
   getStorage(): chrome.storage.StorageArea {
     return this.#storage;
+  }
+
+  async initVault() {
+    const vault = await this.getVault();
+    if (!vault) {
+      this.setVault(new Vault());
+    }
   }
 
   async getVault() {
