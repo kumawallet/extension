@@ -1,8 +1,4 @@
-/**
- * rollup-plugin-chrome-extension
- * https://github.com/extend-chrome/rollup-plugin-chrome-extension
- */
-export interface ManifestType {
+export interface ManifestTypeV3 {
   manifest_version: number;
   name: string;
   version: string;
@@ -257,4 +253,37 @@ interface WebAccessibleResourceById {
   extension_ids: string[];
   resources: string[];
   use_dynamic_url?: boolean;
+}
+
+export interface BrowserAction {
+  default_popup: string;
+  default_title: string;
+}
+
+export interface ContentScript {
+  matches: string[];
+  run_at: string;
+  js: string[];
+  css: string[];
+}
+
+export interface Background {
+  page: string;
+  persistent: boolean;
+}
+
+export interface Icons {
+  128: string;
+}
+
+export interface ManifestTypeV2 {
+  name: string;
+  description: string;
+  version: string;
+  manifest_version: number;
+  browser_action: BrowserAction;
+  optional_permissions: string[];
+  content_scripts: ContentScript[];
+  background: Background;
+  icons: Icons;
 }

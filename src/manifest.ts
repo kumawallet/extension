@@ -1,7 +1,9 @@
 import pkg from "../package.json";
-import { ManifestType } from "@src/manifest-type";
+import { ManifestTypeV2, ManifestTypeV3 } from "@src/manifest-type";
 
-const manifest: ManifestType = {
+const isChrome = process.env.BROWSER_TARGET === "CHROME";
+
+const manifestV3: ManifestTypeV3 = {
   manifest_version: 3,
   name: pkg.displayName,
   version: pkg.version,
@@ -45,4 +47,31 @@ const manifest: ManifestType = {
   ],
 };
 
-export default manifest;
+const manifestV2: ManifestTypeV2 = {
+  name: pkg.displayName,
+  version: pkg.version,
+  description: pkg.description,
+  manifest_version: 2,
+  browser_action: {
+    default_popup: "src/pages/popup/index.html",
+    default_title: "Open the popup",
+  },
+  optional_permissions: ["<all_urls>"],
+  content_scripts: [
+    {
+      matches: ["http://*/*", "https://*/*", "<all_urls>"],
+      run_at: "document_end",
+      js: ["src/pages/content/index.js"],
+      css: ["contentStyle.css"],
+    },
+  ],
+  background: {
+    page: "src/pages/background/index.js",
+    persistent: false,
+  },
+  icons: {
+    "128": "vite.svg",
+  },
+};
+
+export default isChrome ? manifestV3 : manifestV2;
