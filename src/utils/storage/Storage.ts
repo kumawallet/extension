@@ -24,7 +24,7 @@ export default class Storage {
     }
   }
 
-  async getVault() {
+  async getVault(): Promise<Vault> {
     const encryptedVault = await this.#storage.get(VAULT);
     return this.#auth.decryptVault(encryptedVault.vault);
   }
@@ -56,7 +56,7 @@ export default class Storage {
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
     const vault = await this.getVault();
-    if (!vault) throw new Error("Vault is not initialized");
+    if (!vault.accounts) throw new Error("Vault is not initialized");
     return vault.accounts[key];
   }
 }

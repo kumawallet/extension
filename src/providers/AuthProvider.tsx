@@ -7,17 +7,14 @@ import {
   useContext,
   useReducer,
 } from "react";
-import Auth from "@src/utils/storage/Auth";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 
 interface InitialState {
-  authController: Auth | null;
   extensionController: Extension | null;
   isInit: boolean;
 }
 
 const initialState: InitialState = {
-  authController: null,
   extensionController: null,
   isInit: true,
 };
@@ -47,15 +44,11 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const authController = new Auth();
-      const extensionController = new Extension({});
-
-      await authController.loadVault();
+      const extensionController = new Extension();
 
       dispatch({
         type: "init",
         payload: {
-          authController,
           extensionController,
         },
       });
