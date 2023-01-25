@@ -1,8 +1,8 @@
+import { VAULT } from "../constants";
 import Account, { AccountKey } from "./Account";
 import Auth from "./Auth";
 import Vault from "./Vault";
 
-const VAULT = "vault";
 
 export default class Storage {
   #storage: chrome.storage.StorageArea;
@@ -22,6 +22,11 @@ export default class Storage {
     if (!vault) {
       this.setVault(new Vault());
     }
+  }
+
+  async isVaultInitialized(): Promise<boolean> {
+    const vault = await this.#storage.get(VAULT);
+    return Object.keys(vault).length > 0 && !!vault.vault;
   }
 
   async getVault(): Promise<Vault> {

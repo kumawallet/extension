@@ -52,7 +52,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const ext = new Extension({});
+  const ext = new Extension();
 
   useEffect(() => {
     (async () => {
@@ -63,8 +63,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       let address = "";
       let accountType = "";
       if (accounts.length > 0) { 
-        address = Object.keys(accounts[0])[0];
-        accountType = accounts[0][address];
+        address = accounts[0].value.address;
+        accountType = accounts[0].type;
       }
 
       dispatch({

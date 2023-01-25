@@ -1,3 +1,4 @@
+import { VAULT } from "./constants";
 import AccountManager, { AccountType } from "./handlers/AccountManager";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
@@ -6,7 +7,6 @@ import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import Vault from "./storage/Vault";
 
-const storage = chrome.storage.local;
 
 export default class Extension {
   #accountType: AccountType;
@@ -58,11 +58,11 @@ export default class Extension {
   }
 
   async signIn(password: string) {
-    const vault = await this.#storage.getStorage().get("vault");
-    if (Object.keys(vault).length === 0 || !vault.vault) {
-      throw new Error("Vault not found");
+    if (!(await this.#storage.isVaultInitialized())) {
+      throw new Error("Vault is not initialized");
     }
-    const toDecrypt: string = vault.vault;
+    const { vault } = await this.#storage.getStorage().get(VAULT);
+    const toDecrypt: string = vault;
     this.#auth.signIn(password, toDecrypt);
   }
 
