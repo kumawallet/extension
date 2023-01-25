@@ -1,10 +1,13 @@
 import { AccountProvider } from "./providers";
+import { AuthProvider } from "./providers/AuthProvider";
 import { Routes } from "./routes";
 
 export const Main = () => {
   return (
-    <AccountProvider>
-      <Routes />
-    </AccountProvider>
+    <AuthProvider>
+      <AccountProvider>
+        <Routes />
+      </AccountProvider>
+    </AuthProvider>
   );
 };

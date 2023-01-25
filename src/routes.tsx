@@ -7,13 +7,19 @@ import { CreateAccount } from "./components/createAccount";
 import { FullScreenFAB } from "./components/common/FullScreenFAB";
 import { Accounts } from "./components/accounts";
 import { ImportAccount } from "./components/importAccount/ImportAccount";
-import { useAccountContext } from "./providers/AccountProvider";
+// import { useAccountContext } from "./providers/AccountProvider";
 import { useMemo } from "react";
+import { useAuthContext } from "./providers/AuthProvider";
+import { Unlock } from "./components/unlock";
 
 export const Routes = () => {
+  // const {
+  //   state: { accounts, isLoadingAccounts },
+  // } = useAccountContext();
+
   const {
-    state: { accounts, isLoadingAccounts },
-  } = useAccountContext();
+    state: { authController, extensionController, isInit },
+  } = useAuthContext();
 
   const homeRoute = useMemo(() => {
     const isFirstTime = !localStorage.getItem("welcome");
@@ -21,16 +27,21 @@ export const Routes = () => {
     if (isFirstTime) {
       return <Home />;
     }
-    const haveAccounts = accounts.length > 0;
 
-    if (!haveAccounts) {
-      return <AddAccount />;
+    if (authController?.vault && !authController.isUnlocked) {
+      return <Unlock />;
     }
 
-    return <Balance />;
-  }, [accounts, isLoadingAccounts]);
+    if (authController?.vault && authController?.isUnlocked) {
+      return <Balance />;
+    }
 
-  if (isLoadingAccounts) return <p>loading...</p>;
+    return <AddAccount />;
+  }, [authController, extensionController, isInit]);
+
+  if (isInit) return <p>loading...</p>;
+
+  console.log(authController);
 
   return (
     <MemoryRouter>
@@ -41,6 +52,7 @@ export const Routes = () => {
         <Route path="/create-account" element={<CreateAccount />} />
         <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
+        <Route path="/unlock" element={<Unlock />} />
       </RRoutes>
       <FullScreenFAB />
     </MemoryRouter>

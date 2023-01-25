@@ -1,5 +1,5 @@
 export interface AccountForm {
-  accounType: AccountType;
+  accountType: AccountType;
   name: string;
   password: string;
   confirmPassword: string;

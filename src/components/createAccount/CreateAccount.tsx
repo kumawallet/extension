@@ -1,34 +1,24 @@
-import { useEffect, useState } from "react";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { useState } from "react";
 import { PageWrapper } from "../common/PageWrapper";
 import { BiLeftArrowAlt } from "react-icons/bi";
-import Extension from "@src/utils/Extension";
 import { CreateAccountForm } from "./CreateAccountForm";
 import { AccountForm } from "./createAccount-interfaces";
 import { CreateAccountMessage } from "./CreateAccountMessage";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../providers/AuthProvider";
 
 export const CreateAccount = () => {
+  const { createAccount } = useAuthContext();
+
   const navigate = useNavigate();
-  const [seed, setSeed] = useState<null | string>(null);
   const [isCreated, setIsCreated] = useState(false);
 
-  useEffect(() => {
-    try {
-      const seed = mnemonicGenerate(12);
-      setSeed(seed);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  const createAccount = (data: AccountForm) => {
+  const _createAccount = async (data: AccountForm) => {
     console.log(data);
-    const { name, accounType } = data;
+    const { name, accountType, password } = data;
     try {
-      const ext = new Extension({}, accounType);
-      ext.addAccount({ seed, name });
-      setIsCreated(true);
+      const isCreated = await createAccount({ name, password, accountType });
+      setIsCreated(isCreated);
     } catch (error) {
       console.log(error);
     }
@@ -47,21 +37,7 @@ export const CreateAccount = () => {
         <p className="text-xl">Create Account</p>
       </div>
       <div className="flex flex-col gap-6 mt-5">
-        <CreateAccountForm onSubmit={createAccount} />
-        <div>
-          <label
-            htmlFor="seed"
-            className="block text-sm font-medium text-gray-900 dark:text-gray-300"
-          >
-            Seed
-          </label>
-          <textarea
-            disabled
-            id="seed"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"
-            value={seed || ""}
-          />
-        </div>
+        <CreateAccountForm onSubmit={_createAccount} />
       </div>
     </PageWrapper>
   );
