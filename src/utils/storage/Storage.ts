@@ -1,43 +1,55 @@
-import Account, { AccountKey, AccountValue } from "./Account";
+import Account, { AccountKey } from "./Account";
+import Auth from "./Auth";
+import Vault from "./Vault";
 
 const VAULT = "vault";
 
 export default class Storage {
   #storage: chrome.storage.StorageArea;
+  #auth: Auth;
+
   constructor() {
     this.#storage = chrome.storage.local;
+    this.#auth = new Auth();
   }
-  
+
   getStorage(): chrome.storage.StorageArea {
     return this.#storage;
   }
 
-  //Account methods
-  saveAccount(key: AccountKey, value: AccountValue, callback?: () => void) {
-    this.#storage.set({ [key]: value }, callback);
+  async getVault() {
+    const encryptedVault = await this.#storage.get(VAULT);
+    return this.#auth.decryptVault(encryptedVault.vault);
   }
 
-  removeAccount(key: string, callback?: () => void) {
-    this.#storage.remove(key, callback);
+  async setVault(vault: Vault, callback?: () => void) {
+    const encryptedVault = await this.#auth.encryptVault(vault);
+    this.#storage.set({ [VAULT]: encryptedVault }, callback);
   }
 
-  async getAccount(key: AccountKey): Promise<Account|undefined> {
-    const value = await this.#storage.get(key);
-    // improve this validation
-    if (!value?.address) return undefined;
-    return new Account(key, value as AccountValue);
-  }
-
-  //Vault methods
-  setVault(vault: any, callback?: () => void) {
-    this.#storage.set({ vault }, callback);
-  }
-
-  removeVault(callback?: () => void) { 
+  removeVault(callback?: () => void) {
     this.#storage.remove(VAULT, callback);
   }
 
-  async getVault() {
-    return this.#storage.get(VAULT);
+  async saveAccount(account: Account, callback?: () => void) {
+    const vault = await this.getVault();
+    if (!vault) throw new Error("Vault is not initialized");
+    if (vault.accounts[account.key]) throw new Error("Account already exists");
+    vault.accounts[account.key] = account;
+    this.setVault(vault, callback);
+  }
+
+  async removeAccount(key: AccountKey, callback?: () => void) {
+    const vault = await this.getVault();
+    if (!vault) throw new Error("Vault is not initialized");
+    if (!vault.accounts[key]) throw new Error("Account does not exist");
+    delete vault.accounts[key];
+    this.setVault(vault, callback);
+  }
+
+  async getAccount(key: AccountKey): Promise<Account | undefined> {
+    const vault = await this.getVault();
+    if (!vault) throw new Error("Vault is not initialized");
+    return vault.accounts[key];
   }
 }
