@@ -21,7 +21,7 @@ export default class Auth {
     return this.#vault;
   }
 
-  async encryptVault() {
+  async encryptVault(callback?: () => void) {
     try {
       const encryptedVault = await passworder.encrypt(
         this.#password as string,
@@ -43,10 +43,9 @@ export default class Auth {
 
   async signUp({ password }: any, callback?: () => void) {
     try {
-      const encryptedVault = await passworder.encrypt(password, {});
-      this.#storage.setVault(encryptedVault, callback);
-      this.#vault = this.loadVault();
+      this.#vault = {};
       this.#password = password;
+      this.encryptVault(callback);
       this.#isUnlocked = true;
     } catch (error) {
       throw new Error(error as string);
