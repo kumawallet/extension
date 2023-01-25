@@ -1,5 +1,7 @@
 import Account, { AccountKey, AccountValue } from "./Account";
 
+const VAULT = "vault";
+
 export default class Storage {
   #storage: chrome.storage.StorageArea;
   constructor() {
@@ -10,8 +12,13 @@ export default class Storage {
     return this.#storage;
   }
 
+  //Account methods
   saveAccount(key: AccountKey, value: AccountValue, callback?: () => void) {
     this.#storage.set({ [key]: value }, callback);
+  }
+
+  removeAccount(key: string, callback?: () => void) {
+    this.#storage.remove(key, callback);
   }
 
   async getAccount(key: AccountKey): Promise<Account|undefined> {
@@ -21,11 +28,16 @@ export default class Storage {
     return new Account(key, value as AccountValue);
   }
 
-  removeAccount(key: string, callback?: () => void) {
-    this.#storage.remove(key, callback);
+  //Vault methods
+  setVault(vault: any, callback?: () => void) {
+    this.#storage.set({ vault }, callback);
   }
 
-  savePassword(password: string, callback?: () => void) {
-    this.#storage.set({ password }, callback);
+  removeVault(callback?: () => void) { 
+    this.#storage.remove(VAULT, callback);
+  }
+
+  async getVault() {
+    return this.#storage.get(VAULT);
   }
 }

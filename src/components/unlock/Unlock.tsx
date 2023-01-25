@@ -30,7 +30,7 @@ export const Unlock = () => {
   return (
     <PageWrapper>
       <div className="flex flex-col">
-        <p className="text-center text-xl mb-6">welcome back</p>
+        <p className="text-center text-xl mb-6">Welcome back</p>
         <input
           placeholder="password"
           onChange={({ target }) => setPassword(target.value)}

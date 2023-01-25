@@ -3,13 +3,11 @@ import passworder from "@metamask/browser-passworder";
 
 export default class Auth {
   #storage: Storage;
-  #password: string;
   #isUnlocked: boolean;
   #vault: any;
 
   constructor() {
     this.#storage = new Storage();
-    this.#password = "";
     this.#isUnlocked = false;
   }
 
@@ -32,7 +30,7 @@ export default class Auth {
 
   async loadVault() {
     try {
-      const encryptedVault = await this.#storage.getStorage().get("vault");
+      const encryptedVault = await this.#storage.getVault();
       console.log("encrypted vault", encryptedVault);
       this.#vault = encryptedVault;
     } catch (error) {
@@ -45,7 +43,7 @@ export default class Auth {
       const encryptedSeed = await passworder.encrypt(password, seed);
       this.#storage.saveAccount("vault" as any, encryptedSeed as any);
       this.#isUnlocked = true;
-      this.#password = password;
+      callback && callback();
     } catch (error) {
       throw new Error(error as string);
     }
@@ -53,9 +51,7 @@ export default class Auth {
 
   async unlock(password: string, callback?: () => void): Promise<boolean> {
     try {
-      const { vault: encryptedVault } = await this.#storage
-        .getStorage()
-        .get("vault");
+      const { vault: encryptedVault } = await this.#storage.getVault();
       if (!encryptedVault) {
         throw new Error("There is no vault");
       }
@@ -71,8 +67,8 @@ export default class Auth {
         throw new Error("Invalid password");
       }
       this.#vault = decryptedVault;
-      this.#password = password;
       this.#isUnlocked = true;
+      callback && callback();
       return true;
     } catch (error) {
       throw new Error(error as string);
