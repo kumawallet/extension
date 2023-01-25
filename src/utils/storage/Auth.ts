@@ -27,7 +27,7 @@ export default class Auth {
         this.#password as string,
         this.#vault
       );
-      this.#storage.setVault(encryptedVault);
+      this.#storage.setVault(encryptedVault, callback);
     } catch (error) {
       throw new Error(error as string);
     }
