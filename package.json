@@ -9,8 +9,11 @@
     "url": "https://github.com/blockcoders/cross-chain-wallet.git"
   },
   "scripts": {
-    "build": "tsc --noEmit && vite build",
-    "dev": "nodemon"
+    "build:chrome": "BROWSER_TARGET=CHROME vite build",
+    "build:firefox": "BROWSER_TARGET=FIREFOX vite build",
+    "build": "tsc --noEmit && build:chrome && build:firefox",
+    "dev": "BROWSER_TARGET=CHROME nodemon",
+    "dev:fifefox": "BROWSER_TARGET=FIREFOX nodemon"
   },
   "type": "module",
   "dependencies": {

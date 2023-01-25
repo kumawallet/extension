@@ -7,11 +7,13 @@ import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfil
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
 
+const isChrome = process.env.BROWSER_TARGET === "CHROME";
+
 const root = resolve(__dirname, "src");
 const pagesDir = resolve(root, "pages");
 const assetsDir = resolve(root, "assets");
 const stylesDir = resolve(root, "styles");
-const outDir = resolve(__dirname, "dist");
+const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
 
 export default defineConfig({
