@@ -4,11 +4,14 @@ import passworder from "@metamask/browser-passworder";
 export default class Auth {
   #storage: Storage;
   #isUnlocked: boolean;
-  #vault: any;
+  #vault: any | undefined; // This is the storage data decrypted on memory
+  #password: string | undefined;
 
   constructor() {
     this.#storage = new Storage();
     this.#isUnlocked = false;
+    this.#password = undefined;
+    this.#vault = this.loadVault();
   }
 
   get isUnlocked() {
@@ -19,64 +22,49 @@ export default class Auth {
     return this.#vault;
   }
 
-  changePassword(
-    seedOrPrivateKey: string,
-    newPassword: string,
-    callback?: () => void
-  ) {
-    //
-    //(newPassword, callback)
+  async signUp({ password }: any, callback?: () => void) { 
+    try {
+      const encryptedVault = await passworder.encrypt(password, {});
+      this.#storage.setVault(encryptedVault, callback);
+      this.#vault = encryptedVault;
+      this.#password = password;
+      this.#isUnlocked = true;
+    } catch (error) {
+      throw new Error(error as string);
+    }
   }
 
   async loadVault() {
     try {
-      const encryptedVault = await this.#storage.getVault();
-      console.log("encrypted vault", encryptedVault);
-      this.#vault = encryptedVault;
+      const encryptedVault  = await this.#storage.getVault();
+      this.#vault = encryptedVault || undefined;
     } catch (error) {
       throw new Error(error as string);
     }
   }
 
-  async signIn({ password, seed }: any, callback?: () => void) {
+  async signIn({ password }: any, callback?: () => void) {
     try {
-      const encryptedSeed = await passworder.encrypt(password, seed);
-      this.#storage.saveAccount("vault" as any, encryptedSeed as any);
-      this.#isUnlocked = true;
-      callback && callback();
-    } catch (error) {
-      throw new Error(error as string);
-    }
-  }
-
-  async unlock(password: string, callback?: () => void): Promise<boolean> {
-    try {
-      const { vault: encryptedVault } = await this.#storage.getVault();
-      if (!encryptedVault) {
-        throw new Error("There is no vault");
-      }
-
-      console.log(encryptedVault);
-
-      const decryptedVault = await passworder.decrypt(
-        password,
-        encryptedVault as any
-      );
-
-      if (!decryptedVault) {
+      this.#vault = await passworder.decrypt(password, this.#vault.vault);
+      if (!this.#vault) {
         throw new Error("Invalid password");
       }
-      this.#vault = decryptedVault;
+      this.#password = password;
       this.#isUnlocked = true;
       callback && callback();
-      return true;
     } catch (error) {
+      this.#password = undefined;
       throw new Error(error as string);
     }
   }
 
   signOut() {
-    //
-    //isUnLocked = false;
+    try {
+      this.#isUnlocked = false;
+      this.#password = undefined;
+      this.#vault = undefined;
+    } catch (error) {
+      throw new Error(error as string);
+    }
   }
 }
