@@ -7,7 +7,7 @@ export default class Auth {
 
   constructor() {
     this.#isUnlocked = false;
-    this.#vault = this.loadVault();
+    this.#password = undefined;
   }
 
   get isUnlocked() {
@@ -33,7 +33,10 @@ export default class Auth {
       if (!this.#isUnlocked || !this.#password) {
         throw new Error("Vault is not unlocked");
       }
-      return passworder.encrypt(this.#password as string, vault);
+      return passworder.encrypt(
+        this.#password as string,
+        vault
+      );
     } catch (error) {
       throw new Error(error as string);
     }
@@ -51,10 +54,7 @@ export default class Auth {
 
   async signIn(password: string, vault: string, callback?: () => void) {
     try {
-      const decryptedVault = (await passworder.decrypt(
-        password,
-        vault
-      )) as Vault;
+      const decryptedVault = (await passworder.decrypt(password, vault)) as Vault;
       if (!decryptedVault) {
         throw new Error("Invalid password");
       }
