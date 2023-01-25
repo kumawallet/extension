@@ -66,7 +66,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       console.log("createAccout", accountType);
       const seed = mnemonicGenerate(12);
-      await state.authController?.signIn({ password, seed });
+      await state.authController?.signUp({ password });
+      const vault = await state.authController?.vault;
+
+      await state.authController?.encryptVault(vault);
       state.extensionController!.accountType = accountType;
       await state.extensionController?.addAccount({ name, seed });
       return true;
@@ -75,7 +78,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       return false;
     }
   };
-
   return (
     <AuthContext.Provider
       value={{

@@ -1,4 +1,4 @@
-import State from "./storage/State";
+import State from "./storage/Vault";
 import AccountManager, { AccountType } from "./handlers/AccountManager";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
@@ -8,11 +8,9 @@ import Auth from "./storage/Auth";
 const storage = chrome.storage.local;
 
 export default class Extension {
-  readonly #state: State;
   #accountType: AccountType;
 
-  constructor(state: State, accountType: AccountType = AccountType.EVM) {
-    this.#state = state;
+  constructor(accountType: AccountType = AccountType.EVM) {
     this.#accountType = accountType;
   }
 
@@ -55,15 +53,16 @@ export default class Extension {
     this.auth.changePassword(seedOrPrivateKey, newPassword);
   }
 
-  signIn(password: string) {
-    this.auth.signIn(password);
+  async signIn(password: string) {
+    const vault = await this.accountManager.getEncryptedVault();
+    this.auth.signIn(password, vault);
   }
 
   exportAccount() {
     //this.accountManager.export();
   }
 
-  async getAccount(key: AccountKey): Promise<Account> {
+  async getAccount(key: AccountKey): Promise<Account | undefined> {
     return this.accountManager.getAccount(key);
   }
 

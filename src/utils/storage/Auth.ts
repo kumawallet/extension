@@ -1,14 +1,11 @@
-import Storage from "./Storage";
 import passworder from "@metamask/browser-passworder";
+import Vault from "./Vault";
 
 export default class Auth {
-  #storage: Storage;
   #isUnlocked: boolean;
-  #vault: any; // This is the storage data decrypted on memory
   #password: string | undefined;
 
   constructor() {
-    this.#storage = new Storage();
     this.#isUnlocked = false;
     this.#vault = this.loadVault();
   }
@@ -17,34 +14,48 @@ export default class Auth {
     return this.#isUnlocked;
   }
 
-  get vault(): any {
-    return this.#vault;
+  async decryptVault(vault: string) {
+    try {
+      if (!this.#isUnlocked || !this.#password) {
+        throw new Error("Vault is not unlocked");
+      }
+      return (await passworder.decrypt(
+        this.#password as string,
+        vault
+      )) as Vault;
+    } catch (error) {
+      throw new Error(error as string);
+    }
   }
 
-  async signUp({ password }: any, callback?: () => void) { 
+  async encryptVault(vault: Vault) {
     try {
-      const encryptedVault = await passworder.encrypt(password, {});
-      this.#storage.setVault(encryptedVault, callback);
-      this.#vault = this.loadVault();
+      if (!this.#isUnlocked || !this.#password) {
+        throw new Error("Vault is not unlocked");
+      }
+      return passworder.encrypt(this.#password as string, vault);
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  async signUp({ password }: any, callback?: () => void) {
+    try {
+      this.#password = password;
       this.#isUnlocked = true;
+      callback && callback();
     } catch (error) {
       throw new Error(error as string);
     }
   }
 
-  async loadVault() {
+  async signIn(password: string, vault: string, callback?: () => void) {
     try {
-      const encryptedVault  = await this.#storage.getVault();
-      this.#vault = encryptedVault;
-    } catch (error) {
-      throw new Error(error as string);
-    }
-  }
-
-  async signIn({ password }: any, callback?: () => void) {
-    try {
-      this.#vault = await passworder.decrypt(password, this.#vault.vault);
-      if (!this.#vault) {
+      const decryptedVault = (await passworder.decrypt(
+        password,
+        vault
+      )) as Vault;
+      if (!decryptedVault) {
         throw new Error("Invalid password");
       }
       this.#password = password;
@@ -60,7 +71,6 @@ export default class Auth {
     try {
       this.#isUnlocked = false;
       this.#password = undefined;
-      this.#vault = undefined;
     } catch (error) {
       throw new Error(error as string);
     }
