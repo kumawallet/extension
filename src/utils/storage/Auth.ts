@@ -4,13 +4,12 @@ import passworder from "@metamask/browser-passworder";
 export default class Auth {
   #storage: Storage;
   #isUnlocked: boolean;
-  #vault: any | undefined; // This is the storage data decrypted on memory
+  #vault: any; // This is the storage data decrypted on memory
   #password: string | undefined;
 
   constructor() {
     this.#storage = new Storage();
     this.#isUnlocked = false;
-    this.#password = undefined;
     this.#vault = this.loadVault();
   }
 
@@ -26,8 +25,7 @@ export default class Auth {
     try {
       const encryptedVault = await passworder.encrypt(password, {});
       this.#storage.setVault(encryptedVault, callback);
-      this.#vault = encryptedVault;
-      this.#password = password;
+      this.#vault = this.loadVault();
       this.#isUnlocked = true;
     } catch (error) {
       throw new Error(error as string);
@@ -37,7 +35,7 @@ export default class Auth {
   async loadVault() {
     try {
       const encryptedVault  = await this.#storage.getVault();
-      this.#vault = encryptedVault || undefined;
+      this.#vault = encryptedVault;
     } catch (error) {
       throw new Error(error as string);
     }
