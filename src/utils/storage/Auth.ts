@@ -4,13 +4,13 @@ import passworder from "@metamask/browser-passworder";
 export default class Auth {
   #storage: Storage;
   #isUnlocked: boolean;
-  #vault: any | undefined; // This is the storage data decrypted on memory
+  #vault: any; // This is the storage data decrypted on memory
   #password: string | undefined;
 
   constructor() {
     this.#storage = new Storage();
     this.#isUnlocked = false;
-    this.#vault = this.loadVault();
+    this.#password = undefined;
   }
 
   get isUnlocked() {
