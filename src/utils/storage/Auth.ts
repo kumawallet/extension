@@ -4,7 +4,7 @@ import passworder from "@metamask/browser-passworder";
 export default class Auth {
   #storage: Storage;
   #isUnlocked: boolean;
-  #vault: any; // This is the storage data decrypted on memory
+  #vault: any | undefined; // This is the storage data decrypted on memory
   #password: string | undefined;
 
   constructor() {
@@ -21,12 +21,13 @@ export default class Auth {
     return this.#vault;
   }
 
-  async signUp({ password }: any, callback?: () => void) { 
+  async encryptVault() {
     try {
-      const encryptedVault = await passworder.encrypt(password, {});
-      this.#storage.setVault(encryptedVault, callback);
-      this.#vault = this.loadVault();
-      this.#isUnlocked = true;
+      const encryptedVault = await passworder.encrypt(
+        this.#password as string,
+        this.#vault
+      );
+      this.#storage.setVault(encryptedVault);
     } catch (error) {
       throw new Error(error as string);
     }
@@ -34,8 +35,19 @@ export default class Auth {
 
   async loadVault() {
     try {
-      const encryptedVault  = await this.#storage.getVault();
-      this.#vault = encryptedVault;
+      this.#vault = await this.#storage.getVault();
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  async signUp({ password }: any, callback?: () => void) {
+    try {
+      const encryptedVault = await passworder.encrypt(password, {});
+      this.#storage.setVault(encryptedVault, callback);
+      this.#vault = this.loadVault();
+      this.#password = password;
+      this.#isUnlocked = true;
     } catch (error) {
       throw new Error(error as string);
     }
