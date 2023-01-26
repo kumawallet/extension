@@ -1,6 +1,7 @@
 import { VAULT } from "../constants";
 import Account, { AccountKey } from "./Account";
 import Auth from "./Auth";
+import CacheAuth from "./CacheAuth";
 import Vault from "./Vault";
 
 
@@ -17,10 +18,16 @@ export default class Storage {
     return this.#storage;
   }
 
-  async initVault() {
-    const vault = await this.getVault();
-    if (!vault) {
-      this.setVault(new Vault());
+  async cachePassword() {
+    try {
+      const vault = await this.getVault();
+      if (!vault) throw new Error("Vault is not initialized");
+      CacheAuth.save(this.#auth.password)
+      vault.cacheAuth = CacheAuth.getInstance();
+      this.setVault(vault);
+    } catch (error) {
+      console.error(error);
+      CacheAuth.clear();
     }
   }
 

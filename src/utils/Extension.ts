@@ -48,9 +48,14 @@ export default class Extension {
   }
 
   async signUp({ seed, name, password }: any) {
+    // Stores password in memory
     await this.#auth.signUp({ password });
     const vault = new Vault();
+    // Creates a new vault (first time)
     await this.#storage.setVault(vault);
+    // Caches the password
+    this.#storage.cachePassword();
+    // Adds the account to the vault
     this.addAccount({ seed, name });
   }
 
@@ -68,11 +73,15 @@ export default class Extension {
 
   async signIn(password: string) {
     try {
-      if (!(await this.#storage.isVaultInitialized())) {
+      if (!(await this.isVaultInitialized())) {
         throw new Error("Vault is not initialized");
       }
+      // Get encrypted vault from storage
       const { vault } = await this.#storage.getStorage().get(VAULT);
+      // Decrypt vault with password
       this.#auth.signIn(password, vault);
+      // Cache password
+      this.#storage.cachePassword();
       return true
     } catch (error) {
       console.log("error", error)

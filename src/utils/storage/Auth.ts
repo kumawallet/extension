@@ -14,6 +14,10 @@ export default class Auth {
     return this.#isUnlocked;
   }
 
+  get password() {
+    return this.#password;
+  }
+
   async decryptVault(vault: string) {
     try {
       if (!this.#isUnlocked || !this.#password) {
