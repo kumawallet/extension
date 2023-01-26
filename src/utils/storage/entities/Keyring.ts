@@ -2,10 +2,10 @@ import { AccountType } from "../../../utils/handlers/AccountManager";
 import { AccountKey } from "./Accounts";
 
 export default class Keyring {
-  key: AccountKey;
-  #type: AccountType;
-  #seed: string;
-  #path: string;
+  readonly key: AccountKey;
+  readonly #type: AccountType;
+  readonly #seed: string;
+  readonly #path: string;
   #accountQuantity: number;
 
   constructor(
