@@ -3,17 +3,18 @@ import Extension from "../../utils/Extension";
 import { PageWrapper } from "../common/PageWrapper";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import Account from "@src/utils/storage/Account";
 
 export const Accounts = () => {
   const navigate = useNavigate();
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
 
   useEffect(() => {
     getAllAccounts();
   }, []);
 
   const getAllAccounts = async () => {
-    const ext = new Extension({});
+    const ext = Extension.getInstance();
     const accounts = await ext.getAllAccounts();
     setAccounts(accounts);
   };

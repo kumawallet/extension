@@ -50,6 +50,14 @@ export default abstract class AccountManager {
     this.#storage.removeAccount(key, callback);
   }
 
+  async showPrivateKey(): Promise<string> {
+    const { selectedAccount } = await this.#storage.getVault();
+    if (!selectedAccount) throw new Error("No account selected");
+    const account = await this.getAccount(selectedAccount);
+    if (!account) throw new Error("Account not found");
+    return account.value.privateKey;
+  }
+
   abstract addAccount(seed: string, name: string): Promise<void>;
 
   async getAll(): Promise<Account[]> {

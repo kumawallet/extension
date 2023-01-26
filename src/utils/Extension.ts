@@ -13,10 +13,19 @@ export default class Extension {
   #auth: Auth;
   #storage: Storage;
 
-  constructor(accountType: AccountType = AccountType.EVM) {
+  private static instance: Extension;
+
+  private constructor(accountType: AccountType = AccountType.EVM) {
     this.#accountType = accountType;
     this.#auth = new Auth();
     this.#storage = new Storage(this.#auth);
+  }
+
+  public static getInstance(accountType: AccountType = AccountType.EVM) {
+    if (!Extension.instance) {
+      Extension.instance = new Extension(accountType);
+    }
+    return Extension.instance;
   }
 
   get accountType(): AccountType {
@@ -66,8 +75,16 @@ export default class Extension {
     this.#auth.signIn(password, toDecrypt);
   }
 
-  exportAccount() {
-    //this.accountManager.export();
+  isVaultInitialized() {
+    return this.#storage.isVaultInitialized();
+  }
+
+  isUnlocked() {
+    return this.#auth.isUnlocked;
+  }
+
+  showPrivateKey() {
+    return this.accountManager.showPrivateKey();
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {

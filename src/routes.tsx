@@ -7,41 +7,39 @@ import { CreateAccount } from "./components/createAccount";
 import { FullScreenFAB } from "./components/common/FullScreenFAB";
 import { Accounts } from "./components/accounts";
 import { ImportAccount } from "./components/importAccount/ImportAccount";
-// import { useAccountContext } from "./providers/AccountProvider";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "./providers/AuthProvider";
-import { Unlock } from "./components/unlock";
+import { SignIn } from "./components/signIn";
 
 export const Routes = () => {
-  // const {
-  //   state: { accounts, isLoadingAccounts },
-  // } = useAccountContext();
-
   const {
-    state: { authController, extensionController, isInit },
+    state: { extensionController, isInit },
   } = useAuthContext();
 
-  const homeRoute = useMemo(() => {
-    const isFirstTime = !localStorage.getItem("welcome");
+  const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
 
-    if (isFirstTime) {
-      return <Home />;
-    }
-
-    if (authController?.vault && !authController.isUnlocked) {
-      return <Unlock />;
-    }
-
-    if (authController?.vault && authController?.isUnlocked) {
-      return <Balance />;
-    }
-
-    return <AddAccount />;
-  }, [authController, extensionController, isInit]);
-
-  if (isInit) return <p>loading...</p>;
-
-  console.log(authController);
+  useEffect(() => {
+    const getHomeRoute = async () => {
+      const isFirstTime = !localStorage.getItem("welcome");
+      if (isFirstTime) {
+        setHomeRoute(<Home />);
+        return;
+      }
+      const isVaultInitialized =
+        await extensionController?.isVaultInitialized();
+      if (!isVaultInitialized) {
+        setHomeRoute(<AddAccount />);
+        return;
+      }
+      const isUnlocked = await extensionController?.isUnlocked();
+      if (!isUnlocked) {
+        setHomeRoute(<SignIn />);
+        return;
+      }
+      setHomeRoute(<Balance />);
+    };
+    getHomeRoute();
+  }, [extensionController, isInit]);
 
   return (
     <MemoryRouter>
@@ -52,7 +50,7 @@ export const Routes = () => {
         <Route path="/create-account" element={<CreateAccount />} />
         <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
-        <Route path="/unlock" element={<Unlock />} />
+        <Route path="/sign-in" element={<SignIn />} />
       </RRoutes>
       <FullScreenFAB />
     </MemoryRouter>

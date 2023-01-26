@@ -52,7 +52,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const ext = new Extension();
+  const ext = Extension.getInstance();
 
   useEffect(() => {
     (async () => {

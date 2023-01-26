@@ -45,7 +45,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const extensionController = new Extension();
+      const extensionController = Extension.getInstance();
 
       dispatch({
         type: "init",

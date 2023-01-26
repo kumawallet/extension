@@ -3,11 +3,11 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../common/PageWrapper";
 
-export const Unlock = () => {
+export const SignIn = () => {
   const navigate = useNavigate();
 
   const {
-    state: { authController },
+    state: { extensionController },
   } = useAuthContext();
 
   const [password, setPassword] = useState("");
@@ -16,10 +16,10 @@ export const Unlock = () => {
     return password !== "";
   }, [password]);
 
-  const unlock = async () => {
+  const signIn = async () => {
     try {
-      const isUnlock = await authController?.unlock(password);
-      if (isUnlock) {
+      const signIn = await extensionController?.signIn(password);
+      if (signIn) {
         navigate("/balance");
       }
     } catch (error) {
@@ -31,6 +31,7 @@ export const Unlock = () => {
     <PageWrapper>
       <div className="flex flex-col">
         <p className="text-center text-xl mb-6">Welcome back</p>
+        <p className="text-center text-xl mb-6">{}</p>
         <input
           placeholder="password"
           onChange={({ target }) => setPassword(target.value)}
@@ -41,9 +42,9 @@ export const Unlock = () => {
           aria-disabled={!isValid}
           disabled={!isValid}
           className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto disabled:bg-gray-600"
-          onClick={unlock}
+          onClick={signIn}
         >
-          Unlock
+          Sign In
         </button>
       </div>
     </PageWrapper>
