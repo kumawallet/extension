@@ -117,7 +117,7 @@ export default class Storage {
 
   async isVaultInitialized(): Promise<boolean> {
     const vault = await this.getVault();
-    return vault !== undefined;
+    return !vault.isEmpty();
   }
 
   async getAccounts(): Promise<Accounts> {
