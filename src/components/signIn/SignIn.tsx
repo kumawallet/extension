@@ -19,9 +19,11 @@ export const SignIn = () => {
   const signIn = async () => {
     try {
       const signIn = await extensionController?.signIn(password);
-      if (signIn) {
-        navigate("/balance");
+      if (!signIn) {
+        throw new Error("Invalid password");
       }
+      navigate("/balance");
+
     } catch (error) {
       console.log(error);
     }

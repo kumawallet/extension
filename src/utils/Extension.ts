@@ -67,12 +67,18 @@ export default class Extension {
   }
 
   async signIn(password: string) {
-    if (!(await this.#storage.isVaultInitialized())) {
-      throw new Error("Vault is not initialized");
+    try {
+      if (!(await this.#storage.isVaultInitialized())) {
+        throw new Error("Vault is not initialized");
+      }
+      const { vault } = await this.#storage.getStorage().get(VAULT);
+      this.#auth.signIn(password, vault);
+      return true
+    } catch (error) {
+      console.log("error", error)
+      return false      
     }
-    const { vault } = await this.#storage.getStorage().get(VAULT);
-    const toDecrypt: string = vault;
-    this.#auth.signIn(password, toDecrypt);
+    
   }
 
   isVaultInitialized() {
