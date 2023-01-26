@@ -1,5 +1,5 @@
 import { CACHE_AUTH } from "../../../utils/constants";
-import { Storable } from "../Storage";
+import Storable from "../Storable";
 
 export default class CacheAuth extends Storable {
   password: string | undefined;
@@ -22,7 +22,13 @@ export default class CacheAuth extends Storable {
     return CacheAuth.instance;
   }
 
-  static async save({ password }: any) {
+  set({ password, isUnlocked, timeout }: any) {
+    this.password = password as string;
+    this.isUnlocked = isUnlocked as boolean;
+    this.timeout = timeout as number;
+  }
+
+  static async save(password: string) {
     try {
       CacheAuth.getInstance().password = password;
       CacheAuth.getInstance().isUnlocked = true;

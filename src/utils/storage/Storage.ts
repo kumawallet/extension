@@ -5,18 +5,6 @@ import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
 
-export abstract class Storable {
-  key: string;
-
-  constructor(key: string) {
-    this.key = key;
-  }
-
-  getKey(): string {
-    return this.key;
-  }
-}
-
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
   #auth: Auth;
@@ -44,6 +32,10 @@ export default class Storage {
       const data = await this.#storage.get(key);
       if (!data) throw new Error("Data not found");
       if (key === VAULT && data[key]) {
+        await this.loadCache();
+        if (!Auth.password || !Auth.isUnlocked) {
+          Auth.setAuth(CacheAuth.getInstance());
+        }
         return this.#auth.decryptVault(data[key]);
       }
       return data;
@@ -94,7 +86,8 @@ export default class Storage {
 
   async cachePassword() {
     try {
-      CacheAuth.save(Auth.password);
+      const password = Auth.password || "";
+      CacheAuth.save(password);
       const cacheAuth = CacheAuth.getInstance();
       this.set(cacheAuth.getKey(), cacheAuth);
     } catch (error) {
@@ -103,8 +96,30 @@ export default class Storage {
     }
   }
 
+  async loadCache() {
+    try {
+      const cacheAuth = await this.getCacheAuth();
+      Auth.setAuth(cacheAuth);
+    } catch (error) {
+      console.error(error);
+      CacheAuth.clear();
+    }
+  }
+
+  async getCacheAuth(): Promise<CacheAuth> {
+    const stored = await this.get(CacheAuth.getInstance().getKey());
+    if (!stored) throw new Error("CacheAuth is not initialized");
+    const cacheAuth = CacheAuth.getInstance();
+    cacheAuth.set(stored?.cacheAuth);
+    return cacheAuth;
+  }
+
   async getVault() {
-    return this.get(VAULT);
+    const stored = await this.get(VAULT);
+    if (!stored) throw new Error("Vault is not initialized");
+    const vault = new Vault();
+    vault.set(stored);
+    return vault;
   }
 
   async setVault(vault: Vault) {
@@ -121,9 +136,11 @@ export default class Storage {
   }
 
   async getAccounts(): Promise<Accounts> {
-    const accounts = await this.get(ACCOUNTS);
-    if (!accounts) throw new Error("Accounts are not initialized");
-    return accounts as Accounts;
+    const stored = await this.get(ACCOUNTS);
+    if (!stored) throw new Error("Accounts are not initialized");
+    const accounts = new Accounts();
+    accounts.set(stored);
+    return accounts;
   }
 
   async setAccounts(accounts: Accounts) {

@@ -1,6 +1,6 @@
 import { ACCOUNTS } from "../../constants";
 import { AccountType } from "../../handlers/AccountManager";
-import { Storable } from "../Storage";
+import Storable from "../Storable";
 
 export type AccountKey = `${AccountType}-${string}`;
 
@@ -43,6 +43,10 @@ export class Accounts extends Storable {
 
     get(key: AccountKey) {
         return this.accounts[key];
+    }
+
+    set(accounts: { [key: AccountKey]: Account }) {
+        this.accounts = accounts;
     }
 
     update(key: AccountKey, value: AccountValue) {

@@ -1,5 +1,6 @@
-import * as path from "path";
 export const cropAccount = (account: string) => {
+  console.log("account", account)
+  if (!account) return "";
   const first4Letters = account.slice(0, 4);
 
   const last4Letters = account.slice(account.length - 4, account.length);

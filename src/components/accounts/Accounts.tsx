@@ -3,7 +3,7 @@ import Extension from "../../utils/Extension";
 import { PageWrapper } from "../common/PageWrapper";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import Account from "@src/utils/storage/Account";
+import { Account } from "@src/utils/storage/entities/Accounts";
 
 export const Accounts = () => {
   const navigate = useNavigate();

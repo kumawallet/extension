@@ -22,6 +22,7 @@ export default class Extension {
   public static getInstance(accountType: AccountType = AccountType.EVM) {
     if (!Extension.instance) {
       Extension.instance = new Extension(accountType);
+
     }
     return Extension.instance;
   }

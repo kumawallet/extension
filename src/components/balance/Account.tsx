@@ -10,11 +10,11 @@ export const Account = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const account = cropAccount(selectedAccount.address);
+  const account = cropAccount(selectedAccount);
 
   const copyAccount = () => {
     // TODO: fire popup
-    navigator.clipboard.writeText(selectedAccount.address);
+    navigator.clipboard.writeText(selectedAccount);
   };
 
   const goToAccounts = () => {

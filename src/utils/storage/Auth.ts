@@ -19,12 +19,17 @@ export default class Auth {
     return Auth.instance;
   }
 
-   static get isUnlocked() {
+  static get isUnlocked() {
     return Auth.getInstance().#isUnlocked;
   }
 
   static get password() {
     return Auth.getInstance().#password;
+  }
+
+  static setAuth({ password, isUnlocked }: any) {
+    Auth.getInstance().#password = password;
+    Auth.getInstance().#isUnlocked = isUnlocked;
   }
 
   async decryptVault(vault: string) {
@@ -46,10 +51,7 @@ export default class Auth {
       if (!this.#isUnlocked || !this.#password) {
         throw new Error("Vault is not unlocked");
       }
-      return passworder.encrypt(
-        this.#password as string,
-        vault
-      );
+      return passworder.encrypt(this.#password as string, vault);
     } catch (error) {
       throw new Error(error as string);
     }
@@ -67,7 +69,10 @@ export default class Auth {
   async signIn(password: string, vault: string) {
     try {
       if (!vault) throw new Error("Vault not found");
-      const decryptedVault = (await passworder.decrypt(password, vault)) as Vault;
+      const decryptedVault = (await passworder.decrypt(
+        password,
+        vault
+      )) as Vault;
       if (!decryptedVault) {
         throw new Error("Invalid password");
       }

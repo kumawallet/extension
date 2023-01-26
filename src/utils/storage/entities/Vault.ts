@@ -1,7 +1,7 @@
 import { VAULT } from "../../../utils/constants";
 import Keyring from "./Keyring";
-import { Storable } from "../Storage";
 import { AccountKey } from "./Accounts";
+import Storable from "../Storable";
 
 export default class Vault extends Storable {
   #keyrings: { [key: AccountKey]: Keyring };
@@ -9,6 +9,10 @@ export default class Vault extends Storable {
   constructor() {
     super(VAULT);
     this.#keyrings = {};
+  }
+
+  get keyrings() {
+    return this.#keyrings;
   }
 
   isEmpty() {

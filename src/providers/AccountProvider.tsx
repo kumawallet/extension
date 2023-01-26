@@ -8,24 +8,17 @@ import {
   useReducer,
 } from "react";
 
-interface SelectedAccount {
-  address: "";
-  accountType: "";
-}
 
 interface InitialState {
   accounts: any[];
   isLoadingAccounts: boolean;
-  selectedAccount: SelectedAccount;
+  selectedAccount: string;
 }
 
 const initialState: InitialState = {
   accounts: [],
   isLoadingAccounts: true,
-  selectedAccount: {
-    address: "",
-    accountType: "",
-  },
+  selectedAccount: "",
 };
 
 const AccountContext = createContext(
@@ -57,24 +50,19 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     (async () => {
       const accounts = await ext.getAllAccounts();
-      console.log(accounts)
-
       //TODO: get selected account from localstorage
       let address = "";
       let accountType = "";
       if (accounts.length > 0) { 
-        address = accounts[0].value.address;
-        accountType = accounts[0].type;
+        address = accounts[0]?.value?.address;
+        accountType = accounts[0]?.type;
       }
 
       dispatch({
         type: "load-accounts",
         payload: {
           accounts,
-          selectedAccount: {
-            address,
-            accountType,
-          },
+          selectedAccount: address,
         },
       });
     })();

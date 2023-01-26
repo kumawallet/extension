@@ -1,5 +1,5 @@
 import { SETTINGS } from "../../../utils/constants";
-import { Storable } from "../Storage";
+import Storable from "../Storable";
 
 export class Setting {
   key: string;

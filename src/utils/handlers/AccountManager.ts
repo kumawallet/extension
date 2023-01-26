@@ -61,11 +61,11 @@ export default abstract class AccountManager {
     if (!selectedAccount) throw new Error("No account selected");
     const vault = await this.#storage.getVault();
     if (!vault) throw new Error("Vault not found");
-    return vault?.keyrings[selectedAccount]?.privateKey;
+    return vault?.keyrings[selectedAccount]?.seed;
   }
 
   async getAll(): Promise<Account[]> {
     const accounts = await this.#storage.getAccounts();
-    return Object.keys(accounts).map((key) => accounts.get(key as AccountKey));
+    return Object.keys(accounts.accounts).map((key) => accounts.get(key as AccountKey));
   }
 }
