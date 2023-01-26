@@ -79,9 +79,9 @@ export default class Extension {
       // Get encrypted vault from storage
       const { vault } = await this.#storage.getStorage().get(VAULT);
       // Decrypt vault with password
-      this.#auth.signIn(password, vault);
+      await this.#auth.signIn(password, vault);
       // Cache password
-      this.#storage.cachePassword();
+      await this.#storage.cachePassword();
       return true
     } catch (error) {
       console.log("error", error)
