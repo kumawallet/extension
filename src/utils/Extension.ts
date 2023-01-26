@@ -2,11 +2,9 @@ import { VAULT } from "./constants";
 import AccountManager, { AccountType } from "./handlers/AccountManager";
 import EVMHandler from "./handlers/EVMHandler";
 import WASMHandler from "./handlers/WASMHandler";
-import Account, { AccountKey } from "./storage/Account";
+import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
-import Vault from "./storage/Vault";
-
 
 export default class Extension {
   #accountType: AccountType;
@@ -17,8 +15,8 @@ export default class Extension {
 
   private constructor(accountType: AccountType = AccountType.EVM) {
     this.#accountType = accountType;
-    this.#auth = new Auth();
-    this.#storage = new Storage(this.#auth);
+    this.#auth = Auth.getInstance();
+    this.#storage = Storage.getInstance();
   }
 
   public static getInstance(accountType: AccountType = AccountType.EVM) {
@@ -39,9 +37,9 @@ export default class Extension {
   get accountManager(): AccountManager {
     switch (this.#accountType) {
       case AccountType.EVM:
-        return new EVMHandler(this.#storage);
+        return new EVMHandler();
       case AccountType.WASM:
-        return new WASMHandler(this.#storage);
+        return new WASMHandler();
       default:
         throw new Error("Invalid account type");
     }
@@ -50,13 +48,12 @@ export default class Extension {
   async signUp({ seed, name, password }: any) {
     // Stores password in memory
     await this.#auth.signUp({ password });
-    const vault = new Vault();
-    // Creates a new vault (first time)
-    await this.#storage.setVault(vault);
+    // Initializes the storage
+    this.#storage.init();
     // Caches the password
     this.#storage.cachePassword();
-    // Adds the account to the vault
-    this.addAccount({ seed, name });
+    // Adds the account to storage
+    this.addAccount({ name, seed });
   }
 
   addAccount({ seed, name }: any) {
@@ -73,21 +70,17 @@ export default class Extension {
 
   async signIn(password: string) {
     try {
-      if (!(await this.isVaultInitialized())) {
-        throw new Error("Vault is not initialized");
-      }
       // Get encrypted vault from storage
       const { vault } = await this.#storage.getStorage().get(VAULT);
       // Decrypt vault with password
       await this.#auth.signIn(password, vault);
       // Cache password
       await this.#storage.cachePassword();
-      return true
+      return true;
     } catch (error) {
-      console.log("error", error)
-      return false      
+      console.log("error", error);
+      return false;
     }
-    
   }
 
   isVaultInitialized() {
@@ -95,7 +88,7 @@ export default class Extension {
   }
 
   isUnlocked() {
-    return this.#auth.isUnlocked;
+    return Auth.isUnlocked;
   }
 
   showPrivateKey() {

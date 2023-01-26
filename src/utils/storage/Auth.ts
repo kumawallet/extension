@@ -1,21 +1,30 @@
 import passworder from "@metamask/browser-passworder";
-import Vault from "./Vault";
+import Vault from "./entities/Vault";
 
 export default class Auth {
   #isUnlocked: boolean;
   #password: string | undefined;
 
-  constructor() {
+  private static instance: Auth;
+
+  private constructor() {
     this.#isUnlocked = false;
     this.#password = undefined;
   }
 
-  get isUnlocked() {
-    return this.#isUnlocked;
+  public static getInstance() {
+    if (!Auth.instance) {
+      Auth.instance = new Auth();
+    }
+    return Auth.instance;
   }
 
-  get password() {
-    return this.#password;
+   static get isUnlocked() {
+    return Auth.getInstance().#isUnlocked;
+  }
+
+  static get password() {
+    return Auth.getInstance().#password;
   }
 
   async decryptVault(vault: string) {
@@ -46,25 +55,24 @@ export default class Auth {
     }
   }
 
-  async signUp({ password }: any, callback?: () => void) {
+  async signUp({ password }: any) {
     try {
       this.#password = password;
       this.#isUnlocked = true;
-      callback && callback();
     } catch (error) {
       throw new Error(error as string);
     }
   }
 
-  async signIn(password: string, vault: string, callback?: () => void) {
+  async signIn(password: string, vault: string) {
     try {
+      if (!vault) throw new Error("Vault not found");
       const decryptedVault = (await passworder.decrypt(password, vault)) as Vault;
       if (!decryptedVault) {
         throw new Error("Invalid password");
       }
       this.#password = password;
       this.#isUnlocked = true;
-      callback && callback();
     } catch (error) {
       this.#password = undefined;
       throw new Error(error as string);

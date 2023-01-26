@@ -1,9 +1,13 @@
-export default class CacheAuth {
+import { CACHE_AUTH } from "../../../utils/constants";
+import { Storable } from "../Storage";
+
+export default class CacheAuth extends Storable {
   password: string | undefined;
   isUnlocked: boolean;
   timeout: number;
 
   private constructor() {
+    super(CACHE_AUTH);
     this.password = undefined;
     this.isUnlocked = false;
     this.timeout = 0;

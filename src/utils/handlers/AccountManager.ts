@@ -1,28 +1,43 @@
-import Account, { AccountKey } from "../storage/Account";
+import { Account, AccountKey } from "../storage/entities/Accounts";
+import Keyring from "../storage/entities/Keyring";
+import Vault from "../storage/entities/Vault";
 import Storage from "../storage/Storage";
 
 export enum AccountType {
   EVM = "EVM",
   WASM = "WASM",
+  IMPORTED_EVM = "IMPORTED_EVM",
+  IMPORTED_WASM = "IMPORTED_WASM",
 }
 
 export default abstract class AccountManager {
   #storage: Storage;
   abstract type: AccountType;
 
-  constructor(storage: Storage) {
-    this.#storage = storage;
+  constructor() {
+    this.#storage = Storage.getInstance();
   }
 
+  abstract addAccount(seed: string, name: string): Promise<void>;
+
   formatAddress(address: string): AccountKey {
-    if (address.startsWith("WASM") || address.startsWith("EVM")) {
+    if (address.startsWith("WASM") || address.startsWith("EVM") || address.startsWith("IMPORTED")) {
       return address as AccountKey;
     }
     return `${this.type}-${address}`;
   }
 
-  saveAccount(account: Account, callback?: () => void) {
-    this.#storage.saveAccount(account, callback);
+  async saveAccount(account: Account) {
+    this.#storage.addAccount(account);
+  }
+
+  async saveKeyring(keyring: Keyring) {
+    const stored = await this.#storage.getVault();
+    if (!stored) throw new Error("Vault not found");
+    const vault = new Vault();
+    vault.set(stored);
+    vault.add(keyring);
+    this.#storage.setVault(vault);
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -30,38 +45,27 @@ export default abstract class AccountManager {
     return this.#storage.getAccount(key);
   }
 
-  async add(account: Account, callback?: () => void) {
-    const { key } = account;
-    const exists = await this.getAccount(key);
-    if (exists) {
-      throw new Error("Account already exists");
-    }
-    this.saveAccount(account, callback);
-  }
-
   async changeName(key: AccountKey, newName: string) {
     const account = await this.getAccount(key);
     if (!account) throw new Error("Account not found");
     account.value.name = newName;
-    this.saveAccount(account);
+    this.#storage.updateAccount(account);
   }
 
-  async forget(key: AccountKey, callback?: () => void) {
-    this.#storage.removeAccount(key, callback);
+  async forget(key: AccountKey) {
+    this.#storage.removeAccount(key);
   }
 
   async showPrivateKey(): Promise<string> {
-    const { selectedAccount } = await this.#storage.getVault();
+    const selectedAccount = await this.#storage.getSelectedAccount();
     if (!selectedAccount) throw new Error("No account selected");
-    const account = await this.getAccount(selectedAccount);
-    if (!account) throw new Error("Account not found");
-    return account.value.privateKey;
+    const vault = await this.#storage.getVault();
+    if (!vault) throw new Error("Vault not found");
+    return vault?.keyrings[selectedAccount]?.privateKey;
   }
 
-  abstract addAccount(seed: string, name: string): Promise<void>;
-
   async getAll(): Promise<Account[]> {
-    const { accounts } = await this.#storage.getVault();
-    return Object.keys(accounts).map((key) => accounts[key as AccountKey]);
+    const accounts = await this.#storage.getAccounts();
+    return Object.keys(accounts).map((key) => accounts.get(key as AccountKey));
   }
 }

@@ -1,18 +1,20 @@
 import AccountManager, { AccountType } from "./AccountManager";
 import { ethers } from "ethers";
-import Account from "../storage/Account";
+import { Account, AccountValue } from "../storage/entities/Accounts";
+import Keyring from "../storage/entities/Keyring";
 
 export default class EVMHandler extends AccountManager {
   type = AccountType.EVM;
 
-  addAccount(seed: string, name: string): Promise<void> {
+  async addAccount(seed: string, name: string): Promise<void> {
     const wallet = ethers.Wallet.fromMnemonic(seed);
     const { address } = wallet || {};
     const key = this.formatAddress(address);
-    const value = { name, address, privateKey: seed };
+    const value: AccountValue = { name, address };
     const account = new Account(key, value);
-    const callback = () => console.log("Account created");
-    this.add(account, callback);
+    await this.saveAccount(account);
+    const keyring = new Keyring(key, AccountType.EVM, seed);
+    await this.saveKeyring(keyring);
     return Promise.resolve();
   }
 
