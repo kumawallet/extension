@@ -12,6 +12,7 @@ import { useAuthContext } from "./providers/AuthProvider";
 import { SignIn } from "./components/signIn";
 import { DeriveAccount } from "./components/deriveAccount/DeriveAccount";
 import { Decrypt } from "./components/decrypt";
+import { DeriveImport } from "./components/deriveImport";
 
 export const Routes = () => {
   const {
@@ -54,6 +55,8 @@ export const Routes = () => {
         <Route path="/balance" element={<Balance />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/derive-account" element={<DeriveAccount />} />
+        <Route path="/derive-import" element={<DeriveImport />} />
+
         <Route path="/decrypt" element={<Decrypt />} />
       </RRoutes>
       <FullScreenFAB />

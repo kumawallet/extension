@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import Extension from "../../utils/Extension";
-import { PageWrapper } from "../common/PageWrapper";
-import { BsArrowLeftShort } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
 export const Accounts = () => {
@@ -18,42 +16,43 @@ export const Accounts = () => {
     setAccounts(accounts);
   };
 
+  const changeSelectedAccount = (account: any) => {
+    console.log(`new account will be:`, account);
+  };
+
   return (
-    <PageWrapper>
-      <div className="flex items-center mb-14 gap-3">
-        <BsArrowLeftShort
-          size={24}
-          onClick={() => navigate(-1)}
-          className="cursor-pointer"
-        />
-        <p className="font-medium text-2xl">Accounts</p>
-      </div>
+    <>
       <div className="flex justify-between mb-6 mt-3">
-        <button className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]">
+        <button
+          onClick={() => navigate("/derive-import")}
+          className="border border-custom-green-bg text-white rounded-full px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
+        >
           Import
         </button>
         <button
           onClick={() => navigate("/derive-account")}
-          className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
+          className="border border-custom-green-bg text-white rounded-full px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
           Create
         </button>
       </div>
-      <div>
-        {/* {accounts.map((account, index) => {
-          const address = account.value["address"];
-          const type = account.type;
-          return (
-            <div
-              key={index.toString()}
-              className="bg-gray-400 bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white text-xl"
-            >
-              <p className="w-3/4 overflow-hidden text-ellipsis">{address}</p>
-              <p>{type}</p>
-            </div>
-          );
-        })} */}
+      <div className="flex flex-col gap-5">
+        {accounts.map(({ address, type, name, key }: any, index) => (
+          <div
+            key={address}
+            className={`${
+              index === 0 && "bg-gray-400 bg-opacity-30"
+            }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
+            onClick={() => changeSelectedAccount({ address, type, name, key })}
+          >
+            <p className="w-3/4 overflow-hidden text-ellipsis">
+              <p className="text-cl">{name}</p>
+              <p>{address}</p>
+            </p>
+            <p>{type}</p>
+          </div>
+        ))}
       </div>
-    </PageWrapper>
+    </>
   );
 };
