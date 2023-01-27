@@ -86,18 +86,15 @@ export default class Storage {
   async init() {
     try {
       const accounts = new Accounts();
-      console.log("INIT Accounts", accounts);
       await this.set(ACCOUNTS, accounts);
       const settings = new Settings();
       await this.set(SETTINGS, settings);
       const vault = new Vault();
-      console.log("INIT Vault", vault);
       await this.set(VAULT, vault);
       const cacheAuth = CacheAuth.getInstance();
       await this.set(cacheAuth.getKey(), cacheAuth);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      console.log("Storage initialized");
       console.log(await this.#storage.get(null));
       return;
     } catch (error) {
