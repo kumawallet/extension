@@ -20,7 +20,7 @@ export const ChainSelector = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="left-0 absolute origin-top-left top-12 w-full bg-[#29323C] rounded-t-3xl">
+        <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-t-3xl">
           <div className="px-6 py-2 pt-2 text-start">
             <div className="flex justify-end">
               <RxCross2 />

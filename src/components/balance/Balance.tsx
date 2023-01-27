@@ -23,7 +23,7 @@ const TABS = [
 export const Balance = () => {
   return (
     <>
-      <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center">
+      <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center max-w-3xl w-full mx-auto">
         <ChainSelector />
         <Account />
       </header>
@@ -56,7 +56,7 @@ export const Balance = () => {
       </PageWrapper>
 
       {/* TODO: move to separate component */}
-      <footer className="fixed bottom-0 left-0 right-0 w-full py-2 bg-[#343A40] px-2 flex justify-end gap-20">
+      <footer className="fixed bottom-0 left-0 right-0 py-2 bg-[#343A40] px-2 flex justify-end gap-20 max-w-3xl w-full mx-auto">
         <FullScreenFAB />
         <DecryptFAB />
 
