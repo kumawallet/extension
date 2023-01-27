@@ -99,15 +99,16 @@ export default class Extension {
     return this.accountManager.getAccount(key);
   }
 
-  async getAllAccounts(): Promise<Account[]> {
-    return this.accountManager.getAll();
+  async getAllAccounts() {
+    const accounts = await this.accountManager.getAll();
+    if (!accounts) return [];
+    return accounts.getAll();
   }
 
   async derivateAccount(name: string): Promise<boolean> {
-    const { vault } = await this.#storage.getStorage().get(VAULT);
-    const decrypted = await this.#auth.decryptVault(vault);
-
-    await this.accountManager.derivateAccount(name, decrypted);
+    const vault = await this.#storage.getVault();
+    if (!vault) throw new Error("Vault not found");
+    await this.accountManager.derive(name, vault);
     return true;
   }
 }

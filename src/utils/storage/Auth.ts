@@ -40,7 +40,7 @@ export default class Auth {
       return (await passworder.decrypt(
         this.#password as string,
         vault
-      )) as Vault;
+      ));
     } catch (error) {
       throw new Error(error as string);
     }

@@ -30,7 +30,7 @@ export default class Storage {
   async get(key: string) {
     try {
       const data = await this.#storage.get(key);
-      if (!data) throw new Error("Data not found");
+      if (!data[key]) return undefined;
       if (key === VAULT && data[key]) {
         await this.loadCache();
         if (!Auth.password || !Auth.isUnlocked) {
@@ -38,7 +38,7 @@ export default class Storage {
         }
         return this.#auth.decryptVault(data[key]);
       }
-      return data;
+      return { ...data[key] };
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -52,7 +52,7 @@ export default class Storage {
         data = await this.#auth.encryptVault({ ...data, keyrings });
       }
 
-      const dataIsObject = typeof data === "object";
+      /*const dataIsObject = typeof data === "object";
 
       let _data = dataIsObject ? { ...data } : data;
 
@@ -64,9 +64,10 @@ export default class Storage {
         }
       } else {
         _data && delete _data?.["key"];
-      }
+      }*/
 
-      await this.#storage.set({ [key]: _data });
+      //await this.#storage.set({ [key]: _data });
+      await this.#storage.set({ [key]: data });
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -94,6 +95,8 @@ export default class Storage {
       await this.set(cacheAuth.getKey(), cacheAuth);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
+      console.log("Storage initialized");
+      console.log(await this.#storage.get(null));
       return;
     } catch (error) {
       console.error(error);
@@ -127,13 +130,13 @@ export default class Storage {
     const stored = await this.get(CacheAuth.getInstance().getKey());
     if (!stored) throw new Error("CacheAuth is not initialized");
     const cacheAuth = CacheAuth.getInstance();
-    cacheAuth.set(stored?.cacheAuth);
+    cacheAuth.set(stored);
     return cacheAuth;
   }
 
-  async getVault() {
+  async getVault(): Promise<Vault | undefined> {
     const stored = await this.get(VAULT);
-    if (!stored) throw new Error("Vault is not initialized");
+    if (!stored) return undefined;
     const vault = new Vault();
     vault.set(stored);
     return vault;
@@ -149,14 +152,15 @@ export default class Storage {
 
   async isVaultInitialized(): Promise<boolean> {
     const vault = await this.getVault();
+    if (!vault) return false;
     return !vault.isEmpty();
   }
 
-  async getAccounts(): Promise<Accounts> {
+  async getAccounts(): Promise<Accounts | undefined> {
     const stored = await this.get(ACCOUNTS);
-    if (!stored) throw new Error("Accounts are not initialized");
+    if (!stored || !stored.data) return undefined;
     const accounts = new Accounts();
-    accounts.set(stored);
+    accounts.set(stored.data);
     return accounts;
   }
 

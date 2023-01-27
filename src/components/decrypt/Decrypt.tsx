@@ -9,12 +9,12 @@ export const Decrypt = () => {
 
   const decrypt = async () => {
     try {
-      const decrpted: string = await passworder.decrypt(
+      const decrypted = await passworder.decrypt(
         password,
         String(encrypted)
       );
-      console.log(decrpted);
-      setresult(decrpted);
+      console.log(decrypted);
+      setresult(decrypted as string);
     } catch (error) {
       setresult(String(error));
     }

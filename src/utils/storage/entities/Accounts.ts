@@ -22,44 +22,57 @@ export class Account {
 }
 
 export class Accounts extends Storable {
-    accounts: { [key: AccountKey]: Account};
+    data: { [key: AccountKey]: Account};
 
     constructor() {
         super(ACCOUNTS);
-        this.accounts = {};
+        this.data = {};
     }
 
     isEmpty() {
-        return Object.keys(this.accounts).length === 0;
+        return Object.keys(this.data).length === 0;
     }
 
     add(account: Account) {
-        this.accounts[account.key] = account;
+        this.data[account.key] = account;
     }
 
     remove(key: AccountKey) {
-        delete this.accounts[key];
+        delete this.data[key];
     }
 
     get(key: AccountKey) {
-        return this.accounts[key];
+        if (!this.data[key]) return undefined;
+        return new Account(key, this.data[key].value);
+    }
+
+    getAll() {
+        return Object.keys(this.data).map((key) => {
+            const account = this.data[key as AccountKey];
+            return {
+                key,
+                address: account.value.address,
+                name: account.value.name,
+                type: account.type,
+            };
+        });
     }
 
     set(accounts: { [key: AccountKey]: Account }) {
-        this.accounts = accounts;
+        this.data = accounts;
     }
 
     update(key: AccountKey, value: AccountValue) {
-        this.accounts[key].value = value;
+        this.data[key].value = value;
     }
 
     allreadyExists(key: AccountKey) {
-        return this.accounts[key] !== undefined;
+        return this.data[key] !== undefined;
     }
 
     first() {
-        const keys = Object.keys(this.accounts);
+        const keys = Object.keys(this.data);
         if (keys.length === 0) return undefined;
-        return this.accounts[keys[0] as AccountKey];
+        return this.data[keys[0] as AccountKey];
     }
 }

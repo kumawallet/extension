@@ -49,13 +49,15 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     (async () => {
       const accounts = await ext.getAllAccounts();
+      console.log("accounts", accounts)
       //TODO: get selected account from localstorage
       let address = "";
       let accountType = "";
+      let accountKey = "";
       if (accounts.length > 0) {
-        const accountKey: string = Object.keys(accounts[0])[0];
-        const account = accounts[0][accountKey];
-        address = account?.value?.address;
+        const account = accounts[0];
+        accountKey = account?.key;
+        address = account?.address;
         accountType = account?.type;
       }
 

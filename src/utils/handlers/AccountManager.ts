@@ -1,4 +1,4 @@
-import { Account, AccountKey } from "../storage/entities/Accounts";
+import { Account, AccountKey, Accounts } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
 import Vault from "../storage/entities/Vault";
 import Storage from "../storage/Storage";
@@ -19,9 +19,14 @@ export default abstract class AccountManager {
   }
 
   abstract addAccount(seed: string, name: string): Promise<void>;
+  abstract derive(name: string, vault: Vault): Promise<void>;
 
   formatAddress(address: string): AccountKey {
-    if (address.startsWith("WASM") || address.startsWith("EVM") || address.startsWith("IMPORTED")) {
+    if (
+      address.startsWith("WASM") ||
+      address.startsWith("EVM") ||
+      address.startsWith("IMPORTED")
+    ) {
       return address as AccountKey;
     }
     return `${this.type}-${address}`;
@@ -32,10 +37,8 @@ export default abstract class AccountManager {
   }
 
   async saveKeyring(keyring: Keyring) {
-    const stored = await this.#storage.getVault();
-    if (!stored) throw new Error("Vault not found");
-    const vault = new Vault();
-    vault.set(stored);
+    const vault = await this.#storage.getVault();
+    if (!vault) throw new Error("Vault not found");
     vault.add(keyring);
     this.#storage.setVault(vault);
   }
@@ -64,8 +67,9 @@ export default abstract class AccountManager {
     return vault?.keyrings[selectedAccount]?.seed;
   }
 
-  async getAll(): Promise<Account[]> {
+  async getAll(): Promise<Accounts | undefined> {
     const accounts = await this.#storage.getAccounts();
-    return Object.keys(accounts.accounts).map((key) => accounts.get(key as AccountKey));
+    if (!accounts) return undefined;
+    return accounts;
   }
 }

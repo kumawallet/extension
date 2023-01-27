@@ -1,6 +1,7 @@
 import keyring from "@polkadot/ui-keyring";
 import { Account, AccountValue } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
+import Vault from "../storage/entities/Vault";
 import AccountManager, { AccountType } from "./AccountManager";
 
 export default class WASMHandler extends AccountManager {
@@ -24,7 +25,7 @@ export default class WASMHandler extends AccountManager {
     //
   }
 
-  derive() {
+  async derive(name: string, vault: Vault) {
     //
   }
 }

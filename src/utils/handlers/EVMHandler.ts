@@ -2,6 +2,7 @@ import AccountManager, { AccountType } from "./AccountManager";
 import { ethers } from "ethers";
 import { Account, AccountValue } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
+import Vault from "../storage/entities/Vault";
 
 export default class EVMHandler extends AccountManager {
   type = AccountType.EVM;
@@ -22,7 +23,7 @@ export default class EVMHandler extends AccountManager {
     //
   }
 
-  derive() {
+  async derive(name: string, vault: Vault) {
     //
   }
 }
