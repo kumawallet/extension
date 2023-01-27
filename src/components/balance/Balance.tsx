@@ -6,6 +6,8 @@ import { ChainSelector } from "./ChainSelector";
 import { TotalBalance } from "./TotalBalance";
 import { Tab } from "@headlessui/react";
 import { DecryptFAB } from "../common/DecryptFAB";
+import { Settings } from "../settings";
+import { FullScreenFAB } from "../common/FullScreenFAB";
 
 const TABS = [
   {
@@ -21,7 +23,6 @@ const TABS = [
 export const Balance = () => {
   return (
     <>
-      <DecryptFAB />
       <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center">
         <ChainSelector />
         <Account />
@@ -53,6 +54,14 @@ export const Balance = () => {
           </Tab.Group>
         </div>
       </PageWrapper>
+
+      {/* TODO: move to separate component */}
+      <footer className="fixed bottom-0 left-0 right-0 w-full py-2 bg-[#343A40] px-2 flex justify-end gap-20">
+        <FullScreenFAB />
+        <DecryptFAB />
+
+        <Settings />
+      </footer>
     </>
   );
 };

@@ -4,7 +4,6 @@ import { Home } from "./components/home";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { CreateAccount } from "./components/createAccount";
 
-import { FullScreenFAB } from "./components/common/FullScreenFAB";
 import { Accounts } from "./components/accounts";
 import { ImportAccount } from "./components/importAccount/ImportAccount";
 import { useEffect, useState } from "react";
@@ -59,7 +58,6 @@ export const Routes = () => {
 
         <Route path="/decrypt" element={<Decrypt />} />
       </RRoutes>
-      <FullScreenFAB />
     </MemoryRouter>
   );
 };
