@@ -1,5 +1,6 @@
 import { AccountType } from "../../../utils/handlers/AccountManager";
 import { AccountKey } from "./Accounts";
+import { ACCOUNT_PATH } from "../../constants";
 
 export default class Keyring {
   readonly key: AccountKey;
@@ -8,14 +9,10 @@ export default class Keyring {
   readonly #path: string;
   #accountQuantity: number;
 
-  constructor(
-    key: AccountKey,
-    type: AccountType,
-    seed: string,
-  ) {
+  constructor(key: AccountKey, type: AccountType, seed: string) {
     this.key = key;
     this.#accountQuantity = 0;
-    this.#path = `m/44'/60'/0'/0/0`;
+    this.#path = ACCOUNT_PATH;
     this.#seed = seed;
     this.#type = type;
   }

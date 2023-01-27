@@ -18,8 +18,17 @@ export default abstract class AccountManager {
     this.#storage = Storage.getInstance();
   }
 
-  abstract addAccount(seed: string, name: string): Promise<void>;
+  abstract addAccount(
+    seed: string,
+    name: string,
+    path?: string,
+    keyring?: Keyring
+  ): Promise<void>;
   abstract derive(name: string, vault: Vault): Promise<void>;
+  abstract generateSeedOrPath(
+    pathOrSeed: string,
+    accountQuantity: number
+  ): string;
 
   formatAddress(address: string): AccountKey {
     if (
@@ -39,6 +48,8 @@ export default abstract class AccountManager {
   async saveKeyring(keyring: Keyring) {
     const vault = await this.#storage.getVault();
     if (!vault) throw new Error("Vault not found");
+    console.log("saveKeyring");
+    console.log({ vault });
     vault.add(keyring);
     this.#storage.setVault(vault);
   }
