@@ -50,7 +50,22 @@ export default class Storage {
       if (key === VAULT) {
         data = await this.#auth.encryptVault(data);
       }
-      await this.#storage.set({ [key]: data });
+
+      const dataIsObject = typeof data === "object";
+
+      let _data = dataIsObject ? { ...data } : data;
+
+      if (data?.[key]) {
+        _data = data[key];
+
+        if (dataIsObject && Object.keys(_data).length === 0) {
+          _data = undefined;
+        }
+      } else {
+        _data && delete _data?.["key"];
+      }
+
+      await this.#storage.set({ [key]: _data });
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -69,15 +84,16 @@ export default class Storage {
   async init() {
     try {
       const accounts = new Accounts();
-      this.set(ACCOUNTS, accounts);
+      await this.set(ACCOUNTS, accounts);
       const settings = new Settings();
-      this.set(SETTINGS, settings);
+      await this.set(SETTINGS, settings);
       const vault = new Vault();
-      this.set(VAULT, vault);
+      await this.set(VAULT, vault);
       const cacheAuth = CacheAuth.getInstance();
-      this.set(cacheAuth.getKey(), cacheAuth);
+      await this.set(cacheAuth.getKey(), cacheAuth);
       const selectedAccount = undefined;
-      this.set(SELECTED_ACCOUNT, selectedAccount);
+      await this.set(SELECTED_ACCOUNT, selectedAccount);
+      return;
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -89,7 +105,7 @@ export default class Storage {
       const password = Auth.password || "";
       CacheAuth.save(password);
       const cacheAuth = CacheAuth.getInstance();
-      this.set(cacheAuth.getKey(), cacheAuth);
+      await this.set(cacheAuth.getKey(), cacheAuth);
     } catch (error) {
       console.error(error);
       CacheAuth.clear();

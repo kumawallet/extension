@@ -28,7 +28,7 @@ export default class CacheAuth extends Storable {
     this.timeout = timeout as number;
   }
 
-  static async save(password: string) {
+  static save(password: string) {
     try {
       CacheAuth.getInstance().password = password;
       CacheAuth.getInstance().isUnlocked = true;

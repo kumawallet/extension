@@ -22,7 +22,6 @@ export default class Extension {
   public static getInstance(accountType: AccountType = AccountType.EVM) {
     if (!Extension.instance) {
       Extension.instance = new Extension(accountType);
-
     }
     return Extension.instance;
   }
@@ -50,9 +49,9 @@ export default class Extension {
     // Stores password in memory
     await this.#auth.signUp({ password });
     // Initializes the storage
-    this.#storage.init();
+    await this.#storage.init();
     // Caches the password
-    this.#storage.cachePassword();
+    await this.#storage.cachePassword();
     // Adds the account to storage
     this.addAccount({ name, seed });
   }
