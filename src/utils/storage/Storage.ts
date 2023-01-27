@@ -48,8 +48,8 @@ export default class Storage {
   async set(key: string, data: any) {
     try {
       if (key === VAULT) {
-        const keyrings = data.keyrings;
-        data = await this.#auth.encryptVault({ ...data, keyrings });
+        console.log("Encrypting vault", data);
+        data = await this.#auth.encryptVault(data);
       }
 
       /*const dataIsObject = typeof data === "object";
@@ -86,10 +86,12 @@ export default class Storage {
   async init() {
     try {
       const accounts = new Accounts();
+      console.log("INIT Accounts", accounts);
       await this.set(ACCOUNTS, accounts);
       const settings = new Settings();
       await this.set(SETTINGS, settings);
       const vault = new Vault();
+      console.log("INIT Vault", vault);
       await this.set(VAULT, vault);
       const cacheAuth = CacheAuth.getInstance();
       await this.set(cacheAuth.getKey(), cacheAuth);
@@ -136,9 +138,10 @@ export default class Storage {
 
   async getVault(): Promise<Vault | undefined> {
     const stored = await this.get(VAULT);
-    if (!stored) return undefined;
+    console.log("Vault", stored);
+    if (!stored || !stored.keyrings) return undefined;
     const vault = new Vault();
-    vault.set(stored);
+    vault.set(stored.keyrings);
     return vault;
   }
 
@@ -156,6 +159,23 @@ export default class Storage {
     return !vault.isEmpty();
   }
 
+  async addKeyring(keyring: any) {
+    const vault = await this.getVault();
+    if (!vault) throw new Error("Vault is not initialized");
+    if (vault.allreadyExists(keyring.key)) {
+      throw new Error("Account already exists");
+    }
+    vault.add(keyring);
+    this.setVault(vault);
+  }
+
+  async removeKeyring(keyring: any) {
+    const vault = await this.getVault();
+    if (!vault) throw new Error("Vault is not initialized");
+    vault.remove(keyring);
+    this.setVault(vault);
+  }
+
   async getAccounts(): Promise<Accounts | undefined> {
     const stored = await this.get(ACCOUNTS);
     if (!stored || !stored.data) return undefined;
@@ -166,6 +186,10 @@ export default class Storage {
 
   async setAccounts(accounts: Accounts) {
     this.set(ACCOUNTS, accounts);
+  }
+
+  async removeAccounts() {
+    this.remove(ACCOUNTS);
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -198,24 +222,20 @@ export default class Storage {
     this.setAccounts(accounts);
   }
 
-  async removeAccounts() {
-    this.remove(ACCOUNTS);
-  }
-
-  async getSelectedAccount(): Promise<AccountKey | undefined> {
-    const selectedAccount = await this.#storage.get(SELECTED_ACCOUNT);
+  async getSelectedAccount(): Promise<Account | undefined> {
+    const selectedAccount = await this.get(SELECTED_ACCOUNT);
     if (!selectedAccount) {
       const accounts = await this.getAccounts();
       if (!accounts) throw new Error("Accounts are not initialized");
       const account = accounts.first();
       if (!account) throw new Error("No account found");
-      this.setSelectedAccount(account.key);
-      return account.key;
+      this.setSelectedAccount(account);
+      return account;
     }
-    return selectedAccount as AccountKey;
+    return this.getAccount(selectedAccount?.key);
   }
 
-  async setSelectedAccount(key: AccountKey) {
-    this.set(SELECTED_ACCOUNT, key);
+  async setSelectedAccount(account: Account) {
+    this.set(SELECTED_ACCOUNT, account);
   }
 }

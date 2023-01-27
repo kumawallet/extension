@@ -3,18 +3,29 @@ import { AccountKey } from "./Accounts";
 import { ACCOUNT_PATH } from "../../constants";
 
 export default class Keyring {
-  readonly key: AccountKey;
+  readonly #key: AccountKey;
   readonly #type: AccountType;
   readonly #seed: string;
   readonly #path: string;
+  readonly #privateKey: string;
   #accountQuantity: number;
 
-  constructor(key: AccountKey, type: AccountType, seed: string) {
-    this.key = key;
+  constructor(
+    key: AccountKey,
+    type: AccountType,
+    seed: string,
+    privateKey: string
+  ) {
+    this.#key = key;
     this.#accountQuantity = 0;
     this.#path = ACCOUNT_PATH;
     this.#seed = seed;
     this.#type = type;
+    this.#privateKey = privateKey;
+  }
+
+  get key() {
+    return this.#key;
   }
 
   get type() {
@@ -29,12 +40,28 @@ export default class Keyring {
     return this.#path;
   }
 
+  get privateKey() {
+    return this.#privateKey;
+  }
+
   get accountQuantity() {
     return this.#accountQuantity;
   }
 
   set accountQuantity(accountQuantity: number) {
     this.#accountQuantity = accountQuantity;
+  }
+
+  nextKey() {
+    this.#accountQuantity++;
+    switch (this.#type) {
+      case AccountType.EVM:
+        return this.#path.slice(0, -1) + (this.#accountQuantity);
+      case AccountType.WASM:
+        return `${this.#seed}/${this.#accountQuantity}`;
+      default:
+        throw new Error("Invalid account type");
+    }
   }
 
   increaseAccountQuantity() {

@@ -7,6 +7,7 @@ export type AccountKey = `${AccountType}-${string}`;
 export type AccountValue = {
     name: string;
     address: string;
+    keyring: AccountKey;
 }
 
 export class Account {
@@ -73,6 +74,6 @@ export class Accounts extends Storable {
     first() {
         const keys = Object.keys(this.data);
         if (keys.length === 0) return undefined;
-        return this.data[keys[0] as AccountKey];
+        return this.get(keys[0] as AccountKey);
     }
 }

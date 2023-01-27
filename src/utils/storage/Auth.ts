@@ -27,6 +27,12 @@ export default class Auth {
     return Auth.getInstance().#password;
   }
 
+  static validate() {
+    if (!Auth.getInstance().#isUnlocked || !Auth.getInstance().#password) {
+      throw new Error("Vault is not unlocked");
+    }
+  }
+
   static setAuth({ password, isUnlocked }: any) {
     Auth.getInstance().#password = password;
     Auth.getInstance().#isUnlocked = isUnlocked;
@@ -34,13 +40,8 @@ export default class Auth {
 
   async decryptVault(vault: string) {
     try {
-      if (!this.#isUnlocked || !this.#password) {
-        throw new Error("Vault is not unlocked");
-      }
-      return (await passworder.decrypt(
-        this.#password as string,
-        vault
-      ));
+      Auth.validate();
+      return passworder.decrypt(this.#password as string, vault);
     } catch (error) {
       throw new Error(error as string);
     }
@@ -48,9 +49,7 @@ export default class Auth {
 
   async encryptVault(vault: Vault) {
     try {
-      if (!this.#isUnlocked || !this.#password) {
-        throw new Error("Vault is not unlocked");
-      }
+      Auth.validate();
       return passworder.encrypt(this.#password as string, vault);
     } catch (error) {
       throw new Error(error as string);

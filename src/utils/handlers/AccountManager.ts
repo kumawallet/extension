@@ -24,11 +24,14 @@ export default abstract class AccountManager {
     path?: string,
     keyring?: Keyring
   ): Promise<void>;
-  abstract derive(name: string, vault: Vault): Promise<void>;
-  abstract generateSeedOrPath(
-    pathOrSeed: string,
-    accountQuantity: number
-  ): string;
+  
+  async derive(name: string, vault: Vault) {
+    const keyring = await vault.getKeyringsByType(this.type);
+    if (!keyring) throw new Error("Keyring not found");
+
+    const newPath = keyring.nextKey();
+    this.addAccount(keyring.seed, name, newPath, keyring);
+  }
 
   formatAddress(address: string): AccountKey {
     if (
@@ -46,12 +49,7 @@ export default abstract class AccountManager {
   }
 
   async saveKeyring(keyring: Keyring) {
-    const vault = await this.#storage.getVault();
-    if (!vault) throw new Error("Vault not found");
-    console.log("saveKeyring");
-    console.log({ vault });
-    vault.add(keyring);
-    this.#storage.setVault(vault);
+    this.#storage.addKeyring(keyring);
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -70,12 +68,12 @@ export default abstract class AccountManager {
     this.#storage.removeAccount(key);
   }
 
-  async showPrivateKey(): Promise<string> {
+  async showPrivateKey(): Promise<string | undefined> {
     const selectedAccount = await this.#storage.getSelectedAccount();
-    if (!selectedAccount) throw new Error("No account selected");
+    if (!selectedAccount) return undefined;
     const vault = await this.#storage.getVault();
     if (!vault) throw new Error("Vault not found");
-    return vault?.keyrings[selectedAccount]?.seed;
+    return vault?.keyrings[selectedAccount.key]?.privateKey;
   }
 
   async getAll(): Promise<Accounts | undefined> {
