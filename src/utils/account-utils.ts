@@ -1,5 +1,4 @@
 export const cropAccount = (account: string) => {
-  console.log("account", account)
   if (!account) return "";
   const first4Letters = account.slice(0, 4);
 

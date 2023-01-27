@@ -8,7 +8,6 @@ import {
   useReducer,
 } from "react";
 
-
 interface InitialState {
   accounts: any[];
   isLoadingAccounts: boolean;
@@ -53,9 +52,11 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       //TODO: get selected account from localstorage
       let address = "";
       let accountType = "";
-      if (accounts.length > 0) { 
-        address = accounts[0]?.value?.address;
-        accountType = accounts[0]?.type;
+      if (accounts.length > 0) {
+        const accountKey: string = Object.keys(accounts[0])[0];
+        const account = accounts[0][accountKey];
+        address = account?.value?.address;
+        accountType = account?.type;
       }
 
       dispatch({
