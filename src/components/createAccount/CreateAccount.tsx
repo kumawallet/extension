@@ -14,7 +14,6 @@ export const CreateAccount = () => {
   const [isCreated, setIsCreated] = useState(false);
 
   const _createAccount = async (data: AccountForm) => {
-    console.log(data);
     const { name, accountType, password } = data;
     try {
       const isCreated = await createAccount({ name, password, accountType });

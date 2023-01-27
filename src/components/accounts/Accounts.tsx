@@ -33,12 +33,15 @@ export const Accounts = () => {
         <button className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]">
           Import
         </button>
-        <button className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]">
+        <button
+          onClick={() => navigate("/derive-account")}
+          className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
+        >
           Create
         </button>
       </div>
       <div>
-        {accounts.map((account, index) => {
+        {/* {accounts.map((account, index) => {
           const address = account.value["address"];
           const type = account.type;
           return (
@@ -50,7 +53,7 @@ export const Accounts = () => {
               <p>{type}</p>
             </div>
           );
-        })}
+        })} */}
       </div>
     </PageWrapper>
   );

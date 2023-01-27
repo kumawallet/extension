@@ -102,4 +102,12 @@ export default class Extension {
   async getAllAccounts(): Promise<Account[]> {
     return this.accountManager.getAll();
   }
+
+  async derivateAccount(name: string): Promise<boolean> {
+    const { vault } = await this.#storage.getStorage().get(VAULT);
+    const decrypted = await this.#auth.decryptVault(vault);
+
+    await this.accountManager.derivateAccount(name, decrypted);
+    return true;
+  }
 }

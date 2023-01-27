@@ -5,6 +5,7 @@ import { Assets } from "./Assets";
 import { ChainSelector } from "./ChainSelector";
 import { TotalBalance } from "./TotalBalance";
 import { Tab } from "@headlessui/react";
+import { DecryptFAB } from "../common/DecryptFAB";
 
 const TABS = [
   {
@@ -20,6 +21,7 @@ const TABS = [
 export const Balance = () => {
   return (
     <>
+      <DecryptFAB />
       <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center">
         <ChainSelector />
         <Account />

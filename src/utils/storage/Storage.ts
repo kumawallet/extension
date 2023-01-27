@@ -48,7 +48,8 @@ export default class Storage {
   async set(key: string, data: any) {
     try {
       if (key === VAULT) {
-        data = await this.#auth.encryptVault(data);
+        const keyrings = data.keyrings;
+        data = await this.#auth.encryptVault({ ...data, keyrings });
       }
 
       const dataIsObject = typeof data === "object";

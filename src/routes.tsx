@@ -10,6 +10,8 @@ import { ImportAccount } from "./components/importAccount/ImportAccount";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "./providers/AuthProvider";
 import { SignIn } from "./components/signIn";
+import { DeriveAccount } from "./components/deriveAccount/DeriveAccount";
+import { Decrypt } from "./components/decrypt";
 
 export const Routes = () => {
   const {
@@ -51,6 +53,8 @@ export const Routes = () => {
         <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
         <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/derive-account" element={<DeriveAccount />} />
+        <Route path="/decrypt" element={<Decrypt />} />
       </RRoutes>
       <FullScreenFAB />
     </MemoryRouter>
