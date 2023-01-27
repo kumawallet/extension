@@ -3,8 +3,10 @@ import { useForm } from "react-hook-form";
 import { PageWrapper } from "../common/PageWrapper";
 import { DerivateAccountForm } from "./DerivateAccount-interfaces";
 import Extension from "../../utils/Extension";
+import { useNavigate } from "react-router-dom";
 
 export const DeriveAccount = () => {
+  const navigate = useNavigate();
   const ext = Extension.getInstance();
 
   const {
@@ -12,11 +14,14 @@ export const DeriveAccount = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<DerivateAccountForm>();
-  const _onSubmit = handleSubmit((data) => {
-    // onSubmit(data);
-    console.log(data);
-    ext.accountType = data.accountType;
-    ext.derivateAccount(data.name);
+  const _onSubmit = handleSubmit(async (data) => {
+    try {
+      ext.accountType = data.accountType;
+      const isCreated = await ext.derivateAccount(data.name);
+      isCreated && navigate("/balance");
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   return (

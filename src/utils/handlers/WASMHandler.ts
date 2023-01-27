@@ -20,7 +20,6 @@ export default class WASMHandler extends AccountManager {
     const account = new Account(key, value);
     await this.saveAccount(account);
     const privateKey = wallet.pair.meta.privateKey;
-    console.log("privateKey", privateKey)
     const _keyring = keyring || new Keyring(key, this.type, seed, "");
     await this.saveKeyring(_keyring);
     return Promise.resolve();

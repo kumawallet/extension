@@ -14,10 +14,11 @@ export default class Keyring {
     key: AccountKey,
     type: AccountType,
     seed: string,
-    privateKey: string
+    privateKey: string,
+    accountQuantity?: number
   ) {
     this.#key = key;
-    this.#accountQuantity = 0;
+    this.#accountQuantity = accountQuantity || 0;
     this.#path = ACCOUNT_PATH;
     this.#seed = seed;
     this.#type = type;
@@ -53,10 +54,10 @@ export default class Keyring {
   }
 
   nextKey() {
-    this.#accountQuantity++;
+    this.increaseAccountQuantity();
     switch (this.#type) {
       case AccountType.EVM:
-        return this.#path.slice(0, -1) + (this.#accountQuantity);
+        return this.#path.slice(0, -1) + this.#accountQuantity;
       case AccountType.WASM:
         return `${this.#seed}/${this.#accountQuantity}`;
       default:

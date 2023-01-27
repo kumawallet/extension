@@ -48,7 +48,6 @@ export default class Storage {
   async set(key: string, data: any) {
     try {
       if (key === VAULT) {
-        console.log("Encrypting vault", data);
         data = await this.#auth.encryptVault(data);
       }
 
@@ -95,7 +94,6 @@ export default class Storage {
       await this.set(cacheAuth.getKey(), cacheAuth);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      console.log(await this.#storage.get(null));
       return;
     } catch (error) {
       console.error(error);
@@ -135,7 +133,6 @@ export default class Storage {
 
   async getVault(): Promise<Vault | undefined> {
     const stored = await this.get(VAULT);
-    console.log("Vault", stored);
     if (!stored || !stored.keyrings) return undefined;
     const vault = new Vault();
     vault.set(stored.keyrings);
@@ -159,10 +156,10 @@ export default class Storage {
   async addKeyring(keyring: any) {
     const vault = await this.getVault();
     if (!vault) throw new Error("Vault is not initialized");
-    if (vault.allreadyExists(keyring.key)) {
-      throw new Error("Account already exists");
-    }
+    // if (!vault.allreadyExists(keyring.key)) {
+    // throw new Error("Account already exists");
     vault.add(keyring);
+    // }
     this.setVault(vault);
   }
 

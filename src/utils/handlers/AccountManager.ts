@@ -24,7 +24,7 @@ export default abstract class AccountManager {
     path?: string,
     keyring?: Keyring
   ): Promise<void>;
-  
+
   async derive(name: string, vault: Vault) {
     const keyring = await vault.getKeyringsByType(this.type);
     if (!keyring) throw new Error("Keyring not found");

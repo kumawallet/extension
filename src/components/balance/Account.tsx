@@ -4,18 +4,24 @@ import { cropAccount } from "../../utils/account-utils";
 // import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { AccountManage } from "./AccountManage";
+import { useEffect } from "react";
 
 export const Account = () => {
   // const navigate = useNavigate();
   const {
     state: { selectedAccount },
+    getSelectedAccount,
   } = useAccountContext();
 
-  const account = cropAccount(selectedAccount);
+  useEffect(() => {
+    getSelectedAccount();
+  }, []);
+
+  const account = cropAccount(selectedAccount?.value?.address || "");
 
   const copyAccount = () => {
     // TODO: fire popup
-    navigator.clipboard.writeText(selectedAccount);
+    navigator.clipboard.writeText(selectedAccount?.value?.address || "");
   };
 
   return (

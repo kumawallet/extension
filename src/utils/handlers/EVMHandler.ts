@@ -20,7 +20,6 @@ export default class EVMHandler extends AccountManager {
     const account = new Account(key, value);
     await this.saveAccount(account);
     const _keyring = keyring || new Keyring(key, this.type, seed, privateKey);
-    console.log(_keyring)
     await this.saveKeyring(_keyring);
     return Promise.resolve();
   }
