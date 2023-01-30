@@ -1,5 +1,5 @@
 import { ACCOUNTS } from "../../constants";
-import { AccountType } from "../../handlers/AccountManager";
+import { AccountType } from "../../AccountManager";
 import Storable from "../Storable";
 
 export type AccountKey = `${AccountType}-${string}`;

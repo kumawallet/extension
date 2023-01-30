@@ -1,4 +1,4 @@
-import { AccountType } from "@src/utils/handlers/AccountManager";
+import { AccountType } from "@src/utils/AccountManager";
 import { useForm } from "react-hook-form";
 import { PageWrapper } from "../common/PageWrapper";
 import { DerivateAccountForm } from "./DerivateAccount-interfaces";
@@ -28,7 +28,6 @@ export const DeriveAccount = () => {
           type,
           value: { address, name, keyring },
         } = account;
-        console.log({ type, address, name, key: keyring });
         await setSelectedAccount({ type, address, name, key: keyring });
         navigate("/balance");
       }

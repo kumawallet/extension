@@ -1,4 +1,4 @@
-import { AccountType } from "../../../utils/handlers/AccountManager";
+import { AccountType } from "../../AccountManager";
 import { AccountKey } from "./Accounts";
 import { ACCOUNT_PATH } from "../../constants";
 
@@ -51,18 +51,6 @@ export default class Keyring {
 
   set accountQuantity(accountQuantity: number) {
     this.#accountQuantity = accountQuantity;
-  }
-
-  nextKey() {
-    this.increaseAccountQuantity();
-    switch (this.#type) {
-      case AccountType.EVM:
-        return this.#path.slice(0, -1) + this.#accountQuantity;
-      case AccountType.WASM:
-        return `${this.#seed}/${this.#accountQuantity}`;
-      default:
-        throw new Error("Invalid account type");
-    }
   }
 
   increaseAccountQuantity() {

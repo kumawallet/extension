@@ -4,6 +4,7 @@ import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
+import Keyring from "./entities/Keyring";
 
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
@@ -137,7 +138,7 @@ export default class Storage {
     return !vault.isEmpty();
   }
 
-  async saveKeyring(keyring: any) {
+  async saveKeyring(keyring: Keyring) {
     const vault = await this.getVault();
     if (!vault) throw new Error("Vault is not initialized");
     vault.add(keyring);

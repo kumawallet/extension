@@ -1,7 +1,5 @@
 import { VAULT } from "./constants";
-import AccountManager, { AccountType } from "./handlers/AccountManager";
-import EVMHandler from "./handlers/EVMHandler";
-import WASMHandler from "./handlers/WASMHandler";
+import AccountManager, { AccountType } from "./AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
@@ -34,17 +32,6 @@ export default class Extension {
     this.#accountType = accountType;
   }
 
-  get accountManager(): AccountManager {
-    switch (this.#accountType) {
-      case AccountType.EVM:
-        return new EVMHandler();
-      case AccountType.WASM:
-        return new WASMHandler();
-      default:
-        throw new Error("Invalid account type");
-    }
-  }
-
   async signUp({ seed, name, password }: any) {
     // Stores password in memory
     await this.#auth.signUp({ password });
@@ -53,19 +40,20 @@ export default class Extension {
     // Caches the password
     await this.#storage.cachePassword();
     // Adds the account to storage
-    this.addAccount({ name, seed });
+    this.addAccounts({ name, seed });
   }
 
-  addAccount({ seed, name }: any) {
-    this.accountManager.addAccount(seed, name);
+  async addAccounts({ seed, name }: any) {
+    await AccountManager.addEVMAccount(seed, name);
+    await AccountManager.addWASMAccount(seed, name);
   }
 
   removeAccount(key: AccountKey) {
-    this.accountManager.forget(key);
+    AccountManager.forget(key);
   }
 
   changeAccountName({ key, newName }: any) {
-    this.accountManager.changeName(key, newName);
+    AccountManager.changeName(key, newName);
   }
 
   async signIn(password: string) {
@@ -92,22 +80,22 @@ export default class Extension {
   }
 
   showPrivateKey() {
-    return this.accountManager.showPrivateKey();
+    return AccountManager.showPrivateKey();
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
-    return this.accountManager.getAccount(key);
+    return AccountManager.getAccount(key);
   }
 
   async getAllAccounts() {
-    const accounts = await this.accountManager.getAll();
+    const accounts = await AccountManager.getAll();
     if (!accounts) return [];
     return accounts.getAll();
   }
 
-  async derivateAccount(name: string): Promise<Account> {
+  async derivateAccount(name: string, type: AccountType): Promise<Account> {
     const vault = await this.#storage.getVault();
     if (!vault) throw new Error("Vault not found");
-    return await this.accountManager.derive(name, vault);
+    return AccountManager.derive(name, vault, type);
   }
 }
