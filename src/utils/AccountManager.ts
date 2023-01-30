@@ -50,7 +50,9 @@ export default class AccountManager {
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
     await AccountManager.saveAccount(account);
+    console.log("SAVE ACCOUNT", await Storage.getInstance().getAll());
     await AccountManager.saveKeyring(keyring);
+    console.log("SAVE KEYRING", await Storage.getInstance().getAll());
     return account;
   }
 

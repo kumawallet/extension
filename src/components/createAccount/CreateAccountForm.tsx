@@ -1,4 +1,3 @@
-import { AccountType } from "@src/utils/AccountManager";
 import { FC } from "react";
 import { useForm } from "react-hook-form";
 import { AccountForm } from "./createAccount-interfaces";
@@ -20,21 +19,8 @@ export const CreateAccountForm: FC<CreateAccountFormProps> = ({ onSubmit }) => {
   return (
     <>
       <div>
-        <label htmlFor="accounType" className="block text-sm font-medium mb-1">
-          Account type
-        </label>
-        <select
-          id="accounType"
-          className="  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-          {...register("accountType")}
-        >
-          <option value={AccountType.EVM}>EVM</option>
-          <option value={AccountType.WASM}>WASM</option>
-        </select>
-      </div>
-      <div>
         <label htmlFor="name" className="block text-sm font-medium mb-1">
-          Account name/alias (optional)
+          Account Name (optional)
         </label>
         <input
           id="name"
@@ -48,16 +34,19 @@ export const CreateAccountForm: FC<CreateAccountFormProps> = ({ onSubmit }) => {
         </label>
         <input
           id="password"
+          required
+          type={"password"}
           className="border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
           {...register("password")}
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1">
+        <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
           Confirm password
         </label>
         <input
           id="confirmPassword"
+          type={"password"}
           className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
           {...register("confirmPassword")}
         />

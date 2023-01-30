@@ -8,11 +8,16 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { AccountType } from "@src/utils/handlers/AccountManager";
 import { Account } from "@src/utils/storage/entities/Accounts";
+import { AccountType } from "@src/utils/AccountManager";
 
 interface InitialState {
-  accounts: any[];
+  accounts: {
+    key: string;
+    address: string;
+    name: string;
+    type: AccountType;
+  }[];
   isLoadingAccounts: boolean;
   selectedAccount: {
     address: string;
@@ -32,9 +37,16 @@ const initialState: InitialState = {
 const AccountContext = createContext(
   {} as {
     state: InitialState;
-    getAllAccounts: () => Promise<any[]>;
+    getAllAccounts: () => Promise<
+      {
+        key: string;
+        address: string;
+        name: string;
+        type: AccountType;
+      }[]
+    >;
     getSelectedAccount: () => void;
-    setSelectedAccount: (account: any) => void;
+    setSelectedAccount: (account: Account) => void;
     derivateAccount: (
       name: string,
       accountType: AccountType
@@ -68,7 +80,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const ext = Extension.getInstance();
+
   const stg = Storage.getInstance();
 
   useEffect(() => {
@@ -77,14 +89,14 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getAllAccounts = async () => {
     try {
-      const accounts = await ext.getAllAccounts();
+      const accounts = await Extension.getAllAccounts();
       dispatch({
         type: "set-accounts",
         payload: {
           accounts,
         },
       });
-      return accounts;
+      return accounts || [];
     } catch (error) {
       console.log(error);
     }
@@ -112,8 +124,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const derivateAccount = async (name: string, accountType: AccountType) => {
-    ext.accountType = accountType;
-    return await ext.derivateAccount(name);
+    return await Extension.derivateAccount(name, accountType);
   };
 
   return (

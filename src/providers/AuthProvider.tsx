@@ -8,15 +8,12 @@ import {
   useReducer,
 } from "react";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { AccountType } from "@src/utils/handlers/AccountManager";
 
 interface InitialState {
-  extensionController: Extension | null;
   isInit: boolean;
 }
 
 const initialState: InitialState = {
-  extensionController: null,
   isInit: true,
 };
 
@@ -45,23 +42,22 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const extensionController = Extension.getInstance();
 
       dispatch({
         type: "init",
         payload: {
-          extensionController,
         },
       });
     })();
   }, []);
 
-  const createAccount = async ({ name, password, accountType }: any) => {
-    if (!state.extensionController) return false;
+  const createAccount = async ({ name, password, confirmPassword }: any) => {
     try {
-      const seed = mnemonicGenerate(12);
-      state.extensionController.accountType = accountType as AccountType;
-      await state.extensionController?.signUp({ password, name, seed });
+      if (password !== confirmPassword) {
+        throw new Error("Password does not match");
+      }
+      const seed = mnemonicGenerate(24);
+      await Extension.signUp({ password, name, seed });
       return true;
     } catch (error) {
       console.log(error as string);
