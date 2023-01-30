@@ -15,7 +15,6 @@ export enum AccountType {
 }
 
 export default class AccountManager {
-
   static async addEVMAccount(
     seed: string,
     name: string,
@@ -50,7 +49,9 @@ export default class AccountManager {
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
     await AccountManager.saveAccount(account);
+    console.log("SAVE ACCOUNT", await Storage.getInstance().getAll());
     await AccountManager.saveKeyring(keyring);
+    console.log("SAVE KEYRING", await Storage.getInstance().getAll());
     return account;
   }
 
@@ -64,7 +65,7 @@ export default class AccountManager {
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
         return AccountManager.addEVMAccount(keyring.seed, name, path, keyring);
       case AccountType.WASM:
-        path = `${keyring.path}/${keyring.accountQuantity}`
+        path = `${keyring.path}/${keyring.accountQuantity}`;
         return AccountManager.addWASMAccount(keyring.seed, name, keyring);
       default:
         throw new Error("Invalid account type");
@@ -83,11 +84,11 @@ export default class AccountManager {
   }
 
   static async saveAccount(account: Account) {
-    Storage.getInstance().addAccount(account);
+    await Storage.getInstance().addAccount(account);
   }
 
   static async saveKeyring(keyring: Keyring) {
-    Storage.getInstance().saveKeyring(keyring);
+    await Storage.getInstance().saveKeyring(keyring);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {

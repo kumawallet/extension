@@ -1,4 +1,10 @@
-import { ACCOUNTS, SELECTED_ACCOUNT, SETTINGS, VAULT } from "../constants";
+import {
+  ACCOUNTS,
+  CACHE_AUTH,
+  SELECTED_ACCOUNT,
+  SETTINGS,
+  VAULT,
+} from "../constants";
 import { Account, AccountKey, Accounts } from "./entities/Accounts";
 import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
@@ -8,13 +14,11 @@ import Keyring from "./entities/Keyring";
 
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
-  #auth: Auth;
 
   private static instance: Storage;
 
   private constructor() {
     this.#storage = chrome.storage.local;
-    this.#auth = Auth.getInstance();
   }
 
   static getInstance() {
@@ -37,7 +41,7 @@ export default class Storage {
         if (!Auth.password || !Auth.isUnlocked) {
           Auth.setAuth(CacheAuth.getInstance());
         }
-        return this.#auth.decryptVault(data[key]);
+        return Auth.getInstance().decryptVault(data[key]);
       }
       return { ...data[key] };
     } catch (error) {
@@ -46,10 +50,14 @@ export default class Storage {
     }
   }
 
+  async getAll() {
+    return this.#storage.get(null);
+  }
+
   async set(key: string, data: any) {
     try {
       if (key === VAULT) {
-        data = await this.#auth.encryptVault(data);
+        data = await Auth.getInstance().encryptVault(data);
       }
       await this.#storage.set({ [key]: data });
     } catch (error) {
@@ -71,14 +79,13 @@ export default class Storage {
     try {
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
+      const selectedAccount = undefined;
+      await this.set(SELECTED_ACCOUNT, selectedAccount);
       const settings = new Settings();
       await this.set(SETTINGS, settings);
       const vault = new Vault();
       await this.set(VAULT, vault);
-      const cacheAuth = CacheAuth.getInstance();
-      await this.set(cacheAuth.getKey(), cacheAuth);
-      const selectedAccount = undefined;
-      await this.set(SELECTED_ACCOUNT, selectedAccount);
+      await this.set(CACHE_AUTH, CacheAuth.getInstance());
       return;
     } catch (error) {
       console.error(error);
@@ -125,11 +132,23 @@ export default class Storage {
   }
 
   async setVault(vault: Vault) {
-    this.set(VAULT, vault);
+    try {
+      await this.set(VAULT, vault);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async removeVault() {
-    this.remove(VAULT);
+    try {
+      await this.remove(VAULT);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async isVaultInitialized(): Promise<boolean> {
@@ -139,17 +158,29 @@ export default class Storage {
   }
 
   async saveKeyring(keyring: Keyring) {
-    const vault = await this.getVault();
-    if (!vault) throw new Error("Vault is not initialized");
-    vault.add(keyring);
-    this.setVault(vault);
+    try {
+      const vault = await this.getVault();
+      if (!vault) throw new Error("Vault is not initialized");
+      vault.add(keyring);
+      await this.setVault(vault);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async removeKeyring(keyring: any) {
-    const vault = await this.getVault();
-    if (!vault) throw new Error("Vault is not initialized");
-    vault.remove(keyring);
-    this.setVault(vault);
+    try {
+      const vault = await this.getVault();
+      if (!vault) throw new Error("Vault is not initialized");
+      vault.remove(keyring);
+      await this.setVault(vault);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 
   async getAccounts(): Promise<Accounts | undefined> {
@@ -161,11 +192,23 @@ export default class Storage {
   }
 
   async setAccounts(accounts: Accounts) {
-    this.set(ACCOUNTS, accounts);
+    try {
+      await this.set(ACCOUNTS, accounts);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async removeAccounts() {
-    this.remove(ACCOUNTS);
+    try {
+      await this.remove(ACCOUNTS);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -175,27 +218,45 @@ export default class Storage {
   }
 
   async addAccount(account: Account) {
-    const accounts = await this.getAccounts();
-    if (!accounts) throw new Error("Accounts are not initialized");
-    if (accounts.allreadyExists(account.key)) {
-      throw new Error("Account already exists");
+    try {
+      const accounts = await this.getAccounts();
+      if (!accounts) throw new Error("Accounts are not initialized");
+      if (accounts.allreadyExists(account.key)) {
+        throw new Error("Account already exists");
+      }
+      accounts.add(account);
+      await this.setAccounts(accounts);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    accounts.add(account);
-    this.setAccounts(accounts);
   }
 
   async updateAccount(account: Account) {
-    const accounts = await this.getAccounts();
-    if (!accounts) throw new Error("Accounts are not initialized");
-    accounts.update(account.key, account.value);
-    this.setAccounts(accounts);
+    try {
+      const accounts = await this.getAccounts();
+      if (!accounts) throw new Error("Accounts are not initialized");
+      accounts.update(account.key, account.value);
+      await this.setAccounts(accounts);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async removeAccount(key: AccountKey) {
-    const accounts = await this.getAccounts();
-    if (!accounts) throw new Error("Accounts are not initialized");
-    accounts.remove(key);
-    this.setAccounts(accounts);
+    try {
+      const accounts = await this.getAccounts();
+      if (!accounts) throw new Error("Accounts are not initialized");
+      accounts.remove(key);
+      await this.setAccounts(accounts);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   async getSelectedAccount(): Promise<Account | undefined> {
@@ -212,6 +273,12 @@ export default class Storage {
   }
 
   async setSelectedAccount(account: Account) {
-    await this.set(SELECTED_ACCOUNT, account);
+    try {
+      await this.set(SELECTED_ACCOUNT, account);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 }
