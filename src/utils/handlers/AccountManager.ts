@@ -23,14 +23,14 @@ export default abstract class AccountManager {
     name: string,
     path?: string,
     keyring?: Keyring
-  ): Promise<void>;
+  ): Promise<Account>;
 
   async derive(name: string, vault: Vault) {
     const keyring = await vault.getKeyringsByType(this.type);
     if (!keyring) throw new Error("Keyring not found");
 
     const newPath = keyring.nextKey();
-    this.addAccount(keyring.seed, name, newPath, keyring);
+    return this.addAccount(keyring.seed, name, newPath, keyring);
   }
 
   formatAddress(address: string): AccountKey {

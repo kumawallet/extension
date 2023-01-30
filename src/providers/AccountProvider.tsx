@@ -9,6 +9,7 @@ import {
   useReducer,
 } from "react";
 import { AccountType } from "@src/utils/handlers/AccountManager";
+import { Account } from "@src/utils/storage/entities/Accounts";
 
 interface InitialState {
   accounts: any[];
@@ -37,7 +38,7 @@ const AccountContext = createContext(
     derivateAccount: (
       name: string,
       accountType: AccountType
-    ) => Promise<boolean>;
+    ) => Promise<Account>;
   }
 );
 

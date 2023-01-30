@@ -105,14 +105,9 @@ export default class Extension {
     return accounts.getAll();
   }
 
-  async derivateAccount(name: string): Promise<boolean> {
-    try {
-      const vault = await this.#storage.getVault();
-      if (!vault) throw new Error("Vault not found");
-      await this.accountManager.derive(name, vault);
-      return true;
-    } catch (error) {
-      return false;
-    }
+  async derivateAccount(name: string): Promise<Account> {
+    const vault = await this.#storage.getVault();
+    if (!vault) throw new Error("Vault not found");
+    return await this.accountManager.derive(name, vault);
   }
 }

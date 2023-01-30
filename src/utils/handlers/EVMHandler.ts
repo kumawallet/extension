@@ -12,7 +12,7 @@ export default class EVMHandler extends AccountManager {
     name: string,
     path: string = ACCOUNT_PATH,
     keyring?: Keyring
-  ): Promise<void> {
+  ): Promise<Account> {
     const { address, privateKey } =
       ethers.Wallet.fromMnemonic(seed, path) || {};
     const key = this.formatAddress(address);
@@ -21,7 +21,7 @@ export default class EVMHandler extends AccountManager {
     await this.saveAccount(account);
     const _keyring = keyring || new Keyring(key, this.type, seed, privateKey);
     await this.saveKeyring(_keyring);
-    return Promise.resolve();
+    return account;
   }
 
   export() {

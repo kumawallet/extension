@@ -21,10 +21,15 @@ export const DeriveAccount = () => {
 
   const _onSubmit = handleSubmit(async (data) => {
     try {
-      const isCreated = await derivateAccount(data.name, data.accountType);
-      if (isCreated) {
+      const account = await derivateAccount(data.name, data.accountType);
+      if (account.key) {
         // TODO: the method should return the new account?
-
+        const {
+          type,
+          value: { address, name, keyring },
+        } = account;
+        console.log({ type, address, name, key: keyring });
+        await setSelectedAccount({ type, address, name, key: keyring });
         navigate("/balance");
       }
     } catch (error) {
