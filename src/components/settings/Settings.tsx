@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsGear } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 const OPTIONS = [
   {
@@ -27,6 +28,8 @@ const OPTIONS = [
 ];
 
 export const Settings = () => {
+  const navigate = useNavigate();
+
   return (
     <Menu>
       <Menu.Button>
@@ -52,7 +55,8 @@ export const Settings = () => {
               {OPTIONS.map((opt) => (
                 <div
                   key={opt.text}
-                  className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3"
+                  onClick={() => navigate(opt.href)}
+                  className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
                 >
                   <p className="capitalize text-xl">{opt.text}</p>
                   <BsChevronRight />

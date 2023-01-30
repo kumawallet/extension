@@ -12,11 +12,13 @@ import { SignIn } from "./components/signIn";
 import { DeriveAccount } from "./components/deriveAccount/DeriveAccount";
 import { Decrypt } from "./components/decrypt";
 import { DeriveImport } from "./components/deriveImport";
-import { General } from "./components/settings/General";
-import { Advanced } from "./components/settings/Advanced";
-import { Contacs } from "./components/settings/Contacts";
-import { Security } from "./components/settings/Security";
-import { BugReport } from "./components/settings/BugReport";
+import {
+  Advanced,
+  BugReport,
+  Contacts,
+  General,
+  Security,
+} from "./components/settings";
 
 export const Routes = () => {
   const {
@@ -64,7 +66,7 @@ export const Routes = () => {
         {/* setting views */}
         <Route path="/settings-general" element={<General />} />
         <Route path="/settings-advanced" element={<Advanced />} />
-        <Route path="/settings-contacts" element={<Contacs />} />
+        <Route path="/settings-contacts" element={<Contacts />} />
         <Route path="/settings-security" element={<Security />} />
         <Route path="/settings-bug" element={<BugReport />} />
 

@@ -3,7 +3,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../common/PageWrapper";
 
-export const Contacs = () => {
+export const Contacts = () => {
   const navigate = useNavigate();
 
   return (
@@ -14,7 +14,7 @@ export const Contacs = () => {
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className="font-medium text-2xl">Contacs</p>
+        <p className="font-medium text-2xl">Contacts</p>
       </div>
     </PageWrapper>
   );
