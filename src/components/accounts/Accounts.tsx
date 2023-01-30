@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
-import Extension from "../../utils/Extension";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAccountContext } from "@src/providers";
+import { Menu } from "@headlessui/react";
 
 export const Accounts = () => {
   const navigate = useNavigate();
-  const [accounts, setAccounts] = useState<any>([]);
+  const {
+    state: { selectedAccount, accounts },
+    getAllAccounts,
+    setSelectedAccount,
+  } = useAccountContext();
 
   useEffect(() => {
     getAllAccounts();
   }, []);
 
-  const getAllAccounts = async () => {
-    const ext = Extension.getInstance();
-    const accounts = await ext.getAllAccounts();
-    setAccounts(accounts);
-  };
-
   const changeSelectedAccount = (account: any) => {
-    console.log(`new account will be:`, account);
+    setSelectedAccount(account);
   };
 
   return (
@@ -37,21 +36,31 @@ export const Accounts = () => {
         </button>
       </div>
       <div className="flex flex-col gap-5">
-        {accounts.map(({ address, type, name, key }: any, index) => (
-          <div
-            key={address}
-            className={`${
-              index === 0 && "bg-gray-400 bg-opacity-30"
-            }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
-            onClick={() => changeSelectedAccount({ address, type, name, key })}
-          >
-            <p className="w-3/4 overflow-hidden text-ellipsis">
-              <p className="text-cl">{name}</p>
-              <p>{address}</p>
-            </p>
-            <p>{type}</p>
-          </div>
-        ))}
+        <Menu.Item>
+          {({ close }) => (
+            <>
+              {accounts.map(({ address, name, type, key }: any, index) => (
+                <div
+                  key={address}
+                  className={`${
+                    selectedAccount?.value?.address === address &&
+                    "bg-gray-400 bg-opacity-30"
+                  }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
+                  onClick={() => {
+                    changeSelectedAccount({ address, type, name, key });
+                    close();
+                  }}
+                >
+                  <p className="w-3/4 overflow-hidden text-ellipsis">
+                    <p className="text-cl">{name}</p>
+                    <p>{address}</p>
+                  </p>
+                  <p>{type}</p>
+                </div>
+              ))}
+            </>
+          )}
+        </Menu.Item>
       </div>
     </>
   );

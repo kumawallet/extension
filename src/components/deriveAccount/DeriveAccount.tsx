@@ -2,25 +2,31 @@ import { AccountType } from "@src/utils/handlers/AccountManager";
 import { useForm } from "react-hook-form";
 import { PageWrapper } from "../common/PageWrapper";
 import { DerivateAccountForm } from "./DerivateAccount-interfaces";
-import Extension from "../../utils/Extension";
 import { useNavigate } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
 import { ICON_SIZE } from "../../contants/icons";
+import { useAccountContext } from "../../providers/AccountProvider";
 
 export const DeriveAccount = () => {
   const navigate = useNavigate();
-  const ext = Extension.getInstance();
+
+  const { derivateAccount, getAllAccounts, setSelectedAccount } =
+    useAccountContext();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<DerivateAccountForm>();
+
   const _onSubmit = handleSubmit(async (data) => {
     try {
-      ext.accountType = data.accountType;
-      const isCreated = await ext.derivateAccount(data.name);
-      isCreated && navigate("/balance");
+      const isCreated = await derivateAccount(data.name, data.accountType);
+      if (isCreated) {
+        // TODO: the method should return the new account?
+
+        navigate("/balance");
+      }
     } catch (error) {
       console.log(error);
     }

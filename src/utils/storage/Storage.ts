@@ -211,6 +211,6 @@ export default class Storage {
   }
 
   async setSelectedAccount(account: Account) {
-    this.set(SELECTED_ACCOUNT, account);
+    await this.set(SELECTED_ACCOUNT, account);
   }
 }

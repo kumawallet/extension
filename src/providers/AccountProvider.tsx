@@ -8,6 +8,7 @@ import {
   useContext,
   useReducer,
 } from "react";
+import { AccountType } from "@src/utils/handlers/AccountManager";
 
 interface InitialState {
   accounts: any[];
@@ -30,8 +31,13 @@ const initialState: InitialState = {
 const AccountContext = createContext(
   {} as {
     state: InitialState;
-    getAllAccounts: () => void;
+    getAllAccounts: () => Promise<any[]>;
     getSelectedAccount: () => void;
+    setSelectedAccount: (account: any) => void;
+    derivateAccount: (
+      name: string,
+      accountType: AccountType
+    ) => Promise<boolean>;
   }
 );
 
@@ -65,27 +71,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const stg = Storage.getInstance();
 
   useEffect(() => {
-    // (async () => {
-    //   const accounts = await ext.getAllAccounts();
-    //   //TODO: get selected account from localstorage
-    //   let address = "";
-    //   let accountType = "";
-    //   let accountKey = "";
-    //   if (accounts.length > 0) {
-    //     const account = accounts[0];
-    //     accountKey = account?.key;
-    //     address = account?.address;
-    //     accountType = account?.type;
-    //   }
-
-    //   dispatch({
-    //     type: "set-accounts",
-    //     payload: {
-    //       accounts,
-    //       selectedAccount: address,
-    //     },
-    //   });
-    // })();
     getAllAccounts();
   }, []);
 
@@ -93,11 +78,12 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const accounts = await ext.getAllAccounts();
       dispatch({
-        type: "set-account",
+        type: "set-accounts",
         payload: {
           accounts,
         },
       });
+      return accounts;
     } catch (error) {
       console.log(error);
     }
@@ -112,9 +98,21 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           selectedAccount,
         },
       });
+      return selectedAccount;
     } catch (error) {
       console.log(error);
     }
+  };
+
+  // TODO: add account type
+  const setSelectedAccount = async (account: any) => {
+    await stg.setSelectedAccount(account);
+    getSelectedAccount();
+  };
+
+  const derivateAccount = async (name: string, accountType: AccountType) => {
+    ext.accountType = accountType;
+    return await ext.derivateAccount(name);
   };
 
   return (
@@ -123,6 +121,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         state,
         getAllAccounts,
         getSelectedAccount,
+        setSelectedAccount,
+        derivateAccount,
       }}
     >
       {children}
