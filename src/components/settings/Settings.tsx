@@ -1,29 +1,28 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsGear } from "react-icons/bs";
-import { RxCross2 } from "react-icons/rx";
 import { BsChevronRight } from "react-icons/bs";
 
 const OPTIONS = [
   {
     text: "general",
-    href: "#",
+    href: "/settings-general",
   },
   {
     text: "advanced",
-    href: "#",
+    href: "/settings-advanced",
   },
   {
     text: "contacts",
-    href: "",
+    href: "/settings-contacts",
   },
   {
     text: "security",
-    href: "",
+    href: "/settings-security",
   },
   {
     text: "bug report",
-    href: "",
+    href: "/settings-bug",
   },
 ];
 
@@ -44,17 +43,16 @@ export const Settings = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="right-0 absolute origin-bottom-right max-w-lg  bottom-12 w-full h-[calc(100vh-48px)] bg-[#29323C] ring-0 outline-0">
-          <div className="text-start px-3 py-10">
-            <div className="flex justify-between mb-20">
-              <p className="pb-6 text-xl">Settings</p>
-              <RxCross2 />
+        <Menu.Items className="right-0 absolute origin-bottom-right max-w-lg  bottom-12 w-full h-[calc(100vh-99px)] bg-[#29323C] ring-0 outline-0 rounded-xl">
+          <div className="text-start px-4 py-10">
+            <div className="mb-10">
+              <p className="pb-6 text-2xl font-medium">Settings</p>
             </div>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-1">
               {OPTIONS.map((opt) => (
                 <div
                   key={opt.text}
-                  className="flex justify-between items-center"
+                  className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3"
                 >
                   <p className="capitalize text-xl">{opt.text}</p>
                   <BsChevronRight />

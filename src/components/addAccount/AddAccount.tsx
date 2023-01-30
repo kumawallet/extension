@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { RxCross2 } from "react-icons/rx";
 import { BsChevronRight } from "react-icons/bs";
 import { PageWrapper } from "../common/PageWrapper";
 import { OptionButton } from "./OptionButton";
@@ -9,9 +8,8 @@ export const AddAccount = () => {
 
   return (
     <PageWrapper>
-      <div className="flex justify-between items-center mb-14">
+      <div className="mb-14">
         <p className="font-medium text-2xl">Add Accounts</p>
-        <RxCross2 size={20} />
       </div>
       <div className="flex flex-col gap-8">
         <OptionButton onClick={() => navigate("/import-account")}>

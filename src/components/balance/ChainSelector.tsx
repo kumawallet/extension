@@ -20,12 +20,9 @@ export const ChainSelector = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-t-3xl">
+        <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl">
           <div className="px-6 py-2 pt-2 text-start">
-            <div className="flex justify-end">
-              <RxCross2 />
-            </div>
-            <p className="py-6">polkadot</p>
+            <p className="py-4 text-2xl font-medium capitalize">polkadot</p>
 
             <div className="flex flex-col gap-6">
               {chainSelectorMock.map((item, index) => (

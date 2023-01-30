@@ -4,6 +4,8 @@ import { PageWrapper } from "../common/PageWrapper";
 import { DerivateAccountForm } from "./DerivateAccount-interfaces";
 import Extension from "../../utils/Extension";
 import { useNavigate } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";
+import { ICON_SIZE } from "../../contants/icons";
 
 export const DeriveAccount = () => {
   const navigate = useNavigate();
@@ -26,6 +28,14 @@ export const DeriveAccount = () => {
 
   return (
     <PageWrapper>
+      <div className="flex items-center gap-3 mb-10">
+        <FiChevronLeft
+          className="cursor-pointer"
+          size={ICON_SIZE}
+          onClick={() => navigate(-1)}
+        />
+        <p className="font-medium text-2xl">Add account</p>
+      </div>
       <div className="flex flex-col gap-6 mt-5">
         <div>
           <label

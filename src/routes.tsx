@@ -12,6 +12,11 @@ import { SignIn } from "./components/signIn";
 import { DeriveAccount } from "./components/deriveAccount/DeriveAccount";
 import { Decrypt } from "./components/decrypt";
 import { DeriveImport } from "./components/deriveImport";
+import { General } from "./components/settings/General";
+import { Advanced } from "./components/settings/Advanced";
+import { Contacs } from "./components/settings/Contacts";
+import { Security } from "./components/settings/Security";
+import { BugReport } from "./components/settings/BugReport";
 
 export const Routes = () => {
   const {
@@ -56,6 +61,14 @@ export const Routes = () => {
         <Route path="/derive-account" element={<DeriveAccount />} />
         <Route path="/derive-import" element={<DeriveImport />} />
 
+        {/* setting views */}
+        <Route path="/settings-general" element={<General />} />
+        <Route path="/settings-advanced" element={<Advanced />} />
+        <Route path="/settings-contacts" element={<Contacs />} />
+        <Route path="/settings-security" element={<Security />} />
+        <Route path="/settings-bug" element={<BugReport />} />
+
+        {/* TODO: remove, only for developmet */}
         <Route path="/decrypt" element={<Decrypt />} />
       </RRoutes>
     </MemoryRouter>

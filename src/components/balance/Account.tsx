@@ -1,13 +1,10 @@
 import { FiCopy } from "react-icons/fi";
-// import logo from "../../assets/img/logo.svg";
 import { cropAccount } from "../../utils/account-utils";
-// import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { AccountManage } from "./AccountManage";
 import { useEffect } from "react";
 
 export const Account = () => {
-  // const navigate = useNavigate();
   const {
     state: { selectedAccount },
     getSelectedAccount,
