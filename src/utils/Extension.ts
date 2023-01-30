@@ -5,15 +5,12 @@ import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 
 export default class Extension {
-
   static async signUp({ seed, name = "New Account", password }: any) {
     try {
       if (!seed || !password) throw new Error("Missing data");
       await Auth.getInstance().signUp({ password });
       await Storage.getInstance().init();
       await Storage.getInstance().cachePassword();
-      console.log(await Storage.getInstance().getAll());
-      // Adds the account to storage
       await this.addAccounts({ name, seed });
       return true;
     } catch (error) {
@@ -74,7 +71,10 @@ export default class Extension {
     return accounts.getAll();
   }
 
-  static async derivateAccount(name: string, type: AccountType): Promise<Account> {
+  static async derivateAccount(
+    name: string,
+    type: AccountType
+  ): Promise<Account> {
     const vault = await Storage.getInstance().getVault();
     if (!vault) throw new Error("Vault not found");
     return AccountManager.derive(name, vault, type);

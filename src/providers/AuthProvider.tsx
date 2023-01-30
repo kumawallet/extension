@@ -42,11 +42,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-
       dispatch({
         type: "init",
-        payload: {
-        },
+        payload: {},
       });
     })();
   }, []);
@@ -57,8 +55,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         throw new Error("Password does not match");
       }
       const seed = mnemonicGenerate(24);
-      await Extension.signUp({ password, name, seed });
-      return true;
+      return Extension.signUp({ password, name, seed });
     } catch (error) {
       console.log(error as string);
       return false;

@@ -19,10 +19,11 @@ import {
   General,
   Security,
 } from "./components/settings";
+import Extension from "./utils/Extension";
 
 export const Routes = () => {
   const {
-    state: { extensionController, isInit },
+    state: { isInit },
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
@@ -35,12 +36,12 @@ export const Routes = () => {
         return;
       }
       const isVaultInitialized =
-        await extensionController?.isVaultInitialized();
+        await Extension.isVaultInitialized();
       if (!isVaultInitialized) {
         setHomeRoute(<AddAccount />);
         return;
       }
-      const isUnlocked = await extensionController?.isUnlocked();
+      const isUnlocked = await Extension.isUnlocked();
       if (!isUnlocked) {
         setHomeRoute(<SignIn />);
         return;
@@ -48,7 +49,7 @@ export const Routes = () => {
       setHomeRoute(<Balance />);
     };
     getHomeRoute();
-  }, [extensionController, isInit]);
+  }, [Extension, isInit]);
 
   return (
     <MemoryRouter>
