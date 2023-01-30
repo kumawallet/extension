@@ -7,7 +7,7 @@ export const ChainSelector = () => {
   const {
     state: { chains, selectedChain },
     getSelectedNetwork,
-    selectNetwork,
+    setSelectNetwork,
   } = useNetworkContext();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const ChainSelector = () => {
                         <div
                           className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg py-2 px-4 rounded-xl"
                           onClick={() => {
-                            selectNetwork(chain);
+                            setSelectNetwork(chain);
 
                             close();
                           }}

@@ -81,8 +81,6 @@ const reducer = (state: InitialState, action: any): InitialState => {
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const stg = Storage.getInstance();
-
   useEffect(() => {
     getAllAccounts();
   }, []);
@@ -104,7 +102,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSelectedAccount = async () => {
     try {
-      const selectedAccount = await stg.getSelectedAccount();
+      const selectedAccount = await Storage.getInstance().getSelectedAccount();
       dispatch({
         type: "set-selected-account",
         payload: {

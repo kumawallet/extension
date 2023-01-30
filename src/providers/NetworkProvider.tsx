@@ -7,6 +7,9 @@ import {
   useReducer,
 } from "react";
 import { Chain, CHAINS } from "@src/contants/chains";
+import { Network } from "@src/utils/storage/entities/Network";
+import Extension from "../utils/Extension";
+import Storage from "@src/utils/storage/Storage";
 
 interface InitialState {
   chains: typeof CHAINS;
@@ -21,7 +24,7 @@ const initialState: InitialState = {
 const NetworkContext = createContext(
   {} as {
     state: InitialState;
-    selectNetwork: (network: any) => void;
+    setSelectNetwork: (network: any) => void;
     getSelectedNetwork: () => Chain;
   }
 );
@@ -47,34 +50,31 @@ const reducer = (state: InitialState, action: any): InitialState => {
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    (async () => {
-      // local selectedNetwork
-    })();
-  }, []);
+  const setSelectNetwork = async (network: Chain) => {
+    await Extension.setNetwork(network);
 
-  const selectNetwork = (network: Chain) => {
     dispatch({
       type: "select-network",
       payload: network,
     });
   };
 
-  const getSelectedNetwork = () => {
-    const selectedNetwork: Chain = state.chains[0].chains[0];
+  const getSelectedNetwork = async () => {
+    const selectedNetwork = await Storage.getInstance().getNetwork();
 
-    // TODO: get selecteNetowork from settings
+    dispatch({
+      type: "select-network",
+      payload: selectedNetwork?.chain,
+    });
 
-    selectNetwork(selectedNetwork);
-
-    return selectedNetwork;
+    return selectedNetwork?.chain;
   };
 
   return (
     <NetworkContext.Provider
       value={{
         state,
-        selectNetwork,
+        setSelectNetwork,
         getSelectedNetwork,
       }}
     >

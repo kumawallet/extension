@@ -1,8 +1,10 @@
-import { VAULT } from "./constants";
+import { VAULT, NETWORK } from "./constants";
 import AccountManager, { AccountType } from "./AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
+import { Chain } from "@src/contants/chains";
+import { Network } from "./storage/entities/Network";
 
 export default class Extension {
   static async signUp({ seed, name = "New Account", password }: any) {
@@ -21,9 +23,7 @@ export default class Extension {
 
   static async addAccounts({ seed, name }: any) {
     await AccountManager.addWASMAccount(seed, name);
-    console.log(await Storage.getInstance().getAll());
     await AccountManager.addEVMAccount(seed, name);
-    console.log(await Storage.getInstance().getAll());
   }
 
   static removeAccount(key: AccountKey) {
@@ -78,5 +78,14 @@ export default class Extension {
     const vault = await Storage.getInstance().getVault();
     if (!vault) throw new Error("Vault not found");
     return AccountManager.derive(name, vault, type);
+  }
+
+  static async setNetwork(chain: Chain): Promise<boolean> {
+    const vault = await Storage.getInstance().getVault();
+    if (!vault) throw new Error("Vault not found");
+    const network = Network.getInstance();
+    network.set(chain);
+    await Storage.getInstance().setNetwork(network);
+    return true;
   }
 }

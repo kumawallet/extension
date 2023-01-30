@@ -15,12 +15,12 @@ cryptoWaitReady()
 
 export const Main = () => {
   return (
-    <NetworkProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <NetworkProvider>
         <AccountProvider>
           <Routes />
         </AccountProvider>
-      </AuthProvider>
-    </NetworkProvider>
+      </NetworkProvider>
+    </AuthProvider>
   );
 };

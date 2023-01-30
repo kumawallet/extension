@@ -2,7 +2,7 @@ import { VAULT } from "../../../utils/constants";
 import Keyring from "./Keyring";
 import { AccountKey } from "./Accounts";
 import Storable from "../Storable";
-import { AccountType } from "@src/utils/handlers/AccountManager";
+import { AccountType } from "@src/utils/AccountManager";
 
 export default class Vault extends Storable {
   keyrings: { [key: AccountKey]: Keyring };

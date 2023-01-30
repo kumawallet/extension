@@ -1,6 +1,7 @@
 import {
   ACCOUNTS,
   CACHE_AUTH,
+  NETWORK,
   SELECTED_ACCOUNT,
   SETTINGS,
   VAULT,
@@ -11,6 +12,8 @@ import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
 import Keyring from "./entities/Keyring";
+import { Chain, CHAINS } from "@src/contants/chains";
+import { Network } from "./entities/Network";
 
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
@@ -86,6 +89,8 @@ export default class Storage {
       const vault = new Vault();
       await this.set(VAULT, vault);
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
+      const network = new Network();
+      await this.set(NETWORK, network);
       return;
     } catch (error) {
       console.error(error);
@@ -280,5 +285,27 @@ export default class Storage {
       console.error(error);
       return false;
     }
+  }
+
+  async setNetwork(network: Network) {
+    try {
+      await this.set(NETWORK, network);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async getNetwork(): Promise<Chain | undefined> {
+    const stored = await this.get(NETWORK);
+    if (!stored) {
+      const network = new Network();
+      const defaultChain = CHAINS[0].chains[0];
+      network.set(defaultChain);
+      return defaultChain;
+    }
+
+    return stored;
   }
 }
