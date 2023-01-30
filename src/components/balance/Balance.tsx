@@ -46,7 +46,7 @@ export const Balance = () => {
                 </Tab>
               ))}
             </Tab.List>
-            <Tab.Panels className="mt-2">
+            <Tab.Panels className="mt-2 px-4">
               {TABS.map((tab, idx) => (
                 <Tab.Panel key={idx}>{tab.component}</Tab.Panel>
               ))}
