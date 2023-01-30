@@ -49,7 +49,7 @@ export default abstract class AccountManager {
   }
 
   async saveKeyring(keyring: Keyring) {
-    this.#storage.addKeyring(keyring);
+    this.#storage.saveKeyring(keyring);
   }
 
   async getAccount(key: AccountKey): Promise<Account | undefined> {

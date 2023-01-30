@@ -34,14 +34,15 @@ export default class Vault extends Storable {
 
   getAll() {
     return Object.keys(this.keyrings).map((key) => {
-      const {
-        // key: _key, // fix?
+      const { type, seed, privateKey, accountQuantity } =
+        this.keyrings[key as AccountKey];
+      return new Keyring(
+        key as AccountKey,
         type,
         seed,
         privateKey,
-        accountQuantity,
-      } = this.keyrings[key as AccountKey];
-      return new Keyring(key as any, type, seed, privateKey, accountQuantity);
+        accountQuantity
+      );
     });
   }
 

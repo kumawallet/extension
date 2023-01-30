@@ -50,22 +50,6 @@ export default class Storage {
       if (key === VAULT) {
         data = await this.#auth.encryptVault(data);
       }
-
-      /*const dataIsObject = typeof data === "object";
-
-      let _data = dataIsObject ? { ...data } : data;
-
-      if (data?.[key]) {
-        _data = data[key];
-
-        if (dataIsObject && Object.keys(_data).length === 0) {
-          _data = undefined;
-        }
-      } else {
-        _data && delete _data?.["key"];
-      }*/
-
-      //await this.#storage.set({ [key]: _data });
       await this.#storage.set({ [key]: data });
     } catch (error) {
       console.error(error);
@@ -153,13 +137,10 @@ export default class Storage {
     return !vault.isEmpty();
   }
 
-  async addKeyring(keyring: any) {
+  async saveKeyring(keyring: any) {
     const vault = await this.getVault();
     if (!vault) throw new Error("Vault is not initialized");
-    // if (!vault.allreadyExists(keyring.key)) {
-    // throw new Error("Account already exists");
     vault.add(keyring);
-    // }
     this.setVault(vault);
   }
 
