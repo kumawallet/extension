@@ -65,7 +65,7 @@ export const DeriveAccount = () => {
         </div>
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
-            Account name/alias (optional)
+            Account name (optional)
           </label>
           <input
             id="name"

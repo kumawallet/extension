@@ -18,7 +18,12 @@ export class Account {
     constructor(key: AccountKey, value: AccountValue) {
         this.key = key;
         this.value = value;
-        this.type = key.startsWith("EVM") ? AccountType.EVM : AccountType.WASM;
+        this.type = this.getType(key);
+    }
+
+    private getType(key: AccountKey) {
+        const split = key.split("-");
+        return split[0] as AccountType;
     }
 }
 

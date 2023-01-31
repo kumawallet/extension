@@ -78,8 +78,11 @@ export default class Storage {
     }
   }
 
-  async init() {
+  async init(force = false) {
     try {
+      if (await this.isVaultInitialized() && !force) { 
+        return;
+      }
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
       const selectedAccount = undefined;

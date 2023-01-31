@@ -8,6 +8,7 @@ import {
   useReducer,
 } from "react";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { ImportAccountFormType } from "@src/components/importAccount/importAccount-interfaces";
 
 interface InitialState {
   isInit: boolean;
@@ -21,6 +22,7 @@ const AuthContext = createContext(
   {} as {
     state: InitialState;
     createAccount: (newAccount: any) => Promise<boolean>;
+    importAccount: (newAccount: ImportAccountFormType) => Promise<boolean>;
   }
 );
 
@@ -61,11 +63,22 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       return false;
     }
   };
+
+  const importAccount = async ({ name, privateKey, password, accountType }: ImportAccountFormType) => {
+    try {
+      return Extension.importAccount({ name, privateKey, password, accountType });
+    } catch (error) {
+      console.log(error as string);
+      return false;
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
         state,
         createAccount,
+        importAccount,
       }}
     >
       {children}

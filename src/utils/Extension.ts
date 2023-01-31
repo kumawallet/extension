@@ -1,19 +1,30 @@
-import { VAULT, NETWORK } from "./constants";
+import { VAULT } from "./constants";
 import AccountManager, { AccountType } from "./AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
+import { ImportAccountFormType } from "@src/components/importAccount/importAccount-interfaces";
 
 export default class Extension {
-  static async signUp({ seed, name = "New Account", password }: any) {
+  private static async init(password: string) {
     try {
-      if (!seed || !password) throw new Error("Missing data");
       await Auth.getInstance().signUp({ password });
       await Storage.getInstance().init();
       await Storage.getInstance().cachePassword();
-      await this.addAccounts({ name, seed });
+    } catch (error) {
+      console.error(error);
+      throw new Error(error as string);
+    }
+  }
+
+  static async signUp({ seed, name = "New Account", password }: any) {
+    try {
+      if (!seed || !password) throw new Error("Missing data");
+      await this.init(password);
+      await AccountManager.addWASMAccount(seed, name);
+      await AccountManager.addEVMAccount(seed, name);
       return true;
     } catch (error) {
       console.error(error);
@@ -21,9 +32,21 @@ export default class Extension {
     }
   }
 
-  static async addAccounts({ seed, name }: any) {
-    await AccountManager.addWASMAccount(seed, name);
-    await AccountManager.addEVMAccount(seed, name);
+  static async importAccount({
+    name,
+    privateKey,
+    password,
+    accountType
+  }: ImportAccountFormType) {
+    try {
+      if (!privateKey || !password) throw new Error("Missing data");
+      await this.init(password);
+      await AccountManager.importAccount({ name, privateKey, accountType });
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   static removeAccount(key: AccountKey) {
