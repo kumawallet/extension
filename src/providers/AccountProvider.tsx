@@ -115,9 +115,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  // TODO: add account type
   const setSelectedAccount = async (account: any) => {
-    await stg.setSelectedAccount(account);
+    await Storage.getInstance().setSelectedAccount(account);
     getSelectedAccount();
   };
 
