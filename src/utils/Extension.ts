@@ -65,7 +65,7 @@ export default class Extension {
     return AccountManager.getAccount(key);
   }
 
-  static async getAllAccounts() {
+  static async getAllAccounts(): Promise<Account[]> {
     const accounts = await AccountManager.getAll();
     if (!accounts) return [];
     return accounts.getAll();

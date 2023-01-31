@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
+import { Account } from "@src/utils/storage/entities/Accounts";
 
 export const Accounts = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export const Accounts = () => {
     getAllAccounts();
   }, []);
 
-  const changeSelectedAccount = (account: any) => {
+  const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);
   };
 
@@ -39,23 +40,23 @@ export const Accounts = () => {
         <Menu.Item>
           {({ close }) => (
             <>
-              {accounts.map(({ address, name, type, key }: any, index) => (
+              {accounts.map((account) => (
                 <div
-                  key={address}
+                  key={account?.value?.address}
                   className={`${
-                    selectedAccount?.value?.address === address &&
+                    selectedAccount?.value?.address === account?.value?.address &&
                     "bg-gray-400 bg-opacity-30"
                   }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
                   onClick={() => {
-                    changeSelectedAccount({ address, type, name, key });
+                    changeSelectedAccount(account);
                     close();
                   }}
                 >
                   <p className="w-3/4 overflow-hidden text-ellipsis">
-                    <p className="text-cl">{name}</p>
-                    <p>{address}</p>
+                    <p className="text-cl">{account?.value?.name}</p>
+                    <p>{account?.value?.address}</p>
                   </p>
-                  <p>{type}</p>
+                  <p>{account?.type}</p>
                 </div>
               ))}
             </>

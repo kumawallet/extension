@@ -48,15 +48,7 @@ export class Accounts extends Storable {
     }
 
     getAll() {
-        return Object.keys(this.data).map((key) => {
-            const account = this.data[key as AccountKey];
-            return {
-                key,
-                address: account.value.address,
-                name: account.value.name,
-                type: account.type,
-            };
-        });
+        return Object.keys(this.data).map((key) => this.data[key as AccountKey]);
     }
 
     set(accounts: { [key: AccountKey]: Account }) {

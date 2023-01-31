@@ -12,40 +12,22 @@ import { Account } from "@src/utils/storage/entities/Accounts";
 import { AccountType } from "@src/utils/AccountManager";
 
 interface InitialState {
-  accounts: {
-    key: string;
-    address: string;
-    name: string;
-    type: AccountType;
-  }[];
+  accounts: Account[];
   isLoadingAccounts: boolean;
-  selectedAccount: {
-    address: string;
-    type: string;
-  };
+  selectedAccount: Account;
 }
 
 const initialState: InitialState = {
   accounts: [],
   isLoadingAccounts: true,
-  selectedAccount: {
-    address: "",
-    type: "",
-  },
+  selectedAccount: {} as Account,
 };
 
 const AccountContext = createContext(
   {} as {
     state: InitialState;
-    getAllAccounts: () => Promise<
-      {
-        key: string;
-        address: string;
-        name: string;
-        type: AccountType;
-      }[]
-    >;
-    getSelectedAccount: () => void;
+    getAllAccounts: () => Promise<Account[]>;
+    getSelectedAccount: () => Promise<Account | undefined>;
     setSelectedAccount: (account: Account) => void;
     derivateAccount: (
       name: string,
@@ -94,7 +76,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           accounts,
         },
       });
-      return accounts || [];
+      return accounts;
     } catch (error) {
       console.log(error);
     }
@@ -115,7 +97,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const setSelectedAccount = async (account: any) => {
+  const setSelectedAccount = async (account: Account) => {
     await Storage.getInstance().setSelectedAccount(account);
     getSelectedAccount();
   };
