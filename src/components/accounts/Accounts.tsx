@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
 import { Account } from "@src/utils/storage/entities/Accounts";
+import { AccountType } from "@src/utils/AccountManager";
 
 export const Accounts = () => {
   const navigate = useNavigate();
@@ -18,6 +19,17 @@ export const Accounts = () => {
 
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);
+  };
+
+  const format = (type: AccountType) => {
+    switch (type) {
+      case AccountType.IMPORTED_EVM:
+      case AccountType.EVM:
+        return "EVM";
+      case AccountType.IMPORTED_WASM:
+      case AccountType.WASM:
+        return "WASM";
+    }
   };
 
   return (
@@ -44,8 +56,8 @@ export const Accounts = () => {
                 <div
                   key={account?.value?.address}
                   className={`${
-                    selectedAccount?.value?.address === account?.value?.address &&
-                    "bg-gray-400 bg-opacity-30"
+                    selectedAccount?.value?.address ===
+                      account?.value?.address && "bg-gray-400 bg-opacity-30"
                   }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
                   onClick={() => {
                     changeSelectedAccount(account);
@@ -56,7 +68,7 @@ export const Accounts = () => {
                     <p className="text-cl">{account?.value?.name}</p>
                     <p>{account?.value?.address}</p>
                   </p>
-                  <p>{account?.type}</p>
+                  <p>{format(account?.type)}</p>
                 </div>
               ))}
             </>
