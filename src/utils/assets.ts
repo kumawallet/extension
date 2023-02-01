@@ -5,8 +5,6 @@ export const getNatitveAssetBalance = async (
   accountAddress: string,
   decimals: number
 ) => {
-  console.log(api.query.system);
-
   const data = await api.query.system?.account(accountAddress);
 
   const amount = data?.data?.free;
@@ -16,4 +14,14 @@ export const getNatitveAssetBalance = async (
   const _decimals = 10 ** decimals;
 
   return amount ? Number(amount) / _decimals : 0;
+};
+
+export const getAssetUSDPrice = async (assetName: string) => {
+  const data = await fetch(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${assetName}&vs_currencies=usd`
+  );
+
+  const json = await data.json();
+
+  return json[assetName]["usd"];
 };

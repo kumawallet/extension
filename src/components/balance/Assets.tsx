@@ -1,42 +1,14 @@
-import { useEffect, useState } from "react";
-import { useNetworkContext } from "../../providers/NetworkProvider";
-import { getNatitveAssetBalance } from "../../utils/assets";
-import { useAccountContext } from "../../providers/AccountProvider";
-import { ApiPromise } from "@polkadot/api";
 import { BsArrowUpRight } from "react-icons/bs";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
-export const Assets = () => {
-  const {
-    state: { api, selectedChain },
-  } = useNetworkContext();
-
-  const {
-    state: { selectedAccount },
-  } = useAccountContext();
-
-  const [assets, setAssets] = useState([]);
-
-  useEffect(() => {
-    if (api && selectedAccount.value?.address) {
-      getAssets(api);
-    }
-  }, [api, selectedAccount]);
-
-  const getAssets = async (api: ApiPromise) => {
-    const nativeAsset = await getNatitveAssetBalance(
-      api,
-      selectedAccount.value.address,
-      selectedChain?.nativeCurrency.decimals || 1
+export const Assets = ({ assets = [], isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-3">
+        <AiOutlineLoading3Quarters className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
+      </div>
     );
-    setAssets([
-      {
-        ...selectedChain.nativeCurrency,
-        amount: nativeAsset,
-      },
-    ]);
-  };
-
-  console.log("assets", assets);
+  }
 
   return (
     <>

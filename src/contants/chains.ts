@@ -56,7 +56,7 @@ export const PARACHAINS = [
   {
     name: "Astar",
     chain: "ASTR",
-    rpc: ["https://rpc.astar.network:8545"],
+    rpc: ["wss://rpc.astar.network"],
     faucets: [],
     nativeCurrency: {
       name: "Astar",
@@ -103,10 +103,7 @@ export const PARACHAINS = [
   {
     name: "Moonriver",
     chain: "MOON",
-    rpc: [
-      "https://rpc.api.moonriver.moonbeam.network",
-      "wss://wss.api.moonriver.moonbeam.network",
-    ],
+    rpc: ["wss://wss.api.moonriver.moonbeam.network"],
     faucets: [],
     nativeCurrency: {
       name: "Moonriver",
@@ -129,12 +126,9 @@ export const PARACHAINS = [
     name: "Shiden",
     chain: "SDN",
     rpc: [
-      "https://shiden.api.onfinality.io/public",
-      "https://shiden-rpc.dwellir.com",
-      "https://shiden.public.blastapi.io",
       "wss://shiden.api.onfinality.io/public-ws",
-      "wss://shiden.public.blastapi.io",
-      "wss://shiden-rpc.dwellir.com",
+      // "wss://shiden.public.blastapi.io",
+      // "wss://shiden-rpc.dwellir.com",
     ],
     faucets: [],
     nativeCurrency: {

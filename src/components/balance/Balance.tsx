@@ -8,7 +8,13 @@ import { Tab } from "@headlessui/react";
 import { DecryptFAB } from "../common/DecryptFAB";
 import { Settings } from "../settings";
 import { FullScreenFAB } from "../common/FullScreenFAB";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { ApiPromise } from "@polkadot/api";
+import { useAccountContext, useNetworkContext } from "@src/providers";
+import { useEffect, useState } from "react";
+import { getNatitveAssetBalance } from "@src/utils/assets";
+import { Account as AccountEntity } from "@src/utils/storage/entities/Accounts";
+import { Chain } from "@src/contants/chains";
+import { getAssetUSDPrice } from "../../utils/assets";
 
 const TABS = [
   {
@@ -21,7 +27,68 @@ const TABS = [
   },
 ];
 
+interface Asset {
+  name: string;
+  symbol: string;
+  decimals: number;
+  amount: number;
+  usdPrice: number;
+}
+
 export const Balance = () => {
+  const {
+    state: { api, selectedChain },
+  } = useNetworkContext();
+
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
+
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoadingAssets, setIsLoadingAssets] = useState(true);
+  const [totalBalance, setTotalBalance] = useState(0);
+
+  useEffect(() => {
+    if (api && selectedAccount.value?.address && selectedChain) {
+      setIsLoadingAssets(true);
+
+      getAssets(api, selectedAccount, selectedChain);
+    }
+  }, [api, selectedAccount, selectedChain]);
+
+  const getAssets = async (
+    api: ApiPromise,
+    account: AccountEntity,
+    chain: Chain
+  ) => {
+    try {
+      const nativeAsset = await getNatitveAssetBalance(
+        api,
+        account.value.address,
+        chain?.nativeCurrency.decimals || 1
+      );
+
+      const usdPrice = await getAssetUSDPrice(
+        chain.nativeCurrency.name.toLowerCase()
+      );
+
+      setAssets([
+        {
+          ...chain.nativeCurrency,
+          amount: nativeAsset,
+          usdPrice: usdPrice || 0,
+        },
+      ]);
+      setIsLoadingAssets(false);
+      setTotalBalance(usdPrice || 0);
+    } catch (error) {
+      setIsLoadingAssets(false);
+      setAssets([]);
+      setTotalBalance(0);
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center max-w-3xl w-full mx-auto">
@@ -30,7 +97,7 @@ export const Balance = () => {
       </header>
       <PageWrapper contentClassName="py-6">
         <div className="flex flex-col">
-          <TotalBalance />
+          <TotalBalance balance={totalBalance} />
 
           <Tab.Group>
             <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">
@@ -48,9 +115,12 @@ export const Balance = () => {
               ))}
             </Tab.List>
             <Tab.Panels className="mt-2 px-4">
-              {TABS.map((tab, idx) => (
-                <Tab.Panel key={idx}>{tab.component}</Tab.Panel>
-              ))}
+              <Tab.Panel key={0}>
+                <Assets assets={assets} isLoading={isLoadingAssets} />
+              </Tab.Panel>
+              <Tab.Panel key={1}>
+                <Activity />
+              </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>
         </div>
