@@ -26,4 +26,14 @@ export class Network extends Storable {
   set(chain: Chain) {
     this.chain = chain;
   }
+
+  static getDefaultNetwork() {
+    try {
+      const defaultNetwork = Network.getInstance();
+      defaultNetwork.chain = CHAINS[0].chains[0];
+      return defaultNetwork;
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
 }

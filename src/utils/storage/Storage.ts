@@ -80,7 +80,7 @@ export default class Storage {
 
   async init(force = false) {
     try {
-      if (await this.isVaultInitialized() && !force) { 
+      if (await this.isVaultInitialized() && !force) {
         return;
       }
       const accounts = new Accounts();
@@ -300,15 +300,15 @@ export default class Storage {
     }
   }
 
-  async getNetwork(): Promise<Chain | undefined> {
+  async getNetwork(): Promise<Network> {
     const stored = await this.get(NETWORK);
-    if (!stored) {
-      const network = new Network();
-      const defaultChain = CHAINS[0].chains[0];
-      network.set(defaultChain);
-      return defaultChain;
+    const defaultNetwork = Network.getDefaultNetwork();
+    if (!stored || !stored.chain) {
+      await this.setNetwork(defaultNetwork);
+      return defaultNetwork;
     }
-
-    return stored;
+    const network = new Network();
+    network.set(stored.chain);
+    return network;
   }
 }

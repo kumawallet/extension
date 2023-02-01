@@ -72,15 +72,17 @@ export const Balance = () => {
         chain.nativeCurrency.name.toLowerCase()
       );
 
+      const totalBalance = usdPrice * nativeAsset;
+
       setAssets([
         {
           ...chain.nativeCurrency,
           amount: nativeAsset,
-          usdPrice: usdPrice || 0,
+          usdPrice: totalBalance || 0,
         },
       ]);
       setIsLoadingAssets(false);
-      setTotalBalance(usdPrice || 0);
+      setTotalBalance(totalBalance || 0);
     } catch (error) {
       setIsLoadingAssets(false);
       setAssets([]);

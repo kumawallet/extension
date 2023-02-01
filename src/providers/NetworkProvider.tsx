@@ -27,7 +27,7 @@ const NetworkContext = createContext(
   {} as {
     state: InitialState;
     setSelectNetwork: (network: any) => void;
-    getSelectedNetwork: () => Chain;
+    getSelectedNetwork: () => Promise<string | undefined>;
   }
 );
 
@@ -72,14 +72,14 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const getSelectedNetwork = async () => {
-    const selectedNetwork = await Storage.getInstance().getNetwork();
 
+    const { chain: selectedNetwork } = await Storage.getInstance().getNetwork();
     dispatch({
       type: "select-network",
-      payload: selectedNetwork?.chain,
+      payload: selectedNetwork,
     });
 
-    return selectedNetwork?.chain;
+    return selectedNetwork;
   };
 
   const setNewApi = async (chain: Chain) => {
