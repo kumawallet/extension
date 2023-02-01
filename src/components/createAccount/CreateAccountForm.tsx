@@ -24,7 +24,7 @@ export const CreateAccountForm: FC<CreateAccountFormProps> = ({ onSubmit }) => {
         </label>
         <input
           id="name"
-          className="  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
           {...register("name")}
         />
       </div>
@@ -36,18 +36,21 @@ export const CreateAccountForm: FC<CreateAccountFormProps> = ({ onSubmit }) => {
           id="password"
           required
           type={"password"}
-          className="border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+          className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
           {...register("password")}
         />
       </div>
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-sm font-medium mb-1"
+        >
           Confirm password
         </label>
         <input
           id="confirmPassword"
           type={"password"}
-          className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+          className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
           {...register("confirmPassword")}
         />
       </div>
