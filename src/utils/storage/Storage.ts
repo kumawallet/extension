@@ -12,8 +12,9 @@ import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
 import Keyring from "./entities/Keyring";
-import { Chain, CHAINS } from "@src/contants/chains";
 import { Network } from "./entities/Network";
+
+const isChrome = process.env.BROWSER_TARGET === "CHROME";
 
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
@@ -21,7 +22,7 @@ export default class Storage {
   private static instance: Storage;
 
   private constructor() {
-    this.#storage = chrome.storage.local;
+    this.#storage = isChrome ? chrome.storage.local : browser.storage.local; // add browser to namespace?
   }
 
   static getInstance() {
@@ -38,7 +39,7 @@ export default class Storage {
   async get(key: string) {
     try {
       const data = await this.#storage.get(key);
-      if (!data[key]) return undefined;
+      if (!data?.[key]) return undefined;
       if (key === VAULT && data[key]) {
         await this.loadCache();
         if (!Auth.password || !Auth.isUnlocked) {
@@ -80,7 +81,7 @@ export default class Storage {
 
   async init(force = false) {
     try {
-      if (await this.isVaultInitialized() && !force) {
+      if ((await this.isVaultInitialized()) && !force) {
         return;
       }
       const accounts = new Accounts();

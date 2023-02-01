@@ -1,27 +1,37 @@
 import pkg from "../package.json";
-import { ManifestTypeV2, ManifestTypeV3 } from "@src/manifest-type";
 
 const isChrome = process.env.BROWSER_TARGET === "CHROME";
 
-const manifestV3: ManifestTypeV3 = {
-  manifest_version: 3,
+const commonManifest = {
   name: pkg.displayName,
   version: pkg.version,
   description: pkg.description,
+  permissions: ["storage"] as chrome.runtime.ManifestPermissions[],
+};
+
+const BACKGROUND = "src/pages/background/index.js";
+const ICON34 = "icon-34.png";
+const ICON128 = "icon-128.png";
+const SECURITY = "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'";
+const POPUP = "src/pages/popup/index.html";
+
+const manifestV3: chrome.runtime.ManifestV3 = {
+  ...commonManifest,
+  manifest_version: 3,
   options_page: "src/pages/options/index.html",
   background: {
-    service_worker: "src/pages/background/index.js",
+    service_worker: BACKGROUND,
     type: "module",
   },
   action: {
-    default_popup: "src/pages/popup/index.html",
-    default_icon: "icon-34.png",
+    default_popup: POPUP,
+    default_icon: ICON34,
   },
   chrome_url_overrides: {
     newtab: "src/pages/newtab/index.html",
   },
   icons: {
-    "128": "icon-128.png",
+    "128": ICON128,
   },
   content_scripts: [
     {
@@ -38,25 +48,17 @@ const manifestV3: ManifestTypeV3 = {
     },
   ],
   content_security_policy: {
-    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+    extension_pages: SECURITY,
   },
-  permissions: [
-    "storage",
-    "activeTab", // REVIEW: Is this needed?
-    "tabs", // REVIEW: Is this needed?
-  ],
 };
 
-const manifestV2: ManifestTypeV2 = {
-  name: pkg.displayName,
-  version: pkg.version,
-  description: pkg.description,
+const manifestV2: chrome.runtime.ManifestV2 = {
+  ...commonManifest,
   manifest_version: 2,
   browser_action: {
-    default_popup: "src/pages/popup/index.html",
+    default_popup: POPUP,
     default_title: "Open the popup",
   },
-  optional_permissions: ["<all_urls>"],
   content_scripts: [
     {
       matches: ["http://*/*", "https://*/*", "<all_urls>"],
@@ -66,12 +68,13 @@ const manifestV2: ManifestTypeV2 = {
     },
   ],
   background: {
-    page: "src/pages/background/index.js",
+    page: BACKGROUND,
     persistent: false,
   },
   icons: {
-    "128": "vite.svg",
+    "128": ICON128,
   },
+  content_security_policy: SECURITY,
 };
 
 export default isChrome ? manifestV3 : manifestV2;
