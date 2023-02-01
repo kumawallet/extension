@@ -19,7 +19,7 @@ import { getAssetUSDPrice } from "../../utils/assets";
 const TABS = [
   {
     name: "Assets",
-    component: <Assets />,
+    component: <Assets assets={[]} isLoading={true} />,
   },
   {
     name: "Activity",
@@ -27,7 +27,7 @@ const TABS = [
   },
 ];
 
-interface Asset {
+export interface Asset {
   name: string;
   symbol: string;
   decimals: number;
@@ -43,8 +43,8 @@ export const Balance = () => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
-
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const emptyAssets: Asset[] = [];
+  const [assets, setAssets] = useState<Asset[]>(emptyAssets);
   const [isLoadingAssets, setIsLoadingAssets] = useState(true);
   const [totalBalance, setTotalBalance] = useState(0);
 

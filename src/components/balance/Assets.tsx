@@ -1,7 +1,14 @@
 import { BsArrowUpRight } from "react-icons/bs";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { Asset } from "./Balance";
 
-export const Assets = ({ assets = [], isLoading = false }) => {
+export const Assets = ({
+  assets = [],
+  isLoading = false,
+}: {
+  assets: Asset[];
+  isLoading: boolean;
+}) => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-3">
