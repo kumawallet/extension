@@ -199,6 +199,28 @@ export const TESTNETS = [
       },
     ],
   },
+  {
+    name: "Contracts Testnet",
+    chain: "Rococo",
+    rpc: ["wss://rococo-contracts-rpc.polkadot.io"],
+    faucets: [],
+    nativeCurrency: {
+      name: "roc",
+      symbol: "ROC",
+      decimals: 12,
+    },
+    infoURL: "",
+    shortName: "rococo-contracts",
+    chainId: 0, // this is a fake chainId
+    networkId: 0, // this is a fake networkId
+    explorers: [
+      {
+        name: "",
+        url: "",
+        standard: "",
+      },
+    ],
+  },
 ];
 
 export const CHAINS = [

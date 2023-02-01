@@ -12,7 +12,10 @@ export const ImportAccountForm: FC<ImportAccountFormProps> = ({ onSubmit }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ImportAccountFormType>();
+    watch,
+  } = useForm<ImportAccountFormType>({
+    defaultValues: { accountType: AccountType.EVM },
+  });
   const _onSubmit = handleSubmit((data) => {
     onSubmit(data);
   });
@@ -30,11 +33,11 @@ export const ImportAccountForm: FC<ImportAccountFormProps> = ({ onSubmit }) => {
         />
       </div>
       <div>
-        <label htmlFor="accounType" className="block text-sm font-medium mb-1">
+        <label htmlFor="accountType" className="block text-sm font-medium mb-1">
           Account type
         </label>
         <select
-          id="accounType"
+          id="accountType"
           className="  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
           {...register("accountType")}
         >
@@ -43,14 +46,19 @@ export const ImportAccountForm: FC<ImportAccountFormProps> = ({ onSubmit }) => {
         </select>
       </div>
       <div>
-        <label htmlFor="privateKey" className="block text-sm font-medium mb-1">
-          Private Key
+        <label
+          htmlFor="privateKeyOrSeed"
+          className="block text-sm font-medium mb-1"
+        >
+          {AccountType.EVM == watch("accountType")
+            ? "Private Key"
+            : `Seed Phrase`}
         </label>
         <input
-          id="privateKey"
+          id="privateKeyOrSeed"
           type={"password"}
           className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-          {...register("privateKey")}
+          {...register("privateKeyOrSeed")}
         />
       </div>
       <div>
@@ -62,6 +70,17 @@ export const ImportAccountForm: FC<ImportAccountFormProps> = ({ onSubmit }) => {
           type={"password"}
           className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
           {...register("password")}
+        />
+      </div>
+      <div>
+        <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
+          Confirm password
+        </label>
+        <input
+          id="confirmPassword"
+          type={"password"}
+          className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+          {...register("confirmPassword")}
         />
       </div>
       <div className="flex justify-end">

@@ -64,14 +64,24 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const importAccount = async ({ name, privateKey, password, accountType }: ImportAccountFormType) => {
+  const importAccount = async ({
+    name,
+    privateKeyOrSeed,
+    password,
+    accountType,
+  }: any) => {
     try {
-      return Extension.importAccount({ name, privateKey, password, accountType });
+      return Extension.importAccount({
+        name,
+        privateKeyOrSeed,
+        password,
+        accountType,
+      });
     } catch (error) {
       console.log(error as string);
       return false;
     }
-  }
+  };
 
   return (
     <AuthContext.Provider

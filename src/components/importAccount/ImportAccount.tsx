@@ -14,9 +14,16 @@ export const ImportAccount = () => {
   const [isImported, setIsImported] = useState(false);
 
   const _importAccount = async (data: ImportAccountFormType) => {
-    const { name, privateKey, password, accountType } = data;
+    const { name, privateKeyOrSeed, password, accountType, confirmPassword } =
+      data;
     try {
-      const isImported = await importAccount({ name, privateKey, password, accountType });
+      const isImported = await importAccount({
+        name,
+        privateKeyOrSeed,
+        password,
+        confirmPassword,
+        accountType,
+      });
       setIsImported(isImported);
     } catch (error) {
       console.log(error);

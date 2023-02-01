@@ -5,7 +5,6 @@ import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
-import { ImportAccountFormType } from "@src/components/importAccount/importAccount-interfaces";
 
 export default class Extension {
   private static async init(password: string) {
@@ -33,15 +32,19 @@ export default class Extension {
   }
 
   static async importAccount({
-    name,
-    privateKey,
+    name = "New Account",
+    privateKeyOrSeed,
     password,
-    accountType
-  }: ImportAccountFormType) {
+    accountType,
+  }: any) {
     try {
-      if (!privateKey || !password) throw new Error("Missing data");
+      if (!privateKeyOrSeed || !password) throw new Error("Missing data");
       await this.init(password);
-      await AccountManager.importAccount({ name, privateKey, accountType });
+      await AccountManager.importAccount({
+        name,
+        privateKeyOrSeed,
+        accountType,
+      });
       return true;
     } catch (error) {
       console.error(error);

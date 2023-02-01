@@ -55,41 +55,45 @@ export default class AccountManager {
   }
 
   private static async getImportedEVMAddress(privateKey: string) {
-    const { address } = new ethers.Wallet(privateKey);
-    return address;
+    const wallet = new ethers.Wallet(privateKey);
+    const { address } = wallet || {};
+    const seed = wallet.mnemonic?.phrase || "";
+    return { address, privateKey, seed };
   }
 
   private static async getImportedWASMAddress(seed: string) {
     const wallet = PolkadotKeyring.addUri(seed, Auth.password);
     const { address } = wallet.json || {};
-    return address;
+    const privateKey = wallet.pair.meta.privateKey?.toString() || "";
+    return { address, seed, privateKey };
   }
 
   static async importAccount({
     name,
-    privateKey,
+    privateKeyOrSeed,
     accountType,
   }: {
     name: string;
-    privateKey: string;
+    privateKeyOrSeed: string;
     accountType: AccountType;
   }) {
-    let address;
     let type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
+    let importedData;
     switch (accountType) {
       case AccountType.EVM:
-        address = await AccountManager.getImportedEVMAddress(privateKey);
+        importedData = await AccountManager.getImportedEVMAddress(privateKeyOrSeed);
         type = AccountType.IMPORTED_EVM;
         break;
       case AccountType.WASM:
-        address = await AccountManager.getImportedWASMAddress(privateKey);
+        importedData = await AccountManager.getImportedWASMAddress(privateKeyOrSeed);
         type = AccountType.IMPORTED_WASM;
         break;
       default:
         throw new Error("Invalid account type");
     }
+    const { address, privateKey, seed } = importedData;
     const key = AccountManager.formatAddress(address, type);
-    const keyring = new Keyring(key, type, "", privateKey);
+    const keyring = new Keyring(key, type, seed, privateKey);
     return AccountManager.addAccount(address, type, name, keyring);
   }
 

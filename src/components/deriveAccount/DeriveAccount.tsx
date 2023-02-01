@@ -10,7 +10,7 @@ import { useAccountContext } from "../../providers/AccountProvider";
 export const DeriveAccount = () => {
   const navigate = useNavigate();
 
-  const { derivateAccount, getAllAccounts, setSelectedAccount } =
+  const { derivateAccount, setSelectedAccount } =
     useAccountContext();
 
   const {
@@ -23,12 +23,7 @@ export const DeriveAccount = () => {
     try {
       const account = await derivateAccount(data.name, data.accountType);
       if (account.key) {
-        // TODO: the method should return the new account?
-        const {
-          type,
-          value: { address, name, keyring },
-        } = account;
-        await setSelectedAccount({ type, address, name, key: keyring });
+        await setSelectedAccount(account);
         navigate("/balance");
       }
     } catch (error) {
@@ -49,13 +44,13 @@ export const DeriveAccount = () => {
       <div className="flex flex-col gap-6 mt-5">
         <div>
           <label
-            htmlFor="accounType"
+            htmlFor="accountType"
             className="block text-sm font-medium mb-1"
           >
             Account type
           </label>
           <select
-            id="accounType"
+            id="accountType"
             className="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             {...register("accountType")}
           >

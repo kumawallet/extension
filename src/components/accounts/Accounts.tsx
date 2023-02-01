@@ -24,9 +24,11 @@ export const Accounts = () => {
   const format = (type: AccountType) => {
     switch (type) {
       case AccountType.IMPORTED_EVM:
+        return "EVM (Imported)";
       case AccountType.EVM:
         return "EVM";
       case AccountType.IMPORTED_WASM:
+        return "WASM (Imported)";
       case AccountType.WASM:
         return "WASM";
     }
