@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   createContext,
   FC,
@@ -7,18 +6,21 @@ import {
   useReducer,
 } from "react";
 import { Chain, CHAINS } from "@src/contants/chains";
-import { Network } from "@src/utils/storage/entities/Network";
 import Extension from "../utils/Extension";
 import Storage from "@src/utils/storage/Storage";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { useEffect } from "react";
 
 interface InitialState {
   chains: typeof CHAINS;
   selectedChain: Chain | null;
+  api: ApiPromise | null;
 }
 
 const initialState: InitialState = {
   chains: CHAINS,
   selectedChain: null,
+  api: null,
 };
 
 const NetworkContext = createContext(
@@ -28,6 +30,10 @@ const NetworkContext = createContext(
     getSelectedNetwork: () => Chain;
   }
 );
+
+const getApi = (rpc: string) => {
+  return ApiPromise.create({ provider: new WsProvider(rpc) });
+};
 
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
@@ -40,6 +46,12 @@ const reducer = (state: InitialState, action: any): InitialState => {
       return {
         ...state,
         selectedChain: action.payload,
+      };
+    }
+    case "set-api": {
+      return {
+        ...state,
+        api: action.payload,
       };
     }
     default:
@@ -69,6 +81,20 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return selectedNetwork?.chain;
   };
+
+  const setNewApi = async (chain: Chain) => {
+    const api = await getApi(chain.rpc[0]);
+    dispatch({
+      type: "set-api",
+      payload: api,
+    });
+  };
+
+  useEffect(() => {
+    if (state.selectedChain?.rpc[0]) {
+      setNewApi(state.selectedChain);
+    }
+  }, [state.selectedChain?.name]);
 
   return (
     <NetworkContext.Provider

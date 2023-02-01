@@ -8,6 +8,7 @@ import { Tab } from "@headlessui/react";
 import { DecryptFAB } from "../common/DecryptFAB";
 import { Settings } from "../settings";
 import { FullScreenFAB } from "../common/FullScreenFAB";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 const TABS = [
   {

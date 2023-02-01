@@ -80,7 +80,7 @@ export const PARACHAINS = [
   {
     name: "Moonbeam",
     chain: "MOON",
-    rpc: ["https://rpc.api.moonbeam.network", "wss://wss.api.moonbeam.network"],
+    rpc: ["wss://wss.api.moonbeam.network"],
     faucets: [],
     nativeCurrency: {
       name: "Glimmer",
@@ -162,10 +162,7 @@ export const TESTNETS = [
   {
     name: "Moonbase Alpha",
     chain: "MOON",
-    rpc: [
-      "https://rpc.api.moonbase.moonbeam.network",
-      "wss://wss.api.moonbase.moonbeam.network",
-    ],
+    rpc: ["wss://wss.api.moonbase.moonbeam.network"],
     faucets: [],
     nativeCurrency: {
       name: "Dev",
