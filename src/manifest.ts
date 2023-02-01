@@ -1,6 +1,5 @@
 import pkg from "../package.json";
-
-const isChrome = process.env.BROWSER_TARGET === "CHROME";
+import { isChrome } from "./utils/env";
 
 const commonManifest = {
   name: pkg.displayName,

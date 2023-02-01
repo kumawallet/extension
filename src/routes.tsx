@@ -2,7 +2,6 @@ import { AddAccount } from "./components/addAccount";
 import { Balance } from "./components/balance";
 import { Home } from "./components/home";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
-import { CreateAccount } from "./components/createAccount";
 
 import { Accounts } from "./components/accounts";
 import { ImportAccount } from "./components/importAccount/ImportAccount";
@@ -20,10 +19,12 @@ import {
   Security,
 } from "./components/settings";
 import Extension from "./utils/Extension";
+import { AddAccountForm } from "./components/addAccountForm";
 
 export const Routes = () => {
   const {
     state: { isInit },
+    createAccount,
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
@@ -35,8 +36,7 @@ export const Routes = () => {
         setHomeRoute(<Home />);
         return;
       }
-      const isVaultInitialized =
-        await Extension.isVaultInitialized();
+      const isVaultInitialized = await Extension.isVaultInitialized();
       if (!isVaultInitialized) {
         setHomeRoute(<AddAccount />);
         return;
@@ -57,7 +57,21 @@ export const Routes = () => {
         <Route path="/" element={homeRoute} />
         <Route path="/account" element={<Accounts />} />
         <Route path="/import-account" element={<ImportAccount />} />
-        <Route path="/create-account" element={<CreateAccount />} />
+        <Route
+          path="/create-account"
+          element={
+            <AddAccountForm
+              title="Create Account"
+              onSubmitFn={createAccount}
+              buttonText="Create"
+              fields={{ password: true }}
+              afterSubmitMessage="Account Created"
+              goAfterSubmit="/balance"
+              backButton
+              generateSeed
+            />
+          }
+        />
         <Route path="/add-account" element={<AddAccount />} />
         <Route path="/balance" element={<Balance />} />
         <Route path="/sign-in" element={<SignIn />} />
