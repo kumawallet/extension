@@ -17,6 +17,7 @@ interface AddAccountFormProps {
   generateSeed?: boolean;
   signUp?: boolean;
   onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
+  callback?: () => void;
   buttonText: string;
   backButton?: boolean;
   goAfterSubmit: string;
@@ -42,6 +43,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   goAfterSubmit,
   afterSubmitMessage,
   onSubmitFn,
+  callback,
 }) => {
   const { register, handleSubmit, watch } = useForm<AccountForm>({
     defaultValues: {
@@ -53,10 +55,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     },
   });
 
+
   const _onSubmit = handleSubmit(async (data) => {
     try {
       const result = await onSubmitFn({ ...data, seed, isSignUp });
       result && setIsSuccessful(true);
+      callback && callback();
     } catch (error) {
       console.log(error);
     }

@@ -28,11 +28,10 @@ export const Routes = () => {
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
   const [canDerive, setCanDerive] = useState(false);
 
+  const getWalletStatus = async () => {
+    setCanDerive(await Extension.areKeyringsInitialized());
+  };
   useEffect(() => {
-    const getWalletStatus = async () => {
-      setCanDerive(await Extension.areKeyringsInitialized());
-    };
-
     const getHomeRoute = async () => {
       const isFirstTime = !localStorage.getItem("welcome");
       if (isFirstTime) {
@@ -112,6 +111,7 @@ export const Routes = () => {
                 goAfterSubmit="/balance"
                 backButton
                 generateSeed
+                callback={getWalletStatus}
               />
             ) : (
               <AccountForm

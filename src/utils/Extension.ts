@@ -142,4 +142,8 @@ export default class Extension {
   static async setSelectedAccount(account: Account) {
     await Storage.getInstance().setSelectedAccount(account);
   }
+
+  static async getSelectedAccount(): Promise<Account | undefined> {
+    return Storage.getInstance().getSelectedAccount();
+  }
 }
