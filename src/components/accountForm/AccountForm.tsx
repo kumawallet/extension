@@ -64,10 +64,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       const result = await onSubmitFn({ ...data, seed, isSignUp });
       result && setIsSuccessful(true);
       callback && callback();
-    } catch (error) {
-      console.log(error);
+    } finally {
+      endLoading();
     }
-    endLoading();
   });
 
   const navigate = useNavigate();

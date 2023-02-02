@@ -1,4 +1,4 @@
-import { useToast } from "@src/hooks";
+import { useToast } from "../hooks";
 import {
   createContext,
   FC,
@@ -45,7 +45,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const createAccount = async ({ name, password, seed, isSignUp }: any) => {
     try {
-      return Extension.createAccounts({ name, password, seed, isSignUp });
+      await Extension.createAccounts({ name, password, seed, isSignUp });
+      return true;
     } catch (error) {
       showErrorToast(error);
       return false;
@@ -64,13 +65,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!password && !isUnlocked) {
         throw new Error("Password is required");
       }
-      return Extension.importAccount({
+      await Extension.importAccount({
         name,
         privateKeyOrSeed,
         password,
         accountType,
         isSignUp,
       });
+      return true;
     } catch (error) {
       showErrorToast(error);
       return false;

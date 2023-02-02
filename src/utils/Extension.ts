@@ -24,21 +24,16 @@ export default class Extension {
     password,
     isSignUp = true,
   }: any) {
-    try {
-      if (!seed) throw new Error("Cannot create accounts without seed");
-      if (isSignUp) {
-        if (!password) throw new Error("Missing password");
-        await this.init(password, true);
-      }
-      const isUnlocked = await Extension.isUnlocked();
-      if (!isUnlocked) throw new Error("Vault is locked");
-      await AccountManager.addWASMAccount(seed, name);
-      await AccountManager.addEVMAccount(seed, name);
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
+    if (!seed) throw new Error("Cannot create accounts without seed");
+    if (isSignUp) {
+      if (!password) throw new Error("Missing password");
+      await this.init(password, true);
     }
+    const isUnlocked = Extension.isUnlocked();
+    if (!isUnlocked) throw new Error("Vault is locked");
+    await AccountManager.addWASMAccount(seed, name);
+    await AccountManager.addEVMAccount(seed, name);
+    return true;
   }
 
   static async importAccount({
@@ -48,24 +43,19 @@ export default class Extension {
     accountType,
     isSignUp = true,
   }: any) {
-    try {
-      if (!privateKeyOrSeed) throw new Error("Cannot import accounts without seed or private key");
-      if (isSignUp) {
-        if (!password) throw new Error("Missing password");
-        await this.init(password, true);
-      }
-      const isUnlocked = await Extension.isUnlocked();
-      if (!isUnlocked) throw new Error("Vault is locked");
-      await AccountManager.importAccount({
-        name,
-        privateKeyOrSeed,
-        accountType,
-      });
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
+    if (!privateKeyOrSeed)
+      throw new Error("Cannot import accounts without seed or private key");
+    if (isSignUp) {
+      if (!password) throw new Error("Missing password");
+      await this.init(password, true);
     }
+    const isUnlocked = await Extension.isUnlocked();
+    if (!isUnlocked) throw new Error("Vault is locked");
+    await AccountManager.importAccount({
+      name,
+      privateKeyOrSeed,
+      accountType,
+    });
   }
 
   static removeAccount(key: AccountKey) {
@@ -77,18 +67,9 @@ export default class Extension {
   }
 
   static async signIn(password: string) {
-    try {
-      // Get encrypted vault from storage
-      const { vault } = await Storage.getInstance().getStorage().get(VAULT);
-      // Decrypt vault with password
-      await Auth.getInstance().signIn(password, vault);
-      // Cache password
-      await Storage.getInstance().cachePassword();
-      return true;
-    } catch (error) {
-      console.log("error", error);
-      return false;
-    }
+    const { vault } = await Storage.getInstance().getStorage().get(VAULT);
+    await Auth.getInstance().signIn(password, vault);
+    await Storage.getInstance().cachePassword();
   }
 
   static isVaultInitialized() {
@@ -96,14 +77,9 @@ export default class Extension {
   }
 
   static async areKeyringsInitialized(): Promise<boolean> {
-    try {
-      const vault = await Storage.getInstance().getVault();
-      if (!vault) return false;
-      return AccountManager.areKeyringsInitialized(vault);
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+    const vault = await Storage.getInstance().getVault();
+    if (!vault) return false;
+    return AccountManager.areKeyringsInitialized(vault);
   }
 
   static isUnlocked() {
