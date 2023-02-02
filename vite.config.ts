@@ -12,6 +12,8 @@ const isChrome = process.env.BROWSER_TARGET === "CHROME";
 const root = resolve(__dirname, "src");
 const pagesDir = resolve(root, "pages");
 const assetsDir = resolve(root, "assets");
+const hookDir = resolve(root, "hooks");
+
 const stylesDir = resolve(root, "styles");
 const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
@@ -23,6 +25,7 @@ export default defineConfig({
       "@assets": assetsDir,
       "@pages": pagesDir,
       "@styles": stylesDir,
+      "@hooks": hookDir,
     },
   },
   plugins: [react(), makeManifest(), copyContentStyle()],

@@ -6,8 +6,7 @@ import {
   useReducer,
 } from "react";
 import Extension from "../utils/Extension";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { useToast } from "@hooks/index";
+import { useToast } from "@hooks/useToast";
 
 interface InitialState {
   isInit: boolean;

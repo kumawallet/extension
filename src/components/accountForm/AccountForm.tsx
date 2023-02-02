@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { AccountType } from "@src/utils/AccountManager";
 import { FaCheckCircle } from "react-icons/fa";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { LoadingButton } from "../common/LoadingButton";
+import { useLoading } from "@hooks/useLoading";
 
 interface AddAccountFormProps {
   title: string;
@@ -45,6 +47,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
+  const { isLoading, endLoading, starLoading } = useLoading();
+
   const { register, handleSubmit, watch } = useForm<AccountForm>({
     defaultValues: {
       accountType: AccountType.EVM,
@@ -55,8 +59,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     },
   });
 
-
   const _onSubmit = handleSubmit(async (data) => {
+    starLoading();
     try {
       const result = await onSubmitFn({ ...data, seed, isSignUp });
       result && setIsSuccessful(true);
@@ -64,6 +68,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     } catch (error) {
       console.log(error);
     }
+    endLoading();
   });
 
   const navigate = useNavigate();
@@ -204,12 +209,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
           </>
         )}
         <div className="flex justify-end">
-          <button
-            className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline"
-            onClick={_onSubmit}
-          >
+          <LoadingButton onClick={_onSubmit} isLoading={isLoading}>
             {buttonText}
-          </button>
+          </LoadingButton>
         </div>
       </div>
     </PageWrapper>
