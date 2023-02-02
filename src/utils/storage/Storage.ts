@@ -86,8 +86,10 @@ export default class Storage {
 
   async init(force = false) {
     try {
-      if ((await this.isVaultInitialized()) && !force) {
-        return;
+      if (!force) {
+        if (await this.isVaultInitialized()) {
+          throw new Error("Vault already initialized");
+        }
       }
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
