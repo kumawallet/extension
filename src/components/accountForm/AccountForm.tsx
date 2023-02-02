@@ -92,10 +92,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       });
       result && setIsSuccessful(true);
       callback && callback();
-    } catch (error) {
-      console.log(error);
+    } finally {
+      endLoading();
     }
-    endLoading();
   });
 
   const navigate = useNavigate();

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import Extension from "../utils/Extension";
-import Storage from "../utils/storage/Storage";
 import {
   createContext,
   FC,
@@ -9,7 +8,7 @@ import {
   useReducer,
 } from "react";
 import { Account } from "@src/utils/storage/entities/Accounts";
-import { useToast } from "@src/hooks";
+import { useToast } from "../hooks";
 
 interface InitialState {
   accounts: Account[];
