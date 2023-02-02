@@ -1,9 +1,17 @@
 import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
 
-export const TotalBalance = ({ balance = 0 }: { balance: number }) => {
+export const TotalBalance = ({
+  balance = 0,
+  accountName = "Account 1",
+}: {
+  balance: number;
+  accountName: string;
+}) => {
   return (
     <div className="mx-auto">
-      <p className="text-lg mb-6">Total Account Balance</p>
+      <div className="flex items-center justify-center">
+        <p className="text-2xl mb-6">{accountName}</p>
+      </div>
       <div className="flex mb-8 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
         <p className="text-5xl">{balance}</p>

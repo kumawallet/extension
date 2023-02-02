@@ -13,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { InputErrorMessage } from "../common/InputErroMessage";
 
 const PASSWORD_RULES =
-  "password must contain at least eight characters, at least one number and both lower and uppercase letters and special characters";
+  "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.";
 
 interface AddAccountFormProps {
   title: string;

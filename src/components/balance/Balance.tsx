@@ -99,7 +99,7 @@ export const Balance = () => {
       </header>
       <PageWrapper contentClassName="py-6">
         <div className="flex flex-col">
-          <TotalBalance balance={totalBalance} />
+          <TotalBalance accountName={selectedAccount?.value?.name} balance={totalBalance} />
 
           <Tab.Group>
             <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">

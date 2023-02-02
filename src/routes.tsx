@@ -96,6 +96,7 @@ export const Routes = () => {
               goAfterSubmit="/balance"
               backButton
               generateSeed
+              callback={getWalletStatus}
             />
           }
         />
