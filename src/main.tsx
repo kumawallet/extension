@@ -3,6 +3,9 @@ import { AuthProvider } from "./providers/AuthProvider";
 import { Routes } from "./routes";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import PolkadotKeyring from "@polkadot/ui-keyring";
+import { ToastContainer } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 cryptoWaitReady()
   .then((): void => {
@@ -19,6 +22,7 @@ export const Main = () => {
       <NetworkProvider>
         <AccountProvider>
           <Routes />
+          <ToastContainer theme="dark" />
         </AccountProvider>
       </NetworkProvider>
     </AuthProvider>

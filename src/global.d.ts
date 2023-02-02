@@ -1,7 +1,9 @@
 import Chrome from "chrome";
 
-interface Window {
-  browser;
+declare global {
+  interface Window {
+    browser;
+  }
 }
 
 declare namespace browser {

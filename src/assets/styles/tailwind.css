@@ -11,3 +11,9 @@ body {
   background: #212529;
   color: white
 }
+
+.toast {
+  background-color: #343A40 !important;  
+  border: 1px solid #343A40;
+  color: #fff !important
+}

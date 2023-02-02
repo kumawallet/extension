@@ -24,7 +24,7 @@ export default class Storage {
   private constructor() {
     this.#storage = isChrome
       ? chrome.storage.local
-      : window.browser?.storage.local; // add browser to namespace?
+      : window.browser.storage.local; // add browser to namespace?
   }
 
   static getInstance() {
