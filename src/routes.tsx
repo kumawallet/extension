@@ -27,9 +27,11 @@ export const Routes = () => {
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
   const [canDerive, setCanDerive] = useState(false);
+  const [importIsSignUp, setImportIsSignUp] = useState(true);
 
   const getWalletStatus = async () => {
     setCanDerive(await Extension.areKeyringsInitialized());
+    setImportIsSignUp(!await Extension.isVaultInitialized());
   };
   useEffect(() => {
     const getHomeRoute = async () => {
@@ -69,15 +71,15 @@ export const Routes = () => {
               title="Import Account"
               onSubmitFn={importAccount}
               buttonText="Import"
-              signUp={true}
+              signUp={importIsSignUp}
               fields={{
-                password: true,
                 privateKeyOrSeed: true,
                 accountType: true,
               }}
               afterSubmitMessage="Account imported"
               goAfterSubmit="/balance"
               backButton
+              callback={getWalletStatus}
             />
           }
         />
@@ -89,7 +91,7 @@ export const Routes = () => {
               onSubmitFn={createAccount}
               buttonText="Create"
               signUp={true}
-              fields={{ password: true }}
+              fields={{}}
               afterSubmitMessage="Account created"
               goAfterSubmit="/balance"
               backButton
