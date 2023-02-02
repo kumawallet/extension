@@ -13,7 +13,8 @@ import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
 import Keyring from "./entities/Keyring";
 import { Network } from "./entities/Network";
-import { isChrome } from "../env";
+
+const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
@@ -21,13 +22,9 @@ export default class Storage {
   private static instance: Storage;
 
   private constructor() {
-    // this.#storage = isChrome
-    //   ? chrome.storage.local
-    //   : window.browser?.storage.local; // add browser to namespace?
-
-    // TODO: isChrome is only bulding time, isChrome is always false when extension is running
-    // find a way to save this const locally?
-    this.#storage = chrome.storage.local;
+    this.#storage = isChrome
+      ? chrome.storage.local
+      : window.browser?.storage.local; // add browser to namespace?
   }
 
   static getInstance() {
