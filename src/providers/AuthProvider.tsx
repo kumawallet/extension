@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import Extension from "../utils/Extension";
 import {
   createContext,
   FC,
@@ -7,7 +5,9 @@ import {
   useContext,
   useReducer,
 } from "react";
+import Extension from "../utils/Extension";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { useToast } from "@hooks/index";
 
 interface InitialState {
   isInit: boolean;
@@ -17,14 +17,14 @@ const initialState: InitialState = {
   isInit: true,
 };
 
-const AuthContext = createContext(
-  {} as {
-    state: InitialState;
-    createAccount: (newAccount: any) => Promise<boolean>;
-    importAccount: (newAccount: any) => Promise<boolean>;
-    deriveAccount: (newAccount: any) => Promise<boolean>;
-  }
-);
+interface AuthContext {
+  state: InitialState;
+  createAccount: (newAccount: any) => Promise<boolean>;
+  importAccount: (newAccount: any) => Promise<boolean>;
+  deriveAccount: (newAccount: any) => Promise<boolean>;
+}
+
+const AuthContext = createContext({} as AuthContext);
 
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
@@ -40,16 +40,18 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showErrorToast } = useToast();
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    (async () => {
-      dispatch({
-        type: "init",
-        payload: {},
-      });
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     dispatch({
+  //       type: "init",
+  //       payload: {},
+  //     });
+  //   })();
+  // }, []);
 
   const createAccount = async ({ name, password, confirmPassword }: any) => {
     try {
@@ -59,7 +61,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       const seed = mnemonicGenerate(24);
       return Extension.signUp({ password, name, seed });
     } catch (error) {
-      console.log(error as string);
+      showErrorToast(error);
       return false;
     }
   };
@@ -78,7 +80,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         accountType,
       });
     } catch (error) {
-      console.log(error as string);
+      showErrorToast(error);
       return false;
     }
   };
@@ -89,7 +91,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await Extension.setSelectedAccount(account);
       return true;
     } catch (error) {
-      console.log(error as string);
+      showErrorToast(error);
       return false;
     }
   };

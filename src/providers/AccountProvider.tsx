@@ -9,6 +9,7 @@ import {
   useReducer,
 } from "react";
 import { Account } from "@src/utils/storage/entities/Accounts";
+import { useToast } from "@src/hooks";
 
 interface InitialState {
   accounts: Account[];
@@ -56,6 +57,8 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showErrorToast } = useToast();
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
@@ -73,7 +76,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
-      console.log(error);
+      showErrorToast(error);
+      return [];
     }
   };
 
@@ -88,15 +92,18 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return selectedAccount;
     } catch (error) {
-      console.log(error);
+      showErrorToast(error);
     }
   };
 
   const setSelectedAccount = async (account: Account) => {
-    await Storage.getInstance().setSelectedAccount(account);
-    getSelectedAccount();
+    try {
+      await Storage.getInstance().setSelectedAccount(account);
+      getSelectedAccount();
+    } catch (error) {
+      showErrorToast(error);
+    }
   };
-
 
   return (
     <AccountContext.Provider

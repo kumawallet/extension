@@ -10,6 +10,7 @@ import Extension from "../utils/Extension";
 import Storage from "@src/utils/storage/Storage";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useEffect } from "react";
+import { useToast } from "../hooks/useToast";
 
 interface InitialState {
   chains: typeof CHAINS;
@@ -23,13 +24,13 @@ const initialState: InitialState = {
   api: null,
 };
 
-const NetworkContext = createContext(
-  {} as {
-    state: InitialState;
-    setSelectNetwork: (network: any) => void;
-    getSelectedNetwork: () => Promise<string | undefined>;
-  }
-);
+interface NetworkContext {
+  state: InitialState;
+  setSelectNetwork: (network: Chain) => void;
+  getSelectedNetwork: () => Promise<Chain | undefined>;
+}
+
+const NetworkContext = createContext({} as NetworkContext);
 
 const getApi = (rpc: string) => {
   return ApiPromise.create({ provider: new WsProvider(rpc) });
@@ -37,11 +38,6 @@ const getApi = (rpc: string) => {
 
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
-    case "init": {
-      return {
-        ...state,
-      };
-    }
     case "select-network": {
       return {
         ...state,
@@ -60,34 +56,48 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { showErrorToast } = useToast();
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const setSelectNetwork = async (network: Chain) => {
-    await Extension.setNetwork(network);
+    try {
+      await Extension.setNetwork(network);
 
-    dispatch({
-      type: "select-network",
-      payload: network,
-    });
+      dispatch({
+        type: "select-network",
+        payload: network,
+      });
+    } catch (error) {
+      showErrorToast(error);
+    }
   };
 
   const getSelectedNetwork = async () => {
+    try {
+      const { chain: selectedNetwork } =
+        await Storage.getInstance().getNetwork();
+      dispatch({
+        type: "select-network",
+        payload: selectedNetwork,
+      });
 
-    const { chain: selectedNetwork } = await Storage.getInstance().getNetwork();
-    dispatch({
-      type: "select-network",
-      payload: selectedNetwork,
-    });
-
-    return selectedNetwork;
+      return selectedNetwork;
+    } catch (error) {
+      showErrorToast(error);
+    }
   };
 
   const setNewApi = async (chain: Chain) => {
-    const api = await getApi(chain.rpc[0]);
-    dispatch({
-      type: "set-api",
-      payload: api,
-    });
+    try {
+      const api = await getApi(chain.rpc[0]);
+      dispatch({
+        type: "set-api",
+        payload: api,
+      });
+    } catch (error) {
+      showErrorToast(error);
+    }
   };
 
   useEffect(() => {
