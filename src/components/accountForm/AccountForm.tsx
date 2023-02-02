@@ -8,6 +8,9 @@ import { FaCheckCircle } from "react-icons/fa";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { LoadingButton } from "../common/LoadingButton";
 import { useLoading } from "@hooks/useLoading";
+import { object, string, ref } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { InputErrorMessage } from "../common/InputErroMessage";
 
 interface AddAccountFormProps {
   title: string;
@@ -46,9 +49,29 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
+  const passwordIsRequired = signUp;
+
+  const schema = object({
+    name: string().required(),
+    password: passwordIsRequired
+      ? string().min(8, "min 5").required("required!")
+      : string().notRequired(),
+    confirmPassword: passwordIsRequired
+      ? string().min(8, "min 5").required("required!")
+      : string()
+          .min(8, "min 5")
+          .oneOf([ref("password"), null], "Passwords must match")
+          .required("required"),
+  }).required();
+
   const { isLoading, endLoading, starLoading } = useLoading();
 
-  const { register, handleSubmit, watch } = useForm<AccountForm>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<AccountForm>({
     defaultValues: {
       accountType: AccountType.EVM,
       confirmPassword: "",
@@ -56,12 +79,17 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       name: "",
       privateKeyOrSeed: "",
     },
+    resolver: yupResolver(schema),
   });
 
   const _onSubmit = handleSubmit(async (data) => {
     starLoading();
     try {
-      const result = await onSubmitFn({ ...data, seed, isSignUp });
+      const result = await onSubmitFn({
+        ...data,
+        seed,
+        isSignUp: passwordIsRequired,
+      });
       result && setIsSuccessful(true);
       callback && callback();
     } catch (error) {
@@ -74,7 +102,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
-  const [isSignUp] = useState(() => (signUp ? true : false));
 
   if (isSuccessful)
     return (
@@ -171,7 +198,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             {...register("name")}
           />
         </div>
-        {isSignUp && (
+        {passwordIsRequired && (
           <>
             <div>
               <label
@@ -189,6 +216,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                 {...register("password")}
               />
+              <InputErrorMessage message={errors.password?.message} />
             </div>
             <div>
               <label
@@ -204,6 +232,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                 {...register("confirmPassword")}
               />
+              <InputErrorMessage message={errors.confirmPassword?.message} />
             </div>
           </>
         )}
