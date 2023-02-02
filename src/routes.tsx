@@ -2,9 +2,7 @@ import { AddAccount } from "./components/addAccount";
 import { Balance } from "./components/balance";
 import { Home } from "./components/home";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
-
 import { Accounts } from "./components/accounts";
-import { ImportAccount } from "./components/importAccount/ImportAccount";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "./providers/AuthProvider";
 import { SignIn } from "./components/signIn";
@@ -19,12 +17,13 @@ import {
   Security,
 } from "./components/settings";
 import Extension from "./utils/Extension";
-import { AddAccountForm } from "./components/addAccountForm";
+import { AddAccountForm } from "./components/addAccountForm/AddAccountForm";
 
 export const Routes = () => {
   const {
     state: { isInit },
     createAccount,
+    importAccount,
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
@@ -56,7 +55,24 @@ export const Routes = () => {
       <RRoutes>
         <Route path="/" element={homeRoute} />
         <Route path="/account" element={<Accounts />} />
-        <Route path="/import-account" element={<ImportAccount />} />
+        <Route
+          path="/import-account"
+          element={
+            <AddAccountForm
+              title="Import Account"
+              onSubmitFn={importAccount}
+              buttonText="Import"
+              fields={{
+                password: true,
+                privateKeyOrSeed: true,
+                accountType: true,
+              }}
+              afterSubmitMessage="Account imported"
+              goAfterSubmit="/balance"
+              backButton
+            />
+          }
+        />
         <Route
           path="/create-account"
           element={
@@ -65,7 +81,7 @@ export const Routes = () => {
               onSubmitFn={createAccount}
               buttonText="Create"
               fields={{ password: true }}
-              afterSubmitMessage="Account Created"
+              afterSubmitMessage="Account created"
               goAfterSubmit="/balance"
               backButton
               generateSeed
@@ -76,7 +92,6 @@ export const Routes = () => {
         <Route path="/balance" element={<Balance />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/derive-account" element={<DeriveAccount />} />
-        <Route path="/derive-import" element={<DeriveImport />} />
 
         {/* setting views */}
         <Route path="/settings-general" element={<General />} />

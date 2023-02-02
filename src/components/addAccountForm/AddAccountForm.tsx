@@ -12,6 +12,7 @@ interface AddAccountFormProps {
   fields: {
     accountType?: boolean;
     password?: boolean;
+    privateKeyOrSeed?: boolean;
   };
   generateSeed?: boolean;
   onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
@@ -26,6 +27,7 @@ interface AccountForm {
   name: string;
   password?: string;
   confirmPassword?: string;
+  privateKeyOrSeed?: string;
 }
 
 export const AddAccountForm: FC<AddAccountFormProps> = ({
@@ -38,12 +40,13 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
   afterSubmitMessage,
   onSubmitFn,
 }) => {
-  const { register, handleSubmit } = useForm<AccountForm>({
+  const { register, handleSubmit, watch } = useForm<AccountForm>({
     defaultValues: {
       accountType: AccountType.EVM,
       confirmPassword: "",
       password: "",
       name: "",
+      privateKeyOrSeed: "",
     },
   });
 
@@ -76,7 +79,7 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
             className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto"
             onClick={() => navigate(goAfterSubmit)}
           >
-            continue
+            Continue
           </button>
         </div>
       </PageWrapper>
@@ -98,7 +101,7 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
         {generateSeed && (
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Seed:
+              Seed
             </label>
             <textarea
               className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
@@ -126,12 +129,32 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
             </select>
           </div>
         )}
+        {fields.privateKeyOrSeed && (
+           <div>
+           <label
+             htmlFor="privateKeyOrSeed"
+             className="block text-sm font-medium mb-1"
+           >
+             {AccountType.EVM == watch("accountType")
+               ? "Private Key"
+               : `Seed Phrase`}
+           </label>
+           <input
+             id="privateKeyOrSeed"
+             type={"password"}
+             className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+             {...register("privateKeyOrSeed")}
+           />
+         </div>
+        )}
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
             Account Name (optional)
           </label>
           <input
             id="name"
+            placeholder="Max 32 characters"
+            max={32}
             className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
             {...register("name")}
           />
@@ -147,7 +170,9 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
               </label>
               <input
                 id="password"
-                required
+                placeholder="Must be at least 8 characters long"
+                min={8}
+                onPaste={(e) => e.preventDefault()}
                 type={"password"}
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                 {...register("password")}
@@ -162,6 +187,7 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
               </label>
               <input
                 id="confirmPassword"
+                onPaste={(e) => e.preventDefault()}
                 type={"password"}
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                 {...register("confirmPassword")}

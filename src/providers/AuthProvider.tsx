@@ -8,7 +8,6 @@ import {
   useReducer,
 } from "react";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { ImportAccountFormType } from "@src/components/importAccount/importAccount-interfaces";
 
 interface InitialState {
   isInit: boolean;
@@ -22,7 +21,7 @@ const AuthContext = createContext(
   {} as {
     state: InitialState;
     createAccount: (newAccount: any) => Promise<boolean>;
-    importAccount: (newAccount: ImportAccountFormType) => Promise<boolean>;
+    importAccount: (newAccount: any) => Promise<boolean>;
   }
 );
 
