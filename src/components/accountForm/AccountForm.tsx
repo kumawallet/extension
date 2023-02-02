@@ -12,6 +12,9 @@ import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InputErrorMessage } from "../common/InputErroMessage";
 
+const PASSWORD_RULES =
+  "password must contain at least eight characters, at least one number and both lower and uppercase letters and special characters";
+
 interface AddAccountFormProps {
   title: string;
   fields: {
@@ -54,14 +57,18 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const schema = object({
     name: string().required(),
     password: passwordIsRequired
-      ? string().min(8, "min 5").required("required!")
+      ? string()
+          .matches(
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+            PASSWORD_RULES
+          )
+          .required("required!")
       : string().notRequired(),
     confirmPassword: passwordIsRequired
-      ? string().min(8, "min 5").required("required!")
-      : string()
-          .min(8, "min 5")
-          .oneOf([ref("password"), null], "Passwords must match")
-          .required("required"),
+      ? string()
+          .oneOf([ref("password"), null], "Passwords doesn't match")
+          .required("required")
+      : string().notRequired(),
   }).required();
 
   const { isLoading, endLoading, starLoading } = useLoading();
@@ -105,7 +112,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   if (isSuccessful)
     return (
       <PageWrapper>
-        <div className="flex flex-col text-center pt-`0">
+        <div className="flex flex-col text-center pt-0 h-screen justify-center">
           <div className="flex gap-3 items-center mb-3 justify-center">
             <p className="text-3xl text-custom-green-bg">
               {afterSubmitMessage}
@@ -215,7 +222,11 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                 {...register("password")}
               />
-              <InputErrorMessage message={errors.password?.message} />
+              {errors.password?.message ? (
+                <InputErrorMessage message={errors.password?.message} />
+              ) : (
+                <p className="text-gray-400 py-2 px-1"> {PASSWORD_RULES}</p>
+              )}
             </div>
             <div>
               <label

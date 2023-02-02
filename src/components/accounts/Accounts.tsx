@@ -67,7 +67,7 @@ export const Accounts = () => {
                   }}
                 >
                   <p className="w-3/4 overflow-hidden text-ellipsis">
-                    <p className="text-cl">{account?.value?.name}</p>
+                    <p className="text-lg font-bold">{account?.value?.name}</p>
                     <p>{account?.value?.address}</p>
                   </p>
                   <p>{format(account?.type)}</p>
