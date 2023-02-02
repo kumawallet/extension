@@ -7,10 +7,10 @@ import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
 
 export default class Extension {
-  private static async init(password: string) {
+  private static async init(password: string, force?: boolean) {
     try {
       await Auth.getInstance().signUp({ password });
-      await Storage.getInstance().init();
+      await Storage.getInstance().init(force);
       await Storage.getInstance().cachePassword();
     } catch (error) {
       console.error(error);
