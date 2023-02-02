@@ -1,3 +1,4 @@
+import { useToast } from "@src/hooks";
 import {
   createContext,
   FC,
@@ -6,7 +7,6 @@ import {
   useReducer,
 } from "react";
 import Extension from "../utils/Extension";
-import { useToast } from "@hooks/useToast";
 
 interface InitialState {
   isInit: boolean;
@@ -42,15 +42,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     dispatch({
-  //       type: "init",
-  //       payload: {},
-  //     });
-  //   })();
-  // }, []);
 
   const createAccount = async ({ name, password, seed, isSignUp }: any) => {
     try {

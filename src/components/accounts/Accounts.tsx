@@ -38,7 +38,7 @@ export const Accounts = () => {
     <>
       <div className="flex justify-between mb-6 mt-3">
         <button
-          onClick={() => navigate("/derive-import")}
+          onClick={() => navigate("/import-account")}
           className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
           Import

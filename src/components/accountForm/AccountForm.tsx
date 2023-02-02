@@ -13,7 +13,6 @@ interface AddAccountFormProps {
   title: string;
   fields: {
     accountType?: boolean;
-    password?: boolean;
     privateKeyOrSeed?: boolean;
   };
   generateSeed?: boolean;
@@ -172,7 +171,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             {...register("name")}
           />
         </div>
-        {fields.password && (
+        {isSignUp && (
           <>
             <div>
               <label
