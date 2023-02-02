@@ -26,7 +26,11 @@ export const Routes = () => {
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
+  const [canDerive, setCanDerive] = useState(false);
 
+  const getWalletStatus = async () => {
+    setCanDerive(await Extension.areKeyringsInitialized());
+  };
   useEffect(() => {
     const getHomeRoute = async () => {
       const isFirstTime = !localStorage.getItem("welcome");
@@ -47,6 +51,7 @@ export const Routes = () => {
       setHomeRoute(<Balance />);
     };
     getHomeRoute();
+    getWalletStatus();
   }, [Extension, isInit]);
 
   return (
@@ -64,6 +69,7 @@ export const Routes = () => {
               title="Import Account"
               onSubmitFn={importAccount}
               buttonText="Import"
+              signUp={true}
               fields={{
                 password: true,
                 privateKeyOrSeed: true,
@@ -82,6 +88,7 @@ export const Routes = () => {
               title="Create Account"
               onSubmitFn={createAccount}
               buttonText="Create"
+              signUp={true}
               fields={{ password: true }}
               afterSubmitMessage="Account created"
               goAfterSubmit="/balance"
@@ -93,15 +100,31 @@ export const Routes = () => {
         <Route
           path="/derive-account"
           element={
-            <AccountForm
-              title="Create Account"
-              onSubmitFn={deriveAccount}
-              buttonText="Create"
-              fields={{ accountType: true }}
-              afterSubmitMessage="Account created"
-              goAfterSubmit="/balance"
-              backButton
-            />
+            !canDerive ? (
+              <AccountForm
+                title="Create Account"
+                onSubmitFn={createAccount}
+                buttonText="Create"
+                fields={{}}
+                signUp={false}
+                afterSubmitMessage="Account created"
+                goAfterSubmit="/balance"
+                backButton
+                generateSeed
+                callback={getWalletStatus}
+              />
+            ) : (
+              <AccountForm
+                title="Create Account"
+                onSubmitFn={deriveAccount}
+                signUp={false}
+                buttonText="Create"
+                fields={{ accountType: true }}
+                afterSubmitMessage="Account created"
+                goAfterSubmit="/balance"
+                backButton
+              />
+            )
           }
         />
 

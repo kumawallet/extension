@@ -83,7 +83,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSelectedAccount = async () => {
     try {
-      const selectedAccount = await Storage.getInstance().getSelectedAccount();
+      const selectedAccount = await Extension.getSelectedAccount();
       dispatch({
         type: "set-selected-account",
         payload: {
@@ -98,7 +98,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const setSelectedAccount = async (account: Account) => {
     try {
-      await Storage.getInstance().setSelectedAccount(account);
+      await Extension.setSelectedAccount(account);
       getSelectedAccount();
     } catch (error) {
       showErrorToast(error);

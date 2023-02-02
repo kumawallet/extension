@@ -18,10 +18,20 @@ export default class Extension {
     }
   }
 
-  static async signUp({ seed, name = "New Account", password }: any) {
+  static async createAccounts({
+    seed,
+    name = "New Account",
+    password,
+    isSignUp = true,
+  }: any) {
     try {
-      if (!seed || !password) throw new Error("Missing data");
-      await this.init(password);
+      if (!seed) throw new Error("Cannot create accounts without seed");
+      if (isSignUp) {
+        if (!password) throw new Error("Missing password");
+        await this.init(password, true);
+      }
+      const isUnlocked = await Extension.isUnlocked();
+      if (!isUnlocked) throw new Error("Vault is locked");
       await AccountManager.addWASMAccount(seed, name);
       await AccountManager.addEVMAccount(seed, name);
       return true;
@@ -36,10 +46,16 @@ export default class Extension {
     privateKeyOrSeed,
     password,
     accountType,
+    isSignUp = true,
   }: any) {
     try {
-      if (!privateKeyOrSeed || !password) throw new Error("Missing data");
-      await this.init(password);
+      if (!privateKeyOrSeed) throw new Error("Cannot import accounts without seed or private key");
+      if (isSignUp) {
+        if (!password) throw new Error("Missing password");
+        await this.init(password, true);
+      }
+      const isUnlocked = await Extension.isUnlocked();
+      if (!isUnlocked) throw new Error("Vault is locked");
       await AccountManager.importAccount({
         name,
         privateKeyOrSeed,
@@ -79,6 +95,17 @@ export default class Extension {
     return Storage.getInstance().isVaultInitialized();
   }
 
+  static async areKeyringsInitialized(): Promise<boolean> {
+    try {
+      const vault = await Storage.getInstance().getVault();
+      if (!vault) return false;
+      return AccountManager.areKeyringsInitialized(vault);
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
   static isUnlocked() {
     return Auth.isUnlocked;
   }
@@ -114,5 +141,9 @@ export default class Extension {
 
   static async setSelectedAccount(account: Account) {
     await Storage.getInstance().setSelectedAccount(account);
+  }
+
+  static async getSelectedAccount(): Promise<Account | undefined> {
+    return Storage.getInstance().getSelectedAccount();
   }
 }

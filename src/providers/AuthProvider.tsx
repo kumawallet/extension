@@ -53,13 +53,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   //   })();
   // }, []);
 
-  const createAccount = async ({ name, password, confirmPassword }: any) => {
+  const createAccount = async ({ name, password, seed, isSignUp }: any) => {
     try {
-      if (password !== confirmPassword) {
-        throw new Error("Password does not match");
-      }
-      const seed = mnemonicGenerate(24);
-      return Extension.signUp({ password, name, seed });
+      return Extension.createAccounts({ name, password, seed, isSignUp });
     } catch (error) {
       showErrorToast(error);
       return false;
@@ -71,13 +67,19 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     privateKeyOrSeed,
     password,
     accountType,
+    isSignUp,
   }: any) => {
     try {
+      const isUnlocked = await Extension.isUnlocked();
+      if (!password && !isUnlocked) {
+        throw new Error("Password is required");
+      }
       return Extension.importAccount({
         name,
         privateKeyOrSeed,
         password,
         accountType,
+        isSignUp,
       });
     } catch (error) {
       showErrorToast(error);
@@ -87,6 +89,10 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const deriveAccount = async ({ name, accountType }: any) => {
     try {
+      const isUnlocked = await Extension.isUnlocked();
+      if (!isUnlocked) {
+        throw new Error("Extension is locked");
+      }
       const account = await Extension.deriveAccount({ name, accountType });
       await Extension.setSelectedAccount(account);
       return true;

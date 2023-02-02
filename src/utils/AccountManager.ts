@@ -162,4 +162,9 @@ export default class AccountManager {
     if (!accounts) return undefined;
     return accounts;
   }
+
+  static async areKeyringsInitialized(vault: Vault): Promise<boolean> {
+    const keyrings = await vault.getAll();
+    return keyrings.filter((keyring) => keyring.type === AccountType.EVM || keyring.type === AccountType.WASM).length > 0;
+  }
 }

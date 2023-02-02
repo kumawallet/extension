@@ -15,7 +15,9 @@ interface AddAccountFormProps {
     privateKeyOrSeed?: boolean;
   };
   generateSeed?: boolean;
+  signUp?: boolean;
   onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
+  callback?: () => void;
   buttonText: string;
   backButton?: boolean;
   goAfterSubmit: string;
@@ -28,17 +30,20 @@ interface AccountForm {
   password?: string;
   confirmPassword?: string;
   privateKeyOrSeed?: string;
+  isSignUp: boolean;
 }
 
 export const AccountForm: FC<AddAccountFormProps> = ({
   title,
   fields,
   generateSeed = false,
+  signUp = true,
   buttonText,
   backButton,
   goAfterSubmit,
   afterSubmitMessage,
   onSubmitFn,
+  callback,
 }) => {
   const { register, handleSubmit, watch } = useForm<AccountForm>({
     defaultValues: {
@@ -50,10 +55,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     },
   });
 
+
   const _onSubmit = handleSubmit(async (data) => {
     try {
-      const result = await onSubmitFn({ ...data, seed });
+      const result = await onSubmitFn({ ...data, seed, isSignUp });
       result && setIsSuccessful(true);
+      callback && callback();
     } catch (error) {
       console.log(error);
     }
@@ -63,6 +70,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
+  const [isSignUp] = useState(() => (signUp ? true : false));
 
   if (isSuccessful)
     return (

@@ -88,6 +88,7 @@ export default class Storage {
           throw new Error("Vault already initialized");
         }
       }
+      await this.#storage.clear();
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
       const selectedAccount = undefined;
