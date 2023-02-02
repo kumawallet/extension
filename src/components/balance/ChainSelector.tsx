@@ -29,7 +29,7 @@ export const ChainSelector = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0">
+        <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
           <div className="px-6 py-2 pt-2 text-start">
             <div className="flex flex-col gap-1">
               {chains.map((spec) => (
@@ -42,7 +42,7 @@ export const ChainSelector = () => {
                     <Menu.Item key={index.toString()}>
                       {({ close }) => (
                         <div
-                          className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg py-2 px-4 rounded-xl"
+                          className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
                           onClick={() => {
                             setSelectNetwork(chain);
 
