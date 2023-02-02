@@ -30,7 +30,7 @@ interface AccountForm {
   privateKeyOrSeed?: string;
 }
 
-export const AddAccountForm: FC<AddAccountFormProps> = ({
+export const AccountForm: FC<AddAccountFormProps> = ({
   title,
   fields,
   generateSeed = false,
@@ -130,22 +130,22 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
           </div>
         )}
         {fields.privateKeyOrSeed && (
-           <div>
-           <label
-             htmlFor="privateKeyOrSeed"
-             className="block text-sm font-medium mb-1"
-           >
-             {AccountType.EVM == watch("accountType")
-               ? "Private Key"
-               : `Seed Phrase`}
-           </label>
-           <input
-             id="privateKeyOrSeed"
-             type={"password"}
-             className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-             {...register("privateKeyOrSeed")}
-           />
-         </div>
+          <div>
+            <label
+              htmlFor="privateKeyOrSeed"
+              className="block text-sm font-medium mb-1"
+            >
+              {AccountType.EVM == watch("accountType")
+                ? "Private Key"
+                : `Seed Phrase`}
+            </label>
+            <input
+              id="privateKeyOrSeed"
+              type={"password"}
+              className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              {...register("privateKeyOrSeed")}
+            />
+          </div>
         )}
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">

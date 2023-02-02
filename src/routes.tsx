@@ -15,7 +15,7 @@ import {
   Security,
 } from "./components/settings";
 import Extension from "./utils/Extension";
-import { AddAccountForm } from "./components/addAccountForm/AddAccountForm";
+import { AccountForm } from "./components/accountForm/AccountForm";
 
 export const Routes = () => {
   const {
@@ -60,7 +60,7 @@ export const Routes = () => {
         <Route
           path="/import-account"
           element={
-            <AddAccountForm
+            <AccountForm
               title="Import Account"
               onSubmitFn={importAccount}
               buttonText="Import"
@@ -78,7 +78,7 @@ export const Routes = () => {
         <Route
           path="/create-account"
           element={
-            <AddAccountForm
+            <AccountForm
               title="Create Account"
               onSubmitFn={createAccount}
               buttonText="Create"
@@ -93,7 +93,7 @@ export const Routes = () => {
         <Route
           path="/derive-account"
           element={
-            <AddAccountForm
+            <AccountForm
               title="Create Account"
               onSubmitFn={deriveAccount}
               buttonText="Create"
