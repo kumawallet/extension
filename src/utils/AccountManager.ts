@@ -108,7 +108,7 @@ export default class AccountManager {
         return AccountManager.addEVMAccount(keyring.seed, name, path, keyring);
       case AccountType.WASM:
         path = `${keyring.path}/${keyring.accountQuantity}`;
-        return AccountManager.addWASMAccount(keyring.seed, name, keyring);
+        return AccountManager.addWASMAccount(path, name, keyring);
       default:
         throw new Error("Invalid account type");
     }

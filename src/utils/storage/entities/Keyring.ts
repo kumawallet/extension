@@ -18,8 +18,8 @@ export default class Keyring {
     accountQuantity?: number
   ) {
     this.#key = key;
-    this.#accountQuantity = accountQuantity || 0;
-    this.#path = type == AccountType.EVM ? ACCOUNT_PATH: "";
+    this.#accountQuantity = accountQuantity || 1;
+    this.#path = type == AccountType.EVM ? ACCOUNT_PATH : seed;
     this.#seed = seed;
     this.#type = type;
     this.#privateKey = privateKey;

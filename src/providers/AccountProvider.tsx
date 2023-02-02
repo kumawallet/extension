@@ -9,7 +9,6 @@ import {
   useReducer,
 } from "react";
 import { Account } from "@src/utils/storage/entities/Accounts";
-import { AccountType } from "@src/utils/AccountManager";
 
 interface InitialState {
   accounts: Account[];
@@ -29,10 +28,6 @@ const AccountContext = createContext(
     getAllAccounts: () => Promise<Account[]>;
     getSelectedAccount: () => Promise<Account | undefined>;
     setSelectedAccount: (account: Account) => void;
-    derivateAccount: (
-      name: string,
-      accountType: AccountType
-    ) => Promise<Account>;
   }
 );
 
@@ -102,9 +97,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     getSelectedAccount();
   };
 
-  const derivateAccount = async (name: string, accountType: AccountType) => {
-    return await Extension.derivateAccount(name, accountType);
-  };
 
   return (
     <AccountContext.Provider
@@ -113,7 +105,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         getAllAccounts,
         getSelectedAccount,
         setSelectedAccount,
-        derivateAccount,
       }}
     >
       {children}

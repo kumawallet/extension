@@ -53,7 +53,7 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
   const _onSubmit = handleSubmit(async (data) => {
     try {
       const result = await onSubmitFn({ ...data, seed });
-      result && setIsCreated(true);
+      result && setIsSuccessful(true);
     } catch (error) {
       console.log(error);
     }
@@ -61,10 +61,10 @@ export const AddAccountForm: FC<AddAccountFormProps> = ({
 
   const navigate = useNavigate();
 
-  const [isCreated, setIsCreated] = useState(false);
+  const [isSuccessful, setIsSuccessful] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
 
-  if (isCreated)
+  if (isSuccessful)
     return (
       <PageWrapper>
         <div className="flex flex-col text-center pt-`0">

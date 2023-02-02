@@ -1,5 +1,5 @@
 import { VAULT } from "./constants";
-import AccountManager, { AccountType } from "./AccountManager";
+import AccountManager from "./AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
@@ -97,13 +97,10 @@ export default class Extension {
     return accounts.getAll();
   }
 
-  static async derivateAccount(
-    name: string,
-    type: AccountType
-  ): Promise<Account> {
+  static async deriveAccount({ name, accountType }: any): Promise<Account> {
     const vault = await Storage.getInstance().getVault();
     if (!vault) throw new Error("Vault not found");
-    return AccountManager.derive(name, vault, type);
+    return AccountManager.derive(name, vault, accountType);
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
@@ -113,5 +110,9 @@ export default class Extension {
     network.set(chain);
     await Storage.getInstance().setNetwork(network);
     return true;
+  }
+
+  static async setSelectedAccount(account: Account) {
+    await Storage.getInstance().setSelectedAccount(account);
   }
 }

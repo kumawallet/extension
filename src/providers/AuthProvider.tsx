@@ -22,6 +22,7 @@ const AuthContext = createContext(
     state: InitialState;
     createAccount: (newAccount: any) => Promise<boolean>;
     importAccount: (newAccount: any) => Promise<boolean>;
+    deriveAccount: (newAccount: any) => Promise<boolean>;
   }
 );
 
@@ -82,12 +83,24 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const deriveAccount = async ({ name, accountType }: any) => {
+    try {
+      const account = await Extension.deriveAccount({ name, accountType });
+      await Extension.setSelectedAccount(account);
+      return true;
+    } catch (error) {
+      console.log(error as string);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         state,
         createAccount,
         importAccount,
+        deriveAccount,
       }}
     >
       {children}

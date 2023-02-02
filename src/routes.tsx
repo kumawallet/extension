@@ -6,9 +6,7 @@ import { Accounts } from "./components/accounts";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "./providers/AuthProvider";
 import { SignIn } from "./components/signIn";
-import { DeriveAccount } from "./components/deriveAccount/DeriveAccount";
 import { Decrypt } from "./components/decrypt";
-import { DeriveImport } from "./components/deriveImport";
 import {
   Advanced,
   BugReport,
@@ -24,6 +22,7 @@ export const Routes = () => {
     state: { isInit },
     createAccount,
     importAccount,
+    deriveAccount,
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
@@ -55,6 +54,9 @@ export const Routes = () => {
       <RRoutes>
         <Route path="/" element={homeRoute} />
         <Route path="/account" element={<Accounts />} />
+        <Route path="/add-account" element={<AddAccount />} />
+        <Route path="/balance" element={<Balance />} />
+        <Route path="/sign-in" element={<SignIn />} />
         <Route
           path="/import-account"
           element={
@@ -88,10 +90,20 @@ export const Routes = () => {
             />
           }
         />
-        <Route path="/add-account" element={<AddAccount />} />
-        <Route path="/balance" element={<Balance />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/derive-account" element={<DeriveAccount />} />
+        <Route
+          path="/derive-account"
+          element={
+            <AddAccountForm
+              title="Create Account"
+              onSubmitFn={deriveAccount}
+              buttonText="Create"
+              fields={{ accountType: true }}
+              afterSubmitMessage="Account created"
+              goAfterSubmit="/balance"
+              backButton
+            />
+          }
+        />
 
         {/* setting views */}
         <Route path="/settings-general" element={<General />} />
