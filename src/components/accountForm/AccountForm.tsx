@@ -15,6 +15,7 @@ interface AddAccountFormProps {
     privateKeyOrSeed?: boolean;
   };
   generateSeed?: boolean;
+  signUp?: boolean;
   onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
   buttonText: string;
   backButton?: boolean;
@@ -28,12 +29,14 @@ interface AccountForm {
   password?: string;
   confirmPassword?: string;
   privateKeyOrSeed?: string;
+  isSignUp: boolean;
 }
 
 export const AccountForm: FC<AddAccountFormProps> = ({
   title,
   fields,
   generateSeed = false,
+  signUp = true,
   buttonText,
   backButton,
   goAfterSubmit,
@@ -52,7 +55,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   const _onSubmit = handleSubmit(async (data) => {
     try {
-      const result = await onSubmitFn({ ...data, seed });
+      const result = await onSubmitFn({ ...data, seed, isSignUp });
       result && setIsSuccessful(true);
     } catch (error) {
       console.log(error);
@@ -63,6 +66,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
+  const [isSignUp] = useState(() => (signUp ? true : false));
 
   if (isSuccessful)
     return (
