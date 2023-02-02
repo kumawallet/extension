@@ -111,8 +111,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   if (isSuccessful)
     return (
-      <PageWrapper>
-        <div className="flex flex-col text-center pt-0 h-screen justify-center">
+      <PageWrapper contentClassName="h-full">
+        <div className="flex flex-col text-center pt-0 justify-center h-full">
           <div className="flex gap-3 items-center mb-3 justify-center">
             <p className="text-3xl text-custom-green-bg">
               {afterSubmitMessage}
