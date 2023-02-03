@@ -46,7 +46,11 @@
         "account": "Accounts",
         "import": "Import",
         "create": "Create"
-      }
+      },
+      "send": "Send",
+      "receive": "Receive",
+      "assets": "Assets",
+      "activity": "Activity"
     }
     
   }

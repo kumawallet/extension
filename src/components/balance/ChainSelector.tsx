@@ -2,6 +2,7 @@ import { Fragment, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "../../providers/NetworkProvider";
+import { Chain } from "@src/contants/chains";
 
 export const ChainSelector = () => {
   const {
@@ -13,6 +14,10 @@ export const ChainSelector = () => {
   useEffect(() => {
     getSelectedNetwork();
   }, []);
+
+  const changeNetwork = (chain: Chain) => {
+    setSelectNetwork(chain);
+  };
 
   return (
     <Menu>
@@ -44,7 +49,7 @@ export const ChainSelector = () => {
                         <div
                           className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
                           onClick={() => {
-                            setSelectNetwork(chain);
+                            changeNetwork(chain);
 
                             close();
                           }}

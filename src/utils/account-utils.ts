@@ -1,3 +1,5 @@
+import keyring from "@polkadot/ui-keyring";
+
 export const cropAccount = (account: string) => {
   if (!account) return "";
   const first4Letters = account.slice(0, 4);
@@ -22,4 +24,16 @@ export const formatAccount = (_account: string) => {
   }
 
   return { address, type };
+};
+
+export const transformAddress = (address: string, addressPrefix = 0) => {
+  if (!address) return "";
+
+  if (address.startsWith("0x")) return address;
+
+  const publicKey = keyring.decodeAddress(address);
+
+  const formattedAddress = keyring.encodeAddress(publicKey, addressPrefix);
+
+  return formattedAddress;
 };

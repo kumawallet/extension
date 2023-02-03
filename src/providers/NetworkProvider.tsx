@@ -32,7 +32,7 @@ interface NetworkContext {
 
 const NetworkContext = createContext({} as NetworkContext);
 
-const getApi = (rpc: string) => {
+const getApi = (rpc: string | undefined) => {
   return ApiPromise.create({ provider: new WsProvider(rpc) });
 };
 
@@ -88,9 +88,9 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const setNewApi = async (chain: Chain) => {
+  const setNewApi = async (rpc: string | undefined) => {
     try {
-      const api = await getApi(chain.rpc[0]);
+      const api = await getApi(rpc);
       dispatch({
         type: "set-api",
         payload: api,
@@ -101,8 +101,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (state.selectedChain?.rpc[0]) {
-      setNewApi(state.selectedChain);
+    if (state.selectedChain?.name) {
+      const isWasm = state.selectedChain.supportedAccounts?.includes("WASM");
+
+      const rpc = state.selectedChain.rpc[isWasm ? "wasm" : "evm"];
+
+      setNewApi(rpc);
     }
   }, [state.selectedChain?.name]);
 

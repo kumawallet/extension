@@ -1,8 +1,14 @@
-type suppotedAccountType = "wasm" | "evm";
+const WASM = "WASM";
+const EVM = "EVM";
+type suppotedAccountType = typeof WASM | typeof EVM;
 export interface Chain {
   name: string;
   chain?: string;
-  rpc: string[];
+  addressPrefix?: number;
+  rpc: {
+    wasm?: string;
+    evm?: string;
+  };
   nativeCurrency: {
     name: string;
     symbol: string;
@@ -19,7 +25,8 @@ export const RELAYCHAINS: Chain[] = [
   {
     name: "Polkadot",
     chain: "substrate",
-    rpc: ["wss://rpc.polkadot.io"],
+    rpc: { wasm: "wss://rpc.polkadot.io" },
+    addressPrefix: 0,
     nativeCurrency: {
       name: "DOT",
       symbol: "DOT",
@@ -31,12 +38,13 @@ export const RELAYCHAINS: Chain[] = [
         url: "https://polkadot.subscan.io/",
       },
     ],
-    supportedAccounts: ["wasm"],
+    supportedAccounts: [WASM],
   },
   {
     name: "Kusama",
     chain: "substrate",
-    rpc: ["wss://kusama-rpc.polkadot.io"],
+    rpc: { wasm: "wss://kusama-rpc.polkadot.io" },
+    addressPrefix: 2,
     nativeCurrency: {
       name: "KSM",
       symbol: "KSM",
@@ -48,176 +56,150 @@ export const RELAYCHAINS: Chain[] = [
         url: "https://kusama.subscan.io/",
       },
     ],
-    supportedAccounts: ["wasm"],
+    supportedAccounts: [WASM],
   },
 ];
 
-export const PARACHAINS = [
+export const PARACHAINS: Chain[] = [
   {
     name: "Astar",
     chain: "ASTR",
-    rpc: ["wss://rpc.astar.network"],
-    faucets: [],
+    rpc: {
+      evm: "https://evm.astar.network",
+      wasm: "wss://rpc.astar.network",
+    },
+    addressPrefix: 5,
     nativeCurrency: {
       name: "Astar",
       symbol: "ASTR",
       decimals: 18,
     },
-    infoURL: "https://astar.network/",
-    shortName: "astr",
-    chainId: 592,
-    networkId: 592,
-    icon: "astar",
     explorers: [
       {
         name: "subscan",
         url: "https://astar.subscan.io",
-        standard: "none",
-        icon: "subscan",
       },
     ],
+    supportedAccounts: [WASM],
   },
   {
     name: "Moonbeam",
     chain: "MOON",
-    rpc: ["wss://wss.api.moonbeam.network"],
-    faucets: [],
+    rpc: {
+      evm: "https://rpc.api.moonbeam.network",
+      wasm: "wss://wss.api.moonbeam.network",
+    },
+    addressPrefix: 1284,
     nativeCurrency: {
       name: "Glimmer",
       symbol: "GLMR",
       decimals: 18,
     },
-    infoURL: "https://moonbeam.network/networks/moonbeam/",
-    shortName: "mbeam",
-    chainId: 1284,
-    networkId: 1284,
     explorers: [
       {
         name: "moonscan",
         url: "https://moonbeam.moonscan.io",
-        standard: "none",
       },
     ],
+    supportedAccounts: [WASM],
   },
 
   {
     name: "Moonriver",
     chain: "MOON",
-    rpc: ["wss://wss.api.moonriver.moonbeam.network"],
-    faucets: [],
+    rpc: { wasm: "wss://wss.api.moonriver.moonbeam.network" },
+    addressPrefix: 1284,
     nativeCurrency: {
       name: "Moonriver",
       symbol: "MOVR",
       decimals: 18,
     },
-    infoURL: "https://moonbeam.network/networks/moonriver/",
-    shortName: "mriver",
-    chainId: 1285,
-    networkId: 1285,
+
     explorers: [
       {
         name: "moonscan",
         url: "https://moonriver.moonscan.io",
-        standard: "none",
       },
     ],
+    supportedAccounts: [WASM],
   },
   {
     name: "Shiden",
     chain: "SDN",
-    rpc: [
-      "wss://shiden.api.onfinality.io/public-ws",
-      // "wss://shiden.public.blastapi.io",
-      // "wss://shiden-rpc.dwellir.com",
-    ],
-    faucets: [],
+    rpc: {
+      wasm: "wss://shiden.api.onfinality.io/public-ws",
+    },
+    addressPrefix: 5,
     nativeCurrency: {
       name: "Shiden",
       symbol: "SDN",
       decimals: 18,
     },
-    infoURL: "https://shiden.astar.network/",
-    shortName: "sdn",
-    chainId: 336,
-    networkId: 336,
-    icon: "shiden",
     explorers: [
       {
         name: "subscan",
         url: "https://shiden.subscan.io",
-        standard: "none",
-        icon: "subscan",
       },
     ],
+    supportedAccounts: [WASM],
   },
 ];
 
-export const TESTNETS = [
+export const TESTNETS: Chain[] = [
   {
     name: "Moonbase Alpha",
     chain: "MOON",
-    rpc: ["wss://wss.api.moonbase.moonbeam.network"],
-    faucets: [],
+    rpc: {
+      wasm: "wss://wss.api.moonbase.moonbeam.network",
+    },
+    addressPrefix: 1287,
     nativeCurrency: {
       name: "Dev",
       symbol: "DEV",
       decimals: 18,
     },
-    infoURL: "https://docs.moonbeam.network/networks/testnet/",
-    shortName: "mbase",
-    chainId: 1287,
-    networkId: 1287,
     explorers: [
       {
         name: "moonscan",
         url: "https://moonbase.moonscan.io",
-        standard: "none",
       },
     ],
   },
   {
     name: "Shibuya",
     chain: "substrate",
-    rpc: [],
-    faucets: [],
+    rpc: {
+      wasm: "wss://shibuya-rpc.dwellir.com",
+    },
     nativeCurrency: {
       name: "shibuya",
       symbol: "SBY",
       decimals: 18,
     },
-    // infoURL: "https://shiden.astar.network/",
-    // shortName: "sdn",
-    // chainId: 336,
-    // networkId: 336,
-    // icon: "shiden",
+    addressPrefix: 5,
+
     explorers: [
       {
         name: "subscan",
         url: "https://shibuya.subscan.io/",
-        standard: "none",
-        icon: "subscan",
       },
     ],
   },
   {
     name: "Contracts Testnet",
     chain: "Rococo",
-    rpc: ["wss://rococo-contracts-rpc.polkadot.io"],
-    faucets: [],
+    rpc: {
+      wasm: "wss://rococo-contracts-rpc.polkadot.io",
+    },
     nativeCurrency: {
       name: "roc",
       symbol: "ROC",
       decimals: 12,
     },
-    infoURL: "",
-    shortName: "rococo-contracts",
-    chainId: 0, // this is a fake chainId
-    networkId: 0, // this is a fake networkId
     explorers: [
       {
         name: "",
         url: "",
-        standard: "",
       },
     ],
   },

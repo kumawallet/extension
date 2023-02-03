@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
@@ -6,9 +6,16 @@ import { Account } from "@src/utils/storage/entities/Accounts";
 import { AccountType } from "@src/utils/AccountManager";
 import { IMPORT_ACCOUNT } from "@src/routes/paths";
 import { DERIVE_ACCOUNT } from "../../routes/paths";
+import { transformAddress } from "../../utils/account-utils";
+import { useNetworkContext } from "../../providers/NetworkProvider";
 
 export const Accounts = () => {
   const navigate = useNavigate();
+
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
+
   const {
     state: { selectedAccount, accounts },
     getAllAccounts,
@@ -36,6 +43,21 @@ export const Accounts = () => {
     }
   };
 
+  const filteredAccounts = useMemo(() => {
+    const acc = accounts.map((acc) => ({
+      ...acc,
+      value: {
+        ...acc.value,
+        address: transformAddress(
+          acc.value?.address,
+          selectedChain?.addressPrefix
+        ),
+      },
+    }));
+
+    return acc;
+  }, [accounts, selectedChain?.name]);
+
   return (
     <>
       <div className="flex justify-between mb-6 mt-3">
@@ -56,15 +78,15 @@ export const Accounts = () => {
         <Menu.Item>
           {({ close }) => (
             <>
-              {accounts.map((account) => (
+              {filteredAccounts.map((account) => (
                 <div
-                  key={account?.value?.address}
+                  key={account?.key}
                   className={`${
-                    selectedAccount?.value?.address ===
-                      account?.value?.address && "bg-gray-400 bg-opacity-30"
+                    selectedAccount?.key === account?.key &&
+                    "bg-gray-400 bg-opacity-30"
                   }  bg-opacity-30 flex justify-between rounded-lg py-2 px-4 text-white cursor-pointer`}
                   onClick={() => {
-                    changeSelectedAccount(account);
+                    changeSelectedAccount(account as Account);
                     close();
                   }}
                 >
