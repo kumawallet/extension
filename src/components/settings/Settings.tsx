@@ -3,6 +3,8 @@ import { Menu, Transition } from "@headlessui/react";
 import { BsGear } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { SIGNIN } from "@src/routes/paths";
+import Extension from "@src/utils/Extension";
 
 const OPTIONS = [
   {
@@ -30,6 +32,10 @@ const OPTIONS = [
 export const Settings = () => {
   const navigate = useNavigate();
 
+  const signOut = async () => {
+    await Extension.signOut();
+    navigate(SIGNIN);
+  };
   return (
     <Menu>
       <Menu.Button>
@@ -48,7 +54,7 @@ export const Settings = () => {
       >
         <Menu.Items className="right-0 absolute origin-bottom-right max-w-lg  bottom-12 w-full h-[calc(100vh-99px)] bg-[#29323C] ring-0 outline-0 rounded-xl z-50">
           <div className="text-start px-4 py-10">
-            <div className="mb-10">
+            <div className="mb-2">
               <p className="pb-6 text-2xl font-medium">Settings</p>
             </div>
             <div className="flex flex-col gap-1">
@@ -62,6 +68,14 @@ export const Settings = () => {
                   <BsChevronRight />
                 </div>
               ))}
+            </div>
+            <div className="mt-10 flex justify-end">
+              <button
+                onClick={() => signOut()}
+                className="border border-custom-red-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-red-bg focus:outline-none focus:shadow-outline w-[40%]"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </Menu.Items>

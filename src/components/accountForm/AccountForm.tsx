@@ -22,6 +22,7 @@ interface AddAccountFormProps {
   };
   generateSeed?: boolean;
   signUp?: boolean;
+  resetPassword?: boolean;
   onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
   callback?: () => void;
   buttonText: string;
@@ -37,6 +38,7 @@ export interface AccountForm {
   confirmPassword?: string;
   privateKeyOrSeed?: string;
   isSignUp?: boolean;
+  resetPassword?: boolean;
 }
 
 export const AccountForm: FC<AddAccountFormProps> = ({
@@ -44,6 +46,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   fields,
   generateSeed = false,
   signUp = true,
+  resetPassword = false,
   buttonText,
   backButton,
   goAfterSubmit,
@@ -51,7 +54,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
-  const passwordIsRequired = signUp;
+  const passwordIsRequired = signUp || resetPassword;
 
   // TODO: move this to separate file
   const schema = object({
@@ -99,6 +102,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       });
       result && setIsSuccessful(true);
       callback && callback();
+    } catch (e) {
+      console.error(e);
     } finally {
       endLoading();
     }
@@ -180,30 +185,34 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               htmlFor="privateKeyOrSeed"
               className="block text-sm font-medium mb-1"
             >
-              {AccountType.EVM == watch("accountType")
-                ? "Private Key"
-                : `Seed Phrase`}
+              {!resetPassword
+                ? AccountType.EVM == watch("accountType")
+                  ? "Private Key"
+                  : `Seed Phrase`
+                : "Recovery Phrase"}
             </label>
             <input
               id="privateKeyOrSeed"
               type={"password"}
-              className=" border  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
               {...register("privateKeyOrSeed")}
             />
           </div>
         )}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
-            Account Name (optional)
-          </label>
-          <input
-            id="name"
-            placeholder="Max 32 characters"
-            max={32}
-            className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-            {...register("name")}
-          />
-        </div>
+        {!resetPassword && (
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              Account Name (optional)
+            </label>
+            <input
+              id="name"
+              placeholder="Max 32 characters"
+              max={32}
+              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+              {...register("name")}
+            />
+          </div>
+        )}
         {passwordIsRequired && (
           <>
             <div>

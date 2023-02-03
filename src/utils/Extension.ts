@@ -7,11 +7,12 @@ import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
 
 export default class Extension {
-  private static async init(password: string, force?: boolean) {
+  private static async init(password: string, recoveryPhrase: string, force?: boolean) {
     try {
       await Auth.getInstance().signUp({ password });
       await Storage.getInstance().init(force);
       await Storage.getInstance().cachePassword();
+      await AccountManager.saveBackup(recoveryPhrase);
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -27,9 +28,9 @@ export default class Extension {
     if (!seed) throw new Error("Cannot create accounts without seed");
     if (isSignUp) {
       if (!password) throw new Error("Missing password");
-      await this.init(password, true);
+      await this.init(password, seed, true);
     }
-    const isUnlocked = Extension.isUnlocked();
+    const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("Vault is locked");
     await AccountManager.addWASMAccount(seed, name);
     await AccountManager.addEVMAccount(seed, name);
@@ -47,7 +48,7 @@ export default class Extension {
       throw new Error("Cannot import accounts without seed or private key");
     if (isSignUp) {
       if (!password) throw new Error("Missing password");
-      await this.init(password, true);
+      await this.init(password, privateKeyOrSeed, true);
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("Vault is locked");
@@ -56,6 +57,13 @@ export default class Extension {
       privateKeyOrSeed,
       accountType,
     });
+  }
+
+  static async restorePassword({ recoveryPhrase, newPassword }: any) {
+    if (!recoveryPhrase)
+      throw new Error("Cannot restore password without seed or private key");
+    if (!newPassword) throw new Error("Missing password");
+    await AccountManager.restorePassword(recoveryPhrase, newPassword);
   }
 
   static removeAccount(key: AccountKey) {
@@ -72,17 +80,28 @@ export default class Extension {
     await Storage.getInstance().cachePassword();
   }
 
-  static isVaultInitialized() {
-    return Storage.getInstance().isVaultInitialized();
+  static alreadySignedUp() {
+    return Storage.getInstance().alreadySignedUp();
   }
 
-  static async areKeyringsInitialized(): Promise<boolean> {
-    const vault = await Storage.getInstance().getVault();
-    if (!vault) return false;
-    return AccountManager.areKeyringsInitialized(vault);
+  static async areAccountsInitialized(): Promise<boolean> {
+    try {
+      const accounts = await Storage.getInstance().getAccounts();
+      if (!accounts) return false;
+      return AccountManager.areAccountsInitialized(accounts);
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
-  static isUnlocked() {
+  static async signOut() {
+    Auth.getInstance().signOut();
+    await Storage.getInstance().clearCache();
+  }
+
+  static async isUnlocked() {
+    await Storage.getInstance().loadCache();
     return Auth.isUnlocked;
   }
 

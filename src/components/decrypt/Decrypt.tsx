@@ -13,7 +13,6 @@ export const Decrypt = () => {
         password,
         String(encrypted)
       );
-      console.log(decrypted);
       setresult(decrypted as string);
     } catch (error) {
       setresult(String(error));
