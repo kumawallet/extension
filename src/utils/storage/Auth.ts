@@ -91,4 +91,21 @@ export default class Auth {
       throw new Error(error as string);
     }
   }
+
+  async encryptBackup(recoveryPhrase: string) {
+    try {
+      if (!this.#password) throw new Error("Vault is not unlocked");
+      return passworder.encrypt(this.#password, recoveryPhrase);
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  static async decryptBackup(backup: string, recoveryPhrase: string) { 
+    try {
+      return passworder.decrypt(recoveryPhrase, backup);
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
 }

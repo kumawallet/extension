@@ -1,5 +1,6 @@
 import {
   ACCOUNTS,
+  BACKUP,
   CACHE_AUTH,
   NETWORK,
   SELECTED_ACCOUNT,
@@ -43,9 +44,8 @@ export default class Storage {
       const data = await this.#storage.get(key);
       if (!data?.[key]) return undefined;
       if (key === VAULT && data[key]) {
-        await this.loadCache();
         if (!Auth.password || !Auth.isUnlocked) {
-          Auth.setAuth(CacheAuth.getInstance());
+          await this.loadCache();
         }
         return Auth.getInstance().decryptVault(data[key]);
       }
@@ -54,10 +54,6 @@ export default class Storage {
       console.error(error);
       throw new Error(error as string);
     }
-  }
-
-  async getAll() {
-    return this.#storage.get(null);
   }
 
   async set(key: string, data: any) {
@@ -84,7 +80,7 @@ export default class Storage {
   async init(force = false) {
     try {
       if (!force) {
-        if (await this.isVaultInitialized()) {
+        if (await this.alreadySignedUp()) {
           throw new Error("Vault already initialized");
         }
       }
@@ -100,7 +96,18 @@ export default class Storage {
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
       const network = new Network();
       await this.set(NETWORK, network);
+      const backup = undefined;
+      await this.set(BACKUP, backup);
       return;
+    } catch (error) {
+      console.error(error);
+      throw new Error(error as string);
+    }
+  }
+
+  async resetWallet() {
+    try {
+      await this.#storage.clear();
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -112,7 +119,7 @@ export default class Storage {
       const password = Auth.password || "";
       CacheAuth.save(password);
       const cacheAuth = CacheAuth.getInstance();
-      await this.set(cacheAuth.getKey(), cacheAuth);
+      await this.set(CACHE_AUTH, cacheAuth);
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
@@ -126,6 +133,15 @@ export default class Storage {
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
+    }
+  }
+
+  async clearCache() { 
+    try {
+      CacheAuth.clear();
+      await this.set(CACHE_AUTH, CacheAuth.getInstance());
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -165,10 +181,9 @@ export default class Storage {
     }
   }
 
-  async isVaultInitialized(): Promise<boolean> {
-    const vault = await this.getVault();
-    if (!vault) return false;
-    return !vault.isEmpty();
+  async alreadySignedUp(): Promise<boolean> {
+    const stored = await this.#storage.get(null);
+    return !!stored && Object.keys(stored).length > 0;
   }
 
   async saveKeyring(keyring: Keyring) {
@@ -316,5 +331,13 @@ export default class Storage {
     const network = new Network();
     network.set(stored.chain);
     return network;
+  }
+
+  async setBackup(backup: string) {
+    await this.set(BACKUP, backup);
+  }
+
+  async getBackup(): Promise<string | undefined> {
+    return await this.get(BACKUP);
   }
 }

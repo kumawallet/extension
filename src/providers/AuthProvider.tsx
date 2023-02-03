@@ -24,6 +24,7 @@ interface AuthContext {
   createAccount: (newAccount: NewAccount) => Promise<boolean>;
   importAccount: (newAccount: NewAccount) => Promise<boolean>;
   deriveAccount: (newAccount: NewAccount) => Promise<boolean>;
+  restorePassword: (newAccount: NewAccount) => Promise<boolean>;
 }
 
 const AuthContext = createContext({} as AuthContext);
@@ -102,6 +103,19 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const restorePassword = async ({
+    seed: recoveryPhrase,
+    password: newPassword,
+  }: NewAccount) => {
+    try {
+      await Extension.restorePassword({ recoveryPhrase, newPassword });
+      return true;
+    } catch (error) {
+      showErrorToast(error);
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -109,6 +123,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         createAccount,
         importAccount,
         deriveAccount,
+        restorePassword,
       }}
     >
       {children}

@@ -16,7 +16,11 @@ import {
 } from "./components/settings";
 import Extension from "./utils/Extension";
 import { AccountForm } from "./components/accountForm/AccountForm";
-import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "./routes/paths";
+import {
+  DERIVE_ACCOUNT,
+  IMPORT_ACCOUNT,
+  RESTORE_PASSWORD,
+} from "./routes/paths";
 import {
   ADD_ACCOUNT,
   BALANCE,
@@ -34,6 +38,7 @@ export const Routes = () => {
     createAccount,
     importAccount,
     deriveAccount,
+    restorePassword,
   } = useAuthContext();
 
   const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
@@ -41,8 +46,8 @@ export const Routes = () => {
   const [importIsSignUp, setImportIsSignUp] = useState(true);
 
   const getWalletStatus = async () => {
-    setCanDerive(await Extension.areKeyringsInitialized());
-    setImportIsSignUp(!(await Extension.isVaultInitialized()));
+    setCanDerive(await Extension.areAccountsInitialized());
+    setImportIsSignUp(!(await Extension.alreadySignedUp()));
   };
   useEffect(() => {
     const getHomeRoute = async () => {
@@ -51,8 +56,8 @@ export const Routes = () => {
         setHomeRoute(<Home />);
         return;
       }
-      const isVaultInitialized = await Extension.isVaultInitialized();
-      if (!isVaultInitialized) {
+      const alreadySignedUp = await Extension.alreadySignedUp();
+      if (!alreadySignedUp) {
         setHomeRoute(<AddAccount />);
         return;
       }
@@ -74,7 +79,7 @@ export const Routes = () => {
         <Route path="/account" element={<Accounts />} />
         <Route path={ADD_ACCOUNT} element={<AddAccount />} />
         <Route path={BALANCE} element={<Balance />} />
-        {/* <Route path="/sign-in" element={<SignIn />} /> */}
+        <Route path="/sign-in" element={<SignIn />} />
         <Route
           path={IMPORT_ACCOUNT}
           element={
@@ -107,6 +112,25 @@ export const Routes = () => {
               goAfterSubmit={BALANCE}
               backButton
               generateSeed
+              callback={getWalletStatus}
+            />
+          }
+        />
+        <Route
+          path={RESTORE_PASSWORD}
+          element={
+            <AccountForm
+              title="Reset Password"
+              onSubmitFn={restorePassword}
+              buttonText="Restore"
+              resetPassword={true}
+              signUp={false}
+              fields={{
+                privateKeyOrSeed: true,
+              }}
+              afterSubmitMessage="Account restored"
+              goAfterSubmit={BALANCE}
+              backButton
               callback={getWalletStatus}
             />
           }

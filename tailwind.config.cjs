@@ -6,6 +6,10 @@ module.exports = {
         "spin-slow": "spin 20s linear infinite",
       },
       colors: {
+        "custom-red": {
+          bg: "#e74c3c",
+          hover: "",
+        },
         "custom-green": {
           bg: "#469999",
           hover: "",

@@ -34,7 +34,7 @@ export default class AccountManager {
     const wallet = PolkadotKeyring.addUri(seed, Auth.password);
     const { address } = wallet.json || {};
     const key = AccountManager.formatAddress(address, type);
-    const _keyring = keyring || new Keyring(key, type, seed, '');
+    const _keyring = keyring || new Keyring(key, type, seed, "");
     return AccountManager.addAccount(address, type, name, _keyring);
   }
 
@@ -79,11 +79,15 @@ export default class AccountManager {
     let importedData;
     switch (accountType) {
       case AccountType.EVM:
-        importedData = await AccountManager.getImportedEVMAddress(privateKeyOrSeed);
+        importedData = await AccountManager.getImportedEVMAddress(
+          privateKeyOrSeed
+        );
         type = AccountType.IMPORTED_EVM;
         break;
       case AccountType.WASM:
-        importedData = await AccountManager.getImportedWASMAddress(privateKeyOrSeed);
+        importedData = await AccountManager.getImportedWASMAddress(
+          privateKeyOrSeed
+        );
         type = AccountType.IMPORTED_WASM;
         break;
       default:
@@ -161,8 +165,32 @@ export default class AccountManager {
     return accounts;
   }
 
-  static async areKeyringsInitialized(vault: Vault): Promise<boolean> {
-    const keyrings = await vault.getAll();
-    return keyrings.filter((keyring) => keyring.type === AccountType.EVM || keyring.type === AccountType.WASM).length > 0;
+  static async areAccountsInitialized(accounts: Accounts): Promise<boolean> {
+    const accountsList = await accounts.getAll();
+    return (
+      accountsList.filter(
+        (account) =>
+          account.type === AccountType.EVM || account.type === AccountType.WASM
+      ).length > 0
+    );
+  }
+
+  static async saveBackup(recoveryPhrase: string) {
+    if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
+    const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
+    await Storage.getInstance().setBackup(encrypted);
+  }
+
+  static async restorePassword(privateKeyOrSeed: string, password: string) {
+    const backup = await Storage.getInstance().getBackup();
+    if (!backup) throw new Error("Backup not found");
+    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
+    if (!decryptedBackup) throw new Error("Invalid recovery phrase");
+    Auth.setAuth({ password: decryptedBackup, isUnlocked: true });
+    const vault = await Storage.getInstance().getVault();
+    if (!vault) throw new Error("Vault not found");
+    Auth.setAuth({ password, isUnlocked: true });
+    await Storage.getInstance().setVault(vault);
+    await Storage.getInstance().setBackup(privateKeyOrSeed);
   }
 }

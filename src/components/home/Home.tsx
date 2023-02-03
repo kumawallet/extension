@@ -13,18 +13,18 @@ export const Home = () => {
 
   return (
     <PageWrapper>
-      <img src={logo} className="mx-auto mt-10 mb-5 w-36 md:w-40" />
+      <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
       <p className="font-medium text-2xl md:text-3xl mb-2 text-center">
-        Welcome to XCM Wallet
+        Welcome to Kuma
       </p>
       <p className="font-light text-xs md:text-sm mb-12 text-center">
-        EVM and WASM accounts in one place
+        All your accounts in one place
       </p>
       <button
         className="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mx-auto"
         onClick={goToAccounts}
       >
-        Continue
+        Get started
       </button>
     </PageWrapper>
   );
