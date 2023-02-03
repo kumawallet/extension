@@ -4,6 +4,8 @@ import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
 import { Account } from "@src/utils/storage/entities/Accounts";
 import { AccountType } from "@src/utils/AccountManager";
+import { IMPORT_ACCOUNT } from "@src/routes/paths";
+import { DERIVE_ACCOUNT } from "../../routes/paths";
 
 export const Accounts = () => {
   const navigate = useNavigate();
@@ -38,13 +40,13 @@ export const Accounts = () => {
     <>
       <div className="flex justify-between mb-6 mt-3">
         <button
-          onClick={() => navigate("/import-account")}
+          onClick={() => navigate(IMPORT_ACCOUNT)}
           className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
           Import
         </button>
         <button
-          onClick={() => navigate("/derive-account")}
+          onClick={() => navigate(DERIVE_ACCOUNT)}
           className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
           Create

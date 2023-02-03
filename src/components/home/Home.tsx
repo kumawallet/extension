@@ -1,13 +1,14 @@
 import logo from "@src/assets/img/logo.svg";
 import { PageWrapper } from "../common/PageWrapper";
 import { useNavigate } from "react-router-dom";
+import { ADD_ACCOUNT } from "../../routes/paths";
 
 export const Home = () => {
   const navigate = useNavigate();
 
   const goToAccounts = () => {
     localStorage.setItem("welcome", String(true));
-    navigate("/add-account");
+    navigate(ADD_ACCOUNT);
   };
 
   return (

@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
+import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { AddAccount } from "./components/addAccount";
 import { Balance } from "./components/balance";
 import { Home } from "./components/home";
-import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { Accounts } from "./components/accounts";
-import { useEffect, useState } from "react";
 import { useAuthContext } from "./providers/AuthProvider";
 import { SignIn } from "./components/signIn";
 import { Decrypt } from "./components/decrypt";
@@ -16,6 +16,17 @@ import {
 } from "./components/settings";
 import Extension from "./utils/Extension";
 import { AccountForm } from "./components/accountForm/AccountForm";
+import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "./routes/paths";
+import {
+  ADD_ACCOUNT,
+  BALANCE,
+  SETTINGS_GENERAL,
+  SETTINGS_ADVANCED,
+  SETTINGS_CONTACTS,
+  SETTINGS_SECURITY,
+  SETTINGS_BUG,
+  CREATE_ACCOUNT,
+} from "./routes/paths";
 
 export const Routes = () => {
   const {
@@ -31,7 +42,7 @@ export const Routes = () => {
 
   const getWalletStatus = async () => {
     setCanDerive(await Extension.areKeyringsInitialized());
-    setImportIsSignUp(!await Extension.isVaultInitialized());
+    setImportIsSignUp(!(await Extension.isVaultInitialized()));
   };
   useEffect(() => {
     const getHomeRoute = async () => {
@@ -61,11 +72,11 @@ export const Routes = () => {
       <RRoutes>
         <Route path="/" element={homeRoute} />
         <Route path="/account" element={<Accounts />} />
-        <Route path="/add-account" element={<AddAccount />} />
-        <Route path="/balance" element={<Balance />} />
-        <Route path="/sign-in" element={<SignIn />} />
+        <Route path={ADD_ACCOUNT} element={<AddAccount />} />
+        <Route path={BALANCE} element={<Balance />} />
+        {/* <Route path="/sign-in" element={<SignIn />} /> */}
         <Route
-          path="/import-account"
+          path={IMPORT_ACCOUNT}
           element={
             <AccountForm
               title="Import Account"
@@ -77,14 +88,14 @@ export const Routes = () => {
                 accountType: true,
               }}
               afterSubmitMessage="Account imported"
-              goAfterSubmit="/balance"
+              goAfterSubmit={BALANCE}
               backButton
               callback={getWalletStatus}
             />
           }
         />
         <Route
-          path="/create-account"
+          path={CREATE_ACCOUNT}
           element={
             <AccountForm
               title="Create Account"
@@ -93,7 +104,7 @@ export const Routes = () => {
               signUp={true}
               fields={{}}
               afterSubmitMessage="Account created"
-              goAfterSubmit="/balance"
+              goAfterSubmit={BALANCE}
               backButton
               generateSeed
               callback={getWalletStatus}
@@ -101,7 +112,7 @@ export const Routes = () => {
           }
         />
         <Route
-          path="/derive-account"
+          path={DERIVE_ACCOUNT}
           element={
             !canDerive ? (
               <AccountForm
@@ -111,7 +122,7 @@ export const Routes = () => {
                 fields={{}}
                 signUp={false}
                 afterSubmitMessage="Account created"
-                goAfterSubmit="/balance"
+                goAfterSubmit={BALANCE}
                 backButton
                 generateSeed
                 callback={getWalletStatus}
@@ -124,7 +135,7 @@ export const Routes = () => {
                 buttonText="Create"
                 fields={{ accountType: true }}
                 afterSubmitMessage="Account created"
-                goAfterSubmit="/balance"
+                goAfterSubmit={BALANCE}
                 backButton
               />
             )
@@ -132,11 +143,11 @@ export const Routes = () => {
         />
 
         {/* setting views */}
-        <Route path="/settings-general" element={<General />} />
-        <Route path="/settings-advanced" element={<Advanced />} />
-        <Route path="/settings-contacts" element={<Contacts />} />
-        <Route path="/settings-security" element={<Security />} />
-        <Route path="/settings-bug" element={<BugReport />} />
+        <Route path={SETTINGS_GENERAL} element={<General />} />
+        <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
+        <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
+        <Route path={SETTINGS_SECURITY} element={<Security />} />
+        <Route path={SETTINGS_BUG} element={<BugReport />} />
 
         {/* TODO: remove, only for developmet */}
         <Route path="/decrypt" element={<Decrypt />} />

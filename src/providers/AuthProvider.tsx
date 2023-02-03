@@ -7,6 +7,9 @@ import {
   useReducer,
 } from "react";
 import Extension from "../utils/Extension";
+import { AccountForm } from "../components/accountForm/AccountForm";
+
+type NewAccount = AccountForm & { seed?: string };
 
 interface InitialState {
   isInit: boolean;
@@ -18,9 +21,9 @@ const initialState: InitialState = {
 
 interface AuthContext {
   state: InitialState;
-  createAccount: (newAccount: any) => Promise<boolean>;
-  importAccount: (newAccount: any) => Promise<boolean>;
-  deriveAccount: (newAccount: any) => Promise<boolean>;
+  createAccount: (newAccount: NewAccount) => Promise<boolean>;
+  importAccount: (newAccount: NewAccount) => Promise<boolean>;
+  deriveAccount: (newAccount: NewAccount) => Promise<boolean>;
 }
 
 const AuthContext = createContext({} as AuthContext);
@@ -41,9 +44,14 @@ const reducer = (state: InitialState, action: any): InitialState => {
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const { showErrorToast } = useToast();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state] = useReducer(reducer, initialState);
 
-  const createAccount = async ({ name, password, seed, isSignUp }: any) => {
+  const createAccount = async ({
+    name,
+    password,
+    seed,
+    isSignUp,
+  }: NewAccount) => {
     try {
       await Extension.createAccounts({ name, password, seed, isSignUp });
       return true;
@@ -59,7 +67,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password,
     accountType,
     isSignUp,
-  }: any) => {
+  }: NewAccount) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!password && !isUnlocked) {
@@ -79,7 +87,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const deriveAccount = async ({ name, accountType }: any) => {
+  const deriveAccount = async ({ name, accountType }: NewAccount) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!isUnlocked) {

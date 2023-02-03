@@ -1,8 +1,8 @@
+import { useEffect } from "react";
 import { FiCopy } from "react-icons/fi";
 import { cropAccount } from "../../utils/account-utils";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { AccountManage } from "./AccountManage";
-import { useEffect } from "react";
 
 export const Account = () => {
   const {

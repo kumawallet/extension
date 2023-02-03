@@ -14,7 +14,6 @@ import { InputErrorMessage } from "../common/InputErroMessage";
 
 const PASSWORD_RULES =
   "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.";
-
 interface AddAccountFormProps {
   title: string;
   fields: {
@@ -31,13 +30,13 @@ interface AddAccountFormProps {
   afterSubmitMessage: string;
 }
 
-interface AccountForm {
+export interface AccountForm {
   accountType?: AccountType;
   name: string;
   password?: string;
   confirmPassword?: string;
   privateKeyOrSeed?: string;
-  isSignUp: boolean;
+  isSignUp?: boolean;
 }
 
 export const AccountForm: FC<AddAccountFormProps> = ({
@@ -54,6 +53,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 }) => {
   const passwordIsRequired = signUp;
 
+  // TODO: move this to separate file
   const schema = object({
     name: string().required(),
     password: passwordIsRequired
@@ -66,7 +66,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       : string().notRequired(),
     confirmPassword: passwordIsRequired
       ? string()
-          .oneOf([ref("password"), null], "Passwords doesn't match")
+          .oneOf([ref("password"), null], "Passwords don't match")
           .required("required")
       : string().notRequired(),
   }).required();
@@ -215,7 +215,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               </label>
               <input
                 id="password"
-                placeholder="Must be at least 8 characters long"
                 min={8}
                 onPaste={(e) => e.preventDefault()}
                 type={"password"}

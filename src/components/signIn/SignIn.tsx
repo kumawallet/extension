@@ -1,14 +1,13 @@
-import { useAuthContext } from "@src/providers/AuthProvider";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../common/PageWrapper";
+import Extension from "../../utils/Extension";
+import { useToast } from "@src/hooks";
+import { BALANCE } from "@src/routes/paths";
 
 export const SignIn = () => {
   const navigate = useNavigate();
-
-  const {
-    state: { extensionController },
-  } = useAuthContext();
+  const { showErrorToast } = useToast();
 
   const [password, setPassword] = useState("");
 
@@ -18,14 +17,10 @@ export const SignIn = () => {
 
   const signIn = async () => {
     try {
-      const signIn = await extensionController?.signIn(password);
-      if (!signIn) {
-        throw new Error("Invalid password");
-      }
-      navigate("/balance");
-
+      await Extension?.signIn(password);
+      navigate(BALANCE);
     } catch (error) {
-      console.log(error);
+      showErrorToast(error);
     }
   };
 
@@ -33,7 +28,6 @@ export const SignIn = () => {
     <PageWrapper>
       <div className="flex flex-col">
         <p className="text-center text-xl mb-6">Welcome back</p>
-        <p className="text-center text-xl mb-6">{}</p>
         <input
           placeholder="password"
           onChange={({ target }) => setPassword(target.value)}
