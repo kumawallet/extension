@@ -338,6 +338,6 @@ export default class Storage {
   }
 
   async getBackup(): Promise<string | undefined> {
-    return await this.get(BACKUP);
+    return this.get(BACKUP);
   }
 }

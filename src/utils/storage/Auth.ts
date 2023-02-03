@@ -95,7 +95,7 @@ export default class Auth {
   async encryptBackup(recoveryPhrase: string) {
     try {
       if (!this.#password) throw new Error("Vault is not unlocked");
-      return passworder.encrypt(this.#password, recoveryPhrase);
+      return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
       throw new Error(error as string);
     }

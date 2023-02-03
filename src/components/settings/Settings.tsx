@@ -69,7 +69,7 @@ export const Settings = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-10 flex justify-right">
+            <div className="mt-10 flex justify-end">
               <button
                 onClick={() => signOut()}
                 className="border border-custom-red-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-red-bg focus:outline-none focus:shadow-outline w-[40%]"

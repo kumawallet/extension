@@ -102,6 +102,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       });
       result && setIsSuccessful(true);
       callback && callback();
+    } catch (e) {
+      console.error(e);
     } finally {
       endLoading();
     }

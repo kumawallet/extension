@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import { ACCOUNT_PATH } from "./constants";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "./storage/Auth";
+import Extension from "./Extension";
 
 export enum AccountType {
   EVM = "EVM",
@@ -183,14 +184,20 @@ export default class AccountManager {
 
   static async restorePassword(privateKeyOrSeed: string, password: string) {
     const backup = await Storage.getInstance().getBackup();
+    console.log("backup", backup);
     if (!backup) throw new Error("Backup not found");
     const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
+    console.log("decryptedBackup", decryptedBackup);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.setAuth({ password: decryptedBackup, isUnlocked: true });
+    console.log("Auth", Auth.getInstance());
     const vault = await Storage.getInstance().getVault();
     if (!vault) throw new Error("Vault not found");
+    console.log("vault", vault);
     Auth.setAuth({ password, isUnlocked: true });
+    console.log("Auth", Auth.getInstance());
     await Storage.getInstance().setVault(vault);
-    await Storage.getInstance().setBackup(privateKeyOrSeed);
+    console.log("vault", await Storage.getInstance().getVault());
+    await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }

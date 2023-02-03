@@ -20,6 +20,7 @@ import {
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
   RESTORE_PASSWORD,
+  SIGNIN,
 } from "./routes/paths";
 import {
   ADD_ACCOUNT,
@@ -128,8 +129,8 @@ export const Routes = () => {
               fields={{
                 privateKeyOrSeed: true,
               }}
-              afterSubmitMessage="Account restored"
-              goAfterSubmit={BALANCE}
+              afterSubmitMessage="Password restored"
+              goAfterSubmit={SIGNIN}
               backButton
               callback={getWalletStatus}
             />
