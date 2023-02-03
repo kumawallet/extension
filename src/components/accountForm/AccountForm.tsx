@@ -58,7 +58,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   // TODO: move this to separate file
   const schema = object({
-    name: string().required(),
+    name: string().optional(),
     password: passwordIsRequired
       ? string()
           .matches(
