@@ -33,10 +33,8 @@ export default class AccountManager {
     const type = AccountType.WASM;
     const wallet = PolkadotKeyring.addUri(seed, Auth.password);
     const { address } = wallet.json || {};
-    const privateKey = wallet.pair.meta.privateKey?.toString() || "";
-    console.log("privateKey", privateKey);
     const key = AccountManager.formatAddress(address, type);
-    const _keyring = keyring || new Keyring(key, type, seed, privateKey);
+    const _keyring = keyring || new Keyring(key, type, seed, '');
     return AccountManager.addAccount(address, type, name, _keyring);
   }
 
