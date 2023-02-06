@@ -1,4 +1,8 @@
-# XCW - cross-chain-wallet 
+<p align="center">
+  <img src="./src/assets/img/logo.svg" />
+</p>
+
+# Kuma Wallet
 
 ## Project Overview
 
@@ -34,3 +38,11 @@ In a first approach, we will be using the following technologies: React, Typescr
 - Design the wallet using React and follow the look and feel of Astar UI, with the option to open in full-screen mode.
 
 The cross-chain functionality will be implemented using the XCM format, enabling users to easily transfer assets between EVM and WASM parachains. The XCM implementation will be simplified to provide a seamless user experience. The user interface will be built using React, and the design will be inspired by the look and feel of Astar UI. The extension will have the option to open in full-screen mode for a more immersive experience.
+
+## Building locally
+
+## Contributing
+
+## License
+
+## Credits
