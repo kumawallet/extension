@@ -4,7 +4,7 @@ import { BsGear } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { SIGNIN } from "@src/routes/paths";
-import Extension from "@src/utils/Extension";
+import Extension from "@src/Extension";
 
 const OPTIONS = [
   {
