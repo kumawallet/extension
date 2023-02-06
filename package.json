@@ -1,12 +1,12 @@
 {
-  "name": "cross-chain-wallet",
-  "displayName": "Cross-Chain Wallet",
+  "name": "kuma-wallet",
+  "displayName": "Kuma Wallet",
   "version": "1.0.0",
   "description": "This wallet is a cross-chain wallet that allows users to manage and transfer tokens between EVM and WASM chains. Built with the user experience in mind, the wallet is elegant and intuitive. It is the only wallet on the market capable of making this type of transfer without using an external platform.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/blockcoders/cross-chain-wallet.git"
+    "url": "https://github.com/blockcoders/kuma-wallet.git"
   },
   "scripts": {
     "build:chrome": "BROWSER_TARGET=CHROME vite build",

@@ -3,8 +3,8 @@
     "loading": "loading..."
   },
   "home": {
-    "welcome": "Welcome to XCM Wallet",
-    "description": "EVM and WASM accounts in one place",
+    "welcome": "Welcome to Kuma Wallet",
+    "description": "All your accounts in one place",
     "continue_button_text": "Continue"
   },
   "add-account": {
