@@ -1,4 +1,4 @@
-# XCW - cross-chain-wallet 
+# Kuma Wallet
 
 ## Project Overview :page_facing_up:
 
