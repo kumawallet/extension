@@ -3,7 +3,6 @@ import { PageWrapper } from "../common/PageWrapper";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { AccountType } from "@src/utils/AccountManager";
 import { FaCheckCircle } from "react-icons/fa";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { LoadingButton } from "../common/LoadingButton";
@@ -11,6 +10,7 @@ import { useLoading } from "@hooks/useLoading";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InputErrorMessage } from "../common/InputErroMessage";
+import { AccountType } from "@src/accounts/AccountManager";
 
 const PASSWORD_RULES =
   "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.";
