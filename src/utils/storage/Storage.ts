@@ -49,6 +49,7 @@ export default class Storage {
         }
         return Auth.getInstance().decryptVault(data[key]);
       }
+      if (typeof data[key] === "string") return data[key];
       return { ...data[key] };
     } catch (error) {
       console.error(error);
@@ -136,7 +137,7 @@ export default class Storage {
     }
   }
 
-  async clearCache() { 
+  async clearCache() {
     try {
       CacheAuth.clear();
       await this.set(CACHE_AUTH, CacheAuth.getInstance());

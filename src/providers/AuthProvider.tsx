@@ -104,7 +104,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const restorePassword = async ({
-    seed: recoveryPhrase,
+    privateKeyOrSeed: recoveryPhrase,
     password: newPassword,
   }: NewAccount) => {
     try {
