@@ -1,4 +1,4 @@
-import { SETTINGS } from "../../../utils/constants";
+import { SETTINGS } from "../../utils/constants";
 import Storable from "../Storable";
 
 export class Setting {

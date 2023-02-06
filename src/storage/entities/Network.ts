@@ -1,6 +1,6 @@
 import { Chain, CHAINS } from "@src/contants/chains";
 import Storable from "../Storable";
-import { NETWORK } from "../../constants";
+import { NETWORK } from "../../utils/constants";
 
 export class Network extends Storable {
   chain: Chain;

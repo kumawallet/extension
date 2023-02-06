@@ -1,5 +1,5 @@
-import { VAULT } from "./constants";
-import AccountManager from "./AccountManager";
+import { VAULT } from "./utils/constants";
+import AccountManager from "./accounts/AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";

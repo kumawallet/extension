@@ -1,6 +1,6 @@
-import { AccountType } from "../../AccountManager";
+import { AccountType } from "../../accounts/AccountManager";
 import { AccountKey } from "./Accounts";
-import { ACCOUNT_PATH } from "../../constants";
+import { ACCOUNT_PATH } from "../../utils/constants";
 
 export default class Keyring {
   readonly #key: AccountKey;

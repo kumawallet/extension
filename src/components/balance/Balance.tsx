@@ -12,7 +12,7 @@ import { FullScreenFAB } from "../common/FullScreenFAB";
 import { ApiPromise } from "@polkadot/api";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { getNatitveAssetBalance } from "@src/utils/assets";
-import { Account as AccountEntity } from "@src/utils/storage/entities/Accounts";
+import { Account as AccountEntity } from "@src/storage/entities/Accounts";
 import { Chain } from "@src/contants/chains";
 import { getAssetUSDPrice } from "../../utils/assets";
 import { useToast } from "@src/hooks";

@@ -1,4 +1,4 @@
-import { CACHE_AUTH } from "../../../utils/constants";
+import { CACHE_AUTH } from "../../utils/constants";
 import Storable from "../Storable";
 
 export default class CacheAuth extends Storable {

@@ -14,7 +14,7 @@ import {
   General,
   Security,
 } from "./components/settings";
-import Extension from "./utils/Extension";
+import Extension from "./Extension";
 import { AccountForm } from "./components/accountForm/AccountForm";
 import {
   DERIVE_ACCOUNT,

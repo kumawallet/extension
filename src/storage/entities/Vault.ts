@@ -1,4 +1,4 @@
-import { VAULT } from "../../../utils/constants";
+import { VAULT } from "../../utils/constants";
 import Keyring from "./Keyring";
 import { AccountKey } from "./Accounts";
 import Storable from "../Storable";

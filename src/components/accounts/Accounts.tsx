@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
-import { Account } from "@src/utils/storage/entities/Accounts";
+import { Account } from "@src/storage/entities/Accounts";
 import { AccountType } from "@src/utils/AccountManager";
 import { IMPORT_ACCOUNT } from "@src/routes/paths";
 import { DERIVE_ACCOUNT } from "../../routes/paths";

@@ -6,8 +6,8 @@ import {
   useReducer,
 } from "react";
 import { Chain, CHAINS } from "@src/contants/chains";
-import Extension from "../utils/Extension";
-import Storage from "@src/utils/storage/Storage";
+import Extension from "../Extension";
+import Storage from "@src/storage/Storage";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useEffect } from "react";
 import { useToast } from "../hooks/useToast";

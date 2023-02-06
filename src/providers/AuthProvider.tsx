@@ -6,7 +6,7 @@ import {
   useContext,
   useReducer,
 } from "react";
-import Extension from "../utils/Extension";
+import Extension from "../Extension";
 import { AccountForm } from "../components/accountForm/AccountForm";
 
 type NewAccount = AccountForm & { seed?: string };

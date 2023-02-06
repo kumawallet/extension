@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Extension from "../utils/Extension";
+import Extension from "../Extension";
 import {
   createContext,
   FC,
@@ -7,7 +7,7 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { Account } from "@src/utils/storage/entities/Accounts";
+import { Account } from "@src/storage/entities/Accounts";
 import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
 import { transformAddress } from "@src/utils/account-utils";

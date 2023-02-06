@@ -6,7 +6,7 @@ import {
   SELECTED_ACCOUNT,
   SETTINGS,
   VAULT,
-} from "../constants";
+} from "../utils/constants";
 import { Account, AccountKey, Accounts } from "./entities/Accounts";
 import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
