@@ -7,7 +7,11 @@ import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
 
 export default class Extension {
-  private static async init(password: string, recoveryPhrase: string, force?: boolean) {
+  private static async init(
+    password: string,
+    recoveryPhrase: string,
+    force?: boolean
+  ) {
     try {
       await Auth.getInstance().signUp({ password });
       await Storage.getInstance().init(force);
@@ -75,7 +79,7 @@ export default class Extension {
   }
 
   static async signIn(password: string) {
-    const { vault } = await Storage.getInstance().getStorage().get(VAULT);
+    const { vault } = await Storage.getInstance().storage.get(VAULT);
     await Auth.getInstance().signIn(password, vault);
     await Storage.getInstance().cachePassword();
   }
@@ -101,7 +105,7 @@ export default class Extension {
   }
 
   static async isUnlocked() {
-    await Storage.getInstance().loadCache();
+    await Storage.getInstance().loadFromCache();
     return Auth.isUnlocked;
   }
 
@@ -141,4 +145,5 @@ export default class Extension {
   static async getSelectedAccount(): Promise<Account | undefined> {
     return Storage.getInstance().getSelectedAccount();
   }
+
 }

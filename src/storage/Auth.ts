@@ -1,4 +1,5 @@
 import passworder from "@metamask/browser-passworder";
+import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 
 export default class Auth {
@@ -23,19 +24,33 @@ export default class Auth {
     return Auth.getInstance().#isUnlocked;
   }
 
+  static set isUnlocked(isUnlocked: boolean) {
+    Auth.getInstance().#isUnlocked = isUnlocked;
+  }
+
   static get password() {
     return Auth.getInstance().#password;
   }
 
+  static set password(password: string | undefined) {
+    Auth.getInstance().#password = password;
+  }
+
   static validate() {
-    if (!Auth.getInstance().#isUnlocked || !Auth.getInstance().#password) {
+    if (!Auth.isUnlocked || !Auth.password) {
       throw new Error("Vault is not unlocked");
     }
   }
 
-  static setAuth({ password, isUnlocked }: any) {
-    Auth.getInstance().#password = password;
-    Auth.getInstance().#isUnlocked = isUnlocked;
+  static async loadAuthFromCache(salt: string) {
+    const { password, isUnlocked } = CacheAuth.getInstance();
+    if (!password || (await CacheAuth.isExpired())) {
+      Auth.getInstance().signOut();
+      return;
+    }
+    const decrypted = await passworder.decrypt(salt, password);
+    Auth.password = decrypted as string;
+    Auth.isUnlocked = isUnlocked;
   }
 
   async decryptVault(vault: string) {
@@ -101,9 +116,17 @@ export default class Auth {
     }
   }
 
-  static async decryptBackup(backup: string, recoveryPhrase: string) { 
+  static async decryptBackup(backup: string, recoveryPhrase: string) {
     try {
       return passworder.decrypt(recoveryPhrase, backup);
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  static async generateSaltedHash(salt: string, password: string) {
+    try {
+      return passworder.encrypt(salt, password);
     } catch (error) {
       throw new Error(error as string);
     }

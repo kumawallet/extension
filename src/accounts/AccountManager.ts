@@ -186,10 +186,12 @@ export default class AccountManager {
     if (!backup) throw new Error("Backup not found");
     const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
-    Auth.setAuth({ password: decryptedBackup, isUnlocked: true });
+    Auth.password = decryptedBackup as string;
+    Auth.isUnlocked = true;
     const vault = await Storage.getInstance().getVault();
     if (!vault) throw new Error("Vault not found");
-    Auth.setAuth({ password, isUnlocked: true });
+    Auth.password = password;
+    Auth.isUnlocked = true;
     await Storage.getInstance().setVault(vault);
     await AccountManager.saveBackup(privateKeyOrSeed);
   }

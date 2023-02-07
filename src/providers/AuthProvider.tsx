@@ -108,7 +108,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password: newPassword,
   }: NewAccount) => {
     try {
-      console.log("restorePassword", recoveryPhrase, newPassword)
       await Extension.restorePassword({ recoveryPhrase, newPassword });
       return true;
     } catch (error) {

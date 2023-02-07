@@ -17,15 +17,17 @@ import { Network } from "./entities/Network";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
+export type Browser = typeof chrome | typeof window.browser;
+
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
+  readonly #browser: Browser;
 
   private static instance: Storage;
 
   private constructor() {
-    this.#storage = isChrome
-      ? chrome.storage.local
-      : window.browser.storage.local; // add browser to namespace?
+    this.#browser = isChrome ? chrome : window.browser;
+    this.#storage = this.#browser.storage.local;
   }
 
   static getInstance() {
@@ -35,8 +37,16 @@ export default class Storage {
     return Storage.instance;
   }
 
-  getStorage(): chrome.storage.StorageArea {
+  get storage() {
     return this.#storage;
+  }
+
+  get browser() {
+    return this.#browser;
+  }
+
+  getSalt() {
+    return this.#browser.runtime.id;
   }
 
   async get(key: string) {
@@ -45,7 +55,7 @@ export default class Storage {
       if (!data?.[key]) return undefined;
       if (key === VAULT && data[key]) {
         if (!Auth.password || !Auth.isUnlocked) {
-          await this.loadCache();
+          await this.loadFromCache();
         }
         return Auth.getInstance().decryptVault(data[key]);
       }
@@ -117,20 +127,23 @@ export default class Storage {
 
   async cachePassword() {
     try {
-      const password = Auth.password || "";
-      CacheAuth.save(password);
-      const cacheAuth = CacheAuth.getInstance();
-      await this.set(CACHE_AUTH, cacheAuth);
+      if (!Auth.password) {
+        return;
+      }
+      const salt = this.getSalt();
+      const encrypted = await Auth.generateSaltedHash(salt, Auth.password);
+      CacheAuth.save(encrypted);
+      await this.set(CACHE_AUTH, CacheAuth.getInstance());
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
     }
   }
 
-  async loadCache() {
+  async loadFromCache() {
     try {
-      const cacheAuth = await this.getCacheAuth();
-      Auth.setAuth(cacheAuth);
+      await this.getCacheAuth();
+      await Auth.loadAuthFromCache(Storage.getInstance().getSalt());
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
@@ -146,12 +159,11 @@ export default class Storage {
     }
   }
 
-  async getCacheAuth(): Promise<CacheAuth> {
-    const stored = await this.get(CacheAuth.getInstance().getKey());
+  private async getCacheAuth() {
+    const stored = await this.get(CACHE_AUTH);
     if (!stored) throw new Error("CacheAuth is not initialized");
     const cacheAuth = CacheAuth.getInstance();
     cacheAuth.set(stored);
-    return cacheAuth;
   }
 
   async getVault(): Promise<Vault | undefined> {
