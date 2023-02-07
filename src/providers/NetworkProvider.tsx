@@ -102,7 +102,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (state.selectedChain?.name) {
-      const isWasm = state.selectedChain.supportedAccounts?.includes("WASM");
+      const isWasm = state.selectedChain.supportedAccounts[0]?.includes("WASM");
 
       const rpc = state.selectedChain.rpc[isWasm ? "wasm" : "evm"];
 

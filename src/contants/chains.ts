@@ -18,7 +18,7 @@ export interface Chain {
     name: string;
     url: string;
   }[];
-  supportedAccounts?: suppotedAccountType[];
+  supportedAccounts: suppotedAccountType[];
 }
 
 export const RELAYCHAINS: Chain[] = [
@@ -101,7 +101,7 @@ export const PARACHAINS: Chain[] = [
         url: "https://moonbeam.moonscan.io",
       },
     ],
-    supportedAccounts: [WASM],
+    supportedAccounts: [EVM],
   },
 
   {
@@ -121,7 +121,7 @@ export const PARACHAINS: Chain[] = [
         url: "https://moonriver.moonscan.io",
       },
     ],
-    supportedAccounts: [WASM],
+    supportedAccounts: [EVM],
   },
   {
     name: "Shiden",
@@ -164,6 +164,7 @@ export const TESTNETS: Chain[] = [
         url: "https://moonbase.moonscan.io",
       },
     ],
+    supportedAccounts: [EVM],
   },
   {
     name: "Shibuya",
@@ -184,6 +185,7 @@ export const TESTNETS: Chain[] = [
         url: "https://shibuya.subscan.io/",
       },
     ],
+    supportedAccounts: [EVM],
   },
   {
     name: "Contracts Testnet",
@@ -202,6 +204,7 @@ export const TESTNETS: Chain[] = [
         url: "",
       },
     ],
+    supportedAccounts: [WASM],
   },
 ];
 
