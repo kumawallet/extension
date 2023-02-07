@@ -11,8 +11,8 @@ interface LoadinButtonProps {
 }
 
 const DEFAULT_CLASSNAME =
-  "border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline disabled:opacity-50";
-const DEFAULT_SPINNER_CLASSNAME = "w-8 h-8 animate-spin fill-white";
+  "min-w-[75px] min-h-[35px] border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline disabled:opacity-50";
+const DEFAULT_SPINNER_CLASSNAME = "mx-auto animate-spin fill-white";
 
 export const LoadingButton: FC<LoadinButtonProps & PropsWithChildren> = ({
   children,
