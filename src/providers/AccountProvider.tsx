@@ -11,6 +11,7 @@ import { Account } from "@src/storage/entities/Accounts";
 import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
 import { transformAddress } from "@src/utils/account-utils";
+import { AccountType } from "../accounts/AccountManager";
 
 interface InitialState {
   accounts: Account[];
@@ -81,12 +82,22 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    getAllAccounts();
-  }, []);
+    if (selectedChain?.name) {
+      (async () => {
+        const newChainType = selectedChain.supportedAccounts[0];
 
-  const getAllAccounts = async () => {
+        const chains = await getAllAccounts(newChainType);
+
+        if (!state.selectedAccount?.type?.includes(newChainType)) {
+          setSelectedAccount(chains[0]);
+        }
+      })();
+    }
+  }, [selectedChain?.name]);
+
+  const getAllAccounts = async (type: AccountType | null = null) => {
     try {
-      const accounts = await Extension.getAllAccounts();
+      const accounts = await Extension.getAllAccounts(type);
       dispatch({
         type: "set-accounts",
         payload: {

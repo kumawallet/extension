@@ -57,7 +57,7 @@ export const Balance = () => {
 
       getAssets(api, selectedAccount, selectedChain);
     }
-  }, [api, selectedAccount, selectedChain]);
+  }, [api, selectedAccount?.key, selectedChain?.name]);
 
   const getAssets = async (
     api: ApiPromise,

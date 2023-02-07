@@ -1,5 +1,5 @@
 import { VAULT } from "./utils/constants";
-import AccountManager from "./accounts/AccountManager";
+import AccountManager, { AccountType } from "./accounts/AccountManager";
 import { Account, AccountKey } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
@@ -117,8 +117,10 @@ export default class Extension {
     return AccountManager.getAccount(key);
   }
 
-  static async getAllAccounts(): Promise<Account[]> {
-    const accounts = await AccountManager.getAll();
+  static async getAllAccounts(
+    type: AccountType | null = null
+  ): Promise<Account[]> {
+    const accounts = await AccountManager.getAll(type);
     if (!accounts) return [];
     return accounts.getAll();
   }
@@ -145,5 +147,4 @@ export default class Extension {
   static async getSelectedAccount(): Promise<Account | undefined> {
     return Storage.getInstance().getSelectedAccount();
   }
-
 }

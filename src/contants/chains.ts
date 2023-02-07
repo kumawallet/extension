@@ -1,6 +1,8 @@
+import { AccountType } from "@src/accounts/AccountManager";
+
 const WASM = "WASM";
 const EVM = "EVM";
-type suppotedAccountType = typeof WASM | typeof EVM;
+type suppotedAccountType = AccountType;
 export interface Chain {
   name: string;
   chain?: string;

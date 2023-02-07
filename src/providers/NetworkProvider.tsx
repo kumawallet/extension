@@ -102,11 +102,14 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (state.selectedChain?.name) {
-      const isWasm = state.selectedChain.supportedAccounts[0]?.includes("WASM");
+      (async () => {
+        const isWasm =
+          state.selectedChain?.supportedAccounts[0]?.includes("WASM");
 
-      const rpc = state.selectedChain.rpc[isWasm ? "wasm" : "evm"];
+        const rpc = state.selectedChain?.rpc[isWasm ? "wasm" : "evm"];
 
-      setNewApi(rpc);
+        await setNewApi(rpc);
+      })();
     }
   }, [state.selectedChain?.name]);
 

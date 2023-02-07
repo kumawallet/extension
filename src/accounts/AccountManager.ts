@@ -159,9 +159,25 @@ export default class AccountManager {
     return vault?.keyrings[selectedAccount.key]?.privateKey;
   }
 
-  static async getAll(): Promise<Accounts | undefined> {
+  static async getAll(
+    type: AccountType | null = null
+  ): Promise<Accounts | undefined> {
     const accounts = await Storage.getInstance().getAccounts();
     if (!accounts) return undefined;
+
+    if (type) {
+      const filteredAccounts: any = {};
+
+      Object.keys(accounts.data).forEach((key: any) => {
+        if (key.includes(type)) {
+          filteredAccounts[key] = accounts.data[key];
+        }
+      });
+
+      // TODO: how to improve this?
+      accounts.data = filteredAccounts;
+    }
+
     return accounts;
   }
 
