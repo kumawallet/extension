@@ -7,9 +7,22 @@ html, body, #__root {
   min-height: 100%;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.282);
+}
+
+::-webkit-scrollbar-thumb {
+  box-shadow: rgba(170, 170, 170, 0.518);
+}
+
 body {
   background: #212529;
-  color: white
+  color: white;
+  overflow: visible;
 }
 
 .toast {
