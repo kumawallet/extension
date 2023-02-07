@@ -45,8 +45,10 @@ export default class Storage {
     return this.#browser;
   }
 
-  getSalt() {
-    return this.#browser.runtime.id;
+  async getSalt() {
+    const { appName, platform, userAgent, language } = navigator;
+    const extensionId = this.#browser.runtime.id;
+    return `${appName}-${platform}-${userAgent}-${language}-${extensionId}`;
   }
 
   async get(key: string) {
@@ -130,7 +132,7 @@ export default class Storage {
       if (!Auth.password) {
         return;
       }
-      const salt = this.getSalt();
+      const salt = await this.getSalt();
       const encrypted = await Auth.generateSaltedHash(salt, Auth.password);
       CacheAuth.save(encrypted);
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
@@ -143,7 +145,7 @@ export default class Storage {
   async loadFromCache() {
     try {
       await this.getCacheAuth();
-      await Auth.loadAuthFromCache(Storage.getInstance().getSalt());
+      await Auth.loadAuthFromCache(await Storage.getInstance().getSalt());
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
