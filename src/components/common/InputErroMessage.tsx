@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-const DEFAULT_CLASSNAME = "text-red-500 py-2 px-1";
+const DEFAULT_CLASSNAME = "text-red-500 pt-2 px-1";
 
 interface InputErrorMessageProps {
   message: string | undefined;

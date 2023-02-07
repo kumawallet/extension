@@ -32,8 +32,11 @@ import {
   SETTINGS_BUG,
   CREATE_ACCOUNT,
 } from "./routes/paths";
+import { useTranslation } from "react-i18next";
 
 export const Routes = () => {
+  const { t } = useTranslation("account_form");
+
   const {
     state: { isInit },
     createAccount,
@@ -85,15 +88,15 @@ export const Routes = () => {
           path={IMPORT_ACCOUNT}
           element={
             <AccountForm
-              title="Import Account"
+              title={t("import.title")}
               onSubmitFn={importAccount}
-              buttonText="Import"
+              buttonText={t("import.button_text")}
               signUp={importIsSignUp}
               fields={{
                 privateKeyOrSeed: true,
                 accountType: true,
               }}
-              afterSubmitMessage="Account imported"
+              afterSubmitMessage={t("import.submit_message")}
               goAfterSubmit={BALANCE}
               backButton
               callback={getWalletStatus}
@@ -104,12 +107,12 @@ export const Routes = () => {
           path={CREATE_ACCOUNT}
           element={
             <AccountForm
-              title="Create Account"
+              title={t("create_or_derivate.title")}
               onSubmitFn={createAccount}
-              buttonText="Create"
+              buttonText={t("create_or_derivate.button_text")}
               signUp={true}
               fields={{}}
-              afterSubmitMessage="Account created"
+              afterSubmitMessage={t("create_or_derivate.submit_message")}
               goAfterSubmit={BALANCE}
               backButton
               generateSeed
@@ -121,15 +124,15 @@ export const Routes = () => {
           path={RESTORE_PASSWORD}
           element={
             <AccountForm
-              title="Reset Password"
+              title={t("restore.title")}
               onSubmitFn={restorePassword}
-              buttonText="Restore"
+              buttonText={t("restore.button_text")}
               resetPassword={true}
               signUp={false}
               fields={{
                 privateKeyOrSeed: true,
               }}
-              afterSubmitMessage="Password restored"
+              afterSubmitMessage={t("restore.submit_message")}
               goAfterSubmit={SIGNIN}
               backButton
               callback={getWalletStatus}
@@ -139,31 +142,43 @@ export const Routes = () => {
         <Route
           path={DERIVE_ACCOUNT}
           element={
-            !canDerive ? (
-              <AccountForm
-                title="Create Account"
-                onSubmitFn={createAccount}
-                buttonText="Create"
-                fields={{}}
-                signUp={false}
-                afterSubmitMessage="Account created"
-                goAfterSubmit={BALANCE}
-                backButton
-                generateSeed
-                callback={getWalletStatus}
-              />
-            ) : (
-              <AccountForm
-                title="Create Account"
-                onSubmitFn={deriveAccount}
-                signUp={false}
-                buttonText="Create"
-                fields={{ accountType: true }}
-                afterSubmitMessage="Account created"
-                goAfterSubmit={BALANCE}
-                backButton
-              />
-            )
+            // !canDerive ? (
+            //   <AccountForm
+            //     title={t("create_or_derivate.title")}
+            //     onSubmitFn={createAccount}
+            //     buttonText={t("create_or_derivate.button_text")}
+            //     fields={{}}
+            //     signUp={false}
+            //     afterSubmitMessage={t("create_or_derivate.submit_message")}
+            //     goAfterSubmit={BALANCE}
+            //     backButton
+            //     generateSeed
+            //     callback={getWalletStatus}
+            //   />
+            // ) : (
+            //   <AccountForm
+            //     title={t("create_or_derivate.title")}
+            //     onSubmitFn={deriveAccount}
+            //     signUp={false}
+            //     buttonText={t("create_or_derivate.button_text")}
+            //     fields={{ accountType: true }}
+            //     afterSubmitMessage={t("create_or_derivate.submit_message")}
+            //     goAfterSubmit={BALANCE}
+            //     backButton
+            //   />
+            // )
+            <AccountForm
+              title={t("create_or_derivate.title")}
+              onSubmitFn={deriveAccount}
+              signUp={false}
+              buttonText={t("create_or_derivate.button_text")}
+              fields={!canDerive ? {} : { accountType: true }}
+              afterSubmitMessage={t("create_or_derivate.submit_message")}
+              goAfterSubmit={BALANCE}
+              backButton
+              generateSeed={!canDerive}
+              callback={!canDerive ? getWalletStatus : () => null}
+            />
           }
         />
 

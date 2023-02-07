@@ -5,9 +5,9 @@
   "home": {
     "welcome": "Welcome to Kuma Wallet",
     "description": "All your accounts in one place",
-    "continue_button_text": "Continue"
+    "button_text": "Get started"
   },
-  "add-account": {
+  "add_account": {
     "title": "Add Account",
     "import_wallet": "Import wallet",
     "create_wallet": "Create wallet"
@@ -23,10 +23,15 @@
       "button_text": "Import",
       "submit_message": "Account imported"
     },
-    "create_or_derive": {
+    "create_or_derivate": {
       "title": "Create Account",
       "button_text": "Create",
       "submit_message": "Account created"
+    },
+    "restore": {
+      "title": "Reset Password",
+      "button_text": "Restore",
+      "submit_message": "Password restored"
     },
     "form": {
       "continue_button_text": "Continue",

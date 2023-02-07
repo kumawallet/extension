@@ -233,7 +233,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               {errors.password?.message ? (
                 <InputErrorMessage message={errors.password?.message} />
               ) : (
-                <p className="text-gray-400 py-2 px-1"> {PASSWORD_RULES}</p>
+                <p className="text-gray-400 p-2 px-1"> {PASSWORD_RULES}</p>
               )}
             </div>
             <div>

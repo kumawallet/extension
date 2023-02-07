@@ -4,6 +4,7 @@ import { Routes } from "./routes";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import { ToastContainer } from "react-toastify";
+import "./utils/i18n";
 
 import "react-toastify/dist/ReactToastify.css";
 
