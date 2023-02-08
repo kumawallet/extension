@@ -123,6 +123,9 @@ export default class AccountManager {
     if (!keyring) throw new Error("Keyring not found");
     keyring.increaseAccountQuantity();
     let path;
+    if (name === "") {
+      name = `Account ${keyring.accountQuantity}`;
+    }
     switch (type) {
       case AccountType.EVM:
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
