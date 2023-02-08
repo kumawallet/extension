@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
 import { PageWrapper } from "../common/PageWrapper";
 import { BiLeftArrowAlt } from "react-icons/bi";
+import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaCheckCircle } from "react-icons/fa";
@@ -66,6 +67,15 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const { t } = useTranslation("account_form");
   const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
+
+  const [passwordType, setPasswordType] = useState("password");
+  const togglePassword = () => {
+    if (passwordType === "password") {
+      setPasswordType("text");
+      return;
+    }
+    setPasswordType("password");
+  };
 
   // TODO: move this to separate file
   const schema = object({
@@ -242,10 +252,19 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 id="password"
                 min={8}
                 onPaste={(e) => e.preventDefault()}
-                type={"password"}
+                type={passwordType}
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                 {...register("password")}
               />
+              <div>
+                <button
+                  className=""
+                  onClick={togglePassword}
+                >
+                  {passwordType === "password" ? <BsEyeSlash /> : <BsEye />}
+                </button>
+              </div>
+
               {errors.password?.message ? (
                 <InputErrorMessage message={errors.password?.message} />
               ) : (
