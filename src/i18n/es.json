@@ -1,1 +1,87 @@
-{}
+{
+  "common": {
+    "loading": "Cargando..."
+  },
+  "home": {
+    "welcome": "Bienvenido a Kuma Wallet",
+    "description": "Todas tus cuentas en un solo lugar",
+    "button_text": "Empezar"
+  },
+  "add_account": {
+    "title": "Añadir cuenta",
+    "import_wallet": "Importar billetera",
+    "create_wallet": "Crear billetera"
+  },
+  "sign_in": {
+    "welcome": "Bienvenido de nuevo",
+    "password_placeholder": "Escribe tu contraseña",
+    "signin_button_text": "Iniciar sesión",
+    "forgot_password": "¿Olvidaste tu contraseña?"
+  },
+  "account_form": {
+    "common": {
+      "loading": "Cargando..."
+    },
+    "import": {
+      "title": "Importar cuenta",
+      "button_text": "Importar",
+      "submit_message": "Cuenta importada"
+    },
+    "create_or_derivate": {
+      "title": "Crear cuenta",
+      "button_text": "Crear",
+      "submit_message": "Cuenta creada"
+    },
+    "restore": {
+      "title": "Restablecer contraseña",
+      "button_text": "Restablecer",
+      "submit_message": "Contraseña restablecida"
+    },
+    "form": {
+      "continue_button_text": "Continuar",
+      "seed": "Semilla",
+      "seed_message": "Esta es la clave de tu cuenta y la única forma de acceder a ella en caso de que olvides tu contraseña. Asegúrate de guardarla en un lugar seguro, ya que no podrás verla de nuevo.",
+      "account_type": "Tipo de cuenta",
+      "evm_type": "Cuenta tipo Ethereum (EVM)",
+      "wasm_type": "Cuenta tipo Polkadot (WASM)",
+      "private_key": "Clave privada",
+      "seed_phrase": "Frase semilla",
+      "recovery_phrase": "Frase de recuperación",
+      "account_name": "Nombre de la cuenta (opcional)",
+      "account_name_placeholder": "Máximo 32 caracteres",
+      "password": "Contraseña",
+      "password_hint": "La contraseña debe contener al menos ocho caracteres, al menos un número, tanto letras minúsculas como mayúsculas y caracteres especiales.",
+      "confirm_password": "Confirmar contraseña",
+      "confirm_password_hint": "Las contraseñas no coinciden."
+    }
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "conectado",
+      "change_to": "Cambiar a",
+      "network_change_warning": "La cuenta seleccionada se cambiará porque la red a la que desea cambiar no es compatible con el tipo de cuenta actual. ¿Está seguro de que desea cambiar la red?",      "cancel": "Cancelar",
+      "cancel": "Cancelar",
+      "change": "Cambiar",
+      "mainnets": "Redes principales (mainnets)",
+      "parachains": "Redes secundarias (parachains)",
+      "testnets": "Redes de prueba (testnets)"
+    },
+    "accounts": {
+      "accounts": "Cuentas",
+      "import": "Importar",
+      "create": "Crear"
+    },
+    "send": "Enviar",
+    "receive": "Recibir",
+    "assets": "Activos",
+    "activity": "Actividad"
+  },
+  "settings": {
+    "title": "Configuración",
+    "general": "general",
+    "advanced": "avanzado",
+    "contacts": "contactos",
+    "security": "seguridad",
+    "bug_report": "informar un error"
+    }
+}

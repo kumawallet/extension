@@ -3,14 +3,14 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { en, es, jp } from "../i18n";
 
-const DEFAULT_LANGUAGE = "en";
+const DEFAULT_LANGUAGE = "es";
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en,
+      //en,
       es,
       jp,
     },

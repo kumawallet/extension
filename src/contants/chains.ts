@@ -23,7 +23,7 @@ export interface Chain {
   supportedAccounts: supportedAccountType[];
 }
 
-export const RELAYCHAINS: Chain[] = [
+export const MAINNETS: Chain[] = [
   {
     name: "Polkadot",
     chain: "substrate",
@@ -59,6 +59,24 @@ export const RELAYCHAINS: Chain[] = [
       },
     ],
     supportedAccounts: [WASM],
+  },
+  {
+    name: "Ethereum",
+    chain: "ethereum",
+    rpc: { evm: "ws://mainnet.infura.io/v3/" },
+    addressPrefix: 1,
+    nativeCurrency: {
+      name: "ETH",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    explorers: [
+      {
+        name: "etherscan",
+        url: "https://etherscan.io/",
+      },
+    ],
+    supportedAccounts: [EVM],
   },
 ];
 
@@ -214,19 +232,37 @@ export const TESTNETS: Chain[] = [
     ],
     supportedAccounts: [WASM],
   },
+  {
+    name: "Goerli",
+    chain: "goerli",
+    rpc: { evm: "https://goerli.infura.io/v3/" },
+    addressPrefix: 5,
+    nativeCurrency: {
+      name: "GoerliETH",
+      symbol: "GoerliETH",
+      decimals: 18,
+    },
+    explorers: [
+      {
+        name: "etherscan",
+        url: "https://goerli.etherscan.io",
+      },
+    ],
+    supportedAccounts: [EVM],
+  },
 ];
 
 export const CHAINS = [
   {
-    name: "Relay chains",
-    chains: RELAYCHAINS,
+    name: "mainnets",
+    chains: MAINNETS,
   },
   {
-    name: "Parachains",
+    name: "parachains",
     chains: PARACHAINS,
   },
   {
-    name: "Testnets",
+    name: "testnets",
     chains: TESTNETS,
   },
 ];

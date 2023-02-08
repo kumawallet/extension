@@ -73,9 +73,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
 
                 <div className="mt-2">
                   <p className="text-sm">
-                    {`${chainToChange?.name || ""} ${t("chain_selector.only_supports")} ${
-                      chainToChange?.supportedAccounts[0].toLowerCase() || ""
-                    } ${t("chain_selector.accounts")}. ${t("chain_selector.network_change_warning")}`}
+                    {t("chain_selector.network_change_warning")}
                   </p>
                 </div>
 

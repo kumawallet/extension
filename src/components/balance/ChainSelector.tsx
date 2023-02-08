@@ -68,7 +68,7 @@ export const ChainSelector = () => {
                 {chains.map((spec) => (
                   <>
                     <div className="flex items-center gap-3 whitespace-nowrap">
-                      <p className="text-[#808385] text-lg">{spec.name}</p>
+                      <p className="text-[#808385] text-lg">{t(`chain_selector.${spec.name}`)}</p>
                       <div className="h-[1px] w-full bg-[#343A40]" />
                     </div>
                     {spec.chains.map((chain, index) => (

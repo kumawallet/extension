@@ -59,11 +59,12 @@
     "chain_selector": {
       "connected": "connected",
       "change_to": "Change to",
-      "only_supports": "only supports",
-      "accounts": "accounts",
-      "network_change_warning": "Make sure to use the desired account. Are you sure you want to change the network?",
+      "network_change_warning": "The selected account will be changed because the network to which you want to change does not support the current account type. Are you sure you want to change the network?",
       "cancel": "Cancel",
-      "change": "Change"
+      "change": "Change",
+      "mainnets": "Relay chains",
+      "parachains": "Parachains",
+      "testnets": "Testnets"
     },
     "accounts": {
       "accounts": "Accounts",
