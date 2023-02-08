@@ -1,7 +1,8 @@
 import { AccountType } from "@src/accounts/AccountManager";
 
-const WASM = "WASM";
-const EVM = "EVM";
+const WASM = "WASM" as AccountType.WASM;
+const EVM = "EVM" as AccountType.EVM;
+
 type suppotedAccountType = AccountType;
 export interface Chain {
   name: string;
@@ -82,7 +83,7 @@ export const PARACHAINS: Chain[] = [
         url: "https://astar.subscan.io",
       },
     ],
-    supportedAccounts: [WASM],
+    supportedAccounts: [WASM, EVM],
   },
   {
     name: "Moonbeam",
@@ -109,7 +110,10 @@ export const PARACHAINS: Chain[] = [
   {
     name: "Moonriver",
     chain: "MOON",
-    rpc: { wasm: "wss://wss.api.moonriver.moonbeam.network" },
+    rpc: {
+      evm: "https://rpc.api.moonriver.moonbeam.network",
+      wasm: "wss://wss.api.moonriver.moonbeam.network",
+    },
     addressPrefix: 1284,
     nativeCurrency: {
       name: "Moonriver",
@@ -129,6 +133,7 @@ export const PARACHAINS: Chain[] = [
     name: "Shiden",
     chain: "SDN",
     rpc: {
+      evm: "https://evm.shiden.astar.network",
       wasm: "wss://shiden.api.onfinality.io/public-ws",
     },
     addressPrefix: 5,
@@ -143,7 +148,7 @@ export const PARACHAINS: Chain[] = [
         url: "https://shiden.subscan.io",
       },
     ],
-    supportedAccounts: [WASM],
+    supportedAccounts: [EVM, WASM],
   },
 ];
 
@@ -152,6 +157,7 @@ export const TESTNETS: Chain[] = [
     name: "Moonbase Alpha",
     chain: "MOON",
     rpc: {
+      evm: "https://rpc.api.moonbase.moonbeam.network",
       wasm: "wss://wss.api.moonbase.moonbeam.network",
     },
     addressPrefix: 1287,
@@ -166,12 +172,13 @@ export const TESTNETS: Chain[] = [
         url: "https://moonbase.moonscan.io",
       },
     ],
-    supportedAccounts: [EVM],
+    supportedAccounts: [EVM, WASM],
   },
   {
     name: "Shibuya",
     chain: "substrate",
     rpc: {
+      evm: "https://evm.shibuya.astar.network",
       wasm: "wss://shibuya-rpc.dwellir.com",
     },
     nativeCurrency: {
@@ -187,7 +194,7 @@ export const TESTNETS: Chain[] = [
         url: "https://shibuya.subscan.io/",
       },
     ],
-    supportedAccounts: [EVM],
+    supportedAccounts: [EVM, WASM],
   },
   {
     name: "Contracts Testnet",

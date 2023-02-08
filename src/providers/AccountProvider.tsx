@@ -28,7 +28,7 @@ const initialState: InitialState = {
 const AccountContext = createContext(
   {} as {
     state: InitialState;
-    getAllAccounts: () => Promise<Account[]>;
+    getAllAccounts: (type?: AccountType[] | null) => Promise<Account[]>;
     getSelectedAccount: () => Promise<Account | undefined>;
     setSelectedAccount: (account: Account) => void;
   }
@@ -84,18 +84,18 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (selectedChain?.name) {
       (async () => {
-        const newChainType = selectedChain.supportedAccounts[0];
+        const newChainType = selectedChain.supportedAccounts;
 
-        const chains = await getAllAccounts(newChainType);
+        const accounts = await getAllAccounts(newChainType);
 
-        if (!state.selectedAccount?.type?.includes(newChainType)) {
-          setSelectedAccount(chains[0]);
+        if (!newChainType.includes(state.selectedAccount?.type)) {
+          setSelectedAccount(accounts[0]);
         }
       })();
     }
   }, [selectedChain?.name]);
 
-  const getAllAccounts = async (type: AccountType | null = null) => {
+  const getAllAccounts = async (type: AccountType[] | null = null) => {
     try {
       const accounts = await Extension.getAllAccounts(type);
       dispatch({

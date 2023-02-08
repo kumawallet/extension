@@ -22,9 +22,9 @@ export const Accounts = () => {
     setSelectedAccount,
   } = useAccountContext();
 
-  // useEffect(() => {
-  //   getAllAccounts();
-  // }, []);
+  useEffect(() => {
+    getAllAccounts(selectedChain?.supportedAccounts);
+  }, []);
 
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);

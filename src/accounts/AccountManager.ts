@@ -160,16 +160,16 @@ export default class AccountManager {
   }
 
   static async getAll(
-    type: AccountType | null = null
+    type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
     const accounts = await Storage.getInstance().getAccounts();
     if (!accounts) return undefined;
 
-    if (type) {
+    if (type && type.length > 0) {
       const filteredAccounts: any = {};
 
       Object.keys(accounts.data).forEach((key: any) => {
-        if (key.includes(type)) {
+        if (type.includes(accounts.data[key].type)) {
           filteredAccounts[key] = accounts.data[key];
         }
       });

@@ -118,7 +118,7 @@ export default class Extension {
   }
 
   static async getAllAccounts(
-    type: AccountType | null = null
+    type: AccountType[] | null = null
   ): Promise<Account[]> {
     const accounts = await AccountManager.getAll(type);
     if (!accounts) return [];
