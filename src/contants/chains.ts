@@ -103,7 +103,7 @@ export const PARACHAINS: Chain[] = [
         url: "https://moonbeam.moonscan.io",
       },
     ],
-    supportedAccounts: [EVM],
+    supportedAccounts: [EVM, WASM],
   },
 
   {

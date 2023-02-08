@@ -12,6 +12,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { InputErrorMessage } from "../common/InputErroMessage";
 import { AccountType } from "@src/accounts/AccountManager";
 import { useTranslation } from "react-i18next";
+import { useAccountContext } from "../../providers/AccountProvider";
+import { useNetworkContext } from "../../providers/NetworkProvider";
 
 interface AddAccountFormProps {
   title: string;
@@ -53,6 +55,14 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
+
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
+
   const { t } = useTranslation("account_form");
   const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
@@ -70,7 +80,10 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       : string().notRequired(),
     confirmPassword: passwordIsRequired
       ? string()
-          .oneOf([ref("password"), null], t("form.confirm_password_hint") as string)
+          .oneOf(
+            [ref("password"), null],
+            t("form.confirm_password_hint") as string
+          )
           .required("required")
       : string().notRequired(),
   }).required();
@@ -84,7 +97,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     formState: { errors },
   } = useForm<AccountForm>({
     defaultValues: {
-      accountType: AccountType.EVM,
+      accountType: selectedAccount?.type || AccountType.EVM,
       confirmPassword: "",
       password: "",
       name: "",
@@ -162,24 +175,26 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             />
           </div>
         )}
-        {fields.accountType && (
-          <div>
-            <label
-              htmlFor="accountType"
-              className="block text-sm font-medium mb-1"
-            >
-              {t("form.account_type")}
-            </label>
-            <select
-              id="accountType"
-              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              {...register("accountType")}
-            >
-              <option value={AccountType.EVM}>{t("form.evm_type")}</option>
-              <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
-            </select>
-          </div>
-        )}
+        {fields.accountType &&
+          selectedChain?.supportedAccounts &&
+          selectedChain?.supportedAccounts.length === 2 && (
+            <div>
+              <label
+                htmlFor="accountType"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("form.account_type")}
+              </label>
+              <select
+                id="accountType"
+                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                {...register("accountType")}
+              >
+                <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+                <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
+              </select>
+            </div>
+          )}
         {fields.privateKeyOrSeed && (
           <div>
             <label

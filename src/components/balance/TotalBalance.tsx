@@ -1,23 +1,26 @@
+import { FC } from "react";
 import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 
-export const TotalBalance = ({
+interface TotalBalanceProps {
+  balance?: number;
+  accountName?: string;
+}
+
+export const TotalBalance: FC<TotalBalanceProps> = ({
   balance = 0,
-  accountName = "Account 1",
-}: {
-  balance: number;
-  accountName: string;
+  accountName = "",
 }) => {
   const { t } = useTranslation("balance");
 
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-center">
-        <p className="text-2xl mb-6">{accountName}</p>
+        <p className="text-2xl mb-6">{accountName || ""}</p>
       </div>
       <div className="flex mb-8 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
-        <p className="text-5xl">{balance}</p>
+        <p className="text-5xl">{balance || 0}</p>
       </div>
       <div className="flex gap-3 justify-center">
         <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
