@@ -257,8 +257,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                 {...register("password")}
               />
+
               <div>
-                <button className="" onClick={togglePassword}>
+                <button onClick={togglePassword}>
                   {passwordType === "password" ? <BsEyeSlash /> : <BsEye />}
                 </button>
               </div>
