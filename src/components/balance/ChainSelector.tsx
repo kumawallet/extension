@@ -4,8 +4,11 @@ import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "../../providers/NetworkProvider";
 import { Chain } from "@src/contants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
+import { useTranslation } from "react-i18next";
+
 
 export const ChainSelector = () => {
+  const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
     getSelectedNetwork,
@@ -81,7 +84,7 @@ export const ChainSelector = () => {
                             <div className="flex gap-3 items-center">
                               <p className="text-xl">{chain.name}</p>
                               {chain.name === selectedChain?.name && (
-                                <p className="text-[#56DF53]">connected</p>
+                                <p className="text-[#56DF53]">{t("chain_selector.connected")}</p>
                               )}
                             </div>
                           </div>

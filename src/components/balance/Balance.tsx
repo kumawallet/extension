@@ -16,17 +16,7 @@ import { Account as AccountEntity } from "@src/storage/entities/Accounts";
 import { Chain } from "@src/contants/chains";
 import { getAssetUSDPrice } from "../../utils/assets";
 import { useToast } from "@src/hooks";
-
-const TABS = [
-  {
-    name: "Assets",
-    component: <Assets assets={[]} isLoading={true} />,
-  },
-  {
-    name: "Activity",
-    component: <Activity />,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export interface Asset {
   name: string;
@@ -37,6 +27,19 @@ export interface Asset {
 }
 
 export const Balance = () => {
+  const { t } = useTranslation("balance");
+
+  const TABS = [
+    {
+      name: t("assets"),
+      component: <Assets assets={[]} isLoading={true} />,
+    },
+    {
+      name: t("activity"),
+      component: <Activity />,
+    },
+  ];
+
   const {
     state: { api, selectedChain },
   } = useNetworkContext();

@@ -5,8 +5,11 @@ import Extension from "../../Extension";
 import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
 import logo from "@src/assets/img/logo.svg";
+import { useTranslation } from "react-i18next";
 
 export const SignIn = () => {
+  const { t } = useTranslation("sign_in");
+
   const navigate = useNavigate();
   const { showErrorToast } = useToast();
 
@@ -29,11 +32,11 @@ export const SignIn = () => {
     <PageWrapper>
       <div className="flex flex-col">
         <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
-        <p className="text-center text-xl mb-6">Welcome back</p>
+        <p className="text-center text-xl mb-6">{t("welcome")}</p>
         <input
           id="password"
           min={8}
-          placeholder="Type your password"
+          placeholder={t("password_placeholder") as string}
           onPaste={(e) => e.preventDefault()}
           type={"password"}
           value={password}
@@ -46,9 +49,9 @@ export const SignIn = () => {
           className="mb-4 border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto disabled:bg-gray-600"
           onClick={signIn}
         >
-          Sign In
+          {t("signin_button_text")}
         </button>
-        <p className="text-center mb-6" onClick={() => navigate(RESTORE_PASSWORD)}>Forgot password?</p>
+        <p className="text-center mb-6" onClick={() => navigate(RESTORE_PASSWORD)}>{t("forgot_password")}</p>
       </div>
     </PageWrapper>
   );

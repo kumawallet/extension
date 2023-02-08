@@ -1,8 +1,8 @@
 import { AccountType } from "@src/accounts/AccountManager";
 
-const WASM = "WASM";
-const EVM = "EVM";
-type suppotedAccountType = AccountType;
+const WASM = "WASM" as AccountType.WASM;
+const EVM = "EVM" as AccountType.EVM;
+type supportedAccountType = AccountType;
 export interface Chain {
   name: string;
   chain?: string;
@@ -20,7 +20,7 @@ export interface Chain {
     name: string;
     url: string;
   }[];
-  supportedAccounts: suppotedAccountType[];
+  supportedAccounts: supportedAccountType[];
 }
 
 export const RELAYCHAINS: Chain[] = [

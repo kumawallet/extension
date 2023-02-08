@@ -2,8 +2,10 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import logo from "../../assets/img/logo.svg";
 import { Accounts } from "../accounts";
+import { useTranslation } from "react-i18next";
 
 export const AccountManage = () => {
+  const { t } = useTranslation("balance");
   return (
     <Menu>
       <Menu.Button>
@@ -22,7 +24,7 @@ export const AccountManage = () => {
       >
         <Menu.Items className="right-0 absolute origin-top-right top-12 w-full max-w-lg bg-[#29323C] rounded-xl ring-0 outline-0 max-h-[90vh] overflow-auto z-50">
           <div className="text-start py-2 pt-2 px-4">
-            <p className="py-4 text-2xl font-medium">Accounts</p>
+            <p className="py-4 text-2xl font-medium">{t("accounts.accounts")}</p>
             <Accounts />
           </div>
         </Menu.Items>

@@ -5,6 +5,7 @@ import { BsChevronRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { SIGNIN } from "@src/routes/paths";
 import Extension from "@src/Extension";
+import { useTranslation } from "react-i18next";
 
 const OPTIONS = [
   {
@@ -24,12 +25,14 @@ const OPTIONS = [
     href: "/settings-security",
   },
   {
-    text: "bug report",
+    text: "bug_report",
     href: "/settings-bug",
   },
 ];
 
 export const Settings = () => {
+  const { t } = useTranslation("settings");
+
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -55,7 +58,7 @@ export const Settings = () => {
         <Menu.Items className="right-0 absolute origin-bottom-right max-w-lg  bottom-12 w-full h-[calc(100vh-99px)] bg-[#29323C] ring-0 outline-0 rounded-xl z-50">
           <div className="text-start px-4 py-10">
             <div className="mb-2">
-              <p className="pb-6 text-2xl font-medium">Settings</p>
+              <p className="pb-6 text-2xl font-medium">{t("title")}</p>
             </div>
             <div className="flex flex-col gap-1">
               {OPTIONS.map((opt) => (
@@ -64,7 +67,7 @@ export const Settings = () => {
                   onClick={() => navigate(opt.href)}
                   className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
                 >
-                  <p className="capitalize text-xl">{opt.text}</p>
+                  <p className="capitalize text-xl">{t(opt.text)}</p>
                   <BsChevronRight />
                 </div>
               ))}

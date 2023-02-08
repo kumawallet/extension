@@ -278,16 +278,11 @@ export default class Storage {
   }
 
   async updateAccount(account: Account) {
-    try {
-      const accounts = await this.getAccounts();
-      if (!accounts) throw new Error("Accounts are not initialized");
-      accounts.update(account.key, account.value);
-      await this.setAccounts(accounts);
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+    const accounts = await this.getAccounts();
+    if (!accounts) throw new Error("Accounts are not initialized");
+    accounts.update(account.key, account.value);
+    await this.setAccounts(accounts);
+    return account;
   }
 
   async removeAccount(key: AccountKey) {

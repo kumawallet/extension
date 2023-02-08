@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { BsArrowRight } from "react-icons/bs";
 import { SiWebassembly, SiEthereum } from "react-icons/si";
 import { Chain } from "@src/contants/chains";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmChainChangeModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
   onConfirm,
   chainToChange,
 }) => {
+  const { t } = useTranslation("balance");
   const changeIsToEVM = chainToChange?.supportedAccounts[0].includes("EVM");
 
   return (
@@ -50,7 +52,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   as="h3"
                   className="text-lg font-medium leading-6 "
                 >
-                  Change to {chainToChange?.supportedAccounts[0] || ""}
+                  {t("chain_selector.change_to")} {chainToChange?.supportedAccounts[0] || ""}
                 </Dialog.Title>
 
                 <div className="flex justify-center gap-3 items-center py-3">
@@ -71,9 +73,9 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
 
                 <div className="mt-2">
                   <p className="text-sm">
-                    {`${chainToChange?.name || ""} only support ${
+                    {`${chainToChange?.name || ""} ${t("chain_selector.only_supports")} ${
                       chainToChange?.supportedAccounts[0].toLowerCase() || ""
-                    } accounts. Make sure bla bla bla.`}
+                    } ${t("chain_selector.accounts")}. ${t("chain_selector.network_change_warning")}`}
                   </p>
                 </div>
 
@@ -83,14 +85,14 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                     className="inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium  outline-0"
                     onClick={onClose}
                   >
-                    Cancel
+                    {t("chain_selector.cancel")}
                   </button>
                   <button
                     type="button"
                     className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
                     onClick={onConfirm}
                   >
-                    Change
+                    {t("chain_selector.change")}
                   </button>
                 </div>
               </Dialog.Panel>
