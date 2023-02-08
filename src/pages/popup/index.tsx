@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
+import "@assets/styles/base.css";
 import "@pages/popup/index.css";
-import "@assets/styles/tailwind.css";
 import { Main } from "@src/main";
 
 function init() {
