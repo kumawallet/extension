@@ -1,6 +1,6 @@
 {
   "common": {
-    "loading": "loading..."
+    "loading": "Loading..."
   },
   "home": {
     "welcome": "Welcome to Kuma Wallet",
@@ -14,10 +14,14 @@
   },
   "sign_in": {
     "welcome": "Welcome back",
-    "password_placeholder": "password",
-    "signin_button_text": "Sign in"
+    "password_placeholder": "Type your password",
+    "signin_button_text": "Sign in",
+    "forgot_password": "Forgot password?"
   },
   "account_form": {
+    "common": {
+      "loading": "Loading..."
+    },
     "import": {
       "title": "Import Account",
       "button_text": "Import",
@@ -37,26 +41,45 @@
       "continue_button_text": "Continue",
       "seed": "Seed",
       "account_type": "Account type",
+      "evm_type": "Ethereum like account (EVM)",
+      "wasm_type": "Polkadot like account (WASM)",
+      "private_key": "Private key",
+      "seed_phrase": "Seed Phrase",
+      "recovery_phrase": "Recovery Phrase",
       "account_name": "Account Name (optional)",
+      "account_name_placeholder": "Max 32 characters",
       "password": "Password",
-      "password_hint":"The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
-      "confirmpassword": "Confirm password",
-      "confirmpassword_hint": "Passwords don't match"
-    },
-    "balance": {
-      "chain_selector": {
-        "connected": "connected"
-      },
-      "account": {
-        "account": "Accounts",
-        "import": "Import",
-        "create": "Create"
-      },
-      "send": "Send",
-      "receive": "Receive",
-      "assets": "Assets",
-      "activity": "Activity"
+      "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
+      "confirm_password": "Confirm password",
+      "confirm_password_hint": "Passwords don't match."
     }
-    
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "connected",
+      "change_to": "Change to",
+      "only_supports": "only supports",
+      "accounts": "accounts",
+      "network_change_warning": "Make sure to use the desired account. Are you sure you want to change the network?",
+      "cancel": "Cancel",
+      "change": "Change"
+    },
+    "accounts": {
+      "accounts": "Accounts",
+      "import": "Import",
+      "create": "Create"
+    },
+    "send": "Send",
+    "receive": "Receive",
+    "assets": "Assets",
+    "activity": "Activity"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "general",
+    "advanced": "advanced",
+    "contacts": "contacts",
+    "security": "security",
+    "bug_report": "bug report"
   }
 }

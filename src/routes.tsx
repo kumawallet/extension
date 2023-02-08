@@ -45,7 +45,7 @@ export const Routes = () => {
     restorePassword,
   } = useAuthContext();
 
-  const [homeRoute, setHomeRoute] = useState(<p>Loading...</p>);
+  const [homeRoute, setHomeRoute] = useState(<p>{t("common.loading")}</p>);
   const [canDerive, setCanDerive] = useState(false);
   const [importIsSignUp, setImportIsSignUp] = useState(true);
 
@@ -142,31 +142,6 @@ export const Routes = () => {
         <Route
           path={DERIVE_ACCOUNT}
           element={
-            // !canDerive ? (
-            //   <AccountForm
-            //     title={t("create_or_derivate.title")}
-            //     onSubmitFn={createAccount}
-            //     buttonText={t("create_or_derivate.button_text")}
-            //     fields={{}}
-            //     signUp={false}
-            //     afterSubmitMessage={t("create_or_derivate.submit_message")}
-            //     goAfterSubmit={BALANCE}
-            //     backButton
-            //     generateSeed
-            //     callback={getWalletStatus}
-            //   />
-            // ) : (
-            //   <AccountForm
-            //     title={t("create_or_derivate.title")}
-            //     onSubmitFn={deriveAccount}
-            //     signUp={false}
-            //     buttonText={t("create_or_derivate.button_text")}
-            //     fields={{ accountType: true }}
-            //     afterSubmitMessage={t("create_or_derivate.submit_message")}
-            //     goAfterSubmit={BALANCE}
-            //     backButton
-            //   />
-            // )
             <AccountForm
               title={t("create_or_derivate.title")}
               onSubmitFn={deriveAccount}

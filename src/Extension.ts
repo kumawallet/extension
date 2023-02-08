@@ -109,8 +109,10 @@ export default class Extension {
     return Auth.isUnlocked;
   }
 
-  static showPrivateKey() {
-    return AccountManager.showPrivateKey();
+  static async showPrivateKey(): Promise<string | undefined> {
+    const selectedAccount = await Storage.getInstance().getSelectedAccount();
+    if (!selectedAccount || !selectedAccount.key) return undefined;
+    return AccountManager.showPrivateKey(selectedAccount.key);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {

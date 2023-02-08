@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
@@ -7,9 +8,9 @@ import { IMPORT_ACCOUNT } from "@src/routes/paths";
 import { DERIVE_ACCOUNT } from "../../routes/paths";
 import { transformAddress } from "../../utils/account-utils";
 import { useNetworkContext } from "../../providers/NetworkProvider";
-import { AccountType } from "@src/accounts/AccountManager";
 
 export const Accounts = () => {
+  const { t } = useTranslation("balance");
   const navigate = useNavigate();
 
   const {
@@ -28,19 +29,6 @@ export const Accounts = () => {
 
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);
-  };
-
-  const format = (type: AccountType) => {
-    switch (type) {
-      case AccountType.IMPORTED_EVM:
-        return "EVM (Imported)";
-      case AccountType.EVM:
-        return "EVM";
-      case AccountType.IMPORTED_WASM:
-        return "WASM (Imported)";
-      case AccountType.WASM:
-        return "WASM";
-    }
   };
 
   const filteredAccounts = useMemo(() => {
@@ -65,13 +53,13 @@ export const Accounts = () => {
           onClick={() => navigate(IMPORT_ACCOUNT)}
           className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
-          Import
+          {t("accounts.import")}
         </button>
         <button
           onClick={() => navigate(DERIVE_ACCOUNT)}
           className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
         >
-          Create
+          {t("accounts.create")}
         </button>
       </div>
       <div className="flex flex-col gap-5">
@@ -94,7 +82,6 @@ export const Accounts = () => {
                     <p className="text-lg font-bold">{account?.value?.name}</p>
                     <p>{account?.value?.address}</p>
                   </p>
-                  <p>{format(account?.type)}</p>
                 </div>
               ))}
             </>

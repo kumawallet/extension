@@ -11,9 +11,8 @@ import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InputErrorMessage } from "../common/InputErroMessage";
 import { AccountType } from "@src/accounts/AccountManager";
+import { useTranslation } from "react-i18next";
 
-const PASSWORD_RULES =
-  "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.";
 interface AddAccountFormProps {
   title: string;
   fields: {
@@ -54,6 +53,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
+  const { t } = useTranslation("account_form");
+  const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
 
   // TODO: move this to separate file
@@ -69,7 +70,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       : string().notRequired(),
     confirmPassword: passwordIsRequired
       ? string()
-          .oneOf([ref("password"), null], "Passwords don't match")
+          .oneOf([ref("password"), null], t("form.confirm_password_hint") as string)
           .required("required")
       : string().notRequired(),
   }).required();
@@ -129,7 +130,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto"
             onClick={() => navigate(goAfterSubmit)}
           >
-            Continue
+            {t("form.continue_button_text")}
           </button>
         </div>
       </PageWrapper>
@@ -151,7 +152,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
         {generateSeed && (
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Seed
+              {t("form.seed")}
             </label>
             <textarea
               className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
@@ -167,15 +168,15 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               htmlFor="accountType"
               className="block text-sm font-medium mb-1"
             >
-              Account type
+              {t("form.account_type")}
             </label>
             <select
               id="accountType"
               className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
               {...register("accountType")}
             >
-              <option value={AccountType.EVM}>EVM</option>
-              <option value={AccountType.WASM}>WASM</option>
+              <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+              <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
             </select>
           </div>
         )}
@@ -187,9 +188,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             >
               {!resetPassword
                 ? AccountType.EVM == watch("accountType")
-                  ? "Private Key"
-                  : `Seed Phrase`
-                : "Recovery Phrase"}
+                  ? t("form.private_key")
+                  : t("form.seed_phrase")
+                : t("form.recovery_phrase")}
             </label>
             <input
               id="privateKeyOrSeed"
@@ -202,11 +203,11 @@ export const AccountForm: FC<AddAccountFormProps> = ({
         {!resetPassword && (
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Account Name (optional)
+              {t("form.account_name")}
             </label>
             <input
               id="name"
-              placeholder="Max 32 characters"
+              placeholder={t("form.account_name_placeholder") as string}
               max={32}
               className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
               {...register("name")}
@@ -220,7 +221,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 htmlFor="password"
                 className="block text-sm font-medium mb-1"
               >
-                Password
+                {t("form.password")}
               </label>
               <input
                 id="password"
@@ -241,7 +242,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium mb-1"
               >
-                Confirm password
+                {t("form.confirm_password")}
               </label>
               <input
                 id="confirmPassword"

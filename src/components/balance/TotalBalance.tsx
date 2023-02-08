@@ -1,4 +1,5 @@
 import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
+import { useTranslation } from "react-i18next";
 
 export const TotalBalance = ({
   balance = 0,
@@ -7,6 +8,8 @@ export const TotalBalance = ({
   balance: number;
   accountName: string;
 }) => {
+  const { t } = useTranslation("balance");
+
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-center">
@@ -19,11 +22,11 @@ export const TotalBalance = ({
       <div className="flex gap-3 justify-center">
         <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
           <BsArrowUpRight />
-          <p>Send</p>
+          <p>{t("send")}</p>
         </button>
         <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
           <BsArrowDownLeft />
-          <p>Receive</p>
+          <p>{t("receive")}</p>
         </button>
       </div>
     </div>
