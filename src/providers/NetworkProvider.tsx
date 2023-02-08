@@ -9,13 +9,14 @@ import { Chain, CHAINS } from "@src/contants/chains";
 import Extension from "../Extension";
 import Storage from "@src/storage/Storage";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { useEffect } from "react";
 import { useToast } from "../hooks/useToast";
+import { ethers } from "ethers";
+import { getAccountType } from "../utils/account-utils";
 
 interface InitialState {
   chains: typeof CHAINS;
   selectedChain: Chain | null;
-  api: ApiPromise | null;
+  api: ApiPromise | ethers.providers.JsonRpcProvider | null;
 }
 
 const initialState: InitialState = {
@@ -28,11 +29,18 @@ interface NetworkContext {
   state: InitialState;
   setSelectNetwork: (network: Chain) => void;
   getSelectedNetwork: () => Promise<Chain | undefined>;
+  setNewRpc: (rpc: string) => void;
 }
 
 const NetworkContext = createContext({} as NetworkContext);
 
-const getApi = (rpc: string | undefined) => {
+const getProvider = (rpc: string | undefined, type: "EVM" | "WASM") => {
+  if (!rpc) return null;
+
+  if (type === "EVM") {
+    return new ethers.providers.JsonRpcProvider(rpc);
+  }
+
   return ApiPromise.create({ provider: new WsProvider(rpc) });
 };
 
@@ -88,9 +96,15 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const setNewApi = async (rpc: string | undefined) => {
+  const setNewRpc = async (type: string) => {
     try {
-      const api = await getApi(rpc);
+      const _type: any = getAccountType(type);
+
+      const rpc =
+        state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"];
+
+      const api = await getProvider(rpc, _type);
+
       dispatch({
         type: "set-api",
         payload: api,
@@ -100,25 +114,13 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (state.selectedChain?.name) {
-      (async () => {
-        const isWasm =
-          state.selectedChain?.supportedAccounts[0]?.includes("WASM");
-
-        const rpc = state.selectedChain?.rpc[isWasm ? "wasm" : "evm"];
-
-        await setNewApi(rpc);
-      })();
-    }
-  }, [state.selectedChain?.name]);
-
   return (
     <NetworkContext.Provider
       value={{
         state,
         setSelectNetwork,
         getSelectedNetwork,
+        setNewRpc,
       }}
     >
       {children}

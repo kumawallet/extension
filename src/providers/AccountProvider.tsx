@@ -10,7 +10,7 @@ import {
 import { Account } from "@src/storage/entities/Accounts";
 import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
-import { transformAddress } from "@src/utils/account-utils";
+import { getAccountType, transformAddress } from "@src/utils/account-utils";
 import { AccountType } from "../accounts/AccountManager";
 
 interface InitialState {
@@ -75,6 +75,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
     state: { selectedChain },
+    setNewRpc,
   } = useNetworkContext();
 
   const { showErrorToast } = useToast();
@@ -90,7 +91,10 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
         if (!newChainType.includes(state.selectedAccount?.type)) {
           setSelectedAccount(accounts[0]);
+          setNewRpc(accounts[0].type);
+          return;
         }
+        setNewRpc(state.selectedAccount.type);
       })();
     }
   }, [selectedChain?.name]);
@@ -145,6 +149,14 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           },
         },
       });
+
+      const actualType = getAccountType(state.selectedAccount.type);
+      const newType = getAccountType(selectedAccount?.type);
+
+      if (actualType !== newType) {
+        setNewRpc(selectedAccount?.type || "");
+      }
+
       return selectedAccount;
     } catch (error) {
       showErrorToast(error);

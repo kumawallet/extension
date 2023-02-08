@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import { ACCOUNT_PATH } from "../utils/constants";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "../storage/Auth";
+import { getAccountType } from "../utils/account-utils";
 
 export enum AccountType {
   EVM = "EVM",
@@ -170,7 +171,9 @@ export default class AccountManager {
       const filteredAccounts: any = {};
 
       Object.keys(accounts.data).forEach((key: any) => {
-        if (type.includes(accounts.data[key].type)) {
+        const accountType = getAccountType(accounts.data[key].type);
+
+        if (type.includes(accountType as AccountType)) {
           filteredAccounts[key] = accounts.data[key];
         }
       });

@@ -20,7 +20,7 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
       </div>
       <div className="flex mb-8 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
-        <p className="text-5xl">{balance || 0}</p>
+        <p className="text-5xl">{Number((balance || 0).toFixed(6))}</p>
       </div>
       <div className="flex gap-3 justify-center">
         <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">

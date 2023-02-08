@@ -37,3 +37,11 @@ export const transformAddress = (address: string, addressPrefix = 0) => {
 
   return formattedAddress;
 };
+
+export const getAccountType = (accountType = "") => {
+  if (accountType.includes("IMPORTED_")) {
+    return accountType.split("IMPORTED_")[1];
+  }
+
+  return accountType;
+};

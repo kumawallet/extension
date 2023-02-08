@@ -17,6 +17,7 @@ import { Chain } from "@src/contants/chains";
 import { getAssetUSDPrice } from "../../utils/assets";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
+import { ethers } from "ethers";
 
 export interface Asset {
   name: string;
@@ -63,7 +64,7 @@ export const Balance = () => {
   }, [api, selectedAccount?.key, selectedChain?.name]);
 
   const getAssets = async (
-    api: ApiPromise,
+    api: ApiPromise | ethers.providers.JsonRpcProvider | null,
     account: AccountEntity,
     chain: Chain
   ) => {
