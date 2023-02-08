@@ -77,6 +77,16 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     setPasswordType("password");
   };
 
+  const [confirmPasswordType, setConfirmPasswordType] = useState("password");
+
+  const toggleConfirmPassword = () => {
+    if (confirmPasswordType === "password") {
+      setConfirmPasswordType("text");
+      return;
+    }
+    setConfirmPasswordType("password");
+  };
+
   // TODO: move this to separate file
   const schema = object({
     name: string().optional(),
@@ -177,12 +187,15 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             <label htmlFor="name" className="block text-sm font-medium mb-1">
               {t("form.seed")}
             </label>
-            <textarea
-              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
-              value={seed}
-              aria-readonly={true}
-              readOnly={true}
-            />
+            <div className="relative">
+              <textarea
+                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none relative"
+                value={seed}
+                aria-readonly={true}
+                readOnly={true}
+              />
+              <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm" />
+            </div>
             <p className="text-gray-400 p-2 px-1"> {t("form.seed_message")}</p>
           </div>
         )}
@@ -249,18 +262,25 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               >
                 {t("form.password")}
               </label>
-              <input
-                id="password"
-                min={8}
-                onPaste={(e) => e.preventDefault()}
-                type={passwordType}
-                className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-                {...register("password")}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  min={8}
+                  onPaste={(e) => e.preventDefault()}
+                  type={passwordType}
+                  className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  {...register("password")}
+                />
 
-              <div>
-                <button onClick={togglePassword}>
-                  {passwordType === "password" ? <BsEyeSlash /> : <BsEye />}
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={togglePassword}
+                >
+                  {passwordType === "password" ? (
+                    <BsEyeSlash size={20} />
+                  ) : (
+                    <BsEye size={20} />
+                  )}
                 </button>
               </div>
 
@@ -277,13 +297,26 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               >
                 {t("form.confirm_password")}
               </label>
-              <input
-                id="confirmPassword"
-                onPaste={(e) => e.preventDefault()}
-                type={"password"}
-                className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                {...register("confirmPassword")}
-              />
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  onPaste={(e) => e.preventDefault()}
+                  type={confirmPasswordType}
+                  className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  {...register("confirmPassword")}
+                />
+
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={toggleConfirmPassword}
+                >
+                  {confirmPasswordType === "password" ? (
+                    <BsEyeSlash size={20} />
+                  ) : (
+                    <BsEye size={20} />
+                  )}
+                </button>
+              </div>
               <InputErrorMessage message={errors.confirmPassword?.message} />
             </div>
           </>
