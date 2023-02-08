@@ -183,6 +183,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               aria-readonly={true}
               readOnly={true}
             />
+            <p className="text-gray-400 p-2 px-1"> {t("form.seed_message")}</p>
           </div>
         )}
         {fields.accountType &&
@@ -257,10 +258,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 {...register("password")}
               />
               <div>
-                <button
-                  className=""
-                  onClick={togglePassword}
-                >
+                <button className="" onClick={togglePassword}>
                   {passwordType === "password" ? <BsEyeSlash /> : <BsEye />}
                 </button>
               </div>
