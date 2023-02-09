@@ -67,7 +67,7 @@ export const Settings = () => {
                   onClick={() => navigate(opt.href)}
                   className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
                 >
-                  <p className="capitalize text-xl">{t(opt.text)}</p>
+                  <p className="text-xl">{t(opt.text)}</p>
                   <BsChevronRight />
                 </div>
               ))}

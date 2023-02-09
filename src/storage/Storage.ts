@@ -163,7 +163,7 @@ export default class Storage {
 
   private async getCacheAuth() {
     const stored = await this.get(CACHE_AUTH);
-    if (!stored) throw new Error("CacheAuth is not initialized");
+    if (!stored) return;
     const cacheAuth = CacheAuth.getInstance();
     cacheAuth.set(stored);
   }

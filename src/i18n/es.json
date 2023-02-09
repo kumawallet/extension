@@ -78,10 +78,10 @@
   },
   "settings": {
     "title": "Configuración",
-    "general": "general",
-    "advanced": "avanzado",
-    "contacts": "contactos",
-    "security": "seguridad",
-    "bug_report": "informar un error"
+    "general": "General",
+    "advanced": "Avanzado",
+    "contacts": "Contactos",
+    "security": "Seguridad",
+    "bug_report": "Informar un error"
     }
 }
