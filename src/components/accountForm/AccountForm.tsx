@@ -214,7 +214,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             <p className="text-gray-400 p-2 px-1"> {t("form.seed_message")}</p>
           </div>
         )}
-        {fields.accountType && (
+        {fields.accountType && signUp && (
           <div>
             <label
               htmlFor="accountType"
