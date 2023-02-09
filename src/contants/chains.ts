@@ -63,7 +63,7 @@ export const MAINNETS: Chain[] = [
   {
     name: "Ethereum",
     chain: "ethereum",
-    rpc: { evm: "ws://mainnet.infura.io/v3/" },
+    rpc: { evm: "https://eth.llamarpc.com" },
     addressPrefix: 1,
     nativeCurrency: {
       name: "ETH",

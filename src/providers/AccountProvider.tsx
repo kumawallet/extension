@@ -150,7 +150,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!isWASM && !selectedChain?.supportedAccounts.includes("EVM")) {
         const defaultEth = CHAINS[0].chains[2];
         setSelectNetwork(defaultEth);
-        setNewRpc(defaultEth.rpc.evm);
+        setNewRpc(selectedAccount?.type);
       }
 
       dispatch({

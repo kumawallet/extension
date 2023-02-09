@@ -41,7 +41,11 @@ const getProvider = (rpc: string | undefined, type: "EVM" | "WASM") => {
     return new ethers.providers.JsonRpcProvider(rpc);
   }
 
-  return ApiPromise.create({ provider: new WsProvider(rpc) });
+  if (type === "WASM") {
+    return ApiPromise.create({ provider: new WsProvider(rpc) });
+  }
+
+  return null;
 };
 
 const reducer = (state: InitialState, action: any): InitialState => {
