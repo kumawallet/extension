@@ -102,7 +102,7 @@ export default class Storage {
       await this.set(ACCOUNTS, accounts);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      const settings = new Settings();
+      const settings = Settings.init();
       await this.set(SETTINGS, settings);
       const vault = new Vault();
       await this.set(VAULT, vault);
@@ -349,5 +349,13 @@ export default class Storage {
 
   async getBackup(): Promise<string | undefined> {
     return this.get(BACKUP);
+  }
+
+  async getSettings(): Promise<Settings | undefined> {
+    const stored = await this.get(SETTINGS);
+    if (!stored) return undefined;
+    const settings = new Settings();
+    settings.set(stored.data);
+    return settings;
   }
 }

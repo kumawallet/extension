@@ -5,6 +5,7 @@ import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
+import { Setting, SettingType } from "./storage/entities/Settings";
 
 export default class Extension {
   private static async init(
@@ -148,5 +149,11 @@ export default class Extension {
 
   static async getSelectedAccount(): Promise<Account | undefined> {
     return Storage.getInstance().getSelectedAccount();
+  }
+
+  static async getGeneralSettings(): Promise<Setting[]> {
+    const settings = await Storage.getInstance().getSettings();
+    if (!settings) throw new Error("Settings not found");
+    return settings.getAll(SettingType.GENERAL);
   }
 }
