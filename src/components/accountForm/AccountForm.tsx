@@ -147,6 +147,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const navigate = useNavigate();
 
   const [isSuccessful, setIsSuccessful] = useState(false);
+  const [showSeed, setShowSeed] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
 
   if (isSuccessful)
@@ -190,36 +191,47 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             </label>
             <div className="relative">
               <textarea
-                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none relative"
+                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none relative select-none"
                 value={seed}
                 aria-readonly={true}
                 readOnly={true}
+                disabled
+                onSelect={(e) => e.preventDefault()}
+                onCopy={(e) => e.preventDefault()}
               />
-              <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm" />
+              {!showSeed && (
+                <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
+                  <button
+                    className="flex flex-col items-center"
+                    onClick={() => setShowSeed(true)}
+                  >
+                    <p>{t("form.show_seed")}</p>
+                    <BsEye size={18} />
+                  </button>
+                </div>
+              )}
             </div>
             <p className="text-gray-400 p-2 px-1"> {t("form.seed_message")}</p>
           </div>
         )}
-        {fields.accountType &&
-          selectedChain?.supportedAccounts &&
-          selectedChain?.supportedAccounts.length === 2 && (
-            <div>
-              <label
-                htmlFor="accountType"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("form.account_type")}
-              </label>
-              <select
-                id="accountType"
-                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                {...register("accountType")}
-              >
-                <option value={AccountType.EVM}>{t("form.evm_type")}</option>
-                <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
-              </select>
-            </div>
-          )}
+        {fields.accountType && (
+          <div>
+            <label
+              htmlFor="accountType"
+              className="block text-sm font-medium mb-1"
+            >
+              {t("form.account_type")}
+            </label>
+            <select
+              id="accountType"
+              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              {...register("accountType")}
+            >
+              <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+              <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
+            </select>
+          </div>
+        )}
         {fields.privateKeyOrSeed && (
           <div>
             <label
