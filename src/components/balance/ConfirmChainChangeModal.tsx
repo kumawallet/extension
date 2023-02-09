@@ -4,22 +4,31 @@ import { BsArrowRight } from "react-icons/bs";
 import { SiWebassembly, SiEthereum } from "react-icons/si";
 import { Chain } from "@src/contants/chains";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 
 interface ConfirmChainChangeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   chainToChange: Chain | null;
+  needToCreateAccount: boolean;
 }
+
+const ICON_COLOR = "#ddda";
 
 export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
   isOpen,
+  needToCreateAccount,
   onClose,
   onConfirm,
   chainToChange,
 }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const changeIsToEVM = chainToChange?.supportedAccounts[0].includes("EVM");
+
+  const chainType = chainToChange?.supportedAccounts[0].toLocaleLowerCase();
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -52,28 +61,35 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   as="h3"
                   className="text-lg font-medium leading-6 "
                 >
-                  {t("chain_selector.change_to")} {chainToChange?.supportedAccounts[0] || ""}
+                  {t("chain_selector.change_to")} {chainToChange?.name || ""}
+                  <span className="capitalize text-gray-300 text-xs block">
+                    ( {t(`chain_selector.${chainType}_type`) || ""} )
+                  </span>
                 </Dialog.Title>
 
                 <div className="flex justify-center gap-3 items-center py-3">
                   {changeIsToEVM ? (
-                    <SiWebassembly size={22} />
+                    <SiWebassembly size={22} color={ICON_COLOR} />
                   ) : (
-                    <SiEthereum size={22} />
+                    <SiEthereum size={22} color={ICON_COLOR} />
                   )}
 
-                  <BsArrowRight size={20} />
+                  <BsArrowRight size={20} color={ICON_COLOR} />
 
                   {changeIsToEVM ? (
-                    <SiEthereum size={22} />
+                    <SiEthereum size={22} color={ICON_COLOR} />
                   ) : (
-                    <SiWebassembly size={22} />
+                    <SiWebassembly size={22} color={ICON_COLOR} />
                   )}
                 </div>
 
-                <div className="mt-2">
+                <div className="my-8">
                   <p className="text-sm">
-                    {t("chain_selector.network_change_warning")}
+                    {needToCreateAccount
+                      ? t("chain_selector.create_or_import_warning", {
+                          type_supported_account: `$t(chain_selector.${chainType}_type)`,
+                        })
+                      : t("chain_selector.network_change_warning")}
                   </p>
                 </div>
 
@@ -85,13 +101,32 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   >
                     {t("chain_selector.cancel")}
                   </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
-                    onClick={onConfirm}
-                  >
-                    {t("chain_selector.change")}
-                  </button>
+                  {!needToCreateAccount ? (
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                      onClick={onConfirm}
+                    >
+                      {t("chain_selector.change")}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                        onClick={() => navigate(IMPORT_ACCOUNT)}
+                      >
+                        {t("chain_selector.import_account")}
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                        onClick={() => navigate(CREATE_ACCOUNT)}
+                      >
+                        {t("chain_selector.create_account")}
+                      </button>
+                    </>
+                  )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

@@ -59,12 +59,17 @@
     "chain_selector": {
       "connected": "connected",
       "change_to": "Change to",
+      "create_or_import_warning": "This network only support {{type_supported}} and you don't have {{type_supported}}, please create or import {{type_supoprted}}.",
       "network_change_warning": "The selected account will be changed because the network to which you want to change does not support the current account type. Are you sure you want to change the network?",
+      "create_account": "Create",
+      "import_account": "Import",
       "cancel": "Cancel",
       "change": "Change",
       "mainnets": "Relay chains",
       "parachains": "Parachains",
-      "testnets": "Testnets"
+      "testnets": "Testnets",
+      "evm_type": "Ethereum like account (EVM)",
+      "wasm_type": "Polkadot like account (WASM)"
     },
     "accounts": {
       "accounts": "Accounts",

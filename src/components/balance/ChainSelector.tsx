@@ -5,29 +5,48 @@ import { useNetworkContext } from "../../providers/NetworkProvider";
 import { Chain } from "@src/contants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
-
+import { useAccountContext } from "../../providers/AccountProvider";
+import { getAccountType } from "../../utils/account-utils";
+import { useNavigate } from "react-router-dom";
+import { CREATE_ACCOUNT } from "@src/routes/paths";
+import Extension from "../../Extension";
 
 export const ChainSelector = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
     getSelectedNetwork,
     setSelectNetwork,
   } = useNetworkContext();
+  const { state } = useAccountContext();
 
   const [chainToChange, setChainToChange] = useState<Chain | null>(null);
   const [openModal, setopenModal] = useState(false);
+  const [needToCreateAccount, setNeedToCreateAccount] = useState(false);
 
   useEffect(() => {
     getSelectedNetwork();
   }, []);
 
-  const selecteNetwork = (chain: Chain, close: () => void) => {
-    if (chain.supportedAccounts[0] !== selectedChain?.supportedAccounts[0]) {
+  const selecteNetwork = async (chain: Chain, close: () => void) => {
+    const accounts = await Extension.getAllAccounts(chain.supportedAccounts);
+
+    const thereIsAccountSupported = accounts.some((acc) =>
+      chain.supportedAccounts.includes(getAccountType(acc.type))
+    );
+
+    if (!thereIsAccountSupported) {
       setopenModal(true);
+      setNeedToCreateAccount(true);
       setChainToChange(chain);
     } else {
-      changeChain(chain);
+      if (chain.supportedAccounts[0] !== selectedChain?.supportedAccounts[0]) {
+        setopenModal(true);
+        setChainToChange(chain);
+      } else {
+        changeChain(chain);
+      }
     }
 
     close?.();
@@ -43,6 +62,7 @@ export const ChainSelector = () => {
 
     setTimeout(() => {
       setChainToChange(null);
+      setNeedToCreateAccount(false);
     }, 500);
   };
 
@@ -68,7 +88,9 @@ export const ChainSelector = () => {
                 {chains.map((spec) => (
                   <>
                     <div className="flex items-center gap-3 whitespace-nowrap">
-                      <p className="text-[#808385] text-lg">{t(`chain_selector.${spec.name}`)}</p>
+                      <p className="text-[#808385] text-lg">
+                        {t(`chain_selector.${spec.name}`)}
+                      </p>
                       <div className="h-[1px] w-full bg-[#343A40]" />
                     </div>
                     {spec.chains.map((chain, index) => (
@@ -84,7 +106,9 @@ export const ChainSelector = () => {
                             <div className="flex gap-3 items-center">
                               <p className="text-xl">{chain.name}</p>
                               {chain.name === selectedChain?.name && (
-                                <p className="text-[#56DF53]">{t("chain_selector.connected")}</p>
+                                <p className="text-[#56DF53]">
+                                  {t("chain_selector.connected")}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -102,7 +126,10 @@ export const ChainSelector = () => {
         isOpen={openModal}
         onClose={onClose}
         chainToChange={chainToChange}
-        onConfirm={() => changeChain()}
+        onConfirm={() =>
+          needToCreateAccount ? navigate(CREATE_ACCOUNT) : changeChain()
+        }
+        needToCreateAccount={needToCreateAccount}
       />
     </>
   );

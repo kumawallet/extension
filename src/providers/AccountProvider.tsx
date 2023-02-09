@@ -91,12 +91,15 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const accounts = await getAllAccounts(newChainType);
 
-        if (!newChainType.includes(state.selectedAccount?.type)) {
+        const selectedAccountType = getAccountType(state.selectedAccount?.type);
+
+        if (!newChainType.includes(selectedAccountType)) {
           setSelectedAccount(accounts[0]);
           setNewRpc(accounts[0].type);
           return;
         }
-        setNewRpc(state.selectedAccount.type);
+
+        setNewRpc(selectedAccountType);
       })();
     }
   }, [selectedChain?.name]);
@@ -105,13 +108,13 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const accounts = await Extension.getAllAccounts(type);
 
-      // const thereAreWasmAccounts = accounts.some((acc) =>
-      //   acc.key.includes("WASM")
-      // );
+      const thereAreWasmAccounts = accounts.some((acc) =>
+        acc.key.includes("WASM")
+      );
 
-      // if (!thereAreWasmAccounts) {
-      //   setSelectNetwork(CHAINS[0].chains[3]);
-      // }
+      if (!thereAreWasmAccounts) {
+        setSelectNetwork(CHAINS[0].chains[3]);
+      }
 
       dispatch({
         type: "set-accounts",
@@ -144,14 +147,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const getSelectedAccount = async () => {
     try {
       const selectedAccount = await Extension.getSelectedAccount();
-
-      const isWASM = selectedAccount?.type.includes("WASM");
-
-      if (!isWASM && !selectedChain?.supportedAccounts.includes("EVM")) {
-        const defaultEth = CHAINS[0].chains[2];
-        setSelectNetwork(defaultEth);
-        setNewRpc(selectedAccount?.type);
-      }
 
       dispatch({
         type: "set-selected-account",

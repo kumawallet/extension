@@ -91,6 +91,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const { chain: selectedNetwork } =
         await Storage.getInstance().getNetwork();
+
       dispatch({
         type: "select-network",
         payload: selectedNetwork,
@@ -106,6 +107,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const _type: any = getAccountType(type);
 
+      if (!_type) return;
+
       const typeIsWasm = type.includes("WASM");
 
       let newRpc =
@@ -115,6 +118,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         const defaultEth = CHAINS[0].chains[2];
         setSelectNetwork(defaultEth);
         newRpc = defaultEth?.rpc.evm;
+      }
+
+      if (!newRpc && typeIsWasm) {
+        const defaultWasm = CHAINS[0].chains[0];
+        setSelectNetwork(defaultWasm);
+        newRpc = defaultWasm?.rpc.wasm;
       }
 
       const api = await getProvider(newRpc, _type);

@@ -18,6 +18,7 @@ i18n
     fallbackLng: DEFAULT_LANGUAGE,
     interpolation: {
       escapeValue: false,
+      skipOnVariables: false,
     },
   });
 

@@ -1,15 +1,15 @@
-import { Chain, CHAINS } from "@src/contants/chains";
+import { Chain } from "@src/contants/chains";
 import Storable from "../Storable";
 import { NETWORK } from "../../utils/constants";
 
 export class Network extends Storable {
-  chain: Chain;
+  chain: Chain | null;
 
   private static instance: Network;
 
   constructor() {
     super(NETWORK);
-    this.chain = CHAINS[0].chains[0];
+    this.chain = null;
   }
 
   public static getInstance() {
@@ -30,7 +30,7 @@ export class Network extends Storable {
   static getDefaultNetwork() {
     try {
       const defaultNetwork = Network.getInstance();
-      defaultNetwork.chain = CHAINS[0].chains[0];
+      defaultNetwork.chain = null;
       return defaultNetwork;
     } catch (error) {
       throw new Error(error as string);
