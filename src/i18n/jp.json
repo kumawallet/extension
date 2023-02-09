@@ -1,3 +1,96 @@
 {
-  
+  "common": {
+    "loading": "読み込み中..."
+  },
+  "home": {
+    "welcome": "Kuma Walletへようこそ",
+    "description": "すべてのアカウントが一つの場所に",
+    "button_text": "開始する"
+  },
+  "add_account": {
+    "title": "アカウントを追加",
+    "import_wallet": "ウォレットをインポート",
+    "create_wallet": "ウォレットを作成"
+  },
+  "sign_in": {
+    "welcome": "お帰りなさい",
+    "password_placeholder": "パスワードを入力してください",
+    "signin_button_text": "サインイン",
+    "forgot_password": "パスワードを忘れましたか？"
+  },
+  "account_form": {
+    "common": {
+      "loading": "読み込み中..."
+    },
+    "import": {
+      "title": "アカウントをインポート",
+      "button_text": "インポート",
+      "submit_message": "アカウントがインポートされました"
+    },
+    "create_or_derivate": {
+      "title": "アカウントを作成",
+      "button_text": "作成",
+      "submit_message": "アカウントが作成されました"
+    },
+    "restore": {
+      "title": "パスワードをリセット",
+      "button_text": "リストア",
+      "submit_message": "パスワードがリストアされました"
+    },
+    "form": {
+      "continue_button_text": "続ける",
+      "seed": "シード",
+      "seed_message": "これはアカウントのキーで、パスワードを忘れた場合にアクセスするための唯一の方法です。これを安全な場所に保存してください。これを再度表示することはできません。",
+      "account_type": "アカウントタイプ",
+      "evm_type": "Ethereum風アカウント (EVM)",
+      "wasm_type": "Polkadot風アカウント (WASM)",
+      "private_key": "プライベートキー",
+      "seed_phrase": "シードフレーズ",
+      "recovery_phrase": "リカバリーフレーズ",
+      "account_name": "アカウント名（任意）",
+      "account_name_placeholder": "最大32文字",
+      "password": "パスワード",
+      "password_hint": "パスワードは、少なくとも8文字、少なくとも1つの数字、大文字と小文字、特殊文字を含める必要があります。",
+      "confirm_password": "パスワードを確認する",
+      "confirm_password_hint": "パスワードが一致しません。"
+    }
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "接続済み",
+      "change_to": "変更先",
+      "create_or_import_warning": "このネットワークは{{type_supported}}のみをサポートしていますが、{{type_supported}}がありません。{{type_supported}}を作成またはインポートしてください。",
+      "network_change_warning": "選択したアカウントは、変更したいネットワークが現在のアカウントタイプをサポートしていないため、変更されます。ネットワークを変更してもよろしいですか？",
+      "create_account": "作成",
+      "import_account": "インポート",
+      "cancel": "キャンセル",
+      "change": "変更",
+      "mainnets": "リレーチェーン",
+      "parachains": "パラチェーン",
+      "testnets": "テストネット",
+      "evm_type": "Ethereum風アカウント (EVM)",
+      "wasm_type": "Polkadot風アカウント (WASM)"
+    },
+    "accounts": {
+      "accounts": "アカウント",
+      "import": "インポート",
+      "create": "作成"
+    },
+    "send": "送信",
+    "receive": "受信",
+    "assets": "資産",
+    "activity": "アクティビティ"
+  },
+  "settings": {
+    "title": "設定",
+    "general": "一般",
+    "advanced": "高度な",
+    "contacts": "連絡先",
+    "security": "セキュリティ",
+    "bug_report": "バグ報告"
+  },
+  "general_settings": {
+    "title": "一般",
+    "languages": "言語"
+  }
 }
