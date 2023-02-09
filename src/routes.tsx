@@ -53,6 +53,7 @@ export const Routes = () => {
     setCanDerive(await Extension.areAccountsInitialized());
     setImportIsSignUp(!(await Extension.alreadySignedUp()));
   };
+
   useEffect(() => {
     const getHomeRoute = async () => {
       const isFirstTime = !localStorage.getItem("welcome");

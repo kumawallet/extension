@@ -70,6 +70,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const setSelectNetwork = async (network: Chain) => {
     try {
+      if (!network) return;
+
       await Extension.setNetwork(network);
 
       dispatch({
@@ -100,10 +102,18 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const _type: any = getAccountType(type);
 
-      const rpc =
+      const typeIsWasm = type.includes("WASM");
+
+      let newRpc =
         state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"];
 
-      const api = await getProvider(rpc, _type);
+      if (!newRpc && !typeIsWasm) {
+        const defaultEth = CHAINS[0].chains[2];
+        setSelectNetwork(defaultEth);
+        newRpc = defaultEth?.rpc.evm;
+      }
+
+      const api = await getProvider(newRpc, _type);
 
       dispatch({
         type: "set-api",

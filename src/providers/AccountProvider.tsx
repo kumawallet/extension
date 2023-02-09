@@ -12,6 +12,7 @@ import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
 import { getAccountType, transformAddress } from "@src/utils/account-utils";
 import { AccountType } from "../accounts/AccountManager";
+import { CHAINS } from "../contants/chains";
 
 interface InitialState {
   accounts: Account[];
@@ -76,6 +77,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
     state: { selectedChain },
     setNewRpc,
+    setSelectNetwork,
   } = useNetworkContext();
 
   const { showErrorToast } = useToast();
@@ -102,6 +104,15 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const getAllAccounts = async (type: AccountType[] | null = null) => {
     try {
       const accounts = await Extension.getAllAccounts(type);
+
+      // const thereAreWasmAccounts = accounts.some((acc) =>
+      //   acc.key.includes("WASM")
+      // );
+
+      // if (!thereAreWasmAccounts) {
+      //   setSelectNetwork(CHAINS[0].chains[3]);
+      // }
+
       dispatch({
         type: "set-accounts",
         payload: {
@@ -133,6 +144,14 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const getSelectedAccount = async () => {
     try {
       const selectedAccount = await Extension.getSelectedAccount();
+
+      const isWASM = selectedAccount?.type.includes("WASM");
+
+      if (!isWASM && !selectedChain?.supportedAccounts.includes("EVM")) {
+        const defaultEth = CHAINS[0].chains[2];
+        setSelectNetwork(defaultEth);
+        setNewRpc(defaultEth.rpc.evm);
+      }
 
       dispatch({
         type: "set-selected-account",

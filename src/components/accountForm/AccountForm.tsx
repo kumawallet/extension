@@ -134,6 +134,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
         seed,
         isSignUp: passwordIsRequired,
       });
+
       result && setIsSuccessful(true);
       callback && callback();
     } catch (e) {
