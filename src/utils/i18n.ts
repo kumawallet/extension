@@ -3,18 +3,20 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { en, es, jp } from "../i18n";
 
-const DEFAULT_LANGUAGE = "es";
+const DEFAULT_LANGUAGE = "en";
+
+const storedLanguage = localStorage.getItem("language") || DEFAULT_LANGUAGE;
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      //en,
+      en,
       es,
       jp,
     },
-    // lng: DEFAULT_LANGUAGE,
+    lng: storedLanguage,
     fallbackLng: DEFAULT_LANGUAGE,
     interpolation: {
       escapeValue: false,

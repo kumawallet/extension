@@ -83,5 +83,9 @@
     "contacts": "Contacts",
     "security": "Security",
     "bug_report": "Bug report"
+  },
+  "general_settings": {
+    "title": "General",
+    "languages": "Languages"
   }
 }

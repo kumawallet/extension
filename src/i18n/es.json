@@ -59,7 +59,7 @@
     "chain_selector": {
       "connected": "conectado",
       "change_to": "Cambiar a",
-      "network_change_warning": "La cuenta seleccionada se cambiará porque la red a la que desea cambiar no es compatible con el tipo de cuenta actual. ¿Está seguro de que desea cambiar la red?",      "cancel": "Cancelar",
+      "network_change_warning": "La cuenta seleccionada se cambiará porque la red a la que desea cambiar no es compatible con el tipo de cuenta actual. ¿Está seguro de que desea cambiar la red?",
       "cancel": "Cancelar",
       "change": "Cambiar",
       "mainnets": "Redes principales (mainnets)",
@@ -83,5 +83,9 @@
     "contacts": "Contactos",
     "security": "Seguridad",
     "bug_report": "Informar un error"
-    }
+  },
+  "general_settings": {
+    "title": "General",
+    "languages": "Idiomas"
+  }
 }
