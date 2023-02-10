@@ -1,8 +1,8 @@
+# Kuma Wallet
+
 <p align="center">
   <img src="./src/assets/img/logo.svg" />
 </p>
-
-# Kuma Wallet
 
 ## Descripción del proyecto
 
