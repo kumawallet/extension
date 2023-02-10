@@ -266,3 +266,6 @@ export const CHAINS = [
     chains: TESTNETS,
   },
 ];
+
+export const DEFAULT_WASM_CHAIN = CHAINS[0].chains[0];
+export const DEFAULT_EVM_CHAIN = CHAINS[0].chains[2];

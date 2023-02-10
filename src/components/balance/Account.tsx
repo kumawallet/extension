@@ -3,16 +3,41 @@ import { FiCopy } from "react-icons/fi";
 import { cropAccount } from "../../utils/account-utils";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { AccountManage } from "./AccountManage";
+import { useNetworkContext } from "@src/providers";
 
 export const Account = () => {
   const {
     state: { selectedAccount },
     getSelectedAccount,
+    getAllAccounts,
   } = useAccountContext();
 
+  const {
+    state: { init, selectedChain },
+    getSelectedNetwork,
+  } = useNetworkContext();
+
   useEffect(() => {
-    getSelectedAccount();
-  }, []);
+    if (!selectedAccount?.value && init) {
+      (async () => {
+        await getSelectedAccount();
+
+        // if (selectedChain) {
+        //   await getAllAccounts(selectedChain?.supportedAccounts);
+        // } else {
+        //   await getAllAccounts(account.type);
+        // }
+      })();
+    }
+  }, [selectedAccount?.value, init]);
+
+  useEffect(() => {
+    if (selectedChain) {
+      (async () => {
+        await getAllAccounts(selectedChain?.supportedAccounts);
+      })();
+    }
+  }, [selectedChain]);
 
   const account = cropAccount(selectedAccount?.value?.address || "");
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
@@ -19,13 +19,9 @@ export const Accounts = () => {
 
   const {
     state: { selectedAccount, accounts },
-    getAllAccounts,
+
     setSelectedAccount,
   } = useAccountContext();
-
-  useEffect(() => {
-    getAllAccounts(selectedChain?.supportedAccounts);
-  }, []);
 
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);

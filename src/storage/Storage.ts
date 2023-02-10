@@ -198,7 +198,7 @@ export default class Storage {
 
   async alreadySignedUp(): Promise<boolean> {
     const stored = await this.#storage.get(null);
-    return !!stored && Object.keys(stored).length > 0;
+    return !!stored && stored[VAULT];
   }
 
   async saveKeyring(keyring: Keyring) {

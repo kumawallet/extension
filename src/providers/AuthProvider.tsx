@@ -81,6 +81,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         accountType,
         isSignUp,
       });
+
       return true;
     } catch (error) {
       showErrorToast(error);

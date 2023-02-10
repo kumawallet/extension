@@ -33,6 +33,8 @@ import {
   CREATE_ACCOUNT,
 } from "./routes/paths";
 import { useTranslation } from "react-i18next";
+import { useNetworkContext } from "./providers/NetworkProvider";
+import { useAccountContext } from "./providers/AccountProvider";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -45,6 +47,12 @@ export const Routes = () => {
     restorePassword,
   } = useAuthContext();
 
+  const {
+    state: { init },
+  } = useNetworkContext();
+
+  const { getAllAccounts, setSelectedAccount } = useAccountContext();
+
   const [homeRoute, setHomeRoute] = useState(<p>{t("common.loading")}</p>);
   const [canDerive, setCanDerive] = useState(false);
   const [importIsSignUp, setImportIsSignUp] = useState(true);
@@ -56,6 +64,10 @@ export const Routes = () => {
 
   useEffect(() => {
     const getHomeRoute = async () => {
+      if (!isInit || !init) {
+        return;
+      }
+
       const isFirstTime = !localStorage.getItem("welcome");
       if (isFirstTime) {
         setHomeRoute(<Home />);
@@ -67,6 +79,7 @@ export const Routes = () => {
         return;
       }
       const isUnlocked = await Extension.isUnlocked();
+
       if (!isUnlocked) {
         setHomeRoute(<SignIn />);
         return;
@@ -75,7 +88,49 @@ export const Routes = () => {
     };
     getHomeRoute();
     getWalletStatus();
-  }, [Extension, isInit]);
+  }, [Extension, isInit, init]);
+
+  // TODO: move this function to another place
+  const onDeriveAccount = async (account: any) => {
+    await deriveAccount(account);
+    const accounts = await getAllAccounts();
+
+    const findCreatedAccount = accounts.findIndex(
+      (acc) => acc?.value?.name === account.name
+    );
+
+    await setSelectedAccount(accounts[findCreatedAccount]);
+    return true;
+  };
+
+  const onImportAccount = async (account: any) => {
+    await importAccount(account);
+
+    if (!importIsSignUp) {
+      const accounts = await getAllAccounts();
+
+      const findCreatedAccount = accounts.findIndex(
+        (acc) => acc?.value?.name === account.name
+      );
+
+      await setSelectedAccount(accounts[findCreatedAccount]);
+    }
+    return true;
+  };
+
+  const onCreateAccount = async (account: any) => {
+    await createAccount(account);
+
+    const accounts = await getAllAccounts();
+
+    const findCreatedAccount = accounts.findIndex(
+      (acc) => acc?.value?.name === account.name
+    );
+
+    await setSelectedAccount(accounts[findCreatedAccount]);
+
+    return true;
+  };
 
   return (
     <MemoryRouter>
@@ -90,7 +145,7 @@ export const Routes = () => {
           element={
             <AccountForm
               title={t("import.title")}
-              onSubmitFn={importAccount}
+              onSubmitFn={onImportAccount}
               buttonText={t("import.button_text")}
               signUp={importIsSignUp}
               fields={{
@@ -145,7 +200,7 @@ export const Routes = () => {
           element={
             <AccountForm
               title={t("create_or_derivate.title")}
-              onSubmitFn={deriveAccount}
+              onSubmitFn={!canDerive ? onCreateAccount : onDeriveAccount}
               signUp={false}
               buttonText={t("create_or_derivate.button_text")}
               fields={!canDerive ? {} : { accountType: true }}

@@ -15,6 +15,9 @@ import { AccountType } from "@src/accounts/AccountManager";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { useNetworkContext } from "../../providers/NetworkProvider";
+import { getAccountType } from "../../utils/account-utils";
+import { ethers } from "ethers";
+import PolkadotKeyring from "@polkadot/ui-keyring";
 
 interface AddAccountFormProps {
   title: string;
@@ -250,6 +253,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
               {...register("privateKeyOrSeed")}
             />
+            <InputErrorMessage message={errors.privateKeyOrSeed?.message} />
           </div>
         )}
         {!resetPassword && (

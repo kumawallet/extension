@@ -49,6 +49,8 @@ export default class Extension {
     accountType,
     isSignUp = true,
   }: any) {
+    // TODO: validate privateKeyOrSeed, accounType
+
     if (!privateKeyOrSeed)
       throw new Error("Cannot import accounts without seed or private key");
     if (isSignUp) {
@@ -149,6 +151,10 @@ export default class Extension {
 
   static async getSelectedAccount(): Promise<Account | undefined> {
     return Storage.getInstance().getSelectedAccount();
+  }
+
+  static async getNetwork(): Promise<any> {
+    return Storage.getInstance().getNetwork();
   }
 
   static async getGeneralSettings(): Promise<Setting[]> {

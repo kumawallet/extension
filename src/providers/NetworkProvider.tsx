@@ -3,6 +3,7 @@ import {
   FC,
   PropsWithChildren,
   useContext,
+  useEffect,
   useReducer,
 } from "react";
 import { Chain, CHAINS } from "@src/contants/chains";
@@ -17,12 +18,16 @@ interface InitialState {
   chains: typeof CHAINS;
   selectedChain: Chain | null;
   api: ApiPromise | ethers.providers.JsonRpcProvider | null;
+  rpc: "";
+  init: boolean;
 }
 
 const initialState: InitialState = {
   chains: CHAINS,
   selectedChain: null,
   api: null,
+  rpc: "",
+  init: false,
 };
 
 interface NetworkContext {
@@ -50,16 +55,34 @@ const getProvider = (rpc: string | undefined, type: "EVM" | "WASM") => {
 
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
-    case "select-network": {
+    case "init": {
+      const { selectedChain, rpc, api } = action.payload;
+
       return {
         ...state,
-        selectedChain: action.payload,
+        api,
+        selectedChain,
+        rpc,
+        init: true,
+      };
+    }
+    case "select-network": {
+      const { selectedChain, rpc, api } = action.payload;
+
+      return {
+        ...state,
+        selectedChain,
+        rpc,
+        api,
       };
     }
     case "set-api": {
+      const { api, rpc } = action.payload;
+
       return {
         ...state,
-        api: action.payload,
+        api,
+        rpc,
       };
     }
     default:
@@ -72,15 +95,60 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const selectedNetwork = await Extension.getNetwork();
+        let selectedChain = null;
+        let rpc = null;
+        let api = "";
+
+        if (selectedNetwork?.chain?.name) {
+          const account = await Extension.getSelectedAccount();
+
+          selectedChain = selectedNetwork?.chain;
+          const accountType = getAccountType(account?.type);
+
+          rpc = selectedChain.rpc[accountType.toLowerCase()];
+
+          api = getProvider(rpc, accountType);
+        }
+
+        dispatch({
+          type: "init",
+          payload: {
+            selectedChain,
+            rpc,
+            api,
+          },
+        });
+      } catch (error) {
+        showErrorToast(error);
+      }
+    })();
+  }, []);
+
   const setSelectNetwork = async (network: Chain) => {
     try {
       if (!network) return;
 
       await Extension.setNetwork(network);
+      const account = await Extension.getSelectedAccount();
+
+      let accountType = getAccountType(account?.type);
+      const rpc =
+        network.rpc[accountType.toLowerCase() || "wasm"] ||
+        network.rpc[accountType.toLowerCase() || "evm"];
+
+      const api = getProvider(rpc, accountType);
 
       dispatch({
         type: "select-network",
-        payload: network,
+        payload: {
+          selectedChain: network,
+          rpc,
+          api,
+        },
       });
     } catch (error) {
       showErrorToast(error);
@@ -103,34 +171,39 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  // only for chain with multi support (WASM and EVM)
   const setNewRpc = async (type: string) => {
     try {
       const _type: any = getAccountType(type);
 
       if (!_type) return;
 
-      const typeIsWasm = type.includes("WASM");
-
-      let newRpc =
+      const newRpc =
         state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"];
 
-      if (!newRpc && !typeIsWasm) {
-        const defaultEth = CHAINS[0].chains[2];
-        setSelectNetwork(defaultEth);
-        newRpc = defaultEth?.rpc.evm;
-      }
+      const rpcAlreadyInUse = newRpc === state.rpc;
 
-      if (!newRpc && typeIsWasm) {
-        const defaultWasm = CHAINS[0].chains[0];
-        setSelectNetwork(defaultWasm);
-        newRpc = defaultWasm?.rpc.wasm;
-      }
+      if (rpcAlreadyInUse) return;
+
+      if (newRpc === state.rpc) return;
+
+      // if (!newRpc && !typeIsWasm) {
+      //   const defaultEth = CHAINS[0].chains[2];
+      //   setSelectNetwork(defaultEth);
+      //   newRpc = defaultEth?.rpc.evm;
+      // }
+
+      // if (!newRpc && typeIsWasm) {
+      //   const defaultWasm = CHAINS[0].chains[0];
+      //   setSelectNetwork(defaultWasm);
+      //   newRpc = defaultWasm?.rpc.wasm;
+      // }
 
       const api = await getProvider(newRpc, _type);
 
       dispatch({
         type: "set-api",
-        payload: api,
+        payload: { api, rpc: newRpc },
       });
     } catch (error) {
       showErrorToast(error);

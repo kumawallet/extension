@@ -91,9 +91,11 @@ export default class AccountManager {
     privateKeyOrSeed: string;
     accountType: AccountType;
   }): Promise<Account> {
+    const _type = getAccountType(accountType);
+
     let type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
     let importedData;
-    switch (accountType) {
+    switch (_type) {
       case AccountType.EVM:
         importedData = await AccountManager.getImportedEVMAddress(
           privateKeyOrSeed
@@ -120,14 +122,17 @@ export default class AccountManager {
     vault: Vault,
     type: AccountType
   ): Promise<Account> {
-    const keyring = await vault.getKeyringsByType(type);
+    const _type = getAccountType(type);
+
+    const keyring = await vault.getKeyringsByType(_type);
     if (!keyring) throw new Error("Keyring not found");
     keyring.increaseAccountQuantity();
     let path;
     if (name === "") {
       name = `Account ${keyring.accountQuantity}`;
     }
-    switch (type) {
+
+    switch (_type) {
       case AccountType.EVM:
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
         return AccountManager.addEVMAccount(keyring.seed, name, path, keyring);

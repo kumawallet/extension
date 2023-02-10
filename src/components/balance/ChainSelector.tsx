@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "../../providers/NetworkProvider";
@@ -16,35 +16,51 @@ export const ChainSelector = () => {
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
-    getSelectedNetwork,
     setSelectNetwork,
   } = useNetworkContext();
-  const { state } = useAccountContext();
+  const {
+    state: { selectedAccount },
+    getAllAccounts,
+    setSelectedAccount,
+  } = useAccountContext();
 
   const [chainToChange, setChainToChange] = useState<Chain | null>(null);
   const [openModal, setopenModal] = useState(false);
   const [needToCreateAccount, setNeedToCreateAccount] = useState(false);
 
-  useEffect(() => {
-    getSelectedNetwork();
-  }, []);
-
   const selecteNetwork = async (chain: Chain, close: () => void) => {
-    const accounts = await Extension.getAllAccounts(chain.supportedAccounts);
+    let chainTypeIsSupportedBySelectedAccount = false;
+    let thereIsAccountToSupport = false;
 
-    const thereIsAccountSupported = accounts.some((acc) =>
-      chain.supportedAccounts.includes(getAccountType(acc.type))
-    );
+    const newChainSupportedTypeAccounts = chain.supportedAccounts;
 
-    if (!thereIsAccountSupported) {
+    // verify is curreny account support the new chain type
+    chainTypeIsSupportedBySelectedAccount =
+      newChainSupportedTypeAccounts.includes(
+        getAccountType(selectedAccount.type)
+      );
+
+    if (!chainTypeIsSupportedBySelectedAccount) {
+      // verify is any account support the new chain type
+      const accounts = await Extension.getAllAccounts(
+        newChainSupportedTypeAccounts
+      );
+
+      thereIsAccountToSupport = accounts.some((acc) =>
+        newChainSupportedTypeAccounts.includes(getAccountType(acc.type))
+      );
+    }
+
+    if (!thereIsAccountToSupport && !chainTypeIsSupportedBySelectedAccount) {
       setopenModal(true);
       setNeedToCreateAccount(true);
       setChainToChange(chain);
     } else {
-      if (chain.supportedAccounts[0] !== selectedChain?.supportedAccounts[0]) {
-        setopenModal(true);
-        setChainToChange(chain);
+      if (chainTypeIsSupportedBySelectedAccount) {
+        changeChain(chain);
       } else {
+        const accounts = await getAllAccounts(chain.supportedAccounts);
+        await setSelectedAccount(accounts[0]);
         changeChain(chain);
       }
     }

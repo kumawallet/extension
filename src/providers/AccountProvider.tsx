@@ -12,7 +12,11 @@ import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
 import { getAccountType, transformAddress } from "@src/utils/account-utils";
 import { AccountType } from "../accounts/AccountManager";
-import { CHAINS } from "../contants/chains";
+import {
+  CHAINS,
+  DEFAULT_WASM_CHAIN,
+  DEFAULT_EVM_CHAIN,
+} from "../contants/chains";
 
 interface InitialState {
   accounts: Account[];
@@ -75,7 +79,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
-    state: { selectedChain },
+    state: { selectedChain, rpc, init },
     setNewRpc,
     setSelectNetwork,
   } = useNetworkContext();
@@ -84,38 +88,26 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    if (selectedChain?.name) {
-      (async () => {
-        const newChainType = selectedChain.supportedAccounts;
+  // TODO: maybe necesary later, DON't delete it
+  // useEffect(() => {
+  //   if (selectedChain?.name && rpc && init) {
 
-        const accounts = await getAllAccounts(newChainType);
-
-        const selectedAccountType = getAccountType(state.selectedAccount?.type);
-
-        if (!newChainType.includes(selectedAccountType)) {
-          setSelectedAccount(accounts[0]);
-          setNewRpc(accounts[0].type);
-          return;
-        }
-
-        setNewRpc(selectedAccountType);
-      })();
-    }
-  }, [selectedChain?.name]);
+  //     // (async () => {
+  //     //   const newChainType = selectedChain.supportedAccounts;
+  //     //   const accounts = await getAllAccounts(newChainType);
+  //     //   const selectedAccountType = getAccountType(state.selectedAccount?.type);
+  //     //   if (!newChainType.includes(selectedAccountType)) {
+  //     //     setSelectedAccount(accounts[0]);
+  //     //     return;
+  //     //   }
+  //     // })();
+  //   }
+  // }, [selectedChain?.name, rpc, init]);
 
   const getAllAccounts = async (type: AccountType[] | null = null) => {
     try {
-      const accounts = await Extension.getAllAccounts(type);
-
-      const thereAreWasmAccounts = accounts.some((acc) =>
-        acc.key.includes("WASM")
-      );
-
-      if (!thereAreWasmAccounts) {
-        setSelectNetwork(CHAINS[0].chains[3]);
-      }
-
+      const _type = type || selectedChain?.supportedAccounts;
+      const accounts = await Extension.getAllAccounts(_type);
       dispatch({
         type: "set-accounts",
         payload: {
@@ -128,26 +120,17 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       return [];
     }
   };
-
-  useEffect(() => {
-    if (state.selectedAccount?.value?.address) {
-      const newAddress = transformAddress(
-        state.selectedAccount.value.address,
-        selectedChain?.addressPrefix
-      );
-      dispatch({
-        type: "change-selected-address-format",
-        payload: {
-          address: newAddress,
-        },
-      });
-    }
-  }, [selectedChain?.name, state?.selectedAccount?.key]);
-
   const getSelectedAccount = async () => {
     try {
       const selectedAccount = await Extension.getSelectedAccount();
 
+      // for first time when there is no default chain selected
+      if (!selectedChain) {
+        const selectedAccountIsWasm = selectedAccount?.key.includes("WASM");
+        setSelectNetwork(
+          selectedAccountIsWasm ? DEFAULT_WASM_CHAIN : DEFAULT_EVM_CHAIN
+        );
+      }
       dispatch({
         type: "set-selected-account",
         payload: {
@@ -164,13 +147,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
 
-      const actualType = getAccountType(state.selectedAccount.type);
-      const newType = getAccountType(selectedAccount?.type);
-
-      if (actualType !== newType) {
-        setNewRpc(selectedAccount?.type || "");
-      }
-
       return selectedAccount;
     } catch (error) {
       showErrorToast(error);
@@ -180,7 +156,22 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const setSelectedAccount = async (account: Account) => {
     try {
       await Extension.setSelectedAccount(account);
-      getSelectedAccount();
+      await setNewRpc(account.type);
+      dispatch({
+        type: "set-selected-account",
+        payload: {
+          selectedAccount: {
+            ...account,
+            value: {
+              ...account?.value,
+              address: transformAddress(
+                account?.value?.address as string,
+                selectedChain?.addressPrefix
+              ),
+            },
+          },
+        },
+      });
     } catch (error) {
       showErrorToast(error);
     }

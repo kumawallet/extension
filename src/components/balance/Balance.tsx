@@ -18,6 +18,7 @@ import { getAssetUSDPrice } from "../../utils/assets";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
+import { getAccountType } from "../../utils/account-utils";
 
 export interface Asset {
   name: string;
@@ -42,7 +43,7 @@ export const Balance = () => {
   ];
 
   const {
-    state: { api, selectedChain },
+    state: { api, selectedChain, rpc },
   } = useNetworkContext();
 
   const {
@@ -56,12 +57,12 @@ export const Balance = () => {
   const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
-    if (api && selectedAccount.value?.address && selectedChain) {
+    if (rpc && selectedAccount?.value?.address) {
       setIsLoadingAssets(true);
 
       getAssets(api, selectedAccount, selectedChain);
     }
-  }, [api, selectedAccount?.key, selectedChain?.name]);
+  }, [rpc, selectedAccount]);
 
   const getAssets = async (
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,
