@@ -95,12 +95,15 @@ export const Routes = () => {
     await deriveAccount(account);
     const accounts = await getAllAccounts();
 
-    const findCreatedAccount = accounts.findIndex(
-      (acc) => acc?.value?.name === account.name
-    );
+    // TODO: accounts without name will fail, deriveAccount should return the new account
+    if (account.name) {
+      const findCreatedAccount = accounts.findIndex(
+        (acc) => acc?.value?.name === account.name
+      );
 
-    await setSelectedAccount(accounts[findCreatedAccount]);
-    return true;
+      await setSelectedAccount(accounts[findCreatedAccount]);
+      return true;
+    }
   };
 
   const onImportAccount = async (account: any) => {

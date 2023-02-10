@@ -5,7 +5,7 @@ import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaCheckCircle } from "react-icons/fa";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
 import { LoadingButton } from "../common/LoadingButton";
 import { useLoading } from "@hooks/useLoading";
 import { object, string, ref } from "yup";
@@ -15,9 +15,7 @@ import { AccountType } from "@src/accounts/AccountManager";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { useNetworkContext } from "../../providers/NetworkProvider";
-import { getAccountType } from "../../utils/account-utils";
 import { ethers } from "ethers";
-import PolkadotKeyring from "@polkadot/ui-keyring";
 
 interface AddAccountFormProps {
   title: string;
@@ -92,6 +90,26 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   // TODO: move this to separate file
   const schema = object({
+    privateKeyOrSeed: fields.privateKeyOrSeed
+      ? string().when("accountType", {
+          is: (value: string) => value && value === "EVM",
+          then: string().test(
+            "evm validation",
+            "invalid private key",
+            (val) => {
+              try {
+                new ethers.Wallet(val || "");
+              } catch (e) {
+                return false;
+              }
+              return true;
+            }
+          ),
+          otherwise: string().test("wasm validation", "invalid seed", (val) => {
+            return mnemonicValidate(val || "");
+          }),
+        })
+      : string().optional(),
     name: string().optional(),
     password: passwordIsRequired
       ? string()
