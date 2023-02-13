@@ -7,9 +7,7 @@ import {
   useReducer,
 } from "react";
 import Extension from "../Extension";
-import { AccountForm } from "../components/accountForm/AccountForm";
-
-type NewAccount = AccountForm & { seed?: string };
+import { AccountFormType } from "../components/accountForm/AccountForm";
 
 interface InitialState {
   isInit: boolean;
@@ -21,10 +19,10 @@ const initialState: InitialState = {
 
 interface AuthContext {
   state: InitialState;
-  createAccount: (newAccount: NewAccount) => Promise<boolean>;
-  importAccount: (newAccount: NewAccount) => Promise<boolean>;
-  deriveAccount: (newAccount: NewAccount) => Promise<boolean>;
-  restorePassword: (newAccount: NewAccount) => Promise<boolean>;
+  createAccount: (account: AccountFormType) => Promise<boolean>;
+  importAccount: (account: AccountFormType) => Promise<boolean>;
+  deriveAccount: (account: AccountFormType) => Promise<boolean>;
+  restorePassword: (account: AccountFormType) => Promise<boolean>;
 }
 
 const AuthContext = createContext({} as AuthContext);
@@ -52,12 +50,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password,
     seed,
     isSignUp,
-  }: NewAccount) => {
+  }: AccountFormType) => {
     try {
       await Extension.createAccounts({ name, password, seed, isSignUp });
       return true;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
       return false;
     }
   };
@@ -68,7 +66,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password,
     accountType,
     isSignUp,
-  }: NewAccount) => {
+  }: AccountFormType) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!password && !isUnlocked) {
@@ -84,12 +82,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return true;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
       return false;
     }
   };
 
-  const deriveAccount = async ({ name, accountType }: NewAccount) => {
+  const deriveAccount = async ({ name, accountType }: AccountFormType) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!isUnlocked) {
@@ -99,7 +97,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await Extension.setSelectedAccount(account);
       return true;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
       return false;
     }
   };
@@ -107,12 +105,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const restorePassword = async ({
     privateKeyOrSeed: recoveryPhrase,
     password: newPassword,
-  }: NewAccount) => {
+  }: AccountFormType) => {
     try {
       await Extension.restorePassword({ recoveryPhrase, newPassword });
       return true;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
       return false;
     }
   };

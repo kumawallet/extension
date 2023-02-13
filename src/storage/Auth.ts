@@ -71,7 +71,7 @@ export default class Auth {
     }
   }
 
-  async signUp({ password }: any) {
+  async signUp({ password }: { password: string }) {
     try {
       this.#password = password;
       this.#isUnlocked = true;

@@ -15,7 +15,7 @@ import {
   Security,
 } from "./components/settings";
 import Extension from "./Extension";
-import { AccountForm } from "./components/accountForm/AccountForm";
+import { AccountForm, AccountFormType } from "./components/accountForm/AccountForm";
 import {
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
@@ -91,7 +91,7 @@ export const Routes = () => {
   }, [Extension, isInit, init]);
 
   // TODO: move this function to another place
-  const onDeriveAccount = async (account: any) => {
+  const onDeriveAccount = async (account: AccountFormType) => {
     await deriveAccount(account);
     const selected = await Extension.getSelectedAccount();
     if (!selected) {
@@ -102,7 +102,7 @@ export const Routes = () => {
     return true;
   };
 
-  const onImportAccount = async (account: any) => {
+  const onImportAccount = async (account: AccountFormType) => {
     await importAccount(account);
 
     if (!importIsSignUp) {
@@ -117,7 +117,7 @@ export const Routes = () => {
     return true;
   };
 
-  const onCreateAccount = async (account: any) => {
+  const onCreateAccount = async (account: AccountFormType) => {
     await createAccount(account);
 
     const accounts = await getAllAccounts();

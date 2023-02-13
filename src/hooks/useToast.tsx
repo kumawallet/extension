@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 
 export const useToast = () => {
-  const showErrorToast = (message: string | any) => {
+  const showErrorToast = (message: string | Error) => {
     toast.error(String(message), {
       position: toast.POSITION.TOP_CENTER,
       autoClose: false,

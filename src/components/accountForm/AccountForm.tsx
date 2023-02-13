@@ -17,6 +17,8 @@ import { useAccountContext } from "../../providers/AccountProvider";
 import { useNetworkContext } from "../../providers/NetworkProvider";
 import { ethers } from "ethers";
 
+export type AccountFormType = AccountForm & { seed?: string };
+
 interface AddAccountFormProps {
   title: string;
   fields: {
@@ -26,7 +28,7 @@ interface AddAccountFormProps {
   generateSeed?: boolean;
   signUp?: boolean;
   resetPassword?: boolean;
-  onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
+  onSubmitFn: (props: AccountFormType) => Promise<boolean>;
   callback?: () => void;
   buttonText: string;
   backButton?: boolean;
