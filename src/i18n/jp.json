@@ -42,6 +42,7 @@
       "seed": "シード",
       "seed_message": "これはアカウントのキーで、パスワードを忘れた場合にアクセスするための唯一の方法です。これを安全な場所に保存してください。これを再度表示することはできません。",
       "account_type": "アカウントタイプ",
+      "show_seed": "シードを表示",
       "evm_type": "Ethereum風アカウント (EVM)",
       "wasm_type": "Polkadot風アカウント (WASM)",
       "private_key": "プライベートキー",

@@ -42,6 +42,7 @@
       "seed": "Seed",
       "seed_message": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
       "account_type": "Account type",
+      "show_seed": "Show seed",
       "evm_type": "Ethereum like account (EVM)",
       "wasm_type": "Polkadot like account (WASM)",
       "private_key": "Private key",

@@ -42,6 +42,7 @@
       "seed": "Semilla",
       "seed_message": "Esta es la clave de tu cuenta y la única forma de acceder a ella en caso de que olvides tu contraseña. Asegúrate de guardarla en un lugar seguro, ya que no podrás verla de nuevo.",
       "account_type": "Tipo de cuenta",
+      "show_seed": "Mostrar semilla",
       "evm_type": "Cuenta tipo Ethereum (EVM)",
       "wasm_type": "Cuenta tipo Polkadot (WASM)",
       "private_key": "Clave privada",
