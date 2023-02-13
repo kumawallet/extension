@@ -1,4 +1,4 @@
-# Kuma Wallet
+# Kuma Wallet (Expect a stable release and proper documentation in Q3 2023.)
 
 ## Project Overview :page_facing_up:
 
