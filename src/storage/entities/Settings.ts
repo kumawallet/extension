@@ -1,5 +1,6 @@
 import { SETTINGS } from "../../utils/constants";
 import Storable from "../Storable";
+import Storage from "../Storage";
 
 export type Language = {
   lang: string;
@@ -28,7 +29,10 @@ export class Setting {
   }
 
   private static format(name: string) {
-    return name.split(/(?=[A-Z])/).join("_").toLowerCase();
+    return name
+      .split(/(?=[A-Z])/)
+      .join("_")
+      .toLowerCase();
   }
 
   isString() {
@@ -56,7 +60,6 @@ export class Setting {
 }
 
 export class LanguageSetting extends Setting {
-
   static getDefault() {
     return { lang: "en", name: "English", englishName: "English" };
   }
@@ -84,6 +87,27 @@ export class Settings extends Storable {
       advanced: {},
       security: {},
     };
+  }
+
+  static init() {
+    const settings = new Settings();
+    settings.addToGeneral(
+      SettingKey.LANGUAGES,
+      LanguageSetting.getSupportedLanguages()
+    );
+    return settings;
+  }
+
+  static async get(): Promise<Settings | undefined> {
+    const stored = await Storage.getInstance().get(SETTINGS);
+    if (!stored) return undefined;
+    const settings = new Settings();
+    settings.set(stored.data);
+    return settings;
+  }
+
+  static async set(settings: Settings) {
+    await Storage.getInstance().set(SETTINGS, settings);
   }
 
   isEmpty() {
@@ -140,14 +164,5 @@ export class Settings extends Storable {
 
   allreadyExists(type: SettingType, key: SettingKey) {
     return this.data[type][key] !== undefined;
-  }
-
-  static init() {
-    const settings = new Settings();
-    settings.addToGeneral(
-      SettingKey.LANGUAGES,
-      LanguageSetting.getSupportedLanguages()
-    );
-    return settings;
   }
 }

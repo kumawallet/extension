@@ -1,6 +1,7 @@
 import { AccountType } from "../../accounts/AccountManager";
 import { AccountKey } from "./Accounts";
 import { ACCOUNT_PATH } from "../../utils/constants";
+import Vault from "./Vault";
 
 export default class Keyring {
   readonly #key: AccountKey;
@@ -51,6 +52,20 @@ export default class Keyring {
 
   set accountQuantity(accountQuantity: number) {
     this.#accountQuantity = accountQuantity;
+  }
+
+  static async save(keyring: Keyring): Promise<void> {
+    const vault = await Vault.get();
+    if (!vault) throw new Error("Vault is not initialized");
+    vault.addKeyring(keyring);
+    await Vault.set(vault);
+  }
+
+  static async remove(keyring: AccountKey): Promise<void> {
+    const vault = await Vault.get();
+    if (!vault) throw new Error("Vault is not initialized");
+    vault.removeKeyring(keyring);
+    await Vault.set(vault);
   }
 
   increaseAccountQuantity() {

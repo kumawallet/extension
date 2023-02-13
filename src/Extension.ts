@@ -1,11 +1,14 @@
 import { VAULT } from "./utils/constants";
 import AccountManager, { AccountType } from "./accounts/AccountManager";
-import { Account, AccountKey } from "./storage/entities/Accounts";
+import { Account, AccountKey, Accounts } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
-import { Setting, SettingType } from "./storage/entities/Settings";
+import { Setting, Settings, SettingType } from "./storage/entities/Settings";
+import Vault from "./storage/entities/Vault";
+import CacheAuth from "./storage/entities/CacheAuth";
+import { SelectedAccount } from "./storage/entities/SelectedAccount";
 
 export default class Extension {
   private static async init(
@@ -16,7 +19,7 @@ export default class Extension {
     try {
       await Auth.getInstance().signUp({ password });
       await Storage.getInstance().init(force);
-      await Storage.getInstance().cachePassword();
+      await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
     } catch (error) {
       console.error(error);
@@ -84,7 +87,7 @@ export default class Extension {
   static async signIn(password: string) {
     const { vault } = await Storage.getInstance().storage.get(VAULT);
     await Auth.getInstance().signIn(password, vault);
-    await Storage.getInstance().cachePassword();
+    await CacheAuth.cachePassword();
   }
 
   static alreadySignedUp() {
@@ -93,7 +96,7 @@ export default class Extension {
 
   static async areAccountsInitialized(): Promise<boolean> {
     try {
-      const accounts = await Storage.getInstance().getAccounts();
+      const accounts = await Accounts.get();
       if (!accounts) return false;
       return AccountManager.areAccountsInitialized(accounts);
     } catch (error) {
@@ -104,18 +107,18 @@ export default class Extension {
 
   static async signOut() {
     Auth.getInstance().signOut();
-    await Storage.getInstance().clearCache();
+    await CacheAuth.clear();
   }
 
   static async isUnlocked() {
-    await Storage.getInstance().loadFromCache();
+    await CacheAuth.loadFromCache();
     return Auth.isUnlocked;
   }
 
   static async showPrivateKey(): Promise<string | undefined> {
-    const selectedAccount = await Storage.getInstance().getSelectedAccount();
+    const selectedAccount = await SelectedAccount.get();
     if (!selectedAccount || !selectedAccount.key) return undefined;
-    return AccountManager.showPrivateKey(selectedAccount.key);
+    return Vault.showPrivateKey(selectedAccount.key);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -131,34 +134,34 @@ export default class Extension {
   }
 
   static async deriveAccount({ name, accountType }: any): Promise<Account> {
-    const vault = await Storage.getInstance().getVault();
+    const vault = await Vault.get();
     if (!vault) throw new Error("Vault not found");
     return AccountManager.derive(name, vault, accountType);
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
-    const vault = await Storage.getInstance().getVault();
+    const vault = await Vault.get();
     if (!vault) throw new Error("Vault not found");
     const network = Network.getInstance();
-    network.set(chain);
-    await Storage.getInstance().setNetwork(network);
+    network.setChain(chain);
+    await Network.set(network);
     return true;
   }
 
   static async setSelectedAccount(account: Account) {
-    await Storage.getInstance().setSelectedAccount(account);
+    await SelectedAccount.set(account);
   }
 
   static async getSelectedAccount(): Promise<Account | undefined> {
-    return Storage.getInstance().getSelectedAccount();
+    return SelectedAccount.get();
   }
 
-  static async getNetwork(): Promise<any> {
-    return Storage.getInstance().getNetwork();
+  static async getNetwork(): Promise<Network> {
+    return Network.get();
   }
 
   static async getGeneralSettings(): Promise<Setting[]> {
-    const settings = await Storage.getInstance().getSettings();
+    const settings = await Settings.get();
     if (!settings) throw new Error("Settings not found");
     return settings.getAll(SettingType.GENERAL);
   }

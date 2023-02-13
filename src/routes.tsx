@@ -93,17 +93,13 @@ export const Routes = () => {
   // TODO: move this function to another place
   const onDeriveAccount = async (account: any) => {
     await deriveAccount(account);
-    const accounts = await getAllAccounts();
-
-    // TODO: accounts without name will fail, deriveAccount should return the new account
-    if (account.name) {
-      const findCreatedAccount = accounts.findIndex(
-        (acc) => acc?.value?.name === account.name
-      );
-
-      await setSelectedAccount(accounts[findCreatedAccount]);
-      return true;
+    const selected = await Extension.getSelectedAccount();
+    if (!selected) {
+      console.error("No account selected")
+      return false;
     }
+    await setSelectedAccount(selected);
+    return true;
   };
 
   const onImportAccount = async (account: any) => {

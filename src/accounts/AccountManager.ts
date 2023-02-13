@@ -48,10 +48,13 @@ export default class AccountManager {
     keyring: Keyring
   ): Promise<Account> {
     const key = AccountManager.formatAddress(address, type);
+    if (name === "") {
+      name = `Account ${keyring.accountQuantity}`;
+    }
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
-    await Storage.getInstance().addAccount(account);
-    await Storage.getInstance().saveKeyring(keyring);
+    await Account.add(account);
+    await Keyring.save(keyring);
     return account;
   }
 
@@ -124,14 +127,10 @@ export default class AccountManager {
   ): Promise<Account> {
     const _type = getAccountType(type);
 
-    const keyring = await vault.getKeyringsByType(_type);
+    const keyring = await vault.getKeyringsByType(_type as AccountType);
     if (!keyring) throw new Error("Keyring not found");
     keyring.increaseAccountQuantity();
     let path;
-    if (name === "") {
-      name = `Account ${keyring.accountQuantity}`;
-    }
-
     switch (_type) {
       case AccountType.EVM:
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
@@ -146,30 +145,24 @@ export default class AccountManager {
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("Account key is required");
-    return Storage.getInstance().getAccount(key);
+    return Account.get(key);
   }
 
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("Account not found");
     account.value.name = newName;
-    return Storage.getInstance().updateAccount(account);
+    return Account.update(account);
   }
 
   static async forget(key: AccountKey): Promise<void> {
-    await Storage.getInstance().removeAccount(key);
-  }
-
-  static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
-    const vault = await Storage.getInstance().getVault();
-    if (!vault) throw new Error("Vault not found");
-    return vault?.keyrings[key]?.privateKey;
+    await Account.remove(key);
   }
 
   static async getAll(
     type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
-    const accounts = await Storage.getInstance().getAccounts();
+    const accounts = await Accounts.get();
     if (!accounts) return undefined;
 
     if (type && type.length > 0) {
@@ -216,11 +209,11 @@ export default class AccountManager {
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
-    const vault = await Storage.getInstance().getVault();
+    const vault = await Vault.get();
     if (!vault) throw new Error("Vault not found");
     Auth.password = password;
     Auth.isUnlocked = true;
-    await Storage.getInstance().setVault(vault);
+    await Vault.set(vault);
     await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }
