@@ -123,7 +123,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           },
         });
       } catch (error) {
-        showErrorToast(error);
+        showErrorToast(error as Error);
       }
     })();
   }, []);
@@ -151,14 +151,14 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 
   const getSelectedNetwork = async () => {
     try {
       const { chain: selectedNetwork } =
-        await Storage.getInstance().getNetwork();
+        await Extension.getNetwork();
 
       dispatch({
         type: "select-network",
@@ -167,7 +167,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedNetwork;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 
@@ -206,7 +206,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: { api, rpc: newRpc },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 

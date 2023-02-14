@@ -145,8 +145,8 @@ export default class Extension {
     const vault = await Vault.get();
     if (!vault) throw new Error("Vault not found");
     const network = Network.getInstance();
-    network.setChain(chain);
-    await Network.set(network);
+    network.set(chain);
+    await Network.set<Network>(network);
     return true;
   }
 

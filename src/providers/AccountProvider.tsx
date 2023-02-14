@@ -116,7 +116,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
       return [];
     }
   };
@@ -149,7 +149,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedAccount;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 
@@ -173,7 +173,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 

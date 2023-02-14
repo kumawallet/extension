@@ -1,18 +1,16 @@
 import { Chain } from "@src/contants/chains";
-import Storable from "../Storable";
-import { NETWORK } from "../../utils/constants";
-import Storage from "../Storage";
+import BaseEntity from "./BaseEntity";
 
-export class Network extends Storable {
+export class Network extends BaseEntity {
   chain: Chain | null;
 
   private static instance: Network;
 
   constructor() {
-    super(NETWORK);
+    super();
     this.chain = null;
   }
-
+  
   public static getInstance() {
     if (!Network.instance) {
       Network.instance = new Network();
@@ -20,33 +18,29 @@ export class Network extends Storable {
     return Network.instance;
   }
 
-  getChain() {
+  static async init() {
+    await Network.set<Network>(Network.getInstance());
+  }
+
+  static async getDefaultValue<Network>(): Promise<Network> {
+    const defaultNetwork = Network.getInstance();
+    defaultNetwork.chain = null;
+    return defaultNetwork as Network;
+  }
+
+
+  static async get<Network>(): Promise<Network> {
+    const network = await super.get<Network>();
+    if (!network) throw new Error("Network not found");
+    return network;
+  }
+
+  get() {
     return this.chain;
   }
 
-  setChain(chain: Chain) {
+  set(chain: Chain) {
     this.chain = chain;
   }
 
-  static getDefaultNetwork() {
-    const defaultNetwork = Network.getInstance();
-    defaultNetwork.chain = null;
-    return defaultNetwork;
-  }
-
-  static async set(network: Network) {
-    await Storage.getInstance().set(NETWORK, network);
-  }
-
-  static async get(): Promise<Network> {
-    const stored = await Storage.getInstance().get(NETWORK);
-    if (!stored || !stored.chain) {
-      const defaultNetwork = Network.getDefaultNetwork();
-      await Network.set(defaultNetwork);
-      return defaultNetwork;
-    }
-    const network = new Network();
-    network.setChain(stored.chain);
-    return network;
-  }
 }

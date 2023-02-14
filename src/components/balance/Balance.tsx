@@ -95,7 +95,7 @@ export const Balance = () => {
       setIsLoadingAssets(false);
       setAssets([]);
       setTotalBalance(0);
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 
