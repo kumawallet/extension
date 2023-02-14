@@ -1,5 +1,5 @@
 import pkg from "../package.json";
-import { isChrome } from "./utils/env";
+import { isChrome, isProduction } from "./utils/env";
 
 const commonManifest = {
   name: pkg.displayName,
@@ -26,9 +26,12 @@ const manifestV3: chrome.runtime.ManifestV3 = {
     default_popup: POPUP,
     default_icon: ICON34,
   },
-  chrome_url_overrides: {
-    newtab: "src/pages/newtab/index.html",
-  },
+  ...(!isProduction && {
+    chrome_url_overrides: {
+      newtab: "src/pages/newtab/index.html",
+    },
+  }),
+
   icons: {
     "128": ICON128,
   },

@@ -6,6 +6,7 @@ import copyContentStyle from "./utils/plugins/copy-content-style";
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
+import { isProduction } from "@src/utils/env";
 
 const isChrome = process.env.BROWSER_TARGET === "CHROME";
 
@@ -28,7 +29,7 @@ $$$$$  \\  $$ |  $$ |$$ | $$ | $$ | /    $$ |      $$ $$/$$ $$ | /    $$ |$$ |$$
 $$ |$$  \\ $$ \\__$$ |$$ | $$ | $$ |/$$$$$$$ |      $$$$/  $$$$ |/$$$$$$$ |$$ |$$ |$$$$$$$$/   $$ |/  |
 $$ | $$  |$$    $$/ $$ | $$ | $$ |$$    $$ |      $$$/    $$$ |$$    $$ |$$ |$$ |$$       |  $$  $$/ 
 $$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/  $$$$$$$/    $$$$/  
-`)
+`);
 
 export default defineConfig({
   resolve: {
@@ -52,7 +53,9 @@ export default defineConfig({
         content: resolve(pagesDir, "content", "index.ts"),
         background: resolve(pagesDir, "background", "index.ts"),
         popup: resolve(pagesDir, "popup", "index.html"),
-        newtab: resolve(pagesDir, "newtab", "index.html"),
+        ...(!isProduction && {
+          newtab: resolve(pagesDir, "newtab", "index.html"),
+        }),
         options: resolve(pagesDir, "options", "index.html"),
       },
       output: {

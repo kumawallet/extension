@@ -11,7 +11,7 @@
   "scripts": {
     "build:chrome": "BROWSER_TARGET=CHROME vite build",
     "build:firefox": "BROWSER_TARGET=FIREFOX vite build",
-    "build": "tsc --noEmit && build:chrome && build:firefox",
+    "build": "NODE_ENV=production tsc --noEmit && build:chrome && build:firefox",
     "dev": "BROWSER_TARGET=CHROME nodemon",
     "dev:firefox": "BROWSER_TARGET=FIREFOX nodemon"
   },
