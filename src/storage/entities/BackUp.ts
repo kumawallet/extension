@@ -1,31 +1,14 @@
-import { BACKUP } from "@src/utils/constants";
-import Storable from "../Storable";
-import Storage from "../Storage";
+import BaseEntity from "./BaseEntity";
 
-export default class BackUp extends Storable {
+export default class BackUp extends BaseEntity {
   data: string | undefined;
 
-  constructor() {
-    super(BACKUP);
-    this.data = undefined;
-  }
-  
-
-  static async get(): Promise<BackUp | undefined> {
-    const stored = await Storage.getInstance().get(BACKUP);
-    if (!stored || !stored.data) return undefined;
-    const backup = new BackUp();
-    backup.set(stored.data);
-    return backup;
-  }
-
-  static async set(backup: string) {
-    const save = new BackUp()
-    save.set(backup);
-    await Storage.getInstance().set(BACKUP, save);
-  }
-
-  set(data: string) {
+  constructor(data: string | undefined) {
+    super();
     this.data = data;
+  }
+
+  static async init() {
+    await BackUp.set(new BackUp(undefined));
   }
 }

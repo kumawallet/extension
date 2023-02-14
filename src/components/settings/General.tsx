@@ -6,8 +6,9 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
-import { Language, Setting } from "@src/storage/entities/Settings";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import Setting from "@src/storage/entities/settings/Setting";
+import { Language } from "@src/storage/entities/settings/Settings";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -29,7 +30,7 @@ export const General = () => {
       setSelectedLanguage(getSelectedLanguage(settings[0].value as Language[]));
     } catch (error) {
       setSettings([]);
-      showErrorToast(error);
+      showErrorToast(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +49,7 @@ export const General = () => {
       setSelectedLanguage(language);
       i18n.changeLanguage(language || "en")
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 

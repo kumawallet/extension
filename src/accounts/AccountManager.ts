@@ -197,14 +197,15 @@ export default class AccountManager {
   static async saveBackup(recoveryPhrase: string): Promise<void> {
     if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
-    await BackUp.set(encrypted);
+    const backup = new BackUp(encrypted);
+    await BackUp.set(backup);
   }
 
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string
   ): Promise<void> {
-    const backup = await BackUp.get();
+    const backup = await BackUp.get<BackUp>();
     if (!backup || !backup.data) throw new Error("Backup not found");
     const decryptedBackup = await Auth.decryptBackup(backup.data, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");

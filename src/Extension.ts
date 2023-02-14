@@ -163,7 +163,7 @@ export default class Extension {
   }
 
   static async getGeneralSettings(): Promise<Setting[]> {
-    const settings = await Settings.get();
+    const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("Settings not found");
     return settings.getAll(SettingType.GENERAL);
   }

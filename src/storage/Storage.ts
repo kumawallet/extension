@@ -98,19 +98,18 @@ export default class Storage {
         }
       }
       await this.#storage.clear();
+      await Settings.init();
+      await BackUp.init();
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      const settings = Settings.init();
-      await this.set(SETTINGS, settings);
       const vault = new Vault();
       await this.set(VAULT, vault);
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
       const network = new Network();
       await this.set(NETWORK, network);
-      const backup = new BackUp();
-      await this.set(BACKUP, backup);
+  
       return;
     } catch (error) {
       console.error(error);
