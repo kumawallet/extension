@@ -11,7 +11,7 @@ import { Accounts } from "./entities/Accounts";
 import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
-import { Settings } from "./entities/Settings";
+import { Settings } from "./entities/settings/Settings";
 import { Network } from "./entities/Network";
 import BackUp from "./entities/BackUp";
 

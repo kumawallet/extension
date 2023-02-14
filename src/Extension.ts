@@ -1,14 +1,16 @@
 import { VAULT } from "./utils/constants";
 import AccountManager, { AccountType } from "./accounts/AccountManager";
-import { Account, AccountKey, Accounts } from "./storage/entities/Accounts";
+import { AccountKey, Accounts } from "./storage/entities/Accounts";
 import Auth from "./storage/Auth";
 import Storage from "./storage/Storage";
 import { Chain } from "@src/contants/chains";
 import { Network } from "./storage/entities/Network";
-import { Setting, Settings, SettingType } from "./storage/entities/Settings";
+import { Settings, SettingType } from "./storage/entities/settings/Settings";
 import Vault from "./storage/entities/Vault";
 import CacheAuth from "./storage/entities/CacheAuth";
 import { SelectedAccount } from "./storage/entities/SelectedAccount";
+import Account from "./storage/entities/Account";
+import Setting from "./storage/entities/settings/Setting";
 
 export default class Extension {
   private static async init(
