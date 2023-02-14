@@ -1,6 +1,11 @@
 import Storage from "../Storage";
 
 export default class BaseEntity {
+  
+  static async init() {
+    return;
+  }
+
   static async getDefaultValue<T>(): Promise<T | undefined> {
     return undefined;
   }

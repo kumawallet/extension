@@ -101,8 +101,7 @@ export default class Storage {
       await BackUp.init();
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      await this.set(CACHE_AUTH, CacheAuth.getInstance());
-  
+      await CacheAuth.init();
       return;
     } catch (error) {
       console.error(error);
