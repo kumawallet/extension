@@ -13,6 +13,7 @@ import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import { Settings } from "./entities/Settings";
 import { Network } from "./entities/Network";
+import BackUp from "./entities/BackUp";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -108,7 +109,7 @@ export default class Storage {
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
       const network = new Network();
       await this.set(NETWORK, network);
-      const backup = undefined;
+      const backup = new BackUp();
       await this.set(BACKUP, backup);
       return;
     } catch (error) {
@@ -129,13 +130,5 @@ export default class Storage {
   async alreadySignedUp(): Promise<boolean> {
     const stored = await this.#storage.get(null);
     return !!stored && stored[VAULT];
-  }
-
-  async setBackup(backup: string) {
-    await this.set(BACKUP, backup);
-  }
-
-  async getBackup(): Promise<string | undefined> {
-    return this.get(BACKUP);
   }
 }

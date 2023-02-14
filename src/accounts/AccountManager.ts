@@ -1,12 +1,12 @@
 import { Account, AccountKey, Accounts } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
 import Vault from "../storage/entities/Vault";
-import Storage from "../storage/Storage";
 import { ethers } from "ethers";
 import { ACCOUNT_PATH } from "../utils/constants";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "../storage/Auth";
 import { getAccountType } from "../utils/account-utils";
+import BackUp from "@src/storage/entities/BackUp";
 
 export enum AccountType {
   EVM = "EVM",
@@ -196,16 +196,16 @@ export default class AccountManager {
   static async saveBackup(recoveryPhrase: string): Promise<void> {
     if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
-    await Storage.getInstance().setBackup(encrypted);
+    await BackUp.set(encrypted);
   }
 
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string
   ): Promise<void> {
-    const backup = await Storage.getInstance().getBackup();
-    if (!backup) throw new Error("Backup not found");
-    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
+    const backup = await BackUp.get();
+    if (!backup || !backup.data) throw new Error("Backup not found");
+    const decryptedBackup = await Auth.decryptBackup(backup.data, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
