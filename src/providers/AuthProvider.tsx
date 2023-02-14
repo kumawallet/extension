@@ -7,7 +7,7 @@ import {
   useReducer,
 } from "react";
 import Extension from "../Extension";
-import { AccountFormType } from "../components/accountForm/AccountForm";
+import { AccountFormType } from "../pages/accountForm/AccountForm";
 
 interface InitialState {
   isInit: boolean;

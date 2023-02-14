@@ -2,8 +2,8 @@
   "common": {
     "loading": "読み込み中..."
   },
-  "home": {
-    "welcome": "Kuma Walletへようこそ",
+  "welcome": {
+    "welcome_message": "Kuma Walletへようこそ",
     "description": "すべてのアカウントが一つの場所に",
     "button_text": "開始する"
   },

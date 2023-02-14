@@ -2,8 +2,8 @@
   "common": {
     "loading": "Cargando..."
   },
-  "home": {
-    "welcome": "Bienvenido a Kuma Wallet",
+  "welcome": {
+    "welcome_message": "Bienvenido a Kuma Wallet",
     "description": "Todas tus cuentas en un solo lugar",
     "button_text": "Empezar"
   },

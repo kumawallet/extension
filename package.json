@@ -12,8 +12,8 @@
     "build:chrome": "BROWSER_TARGET=CHROME vite build",
     "build:firefox": "BROWSER_TARGET=FIREFOX vite build",
     "build": "NODE_ENV=production tsc --noEmit && build:chrome && build:firefox",
-    "dev": "BROWSER_TARGET=CHROME nodemon",
-    "dev:firefox": "BROWSER_TARGET=FIREFOX nodemon"
+    "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME nodemon",
+    "dev:firefox": "NODE_ENV=develop BROWSER_TARGET=FIREFOX nodemon"
   },
   "type": "module",
   "dependencies": {
