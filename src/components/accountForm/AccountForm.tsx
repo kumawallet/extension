@@ -17,6 +17,8 @@ import { useAccountContext } from "../../providers/AccountProvider";
 import { useNetworkContext } from "../../providers/NetworkProvider";
 import { ethers } from "ethers";
 
+export type AccountFormType = AccountForm & { seed?: string };
+
 interface AddAccountFormProps {
   title: string;
   fields: {
@@ -26,7 +28,7 @@ interface AddAccountFormProps {
   generateSeed?: boolean;
   signUp?: boolean;
   resetPassword?: boolean;
-  onSubmitFn: (props: AccountForm & { seed?: string }) => Promise<boolean>;
+  onSubmitFn: (props: AccountFormType) => Promise<boolean>;
   callback?: () => void;
   buttonText: string;
   backButton?: boolean;
@@ -90,26 +92,33 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   // TODO: move this to separate file
   const schema = object({
-    privateKeyOrSeed: fields.privateKeyOrSeed
-      ? string().when("accountType", {
-          is: (value: string) => value && value === "EVM",
-          then: string().test(
-            "evm validation",
-            "invalid private key",
-            (val) => {
-              try {
-                new ethers.Wallet(val || "");
-              } catch (e) {
-                return false;
+    privateKeyOrSeed:
+      fields.privateKeyOrSeed && fields.accountType
+        ? string().when("accountType", {
+            is: (value: string) => value && value === "EVM",
+            then: string().test(
+              "evm validation",
+              "invalid private key",
+              (val) => {
+                try {
+                  new ethers.Wallet(val || "");
+                } catch (e) {
+                  return false;
+                }
+                return true;
               }
-              return true;
-            }
-          ),
-          otherwise: string().test("wasm validation", "invalid seed", (val) => {
-            return mnemonicValidate(val || "");
-          }),
-        })
-      : string().optional(),
+            ),
+            otherwise: string().test(
+              "wasm validation",
+              "invalid seed",
+              (val) => {
+                return mnemonicValidate(val || "");
+              }
+            ),
+          })
+        : fields.privateKeyOrSeed && !fields.accountType
+        ? string().required("required")
+        : string().optional(),
     name: string().optional(),
     password: passwordIsRequired
       ? string()

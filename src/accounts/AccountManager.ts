@@ -1,12 +1,13 @@
-import { Account, AccountKey, Accounts } from "../storage/entities/Accounts";
+import { AccountKey, Accounts } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
 import Vault from "../storage/entities/Vault";
-import Storage from "../storage/Storage";
 import { ethers } from "ethers";
 import { ACCOUNT_PATH } from "../utils/constants";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "../storage/Auth";
 import { getAccountType } from "../utils/account-utils";
+import BackUp from "@src/storage/entities/BackUp";
+import Account from "@src/storage/entities/Account";
 
 export enum AccountType {
   EVM = "EVM",
@@ -48,10 +49,13 @@ export default class AccountManager {
     keyring: Keyring
   ): Promise<Account> {
     const key = AccountManager.formatAddress(address, type);
+    if (name === "") {
+      name = `Account ${keyring.accountQuantity}`;
+    }
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
-    await Storage.getInstance().addAccount(account);
-    await Storage.getInstance().saveKeyring(keyring);
+    await Account.add(account);
+    await Keyring.save(keyring);
     return account;
   }
 
@@ -124,14 +128,10 @@ export default class AccountManager {
   ): Promise<Account> {
     const _type = getAccountType(type);
 
-    const keyring = await vault.getKeyringsByType(_type);
+    const keyring = await vault.getKeyringsByType(_type as AccountType);
     if (!keyring) throw new Error("Keyring not found");
     keyring.increaseAccountQuantity();
     let path;
-    if (name === "") {
-      name = `Account ${keyring.accountQuantity}`;
-    }
-
     switch (_type) {
       case AccountType.EVM:
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
@@ -146,30 +146,24 @@ export default class AccountManager {
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("Account key is required");
-    return Storage.getInstance().getAccount(key);
+    return Account.get(key);
   }
 
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("Account not found");
     account.value.name = newName;
-    return Storage.getInstance().updateAccount(account);
+    return Account.update(account);
   }
 
   static async forget(key: AccountKey): Promise<void> {
-    await Storage.getInstance().removeAccount(key);
-  }
-
-  static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
-    const vault = await Storage.getInstance().getVault();
-    if (!vault) throw new Error("Vault not found");
-    return vault?.keyrings[key]?.privateKey;
+    await Account.remove(key);
   }
 
   static async getAll(
     type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
-    const accounts = await Storage.getInstance().getAccounts();
+    const accounts = await Accounts.get();
     if (!accounts) return undefined;
 
     if (type && type.length > 0) {
@@ -203,24 +197,24 @@ export default class AccountManager {
   static async saveBackup(recoveryPhrase: string): Promise<void> {
     if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
-    await Storage.getInstance().setBackup(encrypted);
+    await BackUp.set(encrypted);
   }
 
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string
   ): Promise<void> {
-    const backup = await Storage.getInstance().getBackup();
-    if (!backup) throw new Error("Backup not found");
-    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
+    const backup = await BackUp.get();
+    if (!backup || !backup.data) throw new Error("Backup not found");
+    const decryptedBackup = await Auth.decryptBackup(backup.data, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
-    const vault = await Storage.getInstance().getVault();
+    const vault = await Vault.get();
     if (!vault) throw new Error("Vault not found");
     Auth.password = password;
     Auth.isUnlocked = true;
-    await Storage.getInstance().setVault(vault);
+    await Vault.set(vault);
     await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }

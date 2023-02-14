@@ -44,7 +44,7 @@ export default class Auth {
 
   static async loadAuthFromCache(salt: string) {
     const { password, isUnlocked } = CacheAuth.getInstance();
-    if (!password || (await CacheAuth.isExpired())) {
+    if (!password || (await CacheAuth.hasExpired())) {
       Auth.getInstance().signOut();
       return;
     }
@@ -71,7 +71,7 @@ export default class Auth {
     }
   }
 
-  async signUp({ password }: any) {
+  async signUp({ password }: { password: string }) {
     try {
       this.#password = password;
       this.#isUnlocked = true;

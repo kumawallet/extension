@@ -2,7 +2,8 @@ import { VAULT } from "../../utils/constants";
 import Keyring from "./Keyring";
 import { AccountKey } from "./Accounts";
 import Storable from "../Storable";
-import { AccountType } from "@src/utils/AccountManager";
+import Storage from "../Storage";
+import { AccountType } from "@src/accounts/AccountManager";
 
 export default class Vault extends Storable {
   keyrings: { [key: AccountKey]: Keyring };
@@ -12,24 +13,50 @@ export default class Vault extends Storable {
     this.keyrings = {};
   }
 
+  static async get(): Promise<Vault | undefined> {
+    const stored = await Storage.getInstance().get(VAULT);
+    if (!stored || !stored.keyrings) return undefined;
+    const vault = new Vault();
+    vault.setKeyrings(stored.keyrings);
+    return vault;
+  }
+
+  static async set(vault: Vault) {
+    await Storage.getInstance().set(VAULT, vault);
+  }
+
+  static async remove() {
+    await Storage.getInstance().remove(VAULT);
+  }
+
+  static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
+    const vault = await Vault.get();
+    if (!vault) throw new Error("Vault not found");
+    return vault?.keyrings[key]?.privateKey;
+  }
+
   isEmpty() {
     return Object.keys(this.keyrings).length === 0;
   }
 
-  add(keyring: Keyring) {
+  addKeyring(keyring: Keyring) {
     this.keyrings[keyring.key] = keyring;
   }
 
-  set(keyrings: { [key: AccountKey]: Keyring }) {
-    this.keyrings = keyrings;
+  getKeyring(key: AccountKey) {
+    return this.keyrings[key];
   }
 
-  remove(key: AccountKey) {
+  updateKeyring(key: AccountKey, value: Keyring) {
+    this.keyrings[key] = value;
+  }
+
+  removeKeyring(key: AccountKey) {
     delete this.keyrings[key];
   }
 
-  get(key: AccountKey) {
-    return this.keyrings[key];
+  setKeyrings(keyrings: { [key: AccountKey]: Keyring }) {
+    this.keyrings = keyrings;
   }
 
   getAll() {
@@ -48,10 +75,6 @@ export default class Vault extends Storable {
 
   getKeyringsByType(type: AccountType) {
     return this.getAll().find((keyring) => keyring.type === type);
-  }
-
-  update(key: AccountKey, value: Keyring) {
-    this.keyrings[key] = value;
   }
 
   allreadyExists(key: AccountKey) {
