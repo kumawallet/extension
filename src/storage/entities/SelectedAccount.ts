@@ -1,7 +1,8 @@
 import { SELECTED_ACCOUNT } from "@src/utils/constants";
 import Storable from "../Storable";
 import Storage from "../Storage";
-import { Account, Accounts } from "./Accounts";
+import Account from "./Account";
+import { Accounts } from "./Accounts";
 
 export class SelectedAccount extends Storable {
   constructor() {

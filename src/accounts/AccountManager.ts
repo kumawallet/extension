@@ -1,4 +1,4 @@
-import { Account, AccountKey, Accounts } from "../storage/entities/Accounts";
+import { AccountKey, Accounts } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
 import Vault from "../storage/entities/Vault";
 import { ethers } from "ethers";
@@ -7,6 +7,7 @@ import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "../storage/Auth";
 import { getAccountType } from "../utils/account-utils";
 import BackUp from "@src/storage/entities/BackUp";
+import Account from "@src/storage/entities/Account";
 
 export enum AccountType {
   EVM = "EVM",
