@@ -1,6 +1,8 @@
-import { SETTINGS } from "../../utils/constants";
-import Storable from "../Storable";
-import Storage from "../Storage";
+import { SETTINGS } from "../../../utils/constants";
+import Storable from "../../Storable";
+import Storage from "../../Storage";
+import LanguageSetting from "./LanguageSetting";
+import Setting from "./Setting";
 
 export type Language = {
   lang: string;
@@ -18,60 +20,6 @@ export enum SettingKey {
   LANGUAGES = "languages",
 }
 export type SettingValue = string | Language[] | number | boolean;
-
-export class Setting {
-  value: SettingValue;
-  name: string;
-
-  constructor(name: string, value: SettingValue) {
-    this.value = value;
-    this.name = Setting.format(name);
-  }
-
-  private static format(name: string) {
-    return name
-      .split(/(?=[A-Z])/)
-      .join("_")
-      .toLowerCase();
-  }
-
-  isString() {
-    return typeof this.value === "string";
-  }
-
-  isNumber() {
-    return typeof this.value === "number";
-  }
-
-  isBoolean() {
-    return typeof this.value === "boolean";
-  }
-
-  isObject() {
-    return typeof this.value === "object";
-  }
-
-  isLanguageArray() {
-    if (this.isObject()) {
-      const lang = this.value as Language[];
-      return lang.length > 0 && lang[0].lang !== undefined;
-    }
-  }
-}
-
-export class LanguageSetting extends Setting {
-  static getDefault() {
-    return { lang: "en", name: "English", englishName: "English" };
-  }
-
-  static getSupportedLanguages() {
-    return [
-      { lang: "en", name: "English", englishName: "English" },
-      { lang: "es", name: "Español", englishName: "Spanish" },
-      { lang: "jp", name: "日本語", englishName: "Japanese" },
-    ];
-  }
-}
 
 export class Settings extends Storable {
   data: {
