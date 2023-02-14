@@ -1,4 +1,4 @@
-import { ICON_SIZE } from "@src/contants/icons";
+import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../common/PageWrapper";
@@ -8,7 +8,7 @@ import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Setting from "@src/storage/entities/settings/Setting";
-import { Language } from "@src/storage/entities/settings/Settings";
+import { Language } from "@src/storage/entities/settings/types";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");

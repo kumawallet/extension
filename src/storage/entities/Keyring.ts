@@ -1,5 +1,4 @@
-import { AccountType } from "../../accounts/AccountManager";
-import { AccountKey } from "./Accounts";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { ACCOUNT_PATH } from "../../utils/constants";
 import Vault from "./Vault";
 

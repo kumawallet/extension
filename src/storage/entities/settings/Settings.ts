@@ -1,25 +1,9 @@
 import BaseEntity from "../BaseEntity";
 import LanguageSetting from "./LanguageSetting";
 import Setting from "./Setting";
+import { SettingKey, SettingType, SettingValue } from "./types";
 
-export type Language = {
-  lang: string;
-  name: string;
-  englishName: string;
-};
-
-export enum SettingType {
-  GENERAL = "general",
-  ADVANCED = "advanced",
-  SECURITY = "security",
-}
-
-export enum SettingKey {
-  LANGUAGES = "languages",
-}
-export type SettingValue = string | Language[] | number | boolean;
-
-export class Settings extends BaseEntity {
+export default class Settings extends BaseEntity {
   data: {
     general: { [key: string]: Setting };
     advanced: { [key: string]: Setting };

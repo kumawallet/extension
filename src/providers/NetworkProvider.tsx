@@ -6,9 +6,8 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import { Chain, CHAINS } from "@src/contants/chains";
+import { Chain, CHAINS } from "@src/constants/chains";
 import Extension from "../Extension";
-import Storage from "@src/storage/Storage";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "../hooks/useToast";
 import { ethers } from "ethers";

@@ -1,8 +1,7 @@
-import Keyring from "./Keyring";
-import { AccountKey } from "./Accounts";
-import Storage from "../Storage";
-import { AccountType } from "@src/accounts/AccountManager";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import BaseEntity from "./BaseEntity";
+import Keyring from "./Keyring";
+import Storage from "../Storage";
 import Auth from "../Auth";
 import CacheAuth from "./CacheAuth";
 

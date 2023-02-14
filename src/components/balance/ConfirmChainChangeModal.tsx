@@ -2,7 +2,7 @@ import { FC, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { BsArrowRight } from "react-icons/bs";
 import { SiWebassembly, SiEthereum } from "react-icons/si";
-import { Chain } from "@src/contants/chains";
+import { Chain } from "@src/constants/chains";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";

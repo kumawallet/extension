@@ -7,16 +7,16 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { Account } from "@src/storage/entities/Accounts";
 import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
 import { getAccountType, transformAddress } from "@src/utils/account-utils";
-import { AccountType } from "../accounts/AccountManager";
 import {
   CHAINS,
   DEFAULT_WASM_CHAIN,
   DEFAULT_EVM_CHAIN,
-} from "../contants/chains";
+} from "../constants/chains";
+import Account from "@src/storage/entities/Account";
+import { AccountType } from "@src/accounts/types";
 
 interface InitialState {
   accounts: Account[];

@@ -1,16 +1,17 @@
-import { VAULT } from "./utils/constants";
-import AccountManager, { AccountType } from "./accounts/AccountManager";
-import { AccountKey, Accounts } from "./storage/entities/Accounts";
-import Auth from "./storage/Auth";
+import { Chain } from "@src/constants/chains";
+import { AccountKey, AccountType } from "./accounts/types";
 import Storage from "./storage/Storage";
-import { Chain } from "@src/contants/chains";
-import { Network } from "./storage/entities/Network";
-import { Settings, SettingType } from "./storage/entities/settings/Settings";
-import Vault from "./storage/entities/Vault";
-import CacheAuth from "./storage/entities/CacheAuth";
-import { SelectedAccount } from "./storage/entities/SelectedAccount";
-import Account from "./storage/entities/Account";
+import AccountManager from "./accounts/AccountManager";
 import Setting from "./storage/entities/settings/Setting";
+import Network from "./storage/entities/Network";
+import Accounts from "./storage/entities/Accounts";
+import Account from "./storage/entities/Account";
+import Vault from "./storage/entities/Vault";
+import Auth from "./storage/Auth";
+import CacheAuth from "./storage/entities/CacheAuth";
+import SelectedAccount from "./storage/entities/SelectedAccount";
+import Settings from "./storage/entities/settings/Settings";
+import { SettingType } from "./storage/entities/settings/types";
 
 export default class Extension {
   private static async init(
@@ -99,7 +100,7 @@ export default class Extension {
 
   static async areAccountsInitialized(): Promise<boolean> {
     try {
-      const accounts = await Accounts.get();
+      const accounts = await Accounts.get<Accounts>();
       if (!accounts) return false;
       return AccountManager.areAccountsInitialized(accounts);
     } catch (error) {

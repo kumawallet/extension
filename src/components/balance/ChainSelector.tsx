@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "../../providers/NetworkProvider";
-import { Chain } from "@src/contants/chains";
+import { Chain } from "@src/constants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "../../providers/AccountProvider";

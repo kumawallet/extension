@@ -1,16 +1,15 @@
 import {
-  ACCOUNTS,
   CACHE_AUTH,
   SELECTED_ACCOUNT,
   VAULT,
 } from "../utils/constants";
-import { Accounts } from "./entities/Accounts";
 import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
-import { Settings } from "./entities/settings/Settings";
-import { Network } from "./entities/Network";
 import BackUp from "./entities/BackUp";
+import Network from "./entities/Network";
+import Settings from "./entities/settings/Settings";
+import Accounts from "./entities/Accounts";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -95,12 +94,11 @@ export default class Storage {
         }
       }
       await this.#storage.clear();
-      await Settings.init();
-      await BackUp.init();
-      await Network.init();
       await Vault.init();
-      const accounts = new Accounts();
-      await this.set(ACCOUNTS, accounts);
+      await Network.init();
+      await Settings.init();
+      await Accounts.init();
+      await BackUp.init();
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
       await this.set(CACHE_AUTH, CacheAuth.getInstance());

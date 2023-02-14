@@ -1,7 +1,7 @@
-import { Chain } from "@src/contants/chains";
+import { Chain } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
 
-export class Network extends BaseEntity {
+export default class Network extends BaseEntity {
   chain: Chain | null;
 
   private static instance: Network;
