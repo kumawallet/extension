@@ -82,7 +82,6 @@ export default class Auth {
 
   async signIn(password: string, vault: string) {
     try {
-      if (!vault) throw new Error("Vault not found");
       const decryptedVault = (await passworder.decrypt(
         password,
         vault

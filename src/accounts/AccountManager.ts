@@ -211,7 +211,7 @@ export default class AccountManager {
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault not found");
     Auth.password = password;
     Auth.isUnlocked = true;

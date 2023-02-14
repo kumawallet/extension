@@ -55,14 +55,14 @@ export default class Keyring {
   }
 
   static async save(keyring: Keyring): Promise<void> {
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault is not initialized");
     vault.addKeyring(keyring);
     await Vault.set(vault);
   }
 
   static async remove(keyring: AccountKey): Promise<void> {
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault is not initialized");
     vault.removeKeyring(keyring);
     await Vault.set(vault);

@@ -87,7 +87,8 @@ export default class Extension {
   }
 
   static async signIn(password: string) {
-    const { vault } = await Storage.getInstance().storage.get(VAULT);
+    const vault = await Vault.getEncryptedVault();
+    if (!vault) throw new Error("Vault not found");
     await Auth.getInstance().signIn(password, vault);
     await CacheAuth.cachePassword();
   }
@@ -136,13 +137,13 @@ export default class Extension {
   }
 
   static async deriveAccount({ name, accountType }: any): Promise<Account> {
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault not found");
     return AccountManager.derive(name, vault, accountType);
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault not found");
     const network = Network.getInstance();
     network.set(chain);

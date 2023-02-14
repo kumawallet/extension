@@ -1,10 +1,7 @@
 import {
   ACCOUNTS,
-  BACKUP,
   CACHE_AUTH,
-  NETWORK,
   SELECTED_ACCOUNT,
-  SETTINGS,
   VAULT,
 } from "../utils/constants";
 import { Accounts } from "./entities/Accounts";
@@ -101,12 +98,11 @@ export default class Storage {
       await Settings.init();
       await BackUp.init();
       await Network.init();
+      await Vault.init();
       const accounts = new Accounts();
       await this.set(ACCOUNTS, accounts);
       const selectedAccount = undefined;
       await this.set(SELECTED_ACCOUNT, selectedAccount);
-      const vault = new Vault();
-      await this.set(VAULT, vault);
       await this.set(CACHE_AUTH, CacheAuth.getInstance());
   
       return;
