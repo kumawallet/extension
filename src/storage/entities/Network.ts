@@ -31,7 +31,7 @@ export default class Network extends BaseEntity {
 
   static async get<Network>(): Promise<Network> {
     const network = await super.get<Network>();
-    if (!network) throw new Error("Network not found");
+    if (!network) throw new Error("network_not_found");
     return network;
   }
 

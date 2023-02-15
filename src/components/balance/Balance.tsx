@@ -30,6 +30,8 @@ export interface Asset {
 
 export const Balance = () => {
   const { t } = useTranslation("balance");
+  const { t: tCommon } = useTranslation("common");
+  const { showErrorToast } = useToast();
 
   const TABS = [
     {
@@ -50,7 +52,6 @@ export const Balance = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { showErrorToast } = useToast();
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoadingAssets, setIsLoadingAssets] = useState(true);
@@ -95,7 +96,7 @@ export const Balance = () => {
       setIsLoadingAssets(false);
       setAssets([]);
       setTotalBalance(0);
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

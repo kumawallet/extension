@@ -12,6 +12,7 @@ import { Language } from "@src/storage/entities/settings/types";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
+  const { t: tCommon, i18n: i18nCommon } = useTranslation("common");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState([] as Setting[]);
@@ -30,7 +31,7 @@ export const General = () => {
       setSelectedLanguage(getSelectedLanguage(settings[0].value as Language[]));
     } catch (error) {
       setSettings([]);
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
     }
@@ -47,9 +48,10 @@ export const General = () => {
     try {
       await localStorage.setItem("language", language || "en");
       setSelectedLanguage(language);
-      i18n.changeLanguage(language || "en")
+      i18n.changeLanguage(language || "en");
+      i18nCommon.changeLanguage(language || "en");
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

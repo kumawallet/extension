@@ -59,6 +59,7 @@ export default class CacheAuth extends BaseEntity {
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
+      throw new Error("failed_to_cache_password");
     }
   }
 

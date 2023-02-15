@@ -17,6 +17,7 @@ import {
 } from "../constants/chains";
 import Account from "@src/storage/entities/Account";
 import { AccountType } from "@src/accounts/types";
+import { useTranslation } from "react-i18next";
 
 interface InitialState {
   accounts: Account[];
@@ -83,7 +84,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     setNewRpc,
     setSelectNetwork,
   } = useNetworkContext();
-
+  const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -116,7 +117,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
       return [];
     }
   };
@@ -149,7 +150,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedAccount;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
@@ -173,7 +174,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

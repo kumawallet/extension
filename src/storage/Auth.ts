@@ -38,7 +38,7 @@ export default class Auth {
 
   static validate() {
     if (!Auth.isUnlocked || !Auth.password) {
-      throw new Error("Vault is not unlocked");
+      throw new Error("login_required");
     }
   }
 
@@ -75,7 +75,7 @@ export default class Auth {
         vault
       )) as Vault;
       if (!decryptedVault) {
-        throw new Error("Invalid password");
+        throw new Error("invalid_credentials");
       }
       this.#password = password;
       this.#isUnlocked = true;
@@ -92,11 +92,11 @@ export default class Auth {
 
   async encryptBackup(recoveryPhrase: string) {
     try {
-      if (!this.#password) throw new Error("Vault is not unlocked");
+      if (!this.#password) throw new Error("login_required");
       return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to encrypt backup");
+      throw new Error("failed_to_save_backup");
     }
   }
 
@@ -105,16 +105,11 @@ export default class Auth {
       return passworder.decrypt(recoveryPhrase, backup);
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to decrypt backup");
+      throw new Error("failed_to_restore_backup");
     }
   }
 
   static async generateSaltedHash(salt: string, password: string) {
-    try {
-      return passworder.encrypt(salt, password);
-    } catch (error) {
-      console.error(error);
-      throw new Error("Failed to generate salted hash");
-    }
+    return passworder.encrypt(salt, password);
   }
 }

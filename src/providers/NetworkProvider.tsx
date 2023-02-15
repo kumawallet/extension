@@ -12,6 +12,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "../hooks/useToast";
 import { ethers } from "ethers";
 import { getAccountType } from "../utils/account-utils";
+import { useTranslation } from "react-i18next";
 
 interface InitialState {
   chains: typeof CHAINS;
@@ -90,6 +91,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -120,7 +122,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           },
         });
       } catch (error) {
-        showErrorToast(error as Error);
+        showErrorToast(tCommon(error as string));
       }
     })();
   }, []);
@@ -147,7 +149,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
@@ -162,7 +164,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedNetwork;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
@@ -201,7 +203,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: { api, rpc: newRpc },
       });
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

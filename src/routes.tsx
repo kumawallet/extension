@@ -38,7 +38,6 @@ import { useAccountContext } from "./providers/AccountProvider";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
-
   const {
     state: { isInit },
     createAccount,

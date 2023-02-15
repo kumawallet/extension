@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 export const SignIn = () => {
   const { t } = useTranslation("sign_in");
+  const { t: tCommon } = useTranslation("common");
 
   const navigate = useNavigate();
   const { showErrorToast } = useToast();
@@ -24,7 +25,7 @@ export const SignIn = () => {
       await Extension?.signIn(password);
       navigate(BALANCE);
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

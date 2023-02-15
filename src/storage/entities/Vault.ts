@@ -35,8 +35,8 @@ export default class Vault extends BaseEntity {
       await CacheAuth.loadFromCache();
     }
     const data = await Auth.getInstance().decryptVault(stored[this.name]);
-    if (!data) throw new Error("Invalid credentials");
-    return this.fromData(data) as Vault;
+    if (!data) throw new Error("invalid_credentials");
+    return this.fromData(data);
   }
 
   static async set<Vault>(data: Vault): Promise<void> {
@@ -46,7 +46,7 @@ export default class Vault extends BaseEntity {
 
   static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
     const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("Vault not found");
+    if (!vault) throw new Error("failed_to_show_private_key");
     return vault?.keyrings[key]?.privateKey;
   }
 

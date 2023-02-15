@@ -23,7 +23,7 @@ export default class SelectedAccount extends BaseEntity {
 
   static async getDefaultValue<SelectedAccount>(): Promise<SelectedAccount> {
     const accounts = await Accounts.get<Accounts>();
-    if (!accounts) throw new Error("Accounts are not initialized");
+    if (!accounts) throw new Error("accounts_not_found");
     const account = accounts.first();
     if (!account) return undefined as SelectedAccount;
     const selected = new SelectedAccount();

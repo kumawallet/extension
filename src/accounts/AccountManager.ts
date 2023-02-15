@@ -10,7 +10,6 @@ import Account from "@src/storage/entities/Account";
 import Accounts from "@src/storage/entities/Accounts";
 import { AccountType, AccountKey } from "./types";
 
-
 export default class AccountManager {
   private static formatAddress(address: string, type: AccountType): AccountKey {
     if (
@@ -108,7 +107,7 @@ export default class AccountManager {
         type = AccountType.IMPORTED_WASM;
         break;
       default:
-        throw new Error("Invalid account type");
+        throw new Error("account_type_not_supported");
     }
     const { address, privateKey, seed } = importedData;
     const key = AccountManager.formatAddress(address, type);
@@ -122,9 +121,8 @@ export default class AccountManager {
     type: AccountType
   ): Promise<Account> {
     const _type = getAccountType(type);
-
     const keyring = await vault.getKeyringsByType(_type as AccountType);
-    if (!keyring) throw new Error("Keyring not found");
+    if (!keyring) throw new Error("failed_to_derive_from_empty_keyring");
     keyring.increaseAccountQuantity();
     let path;
     switch (_type) {
@@ -135,23 +133,23 @@ export default class AccountManager {
         path = `${keyring.path}/${keyring.accountQuantity}`;
         return AccountManager.addWASMAccount(path, name, keyring);
       default:
-        throw new Error("Invalid account type");
+        throw new Error("account_type_not_supported");
     }
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
-    if (!key) throw new Error("Account key is required");
+    if (!key) throw new Error("account_key_required");
     return Accounts.getAccount(key);
   }
 
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
-    if (!account) throw new Error("Account not found");
+    if (!account) throw new Error("account_not_found");
     account.value.name = newName;
     return Accounts.update(account);
   }
 
-  static async forget(key: AccountKey): Promise<void> {
+  static async remove(key: AccountKey): Promise<void> {
     await Accounts.removeAccount(key);
   }
 
@@ -163,19 +161,17 @@ export default class AccountManager {
 
     if (type && type.length > 0) {
       const filteredAccounts: any = {};
-
-      Object.keys(accounts.data).forEach((key: any) => {
-        const accountType = getAccountType(accounts.data[key].type);
-
+      Object.keys(accounts.data).forEach((key: string) => {
+        const account = accounts.get(key as AccountKey);
+        if (!account) return;
+        const accountType = getAccountType(account.type);
         if (type.includes(accountType as AccountType)) {
-          filteredAccounts[key] = accounts.data[key];
+          filteredAccounts[key] = account;
         }
       });
-
       // TODO: how to improve this?
       accounts.data = filteredAccounts;
     }
-
     return accounts;
   }
 
@@ -190,7 +186,7 @@ export default class AccountManager {
   }
 
   static async saveBackup(recoveryPhrase: string): Promise<void> {
-    if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
+    if (!recoveryPhrase) throw new Error("recovery_phrase_required");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
     const backup = new BackUp(encrypted);
     await BackUp.set(backup);
@@ -201,13 +197,16 @@ export default class AccountManager {
     password: string
   ): Promise<void> {
     const backup = await BackUp.get<BackUp>();
-    if (!backup || !backup.data) throw new Error("Backup not found");
-    const decryptedBackup = await Auth.decryptBackup(backup.data, privateKeyOrSeed);
-    if (!decryptedBackup) throw new Error("Invalid recovery phrase");
+    if (!backup || !backup.data) throw new Error("backup_not_found");
+    const decryptedBackup = await Auth.decryptBackup(
+      backup.data,
+      privateKeyOrSeed
+    );
+    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
     const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("Vault not found");
+    if (!vault) throw new Error("failed_to_restore_password");
     Auth.password = password;
     Auth.isUnlocked = true;
     await Vault.set(vault);
