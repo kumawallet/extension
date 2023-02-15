@@ -44,7 +44,7 @@ export default class Storage {
   async init(force = false) {
     if (!force) {
       if (await Vault.alreadySignedUp()) {
-        throw new Error("Vault already initialized");
+        throw new Error("already_signed_up");
       }
     }
     await this.#storage.clear();

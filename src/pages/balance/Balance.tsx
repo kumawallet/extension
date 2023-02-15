@@ -30,6 +30,7 @@ export const Balance = () => {
   } = useAccountContext();
 
   const { t } = useTranslation("balance");
+  const { t: tCommon } = useTranslation("common");
 
   const TABS = useMemo(() => {
     return [
@@ -89,7 +90,7 @@ export const Balance = () => {
       setIsLoadingAssets(false);
       setAssets([]);
       setTotalBalance(0);
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

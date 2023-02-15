@@ -16,7 +16,7 @@ export default class Accounts extends BaseEntity {
 
   static async update(account: Account): Promise<Account> {
     const accounts = await Accounts.get<Accounts>();
-    if (!accounts) throw new Error("Accounts are not initialized");
+    if (!accounts) throw new Error("failed_to_update_account");
     accounts.update(account.key, account.value);
     await Accounts.set<Accounts>(accounts);
     return account;
@@ -24,16 +24,16 @@ export default class Accounts extends BaseEntity {
 
   static async removeAccount(key: AccountKey) {
     const accounts = await Accounts.get<Accounts>();
-    if (!accounts) throw new Error("Accounts are not initialized");
+    if (!accounts) throw new Error("failed_to_remove_account");
     accounts.remove(key);
     await Accounts.set<Accounts>(accounts);
   }
 
   static async add(account: Account): Promise<void> {
     const accounts = await Accounts.get<Accounts>();
-    if (!accounts) throw new Error("Accounts are not initialized");
+    if (!accounts) throw new Error("failed_to_add_account");
     if (accounts.allreadyExists(account.key)) {
-      throw new Error("Account already exists");
+      throw new Error("account_already_exists");
     }
     accounts.add(account);
     await Accounts.set<Accounts>(accounts);
@@ -41,7 +41,7 @@ export default class Accounts extends BaseEntity {
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     const accounts = await Accounts.get<Accounts>();
-    if (!accounts) throw new Error("Accounts are not initialized");
+    if (!accounts) throw new Error("failed_to_get_account");
     return accounts.get(key);
   }
 
