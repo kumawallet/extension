@@ -1,6 +1,7 @@
 import { BsArrowUpRight } from "react-icons/bs";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { Asset } from "./Balance";
+import { Asset } from "../Balance";
+import { formatAmountWithDecimals } from "@src/utils/assets";
 
 export const Assets = ({
   assets = [],
@@ -27,7 +28,7 @@ export const Assets = ({
           <div className="flex gap-2 items-center">
             <div className="w-6 h-6 bg-black rounded-full" />
             <div className="flex gap-1 text-xl">
-              <p>{asset.amount}</p>
+              <p>{formatAmountWithDecimals(asset.amount)}</p>
               <p>{asset.symbol}</p>
             </div>
           </div>

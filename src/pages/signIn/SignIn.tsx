@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "../../components/common/PageWrapper";
-import Extension from "../../Extension";
+import { PageWrapper } from "@src/components/common/PageWrapper";
+import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
 import logo from "/logo.svg";

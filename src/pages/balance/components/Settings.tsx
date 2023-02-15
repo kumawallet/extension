@@ -1,32 +1,38 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { BsGear } from "react-icons/bs";
-import { BsChevronRight } from "react-icons/bs";
+import { BsChevronRight, BsGear } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { SIGNIN } from "@src/routes/paths";
 import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
+import {
+  SETTINGS_GENERAL,
+  SETTINGS_ADVANCED,
+  SETTINGS_CONTACTS,
+  SETTINGS_SECURITY,
+  SETTINGS_BUG,
+  SIGNIN,
+} from "@src/routes/paths";
 
 const OPTIONS = [
   {
     text: "general",
-    href: "/settings-general",
+    href: SETTINGS_GENERAL,
   },
   {
     text: "advanced",
-    href: "/settings-advanced",
+    href: SETTINGS_ADVANCED,
   },
   {
     text: "contacts",
-    href: "/settings-contacts",
+    href: SETTINGS_CONTACTS,
   },
   {
     text: "security",
-    href: "/settings-security",
+    href: SETTINGS_SECURITY,
   },
   {
     text: "bug_report",
-    href: "/settings-bug",
+    href: SETTINGS_BUG,
   },
 ];
 
@@ -39,6 +45,7 @@ export const Settings = () => {
     await Extension.signOut();
     navigate(SIGNIN);
   };
+
   return (
     <Menu>
       <Menu.Button>

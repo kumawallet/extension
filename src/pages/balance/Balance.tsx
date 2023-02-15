@@ -1,24 +1,16 @@
-import { useEffect, useState } from "react";
-import { PageWrapper } from "../../components/common/PageWrapper";
-import { Account } from "./Account";
-import { Activity } from "./Activity";
-import { Assets } from "./Assets";
-import { ChainSelector } from "./ChainSelector";
-import { TotalBalance } from "./TotalBalance";
+import { useEffect, useState, useMemo } from "react";
+import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
-import { DecryptFAB } from "../../components/common/DecryptFAB";
-import { Settings } from "../settings";
-import { FullScreenFAB } from "../../components/common/FullScreenFAB";
 import { ApiPromise } from "@polkadot/api";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { getNatitveAssetBalance } from "@src/utils/assets";
 import { Chain } from "@src/constants/chains";
-import { getAssetUSDPrice } from "../../utils/assets";
+import { getAssetUSDPrice } from "@src/utils/assets";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
-import { getAccountType } from "../../utils/account-utils";
+import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
 
 export interface Asset {
   name: string;
@@ -29,19 +21,6 @@ export interface Asset {
 }
 
 export const Balance = () => {
-  const { t } = useTranslation("balance");
-
-  const TABS = [
-    {
-      name: t("assets"),
-      component: <Assets assets={[]} isLoading={true} />,
-    },
-    {
-      name: t("activity"),
-      component: <Activity />,
-    },
-  ];
-
   const {
     state: { api, selectedChain, rpc },
   } = useNetworkContext();
@@ -50,6 +29,21 @@ export const Balance = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
+  const { t } = useTranslation("balance");
+
+  const TABS = useMemo(() => {
+    return [
+      {
+        name: t("assets"),
+        component: <Assets assets={[]} isLoading={true} />,
+      },
+      {
+        name: t("activity"),
+        component: <Activity />,
+      },
+    ];
+  }, []);
+
   const { showErrorToast } = useToast();
 
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -57,7 +51,7 @@ export const Balance = () => {
   const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
-    if (rpc && selectedAccount?.value?.address) {
+    if (rpc && selectedAccount?.value?.address && selectedChain) {
       setIsLoadingAssets(true);
 
       getAssets(api, selectedAccount, selectedChain);
@@ -101,10 +95,7 @@ export const Balance = () => {
 
   return (
     <>
-      <header className="flex justify-between px-3 bg-[#343A40] py-1 relative items-center max-w-3xl w-full mx-auto">
-        <ChainSelector />
-        <Account />
-      </header>
+      <Header />
       <PageWrapper contentClassName="py-6">
         <div className="flex flex-col">
           <TotalBalance
@@ -138,13 +129,7 @@ export const Balance = () => {
           </Tab.Group>
         </div>
       </PageWrapper>
-
-      {/* TODO: move to separate component */}
-      <footer className="fixed bottom-0 left-0 right-0 py-2 bg-[#343A40] px-2 flex justify-end gap-20 max-w-3xl w-full mx-auto">
-        <FullScreenFAB />
-        <DecryptFAB />
-        <Settings />
-      </footer>
+      <Footer />
     </>
   );
 };

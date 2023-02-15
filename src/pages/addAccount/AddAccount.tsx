@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BsChevronRight } from "react-icons/bs";
-import { PageWrapper } from "../../components/common/PageWrapper";
+import { PageWrapper } from "@src/components/common/PageWrapper";
 import { OptionButton } from "./OptionButton";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 

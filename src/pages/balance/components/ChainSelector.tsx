@@ -1,15 +1,14 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
-import { useNetworkContext } from "../../providers/NetworkProvider";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { Chain } from "@src/constants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
-import { useAccountContext } from "../../providers/AccountProvider";
-import { getAccountType } from "../../utils/account-utils";
+import { getAccountType } from "@src/utils/account-utils";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
-import Extension from "../../Extension";
+import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
 
 export const ChainSelector = () => {
