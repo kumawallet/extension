@@ -93,7 +93,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             is: (value: string) => value && value === "EVM",
             then: string().test(
               "evm validation",
-              "invalid private key",
+              t("form.private_key_validation") as string,
               (val) => {
                 try {
                   new ethers.Wallet(val || "");
@@ -105,14 +105,14 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             ),
             otherwise: string().test(
               "wasm validation",
-              "invalid seed",
+              t("form.seed_phrasey_validation") as string,
               (val) => {
                 return mnemonicValidate(val || "");
               }
             ),
           })
         : fields?.privateKeyOrSeed && !fields?.accountType
-        ? string().required("required")
+        ? string().required(t("form.required") as string)
         : string().optional(),
     name: string().optional(),
     password: passwordIsRequired
@@ -121,7 +121,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
             PASSWORD_RULES
           )
-          .required("required!")
+          .required(t("form.required") as string)
       : string().notRequired(),
     confirmPassword: passwordIsRequired
       ? string()
@@ -129,7 +129,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             [ref("password"), null],
             t("form.confirm_password_hint") as string
           )
-          .required("required")
+          .required(t("form.required") as string)
       : string().notRequired(),
   }).required();
 

@@ -55,7 +55,9 @@
       "password": "パスワード",
       "password_hint": "パスワードは、少なくとも8文字、少なくとも1つの数字、大文字と小文字、特殊文字を含める必要があります。",
       "confirm_password": "パスワードを確認する",
-      "confirm_password_hint": "パスワードが一致しません。"
+      "confirm_password_hint": "パスワードが一致しません。",
+      "required": "必須"
+
     }
   },
   "balance": {

@@ -55,7 +55,8 @@
       "password": "Contraseña",
       "password_hint": "La contraseña debe contener al menos ocho caracteres, al menos un número, tanto letras minúsculas como mayúsculas y caracteres especiales.",
       "confirm_password": "Confirmar contraseña",
-      "confirm_password_hint": "Las contraseñas no coinciden."
+      "confirm_password_hint": "Las contraseñas no coinciden.",
+      "required": "requerido"
     }
   },
   "balance": {

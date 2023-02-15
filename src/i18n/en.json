@@ -55,7 +55,8 @@
       "password": "Password",
       "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
       "confirm_password": "Confirm password",
-      "confirm_password_hint": "Passwords don't match."
+      "confirm_password_hint": "Passwords don't match.",
+      "required": "required"
     }
   },
   "balance": {
