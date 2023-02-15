@@ -36,11 +36,11 @@ const manifestV3: chrome.runtime.ManifestV3 = {
     default_popup: POPUP,
     default_icon: ICON34,
   },
-  // ...(!isProduction && {
-  //   chrome_url_overrides: {
-  //     newtab: "src/entries/newtab/index.html",
-  //   },
-  // }),
+  ...(!isProduction && {
+    chrome_url_overrides: {
+      newtab: "src/entries/newtab/index.html",
+    },
+  }),
   // devtools_page: "src/entries/devtools/index.html",
   content_security_policy: {
     extension_pages: SECURITY,

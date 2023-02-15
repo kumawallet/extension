@@ -6,7 +6,7 @@ import copyContentStyle from "./utils/plugins/copy-content-style";
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
-import { isChrome, isProduction } from "./src/utils/env";
+import { isChrome } from "./src/utils/env";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");
@@ -53,9 +53,7 @@ export default defineConfig({
         content: resolve(entriesDir, "content", "index.ts"),
         background: resolve(entriesDir, "background", "index.ts"),
         popup: resolve(entriesDir, "popup", "index.html"),
-        // ...(!isProduction && {
         newtab: resolve(entriesDir, "newtab", "index.html"),
-        // }),
         options: resolve(entriesDir, "options", "index.html"),
       },
       output: {

@@ -4,18 +4,19 @@ import { useNavigate } from "react-router-dom";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
-import { FaCheckCircle } from "react-icons/fa";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
 import { useLoading } from "@hooks/useLoading";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
-import { useAccountContext } from "../../providers/AccountProvider";
-import { useNetworkContext } from "../../providers/NetworkProvider";
+import { useAccountContext } from "@src/providers";
 import { AccountType } from "@src/accounts/types";
-import { PageWrapper } from "@src/components/common/PageWrapper";
-import { InputErrorMessage } from "@src/components/common/InputErroMessage";
-import { LoadingButton } from "@src/components/common/LoadingButton";
+import {
+  InputErrorMessage,
+  LoadingButton,
+  PageWrapper,
+  SucessMessage,
+} from "@src/components/common";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -60,10 +61,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   callback,
 }) => {
   const {
-    state: { selectedChain },
-  } = useNetworkContext();
-
-  const {
     state: { selectedAccount },
   } = useAccountContext();
 
@@ -71,26 +68,24 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
 
+  const navigate = useNavigate();
+  const { isLoading, endLoading, starLoading } = useLoading();
+
+  const [isSuccessful, setIsSuccessful] = useState(false);
+  const [showSeed, setShowSeed] = useState(false);
+  const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
   const [passwordType, setPasswordType] = useState("password");
   const togglePassword = () => {
-    if (passwordType === "password") {
-      setPasswordType("text");
-      return;
-    }
-    setPasswordType("password");
+    setPasswordType(passwordType === "password" ? "password" : "text");
   };
 
   const [confirmPasswordType, setConfirmPasswordType] = useState("password");
-
   const toggleConfirmPassword = () => {
-    if (confirmPasswordType === "password") {
-      setConfirmPasswordType("text");
-      return;
-    }
-    setConfirmPasswordType("password");
+    setConfirmPasswordType(
+      confirmPasswordType === "password" ? "password" : "text"
+    );
   };
 
-  // TODO: move this to separate file
   const schema = object({
     privateKeyOrSeed:
       fields?.privateKeyOrSeed && fields?.accountType
@@ -138,8 +133,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       : string().notRequired(),
   }).required();
 
-  const { isLoading, endLoading, starLoading } = useLoading();
-
   const {
     register,
     handleSubmit,
@@ -174,31 +167,13 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     }
   });
 
-  const navigate = useNavigate();
-
-  const [isSuccessful, setIsSuccessful] = useState(false);
-  const [showSeed, setShowSeed] = useState(false);
-  const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
-
   if (isSuccessful)
     return (
-      <PageWrapper contentClassName="h-full">
-        <div className="flex flex-col text-center pt-0 justify-center h-full">
-          <div className="flex gap-3 items-center mb-3 justify-center">
-            <p className="text-3xl text-custom-green-bg">
-              {afterSubmitMessage}
-            </p>
-            <FaCheckCircle color="green" size={30} />
-          </div>
-
-          <button
-            className="border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto"
-            onClick={() => navigate(goAfterSubmit)}
-          >
-            {t("form.continue_button_text")}
-          </button>
-        </div>
-      </PageWrapper>
+      <SucessMessage
+        title={afterSubmitMessage}
+        onClick={() => navigate(goAfterSubmit)}
+        buttonText={t("form.continue_button_text")}
+      />
     );
 
   return (
