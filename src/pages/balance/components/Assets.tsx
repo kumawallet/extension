@@ -1,7 +1,7 @@
 import { BsArrowUpRight } from "react-icons/bs";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Asset } from "../Balance";
 import { formatAmountWithDecimals } from "@src/utils/assets";
+import { LoadingButton } from "@src/components/common";
 
 export const Assets = ({
   assets = [],
@@ -11,11 +11,7 @@ export const Assets = ({
   isLoading: boolean;
 }) => {
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-3">
-        <AiOutlineLoading3Quarters className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
-      </div>
-    );
+    return <LoadingButton />;
   }
 
   return (

@@ -1,14 +1,14 @@
 import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "../../components/common/PageWrapper";
+import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Language } from "@src/storage/entities/settings/types";
+import { Loading } from "@src/components/common";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -54,11 +54,7 @@ export const General = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-3">
-        <AiOutlineLoading3Quarters className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

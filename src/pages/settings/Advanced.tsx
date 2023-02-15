@@ -1,7 +1,7 @@
 import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "../../components/common/PageWrapper";
+import { PageWrapper } from "@src/components/common/PageWrapper";
 
 export const Advanced = () => {
   const navigate = useNavigate();
