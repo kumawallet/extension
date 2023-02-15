@@ -1,7 +1,7 @@
 import { BsArrowUpRight } from "react-icons/bs";
 import { Asset } from "../Balance";
 import { formatAmountWithDecimals } from "@src/utils/assets";
-import { LoadingButton } from "@src/components/common";
+import { Loading } from "@src/components/common";
 
 export const Assets = ({
   assets = [],
@@ -11,7 +11,7 @@ export const Assets = ({
   isLoading: boolean;
 }) => {
   if (isLoading) {
-    return <LoadingButton />;
+    return <Loading />;
   }
 
   return (

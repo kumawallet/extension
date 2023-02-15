@@ -167,6 +167,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     }
   });
 
+  console.log();
+
   if (isSuccessful)
     return (
       <SucessMessage
@@ -269,6 +271,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               max={32}
               className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
               {...register("name")}
+              onKeyDown={({ key }) =>
+                key === "Enter" && !generateSeed && _onSubmit()
+              }
             />
           </div>
         )}
@@ -323,6 +328,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   type={confirmPasswordType}
                   className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   {...register("confirmPassword")}
+                  onKeyDown={({ key }) => key === "Enter" && _onSubmit()}
                 />
 
                 <button

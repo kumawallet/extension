@@ -3,7 +3,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const DEFAULT_CONTAINER_CLASSNAME = "flex justify-center py-3";
 const DEFAULT_ICON_CLASSNAME =
-  "w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600";
+  "w-8 h-8 mr-2 text-gray-200 animate-spin fill-custom-green-bg";
 
 interface LoadingProps {
   containerClass?: HTMLElement["className"];
