@@ -6,6 +6,7 @@ export const useToast = () => {
       position: toast.POSITION.TOP_CENTER,
       autoClose: false,
       className: "toast",
+      toastId: "TOAST_ERROR",
     });
   };
 

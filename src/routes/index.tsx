@@ -2,14 +2,7 @@ import { useEffect, useState } from "react";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import {
-  AddAccount,
-  AccountForm,
-  AccountFormType,
-  Balance,
-  SignIn,
-  Welcome,
-} from "@src/pages";
+import { AddAccount, AccountForm, Balance, SignIn, Welcome } from "@src/pages";
 import {
   Advanced,
   BugReport,
@@ -46,9 +39,7 @@ export const Routes = () => {
 
   const {
     state: { isInit },
-    createAccount,
-    importAccount,
-    deriveAccount,
+    // createAccount,
     restorePassword,
   } = useAuthContext();
 
@@ -56,7 +47,7 @@ export const Routes = () => {
     state: { init },
   } = useNetworkContext();
 
-  const { getAllAccounts, setSelectedAccount } = useAccountContext();
+  const { deriveAccount, createAccount, importAccount } = useAccountContext();
 
   const [homeRoute, setHomeRoute] = useState(<></>);
   const [canDerive, setCanDerive] = useState(false);
@@ -95,47 +86,6 @@ export const Routes = () => {
     getWalletStatus();
   }, [Extension, isInit, init]);
 
-  // TODO: move this function to another place
-  const onDeriveAccount = async (account: AccountFormType) => {
-    await deriveAccount(account);
-    const selected = await Extension.getSelectedAccount();
-    if (!selected) {
-      console.error("No account selected");
-      return false;
-    }
-    await setSelectedAccount(selected);
-    return true;
-  };
-
-  const onImportAccount = async (account: AccountFormType) => {
-    await importAccount(account);
-
-    if (!importIsSignUp) {
-      const accounts = await getAllAccounts();
-
-      const findCreatedAccount = accounts.findIndex(
-        (acc) => acc?.value?.name === account.name
-      );
-
-      await setSelectedAccount(accounts[findCreatedAccount]);
-    }
-    return true;
-  };
-
-  const onCreateAccount = async (account: AccountFormType) => {
-    await createAccount(account);
-
-    const accounts = await getAllAccounts();
-
-    const findCreatedAccount = accounts.findIndex(
-      (acc) => acc?.value?.name === account.name
-    );
-
-    await setSelectedAccount(accounts[findCreatedAccount]);
-
-    return true;
-  };
-
   return (
     <MemoryRouter>
       <RRoutes>
@@ -148,7 +98,7 @@ export const Routes = () => {
           element={
             <AccountForm
               title={t("import.title")}
-              onSubmitFn={onImportAccount}
+              onSubmitFn={importAccount}
               buttonText={t("import.button_text")}
               signUp={importIsSignUp}
               fields={{
@@ -202,7 +152,7 @@ export const Routes = () => {
           element={
             <AccountForm
               title={t("create_or_derivate.title")}
-              onSubmitFn={!canDerive ? onCreateAccount : onDeriveAccount}
+              onSubmitFn={!canDerive ? createAccount : deriveAccount}
               signUp={false}
               buttonText={t("create_or_derivate.button_text")}
               fields={!canDerive ? {} : { accountType: true }}
