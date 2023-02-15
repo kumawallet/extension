@@ -54,30 +54,18 @@ export default class Auth {
   }
 
   async decryptVault(vault: string) {
-    try {
-      Auth.validate();
-      return passworder.decrypt(this.#password as string, vault);
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    Auth.validate();
+    return passworder.decrypt(this.#password as string, vault);
   }
 
   async encryptVault(vault: Vault) {
-    try {
-      Auth.validate();
-      return passworder.encrypt(this.#password as string, vault);
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    Auth.validate();
+    return passworder.encrypt(this.#password as string, vault);
   }
 
-  async signUp({ password }: { password: string }) {
-    try {
-      this.#password = password;
-      this.#isUnlocked = true;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+  async signUp(password: string) {
+    this.#password = password;
+    this.#isUnlocked = true;
   }
 
   async signIn(password: string, vault: string) {
@@ -92,18 +80,14 @@ export default class Auth {
       this.#password = password;
       this.#isUnlocked = true;
     } catch (error) {
-      this.#password = undefined;
-      throw new Error(error as string);
+      this.signOut();
+      throw error;
     }
   }
 
   signOut() {
-    try {
-      this.#isUnlocked = false;
-      this.#password = undefined;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    this.#isUnlocked = false;
+    this.#password = undefined;
   }
 
   async encryptBackup(recoveryPhrase: string) {
@@ -111,7 +95,8 @@ export default class Auth {
       if (!this.#password) throw new Error("Vault is not unlocked");
       return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
-      throw new Error(error as string);
+      console.error(error);
+      throw new Error("Failed to encrypt backup");
     }
   }
 
@@ -119,7 +104,8 @@ export default class Auth {
     try {
       return passworder.decrypt(recoveryPhrase, backup);
     } catch (error) {
-      throw new Error(error as string);
+      console.error(error);
+      throw new Error("Failed to decrypt backup");
     }
   }
 
@@ -127,7 +113,8 @@ export default class Auth {
     try {
       return passworder.encrypt(salt, password);
     } catch (error) {
-      throw new Error(error as string);
+      console.error(error);
+      throw new Error("Failed to generate salted hash");
     }
   }
 }

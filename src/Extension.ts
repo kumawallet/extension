@@ -20,7 +20,7 @@ export default class Extension {
     force?: boolean
   ) {
     try {
-      await Auth.getInstance().signUp({ password });
+      await Auth.getInstance().signUp(password);
       await Storage.getInstance().init(force);
       await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
