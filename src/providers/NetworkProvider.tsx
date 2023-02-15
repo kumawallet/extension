@@ -104,10 +104,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
         if (selectedNetwork?.chain?.name) {
           const account = await Extension.getSelectedAccount();
-
           selectedChain = selectedNetwork?.chain;
           const accountType = getAccountType(account?.type);
-
           rpc = selectedChain.rpc[accountType.toLowerCase()];
 
           api = getProvider(rpc, accountType);
@@ -133,8 +131,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       await Extension.setNetwork(network);
       const account = await Extension.getSelectedAccount();
-
-      let accountType = getAccountType(account?.type);
+      const accountType = getAccountType(account?.type);
       const rpc =
         network.rpc[accountType.toLowerCase() || "wasm"] ||
         network.rpc[accountType.toLowerCase() || "evm"];
@@ -156,8 +153,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSelectedNetwork = async () => {
     try {
-      const { chain: selectedNetwork } =
-        await Extension.getNetwork();
+      const { chain: selectedNetwork } = await Extension.getNetwork();
 
       dispatch({
         type: "select-network",

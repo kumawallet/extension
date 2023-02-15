@@ -8,11 +8,6 @@ export default class Account {
   constructor(key: AccountKey, value: AccountValue) {
     this.key = key;
     this.value = value;
-    this.type = this.getType(key);
-  }
-
-  private getType(key: AccountKey) {
-    const split = key.split("-");
-    return split[0] as AccountType;
+    this.type = key.split("-")[0] as AccountType;
   }
 }

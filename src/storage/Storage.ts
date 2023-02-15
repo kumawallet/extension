@@ -1,9 +1,3 @@
-import {
-  CACHE_AUTH,
-  SELECTED_ACCOUNT,
-  VAULT,
-} from "../utils/constants";
-import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
 import BackUp from "./entities/BackUp";
@@ -47,79 +41,22 @@ export default class Storage {
     return `${appName}-${platform}-${userAgent}-${language}-${extensionId}`;
   }
 
-  async get(key: string) {
-    try {
-      const data = await this.#storage.get(key);
-      if (!data?.[key]) return undefined;
-      if (key === VAULT && data[key]) {
-        if (!Auth.password || !Auth.isUnlocked) {
-          await CacheAuth.loadFromCache();
-        }
-        return Auth.getInstance().decryptVault(data[key]);
-      }
-      if (typeof data[key] === "string") return data[key];
-      return { ...data[key] };
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async set(key: string, data: any) {
-    try {
-      if (key === VAULT) {
-        data = await Auth.getInstance().encryptVault(data);
-      }
-      await this.#storage.set({ [key]: data });
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async remove(key: string, callback?: () => void) {
-    try {
-      await this.#storage.remove(key, callback);
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
   async init(force = false) {
-    try {
-      if (!force) {
-        if (await this.alreadySignedUp()) {
-          throw new Error("Vault already initialized");
-        }
+    if (!force) {
+      if (await Vault.alreadySignedUp()) {
+        throw new Error("Vault already initialized");
       }
-      await this.#storage.clear();
-      await Vault.init();
-      await Network.init();
-      await Settings.init();
-      await Accounts.init();
-      await BackUp.init();
-      const selectedAccount = undefined;
-      await this.set(SELECTED_ACCOUNT, selectedAccount);
-      await CacheAuth.init();
-      return;
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
     }
+    await this.#storage.clear();
+    await Vault.init();
+    await Network.init();
+    await Settings.init();
+    await Accounts.init();
+    await BackUp.init();
+    await CacheAuth.init();
   }
 
   async resetWallet() {
-    try {
-      await this.#storage.clear();
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async alreadySignedUp(): Promise<boolean> {
-    const stored = await this.#storage.get(null);
-    return !!stored && stored[VAULT];
+    await this.#storage.clear();
   }
 }

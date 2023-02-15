@@ -107,7 +107,9 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password: newPassword,
   }: AccountFormType) => {
     try {
-      await Extension.restorePassword({ recoveryPhrase, newPassword });
+      if (!recoveryPhrase) throw new Error("Recovery phrase is required");
+      if (!newPassword) throw new Error("New password is required");
+      await Extension.restorePassword(recoveryPhrase, newPassword);
       return true;
     } catch (error) {
       showErrorToast(error as Error);

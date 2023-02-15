@@ -17,6 +17,11 @@ export default class Vault extends BaseEntity {
     await Vault.set<Vault>(new Vault());
   }
 
+  static async alreadySignedUp(): Promise<boolean> {
+    const stored = await Storage.getInstance().storage.get(null);
+    return !!stored && stored[this.name];
+  }
+
   static async getEncryptedVault(): Promise<string | undefined> {
     const stored = await Storage.getInstance().storage.get(this.name);
     if (!stored || !stored[this.name]) return undefined;

@@ -72,7 +72,7 @@ export default class Extension {
     });
   }
 
-  static async restorePassword({ recoveryPhrase, newPassword }: any) {
+  static async restorePassword(recoveryPhrase: string, newPassword: string) {
     if (!recoveryPhrase)
       throw new Error("Cannot restore password without seed or private key");
     if (!newPassword) throw new Error("Missing password");
@@ -83,7 +83,7 @@ export default class Extension {
     AccountManager.forget(key);
   }
 
-  static changeAccountName({ key, newName }: any) {
+  static changeAccountName(key: AccountKey, newName: string) {
     AccountManager.changeName(key, newName);
   }
 
@@ -95,7 +95,7 @@ export default class Extension {
   }
 
   static alreadySignedUp() {
-    return Storage.getInstance().alreadySignedUp();
+    return Vault.alreadySignedUp();
   }
 
   static async areAccountsInitialized(): Promise<boolean> {
@@ -120,7 +120,7 @@ export default class Extension {
   }
 
   static async showPrivateKey(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get();
+    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
     if (!selectedAccount || !selectedAccount.key) return undefined;
     return Vault.showPrivateKey(selectedAccount.key);
   }
@@ -153,11 +153,13 @@ export default class Extension {
   }
 
   static async setSelectedAccount(account: Account) {
-    await SelectedAccount.set(account);
+    const selected = new SelectedAccount();
+    selected.fromAccount(account);
+    await SelectedAccount.set<SelectedAccount>(selected);
   }
 
   static async getSelectedAccount(): Promise<Account | undefined> {
-    return SelectedAccount.get();
+    return SelectedAccount.get<SelectedAccount>();
   }
 
   static async getNetwork(): Promise<Network> {
