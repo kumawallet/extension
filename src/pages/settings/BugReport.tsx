@@ -1,4 +1,4 @@
-import { ICON_SIZE } from "@src/contants/icons";
+import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../../components/common/PageWrapper";

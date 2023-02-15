@@ -1,21 +1,21 @@
 import { FC, useState } from "react";
-import { PageWrapper } from "../../components/common/PageWrapper";
+import { ethers } from "ethers";
+import { useNavigate } from "react-router-dom";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaCheckCircle } from "react-icons/fa";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
-import { LoadingButton } from "../../components/common/LoadingButton";
 import { useLoading } from "@hooks/useLoading";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { InputErrorMessage } from "../../components/common/InputErroMessage";
-import { AccountType } from "@src/accounts/AccountManager";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "../../providers/AccountProvider";
 import { useNetworkContext } from "../../providers/NetworkProvider";
-import { ethers } from "ethers";
+import { AccountType } from "@src/accounts/types";
+import { PageWrapper } from "@src/components/common/PageWrapper";
+import { InputErrorMessage } from "@src/components/common/InputErroMessage";
+import { LoadingButton } from "@src/components/common/LoadingButton";
 
 export type AccountFormType = AccountForm & { seed?: string };
 

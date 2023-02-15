@@ -1,21 +1,14 @@
-import { CACHE_AUTH } from "../../utils/constants";
 import Auth from "../Auth";
-import Storable from "../Storable";
 import Storage from "../Storage";
+import BaseEntity from "./BaseEntity";
 
-type StoredCacheAuth = {
-  password: string;
-  isUnlocked: boolean;
-  timeout: number;
-};
-
-export default class CacheAuth extends Storable {
+export default class CacheAuth extends BaseEntity {
   password: string | undefined;
   isUnlocked: boolean;
   timeout: number;
 
   private constructor() {
-    super(CACHE_AUTH);
+    super();
     this.password = undefined;
     this.isUnlocked = false;
     this.timeout = 0;
@@ -30,17 +23,17 @@ export default class CacheAuth extends Storable {
     return CacheAuth.instance;
   }
 
-  private setCachedData({ password, isUnlocked, timeout }: StoredCacheAuth) {
-    this.password = password as string;
-    this.isUnlocked = isUnlocked as boolean;
-    this.timeout = timeout as number;
+  static async init() {
+    await CacheAuth.get<CacheAuth>();
   }
 
-  private static async get() {
-    const stored = await Storage.getInstance().get(CACHE_AUTH);
-    if (!stored) return;
-    const cacheAuth = CacheAuth.getInstance();
-    cacheAuth.setCachedData(stored);
+  static fromData<CacheAuth>(data: { [key: string]: any; }): CacheAuth {
+    const entity = CacheAuth.getInstance();
+    Object.keys(data).forEach((key) => {
+      (entity as any)[key] = data[key];
+    }
+    );
+    return entity as CacheAuth;
   }
 
   private static save(password: string) {
@@ -54,10 +47,6 @@ export default class CacheAuth extends Storable {
     }
   }
 
-  static async set(cache: CacheAuth) {
-    await Storage.getInstance().set(CACHE_AUTH, cache);
-  }
-
   static async cachePassword() {
     try {
       if (!Auth.password) {
@@ -66,7 +55,7 @@ export default class CacheAuth extends Storable {
       const salt = await Storage.getInstance().getSalt();
       const encrypted = await Auth.generateSaltedHash(salt, Auth.password);
       CacheAuth.save(encrypted);
-      await CacheAuth.set(CacheAuth.getInstance());
+      await CacheAuth.set<CacheAuth>(CacheAuth.getInstance());
     } catch (error) {
       console.error(error);
       CacheAuth.clear();
@@ -75,7 +64,7 @@ export default class CacheAuth extends Storable {
 
   static async loadFromCache() {
     try {
-      await CacheAuth.get();
+      await CacheAuth.get<CacheAuth>();
       const salt = await Storage.getInstance().getSalt();
       await Auth.loadAuthFromCache(salt);
     } catch (error) {
@@ -88,7 +77,7 @@ export default class CacheAuth extends Storable {
     CacheAuth.getInstance().password = undefined;
     CacheAuth.getInstance().isUnlocked = false;
     CacheAuth.getInstance().timeout = 0;
-    CacheAuth.set(CacheAuth.getInstance());
+    CacheAuth.set<CacheAuth>(CacheAuth.getInstance());
   }
 
   static async hasExpired() {

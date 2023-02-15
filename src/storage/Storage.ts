@@ -1,19 +1,9 @@
-import {
-  ACCOUNTS,
-  BACKUP,
-  CACHE_AUTH,
-  NETWORK,
-  SELECTED_ACCOUNT,
-  SETTINGS,
-  VAULT,
-} from "../utils/constants";
-import { Accounts } from "./entities/Accounts";
-import Auth from "./Auth";
 import CacheAuth from "./entities/CacheAuth";
 import Vault from "./entities/Vault";
-import { Settings } from "./entities/settings/Settings";
-import { Network } from "./entities/Network";
 import BackUp from "./entities/BackUp";
+import Network from "./entities/Network";
+import Settings from "./entities/settings/Settings";
+import Accounts from "./entities/Accounts";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -51,84 +41,22 @@ export default class Storage {
     return `${appName}-${platform}-${userAgent}-${language}-${extensionId}`;
   }
 
-  async get(key: string) {
-    try {
-      const data = await this.#storage.get(key);
-      if (!data?.[key]) return undefined;
-      if (key === VAULT && data[key]) {
-        if (!Auth.password || !Auth.isUnlocked) {
-          await CacheAuth.loadFromCache();
-        }
-        return Auth.getInstance().decryptVault(data[key]);
-      }
-      if (typeof data[key] === "string") return data[key];
-      return { ...data[key] };
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async set(key: string, data: any) {
-    try {
-      if (key === VAULT) {
-        data = await Auth.getInstance().encryptVault(data);
-      }
-      await this.#storage.set({ [key]: data });
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async remove(key: string, callback?: () => void) {
-    try {
-      await this.#storage.remove(key, callback);
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
   async init(force = false) {
-    try {
-      if (!force) {
-        if (await this.alreadySignedUp()) {
-          throw new Error("Vault already initialized");
-        }
+    if (!force) {
+      if (await Vault.alreadySignedUp()) {
+        throw new Error("Vault already initialized");
       }
-      await this.#storage.clear();
-      const accounts = new Accounts();
-      await this.set(ACCOUNTS, accounts);
-      const selectedAccount = undefined;
-      await this.set(SELECTED_ACCOUNT, selectedAccount);
-      const settings = Settings.init();
-      await this.set(SETTINGS, settings);
-      const vault = new Vault();
-      await this.set(VAULT, vault);
-      await this.set(CACHE_AUTH, CacheAuth.getInstance());
-      const network = new Network();
-      await this.set(NETWORK, network);
-      const backup = new BackUp();
-      await this.set(BACKUP, backup);
-      return;
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
     }
+    await this.#storage.clear();
+    await Vault.init();
+    await Network.init();
+    await Settings.init();
+    await Accounts.init();
+    await BackUp.init();
+    await CacheAuth.init();
   }
 
   async resetWallet() {
-    try {
-      await this.#storage.clear();
-    } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
-    }
-  }
-
-  async alreadySignedUp(): Promise<boolean> {
-    const stored = await this.#storage.get(null);
-    return !!stored && stored[VAULT];
+    await this.#storage.clear();
   }
 }

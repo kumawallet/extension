@@ -1,4 +1,4 @@
-import { SettingValue } from "./Settings";
+import { Language, SettingValue } from "./types";
 
 export default class Setting {
     value: SettingValue;

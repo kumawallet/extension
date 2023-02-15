@@ -1,4 +1,3 @@
-import { AccountKey, Accounts } from "../storage/entities/Accounts";
 import Keyring from "../storage/entities/Keyring";
 import Vault from "../storage/entities/Vault";
 import { ethers } from "ethers";
@@ -8,13 +7,9 @@ import Auth from "../storage/Auth";
 import { getAccountType } from "../utils/account-utils";
 import BackUp from "@src/storage/entities/BackUp";
 import Account from "@src/storage/entities/Account";
+import Accounts from "@src/storage/entities/Accounts";
+import { AccountType, AccountKey } from "./types";
 
-export enum AccountType {
-  EVM = "EVM",
-  WASM = "WASM",
-  IMPORTED_EVM = "IMPORTED_EVM",
-  IMPORTED_WASM = "IMPORTED_WASM",
-}
 
 export default class AccountManager {
   private static formatAddress(address: string, type: AccountType): AccountKey {
@@ -54,7 +49,7 @@ export default class AccountManager {
     }
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
-    await Account.add(account);
+    await Accounts.add(account);
     await Keyring.save(keyring);
     return account;
   }
@@ -146,24 +141,24 @@ export default class AccountManager {
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("Account key is required");
-    return Account.get(key);
+    return Accounts.getAccount(key);
   }
 
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("Account not found");
     account.value.name = newName;
-    return Account.update(account);
+    return Accounts.update(account);
   }
 
   static async forget(key: AccountKey): Promise<void> {
-    await Account.remove(key);
+    await Accounts.removeAccount(key);
   }
 
   static async getAll(
     type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
-    const accounts = await Accounts.get();
+    const accounts = await Accounts.get<Accounts>();
     if (!accounts) return undefined;
 
     if (type && type.length > 0) {
@@ -197,20 +192,21 @@ export default class AccountManager {
   static async saveBackup(recoveryPhrase: string): Promise<void> {
     if (!recoveryPhrase) throw new Error("Recovery phrase is empty");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
-    await BackUp.set(encrypted);
+    const backup = new BackUp(encrypted);
+    await BackUp.set(backup);
   }
 
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string
   ): Promise<void> {
-    const backup = await BackUp.get();
+    const backup = await BackUp.get<BackUp>();
     if (!backup || !backup.data) throw new Error("Backup not found");
     const decryptedBackup = await Auth.decryptBackup(backup.data, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("Invalid recovery phrase");
     Auth.password = decryptedBackup as string;
     Auth.isUnlocked = true;
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault not found");
     Auth.password = password;
     Auth.isUnlocked = true;

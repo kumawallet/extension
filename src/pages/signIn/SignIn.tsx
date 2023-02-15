@@ -24,7 +24,7 @@ export const SignIn = () => {
       await Extension?.signIn(password);
       navigate(BALANCE);
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 

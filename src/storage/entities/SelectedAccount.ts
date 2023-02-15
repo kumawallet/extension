@@ -1,33 +1,34 @@
-import { SELECTED_ACCOUNT } from "@src/utils/constants";
-import Storable from "../Storable";
-import Storage from "../Storage";
+import Accounts from "./Accounts";
+import BaseEntity from "./BaseEntity";
+import { AccountKey, AccountType, AccountValue } from "@src/accounts/types";
 import Account from "./Account";
-import { Accounts } from "./Accounts";
 
-export class SelectedAccount extends Storable {
+export default class SelectedAccount extends BaseEntity {
+  key: AccountKey;
+  value: AccountValue;
+  type: AccountType;
+
   constructor() {
-    super(SELECTED_ACCOUNT);
+    super();
+    this.key = "EVM-0x000000000";
+    this.value = {} as AccountValue;
+    this.type = AccountType.EVM;
   }
 
-  static async getDefaultAccount(): Promise<Account> {
-    const accounts = await Accounts.get();
+  fromAccount(account: Account) {
+    this.key = account.key;
+    this.value = account.value;
+    this.type = this.key.split("-")[0] as AccountType;
+  }
+
+  static async getDefaultValue<SelectedAccount>(): Promise<SelectedAccount> {
+    const accounts = await Accounts.get<Accounts>();
     if (!accounts) throw new Error("Accounts are not initialized");
     const account = accounts.first();
-    if (!account) throw new Error("No account found");
-    return account;
-  }
-
-  static async get(): Promise<Account | undefined> {
-    const selectedAccount = await Storage.getInstance().get(SELECTED_ACCOUNT);
-    if (!selectedAccount) {
-      const account = await SelectedAccount.getDefaultAccount();
-      SelectedAccount.set(account);
-      return account;
-    }
-    return Account.get(selectedAccount?.key);
-  }
-
-  static async set(account: Account) {
-    await Storage.getInstance().set(SELECTED_ACCOUNT, account);
+    if (!account) return undefined as SelectedAccount;
+    const selected = new SelectedAccount();
+    selected.fromAccount(account);
+    await SelectedAccount.set<SelectedAccount>(selected as SelectedAccount);
+    return selected as SelectedAccount;
   }
 }

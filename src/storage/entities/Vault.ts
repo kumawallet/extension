@@ -1,36 +1,51 @@
-import { VAULT } from "../../utils/constants";
+import { AccountKey, AccountType } from "@src/accounts/types";
+import BaseEntity from "./BaseEntity";
 import Keyring from "./Keyring";
-import { AccountKey } from "./Accounts";
-import Storable from "../Storable";
 import Storage from "../Storage";
-import { AccountType } from "@src/accounts/AccountManager";
+import Auth from "../Auth";
+import CacheAuth from "./CacheAuth";
 
-export default class Vault extends Storable {
+export default class Vault extends BaseEntity {
   keyrings: { [key: AccountKey]: Keyring };
 
   constructor() {
-    super(VAULT);
+    super();
     this.keyrings = {};
   }
 
-  static async get(): Promise<Vault | undefined> {
-    const stored = await Storage.getInstance().get(VAULT);
-    if (!stored || !stored.keyrings) return undefined;
-    const vault = new Vault();
-    vault.setKeyrings(stored.keyrings);
-    return vault;
+  static async init() {
+    await Vault.set<Vault>(new Vault());
   }
 
-  static async set(vault: Vault) {
-    await Storage.getInstance().set(VAULT, vault);
+  static async alreadySignedUp(): Promise<boolean> {
+    const stored = await Storage.getInstance().storage.get(null);
+    return !!stored && stored[this.name];
   }
 
-  static async remove() {
-    await Storage.getInstance().remove(VAULT);
+  static async getEncryptedVault(): Promise<string | undefined> {
+    const stored = await Storage.getInstance().storage.get(this.name);
+    if (!stored || !stored[this.name]) return undefined;
+    return stored[this.name];
+  }
+
+  static async get<Vault>(): Promise<Vault | undefined> {
+    const stored = await Storage.getInstance().storage.get(this.name);
+    if (!stored || !stored[this.name]) return this.getDefaultValue();
+    if (!Auth.password || !Auth.isUnlocked) {
+      await CacheAuth.loadFromCache();
+    }
+    const data = await Auth.getInstance().decryptVault(stored[this.name]);
+    if (!data) throw new Error("Invalid credentials");
+    return this.fromData(data) as Vault;
+  }
+
+  static async set<Vault>(data: Vault): Promise<void> {
+    const encryptedData = await Auth.getInstance().encryptVault(data as any);
+    await super.set(encryptedData);
   }
 
   static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
-    const vault = await Vault.get();
+    const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("Vault not found");
     return vault?.keyrings[key]?.privateKey;
   }

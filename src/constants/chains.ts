@@ -1,4 +1,4 @@
-import { AccountType } from "@src/accounts/AccountManager";
+import { AccountType } from "@src/accounts/types";
 
 const WASM = "WASM" as AccountType.WASM;
 const EVM = "EVM" as AccountType.EVM;

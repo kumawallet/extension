@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "../../providers/NetworkProvider";
-import { Chain } from "@src/contants/chains";
+import { Chain } from "@src/constants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "../../providers/AccountProvider";
@@ -10,6 +10,7 @@ import { getAccountType } from "../../utils/account-utils";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import Extension from "../../Extension";
+import { AccountType } from "@src/accounts/types";
 
 export const ChainSelector = () => {
   const navigate = useNavigate();
@@ -33,12 +34,11 @@ export const ChainSelector = () => {
     let thereIsAccountToSupport = false;
 
     const newChainSupportedTypeAccounts = chain.supportedAccounts;
+    const accountType = getAccountType(selectedAccount.type) as AccountType;
 
     // verify is curreny account support the new chain type
     chainTypeIsSupportedBySelectedAccount =
-      newChainSupportedTypeAccounts.includes(
-        getAccountType(selectedAccount.type)
-      );
+      newChainSupportedTypeAccounts.includes(accountType);
 
     if (!chainTypeIsSupportedBySelectedAccount) {
       // verify is any account support the new chain type
@@ -46,9 +46,10 @@ export const ChainSelector = () => {
         newChainSupportedTypeAccounts
       );
 
-      thereIsAccountToSupport = accounts.some((acc) =>
-        newChainSupportedTypeAccounts.includes(getAccountType(acc.type))
-      );
+      thereIsAccountToSupport = accounts.some((acc) => {
+        const accountType = getAccountType(acc.type) as AccountType;
+        return newChainSupportedTypeAccounts.includes(accountType);
+      });
     }
 
     if (!thereIsAccountToSupport && !chainTypeIsSupportedBySelectedAccount) {

@@ -12,12 +12,12 @@ import { FullScreenFAB } from "../../components/common/FullScreenFAB";
 import { ApiPromise } from "@polkadot/api";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { getNatitveAssetBalance } from "@src/utils/assets";
-import { Account as AccountEntity } from "@src/storage/entities/Accounts";
-import { Chain } from "@src/contants/chains";
+import { Chain } from "@src/constants/chains";
 import { getAssetUSDPrice } from "../../utils/assets";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
+import AccountEntity from "@src/storage/entities/Account";
 import { getAccountType } from "../../utils/account-utils";
 
 export interface Asset {
@@ -95,7 +95,7 @@ export const Balance = () => {
       setIsLoadingAssets(false);
       setAssets([]);
       setTotalBalance(0);
-      showErrorToast(error);
+      showErrorToast(error as Error);
     }
   };
 

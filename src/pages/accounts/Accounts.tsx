@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAccountContext } from "@src/providers";
 import { Menu } from "@headlessui/react";
-import { Account } from "@src/storage/entities/Accounts";
 import { IMPORT_ACCOUNT } from "@src/routes/paths";
 import { DERIVE_ACCOUNT } from "../../routes/paths";
 import { transformAddress } from "../../utils/account-utils";
 import { useNetworkContext } from "../../providers/NetworkProvider";
+import Account from "@src/storage/entities/Account";
 
 export const Accounts = () => {
   const { t } = useTranslation("balance");
