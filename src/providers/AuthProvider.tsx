@@ -7,7 +7,8 @@ import {
   useReducer,
 } from "react";
 import Extension from "../Extension";
-import { AccountFormType } from "../components/accountForm/AccountForm";
+import { useTranslation } from "react-i18next";
+import { AccountFormType } from "@src/pages";
 
 interface InitialState {
   isInit: boolean;
@@ -41,6 +42,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state] = useReducer(reducer, initialState);
@@ -52,10 +54,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     isSignUp,
   }: AccountFormType) => {
     try {
-      await Extension.createAccounts({ name, password, seed, isSignUp });
+      if (!password) throw new Error("password_required");
+      if (!seed) throw new Error("seed_required");
+      await Extension.createAccounts(seed, name, password, isSignUp);
       return true;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
       return false;
     }
   };
@@ -70,19 +74,21 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!password && !isUnlocked) {
-        throw new Error("Password is required");
+        throw new Error("password_required");
       }
-      await Extension.importAccount({
+      if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
+      if (!accountType) throw new Error("account_type_required");
+      await Extension.importAccount(
         name,
         privateKeyOrSeed,
         password,
         accountType,
-        isSignUp,
-      });
+        isSignUp
+      );
 
       return true;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
       return false;
     }
   };
@@ -91,13 +97,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
       if (!isUnlocked) {
-        throw new Error("Extension is locked");
+        throw new Error("failed_to_derive_account");
       }
-      const account = await Extension.deriveAccount({ name, accountType });
+      if (!accountType) throw new Error("account_type_required");
+      const account = await Extension.deriveAccount(name, accountType);
       await Extension.setSelectedAccount(account);
       return true;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
       return false;
     }
   };
@@ -107,10 +114,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     password: newPassword,
   }: AccountFormType) => {
     try {
-      await Extension.restorePassword({ recoveryPhrase, newPassword });
+      if (!recoveryPhrase) throw new Error("recovery_phrase_required");
+      if (!newPassword) throw new Error("password_required");
+      await Extension.restorePassword(recoveryPhrase, newPassword);
       return true;
     } catch (error) {
-      showErrorToast(error as Error);
+      showErrorToast(tCommon(error as string));
       return false;
     }
   };

@@ -38,7 +38,7 @@ export default class Auth {
 
   static validate() {
     if (!Auth.isUnlocked || !Auth.password) {
-      throw new Error("Vault is not unlocked");
+      throw new Error("login_required");
     }
   }
 
@@ -54,65 +54,49 @@ export default class Auth {
   }
 
   async decryptVault(vault: string) {
-    try {
-      Auth.validate();
-      return passworder.decrypt(this.#password as string, vault);
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    Auth.validate();
+    return passworder.decrypt(this.#password as string, vault);
   }
 
   async encryptVault(vault: Vault) {
-    try {
-      Auth.validate();
-      return passworder.encrypt(this.#password as string, vault);
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    Auth.validate();
+    return passworder.encrypt(this.#password as string, vault);
   }
 
-  async signUp({ password }: { password: string }) {
-    try {
-      this.#password = password;
-      this.#isUnlocked = true;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+  async signUp(password: string) {
+    this.#password = password;
+    this.#isUnlocked = true;
   }
 
   async signIn(password: string, vault: string) {
     try {
-      if (!vault) throw new Error("Vault not found");
       const decryptedVault = (await passworder.decrypt(
         password,
         vault
       )) as Vault;
       if (!decryptedVault) {
-        throw new Error("Invalid password");
+        throw new Error("invalid_credentials");
       }
       this.#password = password;
       this.#isUnlocked = true;
     } catch (error) {
-      this.#password = undefined;
-      throw new Error(error as string);
+      this.signOut();
+      throw error;
     }
   }
 
   signOut() {
-    try {
-      this.#isUnlocked = false;
-      this.#password = undefined;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    this.#isUnlocked = false;
+    this.#password = undefined;
   }
 
   async encryptBackup(recoveryPhrase: string) {
     try {
-      if (!this.#password) throw new Error("Vault is not unlocked");
+      if (!this.#password) throw new Error("login_required");
       return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
-      throw new Error(error as string);
+      console.error(error);
+      throw new Error("failed_to_save_backup");
     }
   }
 
@@ -120,15 +104,12 @@ export default class Auth {
     try {
       return passworder.decrypt(recoveryPhrase, backup);
     } catch (error) {
-      throw new Error(error as string);
+      console.error(error);
+      throw new Error("failed_to_restore_backup");
     }
   }
 
   static async generateSaltedHash(salt: string, password: string) {
-    try {
-      return passworder.encrypt(salt, password);
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    return passworder.encrypt(salt, password);
   }
 }

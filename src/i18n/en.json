@@ -1,9 +1,43 @@
 {
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "seed_required": "Seed is required",
+    "password_required": "Password is required",
+    "failed_to_create_accounts": "Failed to create accounts",
+    "private_key_or_seed_required": "Private Key or Seed is required",
+    "failed_to_import_account": "Cannot import accounts without seed or private key",
+    "failed_to_sign_in": "Failed to Sign In",
+    "failed_to_derive_account": "Failed to derive account",
+    "failed_to_set_network": "Failed to change network",
+    "failed_to_get_settings": "Failed to get settings",
+    "account_type_not_supported": "Account type not supported",
+    "failed_to_derive_from_empty_keyring": "Failed to derive from empty keyring",
+    "account_key_required": "Account key required",
+    "account_type_required": "Account type required",
+    "account_not_found": "Account not found",
+    "recovery_phrase_required": "Recovery phrase required",
+    "backup_not_found": "Backup not found",
+    "invalid_recovery_phrase": "Invalid recovery phrase",
+    "failed_to_restore_password": "Failed to restore password",
+    "login_required": "Login required",
+    "invalid_credentials": "Invalid password",
+    "failed_to_save_backup": "Failed to save backup",
+    "failed_to_restore_backup": "Failed to restore backup",
+    "failed_to_cache_password": "Failed to cache password",
+    "already_signed_up": "Already signed up",
+    "failed_to_update_account": "Failed to update account",
+    "failed_to_remove_account": "Failed to remove account",
+    "failed_to_add_account": "Failed to add account",
+    "account_already_exists": "Account already exists",
+    "failed_to_get_account": "Failed to get account",
+    "failed_to_save_keyring": "Failed to save keyring",
+    "failed_to_remove_keyring": "Failed to remove keyring",
+    "network_not_found": "Network not found",
+    "accounts_not_found": "Accounts not found",
+    "failed_to_show_private_key": "Failed to show private key"
   },
-  "home": {
-    "welcome": "Welcome to Kuma Wallet",
+  "welcome": {
+    "welcome_message": "Welcome to Kuma Wallet",
     "description": "All your accounts in one place",
     "button_text": "Get started"
   },
@@ -55,7 +89,8 @@
       "password": "Password",
       "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
       "confirm_password": "Confirm password",
-      "confirm_password_hint": "Passwords don't match."
+      "confirm_password_hint": "Passwords don't match.",
+      "required": "required"
     }
   },
   "balance": {

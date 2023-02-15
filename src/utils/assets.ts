@@ -5,28 +5,29 @@ export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
   accountAddress: string,
   decimals: number
-) => {
+): Promise<number> => {
   try {
-    if (!api) return 0;
+    let _amount = 0;
+
+    if (!api) return _amount;
 
     if ("query" in api) {
       const { data }: any =
         (await api.query.system?.account(accountAddress)) || {};
 
-      const amount = data?.free;
+      _amount = data?.free;
       const _decimals = 10 ** decimals;
-      return amount ? Number(amount) / _decimals : 0;
+      _amount = _amount ? Number(_amount) / _decimals : 0;
     }
 
     if ("getBalance" in api) {
-      const amount = ethers.utils.formatEther(
+      const etherAmount = ethers.utils.formatEther(
         await api.getBalance(accountAddress)
       );
-
-      return amount;
+      _amount = Number(etherAmount);
     }
 
-    return 0;
+    return Number(_amount);
   } catch (error) {
     console.error(error);
     return 0;
@@ -46,4 +47,8 @@ export const getAssetUSDPrice = async (assetName: string) => {
     console.error(error);
     return 0;
   }
+};
+
+export const formatAmountWithDecimals = (amount: number, decimals = 0) => {
+  return Number((amount || 0).toFixed(decimals));
 };

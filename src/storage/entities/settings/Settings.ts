@@ -1,27 +1,9 @@
-import { SETTINGS } from "../../../utils/constants";
-import Storable from "../../Storable";
-import Storage from "../../Storage";
+import BaseEntity from "../BaseEntity";
 import LanguageSetting from "./LanguageSetting";
 import Setting from "./Setting";
+import { SettingKey, SettingType, SettingValue } from "./types";
 
-export type Language = {
-  lang: string;
-  name: string;
-  englishName: string;
-};
-
-export enum SettingType {
-  GENERAL = "general",
-  ADVANCED = "advanced",
-  SECURITY = "security",
-}
-
-export enum SettingKey {
-  LANGUAGES = "languages",
-}
-export type SettingValue = string | Language[] | number | boolean;
-
-export class Settings extends Storable {
+export default class Settings extends BaseEntity {
   data: {
     general: { [key: string]: Setting };
     advanced: { [key: string]: Setting };
@@ -29,7 +11,7 @@ export class Settings extends Storable {
   };
 
   constructor() {
-    super(SETTINGS);
+    super();
     this.data = {
       general: {},
       advanced: {},
@@ -37,25 +19,13 @@ export class Settings extends Storable {
     };
   }
 
-  static init() {
+  static async init() {
     const settings = new Settings();
     settings.addToGeneral(
       SettingKey.LANGUAGES,
       LanguageSetting.getSupportedLanguages()
     );
-    return settings;
-  }
-
-  static async get(): Promise<Settings | undefined> {
-    const stored = await Storage.getInstance().get(SETTINGS);
-    if (!stored) return undefined;
-    const settings = new Settings();
-    settings.set(stored.data);
-    return settings;
-  }
-
-  static async set(settings: Settings) {
-    await Storage.getInstance().set(SETTINGS, settings);
+    await Settings.set(settings);
   }
 
   isEmpty() {
@@ -96,14 +66,6 @@ export class Settings extends Storable {
     return Object.keys(this.data[type]).map(
       (key) => new Setting(key, this.data[type][key].value)
     );
-  }
-
-  set(settings: {
-    general: { [key: string]: Setting };
-    advanced: { [key: string]: Setting };
-    security: { [key: string]: Setting };
-  }) {
-    this.data = settings;
   }
 
   update(type: SettingType, key: SettingKey, value: SettingValue) {

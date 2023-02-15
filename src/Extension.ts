@@ -1,16 +1,17 @@
-import { VAULT } from "./utils/constants";
-import AccountManager, { AccountType } from "./accounts/AccountManager";
-import { AccountKey, Accounts } from "./storage/entities/Accounts";
-import Auth from "./storage/Auth";
+import { Chain } from "@src/constants/chains";
+import { AccountKey, AccountType } from "./accounts/types";
 import Storage from "./storage/Storage";
-import { Chain } from "@src/contants/chains";
-import { Network } from "./storage/entities/Network";
-import { Settings, SettingType } from "./storage/entities/settings/Settings";
-import Vault from "./storage/entities/Vault";
-import CacheAuth from "./storage/entities/CacheAuth";
-import { SelectedAccount } from "./storage/entities/SelectedAccount";
-import Account from "./storage/entities/Account";
+import AccountManager from "./accounts/AccountManager";
 import Setting from "./storage/entities/settings/Setting";
+import Network from "./storage/entities/Network";
+import Accounts from "./storage/entities/Accounts";
+import Account from "./storage/entities/Account";
+import Vault from "./storage/entities/Vault";
+import Auth from "./storage/Auth";
+import CacheAuth from "./storage/entities/CacheAuth";
+import SelectedAccount from "./storage/entities/SelectedAccount";
+import Settings from "./storage/entities/settings/Settings";
+import { SettingType } from "./storage/entities/settings/types";
 
 export default class Extension {
   private static async init(
@@ -19,7 +20,7 @@ export default class Extension {
     force?: boolean
   ) {
     try {
-      await Auth.getInstance().signUp({ password });
+      await Auth.getInstance().signUp(password);
       await Storage.getInstance().init(force);
       await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
@@ -29,41 +30,40 @@ export default class Extension {
     }
   }
 
-  static async createAccounts({
-    seed,
-    name = "New Account",
-    password,
-    isSignUp = true,
-  }: any) {
-    if (!seed) throw new Error("Cannot create accounts without seed");
+  static async createAccounts(
+    seed: string,
+    name: string,
+    password: string,
+    isSignUp = true
+  ) {
+    if (!seed) throw new Error("seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("Missing password");
+      if (!password) throw new Error("password_required");
       await this.init(password, seed, true);
     }
     const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("Vault is locked");
+    if (!isUnlocked) throw new Error("failed_to_create_accounts");
     await AccountManager.addWASMAccount(seed, name);
     await AccountManager.addEVMAccount(seed, name);
     return true;
   }
 
-  static async importAccount({
-    name = "New Account",
-    privateKeyOrSeed,
-    password,
-    accountType,
-    isSignUp = true,
-  }: any) {
+  static async importAccount(
+    name: string,
+    privateKeyOrSeed: string,
+    password: string | undefined,
+    accountType: AccountType,
+    isSignUp = true
+  ) {
     // TODO: validate privateKeyOrSeed, accounType
 
-    if (!privateKeyOrSeed)
-      throw new Error("Cannot import accounts without seed or private key");
+    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("Missing password");
+      if (!password) throw new Error("password_required");
       await this.init(password, privateKeyOrSeed, true);
     }
     const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("Vault is locked");
+    if (!isUnlocked) throw new Error("failed_to_import_account");
     await AccountManager.importAccount({
       name,
       privateKeyOrSeed,
@@ -71,34 +71,39 @@ export default class Extension {
     });
   }
 
-  static async restorePassword({ recoveryPhrase, newPassword }: any) {
-    if (!recoveryPhrase)
-      throw new Error("Cannot restore password without seed or private key");
-    if (!newPassword) throw new Error("Missing password");
+  static async restorePassword(recoveryPhrase: string, newPassword: string) {
+    if (!recoveryPhrase) throw new Error("private_key_or_seed_required");
+    if (!newPassword) throw new Error("password_required");
     await AccountManager.restorePassword(recoveryPhrase, newPassword);
   }
 
   static removeAccount(key: AccountKey) {
-    AccountManager.forget(key);
+    AccountManager.remove(key);
   }
 
-  static changeAccountName({ key, newName }: any) {
+  static changeAccountName(key: AccountKey, newName: string) {
     AccountManager.changeName(key, newName);
   }
 
   static async signIn(password: string) {
-    const { vault } = await Storage.getInstance().storage.get(VAULT);
-    await Auth.getInstance().signIn(password, vault);
-    await CacheAuth.cachePassword();
+    try {
+      const vault = await Vault.getEncryptedVault();
+      if (!vault) throw new Error("failed_to_sign_in");
+      await Auth.getInstance().signIn(password, vault);
+      await CacheAuth.cachePassword();
+    } catch (error) {
+      Auth.getInstance().signOut();
+      throw error;
+    }
   }
 
   static alreadySignedUp() {
-    return Storage.getInstance().alreadySignedUp();
+    return Vault.alreadySignedUp();
   }
 
   static async areAccountsInitialized(): Promise<boolean> {
     try {
-      const accounts = await Accounts.get();
+      const accounts = await Accounts.get<Accounts>();
       if (!accounts) return false;
       return AccountManager.areAccountsInitialized(accounts);
     } catch (error) {
@@ -118,7 +123,7 @@ export default class Extension {
   }
 
   static async showPrivateKey(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get();
+    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
     if (!selectedAccount || !selectedAccount.key) return undefined;
     return Vault.showPrivateKey(selectedAccount.key);
   }
@@ -135,27 +140,32 @@ export default class Extension {
     return accounts.getAll();
   }
 
-  static async deriveAccount({ name, accountType }: any): Promise<Account> {
-    const vault = await Vault.get();
-    if (!vault) throw new Error("Vault not found");
+  static async deriveAccount(
+    name: string,
+    accountType: AccountType
+  ): Promise<Account> {
+    const vault = await Vault.get<Vault>();
+    if (!vault) throw new Error("failed_to_derive_account");
     return AccountManager.derive(name, vault, accountType);
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
-    const vault = await Vault.get();
-    if (!vault) throw new Error("Vault not found");
+    const vault = await Vault.get<Vault>();
+    if (!vault) throw new Error("failed_to_set_network");
     const network = Network.getInstance();
-    network.setChain(chain);
-    await Network.set(network);
+    network.set(chain);
+    await Network.set<Network>(network);
     return true;
   }
 
   static async setSelectedAccount(account: Account) {
-    await SelectedAccount.set(account);
+    const selected = new SelectedAccount();
+    selected.fromAccount(account);
+    await SelectedAccount.set<SelectedAccount>(selected);
   }
 
   static async getSelectedAccount(): Promise<Account | undefined> {
-    return SelectedAccount.get();
+    return SelectedAccount.get<SelectedAccount>();
   }
 
   static async getNetwork(): Promise<Network> {
@@ -163,8 +173,8 @@ export default class Extension {
   }
 
   static async getGeneralSettings(): Promise<Setting[]> {
-    const settings = await Settings.get();
-    if (!settings) throw new Error("Settings not found");
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
     return settings.getAll(SettingType.GENERAL);
   }
 }

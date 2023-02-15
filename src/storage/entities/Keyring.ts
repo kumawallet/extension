@@ -1,5 +1,4 @@
-import { AccountType } from "../../accounts/AccountManager";
-import { AccountKey } from "./Accounts";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { ACCOUNT_PATH } from "../../utils/constants";
 import Vault from "./Vault";
 
@@ -24,6 +23,20 @@ export default class Keyring {
     this.#seed = seed;
     this.#type = type;
     this.#privateKey = privateKey;
+  }
+
+  static async save(keyring: Keyring): Promise<void> {
+    const vault = await Vault.get<Vault>();
+    if (!vault) throw new Error("failed_to_save_keyring");
+    vault.addKeyring(keyring);
+    await Vault.set(vault);
+  }
+
+  static async remove(keyring: AccountKey): Promise<void> {
+    const vault = await Vault.get<Vault>();
+    if (!vault) throw new Error("failed_to_remove_keyring");
+    vault.removeKeyring(keyring);
+    await Vault.set(vault);
   }
 
   get key() {
@@ -52,20 +65,6 @@ export default class Keyring {
 
   set accountQuantity(accountQuantity: number) {
     this.#accountQuantity = accountQuantity;
-  }
-
-  static async save(keyring: Keyring): Promise<void> {
-    const vault = await Vault.get();
-    if (!vault) throw new Error("Vault is not initialized");
-    vault.addKeyring(keyring);
-    await Vault.set(vault);
-  }
-
-  static async remove(keyring: AccountKey): Promise<void> {
-    const vault = await Vault.get();
-    if (!vault) throw new Error("Vault is not initialized");
-    vault.removeKeyring(keyring);
-    await Vault.set(vault);
   }
 
   increaseAccountQuantity() {

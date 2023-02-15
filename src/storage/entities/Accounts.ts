@@ -1,39 +1,48 @@
-import { ACCOUNTS } from "../../utils/constants";
-import { AccountType } from "../../accounts/AccountManager";
-import Storable from "../Storable";
-import Storage from "../Storage";
+import { AccountKey, AccountValue } from "@src/accounts/types";
+import BaseEntity from "./BaseEntity";
 import Account from "./Account";
 
-export type AccountKey = `${AccountType}-${string}`;
-
-export type AccountValue = {
-  name: string;
-  address: string;
-  keyring: AccountKey;
-};
-
-export class Accounts extends Storable {
+export default class Accounts extends BaseEntity {
   data: { [key: AccountKey]: Account };
 
   constructor() {
-    super(ACCOUNTS);
+    super();
     this.data = {};
   }
 
-  static async get(): Promise<Accounts | undefined> {
-    const stored = await Storage.getInstance().get(ACCOUNTS);
-    if (!stored || !stored.data) return undefined;
-    const accounts = new Accounts();
-    accounts.set(stored.data);
-    return accounts;
+  static async init() {
+    await Accounts.set<Accounts>(new Accounts());
   }
 
-  static async set(accounts: Accounts) {
-    await Storage.getInstance().set(ACCOUNTS, accounts);
+  static async update(account: Account): Promise<Account> {
+    const accounts = await Accounts.get<Accounts>();
+    if (!accounts) throw new Error("failed_to_update_account");
+    accounts.update(account.key, account.value);
+    await Accounts.set<Accounts>(accounts);
+    return account;
   }
 
-  static async remove() {
-    await Storage.getInstance().remove(ACCOUNTS);
+  static async removeAccount(key: AccountKey) {
+    const accounts = await Accounts.get<Accounts>();
+    if (!accounts) throw new Error("failed_to_remove_account");
+    accounts.remove(key);
+    await Accounts.set<Accounts>(accounts);
+  }
+
+  static async add(account: Account): Promise<void> {
+    const accounts = await Accounts.get<Accounts>();
+    if (!accounts) throw new Error("failed_to_add_account");
+    if (accounts.allreadyExists(account.key)) {
+      throw new Error("account_already_exists");
+    }
+    accounts.add(account);
+    await Accounts.set<Accounts>(accounts);
+  }
+
+  static async getAccount(key: AccountKey): Promise<Account | undefined> {
+    const accounts = await Accounts.get<Accounts>();
+    if (!accounts) throw new Error("failed_to_get_account");
+    return accounts.get(key);
   }
 
   isEmpty() {
@@ -55,10 +64,6 @@ export class Accounts extends Storable {
 
   getAll() {
     return Object.keys(this.data).map((key) => this.data[key as AccountKey]);
-  }
-
-  set(accounts: { [key: AccountKey]: Account }) {
-    this.data = accounts;
   }
 
   update(key: AccountKey, value: AccountValue) {

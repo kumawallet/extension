@@ -1,9 +1,43 @@
 {
   "common": {
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "seed_required": "シードが必要です",
+    "password_required": "パスワードが必要です",
+    "failed_to_create_accounts": "アカウントの作成に失敗しました",
+    "private_key_or_seed_required": "秘密鍵またはシードが必要です",
+    "failed_to_import_account": "シードまたは秘密鍵なしでアカウントをインポートできません",
+    "failed_to_sign_in": "サインインに失敗しました",
+    "failed_to_derive_account": "アカウントの派生に失敗しました",
+    "failed_to_set_network": "ネットワークの変更に失敗しました",
+    "failed_to_get_settings": "設定の取得に失敗しました",
+    "account_type_not_supported": "アカウントの種類はサポートされていません",
+    "failed_to_derive_from_empty_keyring": "空のキーリングからの派生に失敗しました",
+    "account_key_required": "アカウント キーが必要です",
+    "account_type_required": "アカウントの種類が必要です",
+    "account_not_found": "アカウントが見つかりません",
+    "recovery_phrase_required": "回復フレーズが必要です",
+    "backup_not_found": "バックアップが見つかりません",
+    "invalid_recovery_phrase": "無効な回復フレーズ",
+    "failed_to_restore_password": "パスワードの復元に失敗しました",
+    "login_required": "ログインが必要です",
+    "invalid_credentials": "パスワードが無効です",
+    "failed_to_save_backup": "バックアップの保存に失敗しました",
+    "failed_to_restore_backup": "バックアップの復元に失敗しました",
+    "failed_to_cache_password": "パスワードのキャッシュに失敗しました",
+    "already_signed_up": "すでにサインアップしています",
+    "failed_to_update_account": "アカウントの更新に失敗しました",
+    "failed_to_remove_account": "アカウントを削除できませんでした",
+    "failed_to_add_account": "アカウントの追加に失敗しました",
+    "account_already_exists": "アカウントは既に存在します",
+    "failed_to_get_account": "アカウントの取得に失敗しました",
+    "failed_to_save_keyring": "キーリングの保存に失敗しました",
+    "failed_to_remove_keyring": "キーリングの削除に失敗しました",
+    "network_not_found": "ネットワークが見つかりません",
+    "accounts_not_found": "アカウントが見つかりません",
+    "failed_to_show_private_key": "秘密鍵の表示に失敗しました"
   },
-  "home": {
-    "welcome": "Kuma Walletへようこそ",
+  "welcome": {
+    "welcome_message": "Kuma Walletへようこそ",
     "description": "すべてのアカウントが一つの場所に",
     "button_text": "開始する"
   },
@@ -55,7 +89,9 @@
       "password": "パスワード",
       "password_hint": "パスワードは、少なくとも8文字、少なくとも1つの数字、大文字と小文字、特殊文字を含める必要があります。",
       "confirm_password": "パスワードを確認する",
-      "confirm_password_hint": "パスワードが一致しません。"
+      "confirm_password_hint": "パスワードが一致しません。",
+      "required": "必須"
+
     }
   },
   "balance": {

@@ -1,9 +1,0 @@
-html, body{
-  width: 357px;
-  height: 600px;
-}
-
-body {
-  min-height: 500px;
-  overflow: auto;
-}

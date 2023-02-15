@@ -6,13 +6,13 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import { Chain, CHAINS } from "@src/contants/chains";
+import { Chain, CHAINS } from "@src/constants/chains";
 import Extension from "../Extension";
-import Storage from "@src/storage/Storage";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "../hooks/useToast";
 import { ethers } from "ethers";
 import { getAccountType } from "../utils/account-utils";
+import { useTranslation } from "react-i18next";
 
 interface InitialState {
   chains: typeof CHAINS;
@@ -91,6 +91,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
 };
 
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
+  const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -105,10 +106,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
         if (selectedNetwork?.chain?.name) {
           const account = await Extension.getSelectedAccount();
-
           selectedChain = selectedNetwork?.chain;
           const accountType = getAccountType(account?.type);
-
           rpc = selectedChain.rpc[accountType.toLowerCase()];
 
           api = getProvider(rpc, accountType);
@@ -123,7 +122,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           },
         });
       } catch (error) {
-        showErrorToast(error);
+        showErrorToast(tCommon(error as string));
       }
     })();
   }, []);
@@ -134,8 +133,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       await Extension.setNetwork(network);
       const account = await Extension.getSelectedAccount();
-
-      let accountType = getAccountType(account?.type);
+      const accountType = getAccountType(account?.type);
       const rpc =
         network.rpc[accountType.toLowerCase() || "wasm"] ||
         network.rpc[accountType.toLowerCase() || "evm"];
@@ -151,14 +149,13 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
   const getSelectedNetwork = async () => {
     try {
-      const { chain: selectedNetwork } =
-        await Storage.getInstance().getNetwork();
+      const { chain: selectedNetwork } = await Extension.getNetwork();
 
       dispatch({
         type: "select-network",
@@ -167,7 +164,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedNetwork;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
@@ -206,7 +203,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: { api, rpc: newRpc },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
     }
   };
 

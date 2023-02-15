@@ -2,7 +2,7 @@ import { BsFullscreen } from "react-icons/bs";
 
 export const FullScreenFAB = () => {
   const openTab = () => {
-    const url = chrome.runtime.getURL("src/pages/newtab/index.html");
+    const url = chrome.runtime.getURL("src/entries/newtab/index.html");
     chrome.tabs.create({ url });
   };
 

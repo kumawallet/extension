@@ -1,22 +1,21 @@
-import { useEffect } from "react";
 import Extension from "../Extension";
 import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useReducer,
 } from "react";
-import { Account } from "@src/storage/entities/Accounts";
 import { useToast } from "../hooks";
 import { useNetworkContext } from "./NetworkProvider";
-import { getAccountType, transformAddress } from "@src/utils/account-utils";
-import { AccountType } from "../accounts/AccountManager";
-import {
-  CHAINS,
-  DEFAULT_WASM_CHAIN,
-  DEFAULT_EVM_CHAIN,
-} from "../contants/chains";
+import { transformAddress } from "@src/utils/account-utils";
+import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "../constants/chains";
+import Account from "@src/storage/entities/Account";
+import { AccountType } from "@src/accounts/types";
+import { useAuthContext } from "./AuthProvider";
+import { AccountFormType } from "@src/pages";
+import { useTranslation } from "react-i18next";
 
 interface InitialState {
   accounts: Account[];
@@ -36,6 +35,9 @@ const AccountContext = createContext(
     getAllAccounts: (type?: AccountType[] | null) => Promise<Account[]>;
     getSelectedAccount: () => Promise<Account | undefined>;
     setSelectedAccount: (account: Account) => void;
+    deriveAccount: (account: AccountFormType) => Promise<boolean>;
+    importAccount: (account: AccountFormType) => Promise<boolean>;
+    createAccount: (account: AccountFormType) => Promise<boolean>;
   }
 );
 
@@ -79,30 +81,20 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
-    state: { selectedChain, rpc, init },
+    createAccount: _createAccount,
+    deriveAccount: _deriveAccount,
+    importAccount: _importAccount,
+  } = useAuthContext();
+
+  const {
+    state: { selectedChain },
     setNewRpc,
     setSelectNetwork,
   } = useNetworkContext();
-
+  const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  // TODO: maybe necesary later, DON't delete it
-  // useEffect(() => {
-  //   if (selectedChain?.name && rpc && init) {
-
-  //     // (async () => {
-  //     //   const newChainType = selectedChain.supportedAccounts;
-  //     //   const accounts = await getAllAccounts(newChainType);
-  //     //   const selectedAccountType = getAccountType(state.selectedAccount?.type);
-  //     //   if (!newChainType.includes(selectedAccountType)) {
-  //     //     setSelectedAccount(accounts[0]);
-  //     //     return;
-  //     //   }
-  //     // })();
-  //   }
-  // }, [selectedChain?.name, rpc, init]);
 
   const getAllAccounts = async (type: AccountType[] | null = null) => {
     try {
@@ -116,7 +108,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
       return [];
     }
   };
@@ -149,7 +141,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedAccount;
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
     }
   };
 
@@ -173,9 +165,27 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(tCommon(error as string));
     }
   };
+
+  const deriveAccount = useCallback(async (account: AccountFormType) => {
+    const result = await _deriveAccount(account);
+    result && (await getSelectedAccount());
+    return result;
+  }, []);
+
+  const importAccount = useCallback(async (account: AccountFormType) => {
+    const result = await _importAccount(account);
+    result && (await getSelectedAccount());
+    return result;
+  }, []);
+
+  const createAccount = useCallback(async (account: AccountFormType) => {
+    const result = await _createAccount(account);
+    result && (await getSelectedAccount());
+    return result;
+  }, []);
 
   return (
     <AccountContext.Provider
@@ -184,6 +194,9 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         getAllAccounts,
         getSelectedAccount,
         setSelectedAccount,
+        deriveAccount,
+        importAccount,
+        createAccount,
       }}
     >
       {children}
