@@ -44,7 +44,8 @@ export default class AccountManager {
   ): Promise<Account> {
     const key = AccountManager.formatAddress(address, type);
     if (name === "") {
-      name = `Account ${keyring.accountQuantity}`;
+      const n = await Accounts.count();
+      name = `Account ${n+1}`;
     }
     const value = { name, address, keyring: key };
     const account = new Account(key, value);

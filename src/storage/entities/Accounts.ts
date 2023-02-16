@@ -45,6 +45,12 @@ export default class Accounts extends BaseEntity {
     return accounts.get(key);
   }
 
+  static async count(): Promise<number> {
+    const accounts = await Accounts.get<Accounts>();
+    if (!accounts) return 0;
+    return accounts.getAll().length;
+  }
+
   isEmpty() {
     return Object.keys(this.data).length === 0;
   }
