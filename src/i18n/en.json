@@ -135,7 +135,8 @@
     "advanced": "Advanced",
     "contacts": "Contacts",
     "security": "Security",
-    "bug_report": "Bug report"
+    "bug_report": "Bug report",
+    "sign_out": "Sign out"
   },
   "general_settings": {
     "title": "General",

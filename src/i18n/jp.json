@@ -135,7 +135,8 @@
     "advanced": "高度な",
     "contacts": "連絡先",
     "security": "セキュリティ",
-    "bug_report": "バグ報告"
+    "bug_report": "バグ報告",
+    "sign_out": "サインアウト"
   },
   "general_settings": {
     "title": "一般",

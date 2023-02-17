@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { BsChevronRight, BsGear } from "react-icons/bs";
+import { BsBoxArrowInRight, BsChevronRight, BsGear } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import {
   SETTINGS_BUG,
   SIGNIN,
 } from "@src/routes/paths";
+import { ICON_SIZE } from "@src/constants/icons";
 
 const OPTIONS = [
   {
@@ -80,12 +81,10 @@ export const Settings = () => {
               ))}
             </div>
             <div className="mt-10 flex justify-end">
-              <button
-                onClick={() => signOut()}
-                className="border border-custom-red-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-red-bg focus:outline-none focus:shadow-outline w-[40%]"
-              >
-                Sign Out
-              </button>
+              <div className="flex cursor-pointer hover:bg-gray-400 hover:bg-opacity-30 rounded-xl px-3 py-3">
+                <p className="text-lg pr-3">{t("sign_out")}</p>
+                <BsBoxArrowInRight size={ICON_SIZE} onClick={() => signOut()} />
+              </div>
             </div>
           </div>
         </Menu.Items>

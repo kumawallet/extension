@@ -135,7 +135,8 @@
     "advanced": "Avanzado",
     "contacts": "Contactos",
     "security": "Seguridad",
-    "bug_report": "Informar un error"
+    "bug_report": "Informar un error",
+    "sign_out": "Cerrar sesión"
   },
   "general_settings": {
     "title": "General",
