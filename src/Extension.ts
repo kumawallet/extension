@@ -14,8 +14,8 @@ import Settings from "./storage/entities/settings/Settings";
 import { SettingType } from "./storage/entities/settings/types";
 import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
-import Record from "./storage/entities/history/Record";
-import History from "./storage/entities/history/History";
+import Record from "./storage/entities/activity/Record";
+import Activity from "./storage/entities/activity/Activity";
 
 export default class Extension {
   private static async init(
@@ -219,6 +219,6 @@ export default class Extension {
   }
 
   static async getActivity(): Promise<Record[]> {
-    return History.getRecords();
+    return Activity.getRecords();
   }
 }

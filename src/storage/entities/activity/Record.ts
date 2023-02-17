@@ -1,6 +1,7 @@
 import { RecordStatus, RecordType } from "./types";
 
-export default class Record {
+export default abstract class Record {
+  hash: string;
   type: RecordType;
   reference: string;
   status: RecordStatus;
@@ -9,12 +10,14 @@ export default class Record {
   lastUpdated: number;
 
   constructor(
+    hash: string,
     type: RecordType,
     reference: string,
     status: RecordStatus,
     timestamp: number,
     error?: string
   ) {
+    this.hash = hash;
     this.type = type;
     this.reference = reference;
     this.status = status;

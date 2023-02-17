@@ -1,6 +1,5 @@
 export enum RecordType {
   CALL = "call",
-  DEPLOY = "deploy",
   TRANSFER = "transfer",
 }
 
