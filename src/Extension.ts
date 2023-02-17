@@ -12,6 +12,7 @@ import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
 import { SettingType } from "./storage/entities/settings/types";
+import Registry, { Contact } from "./storage/entities/Registry";
 
 export default class Extension {
   private static async init(
@@ -177,4 +178,39 @@ export default class Extension {
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.getAll(SettingType.GENERAL);
   }
+
+  static async getContacts(): Promise<Contact[]> {
+    const registry = await Registry.get<Registry>();
+    if (!registry) throw new Error("failed_to_get_registry");
+    return registry.getAllContacts();
+  }
+
+  static async getRegistryAddresses() {
+    const registry = await Registry.get<Registry>();
+    if (!registry) throw new Error("failed_to_get_registry");
+    const { chain } = await Network.get<Network>();
+    if (!chain) throw new Error("failed_to_get_network");
+    const types = chain.supportedAccounts || [];
+    const accounts = await AccountManager.getAll(types);
+    if (!accounts) throw new Error("failed_to_get_accounts");
+    return {
+      ownAccounts: accounts
+        .getAll()
+        .map((account) => (new Contact(account.value.name, account.value.address))),
+      contacts: registry.getAllContacts(),
+      recent: registry.getRecent(chain.name)
+    };
+  }
+
+  static async saveContact(contact: Contact) {
+    const registry = await Registry.get<Registry>();
+    if (!registry) throw new Error("failed_to_get_registry");
+    registry.addContact(contact);
+    await Registry.set<Registry>(registry);
+  }
+
+  static async removeContact(address: string) {
+    await Registry.removeContact(address);
+  }
+
 }

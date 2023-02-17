@@ -34,7 +34,17 @@
     "failed_to_remove_keyring": "Failed to remove keyring",
     "network_not_found": "Network not found",
     "accounts_not_found": "Accounts not found",
-    "failed_to_show_private_key": "Failed to show private key"
+    "failed_to_show_private_key": "Failed to show private key",
+    "failed_to_add_contact": "Failed to add contact",
+    "failed_to_get_contact": "Failed to get contact",
+    "failed_to_change_contact_name": "Failed to change contact name",
+    "contact_not_found": "Contact not found",
+    "failed_to_remove_contact": "Failed to remove contact",
+    "failed_to_add_recent": "Failed to add recent",
+    "failed_to_get_recent": "Failed to get recent",
+    "no_contacts_found": "No contacts found",
+    "name_required": "Name is required",
+    "address_required": "Address is required"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -130,5 +140,14 @@
   "general_settings": {
     "title": "General",
     "languages": "Languages"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "name": "Name",
+    "address": "Address",
+    "save_contact": "Save contact",
+    "insert_name": "Insert contact name",
+    "insert_address": "Insert address",
+    "search": "Search contacts by name or address"
   }
 }

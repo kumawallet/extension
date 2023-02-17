@@ -4,6 +4,7 @@ import BackUp from "./entities/BackUp";
 import Network from "./entities/Network";
 import Settings from "./entities/settings/Settings";
 import Accounts from "./entities/Accounts";
+import Registry from "./entities/Registry";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -54,6 +55,7 @@ export default class Storage {
     await Accounts.init();
     await BackUp.init();
     await CacheAuth.init();
+    await Registry.init();
   }
 
   async resetWallet() {

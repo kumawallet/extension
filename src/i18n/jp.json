@@ -34,7 +34,17 @@
     "failed_to_remove_keyring": "キーリングの削除に失敗しました",
     "network_not_found": "ネットワークが見つかりません",
     "accounts_not_found": "アカウントが見つかりません",
-    "failed_to_show_private_key": "秘密鍵の表示に失敗しました"
+    "failed_to_show_private_key": "秘密鍵の表示に失敗しました",
+    "failed_to_add_contact": "連絡先の追加に失敗しました",
+    "failed_to_get_contact": "連絡先の取得に失敗しました",
+    "failed_to_change_contact_name": "連絡先の名前の変更に失敗しました",
+    "contact_not_found": "連絡先が見つかりません",
+    "failed_to_remove_contact": "連絡先の削除に失敗しました",
+    "failed_to_add_recent": "最近の追加に失敗しました",
+    "failed_to_get_recent": "最近の取得に失敗しました",
+    "no_contacts_found": "連絡先が見つかりませんでした",
+    "name_required": "名前が必要です",
+    "address_required": "住所が必要です"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -91,7 +101,6 @@
       "confirm_password": "パスワードを確認する",
       "confirm_password_hint": "パスワードが一致しません。",
       "required": "必須"
-
     }
   },
   "balance": {
@@ -131,5 +140,14 @@
   "general_settings": {
     "title": "一般",
     "languages": "言語"
+  },
+  "contacts": {
+    "title": "連絡先",
+    "name": "名前",
+    "address": "住所",
+    "save_contact": "連絡先を保存する",
+    "insert_name": "連絡先の名前を入力してください",
+    "insert_address": "連絡先の住所を入力してください",
+    "search": "名前または住所で連絡先を検索する"
   }
 }
