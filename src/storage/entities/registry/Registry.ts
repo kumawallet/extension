@@ -1,23 +1,6 @@
-import BaseEntity from "./BaseEntity";
-
-export class Contact {
-  name: string;
-  address: string;
-  constructor(name: string, address: string) {
-    this.name = name;
-    this.address = address;
-  }
-}
-
-export class Register {
-  address: string;
-  timestamp: number;
-
-  constructor(address: string, timestamp: number) {
-    this.address = address;
-    this.timestamp = timestamp;
-  }
-}
+import BaseEntity from "../BaseEntity";
+import Contact from "./Contact";
+import Register from "./Register";
 
 export default class Registry extends BaseEntity {
   data: {
@@ -95,11 +78,19 @@ export default class Registry extends BaseEntity {
     if (!this.data.recent[network]) {
       this.data.recent[network] = [] as unknown as [Register];
     }
+    if (this.data.recent[network].length >= 10) {
+      this.data.recent[network].shift();
+    }
+
     this.data.recent[network].push(register);
   }
 
   getRecent(network: string): Register[] {
-    return this.data.recent[network] || [];
+    return (
+      this.data.recent[network].sort(
+        (a: Register, b: Register) => b.timestamp - a.timestamp
+      ) || []
+    );
   }
 
   getAllContacts(): Contact[] {

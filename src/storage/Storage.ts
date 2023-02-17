@@ -4,7 +4,7 @@ import BackUp from "./entities/BackUp";
 import Network from "./entities/Network";
 import Settings from "./entities/settings/Settings";
 import Accounts from "./entities/Accounts";
-import Registry from "./entities/Registry";
+import Registry from "./entities/registry/Registry";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 

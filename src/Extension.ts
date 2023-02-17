@@ -12,7 +12,8 @@ import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
 import { SettingType } from "./storage/entities/settings/types";
-import Registry, { Contact } from "./storage/entities/Registry";
+import Registry from "./storage/entities/registry/Registry";
+import Contact from "./storage/entities/registry/Contact";
 
 export default class Extension {
   private static async init(
@@ -196,9 +197,11 @@ export default class Extension {
     return {
       ownAccounts: accounts
         .getAll()
-        .map((account) => (new Contact(account.value.name, account.value.address))),
+        .map(
+          (account) => new Contact(account.value.name, account.value.address)
+        ),
       contacts: registry.getAllContacts(),
-      recent: registry.getRecent(chain.name)
+      recent: registry.getRecent(chain.name),
     };
   }
 
@@ -212,5 +215,4 @@ export default class Extension {
   static async removeContact(address: string) {
     await Registry.removeContact(address);
   }
-
 }

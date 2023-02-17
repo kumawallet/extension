@@ -2,7 +2,7 @@ import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
-import { Contact } from "@src/storage/entities/Registry";
+import Contact from "@src/storage/entities/registry/Contact";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
