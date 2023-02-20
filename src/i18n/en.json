@@ -150,5 +150,10 @@
     "insert_name": "Insert contact name",
     "insert_address": "Insert address",
     "search": "Search contacts by name or address"
+  },
+  "activity": {
+    "title": "Activity",
+    "empty": "No activity yet",
+    "search": "Search by transaction hash, address or reference"
   }
 }

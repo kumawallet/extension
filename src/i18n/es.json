@@ -150,5 +150,10 @@
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
     "search": "Buscar contactos por nombre o dirección"
+  },
+  "activity": {
+    "title": "Actividad",
+    "empty": "No hay actividad",
+    "search": "Busca por dirección, hash o referencia"
   }
 }

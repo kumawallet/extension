@@ -1,24 +1,24 @@
 import Record from "./Record";
-import { TransferData, RecordType, RecordStatus } from "./types";
+import { RecordType, RecordStatus, CallData } from "./types";
 
-export default class TransferRecord extends Record {
-  data: TransferData;
+export default class CallRecord extends Record {
+  data: CallData;
 
   constructor(
     hash: string,
     address: string,
     network: string,
-    data: TransferData,
+    data: CallData,
     reference: string
   ) {
     super(
       hash,
       address,
-      RecordType.TRANSFER,
+      RecordType.CALL,
       network,
       network,
       reference,
-      RecordStatus.PENDING,
+      RecordStatus.PENDING
     );
     this.data = data;
   }
