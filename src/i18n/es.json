@@ -44,7 +44,8 @@
     "failed_to_get_recent": "No se pudo obtener el reciente",
     "no_contacts_found": "No se encontraron contactos",
     "name_required": "Nombre requerido",
-    "address_required": "Dirección requerida"
+    "address_required": "Dirección requerida",
+    "view_in_scanner": "Ver en el escáner"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -150,5 +151,10 @@
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
     "search": "Buscar contactos por nombre o dirección"
+  },
+  "activity": {
+    "title": "Actividad",
+    "empty": "No hay actividad",
+    "search": "Busca por dirección, hash o referencia"
   }
 }

@@ -97,7 +97,7 @@ export const PARACHAINS: Chain[] = [
     explorers: [
       {
         name: "subscan",
-        url: "https://astar.subscan.io",
+        url: "https://astar.subscan.io/",
       },
     ],
     supportedAccounts: [WASM, EVM],
@@ -118,7 +118,7 @@ export const PARACHAINS: Chain[] = [
     explorers: [
       {
         name: "moonscan",
-        url: "https://moonbeam.moonscan.io",
+        url: "https://moonbeam.moonscan.io/",
       },
     ],
     supportedAccounts: [EVM, WASM],
@@ -141,7 +141,7 @@ export const PARACHAINS: Chain[] = [
     explorers: [
       {
         name: "moonscan",
-        url: "https://moonriver.moonscan.io",
+        url: "https://moonriver.moonscan.io/",
       },
     ],
     supportedAccounts: [EVM],
@@ -162,7 +162,7 @@ export const PARACHAINS: Chain[] = [
     explorers: [
       {
         name: "subscan",
-        url: "https://shiden.subscan.io",
+        url: "https://shiden.subscan.io/",
       },
     ],
     supportedAccounts: [EVM, WASM],
@@ -186,7 +186,7 @@ export const TESTNETS: Chain[] = [
     explorers: [
       {
         name: "moonscan",
-        url: "https://moonbase.moonscan.io",
+        url: "https://moonbase.moonscan.io/",
       },
     ],
     supportedAccounts: [EVM, WASM],
@@ -245,7 +245,7 @@ export const TESTNETS: Chain[] = [
     explorers: [
       {
         name: "etherscan",
-        url: "https://goerli.etherscan.io",
+        url: "https://goerli.etherscan.io/",
       },
     ],
     supportedAccounts: [EVM],

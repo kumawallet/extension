@@ -44,7 +44,8 @@
     "failed_to_get_recent": "最近の取得に失敗しました",
     "no_contacts_found": "連絡先が見つかりませんでした",
     "name_required": "名前が必要です",
-    "address_required": "住所が必要です"
+    "address_required": "住所が必要です",
+    "view_in_scanner": "スキャナーで表示"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -150,5 +151,10 @@
     "insert_name": "連絡先の名前を入力してください",
     "insert_address": "連絡先の住所を入力してください",
     "search": "名前または住所で連絡先を検索する"
+  },
+  "activity": {
+    "title": "アクティビティ",
+    "empty": "アクティビティはありません",
+    "search": "ハッシュ、アドレスまたは参照"
   }
 }
