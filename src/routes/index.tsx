@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { AddAccount, AccountForm, Balance, SignIn, Welcome } from "@src/pages";
+import {
+  AddAccount,
+  AccountForm,
+  Balance,
+  SignIn,
+  Welcome,
+  Send,
+} from "@src/pages";
 import {
   Advanced,
   BugReport,
@@ -88,7 +95,7 @@ export const Routes = () => {
   return (
     <MemoryRouter>
       <RRoutes>
-        <Route path="/" element={homeRoute} />
+        <Route path="/" element={<Send />} />
         <Route path={ADD_ACCOUNT} element={<AddAccount />} />
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />

@@ -12,7 +12,7 @@ export const PageWrapper: FC<PageWrapperProps> = ({
   const defaultContentClassName = "flex py-6 px-4";
 
   return (
-    <div className={contentClassName || defaultContentClassName}>
+    <div className={`${defaultContentClassName} ${contentClassName}`}>
       <div className="max-w-3xl w-full mx-auto md:px-10 h-full">{children}</div>
     </div>
   );
