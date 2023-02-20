@@ -40,6 +40,7 @@ import {
 
 // TODO: delete for production
 import { Decrypt } from "@src/components/decrypt";
+import { SEND } from "./paths";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -95,10 +96,11 @@ export const Routes = () => {
   return (
     <MemoryRouter>
       <RRoutes>
-        <Route path="/" element={<Send />} />
+        <Route path="/" element={homeRoute} />
         <Route path={ADD_ACCOUNT} element={<AddAccount />} />
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
+        <Route path={SEND} element={<Send />} />
         <Route
           path={IMPORT_ACCOUNT}
           element={

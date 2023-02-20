@@ -9,11 +9,37 @@ import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { BsPlus, BsTrash } from "react-icons/bs";
+import { useForm } from "react-hook-form";
+import { object, string } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+interface AccountForm {
+  name: string;
+  address: string;
+}
 
 export const Contacts = () => {
   const { t } = useTranslation("contacts");
   const { t: tCommon } = useTranslation("common");
   const navigate = useNavigate();
+
+  const schema = object({
+    name: string().required(t("required") as string),
+    address: string().required(t("required") as string),
+  }).required();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AccountForm>({
+    defaultValues: {
+      name: "",
+      address: "",
+    },
+    resolver: yupResolver(schema),
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateContact, setIsCreateContact] = useState(false);
   const [contacts, setContacts] = useState([] as Contact[]);
@@ -37,10 +63,10 @@ export const Contacts = () => {
     }
   };
 
-  const saveContact = async (name: string, address: string) => {
+  const saveContact = handleSubmit(async (form: AccountForm) => {
     try {
-      if (!name) throw new Error("name_required");
-      if (!address) throw new Error("address_required");
+      const { name, address } = form;
+
       const contact = new Contact(name, address);
       await Extension.saveContact(contact);
       getContacts();
@@ -49,7 +75,7 @@ export const Contacts = () => {
     } finally {
       setIsCreateContact(false);
     }
-  };
+  });
 
   const deleteContact = async (address: string) => {
     try {
@@ -100,6 +126,7 @@ export const Contacts = () => {
             max={32}
             min={1}
             className="mb-5 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            {...register("name")}
           />
           <label htmlFor="name" className="block text-sm font-medium mb-1">
             {t("address")}
@@ -108,12 +135,13 @@ export const Contacts = () => {
             id="address"
             placeholder="Insert address"
             className="mb-5 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            {...register("address")}
           />
           <div className="flex justify-end">
             <button
               type="button"
               className="mt-5 inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
-              onClick={() => saveContact(name, address)}
+              onClick={saveContact}
             >
               {t("save_contact")}
             </button>
