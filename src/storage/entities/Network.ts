@@ -10,7 +10,7 @@ export default class Network extends BaseEntity {
     super();
     this.chain = null;
   }
-  
+
   public static getInstance() {
     if (!Network.instance) {
       Network.instance = new Network();
@@ -28,7 +28,6 @@ export default class Network extends BaseEntity {
     return defaultNetwork as Network;
   }
 
-
   static async get<Network>(): Promise<Network> {
     const network = await super.get<Network>();
     if (!network) throw new Error("network_not_found");
@@ -42,5 +41,4 @@ export default class Network extends BaseEntity {
   set(chain: Chain) {
     this.chain = chain;
   }
-
 }

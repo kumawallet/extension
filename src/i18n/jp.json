@@ -44,7 +44,8 @@
     "failed_to_get_recent": "最近の取得に失敗しました",
     "no_contacts_found": "連絡先が見つかりませんでした",
     "name_required": "名前が必要です",
-    "address_required": "住所が必要です"
+    "address_required": "住所が必要です",
+    "view_in_scanner": "スキャナーで表示"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",

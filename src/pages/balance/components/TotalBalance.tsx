@@ -17,9 +17,9 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-center">
-        <p className="text-2xl mb-6">{accountName || ""}</p>
+        <p className="text-2xl mb-4">{accountName || ""}</p>
       </div>
-      <div className="flex mb-8 gap-2 items-center justify-center">
+      <div className="flex mb-4 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
         <p className="text-5xl">{formatAmountWithDecimals(balance, 5)}</p>
       </div>

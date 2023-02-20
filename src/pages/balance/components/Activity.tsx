@@ -5,17 +5,11 @@ import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import Record from "@src/storage/entities/activity/Record";
-import {
-  RecordData,
-  RecordStatus,
-  RecordType,
-} from "@src/storage/entities/activity/types";
-import {
-  BsFillArrowUpRightCircleFill,
-  BsFillFileEarmarkFill,
-} from "react-icons/bs";
+import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
+import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
+import { CHAINS } from "@src/constants/chains";
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
@@ -57,6 +51,15 @@ export const Activity = () => {
     }
   };
 
+  const getLink = (network: string, hash: string) => {
+    const { explorers } =
+      CHAINS.flatMap((chainType) => chainType.chains).find(
+        (chain) => chain.name.toLowerCase() === network.toLowerCase()
+      ) || {};
+    const { url } = explorers?.[0] || {};
+    return `${url}tx/${hash}`;
+  };
+
   const getContactName = (address: string) => {
     const contact = contacts.find((c) => c.address === address);
     return contact
@@ -82,27 +85,6 @@ export const Activity = () => {
     }
   };
 
-  const getTypeIcon = (type: string, status: RecordStatus) => {
-    switch (type) {
-      case RecordType.TRANSFER:
-        return (
-          <BsFillArrowUpRightCircleFill
-            size={ICON_SIZE}
-            color={getStatusColor(status)}
-          />
-        );
-      case RecordType.CALL:
-        return (
-          <BsFillFileEarmarkFill
-            size={ICON_SIZE}
-            color={getStatusColor(status)}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
   if (isLoading) {
     return <Loading />;
   }
@@ -117,7 +99,7 @@ export const Activity = () => {
         }}
       />
 
-      <div className="flex flex-col mt-5">
+      <div className="flex flex-col mt-5 overflow-y-auto mb-5">
         {records.length === 0 && (
           <div className="flex justify-center items-center mt-5">
             <p className="text-lg font-medium">{t("empty")}</p>
@@ -133,21 +115,41 @@ export const Activity = () => {
               );
             })
             .sort((a, b) => b.lastUpdated - a.lastUpdated)
-            .map(({ address, status, lastUpdated, type, data }, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-start hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
-              >
-                <div>{getTypeIcon(type, status)}</div>
-                <div className="overflow-hidden text-ellipsis">
-                  <p className="text-lg font-medium">
-                    {getContactName(address)}
-                  </p>
-                  <p>{formatDate(lastUpdated)}</p>
+            .map(
+              (
+                { address, status, lastUpdated, data, network, hash },
+                index
+              ) => (
+                <div
+                  key={index}
+                  className="mb-5 bg-[#343A40] flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
+                >
+                  <BsArrowUpRight
+                    size={ICON_SIZE}
+                    color={getStatusColor(status)}
+                  />
+                  <div className="overflow-hidden text-ellipsis p-4">
+                    <p className="text-lg">{getContactName(address)}</p>
+                    <p>
+                      {`${formatDate(lastUpdated)} - `}
+                      <a
+                        className="text-custom-green-bg hover:text-white"
+                        href={getLink(network, hash)}
+                      >
+                        {tCommon("view_in_scanner")}
+                      </a>
+                    </p>
+                  </div>
+                  <div className="text-lg">
+                    <p>{getValue(data)}</p>
+                    <div className="flex justify-evenly">
+                      <div className="w-5 h-5 rounded-full bg-gray-400" />
+                      <div className="w-5 h-5 rounded-full bg-gray-400" />
+                    </div>
+                  </div>
                 </div>
-                <div className="text-lg">{getValue(data)}</div>
-              </div>
-            ))}
+              )
+            )}
       </div>
     </>
   );
