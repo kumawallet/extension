@@ -45,8 +45,9 @@ export default class AccountManager {
     const key = AccountManager.formatAddress(address, type);
     if (name === "") {
       const n = await Accounts.count();
-      name = `Account ${n+1}`;
+      name = `Account ${n + 1}`;
     }
+    console.log("save keyring", keyring);
     const value = { name, address, keyring: key };
     const account = new Account(key, value);
     await Accounts.add(account);

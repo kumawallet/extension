@@ -1,5 +1,4 @@
-import { FC, PropsWithChildren, SVGAttributes } from "react";
-import { HTMLAttributes } from "react";
+import { FC, HTMLAttributes, PropsWithChildren, SVGAttributes } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface LoadinButtonProps {
@@ -24,7 +23,7 @@ export const LoadingButton: FC<LoadinButtonProps & PropsWithChildren> = ({
 }) => {
   return (
     <button
-      className={DEFAULT_CLASSNAME || classname}
+      className={classname || DEFAULT_CLASSNAME}
       onClick={onClick}
       disabled={isDisabled || isLoading}
     >

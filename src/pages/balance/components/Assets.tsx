@@ -24,7 +24,7 @@ export const Assets = ({
           <div className="flex gap-2 items-center">
             <div className="w-6 h-6 bg-black rounded-full" />
             <div className="flex gap-1 text-xl">
-              <p>{formatAmountWithDecimals(asset.amount)}</p>
+              <p>{formatAmountWithDecimals(asset.amount, 6)}</p>
               <p>{asset.symbol}</p>
             </div>
           </div>
