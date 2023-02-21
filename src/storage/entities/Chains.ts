@@ -40,12 +40,6 @@ export default class Chains extends BaseEntity {
     return defaultChains as Chains;
   }
 
-  static async get<Chains>(): Promise<Chains> {
-    const chains = await super.get<Chains>();
-    if (!chains) throw new Error("chains_not_found");
-    return chains;
-  }
-
   static async loadChains(): Promise<void> {
     const stored = await Chains.get<Chains>();
     if (!stored) throw new Error("failed_to_load_chains");

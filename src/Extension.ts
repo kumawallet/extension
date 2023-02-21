@@ -224,7 +224,9 @@ export default class Extension {
   }
 
   static async getAllChains(): Promise<Chains> {
-    return Chains.get<Chains>();
+    const chains = await Chains.get<Chains>();
+    if (!chains) throw new Error("failed_to_get_chains");
+    return chains;
   }
 
   static async getXCMChains(chainName: string): Promise<Chain[]> {
