@@ -6,6 +6,7 @@ import Settings from "./entities/settings/Settings";
 import Accounts from "./entities/Accounts";
 import Registry from "./entities/registry/Registry";
 import Activity from "./entities/activity/Activity";
+import Chains from "./entities/Chains";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -58,6 +59,7 @@ export default class Storage {
     await CacheAuth.init();
     await Registry.init();
     await Activity.init();
+    await Chains.init();
   }
 
   async resetWallet() {

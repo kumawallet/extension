@@ -16,6 +16,7 @@ import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
 import Record from "./storage/entities/activity/Record";
 import Activity from "./storage/entities/activity/Activity";
+import Chains from "./storage/entities/Chains";
 
 export default class Extension {
   private static async init(
@@ -220,5 +221,19 @@ export default class Extension {
 
   static async getActivity(): Promise<Record[]> {
     return Activity.getRecords();
+  }
+
+  static async getAllChains(): Promise<Chains> {
+    return Chains.get<Chains>();
+  }
+
+  static async getXCMChains(chainName: string): Promise<Chain[]> {
+    const { xcm } = (await Chains.getByName(chainName)) || {};
+    if (!xcm) throw new Error("failed_to_get_chain");
+    const chains = await Chains.get<Chains>();
+    if (!chains) throw new Error("failed_to_get_chains");
+    return chains
+      .getAll()
+      .filter((chain) => xcm.includes(chain.name));
   }
 }
