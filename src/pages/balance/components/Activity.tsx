@@ -99,7 +99,7 @@ export const Activity = () => {
         }}
       />
 
-      <div className="flex flex-col mt-5 overflow-y-auto mb-5">
+      <div className="flex flex-col my-5 overflow-y-auto max-h-64">
         {records.length === 0 && (
           <div className="flex justify-center items-center mt-5">
             <p className="text-lg font-medium">{t("empty")}</p>
@@ -122,13 +122,13 @@ export const Activity = () => {
               ) => (
                 <div
                   key={index}
-                  className="mb-5 bg-[#343A40] flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
+                  className="mb-5 mr-1 bg-[#343A40] flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
                 >
                   <BsArrowUpRight
                     size={ICON_SIZE}
                     color={getStatusColor(status)}
                   />
-                  <div className="overflow-hidden text-ellipsis p-4">
+                  <div className="overflow-hidden text-ellipsis py-4 px-1">
                     <p className="text-lg">{getContactName(address)}</p>
                     <p>
                       {`${formatDate(lastUpdated)} - `}
