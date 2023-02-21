@@ -132,6 +132,12 @@ export default class Extension {
     return Vault.showPrivateKey(selectedAccount.key);
   }
 
+  static async showSeed(): Promise<string | undefined> {
+    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
+    if (!selectedAccount || !selectedAccount.key) return undefined;
+    return Vault.showSeed(selectedAccount.key);
+  }
+
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     return AccountManager.getAccount(key);
   }

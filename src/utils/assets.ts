@@ -9,11 +9,15 @@ export const getNatitveAssetBalance = async (
   try {
     let _amount = 0;
 
+    console.log(api);
+
     if (!api) return _amount;
 
     if ("query" in api) {
       const { data }: any =
         (await api.query.system?.account(accountAddress)) || {};
+
+      console.log("data", data);
 
       _amount = data?.free;
       const _decimals = 10 ** decimals;

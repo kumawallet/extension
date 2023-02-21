@@ -110,7 +110,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           const accountType = getAccountType(account?.type);
           rpc = selectedChain.rpc[accountType.toLowerCase()];
 
-          api = getProvider(rpc, accountType);
+          // TODO: fix this, show loading while is finish the promise
+          api = await getProvider(rpc, accountType);
         }
 
         dispatch({

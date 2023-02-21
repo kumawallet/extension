@@ -217,8 +217,10 @@ export const TESTNETS: Chain[] = [
     name: "Contracts Testnet",
     chain: "Rococo",
     rpc: {
-      wasm: "wss://rococo-contracts-rpc.polkadot.io",
+      wasm: "wss://rococo-rpc.polkadot.io",
     },
+    addressPrefix: 42,
+
     nativeCurrency: {
       name: "roc",
       symbol: "ROC",

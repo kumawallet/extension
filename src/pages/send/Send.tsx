@@ -19,6 +19,8 @@ import { number, object } from "yup";
 import { ethers } from "ethers";
 import { useToast } from "@src/hooks";
 import { useAccountContext } from "@src/providers/AccountProvider";
+import { ApiPromise } from "@polkadot/api";
+import { Keyring } from "@polkadot/keyring";
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -46,6 +48,7 @@ export const Send = () => {
     handleSubmit,
     getValues,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<any>({
     defaultValues: {
@@ -58,7 +61,11 @@ export const Send = () => {
     resolver: yupResolver(schema),
   });
 
+  const amount = watch("amount");
+  const destinationAccount = watch("destinationAccount");
+
   const [evmFees, setEvmFees] = useState({});
+  const [wasmFees, setWasmFees] = useState({});
   const [loadingFee, setLoadingFee] = useState(true);
   const [isSendingTx, setIsSendingTx] = useState(false);
 
@@ -67,27 +74,31 @@ export const Send = () => {
     try {
       setIsSendingTx(true);
       // ethers.providers.JsonRpcProvider
-      const tx = {
-        // from: selectedAccount.value.address,
-        to: data.destinationAccount.address,
-        value: ethers.utils.parseEther(String(data.amount)),
-      };
+      if (selectedAccount.type.includes("EMV")) {
+        const tx = {
+          // from: selectedAccount.value.address,
+          to: data.destinationAccount.address,
+          value: ethers.utils.parseEther(String(data.amount)),
+        };
 
-      const pk = await Extension.showPrivateKey();
+        const pk = await Extension.showPrivateKey();
 
-      console.log({
-        tx,
-        pk,
-      });
+        console.log({
+          tx,
+          pk,
+        });
 
-      const wallet = new ethers.Wallet(
-        pk as string,
-        api as ethers.providers.JsonRpcProvider
-      );
+        const wallet = new ethers.Wallet(
+          pk as string,
+          api as ethers.providers.JsonRpcProvider
+        );
 
-      const res = await wallet.sendTransaction(tx);
-      res.wait();
-      console.log("tx result", res);
+        const res = await wallet.sendTransaction(tx);
+        res.wait();
+        console.log("tx result", res);
+      } else {
+        // polkadot
+      }
     } catch (error) {
       console.log(error);
       showErrorToast(error as string);
@@ -109,23 +120,26 @@ export const Send = () => {
   useEffect(() => {
     (async () => {
       try {
-        const feeData = await (
-          api as ethers.providers.JsonRpcProvider
-        ).getFeeData();
+        if (selectedAccount.type.includes("EVM")) {
+          const feeData = await (
+            api as ethers.providers.JsonRpcProvider
+          ).getFeeData();
 
-        const gas = formatEthAmount(feeData.gasPrice);
-        const lastBaseFeePerGas = formatEthAmount(feeData.lastBaseFeePerGas);
-        const maxFeePerGas = formatEthAmount(feeData.maxFeePerGas);
-        const maxPriorityFeePerGas = formatEthAmount(
-          feeData.maxPriorityFeePerGas
-        );
+          const gas = formatEthAmount(feeData.gasPrice);
+          const lastBaseFeePerGas = formatEthAmount(feeData.lastBaseFeePerGas);
+          const maxFeePerGas = formatEthAmount(feeData.maxFeePerGas);
+          const maxPriorityFeePerGas = formatEthAmount(
+            feeData.maxPriorityFeePerGas
+          );
 
-        setEvmFees({
-          gas,
-          lastBaseFeePerGas,
-          maxFeePerGas,
-          maxPriorityFeePerGas,
-        });
+          setEvmFees({
+            gas,
+            lastBaseFeePerGas,
+            maxFeePerGas,
+            maxPriorityFeePerGas,
+          });
+        } else {
+        }
       } catch (error) {
         showErrorToast(error);
       } finally {
@@ -133,6 +147,43 @@ export const Send = () => {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (selectedAccount.type.includes("EVM")) return;
+
+    if (!destinationAccount || amount <= 0) return;
+
+    setLoadingFee(true);
+
+    const getData = setTimeout(async () => {
+      try {
+        const extrinsic = await (api as ApiPromise).tx.balances.transfer(
+          destinationAccount.address,
+          amount * selectedChain?.nativeCurrency.decimals
+        );
+
+        const seed = await Extension.showSeed();
+
+        const keyring = new Keyring({ type: "sr25519" });
+        const sender = keyring.addFromMnemonic(seed as string);
+
+        const { weight, partialFee } = await extrinsic.paymentInfo(sender);
+
+        setWasmFees({
+          partialFee: partialFee.toString(),
+          weightRefTime: weight.toJSON().refTime,
+          weightProofSize: weight.toJSON().proofSize,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      setLoadingFee(false);
+    }, 1000);
+
+    return () => clearTimeout(getData);
+  }, [amount, destinationAccount]);
+
+  const originAccountIsEVM = selectedAccount.type.includes("EVM");
 
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
@@ -192,17 +243,13 @@ export const Send = () => {
             <Loading />
           ) : (
             <div className="flex flex-col gap-1">
-              {selectedAccount.type.includes("EVM") ? (
-                <>
-                  {Object.keys(evmFees).map((key) => (
-                    <div key={key} className="flex justify-between">
-                      <p>{key}</p>
-                      <p>{evmFees[key]}</p>
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <></>
+              {Object.keys(originAccountIsEVM ? evmFees : wasmFees).map(
+                (key) => (
+                  <div key={key} className="flex justify-between">
+                    <p>{key}</p>
+                    <p>{originAccountIsEVM ? evmFees[key] : wasmFees[key]}</p>
+                  </div>
+                )
               )}
             </div>
           )}
