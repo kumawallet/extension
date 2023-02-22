@@ -87,13 +87,13 @@ export default class Registry extends BaseEntity {
 
   getRecent(network: string): Register[] {
     return (
-      this.data.recent[network].sort(
+      this.data.recent?.[network]?.sort(
         (a: Register, b: Register) => b.timestamp - a.timestamp
       ) || []
     );
   }
 
   getAllContacts(): Contact[] {
-    return Object.values(this.data.contacts) || [];
+    return Object.values(this.data.contacts || {}) || [];
   }
 }
