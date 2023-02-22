@@ -20,6 +20,7 @@ interface InitialState {
   api: ApiPromise | ethers.providers.JsonRpcProvider | null;
   rpc: "";
   init: boolean;
+  type: string;
 }
 
 const initialState: InitialState = {
@@ -28,6 +29,7 @@ const initialState: InitialState = {
   api: null,
   rpc: "",
   init: false,
+  type: "",
 };
 
 interface NetworkContext {
@@ -56,7 +58,7 @@ const getProvider = (rpc: string | undefined, type: "EVM" | "WASM") => {
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
     case "init": {
-      const { selectedChain, rpc, api } = action.payload;
+      const { selectedChain, rpc, api, type } = action.payload;
 
       return {
         ...state,
@@ -64,16 +66,18 @@ const reducer = (state: InitialState, action: any): InitialState => {
         selectedChain,
         rpc,
         init: true,
+        type,
       };
     }
     case "select-network": {
-      const { selectedChain, rpc, api } = action.payload;
+      const { selectedChain, rpc, api, type } = action.payload;
 
       return {
         ...state,
         selectedChain,
         rpc,
         api,
+        type,
       };
     }
     case "set-api": {
@@ -81,8 +85,8 @@ const reducer = (state: InitialState, action: any): InitialState => {
 
       return {
         ...state,
+        rpc: rpc || state.rpc,
         api,
-        rpc,
       };
     }
     default:
@@ -103,15 +107,16 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         let selectedChain = null;
         let rpc = null;
         let api = "";
+        let type;
 
         if (selectedNetwork?.chain?.name) {
           const account = await Extension.getSelectedAccount();
           selectedChain = selectedNetwork?.chain;
-          const accountType = getAccountType(account?.type);
-          rpc = selectedChain.rpc[accountType.toLowerCase()];
+          type = getAccountType(account?.type);
+          rpc = selectedChain.rpc[type.toLowerCase()];
 
           // TODO: fix this, show loading while is finish the promise
-          api = await getProvider(rpc, accountType);
+          // api = getProvider(rpc, accountType);
         }
 
         dispatch({
@@ -120,6 +125,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
             selectedChain,
             rpc,
             api,
+            type,
           },
         });
       } catch (error) {
@@ -139,14 +145,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         network.rpc[accountType.toLowerCase() || "wasm"] ||
         network.rpc[accountType.toLowerCase() || "evm"];
 
-      const api = getProvider(rpc, accountType);
-
       dispatch({
         type: "select-network",
         payload: {
           selectedChain: network,
           rpc,
-          api,
+          type: accountType,
         },
       });
     } catch (error) {
@@ -169,7 +173,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  // only for chain with multi support (WASM and EVM)
+  //  only for chain with multi support (WASM and EVM)
   const setNewRpc = async (type: string) => {
     try {
       const _type: any = getAccountType(type);
@@ -183,20 +187,6 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (rpcAlreadyInUse) return;
 
-      if (newRpc === state.rpc) return;
-
-      // if (!newRpc && !typeIsWasm) {
-      //   const defaultEth = CHAINS[0].chains[2];
-      //   setSelectNetwork(defaultEth);
-      //   newRpc = defaultEth?.rpc.evm;
-      // }
-
-      // if (!newRpc && typeIsWasm) {
-      //   const defaultWasm = CHAINS[0].chains[0];
-      //   setSelectNetwork(defaultWasm);
-      //   newRpc = defaultWasm?.rpc.wasm;
-      // }
-
       const api = await getProvider(newRpc, _type);
 
       dispatch({
@@ -207,6 +197,20 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       showErrorToast(tCommon(error as string));
     }
   };
+
+  useEffect(() => {
+    if (state.rpc && state.type) {
+      (async () => {
+        const api = await getProvider(state.rpc, state.type);
+        dispatch({
+          type: "set-api",
+          payload: {
+            api,
+          },
+        });
+      })();
+    }
+  }, [state.rpc, state.type]);
 
   return (
     <NetworkContext.Provider

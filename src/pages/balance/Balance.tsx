@@ -22,7 +22,7 @@ export interface Asset {
 
 export const Balance = () => {
   const {
-    state: { api, selectedChain, rpc },
+    state: { api, selectedChain, rpc, type },
   } = useNetworkContext();
 
   const {
@@ -52,12 +52,18 @@ export const Balance = () => {
   const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
-    if (rpc && selectedAccount?.value?.address && selectedChain) {
+    if (
+      rpc &&
+      selectedAccount?.value?.address &&
+      selectedChain &&
+      type &&
+      api
+    ) {
       setIsLoadingAssets(true);
 
       getAssets(api, selectedAccount, selectedChain);
     }
-  }, [rpc, selectedAccount]);
+  }, [rpc, selectedAccount, type, api]);
 
   const getAssets = async (
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,

@@ -56,7 +56,7 @@ export const Routes = () => {
 
   const { deriveAccount, createAccount, importAccount } = useAccountContext();
 
-  const [homeRoute, setHomeRoute] = useState(<></>);
+  const [homeRoute, setHomeRoute] = useState(<>loading</>);
   const [canDerive, setCanDerive] = useState(false);
   const [importIsSignUp, setImportIsSignUp] = useState(true);
 

@@ -99,7 +99,7 @@ export const Activity = () => {
         }}
       />
 
-      <div className="flex flex-col my-5 overflow-y-auto max-h-64">
+      <div className="flex flex-col my-5 overflow-y-auto h-full">
         {records.length === 0 && (
           <div className="flex justify-center items-center mt-5">
             <p className="text-lg font-medium">{t("empty")}</p>
