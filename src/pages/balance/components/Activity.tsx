@@ -9,9 +9,15 @@ import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
 import { CHAINS } from "@src/constants/chains";
+import { useAccountContext } from "../../../providers/AccountProvider";
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
+
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
+
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
@@ -20,9 +26,11 @@ export const Activity = () => {
   const { showErrorToast } = useToast();
 
   useEffect(() => {
-    getActivity();
-    getContacts();
-  }, []);
+    if (selectedAccount) {
+      getActivity();
+      getContacts();
+    }
+  }, [selectedAccount.key]);
 
   const getActivity = async () => {
     try {
@@ -30,6 +38,7 @@ export const Activity = () => {
       const records = await Extension.getActivity();
       setRecords(records);
     } catch (error) {
+      console.error(error);
       setRecords([]);
       showErrorToast(tCommon(error as string));
     } finally {
