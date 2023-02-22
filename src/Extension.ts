@@ -39,7 +39,7 @@ export default class Extension {
   static async createAccounts(
     seed: string,
     name: string,
-    password: string,
+    password?: string,
     isSignUp = true
   ) {
     if (!seed) throw new Error("seed_required");

@@ -10,7 +10,17 @@ export const useToast = () => {
     });
   };
 
+  const showSuccessToast = (message: string) => {
+    toast.success(String(message), {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: false,
+      className: "toast",
+      toastId: "TOAST_SUCCESS",
+    });
+  };
+
   return {
     showErrorToast,
+    showSuccessToast,
   };
 };

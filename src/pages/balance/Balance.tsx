@@ -52,6 +52,10 @@ export const Balance = () => {
   const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
+    setIsLoadingAssets(true);
+  }, [rpc]);
+
+  useEffect(() => {
     if (
       rpc &&
       selectedAccount?.value?.address &&

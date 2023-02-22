@@ -26,11 +26,15 @@ import {
   RecordType,
   RecordStatus,
   TransferData,
-} from "../../storage/entities/activity/types";
+} from "@src/storage/entities/activity/types";
+import { useNavigate } from "react-router-dom";
+import { BALANCE } from "@src/routes/paths";
+import { BiLeftArrowAlt } from "react-icons/bi";
 
 export const Send = () => {
   const { t } = useTranslation("send");
-  const { showErrorToast } = useToast();
+  const navigate = useNavigate();
+  const { showErrorToast, showSuccessToast } = useToast();
 
   const {
     state: { selectedChain, api },
@@ -42,9 +46,15 @@ export const Send = () => {
 
   const schema = useMemo(() => {
     return object({
-      from: object().required(t("required") as string),
-      to: object().required(t("required") as string),
-      destinationAccount: object().required(t("required") as string),
+      from: object()
+        .typeError(t("required") as string)
+        .required(t("required") as string),
+      to: object()
+        .typeError(t("required") as string)
+        .required(t("required") as string),
+      destinationAccount: object()
+        .typeError(t("required") as string)
+        .required(t("required") as string),
       amount: number().required(t("required") as string),
       asset: object().required(t("required") as string),
     }).required();
@@ -77,10 +87,13 @@ export const Send = () => {
   const [isSendingTx, setIsSendingTx] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
+    setIsSendingTx(true);
     try {
-      let activity: Partial<Record>;
-      setIsSendingTx(true);
-      if (selectedAccount.type.includes("EMV")) {
+      let hash = "";
+      let date;
+      let reference = "";
+
+      if (selectedAccount.type.includes("EVM")) {
         const tx = {
           to: data.destinationAccount.address,
           value: ethers.utils.parseEther(String(data.amount)),
@@ -94,48 +107,46 @@ export const Send = () => {
         );
 
         const res = await wallet.sendTransaction(tx);
-        res.wait();
-        console.log("tx result", res);
+
+        hash = res.hash;
+        date = Date.now();
+        reference = "evm";
       } else {
-        // polkadot
-        console.log("sending extrinsic...");
         const seed = await Extension.showSeed();
 
         const keyring = new Keyring({ type: "sr25519" });
         const sender = keyring.addFromMnemonic(seed as string);
         const res = await extrinsic?.signAndSend(sender);
 
-        const hash = res.toHuman();
-        const date = Date.now();
-
-        activity = {
-          address: destinationAccount.address,
-          type: RecordType.TRANSFER,
-          reference: "",
-          hash,
-          status: RecordStatus.PENDING,
-          createdAt: date,
-          lastUpdated: date,
-          error: undefined,
-          network: selectedChain?.name || "",
-          recipientNetwork: selectedChain?.name || "",
-          data: {
-            symbol: String(selectedChain?.nativeCurrency.symbol),
-            from: selectedAccount.value.address,
-            to: destinationAccount.address,
-            gas: "0",
-            gasPrice: "0",
-            value: amount,
-          } as TransferData,
-        };
-
-        console.log({
-          hash,
-          activity,
-        });
-
-        await Extension.addActivity(hash, activity as Record);
+        hash = res.toHuman();
+        date = Date.now();
+        reference = "wasm";
       }
+
+      const activity = {
+        address: destinationAccount.address,
+        type: RecordType.TRANSFER,
+        reference,
+        hash,
+        status: RecordStatus.PENDING,
+        createdAt: date,
+        lastUpdated: date,
+        error: undefined,
+        network: selectedChain?.name || "",
+        recipientNetwork: selectedChain?.name || "",
+        data: {
+          symbol: String(selectedChain?.nativeCurrency.symbol),
+          from: selectedAccount.value.address,
+          to: destinationAccount.address,
+          gas: "0",
+          gasPrice: "0",
+          value: amount,
+        } as TransferData,
+      };
+
+      await Extension.addActivity(hash, activity as Record);
+      showSuccessToast(t("tx_saved"));
+      navigate(BALANCE);
     } catch (error) {
       console.log(error);
       showErrorToast(error as string);
@@ -234,9 +245,16 @@ export const Send = () => {
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
       <div className="mx-auto">
-        <div className="mb-7">
-          <p className="font-medium text-2xl">{t("title")}</p>
+        <div className="flex gap-3 items-center mb-7">
+          <BiLeftArrowAlt
+            size={26}
+            className="cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
+
+          <p className="text-xl">{t("title")}</p>
         </div>
+
         <div className="flex gap-2 justify-center items-end">
           <div className="px-2">
             <p className="mb-2">From:</p>

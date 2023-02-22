@@ -1,5 +1,4 @@
-import { ICON_SIZE } from "@src/constants/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
@@ -85,9 +84,26 @@ export const Activity = () => {
     }
   };
 
+  const filteredRecords = useMemo(() => {
+    const _search = search.trim().toLocaleLowerCase();
+
+    if (!_search) return records;
+
+    return records
+      .filter(({ hash, reference, address }) => {
+        return (
+          hash.toLowerCase().includes(_search) ||
+          reference?.toLowerCase().includes(_search) ||
+          address.toLowerCase().includes(_search)
+        );
+      })
+      .sort((a, b) => b.lastUpdated - a.lastUpdated);
+  }, [search, records]);
+
   if (isLoading) {
     return <Loading />;
   }
+
   return (
     <>
       <input
@@ -105,51 +121,39 @@ export const Activity = () => {
             <p className="text-lg font-medium">{t("empty")}</p>
           </div>
         )}
-        {records.length > 0 &&
-          records
-            .filter(({ hash, reference, address }) => {
-              return (
-                hash.toLowerCase().includes(search.toLowerCase()) ||
-                reference.toLowerCase().includes(search.toLowerCase()) ||
-                address.toLowerCase().includes(search.toLowerCase())
-              );
-            })
-            .sort((a, b) => b.lastUpdated - a.lastUpdated)
-            .map(
-              (
-                { address, status, lastUpdated, data, network, hash },
-                index
-              ) => (
-                <div
-                  key={index}
-                  className="mb-5 mr-1 bg-[#343A40] flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
-                >
-                  <BsArrowUpRight
-                    size={ICON_SIZE}
-                    color={getStatusColor(status)}
-                  />
-                  <div className="overflow-hidden text-ellipsis py-4 px-1">
-                    <p className="text-lg">{getContactName(address)}</p>
-                    <p>
-                      {`${formatDate(lastUpdated)} - `}
-                      <a
-                        className="text-custom-green-bg hover:text-white"
-                        href={getLink(network, hash)}
-                      >
-                        {tCommon("view_in_scanner")}
-                      </a>
-                    </p>
-                  </div>
-                  <div className="text-lg">
-                    <p>{getValue(data)}</p>
-                    <div className="flex justify-evenly">
-                      <div className="w-5 h-5 rounded-full bg-gray-400" />
-                      <div className="w-5 h-5 rounded-full bg-gray-400" />
-                    </div>
-                  </div>
+        {filteredRecords.map(
+          ({ address, status, lastUpdated, data, network, hash }, index) => (
+            <div
+              key={hash}
+              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
+            >
+              <div className="flex items-center gap-1">
+                <BsArrowUpRight size={20} color={getStatusColor(status)} />
+                <div className="overflow-hidden text-ellipsis py-4 px-1">
+                  <p className="text-sm">{getContactName(address)}</p>
+                  <p>
+                    {`${formatDate(lastUpdated)} - `}
+                    <a
+                      className="text-custom-green-bg hover:text-white text-sm"
+                      href={getLink(network, hash)}
+                    >
+                      {tCommon("view_in_scanner")}
+                    </a>
+                  </p>
                 </div>
-              )
-            )}
+              </div>
+              <div className="text-lg px-1">
+                <p className="text-sm whitespace-nowrap mb-1">
+                  {getValue(data)}
+                </p>
+                <div className="flex justify-evenly">
+                  <div className="w-5 h-5 rounded-full bg-gray-400" />
+                  <div className="w-5 h-5 rounded-full bg-gray-400" />
+                </div>
+              </div>
+            </div>
+          )
+        )}
       </div>
     </>
   );

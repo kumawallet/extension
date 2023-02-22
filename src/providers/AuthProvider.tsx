@@ -54,7 +54,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     isSignUp,
   }: AccountFormType) => {
     try {
-      if (!password) throw new Error("password_required");
       if (!seed) throw new Error("seed_required");
       await Extension.createAccounts(seed, name, password, isSignUp);
       return true;
