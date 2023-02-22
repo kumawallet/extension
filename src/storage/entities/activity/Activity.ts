@@ -53,7 +53,10 @@ export default class Activity extends BaseEntity {
   }
 
   addRecord(key: AccountKey, txHash: string, record: Record): void {
-    this.data[key][txHash.toLowerCase()] = record;
+    this.data[key] = {
+      ...this.data[key],
+      [txHash.toLowerCase()]: record,
+    };
   }
 
   getRecords(key: AccountKey, network: string): Record[] {

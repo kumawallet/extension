@@ -3,12 +3,12 @@ import { RecordData, RecordStatus, RecordType } from "./types";
 export default abstract class Record {
   hash: string;
   type: RecordType;
-  reference: string;
+  reference?: string;
   address: string;
   status: RecordStatus;
-  createdAt: number;
+  createdAt?: number;
   error: string | undefined;
-  lastUpdated: number;
+  lastUpdated?: number;
   network: string;
   recipientNetwork: string;
   abstract data: RecordData;

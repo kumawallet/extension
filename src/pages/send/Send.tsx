@@ -21,6 +21,12 @@ import { useToast } from "@src/hooks";
 import { useAccountContext } from "@src/providers/AccountProvider";
 import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/keyring";
+import Record from "@src/storage/entities/activity/Record";
+import {
+  RecordType,
+  RecordStatus,
+  TransferData,
+} from "../../storage/entities/activity/types";
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -71,23 +77,16 @@ export const Send = () => {
   const [isSendingTx, setIsSendingTx] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
-    //
     try {
+      let activity: Partial<Record>;
       setIsSendingTx(true);
-      // ethers.providers.JsonRpcProvider
       if (selectedAccount.type.includes("EMV")) {
         const tx = {
-          // from: selectedAccount.value.address,
           to: data.destinationAccount.address,
           value: ethers.utils.parseEther(String(data.amount)),
         };
 
         const pk = await Extension.showPrivateKey();
-
-        console.log({
-          tx,
-          pk,
-        });
 
         const wallet = new ethers.Wallet(
           pk as string,
@@ -105,7 +104,37 @@ export const Send = () => {
         const keyring = new Keyring({ type: "sr25519" });
         const sender = keyring.addFromMnemonic(seed as string);
         const res = await extrinsic?.signAndSend(sender);
-        console.log(res.toHuman());
+
+        const hash = res.toHuman();
+        const date = Date.now();
+
+        activity = {
+          address: destinationAccount.address,
+          type: RecordType.TRANSFER,
+          reference: "",
+          hash,
+          status: RecordStatus.PENDING,
+          createdAt: date,
+          lastUpdated: date,
+          error: undefined,
+          network: selectedChain?.name || "",
+          recipientNetwork: selectedChain?.name || "",
+          data: {
+            symbol: String(selectedChain?.nativeCurrency.symbol),
+            from: selectedAccount.value.address,
+            to: destinationAccount.address,
+            gas: "0",
+            gasPrice: "0",
+            value: amount,
+          } as TransferData,
+        };
+
+        console.log({
+          hash,
+          activity,
+        });
+
+        await Extension.addActivity(hash, activity as Record);
       }
     } catch (error) {
       console.log(error);
@@ -185,7 +214,9 @@ export const Send = () => {
         const { weight, partialFee } = await extrinsic.paymentInfo(sender);
 
         setWasmFees({
-          partialFee: partialFee.toString(),
+          partialFee:
+            partialFee.toNumber() /
+            10 ** (selectedChain?.nativeCurrency.decimals || 1),
           weightRefTime: weight.toJSON().refTime,
           weightProofSize: weight.toJSON().proofSize,
         });
