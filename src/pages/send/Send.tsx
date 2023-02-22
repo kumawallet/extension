@@ -208,8 +208,6 @@ export const Send = () => {
         const _amount =
           Number(amount) * 10 ** (selectedChain?.nativeCurrency.decimals || 1);
 
-        console.log(_amount);
-
         const extrinsic = await (api as ApiPromise).tx.balances.transfer(
           destinationAccount.address,
           _amount
@@ -242,6 +240,9 @@ export const Send = () => {
 
   const originAccountIsEVM = selectedAccount.type.includes("EVM");
 
+  const canContinue =
+    (Number(amount) > 0 && destinationAccount?.address) || loadingFee;
+
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
       <div className="mx-auto">
@@ -255,12 +256,12 @@ export const Send = () => {
           <p className="text-xl">{t("title")}</p>
         </div>
 
-        <div className="flex gap-2 justify-center items-end">
+        <div className="flex gap-2 justify-center items-end mb-4">
           <div className="px-2">
             <p className="mb-2">From:</p>
             <SelectableChain selectedChain={getValues("from")} />
           </div>
-          <TbChevronRight size={26} />
+          <TbChevronRight size={26} className="mb-2" />
           <div className="px-2">
             <p className="mb-2">To:</p>
             <SelectableChain
@@ -288,6 +289,7 @@ export const Send = () => {
               <NumericFormat
                 className="bg-transparent w-8/12 outline-0"
                 allowNegative={false}
+                allowLeadingZeros={false}
                 value={getValues("amount")}
                 onValueChange={({ value }) => {
                   setValue("amount", value);
@@ -323,6 +325,7 @@ export const Send = () => {
           classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
           onClick={onSubmit}
           isLoading={isSendingTx}
+          isDisabled={!canContinue}
         >
           {t("continue")}
         </LoadingButton>

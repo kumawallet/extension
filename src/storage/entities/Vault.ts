@@ -47,7 +47,6 @@ export default class Vault extends BaseEntity {
   static async showPrivateKey(key: AccountKey): Promise<string | undefined> {
     const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("failed_to_show_private_key");
-    console.log("vault", vault);
     return vault?.keyrings[key]?.privateKey;
   }
 

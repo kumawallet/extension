@@ -23,7 +23,9 @@ export const LoadingButton: FC<LoadinButtonProps & PropsWithChildren> = ({
 }) => {
   return (
     <button
-      className={classname || DEFAULT_CLASSNAME}
+      className={`${
+        classname || DEFAULT_CLASSNAME
+      } disabled:opacity-30 disabled:bg-gray-600`}
       onClick={onClick}
       disabled={isDisabled || isLoading}
     >

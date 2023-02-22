@@ -50,11 +50,13 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
             <Listbox.Option
               key={index.toString()}
               value={account}
-              className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md"
+              className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden"
             >
               <div>
                 <p>{account.name}</p>
-                <p className="text-gray-400 text-sm">{account.address}</p>
+                <p className="text-gray-400 text-sm text-ellipsis overflow-hidden">
+                  {account.address}
+                </p>
               </div>
             </Listbox.Option>
           ))}
