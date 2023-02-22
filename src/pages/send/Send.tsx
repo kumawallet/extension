@@ -64,6 +64,7 @@ export const Send = () => {
   const amount = watch("amount");
   const destinationAccount = watch("destinationAccount");
 
+  const [extrinsic, setExtrinsic] = useState<any>(null);
   const [evmFees, setEvmFees] = useState({});
   const [wasmFees, setWasmFees] = useState({});
   const [loadingFee, setLoadingFee] = useState(true);
@@ -98,6 +99,13 @@ export const Send = () => {
         console.log("tx result", res);
       } else {
         // polkadot
+        console.log("sending extrinsic...");
+        const seed = await Extension.showSeed();
+
+        const keyring = new Keyring({ type: "sr25519" });
+        const sender = keyring.addFromMnemonic(seed as string);
+        const res = await extrinsic?.signAndSend(sender);
+        console.log(res.toHuman());
       }
     } catch (error) {
       console.log(error);
@@ -157,10 +165,17 @@ export const Send = () => {
 
     const getData = setTimeout(async () => {
       try {
+        const _amount =
+          Number(amount) * 10 ** (selectedChain?.nativeCurrency.decimals || 1);
+
+        console.log(_amount);
+
         const extrinsic = await (api as ApiPromise).tx.balances.transfer(
           destinationAccount.address,
-          amount * selectedChain?.nativeCurrency.decimals
+          _amount
         );
+
+        setExtrinsic(extrinsic);
 
         const seed = await Extension.showSeed();
 

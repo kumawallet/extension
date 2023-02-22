@@ -37,7 +37,9 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
           {destination ? (
             <div className="text-start min-h-[40px] w-full">
               <p>{destination.name}</p>
-              <p className="text-sm">{destination.address}</p>
+              <p className="text-sm overflow-hidden text-ellipsis">
+                {destination.address}
+              </p>
             </div>
           ) : (
             ""
