@@ -2,7 +2,6 @@ import { AccountType } from "@src/accounts/types";
 
 const WASM = "WASM" as AccountType.WASM;
 const EVM = "EVM" as AccountType.EVM;
-type supportedAccountType = AccountType;
 export interface Chain {
   name: string;
   chain?: string;
@@ -20,7 +19,8 @@ export interface Chain {
     name: string;
     url: string;
   }[];
-  supportedAccounts: supportedAccountType[];
+  supportedAccounts: AccountType[];
+  xcm?: string[]
 }
 
 export const MAINNETS: Chain[] = [
