@@ -12,5 +12,6 @@ export enum SettingType {
 
 export enum SettingKey {
   LANGUAGES = "languages",
+  MANAGE_NETWORKS = "manage_networks",
 }
 export type SettingValue = string | Language[] | number | boolean;

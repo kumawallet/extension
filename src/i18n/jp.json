@@ -45,7 +45,9 @@
     "no_contacts_found": "連絡先が見つかりませんでした",
     "name_required": "名前が必要です",
     "address_required": "住所が必要です",
-    "view_in_scanner": "スキャナーで表示"
+    "view_in_scanner": "スキャナーで表示",
+    "add": "追加",
+    "manage": "管理"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -142,6 +144,13 @@
   "general_settings": {
     "title": "一般",
     "languages": "言語"
+  },
+  "advanced_settings": {
+    "title": "高度な",
+    "manage_networks": "ネットワークを追加"
+  },
+  "manage_networks": {
+    "title": "ネットワークを追加"
   },
   "contacts": {
     "title": "連絡先",

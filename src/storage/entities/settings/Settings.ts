@@ -25,6 +25,8 @@ export default class Settings extends BaseEntity {
       SettingKey.LANGUAGES,
       LanguageSetting.getSupportedLanguages()
     );
+    // this setting does not have a value (the true is just a placeholder)
+    settings.addToAdvanced(SettingKey.MANAGE_NETWORKS, true);
     await Settings.set(settings);
   }
 
@@ -37,12 +39,14 @@ export default class Settings extends BaseEntity {
     this.data.general[key] = setting;
   }
 
-  addToAdvanced(key: SettingKey, value: Setting) {
-    this.data.advanced[key] = value;
+  addToAdvanced(key: SettingKey, value: SettingValue) {
+    const setting = new Setting(key, value);
+    this.data.advanced[key] = setting;
   }
 
-  addToSecurity(key: SettingKey, value: Setting) {
-    this.data.security[key] = value;
+  addToSecurity(key: SettingKey, value: SettingValue) {
+    const setting = new Setting(key, value);
+    this.data.security[key] = setting;
   }
 
   getFromGeneral(key: SettingKey) {
