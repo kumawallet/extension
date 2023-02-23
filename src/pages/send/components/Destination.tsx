@@ -90,6 +90,7 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
     <Combobox value={destination} onChange={onChangeAccount}>
       <div className="relative mt-1">
         <Combobox.Input
+          autoComplete="off"
           className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
           onChange={({ target }) => onChangeAccount(target.value)}
           displayValue={(dest) => {
@@ -103,35 +104,36 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
           onBlur={() => {
             setTimeout(() => {
               setisOpenOptions(false);
-            }, 100);
+            }, 200);
           }}
         />
         {filteredAddresses.length > 0 && (
           <Combobox.Options
             static={isOpenOptions}
-            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50"
+            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50 px-2"
           >
             {filteredAddresses.map(
               (type) =>
                 type.values?.length > 0 && (
-                  <>
-                    <p className="px-2 text-[#808385] text-sm">{type.label}</p>
+                  <div key={type.label}>
+                    <div className="flex items-center gap-3 whitespace-nowrap">
+                      <p className="text-[#808385] text-lg">{type.label}</p>
+                      <div className="h-[1px] w-full bg-[#343A40]" />
+                    </div>
                     {type.values.map((acc) => (
-                      <>
-                        <Combobox.Option
-                          key={acc.id}
-                          value={acc}
-                          className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden"
-                          onClick={() => setisOpenOptions(false)}
-                        >
-                          <p>{acc.name}</p>
-                          <p className="text-gray-400 text-sm text-ellipsis overflow-hidden">
-                            {acc.address}
-                          </p>{" "}
-                        </Combobox.Option>
-                      </>
+                      <Combobox.Option
+                        key={acc.address}
+                        value={acc}
+                        className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1"
+                        onClick={() => setisOpenOptions(false)}
+                      >
+                        <p className="font-light text-gray-100">{acc.name}</p>
+                        <p className="text-gray-100 font-light text-sm text-ellipsis overflow-hidden">
+                          {acc.address}
+                        </p>{" "}
+                      </Combobox.Option>
                     ))}
-                  </>
+                  </div>
                 )
             )}
           </Combobox.Options>

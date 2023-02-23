@@ -81,10 +81,18 @@ export const Send = () => {
   const destinationAccount = watch("destinationAccount");
 
   const [extrinsic, setExtrinsic] = useState<any>(null);
-  const [evmFees, setEvmFees] = useState({});
+  const [evmFees, setEvmFees] = useState<any>({});
   const [wasmFees, setWasmFees] = useState({});
-  const [loadingFee, setLoadingFee] = useState(true);
+  const [loadingFee, setLoadingFee] = useState(false);
   const [isSendingTx, setIsSendingTx] = useState(false);
+  const [evmTx, setEvmTx] = useState<
+    ethers.utils.Deferrable<ethers.providers.TransactionRequest>
+  >({
+    to: "",
+    value: 0,
+    maxPriorityFeePerGas: 0,
+    maxFeePerGas: 0,
+  });
 
   const onSubmit = handleSubmit(async (data) => {
     setIsSendingTx(true);
@@ -94,11 +102,6 @@ export const Send = () => {
       let reference = "";
 
       if (selectedAccount.type.includes("EVM")) {
-        const tx = {
-          to: data.destinationAccount.address,
-          value: ethers.utils.parseEther(String(data.amount)),
-        };
-
         const pk = await Extension.showPrivateKey();
 
         const wallet = new ethers.Wallet(
@@ -106,7 +109,12 @@ export const Send = () => {
           api as ethers.providers.JsonRpcProvider
         );
 
-        const res = await wallet.sendTransaction(tx);
+        const res = await wallet.sendTransaction({
+          ...evmTx,
+          value: Number(
+            evmTx.value * 10 ** (selectedChain?.nativeCurrency?.decimals || 1)
+          ),
+        });
 
         hash = res.hash;
         date = Date.now();
@@ -156,37 +164,37 @@ export const Send = () => {
   });
 
   const formatEthAmount = useCallback(
-    (amount: any) => {
+    (amount: any, unitName?: any) => {
       return ethers.utils.formatUnits(
         amount,
-        selectedChain?.nativeCurrency.decimals as number
+        unitName || (selectedChain?.nativeCurrency.decimals as number)
       );
     },
     [selectedChain?.nativeCurrency.decimals]
   );
 
   useEffect(() => {
+    if (!evmTx?.to) return;
     (async () => {
       try {
         if (selectedAccount.type.includes("EVM")) {
-          const feeData = await (
-            api as ethers.providers.JsonRpcProvider
-          ).getFeeData();
-
-          const gas = formatEthAmount(feeData.gasPrice);
-          const lastBaseFeePerGas = formatEthAmount(feeData.lastBaseFeePerGas);
-          const maxFeePerGas = formatEthAmount(feeData.maxFeePerGas);
-          const maxPriorityFeePerGas = formatEthAmount(
-            feeData.maxPriorityFeePerGas
-          );
+          const [feeData, gasLimit] = await Promise.all([
+            (api as ethers.providers.JsonRpcProvider).getFeeData(),
+            (api as ethers.providers.JsonRpcProvider).estimateGas(evmTx),
+          ]);
 
           setEvmFees({
-            gas,
-            lastBaseFeePerGas,
-            maxFeePerGas,
-            maxPriorityFeePerGas,
+            gasLimit: gasLimit,
+            lastBaseFeePerGas: feeData.lastBaseFeePerGas,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
           });
-        } else {
+
+          setEvmTx((prevState) => ({
+            ...prevState,
+            gasLimit,
+            maxFeePerGas: feeData.maxFeePerGas,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+          }));
         }
       } catch (error) {
         showErrorToast(error);
@@ -194,10 +202,17 @@ export const Send = () => {
         setLoadingFee(false);
       }
     })();
-  }, []);
+  }, [evmTx?.to]);
 
   useEffect(() => {
-    if (selectedAccount.type.includes("EVM")) return;
+    if (selectedAccount.type.includes("EVM")) {
+      setEvmTx((prevState) => ({
+        ...prevState,
+        value: amount,
+        to: destinationAccount?.address || "",
+      }));
+      return;
+    }
 
     if (!destinationAccount || amount <= 0) return;
 
@@ -205,8 +220,10 @@ export const Send = () => {
 
     const getData = setTimeout(async () => {
       try {
-        const _amount =
-          Number(amount) * 10 ** (selectedChain?.nativeCurrency.decimals || 1);
+        const currencyUnits =
+          10 ** (selectedChain?.nativeCurrency.decimals || 1);
+
+        const _amount = Number(amount) * currencyUnits;
 
         const extrinsic = await (api as ApiPromise).tx.balances.transfer(
           destinationAccount.address,
@@ -222,12 +239,17 @@ export const Send = () => {
 
         const { weight, partialFee } = await extrinsic.paymentInfo(sender);
 
+        const fee = partialFee.toNumber() / currencyUnits;
+
+        const currencySymbol = selectedChain?.nativeCurrency.symbol;
+
+        const total = (partialFee.toNumber() + _amount) / currencyUnits;
+
         setWasmFees({
-          partialFee:
-            partialFee.toNumber() /
-            10 ** (selectedChain?.nativeCurrency.decimals || 1),
-          weightRefTime: weight.toJSON().refTime,
-          weightProofSize: weight.toJSON().proofSize,
+          "estimated fee": `${fee} ${currencySymbol}`,
+          "weight ref time": weight.toJSON().refTime,
+          "weight proof size": weight.toJSON().proofSize,
+          "estimated total": `${total} ${currencySymbol}`,
         });
       } catch (error) {
         console.error(error);
@@ -236,7 +258,7 @@ export const Send = () => {
     }, 1000);
 
     return () => clearTimeout(getData);
-  }, [amount, destinationAccount]);
+  }, [amount, destinationAccount?.address]);
 
   const originAccountIsEVM = selectedAccount.type.includes("EVM");
 
@@ -313,7 +335,11 @@ export const Send = () => {
                 (key) => (
                   <div key={key} className="flex justify-between">
                     <p>{key}</p>
-                    <p>{originAccountIsEVM ? evmFees[key] : wasmFees[key]}</p>
+                    <p>
+                      {originAccountIsEVM
+                        ? `${Number(evmFees[key])} gwei`
+                        : wasmFees[key]}
+                    </p>
                   </div>
                 )
               )}

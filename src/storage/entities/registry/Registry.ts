@@ -78,6 +78,20 @@ export default class Registry extends BaseEntity {
     if (!this.data.recent[network]) {
       this.data.recent[network] = [] as unknown as [Register];
     }
+
+    const recentIndex = this.data.recent[network].findIndex(
+      (recent) => recent.address === register.address
+    );
+    const alreadyRegister = recentIndex > -1;
+    const finalRecentIndex = this.data.recent[network].length - 1;
+
+    if (alreadyRegister && recentIndex === finalRecentIndex) return;
+
+    if (alreadyRegister && recentIndex !== finalRecentIndex) {
+      // delete from last position
+      this.data.recent[network].splice(recentIndex, 1);
+    }
+
     if (this.data.recent[network].length >= 10) {
       this.data.recent[network].shift();
     }
