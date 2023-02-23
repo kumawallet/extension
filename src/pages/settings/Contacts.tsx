@@ -80,11 +80,11 @@ export const Contacts = () => {
           <div className="flex-1 flex justify-end">
             <button
               type="button"
-              className="mt-5 inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+              className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
               onClick={() => toggleCreateContact()}
             >
-              Add
-              <BsPlus />
+              <span>{tCommon('add')} </span>
+              <BsPlus size={ICON_SIZE} />
             </button>
           </div>
         )}

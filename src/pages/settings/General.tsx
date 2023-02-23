@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
-import { Language } from "@src/storage/entities/settings/types";
+import { Language, SettingKey } from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
 
 export const General = () => {
@@ -69,23 +69,28 @@ export const General = () => {
         />
         <p className="font-medium text-2xl">{t("title")}</p>
       </div>
-      {settings.map((setting, index) => (
-        <div key={index} className="flex flex-col gap-2">
-          <p className="text-lg font-medium">{t(setting.name)}</p>
-          <select
-            className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-            onChange={(e) => saveLanguage(e.target.value)}
-            value={selectedLanguage}
-          >
-            {setting.isLanguageArray() &&
-              (setting.value as Language[]).map((option, index) => (
-                <option key={index} value={option.lang}>
-                  {`${option.name} (${option.englishName})`}
-                </option>
-              ))}
-          </select>
-        </div>
-      ))}
+      {settings.map((setting, index) => {
+        switch (setting.name) {
+          case SettingKey.LANGUAGES:
+            return (
+              <div key={index} className="flex flex-col gap-2">
+                <p className="text-lg font-medium">{t(setting.name)}</p>
+                <select
+                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  onChange={(e) => saveLanguage(e.target.value)}
+                  value={selectedLanguage}
+                >
+                  {setting.isLanguageArray() &&
+                    (setting.value as Language[]).map((option, index) => (
+                      <option key={index} value={option.lang}>
+                        {`${option.name} (${option.englishName})`}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            );
+        }
+      })}
     </PageWrapper>
   );
 };

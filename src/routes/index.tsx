@@ -10,6 +10,7 @@ import {
   General,
   Security,
 } from "@src/pages/settings";
+import { ManageNetworks } from "@src/pages/settings/advanced";
 import Extension from "@src/Extension";
 import {
   useAccountContext,
@@ -28,6 +29,7 @@ import {
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
   SETTINGS_SECURITY,
+  SETTINGS_MANAGE_NETWORKS,
   SIGNIN,
 } from "./paths";
 
@@ -167,6 +169,7 @@ export const Routes = () => {
         {/* setting views */}
         <Route path={SETTINGS_GENERAL} element={<General />} />
         <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
+        <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
         <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />

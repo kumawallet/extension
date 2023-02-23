@@ -184,6 +184,12 @@ export default class Extension {
     return settings.getAll(SettingType.GENERAL);
   }
 
+  static async getAdvancedSettings(): Promise<Setting[]> {
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
+    return settings.getAll(SettingType.ADVANCED);
+  }
+
   static async getContacts(): Promise<Contact[]> {
     const registry = await Registry.get<Registry>();
     if (!registry) throw new Error("failed_to_get_registry");
@@ -224,10 +230,10 @@ export default class Extension {
     return Activity.getRecords();
   }
 
-  static async getAllChains(): Promise<Chains> {
+  static async getAllChains(): Promise<Chain[]> {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
-    return chains;
+    return chains.getAll();
   }
 
   static async getXCMChains(chainName: string): Promise<Chain[]> {

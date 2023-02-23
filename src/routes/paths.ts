@@ -10,3 +10,4 @@ export const SETTINGS_ADVANCED = "/settings-advanced";
 export const SETTINGS_CONTACTS = "/settings-contacts";
 export const SETTINGS_SECURITY = "/settings-security";
 export const SETTINGS_BUG = "/settings-bug";
+export const SETTINGS_MANAGE_NETWORKS = "/settings-manage-networks";

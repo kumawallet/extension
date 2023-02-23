@@ -45,7 +45,9 @@
     "no_contacts_found": "No contacts found",
     "name_required": "Name is required",
     "address_required": "Address is required",
-    "view_in_scanner": "Explore"
+    "view_in_scanner": "Explore",
+    "add": "Add",
+    "manage": "Manage"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -142,6 +144,13 @@
   "general_settings": {
     "title": "General",
     "languages": "Languages"
+  },
+  "advanced_settings": {
+    "title": "Advanced",
+    "manage_networks": "Manage networks"
+  },
+  "manage_networks": {
+    "title": "Manage networks"
   },
   "contacts": {
     "title": "Contacts",
