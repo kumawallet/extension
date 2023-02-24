@@ -9,15 +9,16 @@ import {
   SignIn,
   Welcome,
   Send,
+  ManageAssets,
 } from "@src/pages";
 import {
   Advanced,
   BugReport,
   Contacts,
   General,
+  ManageNetworks,
   Security,
 } from "@src/pages/settings";
-import { ManageNetworks } from "@src/pages/settings/advanced";
 import Extension from "@src/Extension";
 import {
   useAccountContext,
@@ -38,6 +39,7 @@ import {
   SETTINGS_SECURITY,
   SETTINGS_MANAGE_NETWORKS,
   SIGNIN,
+  MANAGE_ASSETS,
 } from "./paths";
 
 // TODO: delete for production
@@ -103,6 +105,8 @@ export const Routes = () => {
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={SEND} element={<Send />} />
+        <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
+
         <Route
           path={IMPORT_ACCOUNT}
           element={

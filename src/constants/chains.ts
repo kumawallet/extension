@@ -20,7 +20,7 @@ export interface Chain {
     url: string;
   }[];
   supportedAccounts: AccountType[];
-  xcm?: string[]
+  xcm?: string[];
 }
 
 export const MAINNETS: Chain[] = [
@@ -217,7 +217,7 @@ export const TESTNETS: Chain[] = [
     name: "Contracts Testnet",
     chain: "Rococo",
     rpc: {
-      wasm: "wss://rococo-rpc.polkadot.io",
+      wasm: "wss://rococo-rockmine-rpc.polkadot.io",
     },
     addressPrefix: 42,
 

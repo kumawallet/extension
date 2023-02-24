@@ -24,6 +24,7 @@
     "@metamask/browser-passworder": "^4.0.2",
     "@polkadot/api": "^9.11.3",
     "@polkadot/ui-keyring": "^2.10.1",
+    "@polkadot/util": "^10.4.2",
     "@polkadot/util-crypto": "^10.2.6",
     "ethers": "^5.7.2",
     "i18next": "^22.4.9",
