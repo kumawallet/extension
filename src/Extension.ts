@@ -49,8 +49,17 @@ export default class Extension {
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_create_accounts");
-    await AccountManager.addWASMAccount(seed, name);
-    await AccountManager.addEVMAccount(seed, name);
+
+    const wasmAccount = await AccountManager.addWASMAccount(seed, name);
+    const evmAccount = await AccountManager.addEVMAccount(seed, name);
+
+    const selectedAccount = await this.getSelectedAccount();
+
+    const selectedAccontIsEVM = selectedAccount?.type.includes("EVM");
+
+    await this.setSelectedAccount(
+      selectedAccontIsEVM ? evmAccount : wasmAccount
+    );
     return true;
   }
 
@@ -70,11 +79,12 @@ export default class Extension {
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_import_account");
-    await AccountManager.importAccount({
+    const account = await AccountManager.importAccount({
       name,
       privateKeyOrSeed,
       accountType,
     });
+    this.setSelectedAccount(account);
   }
 
   static async restorePassword(recoveryPhrase: string, newPassword: string) {
@@ -158,7 +168,9 @@ export default class Extension {
   ): Promise<Account> {
     const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("failed_to_derive_account");
-    return AccountManager.derive(name, vault, accountType);
+    const account = await AccountManager.derive(name, vault, accountType);
+    await this.setSelectedAccount(account);
+    return account;
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {

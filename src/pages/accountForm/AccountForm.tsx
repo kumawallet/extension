@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
 import { useAccountContext } from "@src/providers";
 import { AccountType } from "@src/accounts/types";
+import { getAccountType } from "../../utils/account-utils";
 import {
   InputErrorMessage,
   LoadingButton,
@@ -140,7 +141,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     formState: { errors },
   } = useForm<AccountForm>({
     defaultValues: {
-      accountType: selectedAccount?.type || AccountType.EVM,
+      accountType: getAccountType(selectedAccount?.type) || AccountType.EVM,
       confirmPassword: "",
       password: "",
       name: "",
@@ -166,7 +167,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       endLoading();
     }
   });
-
 
   if (isSuccessful)
     return (

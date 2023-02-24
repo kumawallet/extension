@@ -82,8 +82,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         throw new Error("failed_to_derive_account");
       }
       if (!accountType) throw new Error("account_type_required");
-      const account = await Extension.deriveAccount(name, accountType);
-      await Extension.setSelectedAccount(account);
+      await Extension.deriveAccount(name, accountType);
       return true;
     } catch (error) {
       showErrorToast(tCommon(error as string));
