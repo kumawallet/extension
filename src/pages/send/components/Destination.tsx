@@ -1,13 +1,20 @@
 import { FC, useEffect, useState, useMemo } from "react";
 import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
+import { useFormContext } from "react-hook-form";
 
 interface DestionationProps {
   onSelectedAccount: (address: string) => void;
 }
 
 export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
-  const [destination, setDestination] = useState({});
+  const { register, setValue } = useFormContext();
+  const { onBlur, onChange, ...r } = register("destinationAccount");
+
+  const [destination, setDestination] = useState({
+    name: "",
+    address: "",
+  });
   const [accountToSelect, setAccountToSelect] = useState<any>([]);
   const [isOpenOptions, setisOpenOptions] = useState(false);
 
@@ -87,12 +94,22 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
   }, [accountToSelect, destination]);
 
   return (
-    <Combobox value={destination} onChange={onChangeAccount}>
+    <Combobox
+      value={destination}
+      onChange={(value) => {
+        onChangeAccount(value);
+        setValue("destinationAccount", value?.address || "");
+      }}
+    >
       <div className="relative mt-1">
         <Combobox.Input
           autoComplete="off"
           className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-          onChange={({ target }) => onChangeAccount(target.value)}
+          onChange={({ target, type }) => {
+            onChangeAccount(target.value);
+            onChange({ target, type });
+          }}
+          {...r}
           displayValue={(dest) => {
             if (typeof dest === "string") {
               return dest;

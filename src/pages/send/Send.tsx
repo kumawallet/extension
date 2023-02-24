@@ -12,15 +12,15 @@ import { Destination } from "./components/Destination";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { SelectableAsset } from "./components/SelectableAsset";
 import { NumericFormat } from "react-number-format";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { number, object } from "yup";
+import { number, object, string } from "yup";
 import { ethers } from "ethers";
 import { useToast } from "@src/hooks";
 import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 import { ApiPromise } from "@polkadot/api";
-import { Keyring } from "@polkadot/keyring";
+import { decodeAddress, encodeAddress, Keyring } from "@polkadot/keyring";
 import Record from "@src/storage/entities/activity/Record";
 import {
   RecordType,
@@ -30,6 +30,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { BiLeftArrowAlt } from "react-icons/bi";
+import { isHex } from "@polkadot/util";
+import { isAddress } from "ethers/lib/utils";
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -52,21 +54,30 @@ export const Send = () => {
       to: object()
         .typeError(t("required") as string)
         .required(t("required") as string),
-      destinationAccount: object()
+      destinationAccount: string()
         .typeError(t("required") as string)
+        .test("valid address", t("invalid_address") as string, (address) => {
+          try {
+            if (!address) return false;
+
+            if (isHex(address)) {
+              return isAddress(address);
+            } else {
+              encodeAddress(decodeAddress(address));
+            }
+
+            return true;
+          } catch (error) {
+            return false;
+          }
+        })
         .required(t("required") as string),
       amount: number().required(t("required") as string),
       asset: object().required(t("required") as string),
     }).required();
   }, []);
 
-  const {
-    handleSubmit,
-    getValues,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<any>({
+  const methods = useForm<any>({
     defaultValues: {
       from: selectedChain,
       to: selectedChain,
@@ -75,10 +86,25 @@ export const Send = () => {
       asset: selectedChain?.nativeCurrency,
     },
     resolver: yupResolver(schema),
+    mode: "onChange",
   });
+  const {
+    handleSubmit,
+    getValues,
+    setValue,
+    watch,
+    formState: { errors },
+  } = methods;
 
   const amount = watch("amount");
   const destinationAccount = watch("destinationAccount");
+  const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
+
+  console.log({
+    destinationIsInvalid,
+    destinationAccount,
+    errors,
+  });
 
   const [extrinsic, setExtrinsic] = useState<any>(null);
   const [evmFees, setEvmFees] = useState<any>({});
@@ -205,6 +231,12 @@ export const Send = () => {
   }, [evmTx?.to]);
 
   useEffect(() => {
+    if (destinationIsInvalid) {
+      setEvmTx({});
+      setWasmFees({});
+      return;
+    }
+
     if (selectedAccount.type.includes("EVM")) {
       setEvmTx((prevState) => ({
         ...prevState,
@@ -258,7 +290,7 @@ export const Send = () => {
     }, 1000);
 
     return () => clearTimeout(getData);
-  }, [amount, destinationAccount?.address]);
+  }, [amount, destinationAccount?.address, destinationIsInvalid]);
 
   const originAccountIsEVM = selectedAccount.type.includes("EVM");
 
@@ -267,95 +299,98 @@ export const Send = () => {
 
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
-      <div className="mx-auto">
-        <div className="flex gap-3 items-center mb-7">
-          <BiLeftArrowAlt
-            size={26}
-            className="cursor-pointer"
-            onClick={() => navigate(-1)}
-          />
+      <FormProvider {...methods}>
+        <div className="mx-auto">
+          <div className="flex gap-3 items-center mb-7">
+            <BiLeftArrowAlt
+              size={26}
+              className="cursor-pointer"
+              onClick={() => navigate(-1)}
+            />
 
-          <p className="text-xl">{t("title")}</p>
-        </div>
+            <p className="text-xl">{t("title")}</p>
+          </div>
 
-        <div className="flex gap-2 justify-center items-end mb-4">
-          <div className="px-2">
-            <p className="mb-2">From:</p>
-            <SelectableChain selectedChain={getValues("from")} />
-          </div>
-          <TbChevronRight size={26} className="mb-2" />
-          <div className="px-2">
-            <p className="mb-2">To:</p>
-            <SelectableChain
-              canSelectChain={true}
-              selectedChain={getValues("to")}
-              optionChains={[]}
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-4 mb-3">
-          <div>
-            <p>{t("destination_account")}</p>
-            <Destination
-              onSelectedAccount={(account) =>
-                setValue("destinationAccount", account)
-              }
-            />
-            <InputErrorMessage
-              message={errors.destinationAccount?.message as string}
-            />
-          </div>
-          <div>
-            <p>{t("amount")}</p>
-            <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
-              <NumericFormat
-                className="bg-transparent w-8/12 outline-0"
-                allowNegative={false}
-                allowLeadingZeros={false}
-                value={getValues("amount")}
-                onValueChange={({ value }) => {
-                  setValue("amount", value);
-                }}
-                allowedDecimalSeparators={["%"]}
+          <div className="flex gap-2 justify-center items-end mb-4">
+            <div className="px-2">
+              <p className="mb-2">From:</p>
+              <SelectableChain selectedChain={getValues("from")} />
+            </div>
+            <TbChevronRight size={26} className="mb-2" />
+            <div className="px-2">
+              <p className="mb-2">To:</p>
+              <SelectableChain
+                canSelectChain={true}
+                selectedChain={getValues("to")}
+                optionChains={[]}
               />
-
-              <div className="w-4/12">
-                <SelectableAsset
-                  onChangeAsset={(asset) => setValue("asset", asset)}
-                />
-              </div>
             </div>
-            <InputErrorMessage message={errors.amount?.message as string} />
           </div>
-          {loadingFee ? (
-            <Loading />
-          ) : (
-            <div className="flex flex-col gap-1">
-              {Object.keys(originAccountIsEVM ? evmFees : wasmFees).map(
-                (key) => (
-                  <div key={key} className="flex justify-between">
-                    <p>{key}</p>
-                    <p>
-                      {originAccountIsEVM
-                        ? `${Number(evmFees[key])} gwei`
-                        : wasmFees[key]}
-                    </p>
-                  </div>
-                )
-              )}
+          <div className="flex flex-col gap-4 mb-3">
+            <div>
+              <p>{t("destination_account")}</p>
+              <Destination
+                onSelectedAccount={(account) =>
+                  // setValue("destinationAccount", account)
+                  null
+                }
+              />
+              <InputErrorMessage
+                message={errors.destinationAccount?.message as string}
+              />
             </div>
-          )}
-        </div>
+            <div>
+              <p>{t("amount")}</p>
+              <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
+                <NumericFormat
+                  className="bg-transparent w-8/12 outline-0"
+                  allowNegative={false}
+                  allowLeadingZeros={false}
+                  value={getValues("amount")}
+                  onValueChange={({ value }) => {
+                    setValue("amount", value);
+                  }}
+                  allowedDecimalSeparators={["%"]}
+                />
 
-        <LoadingButton
-          classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
-          onClick={onSubmit}
-          isLoading={isSendingTx}
-          isDisabled={!canContinue}
-        >
-          {t("continue")}
-        </LoadingButton>
-      </div>
+                <div className="w-4/12">
+                  <SelectableAsset
+                    onChangeAsset={(asset) => setValue("asset", asset)}
+                  />
+                </div>
+              </div>
+              <InputErrorMessage message={errors.amount?.message as string} />
+            </div>
+            {loadingFee ? (
+              <Loading />
+            ) : (
+              <div className="flex flex-col gap-1">
+                {Object.keys(originAccountIsEVM ? evmFees : wasmFees).map(
+                  (key) => (
+                    <div key={key} className="flex justify-between">
+                      <p>{key}</p>
+                      <p>
+                        {originAccountIsEVM
+                          ? `${Number(evmFees[key])} gwei`
+                          : wasmFees[key]}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+          </div>
+
+          <LoadingButton
+            classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
+            onClick={onSubmit}
+            isLoading={isSendingTx}
+            isDisabled={!canContinue}
+          >
+            {t("continue")}
+          </LoadingButton>
+        </div>
+      </FormProvider>
     </PageWrapper>
   );
 };
