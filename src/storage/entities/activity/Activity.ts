@@ -63,6 +63,6 @@ export default class Activity extends BaseEntity {
     const records = this.data[key] ? Object.values(this.data[key]) : [];
     return records
       .filter((r) => r.network.toLowerCase() === network.toLowerCase())
-      .sort((a, b) => b.createdAt - a.createdAt);
+      .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));
   }
 }

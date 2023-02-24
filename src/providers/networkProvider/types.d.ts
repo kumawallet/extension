@@ -1,4 +1,4 @@
-import { Chain } from "@src/constants/chains";
+import { Chain, CHAINS } from "@src/constants/chains";
 
 type SelectedChain = Chain | null;
 type Api = ApiPromise | ethers.providers.JsonRpcProvider | null;

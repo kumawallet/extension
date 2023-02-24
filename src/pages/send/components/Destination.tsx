@@ -56,17 +56,17 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
 
     const filters = [];
 
-    const filterdRecent = recent.values.filter((v) =>
+    const filterdRecent = recent.values.filter((v: any) =>
       v?.address
         ?.toLowerCase()
         .includes(destination.address.toLowerCase() || "")
     );
-    const filterdContacts = contacts.values.filter((v) =>
+    const filterdContacts = contacts.values.filter((v: any) =>
       v?.address
         ?.toLowerCase()
         .includes(destination.address.toLowerCase() || "")
     );
-    const filterdOwnAccounts = ownAccounts.values.filter((v) =>
+    const filterdOwnAccounts = ownAccounts.values.filter((v: any) =>
       v?.address
         ?.toLowerCase()
         .includes(destination.address.toLowerCase() || "")
@@ -110,7 +110,7 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
             onChange({ target, type });
           }}
           {...r}
-          displayValue={(dest) => {
+          displayValue={(dest: any) => {
             if (typeof dest === "string") {
               return dest;
             }
@@ -130,14 +130,14 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
             className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50 px-2"
           >
             {filteredAddresses.map(
-              (type) =>
+              (type: any) =>
                 type.values?.length > 0 && (
                   <div key={type.label}>
                     <div className="flex items-center gap-3 whitespace-nowrap">
                       <p className="text-[#808385] text-lg">{type.label}</p>
                       <div className="h-[1px] w-full bg-[#343A40]" />
                     </div>
-                    {type.values.map((acc) => (
+                    {type.values.map((acc: any) => (
                       <Combobox.Option
                         key={acc.address}
                         value={acc}

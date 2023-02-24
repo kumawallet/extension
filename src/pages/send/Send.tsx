@@ -108,7 +108,7 @@ export const Send = () => {
 
   const [extrinsic, setExtrinsic] = useState<any>(null);
   const [evmFees, setEvmFees] = useState<any>({});
-  const [wasmFees, setWasmFees] = useState({});
+  const [wasmFees, setWasmFees] = useState<any>({});
   const [loadingFee, setLoadingFee] = useState(false);
   const [isSendingTx, setIsSendingTx] = useState(false);
   const [evmTx, setEvmTx] = useState<
@@ -138,7 +138,8 @@ export const Send = () => {
         const res = await wallet.sendTransaction({
           ...evmTx,
           value: Number(
-            evmTx.value * 10 ** (selectedChain?.nativeCurrency?.decimals || 1)
+            Number(evmTx.value) *
+              10 ** (selectedChain?.nativeCurrency?.decimals || 1)
           ),
         });
 
@@ -215,12 +216,15 @@ export const Send = () => {
             maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
           });
 
-          setEvmTx((prevState) => ({
-            ...prevState,
-            gasLimit,
-            maxFeePerGas: feeData.maxFeePerGas,
-            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-          }));
+          setEvmTx(
+            (prevState) =>
+              ({
+                ...prevState,
+                gasLimit,
+                maxFeePerGas: feeData.maxFeePerGas,
+                maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+              } as any)
+          );
         }
       } catch (error) {
         showErrorToast(error);

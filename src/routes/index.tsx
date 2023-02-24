@@ -3,13 +3,13 @@ import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import {
-  AddAccount,
   AccountForm,
+  AddAccount,
   Balance,
+  ManageAssets,
+  Send,
   SignIn,
   Welcome,
-  Send,
-  ManageAssets,
 } from "@src/pages";
 import {
   Advanced,
@@ -31,26 +31,26 @@ import {
   CREATE_ACCOUNT,
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
+  MANAGE_ASSETS,
   RESTORE_PASSWORD,
+  SEND,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
-  SETTINGS_SECURITY,
   SETTINGS_MANAGE_NETWORKS,
+  SETTINGS_SECURITY,
   SIGNIN,
-  MANAGE_ASSETS,
 } from "./paths";
 
-// TODO: delete for production
 import { Decrypt } from "@src/components/decrypt";
-import { SEND } from "./paths";
+import { Loading } from "@src/components/common/Loading";
+import { isProduction } from "@src/utils/env";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
   const {
     state: { isInit },
-    // createAccount,
     restorePassword,
   } = useAuthContext();
 
@@ -60,42 +60,47 @@ export const Routes = () => {
 
   const { deriveAccount, createAccount, importAccount } = useAccountContext();
 
-  const [homeRoute, setHomeRoute] = useState(<>loading</>);
+  const [homeRoute, setHomeRoute] = useState(<Loading />);
   const [canDerive, setCanDerive] = useState(false);
   const [importIsSignUp, setImportIsSignUp] = useState(true);
 
   const getWalletStatus = async () => {
-    setCanDerive(await Extension.areAccountsInitialized());
-    setImportIsSignUp(!(await Extension.alreadySignedUp()));
+    const [candDerive, alreadySignedUp] = await Promise.all([
+      Extension.areAccountsInitialized(),
+      Extension.alreadySignedUp(),
+    ]);
+    setCanDerive(candDerive);
+    setImportIsSignUp(!alreadySignedUp);
   };
 
   useEffect(() => {
-    const getHomeRoute = async () => {
-      if (!isInit || !init) {
-        return;
-      }
-
-      const isFirstTime = !localStorage.getItem("welcome");
-      if (isFirstTime) {
-        setHomeRoute(<Welcome />);
-        return;
-      }
-      const alreadySignedUp = await Extension.alreadySignedUp();
-      if (!alreadySignedUp) {
-        setHomeRoute(<AddAccount />);
-        return;
-      }
-      const isUnlocked = await Extension.isUnlocked();
-
-      if (!isUnlocked) {
-        setHomeRoute(<SignIn />);
-        return;
-      }
-      setHomeRoute(<Balance />);
-    };
     getHomeRoute();
     getWalletStatus();
   }, [Extension, isInit, init]);
+
+  const getHomeRoute = async () => {
+    if (!isInit || !init) {
+      return;
+    }
+
+    const isFirstTime = !localStorage.getItem("welcome");
+    if (isFirstTime) {
+      setHomeRoute(<Welcome />);
+      return;
+    }
+    const alreadySignedUp = await Extension.alreadySignedUp();
+    if (!alreadySignedUp) {
+      setHomeRoute(<AddAccount />);
+      return;
+    }
+    const isUnlocked = await Extension.isUnlocked();
+
+    if (!isUnlocked) {
+      setHomeRoute(<SignIn />);
+      return;
+    }
+    setHomeRoute(<Balance />);
+  };
 
   return (
     <MemoryRouter>
@@ -187,8 +192,7 @@ export const Routes = () => {
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
 
-        {/* TODO: remove, only for developmet */}
-        <Route path="/decrypt" element={<Decrypt />} />
+        {!isProduction && <Route path="/decrypt" element={<Decrypt />} />}
       </RRoutes>
     </MemoryRouter>
   );

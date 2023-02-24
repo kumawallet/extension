@@ -55,9 +55,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   }: AccountFormType) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
-      if (!password && !isUnlocked) {
-        throw new Error("password_required");
-      }
+      if (!password && !isUnlocked) throw new Error("password_required");
       if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
       if (!accountType) throw new Error("account_type_required");
       await Extension.importAccount(
@@ -78,9 +76,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const deriveAccount = async ({ name, accountType }: AccountFormType) => {
     try {
       const isUnlocked = await Extension.isUnlocked();
-      if (!isUnlocked) {
-        throw new Error("failed_to_derive_account");
-      }
+      if (!isUnlocked) throw new Error("failed_to_derive_account");
       if (!accountType) throw new Error("account_type_required");
       await Extension.deriveAccount(name, accountType);
       return true;

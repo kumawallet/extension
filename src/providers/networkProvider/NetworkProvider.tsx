@@ -153,7 +153,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   //  only for chain with multi support (WASM and EVM)
   const setNewRpc = async (type: string) => {
     try {
-      const _type: any = getAccountType(type);
+      const _type = getAccountType(type);
 
       if (!_type) return;
 

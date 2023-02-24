@@ -106,7 +106,7 @@ export const Activity = () => {
           address.toLowerCase().includes(_search)
         );
       })
-      .sort((a, b) => b.lastUpdated - a.lastUpdated);
+      .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, records]);
 
   if (isLoading) {
@@ -131,7 +131,7 @@ export const Activity = () => {
           </div>
         )}
         {filteredRecords.map(
-          ({ address, status, lastUpdated, data, network, hash }, index) => (
+          ({ address, status, lastUpdated, data, network, hash }) => (
             <div
               key={hash}
               className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
@@ -141,7 +141,7 @@ export const Activity = () => {
                 <div className="overflow-hidden text-ellipsis py-4 px-1">
                   <p className="text-sm">{getContactName(address)}</p>
                   <p>
-                    {`${formatDate(lastUpdated)} - `}
+                    {`${formatDate(lastUpdated as number)} - `}
                     <a
                       className="text-custom-green-bg hover:text-white text-sm"
                       href={getLink(network, hash)}

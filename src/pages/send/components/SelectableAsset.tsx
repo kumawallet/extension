@@ -18,7 +18,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
   } = useNetworkContext();
 
   const { showErrorToast } = useToast();
-  const [asset, setAsset] = useState(null);
+  const [asset, setAsset] = useState<any>(null);
   const [assetsToSelect, setAssetsToSelect] = useState(assetList);
 
   const _onChangeAsset = (asset: any) => {

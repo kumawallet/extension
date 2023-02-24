@@ -16,11 +16,20 @@ type MetadaObject = {
   entries: () => Promise<any>;
 };
 
+type MetadataFunction = (assetId: assetId) => Promise<any>;
+
 // TODO: move to global instance?
 interface AssetPallet {
   account: (assetId: assetId, accountId32: accountId32) => Promise<any>;
   asset: (assetId?: assetId) => null | object;
-  metadata: ((assetId: assetId) => Promise<any>) | MetadaObject;
+  metadata: MetadataFunction | MetadaObject;
+}
+
+interface AssetToSelect {
+  name: string;
+  symbol: string;
+  decimals: string;
+  id: string;
 }
 
 export const ManageAssets = () => {
@@ -40,8 +49,10 @@ export const ManageAssets = () => {
   const [loading, setIsLoading] = useState(true);
   const [assetPallet, setAssetPallet] = useState<null | AssetPallet>(null);
   const [search, setSearch] = useState("");
-  const [assetToSelect, setAssetToSelect] = useState([]);
-  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [assetToSelect, setAssetToSelect] = useState<AssetToSelect[]>([]);
+  const [selectedAsset, setSelectedAsset] = useState<AssetToSelect | null>(
+    null
+  );
 
   useEffect(() => {
     if (!isEVM) {
@@ -51,7 +62,7 @@ export const ManageAssets = () => {
 
   const loadPolkadotAssets = async () => {
     try {
-      const assetPallet = await (api as ApiPromise)?.query?.assets;
+      const assetPallet: any = await (api as ApiPromise)?.query?.assets;
       console.log(assetPallet);
       if (!assetPallet) {
         setchainSupportAsset(false);
@@ -69,7 +80,9 @@ export const ManageAssets = () => {
 
   const searchPolkadotAsset = async () => {
     if (!search) {
-      const assets = await (assetPallet?.metadata as MetadaObject).entries();
+      const assets: any = await (
+        assetPallet?.metadata as MetadaObject
+      ).entries();
       setAssetToSelect(
         assets.map(
           ([
@@ -77,7 +90,7 @@ export const ManageAssets = () => {
               args: [id],
             },
             asset,
-          ]) => {
+          ]: any) => {
             return {
               id: Number(id),
               name: u8aToString(asset?.name),
@@ -88,7 +101,9 @@ export const ManageAssets = () => {
         )
       );
     } else {
-      const assetMetadata = await assetPallet?.metadata(search);
+      const assetMetadata = await (assetPallet?.metadata as MetadataFunction)(
+        search
+      );
     }
     setSelectedAsset(null);
   };
