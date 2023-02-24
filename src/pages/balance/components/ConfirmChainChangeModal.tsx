@@ -5,7 +5,7 @@ import { SiWebassembly, SiEthereum } from "react-icons/si";
 import { Chain } from "@src/constants/chains";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
+import { CREATE_ACCOUNT } from "@src/routes/paths";
 
 interface ConfirmChainChangeModalProps {
   isOpen: boolean;
@@ -87,7 +87,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   <p className="text-sm">
                     {needToCreateAccount
                       ? t("chain_selector.create_or_import_warning", {
-                          type_supported_account: `$t(chain_selector.${chainType}_type)`,
+                          type_supported: `$t(chain_selector.${chainType}_type)`,
                         })
                       : t("chain_selector.network_change_warning")}
                   </p>
@@ -111,13 +111,13 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                     </button>
                   ) : (
                     <>
-                      <button
+                      {/* <button
                         type="button"
                         className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
                         onClick={() => navigate(IMPORT_ACCOUNT)}
                       >
                         {t("chain_selector.import_account")}
-                      </button>
+                      </button> */}
                       <button
                         type="button"
                         className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"

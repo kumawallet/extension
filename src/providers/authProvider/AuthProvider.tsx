@@ -1,4 +1,3 @@
-import { useToast } from "../hooks";
 import {
   createContext,
   FC,
@@ -6,36 +5,20 @@ import {
   useContext,
   useReducer,
 } from "react";
-import Extension from "../Extension";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@src/hooks";
+import Extension from "@src/Extension";
 import { AccountFormType } from "@src/pages";
-
-interface InitialState {
-  isInit: boolean;
-}
+import { Action, AuthContext, InitialState } from "./types";
 
 const initialState: InitialState = {
   isInit: true,
 };
 
-interface AuthContext {
-  state: InitialState;
-  createAccount: (account: AccountFormType) => Promise<boolean>;
-  importAccount: (account: AccountFormType) => Promise<boolean>;
-  deriveAccount: (account: AccountFormType) => Promise<boolean>;
-  restorePassword: (account: AccountFormType) => Promise<boolean>;
-}
-
 const AuthContext = createContext({} as AuthContext);
 
-const reducer = (state: InitialState, action: any): InitialState => {
+const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
-    case "init": {
-      return {
-        ...action.payload,
-        isInit: false,
-      };
-    }
     default:
       return state;
   }

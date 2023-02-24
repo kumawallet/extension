@@ -1,3 +1,3 @@
-export * from "./AccountProvider";
-export * from "./AuthProvider";
-export * from "./NetworkProvider";
+export * from "./accountProvider";
+export * from "./authProvider";
+export * from "./networkProvider";

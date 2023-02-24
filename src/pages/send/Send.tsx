@@ -18,7 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object } from "yup";
 import { ethers } from "ethers";
 import { useToast } from "@src/hooks";
-import { useAccountContext } from "@src/providers/AccountProvider";
+import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/keyring";
 import Record from "@src/storage/entities/activity/Record";

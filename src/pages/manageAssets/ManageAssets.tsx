@@ -2,10 +2,10 @@ import { Loading, LoadingButton, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext } from "@src/providers/AccountProvider";
+import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 import { useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
-import { useNetworkContext } from "@src/providers/NetworkProvider";
+import { useNetworkContext } from "@src/providers/networkProvider/NetworkProvider";
 import { ApiPromise } from "@polkadot/api";
 import { u8aToString } from "@polkadot/util";
 

@@ -1,4 +1,3 @@
-import Extension from "../Extension";
 import {
   createContext,
   FC,
@@ -7,21 +6,17 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { useToast } from "../hooks";
-import { useNetworkContext } from "./NetworkProvider";
+import { useTranslation } from "react-i18next";
+import { AccountFormType } from "@src/pages";
+import Extension from "@src/Extension";
+import { useToast } from "@src/hooks";
+import { useNetworkContext } from "../networkProvider/NetworkProvider";
 import { transformAddress } from "@src/utils/account-utils";
-import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "../constants/chains";
+import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "@src/constants/chains";
 import Account from "@src/storage/entities/Account";
 import { AccountType } from "@src/accounts/types";
-import { useAuthContext } from "./AuthProvider";
-import { AccountFormType } from "@src/pages";
-import { useTranslation } from "react-i18next";
-
-interface InitialState {
-  accounts: Account[];
-  isLoadingAccounts: boolean;
-  selectedAccount: Account;
-}
+import { useAuthContext } from "../authProvider/AuthProvider";
+import { Action, AccountContext, InitialState } from "./types";
 
 const initialState: InitialState = {
   accounts: [],
@@ -29,19 +24,9 @@ const initialState: InitialState = {
   selectedAccount: {} as Account,
 };
 
-const AccountContext = createContext(
-  {} as {
-    state: InitialState;
-    getAllAccounts: (type?: AccountType[] | null) => Promise<Account[]>;
-    getSelectedAccount: () => Promise<Account | undefined>;
-    setSelectedAccount: (account: Account) => void;
-    deriveAccount: (account: AccountFormType) => Promise<boolean>;
-    importAccount: (account: AccountFormType) => Promise<boolean>;
-    createAccount: (account: AccountFormType) => Promise<boolean>;
-  }
-);
+const AccountContext = createContext({} as AccountContext);
 
-const reducer = (state: InitialState, action: any): InitialState => {
+const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "set-accounts": {
       const { accounts } = action.payload;
@@ -66,7 +51,7 @@ const reducer = (state: InitialState, action: any): InitialState => {
       return {
         ...state,
         selectedAccount: {
-          ...(state.selectedAccount as any),
+          ...state.selectedAccount,
           value: {
             ...state.selectedAccount.value,
             address,
@@ -116,6 +101,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const selectedAccount = await Extension.getSelectedAccount();
 
+      if (!selectedAccount) return null;
       // for first time when there is no default chain selected
       if (!selectedChain) {
         const selectedAccountIsWasm = selectedAccount?.key.includes("WASM");
@@ -123,6 +109,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
           selectedAccountIsWasm ? DEFAULT_WASM_CHAIN : DEFAULT_EVM_CHAIN
         );
       }
+
       dispatch({
         type: "set-selected-account",
         payload: {

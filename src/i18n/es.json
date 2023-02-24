@@ -110,7 +110,7 @@
     "chain_selector": {
       "connected": "conectado",
       "change_to": "Cambiar a",
-      "create_or_import_warning": "Esta red solo soporta {{type_supported_account}} y no tienes ninguna {{type_supported_account}}, por favor crea o importa una {{type_supported_account}}.",
+      "create_or_import_warning": "Esta red solo soporta {{type_supported}} y no tienes ninguna {{type_supported}}, por favor crea o importa una {{type_supported}}.",
       "network_change_warning": "La cuenta seleccionada se cambiará porque la red a la que desea cambiar no es compatible con el tipo de cuenta actual. ¿Está seguro de que desea cambiar la red?",
       "create_account": "Crear",
       "import_account": "Importar",

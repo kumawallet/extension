@@ -76,13 +76,13 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
   const [passwordType, setPasswordType] = useState("password");
   const togglePassword = () => {
-    setPasswordType(passwordType === "password" ? "password" : "text");
+    setPasswordType(passwordType === "password" ? "text" : "password");
   };
 
   const [confirmPasswordType, setConfirmPasswordType] = useState("password");
   const toggleConfirmPassword = () => {
     setConfirmPasswordType(
-      confirmPasswordType === "password" ? "password" : "text"
+      confirmPasswordType === "password" ? "text" : "password"
     );
   };
 
@@ -167,7 +167,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     }
   });
 
-  console.log();
 
   if (isSuccessful)
     return (
@@ -297,13 +296,13 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 />
 
                 <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
                   onClick={togglePassword}
                 >
                   {passwordType === "password" ? (
-                    <BsEyeSlash size={20} />
+                    <BsEyeSlash className="cursor-pointer" size={20} />
                   ) : (
-                    <BsEye size={20} />
+                    <BsEye className="cursor-pointer" size={20} />
                   )}
                 </button>
               </div>
@@ -332,7 +331,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 />
 
                 <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
                   onClick={toggleConfirmPassword}
                 >
                   {confirmPasswordType === "password" ? (

@@ -1,4 +1,4 @@
-import { useToast } from "../hooks";
+import { useToast } from "../../hooks";
 import {
   createContext,
   FC,
@@ -7,7 +7,7 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import Extension from "../Extension";
+import Extension from "../../Extension";
 import { AccountFormType } from "@src/pages";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";

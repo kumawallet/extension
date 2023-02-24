@@ -9,7 +9,7 @@ import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
 import { CHAINS } from "@src/constants/chains";
-import { useAccountContext } from "../../../providers/AccountProvider";
+import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 
 export const Activity = () => {
   const { t } = useTranslation("activity");

@@ -1,5 +1,4 @@
-import { AccountProvider, NetworkProvider } from "./providers";
-import { AuthProvider } from "./providers/AuthProvider";
+import { AccountProvider, AuthProvider, NetworkProvider } from "./providers";
 import { Routes } from "./routes";
 import { ToastContainer } from "react-toastify";
 import "./utils/i18n";
