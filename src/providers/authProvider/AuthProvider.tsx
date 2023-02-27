@@ -9,15 +9,15 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { AccountFormType } from "@src/pages";
-import { Action, AuthContext, InitialState } from "./types";
+import { Action, AuthContext as IAuthContext, InitialState } from "./types";
 
 const initialState: InitialState = {
   isInit: true,
 };
 
-const AuthContext = createContext({} as AuthContext);
+export const AuthContext = createContext({} as IAuthContext);
 
-const reducer = (state: InitialState, action: Action): InitialState => {
+export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     default:
       return state;
