@@ -55,6 +55,7 @@ export default defineConfig({
         popup: resolve(entriesDir, "popup", "index.html"),
         newtab: resolve(entriesDir, "newtab", "index.html"),
         options: resolve(entriesDir, "options", "index.html"),
+        scripts: resolve(entriesDir, "scripts", "contentScript.ts"),
       },
       output: {
         entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,

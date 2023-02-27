@@ -15,7 +15,11 @@ const commonManifest = {
     "128": "icon-128.png",
   },
   description: pkg.description,
-  permissions: ["storage"] as chrome.runtime.ManifestPermissions[],
+  permissions: [
+    "storage",
+    "activeTab",
+    "scripting",
+  ] as chrome.runtime.ManifestPermissions[],
   version: pkg.version,
 };
 
@@ -41,7 +45,13 @@ const manifestV3: chrome.runtime.ManifestV3 = {
       newtab: "src/entries/newtab/index.html",
     },
   }),
-  // devtools_page: "src/entries/devtools/index.html",
+  web_accessible_resources: [
+    {
+      resources: ["src/entries/scripts/index.js"],
+      matches: ["<all_urls>"],
+    },
+  ],
+  // devtools_page: "src/devtools/index.html",
   content_security_policy: {
     extension_pages: SECURITY,
   },
