@@ -7,10 +7,6 @@ import en from "@src/i18n/en.json";
 
 const useNavigateMock = vi.fn();
 
-vi.mock("react-router-dom", () => ({
-  useNavigate: () => () => useNavigateMock(),
-}));
-
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
@@ -20,9 +16,15 @@ const renderComponent = () => {
 };
 
 describe("Welcome", () => {
+  beforeAll(() => {
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => useNavigateMock(),
+    }));
+  });
+
   it("should render", () => {
     renderComponent();
-    expect(screen.getByText(en.welcome.welcome_message));
+    expect(screen.getByText(en.welcome.welcome_message)).toBeTruthy();
   });
 
   it("should call goToAccount function", () => {
