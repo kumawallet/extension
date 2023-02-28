@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /// <reference types="vitest" />
 
-import { defineConfig } from "vite";
+import { defineConfig, configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import makeManifest from "./utils/plugins/make-manifest";
@@ -34,10 +34,16 @@ $$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/
 `);
 
 export default defineConfig({
-  // @ts-ignore
   test: {
     globals: true,
     environment: "jsdom",
+    coverage: {
+      exclude: [
+        ...(configDefaults.coverage.exclude as string[]),
+        "**/src/tests/mocks/**",
+        "**/src/contants/**",
+      ],
+    },
   },
   resolve: {
     alias: {
