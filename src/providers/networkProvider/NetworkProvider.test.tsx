@@ -13,20 +13,23 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { selectedWASMChainMock } from "../../tests/mocks/chain-mocks";
+import {
+  selectedWASMChainMock,
+  selectedMultiSupportChain,
+} from "../../tests/mocks/chain-mocks";
 import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
 
 vi.mock("@src/Extension");
 vi.mock("ethers", () => ({
   ethers: {
     providers: {
-      JsonRpcProvider: vi.fn(),
+      JsonRpcProvider: vi.fn().mockResolvedValue({ getBalance: () => 0 }),
     },
   },
 }));
 vi.mock("@polkadot/api", () => ({
   ApiPromise: {
-    create: vi.fn().mockResolvedValue({}),
+    create: vi.fn().mockResolvedValue({ query: () => 0 }),
   },
   WsProvider: vi.fn(),
 }));
@@ -49,10 +52,10 @@ const testIds = {
 
 interface TestComponentProps {
   newChain?: Chain;
-  rpc?: string;
+  type?: string;
 }
 
-const TestComponent: FC<TestComponentProps> = ({ newChain, rpc }) => {
+const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
   const { getSelectedNetwork, setNewRpc, setSelectNetwork, state } =
     useNetworkContext();
 
@@ -68,7 +71,7 @@ const TestComponent: FC<TestComponentProps> = ({ newChain, rpc }) => {
       />
       <button
         data-testid={testIds.newRpcBtn}
-        onClick={() => setNewRpc(rpc as string)}
+        onClick={() => setNewRpc(type as string)}
       />
       <p data-testid={testIds.state}>{JSON.stringify(state)}</p>
     </>
@@ -185,6 +188,15 @@ describe("NetworkProvider", () => {
 
         expect(newState).toContain(payload);
       });
+
+      it("default", () => {
+        const newState = reducer(initialState, {
+          type: "default" as any,
+          payload: {} as any,
+        });
+
+        expect(newState).toContain(initialState);
+      });
     });
   });
 
@@ -198,38 +210,95 @@ describe("NetworkProvider", () => {
         expect(state).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm);
       });
     });
+
+    it("should show error", async () => {
+      const Extension: any = await import("@src/Extension");
+
+      Extension.default = {
+        getNetwork: vi.fn().mockRejectedValue("no_network"),
+      };
+
+      renderComponent({});
+
+      waitFor(() => {
+        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
+        expect(state).toEqual(initialState);
+      });
+    });
   });
 
   describe("setSelectedNetwork", () => {
     it("should set new evm chain", async () => {
       const Extension: any = await import("@src/Extension");
-      (Extension.default.getSelectedAccount = vi
+      Extension.default.getSelectedAccount = vi
         .fn()
-        .mockResolvedValue(selectedEVMAccountMock)),
-        renderComponent({ newChain: selectedEVMChainMock });
+        .mockResolvedValue(selectedEVMAccountMock);
+
+      Extension.default.setNetwork = vi.fn().mockResolvedValue(true);
+
+      renderComponent({ newChain: selectedEVMChainMock });
 
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
       });
 
-      waitFor(() => {
+      await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
         expect(state).toHaveProperty("rpc", selectedEVMChainMock.rpc.evm);
+      });
+    });
+    it("should show error", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getSelectedAccount = vi
+        .fn()
+        .mockResolvedValue(selectedEVMAccountMock);
+
+      Extension.default.setNetwork = vi.fn().mockRejectedValue("no_network");
+
+      renderComponent({ newChain: selectedEVMChainMock });
+
+      act(() => {
+        fireEvent.click(screen.getByTestId(testIds.selectedBtn));
+      });
+
+      await waitFor(() => {
+        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
+        expect(state).toHaveProperty("rpc", "");
       });
     });
   });
 
   describe("getSelectedNetwork", () => {
-    it("should getSelectedNetwork", () => {
+    it("should getSelectedNetwork", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getNetwork = vi
+        .fn()
+        .mockResolvedValue({ chain: selectedWASMChainMock });
+
       renderComponent();
 
-      const Extension: any = import("@src/Extension");
-      (Extension.getSelectedAccount = vi
+      act(() => {
+        fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
+      });
+
+      waitFor(() =>
+        expect(screen.getByTestId(testIds.state).innerHTML).contains(
+          selectedWASMChainMock.name
+        )
+      );
+    });
+
+    it("should show error", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getNetwork = vi
         .fn()
-        .mockResolvedValue(selectedWASMChainMock)),
-        act(() => {
-          fireEvent.click(screen.getByTestId(testIds.selectedBtn));
-        });
+        .mockRejectedValue("no_default_network");
+
+      renderComponent();
+
+      act(() => {
+        fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
+      });
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.state).innerHTML).contains(
@@ -240,7 +309,7 @@ describe("NetworkProvider", () => {
   });
 
   describe("setNewRpc", () => {
-    it("should set new rpc", async () => {
+    it("should keep the current rpc", async () => {
       renderComponent();
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
@@ -252,6 +321,36 @@ describe("NetworkProvider", () => {
         expect(
           JSON.parse(screen.getByTestId(testIds.state).innerHTML)
         ).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm)
+      );
+    });
+
+    it("should set new rpc if chain support WASM and EVM", async () => {
+      const Extension: any = await import("@src/Extension");
+
+      Extension.default = {
+        getSelectedAccount: vi.fn().mockResolvedValue(selectedWASMAccountMock),
+        getNetwork: vi
+          .fn()
+          .mockResolvedValue({ chain: selectedMultiSupportChain }),
+      };
+
+      renderComponent({
+        type: selectedEVMAccountMock.type,
+      });
+      await waitFor(() => {
+        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
+        expect(state).toHaveProperty("rpc", selectedMultiSupportChain.rpc.wasm);
+      });
+
+      act(() => {
+        fireEvent.click(screen.getByTestId(testIds.selectedBtn));
+        fireEvent.click(screen.getByTestId(testIds.newRpcBtn));
+      });
+
+      await waitFor(() =>
+        expect(
+          JSON.parse(screen.getByTestId(testIds.state).innerHTML)
+        ).toHaveProperty("rpc", selectedMultiSupportChain.rpc.evm)
       );
     });
   });
