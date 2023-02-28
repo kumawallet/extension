@@ -5,7 +5,7 @@ import { BiLeftArrowAlt } from "react-icons/bi";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
-import { useLoading } from "@hooks/useLoading";
+import { useLoading } from "@src/hooks";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";

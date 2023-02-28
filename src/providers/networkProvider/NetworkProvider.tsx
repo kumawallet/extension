@@ -11,7 +11,7 @@ import { Chain, CHAINS } from "@src/constants/chains";
 import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { useToast } from "@src/hooks/useToast";
+import { useToast } from "@src/hooks";
 import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
 
