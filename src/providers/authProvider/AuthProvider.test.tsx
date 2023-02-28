@@ -11,18 +11,7 @@ import { FC, useState } from "react";
 import { AccountFormType } from "@src/pages";
 import { AccountType } from "@src/accounts/types";
 
-vi.mock("@src/Extension", () => {
-  const Extension = {
-    createAccounts: vi.fn().mockResolvedValue(true),
-    isUnlocked: vi.fn().mockResolvedValue(true),
-    importAccount: vi.fn().mockResolvedValue(true),
-    restorePassword: vi.fn().mockResolvedValue(true),
-  };
-
-  return {
-    default: Extension,
-  };
-});
+vi.mock("@src/Extension");
 
 interface ResponseState {
   create: null | boolean;
@@ -79,14 +68,14 @@ const TestComponent: FC<TestComponentProps> = ({ createdAccount }) => {
 
   return (
     <>
-      <button data-testid="create-button" onClick={_create} />
-      <button data-testid="derive-button" onClick={_derive} />
-      <button data-testid="import-button" onClick={_import} />
-      <button data-testid="restore-button" onClick={_restore} />
-      <p data-testid="create-response">{responses.create}</p>
-      <p data-testid="derive-response">{responses.derive}</p>
-      <p data-testid="import-response">{responses.import}</p>
-      <p data-testid="restore-response">{responses.restore}</p>
+      <button data-testid={testIds.createBtn} onClick={_create} />
+      <button data-testid={testIds.deriveBtn} onClick={_derive} />
+      <button data-testid={testIds.importBtn} onClick={_import} />
+      <button data-testid={testIds.restoreBtn} onClick={_restore} />
+      <p data-testid={testIds.createResponse}>{String(responses.create)}</p>
+      <p data-testid={testIds.deriveResponse}>{String(responses.derive)}</p>
+      <p data-testid={testIds.importResonse}>{String(responses.import)}</p>
+      <p data-testid={testIds.restoreResponse}>{String(responses.restore)}</p>
     </>
   );
 };
@@ -109,7 +98,21 @@ const renderComponent = (accountForm: AccountFormType) => {
 };
 
 describe("AuthProvider", () => {
-  describe("reducer", () => {
+  beforeAll(() => {
+    const Extension: any = import("@src/Extension");
+    Extension.default = {
+      createAccounts: vi.fn().mockResolvedValue(true),
+      isUnlocked: vi.fn().mockResolvedValue(true),
+      importAccount: vi.fn().mockResolvedValue(true),
+      restorePassword: vi.fn().mockResolvedValue(true),
+    };
+  });
+
+  afterAll(() => {
+    vi.clearAllMocks();
+  });
+
+  it("reducer", () => {
     const initState = {
       isInit: true,
     };
@@ -119,37 +122,35 @@ describe("AuthProvider", () => {
   });
 
   describe("createAccount", () => {
-    it("should return true", () => {
+    it("should return true", async () => {
       renderComponent(mockAccountForm);
 
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.createBtn));
       });
-
       waitFor(() =>
         expect(screen.getByTestId(testIds.createResponse).innerHTML).toEqual(
-          true
+          "true"
         )
       );
     });
 
-    it("should return seed_required error", () => {
+    it("should return seed_required error", async () => {
       renderComponent({ ...mockAccountForm, seed: "" });
 
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.createBtn));
       });
-
       waitFor(() =>
         expect(screen.getByTestId(testIds.createResponse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
   });
 
   describe("importAccount", () => {
-    it("should return true", () => {
+    it("should return true", async () => {
       renderComponent(mockAccountForm);
 
       act(() => {
@@ -158,12 +159,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
-          true
+          "true"
         )
       );
     });
 
-    it("should return password_required error", () => {
+    it("should return password_required error", async () => {
       renderComponent({ ...mockAccountForm, password: "" });
 
       act(() => {
@@ -172,12 +173,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
 
-    it("should return private_key_or_seed_required error", () => {
+    it("should return private_key_or_seed_required error", async () => {
       renderComponent({ ...mockAccountForm, privateKeyOrSeed: "" });
 
       act(() => {
@@ -186,12 +187,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
 
-    it("should return account_type_required error", () => {
+    it("should return account_type_required error", async () => {
       renderComponent({ ...mockAccountForm, accountType: undefined });
 
       act(() => {
@@ -200,14 +201,14 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
   });
 
   describe("deriveAccount", () => {
-    it("should return true", () => {
+    it("should return true", async () => {
       renderComponent(mockAccountForm);
 
       act(() => {
@@ -216,12 +217,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.deriveResponse).innerHTML).toEqual(
-          true
+          "true"
         )
       );
     });
 
-    it("should return account_type_required error", () => {
+    it("should return account_type_required error", async () => {
       renderComponent({ ...mockAccountForm, accountType: undefined });
 
       act(() => {
@@ -230,14 +231,14 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.deriveResponse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
   });
 
   describe("restoreAccount", () => {
-    it("should return true", () => {
+    it("should return true", async () => {
       renderComponent(mockAccountForm);
 
       act(() => {
@@ -246,12 +247,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
-          true
+          "true"
         )
       );
     });
 
-    it("should return recovery_phrase_required error", () => {
+    it("should return recovery_phrase_required error", async () => {
       renderComponent({ ...mockAccountForm, privateKeyOrSeed: undefined });
 
       act(() => {
@@ -260,12 +261,12 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });
 
-    it("should return password_required error", () => {
+    it("should return password_required error", async () => {
       renderComponent({ ...mockAccountForm, password: undefined });
 
       act(() => {
@@ -274,7 +275,7 @@ describe("AuthProvider", () => {
 
       waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
-          false
+          "false"
         )
       );
     });

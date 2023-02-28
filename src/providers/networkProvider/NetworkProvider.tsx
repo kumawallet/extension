@@ -29,16 +29,16 @@ const NetworkContext = createContext({} as NetworkContext);
 const getProvider = (rpc: string | undefined | null, type: string) => {
   if (!rpc) return null;
 
-  if (type.toLocaleLowerCase() === "evm")
+  if (type.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc);
 
-  if (type.toLocaleLowerCase() === "wasm")
+  if (type.toLowerCase() === "wasm")
     return ApiPromise.create({ provider: new WsProvider(rpc) });
 
   return null;
 };
 
-const reducer = (state: InitialState, action: Action): InitialState => {
+export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "init": {
       const { selectedChain, rpc, type } = action.payload;
@@ -153,6 +153,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   //  only for chain with multi support (WASM and EVM)
   const setNewRpc = async (type: string) => {
     try {
+      console.log("new type", type);
       const _type = getAccountType(type);
 
       if (!_type) return;
@@ -165,6 +166,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       if (rpcAlreadyInUse) return;
 
       const api = await getProvider(newRpc, _type);
+      console.log("newRcp", newRpc);
 
       dispatch({
         type: "set-api",
@@ -188,6 +190,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       })();
     }
   }, [state.rpc, state.type]);
+
+  // console.log(state);
 
   return (
     <NetworkContext.Provider

@@ -46,6 +46,8 @@ export const AccountList = () => {
     selectedChain?.supportedAccounts &&
     selectedChain?.supportedAccounts.length > 1;
 
+  console.log(accounts);
+
   return (
     <Menu>
       <Menu.Button>
