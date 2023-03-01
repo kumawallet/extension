@@ -44,6 +44,7 @@ export default defineConfig({
         "**/src/constants/**",
         "**/src/storage/entities/activity/**",
         "**/src/storage/entities/registry/**",
+        "**/src/storage/entities/Chains.ts",
       ],
     },
   },
