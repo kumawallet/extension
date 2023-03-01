@@ -70,8 +70,6 @@ export default class Extension {
     accountType: AccountType,
     isSignUp = true
   ) {
-    // TODO: validate privateKeyOrSeed, accounType
-
     if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
       if (!password) throw new Error("password_required");
