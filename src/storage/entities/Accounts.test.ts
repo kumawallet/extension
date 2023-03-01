@@ -11,6 +11,9 @@ const accountMock = {
   } as any,
 };
 
+const remove = vi.fn();
+const add = vi.fn();
+
 describe("Account", () => {
   beforeAll(() => {
     vi.mock("./Account", () => {
@@ -62,6 +65,9 @@ describe("Account", () => {
         static get() {
           return {
             update: vi.fn(),
+            remove: () => remove(),
+            allreadyExists: () => false,
+            add: () => add(),
           };
         }
       }
@@ -86,6 +92,64 @@ describe("Account", () => {
   it("should update", async () => {
     const account = await Accounts.update(accountMock);
     expect(account).toMatchObject(accountMock);
+  });
+
+  describe("removeAccout", () => {
+    it("should remove account", async () => {
+      await Accounts.removeAccount(accountMock.key);
+      expect(remove).toHaveBeenCalled();
+    });
+
+    it("should return error", async () => {
+      const BaseEntity = await import("./BaseEntity");
+      BaseEntity.default.get = vi.fn().mockReturnValue(undefined);
+
+      try {
+        await Accounts.removeAccount(accountMock.key);
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_remove_account");
+      }
+    });
+  });
+
+  describe("add", () => {
+    it("should add account", async () => {
+      const BaseEntity = await import("./BaseEntity");
+      BaseEntity.default.get = vi.fn().mockReturnValue({
+        allreadyExists: () => false,
+        add: () => add(),
+      });
+
+      await Accounts.add(accountMock);
+      expect(add).toHaveBeenCalled();
+    });
+
+    it("should return  failed_to_add_account error", async () => {
+      const BaseEntity = await import("./BaseEntity");
+      BaseEntity.default.get = vi.fn().mockReturnValue(undefined);
+
+      try {
+        await Accounts.add(accountMock);
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_add_account");
+      }
+    });
+
+    it("should return  failed_to_add_account error", async () => {
+      const BaseEntity = await import("./BaseEntity");
+      BaseEntity.default.get = vi.fn().mockReturnValue({
+        allreadyExists: () => true,
+      });
+
+      try {
+        await Accounts.add(accountMock);
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: account_already_exists");
+      }
+    });
   });
 
   it("should return isEmpty as true", () => {
