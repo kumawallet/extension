@@ -27,12 +27,11 @@ export default class CacheAuth extends BaseEntity {
     await CacheAuth.get<CacheAuth>();
   }
 
-  static fromData<CacheAuth>(data: { [key: string]: any; }): CacheAuth {
+  static fromData<CacheAuth>(data: { [key: string]: any }): CacheAuth {
     const entity = CacheAuth.getInstance();
     Object.keys(data).forEach((key) => {
       (entity as any)[key] = data[key];
-    }
-    );
+    });
     return entity as CacheAuth;
   }
 
@@ -84,7 +83,8 @@ export default class CacheAuth extends BaseEntity {
   static async hasExpired() {
     const now = new Date().getTime();
     const cache = CacheAuth.getInstance();
-    const hasExpired = cache.isUnlocked && cache.password && cache.timeout < now;
+    const hasExpired =
+      cache.isUnlocked && cache.password && cache.timeout < now;
     if (hasExpired) CacheAuth.clear();
     return hasExpired;
   }

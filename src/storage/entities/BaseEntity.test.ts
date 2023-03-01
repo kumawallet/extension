@@ -1,4 +1,3 @@
-import { Base } from "@polkadot/ui-keyring/Base";
 import BaseEntity from "./BaseEntity";
 
 const mockData = {
