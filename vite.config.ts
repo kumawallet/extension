@@ -41,7 +41,9 @@ export default defineConfig({
       exclude: [
         ...(configDefaults.coverage.exclude as string[]),
         "**/src/tests/mocks/**",
-        "**/src/contants/**",
+        "**/src/constants/**",
+        "**/src/storage/entities/activity/**",
+        "**/src/storage/entities/registry/**",
       ],
     },
   },

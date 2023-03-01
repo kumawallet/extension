@@ -95,7 +95,7 @@ export default class Auth {
       if (!this.#password) throw new Error("login_required");
       return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       throw new Error("failed_to_save_backup");
     }
   }
@@ -104,7 +104,7 @@ export default class Auth {
     try {
       return passworder.decrypt(recoveryPhrase, backup);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       throw new Error("failed_to_restore_backup");
     }
   }

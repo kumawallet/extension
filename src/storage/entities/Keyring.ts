@@ -29,7 +29,6 @@ export default class Keyring {
     const vault = await Vault.get<Vault>();
     if (!vault) throw new Error("failed_to_save_keyring");
     vault.addKeyring(keyring);
-    console.log("vault after addKeyring", vault);
     await Vault.set(vault);
   }
 
