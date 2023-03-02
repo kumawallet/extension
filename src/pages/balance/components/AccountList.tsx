@@ -28,7 +28,7 @@ export const AccountList = () => {
   };
 
   const filteredAccounts = useMemo(() => {
-    const acc = accounts.map((acc) => ({
+    const acc = accounts?.map((acc) => ({
       ...acc,
       value: {
         ...acc.value,
@@ -46,11 +46,9 @@ export const AccountList = () => {
     selectedChain?.supportedAccounts &&
     selectedChain?.supportedAccounts.length > 1;
 
-  console.log(accounts);
-
   return (
     <Menu>
-      <Menu.Button>
+      <Menu.Button data-testid="account-button">
         <div className="flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer">
           <img className="w-5 h-5" src={logo} />
         </div>

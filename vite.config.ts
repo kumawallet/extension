@@ -43,6 +43,9 @@ export default defineConfig({
         "**/src/tests/mocks/**",
         "**/src/constants/**",
         "**/src/routes/**",
+        "**/src/components/common/**",
+
+        "**/src/pages/balance/components/Activity.tsx",
 
         "**/src/storage/entities/activity/**",
         "**/src/storage/entities/registry/**",

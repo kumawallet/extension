@@ -37,6 +37,7 @@ export const AccountSelected = () => {
         {...getReferenceProps()}
         className="flex items-center gap-1"
         onClick={copyAccount}
+        data-testid="account-button"
       >
         <FiCopy />
         <p className="text-custom-green-bg">{account}</p>

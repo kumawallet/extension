@@ -85,7 +85,10 @@ export const ChainSelector = () => {
   return (
     <>
       <Menu>
-        <Menu.Button className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+        <Menu.Button
+          data-testid="chain-button"
+          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+        >
           <p>{selectedChain?.name}</p>
           <BsChevronDown />
         </Menu.Button>
@@ -101,7 +104,7 @@ export const ChainSelector = () => {
           <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
             <div className="px-6 py-2 pt-2 text-start">
               <div className="flex flex-col gap-1">
-                {chains.map((spec) => (
+                {chains?.map((spec) => (
                   <div key={spec.name}>
                     <div className="flex items-center gap-3 whitespace-nowrap">
                       <p className="text-[#808385] text-lg">
