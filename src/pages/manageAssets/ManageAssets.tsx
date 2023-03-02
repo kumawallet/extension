@@ -63,7 +63,6 @@ export const ManageAssets = () => {
   const loadPolkadotAssets = async () => {
     try {
       const assetPallet: any = await (api as ApiPromise)?.query?.assets;
-      console.log(assetPallet);
       if (!assetPallet) {
         setchainSupportAsset(false);
         return;

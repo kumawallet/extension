@@ -21,7 +21,7 @@ import {
 
 export type AccountFormType = AccountForm & { seed?: string };
 
-interface AddAccountFormProps {
+export interface AddAccountFormProps {
   title: string;
   fields?: {
     accountType?: boolean;
@@ -253,6 +253,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 : t("form.recovery_phrase")}
             </label>
             <input
+              data-testid="privateKeyOrSeed"
               id="privateKeyOrSeed"
               type={"password"}
               className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
@@ -289,6 +290,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               </label>
               <div className="relative">
                 <input
+                  data-testid="password"
                   id="password"
                   min={8}
                   onPaste={(e) => e.preventDefault()}
@@ -324,6 +326,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               </label>
               <div className="relative">
                 <input
+                  data-testid="confirmPassword"
                   id="confirmPassword"
                   onPaste={(e) => e.preventDefault()}
                   type={confirmPasswordType}
@@ -347,7 +350,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             </div>
           </>
         )}
-        <div className="flex justify-end">
+        <div className="flex justify-end" data-testid="submitbtn">
           <LoadingButton onClick={_onSubmit} isLoading={isLoading}>
             {buttonText}
           </LoadingButton>

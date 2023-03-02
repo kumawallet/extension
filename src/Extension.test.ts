@@ -1,7 +1,6 @@
 import { AccountType, AccountKey } from "./accounts/types";
 import Extension from "./Extension";
 import { selectedEVMChainMock } from "./tests/mocks/chain-mocks";
-import Network from "./storage/entities/Network";
 import { expect } from "vitest";
 import {
   selectedEVMAccountMock,
@@ -95,16 +94,16 @@ describe("Extension", () => {
       expect(accountManageMock.saveBackup).toHaveBeenCalled();
     });
 
-    it("should init", async () => {
+    it("should throw error on init", async () => {
       const AccountMannager = await import("./accounts/AccountManager");
       AccountMannager.default.saveBackup = vi
         .fn()
-        .mockRejectedValue("save_to_save_backup");
+        .mockRejectedValue("failed_to_failed_backup");
 
       try {
         await Extension["init"]("12345", "1 2 3 4 5", true);
       } catch (error) {
-        expect(String(error)).toEqual("Error: save_to_save_backup");
+        expect(String(error)).toEqual("Error: failed_to_save_backup");
       }
     });
   });

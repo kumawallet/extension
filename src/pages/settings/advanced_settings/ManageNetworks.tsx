@@ -37,7 +37,6 @@ export const ManageNetworks = () => {
 
   const deleteNetwork = async (chainName: string) => {
     try {
-      console.log(chainName)
       //await Extension.removeChain(chainName);
       getNetworks();
     } catch (error) {
@@ -65,22 +64,23 @@ export const ManageNetworks = () => {
         />
         <p className="font-medium text-2xl">{t("title")}</p>
       </div>
-      {networks && networks.map((network, index) => {
-        return (
-          <div
-            key={index}
-            className="flex justify-between items-center gap-2"
-          >
-            <p className="font-medium text-lg">{network.name}</p>
-            <button
-              className="text-red-500 font-medium"
-              onClick={() => deleteNetwork(network.name)}
+      {networks &&
+        networks.map((network, index) => {
+          return (
+            <div
+              key={index}
+              className="flex justify-between items-center gap-2"
             >
-              {t("delete")}
-            </button>
-          </div>
-        );
-      })}
+              <p className="font-medium text-lg">{network.name}</p>
+              <button
+                className="text-red-500 font-medium"
+                onClick={() => deleteNetwork(network.name)}
+              >
+                {t("delete")}
+              </button>
+            </div>
+          );
+        })}
     </PageWrapper>
   );
 };
