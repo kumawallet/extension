@@ -2,6 +2,7 @@ import { AccountType, AccountKey } from "./accounts/types";
 import Extension from "./Extension";
 import { selectedEVMChainMock } from "./tests/mocks/chain-mocks";
 import { expect } from "vitest";
+import Account from "./storage/entities/Account";
 import {
   selectedEVMAccountMock,
   accountsMocks,
@@ -522,8 +523,10 @@ describe("Extension", () => {
       const _Vault = await import("./storage/entities/Vault");
       _Vault.default.get = vi.fn().mockReturnValue("vault");
 
-      const _Network = await import("./storage/entities/Network");
-      _Network.default = NetworkMock as any;
+      const _Network = (await import("./storage/entities/Network")) as {
+        default: object;
+      };
+      _Network.default = NetworkMock;
 
       const result = await Extension.setNetwork(selectedEVMChainMock);
       expect(result).toBe(true);
@@ -554,12 +557,12 @@ describe("Extension", () => {
       }
     }
 
-    const _SelectedAccountMock = await import(
+    const _SelectedAccountMock = (await import(
       "./storage/entities/SelectedAccount"
-    );
-    _SelectedAccountMock.default = SelectedAccountMock as any;
+    )) as { default: object };
+    _SelectedAccountMock.default = SelectedAccountMock;
 
-    await Extension.setSelectedAccount(selectedEVMAccountMock);
+    await Extension.setSelectedAccount(selectedEVMAccountMock as Account);
 
     expect(set).toHaveBeenCalled();
   });

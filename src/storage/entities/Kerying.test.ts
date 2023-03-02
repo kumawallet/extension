@@ -72,6 +72,7 @@ describe("Keyring", () => {
 
     const { key, ..._keyring } = newKeyringMock;
 
+    key;
     const json = keyring.toJSON();
     expect(json).toEqual(_keyring);
   });

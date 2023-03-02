@@ -361,7 +361,7 @@ describe("Vault", () => {
     const vault = new Vault();
     vault.setKeyrings({
       [newKeyring.key]: newKeyring,
-    } as any);
+    } as { [key: string]: Keyring });
     const result = vault.getKeyring(newKeyring.key);
     expect(result).toMatchObject(newKeyring);
   });
@@ -379,7 +379,7 @@ describe("Vault", () => {
     const vault = new Vault();
     vault.setKeyrings({
       [newKeyring.key]: newKeyring,
-    } as any);
+    } as { [key: string]: Keyring });
 
     const result = await vault.getAll();
     expect(result).toEqual([newKeyring]);
@@ -398,7 +398,7 @@ describe("Vault", () => {
     const vault = new Vault();
     vault.setKeyrings({
       [newKeyring.key]: newKeyring,
-    } as any);
+    } as { [key: string]: Keyring });
 
     const result = await vault.getKeyringsByType(AccountType.EVM);
     expect(result).toEqual(newKeyring);

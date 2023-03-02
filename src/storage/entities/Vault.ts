@@ -40,7 +40,9 @@ export default class Vault extends BaseEntity {
   }
 
   static async set<Vault>(data: Vault): Promise<void> {
-    const encryptedData = await Auth.getInstance().encryptVault(data as any);
+    const encryptedData = await Auth.getInstance().encryptVault(
+      data as typeof Vault
+    );
     await super.set(encryptedData);
   }
 

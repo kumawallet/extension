@@ -58,7 +58,7 @@ export default class Auth {
     return passworder.decrypt(this.#password as string, vault);
   }
 
-  async encryptVault(vault: Vault) {
+  async encryptVault(vault: typeof Vault) {
     Auth.validate();
     return passworder.encrypt(this.#password as string, vault);
   }

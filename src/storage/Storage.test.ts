@@ -6,18 +6,19 @@ const clearMock = vi.fn().mockImplementation(() => null);
 
 describe("Storage", () => {
   beforeAll(() => {
-    global.navigator = {
-      ...global.navigator,
-      userAgent: {
-        match: () => true,
-      } as any,
+    // global.navigator = {
+    //   ...global.navigator,
+    //   userAgent: {
+    //     match: () => true,
+    //   } as any,
+    // };
+
+    (global.navigator["userAgent"] as unknown) = {
+      match: () => true,
     };
 
-    global.chrome = {
-      ...global.chrome,
-      storage: {
-        local: {} as any,
-      } as any,
+    (global.chrome["storage"] as unknown) = {
+      local: {},
     };
 
     global.window.browser = {
@@ -97,11 +98,12 @@ describe("Storage", () => {
 
   it("should return salt", async () => {
     global.navigator = {
+      ...global.navigator,
       appName: "1",
       platform: "2",
       userAgent: "3",
       language: "4",
-    } as any;
+    };
 
     const salt = await Storage.getInstance().getSalt();
     expect(salt).toEqual("1-2-3-4-7");

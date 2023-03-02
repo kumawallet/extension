@@ -11,6 +11,6 @@ export interface AuthContext {
 }
 
 export type Action = {
-  type: any;
-  payload: any;
+  type: string;
+  payload: object;
 };

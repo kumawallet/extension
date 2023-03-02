@@ -2,13 +2,13 @@ import { AccountKey, AccountType, AccountValue } from "@src/accounts/types";
 import Accounts from "./Accounts";
 
 const accountMock = {
-  key: "EVM-123" as AccountKey,
-  type: "EVM" as AccountType,
+  key: "EVM-12345" as AccountKey,
+  type: AccountType.EVM,
   value: {
     name: "derived evm",
-    adress: "0x12345",
-    keyring: "EVM-123" as AccountKey,
-  } as any,
+    address: "0x12345",
+    keyring: "EVM-12345" as AccountKey,
+  },
 };
 
 const remove = vi.fn();

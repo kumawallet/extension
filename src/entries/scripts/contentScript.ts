@@ -1,4 +1,4 @@
-console.log("hola");
-(window as any).kuma = {
-  hello: () => "hello",
-};
+// console.log("hola");
+// (window as ob).kuma = {
+//   hello: () => "hello",
+// };

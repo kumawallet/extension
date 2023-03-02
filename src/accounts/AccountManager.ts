@@ -148,7 +148,7 @@ export default class AccountManager {
     const accounts = await Accounts.get<Accounts>();
     if (!accounts) return undefined;
     if (type && type.length > 0) {
-      const filteredAccounts: any = {};
+      const filteredAccounts: { [key: string]: Account } = {};
       Object.keys(accounts.data).forEach((key: string) => {
         const account = accounts.get(key as AccountKey);
         if (!account) return;

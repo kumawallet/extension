@@ -6,9 +6,9 @@ describe("Account", () => {
     const key = "EVM-123" as AccountKey;
     const value = {
       name: "derived evm",
-      adress: "0x12345",
+      address: "0x12345",
       keyring: "EVM-123" as AccountKey,
-    } as any;
+    };
 
     const account = new Account(key, value);
     expect(account).toMatchObject({

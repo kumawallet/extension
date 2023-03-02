@@ -15,7 +15,8 @@
     "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME nodemon",
     "dev:firefox": "NODE_ENV=develop BROWSER_TARGET=FIREFOX nodemon",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix"
   },
   "type": "module",
   "dependencies": {

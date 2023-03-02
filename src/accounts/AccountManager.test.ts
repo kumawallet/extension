@@ -9,6 +9,7 @@ import {
   selectedWASMAccountMock,
 } from "@src/tests/mocks/account-mocks";
 import Accounts from "@src/storage/entities/Accounts";
+import Vault from "@src/storage/entities/Vault";
 
 const evmWalletResponseMock = {
   address: "0x12345",
@@ -77,12 +78,26 @@ describe("AccountManager", () => {
         default: mockKeyring,
       };
     });
-    vi.mock("../storage/entities/Vault", () => ({
-      default: {
-        get: () => ({}),
-        set: () => ({}),
-      },
-    }));
+    vi.mock("../storage/entities/Vault", () => {
+      class _Vault {
+        static get() {
+          return {};
+        }
+        static set() {
+          return {};
+        }
+        async getKeyringsByType() {
+          return {
+            path: "",
+            increaseAccountQuantity: vi.fn(),
+          };
+        }
+      }
+
+      return {
+        default: _Vault,
+      };
+    });
     vi.mock("../storage/Auth", () => ({
       default: {
         password: "",
@@ -115,7 +130,7 @@ describe("AccountManager", () => {
         update: vi.fn().mockImplementation((account) => account),
         getAll: vi.fn().mockImplementation(() => accountsMocks),
         get: vi.fn().mockImplementation(() => {
-          const data: any = {};
+          const data: { [key: string]: object } = {};
 
           accountsMocks.forEach((acc) => {
             data[acc.key] = {
@@ -130,7 +145,7 @@ describe("AccountManager", () => {
         }),
       },
     }));
-    vi.mock("@src/storage/entities/BaseEntity", () => ({}));
+    vi.mock("@src/storage/entities/BaseEntity");
   });
 
   describe("formatAddress", () => {
@@ -298,13 +313,11 @@ describe("AccountManager", () => {
 
   describe("derive", () => {
     it("should derive wasm account", async () => {
+      const mockVault = new Vault();
+
       const deriveForm = {
         name: "derive-evm",
-        vault: {
-          getKeyringsByType: () => ({
-            increaseAccountQuantity: () => 1,
-          }),
-        } as any,
+        vault: mockVault,
         type: AccountType.WASM,
       };
       const result = await AccountManager["derive"](
@@ -324,14 +337,11 @@ describe("AccountManager", () => {
     });
 
     it("should derive evm account", async () => {
+      const mockVault = new Vault();
+
       const deriveForm = {
         name: "derive-evm",
-        vault: {
-          getKeyringsByType: () => ({
-            path: "",
-            increaseAccountQuantity: () => 1,
-          }),
-        } as any,
+        vault: mockVault,
         type: AccountType.EVM,
       };
       const result = await AccountManager["derive"](
