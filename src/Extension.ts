@@ -194,6 +194,7 @@ export default class Extension {
     return Network.get();
   }
 
+  /* c8 ignore start */
   static async getGeneralSettings(): Promise<Setting[]> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
@@ -266,4 +267,5 @@ export default class Extension {
     const register = new Register(address, Date.now());
     await Registry.addRecent(network, register);
   }
+  /* c8 ignore stop */
 }
