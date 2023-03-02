@@ -11,8 +11,6 @@ import { FC, useState } from "react";
 import { AccountFormType } from "@src/pages";
 import { AccountType } from "@src/accounts/types";
 
-vi.mock("@src/Extension");
-
 interface ResponseState {
   create: null | boolean;
   derive: null | boolean;
@@ -99,13 +97,14 @@ const renderComponent = (accountForm: AccountFormType) => {
 
 describe("AuthProvider", () => {
   beforeAll(() => {
-    const Extension: any = import("@src/Extension");
-    Extension.default = {
-      createAccounts: vi.fn().mockResolvedValue(true),
-      isUnlocked: vi.fn().mockResolvedValue(true),
-      importAccount: vi.fn().mockResolvedValue(true),
-      restorePassword: vi.fn().mockResolvedValue(true),
-    };
+    vi.mock("@src/Extension", () => ({
+      defualt: {
+        createAccounts: vi.fn().mockResolvedValue(true),
+        isUnlocked: vi.fn().mockResolvedValue(true),
+        importAccount: vi.fn().mockResolvedValue(true),
+        restorePassword: vi.fn().mockResolvedValue(true),
+      },
+    }));
   });
 
   afterAll(() => {
