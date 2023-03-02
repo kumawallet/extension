@@ -98,7 +98,7 @@ describe("Extension", () => {
       const AccountMannager = await import("./accounts/AccountManager");
       AccountMannager.default.saveBackup = vi
         .fn()
-        .mockRejectedValue("failed_to_failed_backup");
+        .mockRejectedValue("failed_to_save_backup");
 
       try {
         await Extension["init"]("12345", "1 2 3 4 5", true);
