@@ -1,4 +1,4 @@
-# Kuma Wallet (Expect a stable release and proper documentation in Q3 2023)
+# Kuma Wallet (Expect a stable release and proper documentation in Q3 2023.)
 
 <p align="center">
   <img src="./src/assets/img/logo.svg" />
