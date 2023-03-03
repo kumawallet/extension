@@ -63,7 +63,7 @@ export const Balance = () => {
       type &&
       api
     ) {
-      if (selectedAccount.type.includes(type)) {
+      if (selectedAccount?.type?.includes(type)) {
         setIsLoadingAssets(true);
 
         getAssets(api, selectedAccount, selectedChain);

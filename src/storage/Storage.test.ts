@@ -6,19 +6,15 @@ const clearMock = vi.fn().mockImplementation(() => null);
 
 describe("Storage", () => {
   beforeAll(() => {
-    // global.navigator = {
-    //   ...global.navigator,
-    //   userAgent: {
-    //     match: () => true,
-    //   } as any,
-    // };
-
-    (global.navigator["userAgent"] as unknown) = {
-      match: () => true,
+    (global.navigator as unknown) = {
+      ...global.navigator,
+      userAgent: {
+        match: () => true,
+      },
     };
 
-    (global.chrome["storage"] as unknown) = {
-      local: {},
+    (global.chrome as unknown) = {
+      storage: { local: {} },
     };
 
     global.window.browser = {
