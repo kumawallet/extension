@@ -6,10 +6,10 @@ import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
 import {
   SETTINGS_GENERAL,
-  SETTINGS_ADVANCED,
-  SETTINGS_CONTACTS,
-  SETTINGS_SECURITY,
-  SETTINGS_BUG,
+  // SETTINGS_ADVANCED,
+  // SETTINGS_CONTACTS,
+  // SETTINGS_SECURITY,
+  // SETTINGS_BUG,
   SIGNIN,
 } from "@src/routes/paths";
 import { ICON_SIZE } from "@src/constants/icons";
@@ -19,22 +19,22 @@ const OPTIONS = [
     text: "general",
     href: SETTINGS_GENERAL,
   },
-  {
-    text: "advanced",
-    href: SETTINGS_ADVANCED,
-  },
-  {
-    text: "contacts",
-    href: SETTINGS_CONTACTS,
-  },
-  {
-    text: "security",
-    href: SETTINGS_SECURITY,
-  },
-  {
-    text: "bug_report",
-    href: SETTINGS_BUG,
-  },
+  // {
+  //   text: "advanced",
+  //   href: SETTINGS_ADVANCED,
+  // },
+  // {
+  //   text: "contacts",
+  //   href: SETTINGS_CONTACTS,
+  // },
+  // {
+  //   text: "security",
+  //   href: SETTINGS_SECURITY,
+  // },
+  // {
+  //   text: "bug_report",
+  //   href: SETTINGS_BUG,
+  // },
 ];
 
 export const Settings = () => {

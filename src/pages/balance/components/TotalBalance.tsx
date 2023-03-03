@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
-import { useTranslation } from "react-i18next";
+// import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
+// import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
-import { useNavigate } from "react-router-dom";
-import { SEND } from "@src/routes/paths";
+// import { useNavigate } from "react-router-dom";
+// import { SEND } from "@src/routes/paths";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -14,8 +14,8 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
   balance = 0,
   accountName = "",
 }) => {
-  const { t } = useTranslation("balance");
-  const navigate = useNavigate();
+  // const { t } = useTranslation("balance");
+  // const navigate = useNavigate();
 
   return (
     <div className="mx-auto">
@@ -26,7 +26,7 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
         <p className="text-2xl">$</p>
         <p className="text-5xl">{formatAmountWithDecimals(balance, 5)}</p>
       </div>
-      <div className="flex gap-3 justify-center">
+      {/* <div className="flex gap-3 justify-center">
         <button
           onClick={() => navigate(SEND)}
           className="flex gap-1 items-center text-custom-green-bg font-bold text-lg"
@@ -38,7 +38,7 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
           <BsArrowDownLeft />
           <p>{t("receive")}</p>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
