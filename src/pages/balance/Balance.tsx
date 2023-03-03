@@ -53,7 +53,7 @@ export const Balance = () => {
 
   useEffect(() => {
     setIsLoadingAssets(true);
-  }, [rpc]);
+  }, [rpc, api]);
 
   useEffect(() => {
     if (
@@ -63,9 +63,11 @@ export const Balance = () => {
       type &&
       api
     ) {
-      setIsLoadingAssets(true);
+      if (selectedAccount.type.includes(type)) {
+        setIsLoadingAssets(true);
 
-      getAssets(api, selectedAccount, selectedChain);
+        getAssets(api, selectedAccount, selectedChain);
+      }
     }
   }, [rpc, selectedAccount, type, api]);
 

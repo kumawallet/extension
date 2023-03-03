@@ -34,6 +34,7 @@ export type Action =
         selectedChain: SelectedChain;
         rpc?: string;
         type?: string;
+        api?: Api;
       };
     }
   | {
@@ -41,5 +42,6 @@ export type Action =
       payload: {
         api: Api;
         rpc?: string;
+        type?: string;
       };
     };

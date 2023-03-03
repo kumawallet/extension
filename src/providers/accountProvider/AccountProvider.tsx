@@ -4,6 +4,7 @@ import {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
@@ -72,7 +73,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   } = useAuthContext();
 
   const {
-    state: { selectedChain },
+    state: { selectedChain, rpc },
     setNewRpc,
     setSelectNetwork,
   } = useNetworkContext();
@@ -97,11 +98,15 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       return [];
     }
   };
+
   const getSelectedAccount = async () => {
     try {
       const selectedAccount = await Extension.getSelectedAccount();
 
       if (!selectedAccount) return null;
+
+      const { chain: selectedChain } = await Extension.getNetwork();
+
       // for first time when there is no default chain selected
       if (!selectedChain) {
         const selectedAccountIsWasm = selectedAccount?.key.includes("WASM");
@@ -173,6 +178,12 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     result && (await getSelectedAccount());
     return result;
   }, []);
+
+  useEffect(() => {
+    if (rpc) {
+      getSelectedAccount();
+    }
+  }, [rpc]);
 
   return (
     <AccountContext.Provider

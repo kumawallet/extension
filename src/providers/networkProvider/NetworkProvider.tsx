@@ -26,12 +26,12 @@ const initialState: InitialState = {
 
 const NetworkContext = createContext({} as NetworkContext);
 
-const getProvider = (rpc: string | undefined | null, type: string) => {
+const getProvider = (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
-    return new ethers.providers.JsonRpcProvider(rpc);
+    return new ethers.providers.JsonRpcProvider(rpc as string);
 
   if (type.toLowerCase() === "wasm")
-    return ApiPromise.create({ provider: new WsProvider(rpc) });
+    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
 };
 
 export const reducer = (state: InitialState, action: Action): InitialState => {
@@ -48,22 +48,24 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       };
     }
     case "select-network": {
-      const { selectedChain, rpc, type } = action.payload;
+      const { selectedChain, rpc, type, api } = action.payload;
 
       return {
         ...state,
         selectedChain,
         rpc: rpc || state.rpc,
         type: type || state.type,
+        api,
       };
     }
     case "set-api": {
-      const { api, rpc } = action.payload;
+      const { api, rpc, type } = action.payload;
 
       return {
         ...state,
         rpc: rpc || state.rpc,
-        api,
+        api: api,
+        type: type || state.type,
       };
     }
     default:
@@ -97,7 +99,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           payload: {
             selectedChain,
             rpc,
-            type,
+            type: type.toUpperCase(),
           },
         });
       } catch (error) {
@@ -121,7 +123,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: {
           selectedChain: network,
           rpc,
-          type: accountType,
+          type: accountType.toUpperCase(),
+          api: null,
         },
       });
     } catch (error) {
@@ -157,13 +160,11 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"] || "";
 
       const rpcAlreadyInUse = newRpc === state.rpc;
-      if (rpcAlreadyInUse) return;
-
-      const api = await getProvider(newRpc, _type);
+      if (rpcAlreadyInUse || !newRpc) return;
 
       dispatch({
         type: "set-api",
-        payload: { api, rpc: newRpc },
+        payload: { api: null, rpc: newRpc, type: _type },
       });
     } catch (error) {
       showErrorToast(tCommon(error as string));
@@ -173,11 +174,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (state.rpc && state.type) {
       (async () => {
-        const api = await getProvider(state.rpc, state.type);
+        const api = await getProvider(state.rpc as string, state.type);
         dispatch({
           type: "set-api",
           payload: {
             api,
+            type: state.type,
           },
         });
       })();

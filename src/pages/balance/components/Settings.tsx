@@ -81,9 +81,12 @@ export const Settings = () => {
               ))}
             </div>
             <div className="mt-10 flex justify-end">
-              <div className="flex cursor-pointer hover:bg-gray-400 hover:bg-opacity-30 rounded-xl px-3 py-3">
+              <div
+                className="flex cursor-pointer hover:bg-gray-400 hover:bg-opacity-30 rounded-xl px-3 py-3"
+                onClick={signOut}
+              >
                 <p className="text-lg pr-3">{t("sign_out")}</p>
-                <BsBoxArrowInRight size={ICON_SIZE} onClick={() => signOut()} />
+                <BsBoxArrowInRight size={ICON_SIZE} />
               </div>
             </div>
           </div>

@@ -50,11 +50,17 @@ export default class Extension {
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_create_accounts");
 
-    await AccountManager.addEVMAccount(seed, name);
+    const evmAccount = await AccountManager.addEVMAccount(seed, name);
     const wasmAccount = await AccountManager.addWASMAccount(seed, name);
+
+    const selectedAccount = await Extension.getSelectedAccount();
 
     if (isSignUp) {
       await this.setSelectedAccount(wasmAccount);
+    } else {
+      await this.setSelectedAccount(
+        selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
+      );
     }
 
     return true;
