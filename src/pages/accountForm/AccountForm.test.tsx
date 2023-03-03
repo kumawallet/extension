@@ -133,7 +133,7 @@ describe("AccountForm", () => {
         });
       });
       await act(() => {
-        fireEvent.click(submitButton);
+        fireEvent.click(submitButton as ChildNode);
       });
       expect(createAccountCB).toHaveBeenCalled();
 

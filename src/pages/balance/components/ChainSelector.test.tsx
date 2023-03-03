@@ -89,7 +89,7 @@ describe("ChainSelector", () => {
     });
     const account = screen.getByText(CHAINS[0].chains[1].name);
     await act(() => {
-      fireEvent.click(account.parentElement);
+      fireEvent.click(account.parentElement as HTMLElement);
     });
     expect(setSelectNetwork).toHaveBeenCalled();
   });

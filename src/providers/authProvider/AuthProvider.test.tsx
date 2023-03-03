@@ -116,7 +116,7 @@ describe("AuthProvider", () => {
       isInit: true,
     };
 
-    const response = reducer(initState, { type: "init", payload: undefined });
+    const response = reducer(initState, { type: "init", payload: {} });
     expect(response).toEqual(initState);
   });
 

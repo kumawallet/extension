@@ -106,7 +106,7 @@ describe("Auth", () => {
 
     const auth = Auth.getInstance();
 
-    const encrypted = await auth.encryptVault({} as Vault);
+    const encrypted = await auth.encryptVault({} as typeof Vault);
     expect(encrypted).toEqual(ENCRYPTED);
   });
 
