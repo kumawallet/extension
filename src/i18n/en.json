@@ -1,0 +1,169 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "seed_required": "Seed is required",
+    "password_required": "Password is required",
+    "failed_to_create_accounts": "Failed to create accounts",
+    "private_key_or_seed_required": "Private Key or Seed is required",
+    "failed_to_import_account": "Cannot import accounts without seed or private key",
+    "failed_to_sign_in": "Failed to Sign In",
+    "failed_to_derive_account": "Failed to derive account",
+    "failed_to_set_network": "Failed to change network",
+    "failed_to_get_settings": "Failed to get settings",
+    "account_type_not_supported": "Account type not supported",
+    "failed_to_derive_from_empty_keyring": "Failed to derive from empty keyring",
+    "account_key_required": "Account key required",
+    "account_type_required": "Account type required",
+    "account_not_found": "Account not found",
+    "recovery_phrase_required": "Recovery phrase required",
+    "backup_not_found": "Backup not found",
+    "invalid_recovery_phrase": "Invalid recovery phrase",
+    "failed_to_restore_password": "Failed to restore password",
+    "login_required": "Login required",
+    "invalid_credentials": "Invalid password",
+    "failed_to_save_backup": "Failed to save backup",
+    "failed_to_restore_backup": "Failed to restore backup",
+    "failed_to_cache_password": "Failed to cache password",
+    "already_signed_up": "Already signed up",
+    "failed_to_update_account": "Failed to update account",
+    "failed_to_remove_account": "Failed to remove account",
+    "failed_to_add_account": "Failed to add account",
+    "account_already_exists": "Account already exists",
+    "failed_to_get_account": "Failed to get account",
+    "failed_to_save_keyring": "Failed to save keyring",
+    "failed_to_remove_keyring": "Failed to remove keyring",
+    "network_not_found": "Network not found",
+    "accounts_not_found": "Accounts not found",
+    "failed_to_show_private_key": "Failed to show private key",
+    "failed_to_add_contact": "Failed to add contact",
+    "failed_to_get_contact": "Failed to get contact",
+    "failed_to_change_contact_name": "Failed to change contact name",
+    "contact_not_found": "Contact not found",
+    "failed_to_remove_contact": "Failed to remove contact",
+    "failed_to_add_recent": "Failed to add recent",
+    "failed_to_get_recent": "Failed to get recent",
+    "no_contacts_found": "No contacts found",
+    "name_required": "Name is required",
+    "address_required": "Address is required",
+    "view_in_scanner": "Explore",
+    "add": "Add",
+    "manage": "Manage"
+  },
+  "welcome": {
+    "welcome_message": "Welcome to Kuma Wallet",
+    "description": "All your accounts in one place",
+    "button_text": "Get started"
+  },
+  "add_account": {
+    "title": "Add Account",
+    "import_wallet": "Import wallet",
+    "create_wallet": "Create wallet"
+  },
+  "sign_in": {
+    "welcome": "Welcome back",
+    "password_placeholder": "Type your password",
+    "signin_button_text": "Sign in",
+    "forgot_password": "Forgot password?"
+  },
+  "account_form": {
+    "common": {
+      "loading": "Loading..."
+    },
+    "import": {
+      "title": "Import Account",
+      "button_text": "Import",
+      "submit_message": "Account imported"
+    },
+    "create_or_derivate": {
+      "title": "Create Account",
+      "button_text": "Create",
+      "submit_message": "Account created"
+    },
+    "restore": {
+      "title": "Reset Password",
+      "button_text": "Restore",
+      "submit_message": "Password restored"
+    },
+    "form": {
+      "continue_button_text": "Continue",
+      "seed": "Seed",
+      "seed_message": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
+      "account_type": "Account type",
+      "show_seed": "Show seed",
+      "evm_type": "Ethereum like account (EVM)",
+      "wasm_type": "Polkadot like account (WASM)",
+      "private_key": "Private key",
+      "private_key_validation": "Invalidad Private Key",
+      "seed_phrase": "Seed Phrase",
+      "seed_phrasey_validation": "Invalidad Seed Phrase",
+      "recovery_phrase": "Recovery Phrase",
+      "account_name": "Account Name (optional)",
+      "account_name_placeholder": "Max 32 characters",
+      "password": "Password",
+      "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
+      "confirm_password": "Confirm password",
+      "confirm_password_hint": "Passwords don't match.",
+      "required": "required"
+    }
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "connected",
+      "change_to": "Change to",
+      "create_or_import_warning": "This network only support {{type_supported}} and you don't have {{type_supported}}, please create or import {{type_supported}}.",
+      "network_change_warning": "The selected account will be changed because the network to which you want to change does not support the current account type. Are you sure you want to change the network?",
+      "create_account": "Create",
+      "import_account": "Import",
+      "cancel": "Cancel",
+      "change": "Change",
+      "mainnets": "Relay chains",
+      "parachains": "Parachains",
+      "testnets": "Testnets",
+      "evm_type": "Ethereum like account (EVM)",
+      "wasm_type": "Polkadot like account (WASM)"
+    },
+    "accounts": {
+      "accounts": "Accounts",
+      "import": "Import",
+      "create": "Create"
+    },
+    "send": "Send",
+    "receive": "Receive",
+    "assets": "Assets",
+    "activity": "Activity"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "advanced": "Advanced",
+    "contacts": "Contacts",
+    "security": "Security",
+    "bug_report": "Bug report",
+    "sign_out": "Sign out"
+  },
+  "general_settings": {
+    "title": "General",
+    "languages": "Languages"
+  },
+  "advanced_settings": {
+    "title": "Advanced",
+    "manage_networks": "Manage networks"
+  },
+  "manage_networks": {
+    "title": "Manage networks"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "name": "Name",
+    "address": "Address",
+    "save_contact": "Save contact",
+    "insert_name": "Insert contact name",
+    "insert_address": "Insert address",
+    "search": "Search contacts by name or address"
+  },
+  "activity": {
+    "title": "Activity",
+    "empty": "No activity yet",
+    "search": "Search by transaction hash, address or reference"
+  }
+}
