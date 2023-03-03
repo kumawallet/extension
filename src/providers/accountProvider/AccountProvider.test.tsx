@@ -1,17 +1,26 @@
 import { CHAINS } from "@src/constants/chains";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { AccountProvider, useAccountContext } from "./AccountProvider";
-import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
+import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
+import Account from "@src/storage/entities/Account";
 
 const testIds = {
   createAccount: "create-account",
   deriveAccount: "derive-account",
   importAccount: "import-account",
+  getSelectedAccount: "get-selected-account",
+  getAllAccounts: "get-all-accounts",
+  setSelectedAccount: "set-selected-account",
 };
 
 const TestComponent = () => {
   const {
-    state,
     createAccount,
     deriveAccount,
     getAllAccounts,
@@ -22,6 +31,18 @@ const TestComponent = () => {
 
   return (
     <>
+      <button
+        data-testid={testIds.setSelectedAccount}
+        onClick={() => setSelectedAccount(selectedEVMAccountMock as Account)}
+      />
+      <button
+        data-testid={testIds.getAllAccounts}
+        onClick={() => getAllAccounts(null)}
+      />
+      <button
+        data-testid={testIds.getSelectedAccount}
+        onClick={getSelectedAccount}
+      />
       <button
         data-testid={testIds.createAccount}
         onClick={() => createAccount({} as any)}
@@ -50,6 +71,11 @@ const createAccount = vi.fn().mockReturnValue(true);
 const deriveAccount = vi.fn().mockReturnValue(true);
 const importAccount = vi.fn().mockReturnValue(true);
 
+const setSelectedAccount = vi.fn();
+const getSelectedAccount = vi.fn();
+const getAllAccounts = vi.fn();
+const getNetwork = vi.fn();
+
 describe("AccountProvider", () => {
   beforeAll(() => {
     vi.mock("../networkProvider/NetworkProvider.tsx", () => ({
@@ -75,7 +101,10 @@ describe("AccountProvider", () => {
     }));
     vi.mock("@src/Extension", () => ({
       default: {
-        setSelectedAccount: vi.fn(),
+        setSelectedAccount: () => setSelectedAccount(),
+        getSelectedAccount: () => getSelectedAccount(),
+        getNetwork: () => getNetwork(),
+        getAllAccounts: () => getAllAccounts(),
       },
     }));
   });
@@ -108,5 +137,25 @@ describe("AccountProvider", () => {
       fireEvent.click(btn);
     });
     expect(deriveAccount).toHaveBeenCalled();
+  });
+
+  it("should call get selected account", async () => {
+    renderComponent();
+
+    const btn = await screen.findByTestId(testIds.getSelectedAccount);
+    await act(() => {
+      fireEvent.click(btn);
+    });
+    expect(getSelectedAccount).toHaveBeenCalled();
+  });
+
+  it("should call get all accounts", async () => {
+    renderComponent();
+
+    const btn = await screen.findByTestId(testIds.getAllAccounts);
+    act(() => {
+      fireEvent.click(btn);
+    });
+    waitFor(() => expect(getAllAccounts).toHaveBeenCalled());
   });
 });
