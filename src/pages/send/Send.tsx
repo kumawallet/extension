@@ -127,7 +127,7 @@ export const Send = () => {
       let date;
       let reference = "";
 
-      if (selectedAccount.type.includes("EVM")) {
+      if (selectedAccount?.type?.includes("EVM")) {
         const pk = await Extension.showPrivateKey();
 
         const wallet = new ethers.Wallet(
@@ -204,7 +204,7 @@ export const Send = () => {
     if (!evmTx?.to) return;
     (async () => {
       try {
-        if (selectedAccount.type.includes("EVM")) {
+        if (selectedAccount?.type?.includes("EVM")) {
           const [feeData, gasLimit] = await Promise.all([
             (api as ethers.providers.JsonRpcProvider).getFeeData(),
             (api as ethers.providers.JsonRpcProvider).estimateGas(evmTx),
@@ -241,7 +241,7 @@ export const Send = () => {
       return;
     }
 
-    if (selectedAccount.type.includes("EVM")) {
+    if (selectedAccount?.type?.includes("EVM")) {
       setEvmTx((prevState) => ({
         ...prevState,
         value: amount,
@@ -296,7 +296,7 @@ export const Send = () => {
     return () => clearTimeout(getData);
   }, [amount, destinationAccount?.address, destinationIsInvalid]);
 
-  const originAccountIsEVM = selectedAccount.type.includes("EVM");
+  const originAccountIsEVM = selectedAccount?.type?.includes("EVM");
 
   const canContinue =
     (Number(amount) > 0 && destinationAccount?.address) || loadingFee;

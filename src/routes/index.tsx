@@ -9,6 +9,7 @@ import {
   ManageAssets,
   Send,
   SignIn,
+  SignMessage,
   Welcome,
 } from "@src/pages";
 import {
@@ -41,6 +42,7 @@ import {
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
   SIGNIN,
+  SIGN_MESSAGE,
 } from "./paths";
 
 import { Decrypt } from "@src/components/decrypt";
@@ -101,6 +103,19 @@ export const Routes = () => {
     }
     setHomeRoute(<Balance />);
   };
+
+  if (location.search) {
+    return (
+      <MemoryRouter initialEntries={[SIGN_MESSAGE]}>
+        <RRoutes>
+          <Route
+            path={SIGN_MESSAGE}
+            element={<SignMessage message="mensaje de prueba" />}
+          />
+        </RRoutes>
+      </MemoryRouter>
+    );
+  }
 
   return (
     <MemoryRouter>

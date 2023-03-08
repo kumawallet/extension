@@ -19,6 +19,8 @@ const commonManifest = {
     "storage",
     "activeTab",
     "scripting",
+    "nativeMessaging",
+    "tabs",
   ] as chrome.runtime.ManifestPermissions[],
   version: pkg.version,
 };

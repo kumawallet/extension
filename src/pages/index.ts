@@ -5,4 +5,5 @@ export * from "./manageAssets";
 export * from "./send";
 export * from "./settings";
 export * from "./signIn";
+export * from "./signMessage";
 export * from "./welcome";
