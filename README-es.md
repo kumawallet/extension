@@ -1,7 +1,10 @@
-# Kuma Wallet
+Kuma Wallet
+===========
+
+> Kuma es un trabajo en progreso. Es posible que la documentación no refleje la implementación actual. **Espere una versión estable y la documentación adecuada para el tercer trimestre de 2023**.
 
 <p align="center">
-  <img src="./src/assets/img/logo.svg" />
+  <img src="./images/logo.svg" />
 </p>
 
 ## Descripción del proyecto
@@ -83,15 +86,15 @@ Se agregarán más puentes en el futuro para soportar más cadenas.
 
 ```bash
 # Instalar dependencias
-yarn
+npm ci
 # Cree la extensión para Chrome y Firefox (en la carpeta dist/)
-yarn build
+npm run build
 
 # Cree la extensión para Chrome (en la carpeta dist/chrome)
-yarn build:chrome
+npm run build:chrome
 
 # Cree la extensión para Firefox (en la carpeta dist/firefox)
-yarn build:firefox
+npm run build:firefox
 ```
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
@@ -99,11 +102,11 @@ yarn build:firefox
 
 ```bash
 # Instalar dependencias
-yarn
+npm ci
 # Cree y observe los cambios (Chrome)
-yarn dev
+npm run dev
 # Cree y observe los cambios (Firefox)
-yarn dev:firefox
+npm run dev:firefox
 ```
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
@@ -140,7 +143,7 @@ Ahora debería ver la extensión en su navegador.
 
 ```bash
 # Run tests
-yarn test
+npm test
 ```
 
 ## Usando la extensión
