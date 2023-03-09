@@ -110,7 +110,7 @@ export const Routes = () => {
         <RRoutes>
           <Route
             path={SIGN_MESSAGE}
-            element={<SignMessage message="mensaje de prueba" />}
+            element={<SignMessage query={location.search} />}
           />
         </RRoutes>
       </MemoryRouter>

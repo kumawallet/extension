@@ -1,32 +1,26 @@
-import { FaSmileBeam } from "react-icons/fa";
+interface KumaProps {
+  method: string;
+  params: object;
+}
 
-console.log("hola");
 (window as any).kuma = {
-  hello: () => "hello",
-  connect: async () => {
+  call: ({ method, params }: KumaProps) => {
     return new Promise((res, rej) => {
-      try {
-        window.postMessage({
-          connect: "connect",
-          from: "kuma",
-          method: "connect",
-        });
+      window.postMessage({
+        origin: "kuma",
+        method: method,
+        params: params,
+      });
 
-        window.addEventListener("message", async function response(e) {
-          if (e.data["to"] === "connect") {
-            res(e.data);
-            window.removeEventListener("message", response);
-          }
-        });
-      } catch (error) {
-        rej(error);
-      }
-    });
-  },
-  open: () => {
-    window.postMessage({
-      from: "kuma",
-      method: "open",
+      window.addEventListener("message", async function response(e) {
+        if (
+          e.data["method"] === `${method}_response` &&
+          e.data["from"] === "content"
+        ) {
+          res(e.data?.response);
+          window.removeEventListener("message", response);
+        }
+      });
     });
   },
 };

@@ -8,7 +8,6 @@ const commonManifest = {
       matches: ["http://*/*", "https://*/*", "<all_urls>"],
       run_at: "document_end",
       js: ["src/entries/content/index.js"],
-      css: ["contentStyle.css"],
     },
   ],
   icons: {

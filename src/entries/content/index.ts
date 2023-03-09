@@ -9,26 +9,72 @@ function inject() {
 
 inject();
 
+// read messages from injected object
+// messages MUST have origin: "kuma" atribute
 window.addEventListener("message", async function (e) {
-  console.log("content", e);
-
-  // if (e.data["from"] === "signed_tab") {
-  //   chrome.windows.remove(-2);
-  // }
-
-  if (e.data["from"] === "kuma") {
-    const response = await chrome.runtime.sendMessage(e.data);
-
-    // console.log("content", response);
-    // console.log(e);
+  const data = e.data;
+  if (data["origin"] === "kuma") {
+    const response = await chrome.runtime.sendMessage(data);
     e.source?.postMessage(
       {
-        to: e.data["method"],
-        ...response,
+        response_method: data.method,
+        data: response,
       },
       {
         targetOrigin: e.origin,
       }
     );
+    return;
+    // switch (data.method) {
+    //   case "sign_message": {
+    //     const response = await chrome.runtime.sendMessage(data);
+    //     e.source?.postMessage(
+    //       {
+    //         response_method: data.method,
+    //         data: response,
+    //       },
+    //       {
+    //         targetOrigin: e.origin,
+    //       }
+    //     );
+    //     return;
+    //   }
+    //   // case "get_account_info": {
+    //   //   const response = await chrome.runtime.sendMessage(e.data);
+    //   //   e.source?.postMessage(
+    //   //     {
+    //   //       response_method: data.method,
+    //   //       data: response,
+    //   //     },
+    //   //     {
+    //   //       targetOrigin: e.origin,
+    //   //     }
+    //   //   );
+    //   //   return;
+    //   // }
+    //   default:
+    //     break;
+    // }
+  }
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.origin === "kuma") {
+    // console.log("content listener", request);
+    if (request.method.endsWith("_response") && request.from === "bg") {
+      // console.log(request);
+      window.postMessage({ ...request, from: "content" });
+      return "";
+    }
+
+    // switch (request.method) {
+    //   case "sign_message_response":
+    //     window.postMessage(request);
+    //     return "";
+    //     break;
+
+    //   default:
+    //     break;
+    // }
   }
 });

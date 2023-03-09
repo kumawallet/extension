@@ -1,34 +1,90 @@
+import { makeQuerys } from "@src/utils/utils";
 import Extension from "../../Extension";
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log("message in background", {
-    request,
-    sender,
-  });
+const openPopUp = (params: any) => {
+  const querys = makeQuerys(params);
 
-  if (request.from === "signed_tab") {
-    chrome.windows.remove(request.id);
+  // console.log(querys);
 
-    return;
-  }
-
-  chrome.windows.create({
-    // tabId: 1,
-    url: chrome.runtime.getURL("src/entries/popup/index.html?query=1"),
+  return chrome.windows.create({
+    url: chrome.runtime.getURL(`src/entries/popup/index.html${querys}`),
     type: "popup",
     top: 0,
     left: 0,
     width: 357,
     height: 600,
+    focused: true,
   });
-  // if (request)
-  // getSelectedAccount()
-  //   .then((res) => sendResponse({ account: res }))
-  //   .catch((err) => {
-  //     console.log("extension error");
-  //     sendResponse({ err: String(err) });
-  //   });
-  return true;
+};
+
+// read messages from content
+chrome.runtime.onMessage.addListener(async function (
+  request,
+  sender,
+  sendResponse
+) {
+  if (request.origin === "kuma") {
+    // console.log("bg listener", request);
+
+    try {
+      switch (request.method) {
+        case "sign_message": {
+          await openPopUp({ ...request, tabId: sender.tab?.id });
+          return;
+        }
+
+        case "sign_message_response": {
+          if (request.from !== "popup") return;
+          await chrome.tabs.sendMessage(Number(request.toTabId), {
+            ...request,
+            from: "bg",
+          });
+          if (request.fromWindowId)
+            await chrome.windows.remove(request.fromWindowId as number);
+
+          return;
+        }
+
+        case "get_account_info": {
+          getSelectedAccount().then(sendResponse).catch(sendResponse);
+          return;
+        }
+
+        default:
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+      await chrome.tabs.sendMessage(Number(request.toTabId), {
+        ...{
+          ...request,
+          method: `${request.method}_response`,
+        },
+        from: "bg",
+        error,
+      });
+      return error;
+    }
+
+    return true;
+  }
+});
+
+chrome.runtime.onConnect.addListener(function (port) {
+  if (port.name === "sign_message") {
+    port.onDisconnect.addListener(async function (port) {
+      const queries = port.sender?.url?.split("?")[1];
+      const { tabId, origin, method } = Object.fromEntries(
+        new URLSearchParams(queries)
+      );
+      await chrome.tabs.sendMessage(Number(tabId), {
+        origin,
+        method: `${method}_response`,
+        response: null,
+        from: "bg",
+      });
+    });
+  }
 });
 
 const getSelectedAccount = () => {
