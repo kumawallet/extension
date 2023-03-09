@@ -46,7 +46,21 @@ chrome.runtime.onMessage.addListener(async function (
         }
 
         case "get_account_info": {
-          getSelectedAccount().then(sendResponse).catch(sendResponse);
+          getSelectedAccount()
+            .then(async (res) => {
+              await chrome.tabs.sendMessage(Number(sender.tab?.id), {
+                origin: "kuma",
+                method: `${request.method}_response`,
+                response: {
+                  address: res?.value.address,
+                  type: res?.type,
+                },
+                from: "bg",
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           return;
         }
 
