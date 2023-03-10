@@ -88,6 +88,8 @@ describe("ChainSelector", () => {
       expect(account).toBeDefined();
     });
     const account = screen.getByText(CHAINS[0].chains[1].name);
+
+    (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
     await act(() => {
       fireEvent.click(account.parentElement as HTMLElement);
     });

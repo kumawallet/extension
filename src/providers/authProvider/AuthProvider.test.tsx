@@ -267,7 +267,7 @@ describe("AuthProvider", () => {
     it("should return recovery_phrase_required error", async () => {
       renderComponent({ ...mockAccountForm, privateKeyOrSeed: undefined });
 
-      await act(() => {
+      act(() => {
         fireEvent.click(screen.getByTestId(testIds.restoreBtn));
       });
 
@@ -281,7 +281,7 @@ describe("AuthProvider", () => {
     it("should return password_required error", async () => {
       renderComponent({ ...mockAccountForm, password: undefined });
 
-      await act(() => {
+      act(() => {
         fireEvent.click(screen.getByTestId(testIds.restoreBtn));
       });
 
