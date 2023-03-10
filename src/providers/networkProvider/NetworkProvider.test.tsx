@@ -18,6 +18,8 @@ import {
   selectedMultiSupportChain,
 } from "../../tests/mocks/chain-mocks";
 import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@src/utils/i18n";
 
 const initialState: InitialState = {
   chains: CHAINS,
@@ -65,9 +67,11 @@ const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
 
 const renderComponent = (props?: TestComponentProps) => {
   return render(
-    <NetworkProvider>
-      <TestComponent {...props} />
-    </NetworkProvider>
+    <I18nextProvider i18n={i18n}>
+      <NetworkProvider>
+        <TestComponent {...props} />
+      </NetworkProvider>
+    </I18nextProvider>
   );
 };
 

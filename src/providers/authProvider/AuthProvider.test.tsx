@@ -10,6 +10,8 @@ import { vi } from "vitest";
 import { FC, useState } from "react";
 import { AccountFormType } from "@src/pages";
 import { AccountType } from "@src/accounts/types";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@src/utils/i18n";
 
 interface ResponseState {
   create: null | boolean;
@@ -89,9 +91,11 @@ const mockAccountForm: AccountFormType = {
 
 const renderComponent = (accountForm: AccountFormType) => {
   return render(
-    <AuthProvider>
-      <TestComponent createdAccount={accountForm} />
-    </AuthProvider>
+    <I18nextProvider i18n={i18n}>
+      <AuthProvider>
+        <TestComponent createdAccount={accountForm} />
+      </AuthProvider>
+    </I18nextProvider>
   );
 };
 
