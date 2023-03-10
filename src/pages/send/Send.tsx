@@ -151,37 +151,56 @@ export const Send = () => {
 
         const keyring = new Keyring({ type: "sr25519" });
         const sender = keyring.addFromMnemonic(seed as string);
-        const res = await extrinsic?.signAndSend(sender);
+        const unsub = await extrinsic?.signAndSend(
+          sender,
+          ({ events, status, txHash, ...rest }) => {
+            console.log(`Current status is ${status.type}`);
 
-        hash = res.toHuman();
-        date = Date.now();
-        reference = "wasm";
+            if (status.isFinalized) {
+              console.log(
+                `Transaction included at blockHash ${status.asFinalized}`
+              );
+              console.log(`Transaction hash ${txHash.toHex()}`);
+
+              // Loop through Vec<EventRecord> to display all events
+              events.forEach(({ phase, event: { data, method, section } }) => {
+                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+              });
+
+              unsub();
+            }
+          }
+        );
+
+        // hash = res.toHuman();
+        // date = Date.now();
+        // reference = "wasm";
       }
 
-      const activity = {
-        address: destinationAccount.address,
-        type: RecordType.TRANSFER,
-        reference,
-        hash,
-        status: RecordStatus.PENDING,
-        createdAt: date,
-        lastUpdated: date,
-        error: undefined,
-        network: selectedChain?.name || "",
-        recipientNetwork: selectedChain?.name || "",
-        data: {
-          symbol: String(selectedChain?.nativeCurrency.symbol),
-          from: selectedAccount.value.address,
-          to: destinationAccount.address,
-          gas: "0",
-          gasPrice: "0",
-          value: amount,
-        } as TransferData,
-      };
+      // const activity = {
+      //   address: destinationAccount,
+      //   type: RecordType.TRANSFER,
+      //   reference,
+      //   hash,
+      //   status: RecordStatus.PENDING,
+      //   createdAt: date,
+      //   lastUpdated: date,
+      //   error: undefined,
+      //   network: selectedChain?.name || "",
+      //   recipientNetwork: selectedChain?.name || "",
+      //   data: {
+      //     symbol: String(selectedChain?.nativeCurrency.symbol),
+      //     from: selectedAccount.value.address,
+      //     to: destinationAccount,
+      //     gas: "0",
+      //     gasPrice: "0",
+      //     value: amount,
+      //   } as TransferData,
+      // };
 
-      await Extension.addActivity(hash, activity as Record);
+      // await Extension.addActivity(hash, activity as Record);
       showSuccessToast(t("tx_saved"));
-      navigate(BALANCE);
+      // navigate(BALANCE);
     } catch (error) {
       console.log(error);
       showErrorToast(error as string);
@@ -245,7 +264,7 @@ export const Send = () => {
       setEvmTx((prevState) => ({
         ...prevState,
         value: amount,
-        to: destinationAccount?.address || "",
+        to: destinationAccount || "",
       }));
       return;
     }
@@ -262,7 +281,7 @@ export const Send = () => {
         const _amount = Number(amount) * currencyUnits;
 
         const extrinsic = await (api as ApiPromise).tx.balances.transfer(
-          destinationAccount.address,
+          destinationAccount,
           _amount
         );
 
@@ -294,12 +313,11 @@ export const Send = () => {
     }, 1000);
 
     return () => clearTimeout(getData);
-  }, [amount, destinationAccount?.address, destinationIsInvalid]);
+  }, [amount, destinationAccount, destinationIsInvalid]);
 
   const originAccountIsEVM = selectedAccount?.type?.includes("EVM");
 
-  const canContinue =
-    (Number(amount) > 0 && destinationAccount?.address) || loadingFee;
+  const canContinue = Number(amount) > 0 && destinationAccount && !loadingFee;
 
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
