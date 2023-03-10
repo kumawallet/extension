@@ -1,4 +1,4 @@
-import { BsArrowUpRight } from "react-icons/bs";
+// import { BsArrowUpRight } from "react-icons/bs";
 import { Asset } from "../Balance";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { Loading } from "@src/components/common";
@@ -34,12 +34,12 @@ export const Assets = ({
             </div>
           </div>
 
-          <button className="bg-none outline-none rounded-full">
+          {/* <button className="bg-none outline-none rounded-full">
             <BsArrowUpRight
               size={23}
               className="hover:bg-custom-green-bg rounded-full"
             />
-          </button>
+          </button> */}
         </div>
       ))}
 
