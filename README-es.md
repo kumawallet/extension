@@ -7,6 +7,12 @@ Kuma Wallet
   <img src="./images/logo.svg" />
 </p>
 
+[![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
+[![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
+[![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
+[![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+
 ## Descripción del proyecto
 
 Kuma Wallet es la primera de su tipo, una billetera cross-chain que ofrece una gestión y transferencia de activos sin problemas entre las cadenas EVM y WASM. Esta billetera ha sido diseñada para hacer que la experiencia de manejar activos entre cadenas sea lo más fluida e intuitiva posible. Con Kuma Wallet, los usuarios pueden importar y crear cuentas fácilmente en las cadenas EVM y WASM y transferir sus activos con facilidad, gracias a la integración de XCM. El diseño elegante y fácil de usar de Kuma Wallet se ha inspirado en la exitosa interfaz de usuario de Astar. Estamos comprometidos a brindar soporte continuo a Kuma Wallet, incluido el establecimiento de canales de Telegram y Discord, para garantizar que los usuarios tengan una plataforma para recibir comentarios y abordar cualquier problema que pueda surgir.
