@@ -16,7 +16,6 @@ const entriesDir = resolve(root, "entries");
 const assetsDir = resolve(root, "assets");
 const hookDir = resolve(root, "hooks");
 const utilsDir = resolve(root, "utils");
-
 const stylesDir = resolve(root, "styles");
 const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
@@ -68,6 +67,7 @@ export default defineConfig({
   plugins: [react(), makeManifest(), copyContentStyle()],
   publicDir,
   build: {
+    chunkSizeWarningLimit: 1000,
     outDir,
     sourcemap: process.env.__DEV__ === "true",
     rollupOptions: {
@@ -83,11 +83,6 @@ export default defineConfig({
       },
       output: {
         entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          }
-        }
       },
       plugins: [rollupNodePolyFill()],
     },
