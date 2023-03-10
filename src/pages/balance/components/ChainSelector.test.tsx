@@ -69,8 +69,8 @@ describe("ChainSelector", () => {
     await act(() => {
       fireEvent.click(button);
     });
-    waitFor(() => {
-      const account = screen.getByText(CHAINS[0].name);
+    await waitFor(() => {
+      const account = screen.getByText(CHAINS[0].chains[0].name);
       expect(account).toBeDefined();
     });
   });

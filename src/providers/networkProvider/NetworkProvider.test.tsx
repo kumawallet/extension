@@ -170,8 +170,17 @@ describe("NetworkProvider", () => {
   });
   describe("useEffect", () => {
     it("should init", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getNetwork = vi
+        .fn()
+        .mockResolvedValue({ chain: selectedWASMChainMock });
+
+      Extension.default.getSelectedAccount = vi
+        .fn()
+        .mockResolvedValue(selectedWASMAccountMock);
+
       renderComponent({});
-      waitFor(() => {
+      await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
         expect(state).toHaveProperty("type", "WASM");
         expect(state).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm);
@@ -255,14 +264,23 @@ describe("NetworkProvider", () => {
   });
   describe("setNewRpc", () => {
     it("should keep the current rpc", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getNetwork = vi
+        .fn()
+        .mockResolvedValue({ chain: selectedWASMChainMock });
+
+      Extension.default.getSelectedAccount = vi
+        .fn()
+        .mockResolvedValue(selectedWASMAccountMock);
+
       renderComponent();
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
       });
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.newRpcBtn));
       });
-      waitFor(() =>
+      await waitFor(() =>
         expect(
           JSON.parse(screen.getByTestId(testIds.state).innerHTML)
         ).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm)

@@ -98,7 +98,7 @@ const renderComponent = (accountForm: AccountFormType) => {
 describe("AuthProvider", () => {
   beforeAll(() => {
     vi.mock("@src/Extension", () => ({
-      defualt: {
+      default: {
         createAccounts: vi.fn().mockResolvedValue(true),
         isUnlocked: vi.fn().mockResolvedValue(true),
         importAccount: vi.fn().mockResolvedValue(true),
@@ -124,10 +124,10 @@ describe("AuthProvider", () => {
     it("should return true", async () => {
       renderComponent(mockAccountForm);
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.createBtn));
       });
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.createResponse).innerHTML).toEqual(
           "true"
         )

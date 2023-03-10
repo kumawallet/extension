@@ -22,7 +22,9 @@ export const SignIn = () => {
 
   const signIn = async () => {
     try {
+      console.log("signIn");
       await Extension?.signIn(password);
+      console.log("adios");
       navigate(BALANCE);
     } catch (error) {
       showErrorToast(tCommon(error as string));
