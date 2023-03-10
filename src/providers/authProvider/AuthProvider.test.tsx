@@ -103,6 +103,7 @@ describe("AuthProvider", () => {
         isUnlocked: vi.fn().mockResolvedValue(true),
         importAccount: vi.fn().mockResolvedValue(true),
         restorePassword: vi.fn().mockResolvedValue(true),
+        deriveAccount: vi.fn().mockResolvedValue(true),
       },
     }));
   });
@@ -150,27 +151,33 @@ describe("AuthProvider", () => {
 
   describe("importAccount", () => {
     it("should return true", async () => {
+      const Extension = await import("@src/Extension");
+      Extension.default.isUnlocked = vi.fn().mockReturnValue(true);
+
       renderComponent(mockAccountForm);
 
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.importBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() => {
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
           "true"
-        )
-      );
+        );
+      });
     });
 
     it("should return password_required error", async () => {
+      const Extension = await import("@src/Extension");
+      Extension.default.isUnlocked = vi.fn().mockReturnValue(false);
+
       renderComponent({ ...mockAccountForm, password: "" });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.importBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
           "false"
         )
@@ -180,11 +187,11 @@ describe("AuthProvider", () => {
     it("should return private_key_or_seed_required error", async () => {
       renderComponent({ ...mockAccountForm, privateKeyOrSeed: "" });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.importBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
           "false"
         )
@@ -194,11 +201,11 @@ describe("AuthProvider", () => {
     it("should return account_type_required error", async () => {
       renderComponent({ ...mockAccountForm, accountType: undefined });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.importBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.importResonse).innerHTML).toEqual(
           "false"
         )
@@ -208,13 +215,15 @@ describe("AuthProvider", () => {
 
   describe("deriveAccount", () => {
     it("should return true", async () => {
+      const Extension = await import("@src/Extension");
+      Extension.default.isUnlocked = vi.fn().mockReturnValue(true);
       renderComponent(mockAccountForm);
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.deriveBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.deriveResponse).innerHTML).toEqual(
           "true"
         )
@@ -224,11 +233,11 @@ describe("AuthProvider", () => {
     it("should return account_type_required error", async () => {
       renderComponent({ ...mockAccountForm, accountType: undefined });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.deriveBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.deriveResponse).innerHTML).toEqual(
           "false"
         )
@@ -240,11 +249,11 @@ describe("AuthProvider", () => {
     it("should return true", async () => {
       renderComponent(mockAccountForm);
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.restoreBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
           "true"
         )
@@ -254,11 +263,11 @@ describe("AuthProvider", () => {
     it("should return recovery_phrase_required error", async () => {
       renderComponent({ ...mockAccountForm, privateKeyOrSeed: undefined });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.restoreBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
           "false"
         )
@@ -268,11 +277,11 @@ describe("AuthProvider", () => {
     it("should return password_required error", async () => {
       renderComponent({ ...mockAccountForm, password: undefined });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId(testIds.restoreBtn));
       });
 
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.restoreResponse).innerHTML).toEqual(
           "false"
         )
