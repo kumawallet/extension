@@ -10,9 +10,14 @@ import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
 import { CHAINS } from "@src/constants/chains";
 import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
+import { useNetworkContext } from "@src/providers";
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
+
+  const {
+    state: { type },
+  } = useNetworkContext();
 
   const {
     state: { selectedAccount },
@@ -65,7 +70,11 @@ export const Activity = () => {
         (chain) => chain.name.toLowerCase() === network.toLowerCase()
       ) || {};
     const { url } = explorers?.[0] || {};
-    return `${url}tx/${hash}`;
+    if (type.toLowerCase() === "wasm") {
+      return `${url}extrinsic/${hash}`;
+    } else {
+      return `${url}tx/${hash}`;
+    }
   };
 
   const getContactName = (address: string) => {
@@ -145,6 +154,8 @@ export const Activity = () => {
                     <a
                       className="text-custom-green-bg hover:text-white text-sm"
                       href={getLink(network, hash)}
+                      target="_blank"
+                      rel="noreferrer"
                     >
                       {tCommon("view_in_scanner")}
                     </a>

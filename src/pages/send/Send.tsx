@@ -153,54 +153,81 @@ export const Send = () => {
         const sender = keyring.addFromMnemonic(seed as string);
         const unsub = await extrinsic?.signAndSend(
           sender,
-          ({ events, status, txHash, ...rest }) => {
+          async ({ events, status, txHash, ...rest }) => {
             console.log(`Current status is ${status.type}`);
 
-            if (status.isFinalized) {
-              console.log(
-                `Transaction included at blockHash ${status.asFinalized}`
-              );
-              console.log(`Transaction hash ${txHash.toHex()}`);
+            if (status.isInBlock) {
+              console.log("Included at block hash", status.asInBlock.toHex());
+              console.log("Events:");
+            }
 
-              // Loop through Vec<EventRecord> to display all events
-              events.forEach(({ phase, event: { data, method, section } }) => {
-                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-              });
+            if (status.isFinalized) {
+              const failedEvents = events.filter(({ event }) =>
+                api.events.system.ExtrinsicFailed.is(event)
+              );
+
+              console.log("failed events", failedEvents);
+
+              if (failedEvents.length > 0) {
+                console.log("update to failed");
+              } else {
+                let number = 0;
+
+                events.forEach(
+                  ({ event: { data, method, section }, phase, ...evt }) => {
+                    // console.log("evt", evt);
+
+                    number = phase.toJSON().applyExtrinsic;
+
+                    console.log(
+                      "\t",
+                      phase.toString(),
+                      `: ${section}.${method}`,
+                      data.toString()
+                    );
+                  }
+                );
+
+                const { block } = await (api as ApiPromise).rpc.chain.getBlock(
+                  status.asFinalized.toHex()
+                );
+                const extrinsic = `${block.header.number.toNumber()}-${number}`;
+                // console.log("block", `${blockNumber}-${number}`);
+                // console.log("Finalized block hash", status.asFinalized.toHex());
+
+                date = Date.now();
+                reference = "wasm";
+                const activity = {
+                  address: destinationAccount,
+                  type: RecordType.TRANSFER,
+                  reference,
+                  hash: extrinsic,
+                  status: RecordStatus.PENDING,
+                  createdAt: date,
+                  lastUpdated: date,
+                  error: undefined,
+                  network: selectedChain?.name || "",
+                  recipientNetwork: selectedChain?.name || "",
+                  data: {
+                    symbol: String(selectedChain?.nativeCurrency.symbol),
+                    from: selectedAccount.value.address,
+                    to: destinationAccount,
+                    gas: "0",
+                    gasPrice: "0",
+                    value: amount,
+                  } as TransferData,
+                };
+
+                await Extension.addActivity(hash, activity as Record);
+                showSuccessToast(t("tx_saved"));
+                navigate(BALANCE);
+              }
 
               unsub();
             }
           }
         );
-
-        // hash = res.toHuman();
-        // date = Date.now();
-        // reference = "wasm";
       }
-
-      // const activity = {
-      //   address: destinationAccount,
-      //   type: RecordType.TRANSFER,
-      //   reference,
-      //   hash,
-      //   status: RecordStatus.PENDING,
-      //   createdAt: date,
-      //   lastUpdated: date,
-      //   error: undefined,
-      //   network: selectedChain?.name || "",
-      //   recipientNetwork: selectedChain?.name || "",
-      //   data: {
-      //     symbol: String(selectedChain?.nativeCurrency.symbol),
-      //     from: selectedAccount.value.address,
-      //     to: destinationAccount,
-      //     gas: "0",
-      //     gasPrice: "0",
-      //     value: amount,
-      //   } as TransferData,
-      // };
-
-      // await Extension.addActivity(hash, activity as Record);
-      showSuccessToast(t("tx_saved"));
-      // navigate(BALANCE);
     } catch (error) {
       console.log(error);
       showErrorToast(error as string);

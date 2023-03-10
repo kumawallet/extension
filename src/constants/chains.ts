@@ -229,7 +229,7 @@ export const TESTNETS: Chain[] = [
     explorers: [
       {
         name: "",
-        url: "",
+        url: "https://rockmine.subscan.io/",
       },
     ],
     supportedAccounts: [WASM],
