@@ -16,7 +16,7 @@ jobs:
         type: string
     docker:
       - image: cimg/node:<< parameters.node-version >>
-    resource_class: small
+    resource_class: medium
     steps:
       - checkout
       - restore_cache:
