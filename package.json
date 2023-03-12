@@ -17,8 +17,8 @@
     "build": "NODE_ENV=production tsc --noEmit && npm run build:chrome && npm run build:firefox",
     "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME nodemon",
     "dev:firefox": "NODE_ENV=develop BROWSER_TARGET=FIREFOX nodemon",
-    "test": "vitest",
-    "test:cov": "vitest run --coverage",
+    "test": "vitest --reporter=verbose",
+    "test:cov": "vitest  --reporter=verbose run --coverage",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
     "lint:ci": "eslint \"{src,apps,libs}/**/*.ts\""
   },

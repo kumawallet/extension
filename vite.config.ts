@@ -38,6 +38,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "src/tests/setup.ts",
     coverage: {
+      reporter: ['text', 'html', 'lcov', 'text-summary'],
       exclude: [
         ...(configDefaults.coverage.exclude as string[]),
         "**/src/tests/mocks/**",
