@@ -87,12 +87,19 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         let rpc = "";
         let type = "";
 
+        // console.log("selectedNetwork", selectedNetwork);
+
         if (selectedNetwork?.chain?.name) {
           const account = await Extension.getSelectedAccount();
+          // console.log("selectedAccount", account);
           selectedChain = selectedNetwork?.chain;
           type = getAccountType(account?.type);
           rpc = selectedChain.rpc[type.toLowerCase() as "evm" | "wasm"] || "";
         }
+
+        // console.log({
+        //   rpc,
+        // });
 
         dispatch({
           type: "init",

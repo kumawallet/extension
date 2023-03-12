@@ -29,7 +29,7 @@ describe("SignIn", () => {
     }));
 
     vi.mock("@src/Extension", () => ({
-      signIn: () => signIn(),
+      default: { signIn: () => signIn() },
     }));
   });
 
@@ -47,7 +47,8 @@ describe("SignIn", () => {
       fireEvent.change(passwordInput, { target: { value: "Test.123" } });
       fireEvent.click(button);
     });
-    waitFor(() => expect(signIn).toHaveBeenCalled());
+
+    expect(signIn).toHaveBeenCalledOnce();
   });
 
   it("should go to forgot password", async () => {
