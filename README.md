@@ -1,8 +1,18 @@
-# Kuma Wallet (Expect a stable release and proper documentation in Q3 2023.)
+Kuma Wallet
+===========
+
+> Kuma is a work in progress. The documentation may not reflect the current implementation. **Expect a stable release and proper documentation for Q3 2023**.
 
 <p align="center">
-  <img src="./src/assets/img/logo.svg" />
+  <img src="./images/logo.svg" />
 </p>
+
+[![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
+[![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
+[![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
+[![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+
 
 ## Project Overview
 
@@ -84,15 +94,15 @@ More bridges will be added in the future to support more chains.
 
 ```bash
 # Install dependencies
-yarn
+npm ci
 # Build the extension for both Chrome and Firefox (in the dist/ folder)
-yarn build
+npm run build
 
 # Build the extension for Chrome (in the dist/chrome folder)
-yarn build:chrome
+npm run build:chrome
 
 # Build the extension for Firefox (in the dist/firefox folder)
-yarn build:firefox
+npm run build:firefox
 ```
 *Note: As Brave is based on Chromium, the extension can be built for both Chrome and Brave with the same command.*
 
@@ -101,11 +111,11 @@ yarn build:firefox
 
 ```bash
 # Install dependencies
-yarn
+npm ci
 # Build and watch for changes (Chrome)
-yarn dev
+npm run dev
 # Build and watch for changes (Firefox)
-yarn dev:firefox
+npm run dev:firefox
 ```
 
 *Note: As Brave is based on Chromium, the extension can be built for both Chrome and Brave with the same command.*
@@ -143,7 +153,7 @@ You should now see the extension in your browser.
 
 ```bash
 # Run tests
-yarn test
+npm test
 ```
 
 ## Using the extension

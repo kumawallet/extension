@@ -74,7 +74,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
-  const [seed] = useState(() => (generateSeed ? mnemonicGenerate(12) : ""));
+  const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
   const [passwordType, setPasswordType] = useState("password");
   const togglePassword = () => {
     setPasswordType(passwordType === "password" ? "text" : "password");

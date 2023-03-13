@@ -1,26 +1,22 @@
-import { act, fireEvent, renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useLoading } from "./useLoading";
 
 describe("useLoading", () => {
   it("should set isLoading to true", () => {
-    const {
-      result: { current },
-    } = renderHook(() => useLoading());
+    const { result } = renderHook(() => useLoading());
 
     act(() => {
-      current.starLoading();
+      result.current.starLoading();
     });
-    waitFor(() => expect(current.isLoading).toBe(true));
+    expect(result.current.isLoading).toBe(true);
   });
 
   it("should set isLoading to false", () => {
-    const {
-      result: { current },
-    } = renderHook(() => useLoading(true));
+    const { result } = renderHook(() => useLoading(true));
 
     act(() => {
-      current.endLoading();
+      result.current.endLoading();
     });
-    waitFor(() => expect(current.isLoading).toBe(false));
+    expect(result.current.isLoading).toBe(false);
   });
 });

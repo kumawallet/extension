@@ -16,7 +16,6 @@ const entriesDir = resolve(root, "entries");
 const assetsDir = resolve(root, "assets");
 const hookDir = resolve(root, "hooks");
 const utilsDir = resolve(root, "utils");
-
 const stylesDir = resolve(root, "styles");
 const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
@@ -37,7 +36,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    setupFiles: "src/tests/setup.ts",
     coverage: {
+      reporter: ['text', 'html', 'lcov', 'text-summary'],
       exclude: [
         ...(configDefaults.coverage.exclude as string[]),
         "**/src/tests/mocks/**",
@@ -68,6 +69,7 @@ export default defineConfig({
   plugins: [react(), makeManifest(), copyContentStyle()],
   publicDir,
   build: {
+    chunkSizeWarningLimit: 1000,
     outDir,
     sourcemap: process.env.__DEV__ === "true",
     rollupOptions: {

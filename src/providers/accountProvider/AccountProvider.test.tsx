@@ -9,6 +9,8 @@ import {
 import { AccountProvider, useAccountContext } from "./AccountProvider";
 import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
 import Account from "@src/storage/entities/Account";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@src/utils/i18n";
 
 const testIds = {
   createAccount: "create-account",
@@ -61,9 +63,11 @@ const TestComponent = () => {
 
 const renderComponent = () => {
   return render(
-    <AccountProvider>
-      <TestComponent />
-    </AccountProvider>
+    <I18nextProvider i18n={i18n}>
+      <AccountProvider>
+        <TestComponent />
+      </AccountProvider>
+    </I18nextProvider>
   );
 };
 

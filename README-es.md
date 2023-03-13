@@ -1,8 +1,17 @@
-# Kuma Wallet
+Kuma Wallet
+===========
+
+> Kuma es un trabajo en progreso. Es posible que la documentación no refleje la implementación actual. **Espere una versión estable y la documentación adecuada para el tercer trimestre de 2023**.
 
 <p align="center">
-  <img src="./src/assets/img/logo.svg" />
+  <img src="./images/logo.svg" />
 </p>
+
+[![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
+[![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
+[![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
+[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
+[![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 ## Descripción del proyecto
 
@@ -83,15 +92,15 @@ Se agregarán más puentes en el futuro para soportar más cadenas.
 
 ```bash
 # Instalar dependencias
-yarn
+npm ci
 # Cree la extensión para Chrome y Firefox (en la carpeta dist/)
-yarn build
+npm run build
 
 # Cree la extensión para Chrome (en la carpeta dist/chrome)
-yarn build:chrome
+npm run build:chrome
 
 # Cree la extensión para Firefox (en la carpeta dist/firefox)
-yarn build:firefox
+npm run build:firefox
 ```
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
@@ -99,11 +108,11 @@ yarn build:firefox
 
 ```bash
 # Instalar dependencias
-yarn
+npm ci
 # Cree y observe los cambios (Chrome)
-yarn dev
+npm run dev
 # Cree y observe los cambios (Firefox)
-yarn dev:firefox
+npm run dev:firefox
 ```
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
@@ -140,7 +149,7 @@ Ahora debería ver la extensión en su navegador.
 
 ```bash
 # Run tests
-yarn test
+npm test
 ```
 
 ## Usando la extensión

@@ -25,7 +25,6 @@ export const ManageNetworks = () => {
   const getNetworks = async () => {
     try {
       const networks = await Extension.getAllChains();
-      console.log(networks);
       setNetworks(networks);
     } catch (error) {
       setNetworks([]);

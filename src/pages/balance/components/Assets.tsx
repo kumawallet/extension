@@ -1,4 +1,4 @@
-import { BsArrowUpRight } from "react-icons/bs";
+// import { BsArrowUpRight } from "react-icons/bs";
 import { Asset } from "../Balance";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { Loading } from "@src/components/common";
@@ -6,6 +6,7 @@ import { ImCoinDollar } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
+import { BsArrowUpRight } from "react-icons/bs";
 
 export const Assets = ({
   assets = [],
