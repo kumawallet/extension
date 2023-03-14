@@ -13,12 +13,15 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { SelectableAsset } from "./components/SelectableAsset";
 import { NumericFormat } from "react-number-format";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useTxContext,
+} from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object, string } from "yup";
 import { ethers } from "ethers";
 import { useToast } from "@src/hooks";
-import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 import { ApiPromise } from "@polkadot/api";
 import { decodeAddress, encodeAddress, Keyring } from "@polkadot/keyring";
 import Record from "@src/storage/entities/activity/Record";
@@ -32,6 +35,7 @@ import { BALANCE } from "@src/routes/paths";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { isHex } from "@polkadot/util";
 import { isAddress } from "ethers/lib/utils";
+import { AccountType } from "@src/accounts/types";
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -45,6 +49,8 @@ export const Send = () => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const { addTxToQueue } = useTxContext();
 
   const schema = useMemo(() => {
     return object({
@@ -151,82 +157,21 @@ export const Send = () => {
 
         const keyring = new Keyring({ type: "sr25519" });
         const sender = keyring.addFromMnemonic(seed as string);
-        const unsub = await extrinsic?.signAndSend(
+
+        addTxToQueue({
+          type: AccountType.WASM,
+          tx: extrinsic,
           sender,
-          async ({ events, status, txHash, ...rest }) => {
-            console.log(`Current status is ${status.type}`);
+          destinationAccount,
+          amount,
+        });
 
-            if (status.isInBlock) {
-              console.log("Included at block hash", status.asInBlock.toHex());
-              console.log("Events:");
-            }
-
-            if (status.isFinalized) {
-              const failedEvents = events.filter(({ event }) =>
-                api.events.system.ExtrinsicFailed.is(event)
-              );
-
-              console.log("failed events", failedEvents);
-
-              if (failedEvents.length > 0) {
-                console.log("update to failed");
-              } else {
-                let number = 0;
-
-                events.forEach(
-                  ({ event: { data, method, section }, phase, ...evt }) => {
-                    // console.log("evt", evt);
-
-                    number = phase.toJSON().applyExtrinsic;
-
-                    console.log(
-                      "\t",
-                      phase.toString(),
-                      `: ${section}.${method}`,
-                      data.toString()
-                    );
-                  }
-                );
-
-                const { block } = await (api as ApiPromise).rpc.chain.getBlock(
-                  status.asFinalized.toHex()
-                );
-                const extrinsic = `${block.header.number.toNumber()}-${number}`;
-                // console.log("block", `${blockNumber}-${number}`);
-                // console.log("Finalized block hash", status.asFinalized.toHex());
-
-                date = Date.now();
-                reference = "wasm";
-                const activity = {
-                  address: destinationAccount,
-                  type: RecordType.TRANSFER,
-                  reference,
-                  hash: extrinsic,
-                  status: RecordStatus.PENDING,
-                  createdAt: date,
-                  lastUpdated: date,
-                  error: undefined,
-                  network: selectedChain?.name || "",
-                  recipientNetwork: selectedChain?.name || "",
-                  data: {
-                    symbol: String(selectedChain?.nativeCurrency.symbol),
-                    from: selectedAccount.value.address,
-                    to: destinationAccount,
-                    gas: "0",
-                    gasPrice: "0",
-                    value: amount,
-                  } as TransferData,
-                };
-
-                await Extension.addActivity(hash, activity as Record);
-                showSuccessToast(t("tx_saved"));
-                navigate(BALANCE);
-              }
-
-              unsub();
-            }
-          }
-        );
+        showSuccessToast(t("tx_send"));
+        navigate(BALANCE, {
+          state: {
+            tab: "activity",
+          },
+        });
       }
     } catch (error) {
       console.log(error);
@@ -334,7 +279,10 @@ export const Send = () => {
           "estimated total": `${total} ${currencySymbol}`,
         });
       } catch (error) {
-        console.error(error);
+        console.error(String(error));
+        setWasmFees({
+          "": `${String(error).split("Error:")[1]}`,
+        });
       }
       setLoadingFee(false);
     }, 1000);

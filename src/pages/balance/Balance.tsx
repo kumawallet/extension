@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
+import { useLocation } from "react-router-dom";
 
 export interface Asset {
   name: string;
@@ -21,6 +22,8 @@ export interface Asset {
 }
 
 export const Balance = () => {
+  const { state } = useLocation();
+
   const {
     state: { api, selectedChain, rpc, type },
   } = useNetworkContext();
@@ -116,7 +119,7 @@ export const Balance = () => {
             balance={totalBalance}
           />
 
-          <Tab.Group>
+          <Tab.Group defaultIndex={state?.tab === "activity" ? 1 : 0}>
             <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">
               {TABS.map((tab) => (
                 <Tab

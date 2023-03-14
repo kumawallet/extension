@@ -38,7 +38,8 @@ export default class Activity extends BaseEntity {
 
   static async updateRecordStatus(
     txHash: string,
-    status: RecordStatus
+    status: RecordStatus,
+    error: string | undefined
   ): Promise<void> {
     const { key } = (await SelectedAccount.get<SelectedAccount>()) || {};
     if (!key) throw new Error("failed_to_add_record");
@@ -48,6 +49,7 @@ export default class Activity extends BaseEntity {
     if (!record) throw new Error("failed_to_update_record_status");
     record.status = status;
     record.lastUpdated = Date.now();
+    record.error = error;
     activity.addRecord(key, txHash, record);
     await Activity.set<Activity>(activity);
   }

@@ -3,14 +3,19 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
-import Record from "@src/storage/entities/activity/Record";
 import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
 import { CHAINS } from "@src/constants/chains";
 import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
-import { useNetworkContext } from "@src/providers";
+import { useNetworkContext, useTxContext } from "@src/providers";
+
+const chpiColor = {
+  [RecordStatus.FAIL]: "bg-red-600",
+  [RecordStatus.SUCCESS]: "bg-green-600",
+  [RecordStatus.PENDING]: "bg-yellow-600",
+};
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
@@ -23,33 +28,21 @@ export const Activity = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
+  const {
+    state: { activity },
+  } = useTxContext();
+
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
-  const [records, setRecords] = useState([] as Record[]);
   const [contacts, setContacts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
 
   useEffect(() => {
     if (selectedAccount) {
-      getActivity();
       getContacts();
     }
   }, [selectedAccount.key]);
-
-  const getActivity = async () => {
-    try {
-      setIsLoading(true);
-      const records = await Extension.getActivity();
-      setRecords(records);
-    } catch (error) {
-      console.error(error);
-      setRecords([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getContacts = async () => {
     try {
@@ -105,9 +98,9 @@ export const Activity = () => {
   const filteredRecords = useMemo(() => {
     const _search = search.trim().toLocaleLowerCase();
 
-    if (!_search) return records;
+    if (!_search) return activity;
 
-    return records
+    return activity
       .filter(({ hash, reference, address }) => {
         return (
           hash.toLowerCase().includes(_search) ||
@@ -116,7 +109,7 @@ export const Activity = () => {
         );
       })
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
-  }, [search, records]);
+  }, [search, activity]);
 
   if (isLoading) {
     return <Loading />;
@@ -134,7 +127,7 @@ export const Activity = () => {
       />
 
       <div className="flex flex-col my-5 overflow-y-auto h-full">
-        {records.length === 0 && (
+        {activity.length === 0 && (
           <div className="flex justify-center items-center mt-5">
             <p className="text-lg font-medium">{t("empty")}</p>
           </div>
@@ -143,11 +136,11 @@ export const Activity = () => {
           ({ address, status, lastUpdated, data, network, hash }) => (
             <div
               key={hash}
-              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
+              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
             >
-              <div className="flex items-center gap-1">
-                <BsArrowUpRight size={20} color={getStatusColor(status)} />
-                <div className="overflow-hidden text-ellipsis py-4 px-1">
+              <div className="flex items-center justify-between gap-3">
+                <BsArrowUpRight size={24} color={getStatusColor(status)} />
+                <div className="overflow-hidden text-ellipsis px-1">
                   <p className="text-sm">{getContactName(address)}</p>
                   <p>
                     {`${formatDate(lastUpdated as number)} - `}
@@ -159,6 +152,13 @@ export const Activity = () => {
                     >
                       {tCommon("view_in_scanner")}
                     </a>
+                  </p>
+                  <p
+                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
+                      chpiColor[status as RecordStatus]
+                    }`}
+                  >
+                    {status}
                   </p>
                 </div>
               </div>

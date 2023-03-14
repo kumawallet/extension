@@ -18,6 +18,7 @@ import Record from "./storage/entities/activity/Record";
 import Activity from "./storage/entities/activity/Activity";
 import Chains from "./storage/entities/Chains";
 import Register from "./storage/entities/registry/Register";
+import { RecordStatus } from "./storage/entities/activity/types";
 
 export default class Extension {
   private static async init(
@@ -269,6 +270,14 @@ export default class Extension {
     const { address, network } = record;
     const register = new Register(address, Date.now());
     await Registry.addRecent(network, register);
+  }
+
+  static async updateActivity(
+    txHash: string,
+    status: RecordStatus,
+    error?: string | undefined
+  ) {
+    await Activity.updateRecordStatus(txHash, status, error);
   }
   /* c8 ignore stop */
 }

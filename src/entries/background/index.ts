@@ -7,7 +7,7 @@ const openPopUp = (params: any) => {
   // console.log(querys);
 
   return chrome.windows.create({
-    url: chrome.runtime.getURL(`src/entries/popup/index.html${querys}`),
+    url: chrome.runtime.getURL(`src/entries/popup/index.html${querys}`), // ?method="sign_message&params={}"
     type: "popup",
     top: 0,
     left: 0,

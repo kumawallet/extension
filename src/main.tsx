@@ -1,4 +1,9 @@
-import { AccountProvider, AuthProvider, NetworkProvider } from "./providers";
+import {
+  AccountProvider,
+  AuthProvider,
+  NetworkProvider,
+  TxProvider,
+} from "./providers";
 import { Routes } from "./routes";
 import { ToastContainer } from "react-toastify";
 import "./utils/i18n";
@@ -10,7 +15,9 @@ export const Main = () => {
     <AuthProvider>
       <NetworkProvider>
         <AccountProvider>
-          <Routes />
+          <TxProvider>
+            <Routes />
+          </TxProvider>
           <ToastContainer theme="dark" />
         </AccountProvider>
       </NetworkProvider>
