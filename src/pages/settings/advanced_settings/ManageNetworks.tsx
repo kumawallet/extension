@@ -12,6 +12,43 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number } from "yup";
 
+const defaultValues = {
+  name: "New Network",
+  rpc: { evm: "", wasm: "" },
+  addressPrefix: 0,
+  nativeCurrency: {
+    name: "",
+    symbol: "",
+    decimals: 0,
+  },
+  explorer: {},
+};
+
+const schema = object({
+  name: string().required(),
+  chain: string().optional(),
+  addressPrefix: number().optional(),
+  rpc: object().shape({
+    wasm: string().optional(),
+    evm: string().optional(),
+  }),
+  nativeCurrency: object().shape({
+    name: string().required(),
+    symbol: string().required(),
+    decimals: number().required(),
+  }),
+  explorer: object().shape({
+    evm: object().shape({
+      name: string().optional(),
+      url: string().optional(),
+    }),
+    wasm: object().shape({
+      name: string().optional(),
+      url: string().optional(),
+    }),
+  }),
+}).required();
+
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
@@ -33,7 +70,9 @@ export const ManageNetworks = () => {
     try {
       const networks = await Extension.getAllChains();
       setNetworks(networks);
-      setSelectedNetwork(networks.getAll()[0]);
+      const selectedNetwork = networks.getAll()[0];
+      setSelectedNetwork(selectedNetwork);
+      setValue("name", selectedNetwork.name);
     } catch (error) {
       setNetworks({} as Chains);
       showErrorToast(tCommon(error as string));
@@ -46,16 +85,9 @@ export const ManageNetworks = () => {
     const network = networks
       .getAll()
       .find((network) => network.name === chainName);
+
     setSelectedNetwork(network);
-    setValue("name", network?.name || "");
-    setValue("addressPrefix", network?.addressPrefix);
-    setValue("explorer", network?.explorer || {});
-    setValue("logo", network?.logo || "");
-    setValue(
-      "nativeCurrency",
-      network?.nativeCurrency || { name: "", symbol: "", decimals: 0 }
-    );
-    setValue("rpc", network?.rpc || { evm: "", wasm: "" });
+    reset(network);
   };
 
   const isCustom = (chainName: string) => {
@@ -64,42 +96,15 @@ export const ManageNetworks = () => {
       : false;
   };
 
-  const schema = object({
-    name: string().required(),
-    chain: string().optional(),
-    addressPrefix: number().optional(),
-    rpc: object().shape({
-      wasm: string().optional(),
-      evm: string().optional(),
-    }),
-    nativeCurrency: object().shape({
-      name: string().required(),
-      symbol: string().required(),
-      decimals: number().required(),
-    }),
-    explorer: object().shape({
-      name: string().required(),
-      url: string().required(),
-    }),
-  }).required();
-
   const {
     register,
     handleSubmit,
+    reset,
+    watch,
     setValue,
     formState: { errors },
   } = useForm<Chain>({
-    defaultValues: {
-      name: "New Network",
-      rpc: { evm: "", wasm: "" },
-      addressPrefix: 0,
-      nativeCurrency: {
-        name: "",
-        symbol: "",
-        decimals: 0,
-      },
-      explorer: {},
-    },
+    defaultValues,
     resolver: yupResolver(schema),
   });
 
@@ -127,6 +132,19 @@ export const ManageNetworks = () => {
     }
   };
 
+  const ChainName = watch("name");
+
+  useEffect(() => {
+    if (ChainName && networks.mainnets && !isCreating) {
+      changeNetwork(ChainName);
+    }
+  }, [ChainName, networks, isCreating]);
+
+  const showCreateForm = () => {
+    setIsCreating(true);
+    reset(defaultValues);
+  };
+
   if (isLoading) {
     return (
       <PageWrapper>
@@ -151,7 +169,7 @@ export const ManageNetworks = () => {
             <button
               type="button"
               className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-              onClick={() => setIsCreating(true)}
+              onClick={showCreateForm}
             >
               <span>{"New network"}</span>
             </button>
@@ -177,7 +195,7 @@ export const ManageNetworks = () => {
           {...register("name")}
         >
           {networks &&
-            networks.getAll().map((network, index) => {
+            networks?.getAll?.().map((network, index) => {
               return (
                 <option key={index} value={network.name}>
                   {network.name}
