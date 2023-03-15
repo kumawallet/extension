@@ -19,9 +19,10 @@ import {
 import { useAccountContext } from "../accountProvider";
 import Extension from "@src/Extension";
 import Record from "@src/storage/entities/activity/Record";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { AddressOrPair, SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise } from "@polkadot/api";
+import { ethers } from "ethers";
 
 interface InitialState {
   queue: newTx[];
@@ -97,10 +98,12 @@ const reducer = (state: InitialState, action: any): InitialState => {
   }
 };
 
+type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
+type evmTx = ethers.providers.TransactionResponse;
 interface newTx {
   type: AccountType;
-  tx: SubmittableExtrinsic<"promise">;
-  sender: any;
+  tx: polkadotExtrinsic | evmTx;
+  sender: AddressOrPair | ethers.Wallet;
   destinationAccount: string;
   amount: number;
 }
@@ -125,7 +128,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isSearching, setisSearching] = useState(false);
 
   const addTxToQueue = (newTx: newTx) => {
-    ///
     dispatch({
       type: "add-tx-to-queue",
       payload: {
@@ -141,12 +143,14 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (lastTx.type === AccountType.WASM) {
         processWasmTx(lastTx);
+      } else {
+        processEVMTx(lastTx);
       }
     }
   }, [state.queue]);
 
   useEffect(() => {
-    if (selectedAccount.key && api) {
+    if (selectedAccount.key && selectedChain?.name && api) {
       (async () => {
         const records = await Extension.getActivity();
         dispatch({
@@ -157,14 +161,18 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
         });
       })();
     }
-  }, [selectedAccount.key, api]);
+  }, [selectedAccount.key, api, selectedChain?.name]);
 
   useEffect(() => {
     if (state.activity.length > 0 && !isSearching) {
       setisSearching(true);
       for (const activity of state.activity) {
         if (activity.status === RecordStatus.PENDING) {
-          searchTx(Number(activity?.fromBlock), activity.hash);
+          if (activity.reference === "wasm") {
+            searchTx(Number(activity?.fromBlock), activity.hash);
+          } else {
+            searchEvmTx(activity.hash);
+          }
         }
       }
     }
@@ -179,8 +187,9 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   }: newTx) => {
     const a = await (api as ApiPromise).rpc.chain.getBlock();
 
-    const unsub = await extrinsic?.signAndSend(
-      sender,
+    const unsub = await (extrinsic as polkadotExtrinsic)?.signAndSend(
+      sender as AddressOrPair,
+      { tip: 0 },
       async ({ events, txHash, status }: ISubmittableResult) => {
         if (String(status.type) === "Ready") {
           const hash = txHash.toString();
@@ -214,17 +223,14 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
             },
           });
           await Extension.addActivity(hash, activity as Record);
-          console.log("save record");
         }
         if (status.isFinalized) {
           const failedEvents = events.filter(({ event }) =>
             api.events.system.ExtrinsicFailed.is(event)
           );
-          console.log("failed events", failedEvents);
           let status = RecordStatus.PENDING;
           let error = undefined;
           if (failedEvents.length > 0) {
-            console.log("update to failed");
             failedEvents.forEach(
               ({
                 event: {
@@ -232,15 +238,11 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
                 },
               }) => {
                 if (_error.isModule) {
-                  // for module errors, we have the section indexed, lookup
                   const decoded = api.registry.findMetaError(_error.asModule);
                   const { docs, method, section } = decoded;
                   error = `${section}.${method}: ${docs.join(" ")}`;
-                  console.log(error);
                 } else {
-                  // Other, CannotLookup, BadOrigin, no extra info
                   error = _error.toString();
-                  console.log(error);
                 }
               }
             );
@@ -249,10 +251,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
             status = RecordStatus.SUCCESS;
           }
           const hash = txHash.toString();
-          console.log("should update:", {
-            hash,
-            status,
-          });
           dispatch({
             type: "update-activity-status",
             payload: {
@@ -285,17 +283,13 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
           hash,
         },
       ] of block.extrinsics.entries()) {
-        // console.log();
         if (hash.toString() === extHash) {
-          console.log("found at: ", number);
           allRecords
-            // filter the specific events based on the phase and then the
-            // index of our extrinsic in the block
+
             .filter(
               ({ phase }) =>
                 phase.isApplyExtrinsic && phase.asApplyExtrinsic.eq(index)
             )
-            // test the events against the specific types we are looking for
             .forEach(async ({ event }) => {
               let status = RecordStatus.PENDING;
               let error = undefined;
@@ -318,14 +312,14 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
               await Extension.updateActivity(hash.toString(), status, error);
 
-              // dispatch({
-              //   type: "update-activity-status",
-              //   payload: {
-              //     hash,
-              //     status,
-              //     error,
-              //   },
-              // });
+              dispatch({
+                type: "update-activity-status",
+                payload: {
+                  hash,
+                  status,
+                  error,
+                },
+              });
             });
           finish = true;
           break;
@@ -337,6 +331,91 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
         finish = true;
       }
     }
+  };
+
+  const processEVMTx = async ({
+    amount,
+    destinationAccount,
+    sender,
+    tx: evmTx,
+    type,
+  }: newTx) => {
+    try {
+      const tx = evmTx as ethers.providers.TransactionResponse;
+
+      const date = Date.now();
+
+      const hash = tx.hash;
+
+      const activity = {
+        address: destinationAccount,
+        type: RecordType.TRANSFER,
+        reference: "evm",
+        hash: hash,
+        status: RecordStatus.PENDING,
+        createdAt: date,
+        lastUpdated: date,
+        error: undefined,
+        network: selectedChain?.name || "",
+        recipientNetwork: selectedChain?.name || "",
+        data: {
+          symbol: String(selectedChain?.nativeCurrency.symbol),
+          from: selectedAccount.value.address,
+          to: destinationAccount,
+          gas: "0",
+          gasPrice: "0",
+          value: String(amount),
+        } as TransferData,
+      };
+      dispatch({
+        type: "add-activity",
+        payload: {
+          tx: activity,
+        },
+      });
+      await Extension.addActivity(tx.hash, activity as Record);
+
+      const result = await tx.wait();
+
+      const status =
+        result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+      const error = "";
+
+      dispatch({
+        type: "update-activity-status",
+        payload: {
+          hash: hash,
+          status,
+          error,
+        },
+      });
+      await Extension.updateActivity(hash, status, error);
+    } catch (err) {
+      const code = err.data.replace("Reverted ", "");
+      let reason = ethers.utils.toUtf8String("0x" + code.substr(138));
+      showErrorToast(reason);
+    }
+  };
+
+  const searchEvmTx = async (hash: string) => {
+    const txReceipt = await (
+      api as ethers.providers.JsonRpcProvider
+    ).getTransaction(hash);
+    const result = await txReceipt.wait();
+
+    const status =
+      result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+    const error = "";
+
+    dispatch({
+      type: "update-activity-status",
+      payload: {
+        hash: hash,
+        status,
+        error,
+      },
+    });
+    await Extension.updateActivity(hash, status, error);
   };
 
   return (

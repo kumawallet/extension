@@ -9,7 +9,7 @@ import { TbChevronRight } from "react-icons/tb";
 import { SelectableChain } from "./components/SelectableChain";
 import Extension from "@src/Extension";
 import { Destination } from "./components/Destination";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SelectableAsset } from "./components/SelectableAsset";
 import { NumericFormat } from "react-number-format";
 import { FormProvider, useForm } from "react-hook-form";
@@ -24,12 +24,6 @@ import { ethers } from "ethers";
 import { useToast } from "@src/hooks";
 import { ApiPromise } from "@polkadot/api";
 import { decodeAddress, encodeAddress, Keyring } from "@polkadot/keyring";
-import Record from "@src/storage/entities/activity/Record";
-import {
-  RecordType,
-  RecordStatus,
-  TransferData,
-} from "@src/storage/entities/activity/types";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { BiLeftArrowAlt } from "react-icons/bi";
@@ -43,7 +37,7 @@ export const Send = () => {
   const { showErrorToast, showSuccessToast } = useToast();
 
   const {
-    state: { selectedChain, api },
+    state: { selectedChain, api, type },
   } = useNetworkContext();
 
   const {
@@ -129,10 +123,6 @@ export const Send = () => {
   const onSubmit = handleSubmit(async (data) => {
     setIsSendingTx(true);
     try {
-      let hash = "";
-      let date;
-      let reference = "";
-
       if (selectedAccount?.type?.includes("EVM")) {
         const pk = await Extension.showPrivateKey();
 
@@ -141,17 +131,18 @@ export const Send = () => {
           api as ethers.providers.JsonRpcProvider
         );
 
-        const res = await wallet.sendTransaction({
+        const tx = await wallet.sendTransaction({
           ...evmTx,
-          value: Number(
-            Number(evmTx.value) *
-              10 ** (selectedChain?.nativeCurrency?.decimals || 1)
-          ),
+          value: ethers.utils.parseEther(amount),
         });
 
-        hash = res.hash;
-        date = Date.now();
-        reference = "evm";
+        addTxToQueue({
+          type: AccountType.EVM,
+          tx,
+          sender: wallet,
+          destinationAccount,
+          amount,
+        });
       } else {
         const seed = await Extension.showSeed();
 
@@ -165,31 +156,20 @@ export const Send = () => {
           destinationAccount,
           amount,
         });
-
-        showSuccessToast(t("tx_send"));
-        navigate(BALANCE, {
-          state: {
-            tab: "activity",
-          },
-        });
       }
+
+      showSuccessToast(t("tx_send"));
+      navigate(BALANCE, {
+        state: {
+          tab: "activity",
+        },
+      });
     } catch (error) {
-      console.log(error);
       showErrorToast(error as string);
     } finally {
       setIsSendingTx(false);
     }
   });
-
-  const formatEthAmount = useCallback(
-    (amount: any, unitName?: any) => {
-      return ethers.utils.formatUnits(
-        amount,
-        unitName || (selectedChain?.nativeCurrency.decimals as number)
-      );
-    },
-    [selectedChain?.nativeCurrency.decimals]
-  );
 
   useEffect(() => {
     if (!evmTx?.to) return;
@@ -294,6 +274,8 @@ export const Send = () => {
 
   const canContinue = Number(amount) > 0 && destinationAccount && !loadingFee;
 
+  console.log(type);
+
   return (
     <PageWrapper contentClassName="bg-[#29323C]">
       <FormProvider {...methods}>
@@ -358,6 +340,29 @@ export const Send = () => {
               </div>
               <InputErrorMessage message={errors.amount?.message as string} />
             </div>
+
+            {type === "WASM" ? (
+              <>
+                <div>
+                  <p>{t("tip")}</p>
+                  <NumericFormat
+                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    allowNegative={false}
+                    allowLeadingZeros={false}
+                    value={getValues("amount")}
+                    onValueChange={({ value }) => {
+                      setValue("amount", value);
+                    }}
+                    allowedDecimalSeparators={["%"]}
+                  />
+
+                  {/* <InputErrorMessage message={errors.amount?.message as string} /> */}
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
             {loadingFee ? (
               <Loading />
             ) : (
