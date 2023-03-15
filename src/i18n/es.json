@@ -47,7 +47,9 @@
     "address_required": "Dirección requerida",
     "view_in_scanner": "Ver en el escáner",
     "add": "Añadir",
-    "manage": "Administrar"
+    "manage": "Administrar",
+    "cancel": "Cancelar",
+    "save": "Guardar"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -159,7 +161,8 @@
     "save_contact": "Guardar contacto",
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
-    "search": "Buscar contactos por nombre o dirección"
+    "search": "Buscar contactos por nombre o dirección",
+    "new_contact": "Nuevo contacto"
   },
   "activity": {
     "title": "Actividad",

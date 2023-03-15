@@ -47,7 +47,9 @@
     "address_required": "住所が必要です",
     "view_in_scanner": "スキャナーで表示",
     "add": "追加",
-    "manage": "管理"
+    "manage": "管理",
+    "cancel": "キャンセル",
+    "save": "保存"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -159,7 +161,8 @@
     "save_contact": "連絡先を保存する",
     "insert_name": "連絡先の名前を入力してください",
     "insert_address": "連絡先の住所を入力してください",
-    "search": "名前または住所で連絡先を検索する"
+    "search": "名前または住所で連絡先を検索する",
+    "new_contact": "新しい連絡先"
   },
   "activity": {
     "title": "アクティビティ",

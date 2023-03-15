@@ -47,7 +47,9 @@
     "address_required": "Address is required",
     "view_in_scanner": "Explore",
     "add": "Add",
-    "manage": "Manage"
+    "manage": "Manage",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -159,7 +161,8 @@
     "save_contact": "Save contact",
     "insert_name": "Insert contact name",
     "insert_address": "Insert address",
-    "search": "Search contacts by name or address"
+    "search": "Search contacts by name or address",
+    "new_contact": "New contact"
   },
   "activity": {
     "title": "Activity",

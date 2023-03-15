@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
 import { Loading } from "@src/components/common";
 import Extension from "@src/Extension";
-import Chains from "@src/storage/entities/Chains";
-import { Chain } from "@src/constants/chains";
-import { BsPlus } from "react-icons/bs";
+import Chains, { Chain } from "@src/storage/entities/Chains";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { object, string, number } from "yup";
 
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
@@ -46,6 +47,15 @@ export const ManageNetworks = () => {
       .getAll()
       .find((network) => network.name === chainName);
     setSelectedNetwork(network);
+    setValue("name", network?.name || "");
+    setValue("addressPrefix", network?.addressPrefix);
+    setValue("explorer", network?.explorer || {});
+    setValue("logo", network?.logo || "");
+    setValue(
+      "nativeCurrency",
+      network?.nativeCurrency || { name: "", symbol: "", decimals: 0 }
+    );
+    setValue("rpc", network?.rpc || { evm: "", wasm: "" });
   };
 
   const isCustom = (chainName: string) => {
@@ -54,78 +64,54 @@ export const ManageNetworks = () => {
       : false;
   };
 
-  const updateName = (value: string) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    newSelectedNetwork.name = value;
-    setSelectedNetwork(newSelectedNetwork);
-  };
+  const schema = object({
+    name: string().required(),
+    chain: string().optional(),
+    addressPrefix: number().optional(),
+    rpc: object().shape({
+      wasm: string().optional(),
+      evm: string().optional(),
+    }),
+    nativeCurrency: object().shape({
+      name: string().required(),
+      symbol: string().required(),
+      decimals: number().required(),
+    }),
+    explorer: object().shape({
+      name: string().required(),
+      url: string().required(),
+    }),
+  }).required();
 
-  const updateExplorer = async (newExplorer: string, index: number) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    if (!newSelectedNetwork.explorers) {
-      newSelectedNetwork.explorers = [{ url: "", name: "explorer" }];
-    }
-    newSelectedNetwork.explorers[index].url = newExplorer;
-    setSelectedNetwork(newSelectedNetwork as Chain);
-  };
-
-  const updateNativeCurrency = async (key: string, value: string) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    if (!newSelectedNetwork.nativeCurrency) {
-      newSelectedNetwork.nativeCurrency = {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<Chain>({
+    defaultValues: {
+      name: "New Network",
+      rpc: { evm: "", wasm: "" },
+      addressPrefix: 0,
+      nativeCurrency: {
         name: "",
         symbol: "",
         decimals: 0,
-      };
-    }
-    newSelectedNetwork.nativeCurrency[key] =
-      key === "decimals" ? parseInt(value) : value;
-    setSelectedNetwork(newSelectedNetwork as Chain);
-  };
+      },
+      explorer: {},
+    },
+    resolver: yupResolver(schema),
+  });
 
-  const updateAddressPrefix = async (value: string) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    if (!newSelectedNetwork.addressPrefix) {
-      newSelectedNetwork.addressPrefix = 0;
-    }
-    newSelectedNetwork.addressPrefix = parseInt(value);
-    setSelectedNetwork(newSelectedNetwork as Chain);
-  };
-
-  const updateChain = async (value: string) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    if (!newSelectedNetwork.chain) {
-      newSelectedNetwork.chain = "";
-    }
-    newSelectedNetwork.chain = value;
-    setSelectedNetwork(newSelectedNetwork as Chain);
-  };
-
-  const updateRPC = async (key: string, value: string) => {
-    if (!selectedNetwork) return;
-    const newSelectedNetwork = { ...selectedNetwork };
-    if (!newSelectedNetwork.rpc) {
-      newSelectedNetwork.rpc = { evm: "", wasm: "" };
-    }
-    newSelectedNetwork.rpc[key] = value;
-    setSelectedNetwork(newSelectedNetwork as Chain);
-  };
-
-  const saveNetwork = async () => {
-    if (!selectedNetwork) return;
+  const _onSubmit = handleSubmit(async (data) => {
     try {
-      await Extension.saveCustomChain(selectedNetwork);
+      await Extension.saveCustomChain(data);
       getNetworks();
       setIsCreating(false);
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
-  };
+  });
 
   const cancel = () => {
     changeNetwork(networks.mainnets[0].name);
@@ -139,23 +125,6 @@ export const ManageNetworks = () => {
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
-  };
-
-  const newNetwork = async () => {
-    setIsCreating(true);
-    const newCustomNetwork: Chain = {
-      name: "New Network",
-      chain: "",
-      rpc: { evm: "", wasm: "" },
-      addressPrefix: 0,
-      nativeCurrency: {
-        name: "",
-        symbol: "",
-        decimals: 0,
-      },
-      explorers: [{ url: "", name: "explorer" }],
-    } as Chain;
-    setSelectedNetwork(newCustomNetwork);
   };
 
   if (isLoading) {
@@ -182,7 +151,7 @@ export const ManageNetworks = () => {
             <button
               type="button"
               className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-              onClick={() => newNetwork()}
+              onClick={() => setIsCreating(true)}
             >
               <span>{"New network"}</span>
             </button>
@@ -198,19 +167,14 @@ export const ManageNetworks = () => {
           <div className="mt-4">
             <input
               className="relative border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              type="text"
-              name="name"
-              id="name"
-              value={selectedNetwork?.name}
-              onChange={(e) => updateName(e.target.value)}
+              {...register("name")}
             />
           </div>
         </>
       ) : (
         <select
           className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-          value={selectedNetwork?.name}
-          onChange={(e) => changeNetwork(e.target.value)}
+          {...register("name")}
         >
           {networks &&
             networks.getAll().map((network, index) => {
@@ -224,56 +188,60 @@ export const ManageNetworks = () => {
       )}
       {selectedNetwork && (
         <>
-          <label htmlFor="name" className="block text-sm font-medium mt-4">
-            {"Chain"}
-          </label>
-          <div className="mt-4">
-            <input
-              className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              value={selectedNetwork.chain}
-              onChange={(e) => updateChain(e.target.value)}
-              readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-            />
-          </div>
-          <label htmlFor="name" className="block text-sm font-medium mt-4">
+          <label
+            htmlFor="addressPrefix"
+            className="block text-sm font-medium mt-4"
+          >
             {"Address Prefix"}
           </label>
           <div className="mt-4">
             <input
               type="number"
               className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              value={selectedNetwork.addressPrefix}
-              onChange={(e) => updateAddressPrefix(e.target.value)}
               readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+              {...register("addressPrefix")}
             />
           </div>
 
           {selectedNetwork.nativeCurrency && (
             <>
-              <label htmlFor="name" className="block text-lg font-medium mt-4">
+              <label
+                htmlFor="nativeCurrency"
+                className="block text-lg font-medium mt-4"
+              >
                 {"Native currency"}
               </label>
-              {Object.keys(selectedNetwork.nativeCurrency).map((key, index) => {
-                const value = selectedNetwork.nativeCurrency[key];
-                return (
-                  <div key={index} className="mt-5">
-                    <div className="text-sm font-medium mb-2 capitalize">
-                      {key}
-                    </div>
-                    <input
-                      key={index}
-                      placeholder={key}
-                      type={key === "decimals" ? "number" : "text"}
-                      className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                      value={value}
-                      onChange={(e) =>
-                        updateNativeCurrency(key, e.target.value)
-                      }
-                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    />
-                  </div>
-                );
-              })}
+              {selectedNetwork.nativeCurrency.name && (
+                <div className="mt-5">
+                  <div className="text-sm font-medium mb-2">{"Name"}</div>
+                  <input
+                    className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("nativeCurrency.name")}
+                  />
+                </div>
+              )}
+              {selectedNetwork.nativeCurrency.symbol && (
+                <div className="mt-5">
+                  <div className="text-sm font-medium mb-2">{"Symbol"}</div>
+                  <input
+                    className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("nativeCurrency.symbol")}
+                  />
+                </div>
+              )}
+              {selectedNetwork.nativeCurrency.decimals && (
+                <div className="mt-5">
+                  <div className="text-sm font-medium mb-2">{"Name"}</div>
+                  <input
+                    type="number"
+                    className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("nativeCurrency.decimals")}
+                  />
+                </div>
+              )}
             </>
           )}
 
@@ -282,40 +250,54 @@ export const ManageNetworks = () => {
               <label htmlFor="name" className="block text-lg font-medium mt-4">
                 {"RPC URLs"}
               </label>
-              {Object.keys(selectedNetwork.rpc).map((key, index) => {
-                const rpc = selectedNetwork.rpc[key];
-                return (
-                  <div key={index} className="mt-5">
-                    <input
-                      placeholder={key}
-                      className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                      value={rpc}
-                      onChange={(e) => updateRPC(key, e.target.value)}
-                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    />
-                  </div>
-                );
-              })}
+              {selectedNetwork.rpc.evm && (
+                <div className="mt-5">
+                  <input
+                    placeholder={"EVM RPC URL"}
+                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("rpc.evm")}
+                  />
+                </div>
+              )}
+              {selectedNetwork.rpc.wasm && (
+                <div className="mt-5">
+                  <input
+                    placeholder={"WASM RPC URL"}
+                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("rpc.wasm")}
+                  />
+                </div>
+              )}
             </>
           )}
 
-          {selectedNetwork.explorers && (
+          {selectedNetwork.explorer && (
             <>
               <label htmlFor="name" className="block text-lg font-medium mt-4">
                 {"Explorer"}
               </label>
-              {selectedNetwork.explorers.map((key, index) => {
-                return (
-                  <div key={index} className="mt-5">
-                    <input
-                      className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                      value={key.url}
-                      onChange={(e) => updateExplorer(e.target.value, index)}
-                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    />
-                  </div>
-                );
-              })}
+              {selectedNetwork.explorer.evm && (
+                <div className="mt-5">
+                  <input
+                    placeholder="EVM Explorer URL"
+                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("explorer.evm.url")}
+                  />
+                </div>
+              )}
+              {selectedNetwork.explorer.wasm && (
+                <div className="mt-5">
+                  <input
+                    placeholder="WASM Explorer URL"
+                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                    {...register("explorer.wasm.url")}
+                  />
+                </div>
+              )}
             </>
           )}
 
@@ -323,7 +305,7 @@ export const ManageNetworks = () => {
             <div className="flex justify-end">
               <button
                 className="mt-5 bg-custom-green-bg hover:bg-custom-green-hover text-white font-medium py-2 px-4 rounded-lg"
-                onClick={() => saveNetwork()}
+                onClick={_onSubmit}
               >
                 {"Save"}
               </button>

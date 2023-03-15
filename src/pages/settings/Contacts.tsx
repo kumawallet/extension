@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
-import { BsPlus, BsTrash } from "react-icons/bs";
+import { BsTrash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -106,11 +106,10 @@ export const Contacts = () => {
           <div className="flex-1 flex justify-end">
             <button
               type="button"
-              className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+              className="mt-5 inline-flex justify-between items-center rounded-lg border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm"
               onClick={() => toggleCreateContact()}
             >
-              <span>{tCommon('add')} </span>
-              <BsPlus size={ICON_SIZE} />
+              <span>{t("new_contact")} </span>
             </button>
           </div>
         )}
@@ -140,10 +139,17 @@ export const Contacts = () => {
           <div className="flex justify-end">
             <button
               type="button"
-              className="mt-5 inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+              className="mt-5 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
+              onClick={() => toggleCreateContact()}
+            >
+              {tCommon("cancel")}
+            </button>
+            <button
+              type="button"
+              className="mt-5 ml-4 inline-flex justify-center border border-custom-green-bg text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-custom-green-bg focus:outline-none focus:shadow-outline text-sm"
               onClick={saveContact}
             >
-              {t("save_contact")}
+              {tCommon("save")}
             </button>
           </div>
         </>

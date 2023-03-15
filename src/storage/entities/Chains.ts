@@ -1,5 +1,33 @@
-import { Chain, MAINNETS, PARACHAINS, TESTNETS } from "@src/constants/chains";
+import { AccountType } from "@src/accounts/types";
+import { MAINNETS, PARACHAINS, TESTNETS } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
+
+export type Chain = {
+  name: string;
+  addressPrefix?: number;
+  rpc: {
+    wasm?: string;
+    evm?: string;
+  };
+  nativeCurrency: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+  explorer: {
+    evm?: {
+      name: string;
+      url: string;
+    };
+    wasm?: {
+      name: string;
+      url: string;
+    };
+  };
+  logo: string;
+  supportedAccounts: AccountType[];
+  xcm?: string[];
+};
 
 export default class Chains extends BaseEntity {
   mainnets: Chain[];
@@ -53,7 +81,7 @@ export default class Chains extends BaseEntity {
     console.log("chain", chain);
     if (chains.isAlreadyAdded(chain)) throw new Error("chain_already_added");
     chains.custom = [...chains.custom, chain];
-    console.log("chains updated", chains)
+    console.log("chains updated", chains);
     await Chains.set<Chains>(chains);
   }
 

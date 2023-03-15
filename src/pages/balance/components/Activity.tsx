@@ -58,15 +58,15 @@ export const Activity = () => {
   };
 
   const getLink = (network: string, hash: string) => {
-    const { explorers } =
+    const { explorer } =
       CHAINS.flatMap((chainType) => chainType.chains).find(
         (chain) => chain.name.toLowerCase() === network.toLowerCase()
       ) || {};
-    const { url } = explorers?.[0] || {};
+    const { evm, wasm } = explorer || {};
     if (type.toLowerCase() === "wasm") {
-      return `${url}extrinsic/${hash}`;
+      return `${wasm?.url}extrinsic/${hash}`;
     } else {
-      return `${url}tx/${hash}`;
+      return `${evm?.url}tx/${hash}`;
     }
   };
 
