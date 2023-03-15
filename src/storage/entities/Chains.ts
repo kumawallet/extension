@@ -1,16 +1,11 @@
 import { Chain, MAINNETS, PARACHAINS, TESTNETS } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
 
-export enum ChainType {
-  MAINNET = "mainnets",
-  PARACHAIN = "parachains",
-  TESTNET = "testnets",
-}
-
 export default class Chains extends BaseEntity {
   mainnets: Chain[];
   parachains: Chain[];
   testnets: Chain[];
+  custom: Chain[];
 
   private static instance: Chains;
 
@@ -19,6 +14,7 @@ export default class Chains extends BaseEntity {
     this.mainnets = MAINNETS;
     this.parachains = PARACHAINS;
     this.testnets = TESTNETS;
+    this.custom = [];
   }
 
   public static getInstance() {
@@ -47,44 +43,24 @@ export default class Chains extends BaseEntity {
     chains.mainnets = stored.mainnets;
     chains.parachains = stored.parachains;
     chains.testnets = stored.testnets;
+    chains.custom = stored.custom;
   }
 
-  static async saveCustomChain(chain: Chain, chainType: ChainType) {
+  static async saveCustomChain(chain: Chain) {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_save_custom_chain");
+    console.log("chains", chains);
+    console.log("chain", chain);
     if (chains.isAlreadyAdded(chain)) throw new Error("chain_already_added");
-    switch (chainType) {
-      case ChainType.MAINNET:
-        chains.addMainnet(chain);
-        break;
-      case ChainType.PARACHAIN:
-        chains.addParachain(chain);
-        break;
-      case ChainType.TESTNET:
-        chains.addTestnet(chain);
-        break;
-      default:
-        throw new Error("invalid_chain_type");
-    }
+    chains.custom = [...chains.custom, chain];
+    console.log("chains updated", chains)
     await Chains.set<Chains>(chains);
   }
 
-  static async removeCustomChain(chain: Chain, chainType: ChainType) {
+  static async removeCustomChain(chainName: string) {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_remove_custom_chain");
-    switch (chainType) {
-      case ChainType.MAINNET:
-        chains.removeMainnet(chain);
-        break;
-      case ChainType.PARACHAIN:
-        chains.removeParachain(chain);
-        break;
-      case ChainType.TESTNET:
-        chains.removeTestnet(chain);
-        break;
-      default:
-        throw new Error("invalid_chain_type");
-    }
+    chains.custom = chains.custom.filter((c) => c.name !== chainName);
     await Chains.set<Chains>(chains);
   }
 
@@ -97,68 +73,26 @@ export default class Chains extends BaseEntity {
     if (parachain) return parachain;
     const testnet = chains.testnets.find((c) => c.name === chainName);
     if (testnet) return testnet;
+    const custom = chains.custom.find((c) => c.name === chainName);
+    if (custom) return custom;
     return undefined;
   }
 
-  get() {
-    return {
-      mainnets: this.mainnets,
-      parachains: this.parachains,
-      testnets: this.testnets,
-    };
-  }
-
   getAll() {
-    return [...this.mainnets, ...this.parachains, ...this.testnets];
-  }
-
-  set(mainnets: Chain[], parachains: Chain[], testnets: Chain[]) {
-    this.mainnets = mainnets;
-    this.parachains = parachains;
-    this.testnets = testnets;
-  }
-
-  addMainnet(chain: Chain) {
-    this.mainnets.push(chain);
-  }
-
-  addParachain(chain: Chain) {
-    this.parachains.push(chain);
-  }
-
-  addTestnet(chain: Chain) {
-    this.testnets.push(chain);
-  }
-
-  removeMainnet(chain: Chain) {
-    this.mainnets = this.mainnets.filter((c) => c !== chain);
-  }
-
-  removeParachain(chain: Chain) {
-    this.parachains = this.parachains.filter((c) => c !== chain);
-  }
-
-  removeTestnet(chain: Chain) {
-    this.testnets = this.testnets.filter((c) => c !== chain);
-  }
-
-  getMainnets() {
-    return this.mainnets;
-  }
-
-  getParachains() {
-    return this.parachains;
-  }
-
-  getTestnets() {
-    return this.testnets;
+    return [
+      ...this.mainnets,
+      ...this.parachains,
+      ...this.testnets,
+      ...this.custom,
+    ];
   }
 
   isAlreadyAdded(chain: Chain) {
     return (
       this.mainnets.some((c) => c.name === chain.name) ||
       this.parachains.some((c) => c.name === chain.name) ||
-      this.testnets.some((c) => c.name === chain.name)
+      this.testnets.some((c) => c.name === chain.name) ||
+      this.custom.some((c) => c.name === chain.name)
     );
   }
 }

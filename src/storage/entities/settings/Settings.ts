@@ -26,7 +26,7 @@ export default class Settings extends BaseEntity {
       LanguageSetting.getSupportedLanguages()
     );
     // this setting does not have a value (the true is just a placeholder)
-    settings.addToAdvanced(SettingKey.MANAGE_NETWORKS, true);
+    settings.addToGeneral(SettingKey.MANAGE_NETWORKS, true);
     await Settings.set(settings);
   }
 

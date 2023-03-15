@@ -9,6 +9,8 @@ import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Language, SettingKey } from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
+import { BsGear, BsPlus } from "react-icons/bs";
+import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -87,6 +89,22 @@ export const General = () => {
                       </option>
                     ))}
                 </select>
+              </div>
+            );
+          case SettingKey.MANAGE_NETWORKS:
+            return (
+              <div
+                key={index}
+                className="flex justify-between items-center gap-2"
+              >
+                <p className="text-lg font-medium">{t(setting.name)}</p>
+                <button
+                  type="button"
+                  className="mt-5 inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+                  onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
+                >
+                  <BsGear color="white" size={ICON_SIZE} />
+                </button>
               </div>
             );
         }

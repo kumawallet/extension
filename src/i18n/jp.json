@@ -143,11 +143,11 @@
   },
   "general_settings": {
     "title": "一般",
-    "languages": "言語"
+    "languages": "言語",
+    "manage_networks": "ネットワークを追加"
   },
   "advanced_settings": {
-    "title": "高度な",
-    "manage_networks": "ネットワークを追加"
+    "title": "高度な"
   },
   "manage_networks": {
     "title": "ネットワークを追加"

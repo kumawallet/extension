@@ -143,11 +143,11 @@
   },
   "general_settings": {
     "title": "General",
-    "languages": "Idiomas"
+    "languages": "Idiomas",
+    "manage_networks": "Adminsitrar redes"
   },
   "advanced_settings": {
-    "title": "Avanzado",
-    "manage_networks": "Adminsitrar redes"
+    "title": "Avanzado"
   },
   "manage_networks": {
     "title": "Adminsitrar redes"

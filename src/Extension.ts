@@ -251,10 +251,18 @@ export default class Extension {
     return Activity.getRecords();
   }
 
-  static async getAllChains(): Promise<Chain[]> {
+  static async getAllChains(): Promise<Chains> {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
-    return chains.getAll();
+    return chains;
+  }
+
+  static async saveCustomChain(chain: Chain) {
+    await Chains.saveCustomChain(chain);
+  }
+
+  static async removeCustomChain(chainName: string) {
+    await Chains.removeCustomChain(chainName);
   }
 
   static async getXCMChains(chainName: string): Promise<Chain[]> {
