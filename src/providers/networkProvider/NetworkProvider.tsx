@@ -7,16 +7,17 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Chain, CHAINS } from "@src/constants/chains";
 import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "@src/hooks";
 import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
+import Chains, { Chain } from "@src/storage/entities/Chains";
+import { AccountType } from "@src/accounts/types";
 
 const initialState: InitialState = {
-  chains: CHAINS,
+  chains: Chains.getInstance(),
   selectedChain: null,
   api: null,
   rpc: "",
@@ -37,10 +38,11 @@ const getProvider = (rpc: string, type: string) => {
 export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "init": {
-      const { selectedChain, rpc, type } = action.payload;
+      const { selectedChain, rpc, type, chains } = action.payload;
 
       return {
         ...state,
+        chains,
         selectedChain,
         rpc,
         init: true,
@@ -68,6 +70,13 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         type: type || state.type,
       };
     }
+    case "refresh-networks": {
+      const { chains } = action.payload;
+      return {
+        ...state,
+        chains,
+      };
+    }
     default:
       return state;
   }
@@ -82,6 +91,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     (async () => {
       try {
+        const chains = await Extension.getAllChains();
         const selectedNetwork = await Extension.getNetwork();
         let selectedChain = null;
         let rpc = "";
@@ -97,6 +107,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({
           type: "init",
           payload: {
+            chains,
             selectedChain,
             rpc,
             type: type.toUpperCase(),
@@ -171,6 +182,21 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const refreshNetworks = async (supportedAccounts?: AccountType[]) => {
+    try {
+      const chains = await Extension.getAllChains();
+      if (!supportedAccounts) { 
+        // TODO
+      }
+      dispatch({
+        type: "refresh-networks",
+        payload: { chains },
+      });
+    } catch (error) {
+      showErrorToast(tCommon(error as string));
+    }
+  };
+
   useEffect(() => {
     if (state.rpc && state.type) {
       (async () => {
@@ -193,6 +219,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         setSelectNetwork,
         getSelectedNetwork,
         setNewRpc,
+        refreshNetworks,
       }}
     >
       {children}

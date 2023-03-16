@@ -1,4 +1,3 @@
-import { Chain } from "@src/constants/chains";
 import { AccountKey, AccountType } from "./accounts/types";
 import Storage from "./storage/Storage";
 import AccountManager from "./accounts/AccountManager";
@@ -16,7 +15,7 @@ import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
 import Record from "./storage/entities/activity/Record";
 import Activity from "./storage/entities/activity/Activity";
-import Chains from "./storage/entities/Chains";
+import Chains, { Chain } from "./storage/entities/Chains";
 import Register from "./storage/entities/registry/Register";
 import { RecordStatus } from "./storage/entities/activity/types";
 

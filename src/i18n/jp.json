@@ -121,6 +121,7 @@
       "mainnets": "リレーチェーン",
       "parachains": "パラチェーン",
       "testnets": "テストネット",
+      "custom": "カスタム",
       "evm_type": "Ethereum風アカウント (EVM)",
       "wasm_type": "Polkadot風アカウント (WASM)"
     },

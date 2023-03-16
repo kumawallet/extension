@@ -11,8 +11,9 @@ import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number } from "yup";
+import { useNetworkContext } from "@src/providers";
 
-const defaultValues = {
+const defaultValues: Chain = {
   name: "New Network",
   rpc: { evm: "", wasm: "" },
   addressPrefix: 0,
@@ -31,6 +32,9 @@ const defaultValues = {
       url: "",
     },
   },
+  logo: "",
+  supportedAccounts: [],
+  xcm: [],
 };
 
 const schema = object({
@@ -61,6 +65,7 @@ const schema = object({
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
+  const { refreshNetworks } = useNetworkContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [networks, setNetworks] = useState({} as Chains);
@@ -122,6 +127,7 @@ export const ManageNetworks = () => {
       await Extension.saveCustomChain(data);
       getNetworks();
       setIsCreating(false);
+      refreshNetworks();
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
@@ -136,6 +142,7 @@ export const ManageNetworks = () => {
     try {
       await Extension.removeCustomChain(selectedNetwork?.name as string);
       getNetworks();
+      refreshNetworks(selectedNetwork?.supportedAccounts);
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }

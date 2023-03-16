@@ -2,7 +2,6 @@ import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { Chain } from "@src/constants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { getAccountType } from "@src/utils/account-utils";
@@ -10,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
+import { Chain } from "@src/storage/entities/Chains";
 
 export const ChainSelector = () => {
   const navigate = useNavigate();
@@ -104,15 +104,21 @@ export const ChainSelector = () => {
           <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
             <div className="px-6 py-2 pt-2 text-start">
               <div className="flex flex-col gap-1">
-                {chains?.map((spec) => (
-                  <div key={spec.name}>
-                    <div className="flex items-center gap-3 whitespace-nowrap">
-                      <p className="text-[#808385] text-lg">
-                        {t(`chain_selector.${spec.name}`)}
-                      </p>
-                      <div className="h-[1px] w-full bg-[#343A40]" />
-                    </div>
-                    {spec.chains.map((chain, index) => (
+                {Object.keys(chains).map((spec) => (
+                  <div key={spec}>
+                    {chains[
+                      spec as "mainnets" | "parachains" | "testnets" | "custom"
+                    ].length > 0 && (
+                      <div className="flex items-center gap-3 whitespace-nowrap">
+                        <p className="text-[#808385] text-lg">
+                          {t(`chain_selector.${spec}`)}
+                        </p>
+                        <div className="h-[1px] w-full bg-[#343A40]" />
+                      </div>
+                    )}
+                    {chains[
+                      spec as "mainnets" | "parachains" | "testnets" | "custom"
+                    ].map((chain, index) => (
                       <Menu.Item key={index.toString()}>
                         {({ close }) => (
                           <div

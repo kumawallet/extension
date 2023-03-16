@@ -121,6 +121,7 @@
       "mainnets": "Redes principales (mainnets)",
       "parachains": "Redes secundarias (parachains)",
       "testnets": "Redes de prueba (testnets)",
+      "custom": "Personalizadas",
       "evm_type": "cuenta tipo Ethereum (EVM)",
       "wasm_type": "cuenta tipo Polkadot (WASM)"
     },

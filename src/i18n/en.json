@@ -121,6 +121,7 @@
       "mainnets": "Relay chains",
       "parachains": "Parachains",
       "testnets": "Testnets",
+      "custom": "Custom",
       "evm_type": "Ethereum like account (EVM)",
       "wasm_type": "Polkadot like account (WASM)"
     },

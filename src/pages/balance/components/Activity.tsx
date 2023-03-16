@@ -7,9 +7,9 @@ import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
-import { CHAINS } from "@src/constants/chains";
 import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
 import { useNetworkContext, useTxContext } from "@src/providers";
+import Chains from "@src/storage/entities/Chains";
 
 const chpiColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -35,6 +35,7 @@ export const Activity = () => {
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
+  const [networks, setNetworks] = useState({} as Chains);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
@@ -43,7 +44,21 @@ export const Activity = () => {
     if (selectedAccount) {
       getContacts();
     }
+    getNetworks();
   }, [selectedAccount.key]);
+
+  const getNetworks = async () => {
+    try {
+      setIsLoading(true);
+      const networks = await Extension.getAllChains();
+      setNetworks(networks);
+    } catch (error) {
+      setNetworks({} as Chains);
+      showErrorToast(tCommon(error as string));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getContacts = async () => {
     try {
@@ -61,9 +76,10 @@ export const Activity = () => {
 
   const getLink = (network: string, hash: string) => {
     const { explorer } =
-      CHAINS.flatMap((chainType) => chainType.chains).find(
-        (chain) => chain.name.toLowerCase() === network.toLowerCase()
-      ) || {};
+      networks
+        .getAll()
+        .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
+      {};
     const { evm, wasm } = explorer || {};
     if (type.toLowerCase() === "wasm") {
       return `${wasm?.url}extrinsic/${hash}`;
