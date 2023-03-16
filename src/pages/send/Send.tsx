@@ -113,9 +113,11 @@ export const Send = () => {
           tx,
         });
       } else {
+        const value = ethers.utils.parseEther(amount);
+
         const _tx = await tx?.sender.sendTransaction({
           ...tx.tx,
-          value: ethers.utils.parseEther(String(tx.tx.value)),
+          value,
         });
         addTxToQueue({
           amount,
@@ -130,7 +132,10 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      // const completeError = String(error);
+      // console.log(completeError);
+      const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
+      showErrorToast(_err || error);
     }
     setIsLoading(false);
   };

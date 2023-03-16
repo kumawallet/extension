@@ -3,7 +3,7 @@ import { Loading, LoadingButton } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { useNetworkContext } from "@src/providers";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import { FC, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";

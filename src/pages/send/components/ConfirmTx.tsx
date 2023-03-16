@@ -1,10 +1,14 @@
 import { LoadingButton } from "@src/components/common";
+import { cropAccount } from "@src/utils/account-utils";
 import { FC } from "react";
+import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Tx } from "../Send";
+import { useAccountContext } from "../../../providers/accountProvider/AccountProvider";
+import { useNetworkContext } from "../../../providers/networkProvider/NetworkProvider";
 
 interface ConfirmTxProps {
   tx: Tx;
@@ -13,9 +17,30 @@ interface ConfirmTxProps {
 }
 
 export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
   const navigate = useNavigate();
-
   const { t } = useTranslation("send");
+
+  const { getValues } = useFormContext();
+
+  const amount = getValues("amount");
+
+  const destinationAccount = getValues("destinationAccount");
+  const originAccount = getValues("from");
+
+  const originChainName = originAccount.name;
+  const destinationChainName = originAccount.name;
+
+  const originCurrencyName = originAccount.nativeCurrency.name;
+  const destinationCurrencyName = originAccount.nativeCurrency.name;
+
+  const originCurrencySymbol = originAccount.nativeCurrency.symbol;
+  const destinationCurrencySymbol = originAccount.nativeCurrency.symbol;
 
   return (
     <div className="mx-auto px-2">
@@ -32,16 +57,16 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
         <p className="mb-2">Chains:</p>
         <div className="flex justify-around items-center bg-[#212529] rounded-xl py-3 px-5">
           <div className="flex flex-col">
-            <p>Astar</p>
-            <p>FCdp...ZgK8</p>
+            <p>{originChainName}</p>
+            <p>{cropAccount(selectedAccount.value.address || "")}</p>
           </div>
           <div className="flex gap-1">
             <FaChevronLeft />
             <FaChevronRight />
           </div>
           <div className="flex flex-col">
-            <p>Moonriver</p>
-            <p>FCdp...ZgK8</p>
+            <p>{destinationChainName}</p>
+            <p>{cropAccount(destinationAccount)}</p>
           </div>
         </div>
       </div>
@@ -49,10 +74,9 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
         <p>Assets:</p>
         <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
           <div className="flex flex-col">
-            <p>ASTR</p>
+            <p>{originCurrencyName}</p>
             <p>
-              <span>1000</span>
-              ASTR
+              <span>{amount}</span> {originCurrencySymbol}
             </p>
           </div>
           <div className="flex gap-1">
@@ -60,10 +84,9 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
             <FaChevronRight />
           </div>
           <div className="flex flex-col">
-            <p>ASTR</p>
+            <p>{destinationCurrencyName}</p>
             <p>
-              <span>1000</span>
-              ASTR
+              <span>{amount}</span> {destinationCurrencySymbol}
             </p>
           </div>
         </div>
