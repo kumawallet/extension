@@ -137,8 +137,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     if (state.queue.length > 0) {
       const lastTx = state.queue[0];
 
-      console.log("to process:", lastTx);
-
       if (lastTx.tx.type === AccountType.WASM) {
         processWasmTx(lastTx);
       } else {
@@ -157,24 +155,10 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
             activity: records,
           },
         });
+        processPendingTxs(records);
       })();
     }
   }, [selectedAccount.key, api, selectedChain?.name]);
-
-  useEffect(() => {
-    // if (state.activity.length > 0 && !isSearching) {
-    //   setisSearching(true);
-    //   for (const activity of state.activity) {
-    //     if (activity.status === RecordStatus.PENDING) {
-    //       if (activity.reference === "wasm") {
-    //         searchTx(Number(activity?.fromBlock), activity.hash);
-    //       } else {
-    //         searchEvmTx(activity.hash);
-    //       }
-    //     }
-    //   }
-    // }
-  }, [state.activity, isSearching]);
 
   const processWasmTx = async ({ amount, destinationAccount, tx }: newTx) => {
     const { sender, tx: _tx, type, aditional } = tx;
@@ -410,6 +394,18 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       },
     });
     await Extension.updateActivity(hash, status, error);
+  };
+
+  const processPendingTxs = async (activityArray: any[]) => {
+    for (const activity of activityArray) {
+      if (activity.status === RecordStatus.PENDING) {
+        if (activity.reference === "wasm") {
+          searchTx(Number(activity?.fromBlock), activity.hash);
+        } else {
+          searchEvmTx(activity.hash);
+        }
+      }
+    }
   };
 
   return (

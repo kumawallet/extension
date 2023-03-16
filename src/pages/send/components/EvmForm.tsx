@@ -107,7 +107,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       type: AccountType.EVM,
       tx: {
         ...evmTx,
-        value: amount * 10 ** decimals,
+        value: amount,
       },
       // aditional,
       sender: wallet as ethers.Wallet,

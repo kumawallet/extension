@@ -101,7 +101,7 @@ export const Send = () => {
   const { getValues } = methods;
 
   const sendTx = async () => {
-    setIsLoading();
+    setIsLoading(true);
     const amount = getValues("amount");
     const destinationAccount = getValues("destinationAccount");
 
@@ -113,11 +113,9 @@ export const Send = () => {
           tx,
         });
       } else {
-        const value = BigNumber.from(tx?.tx.value);
-
         const _tx = await tx?.sender.sendTransaction({
           ...tx.tx,
-          value,
+          value: ethers.utils.parseEther(String(tx.tx.value)),
         });
         addTxToQueue({
           amount,
@@ -132,7 +130,7 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      console.log(error);
+      showErrorToast(error);
     }
     setIsLoading(false);
   };

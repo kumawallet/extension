@@ -78,6 +78,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
         classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
         onClick={onConfirm}
         isLoading={isLoading}
+        isDisabled={isLoading}
       >
         {t("confirm")}
       </LoadingButton>
