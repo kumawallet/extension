@@ -49,7 +49,8 @@
     "add": "Add",
     "manage": "Manage",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "delete": "Delete"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -153,7 +154,20 @@
     "title": "Advanced"
   },
   "manage_networks": {
-    "title": "Manage networks"
+    "title": "Manage networks",
+    "new_network": "New network",
+    "network_name": "Network name",
+    "address_prefix": "Address prefix",
+    "native_currency": "Native currency",
+    "currency_name": "Currency name",
+    "currency_symbol": "Symbol",
+    "currency_decimals": "Decimals",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "i.e. https://mainnet.infura.io/v3/your-api-key",
+    "rpc_wasm_placeholder": "i.e. wss://rpc.polkadot.io",
+    "explorer": "Explorer",
+    "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "Contacts",

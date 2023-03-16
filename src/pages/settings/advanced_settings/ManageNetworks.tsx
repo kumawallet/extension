@@ -187,7 +187,7 @@ export const ManageNetworks = () => {
               className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
               onClick={showCreateForm}
             >
-              <span>{"New network"}</span>
+              <span>{t("new_network")}</span>
             </button>
           </div>
         )}
@@ -196,7 +196,7 @@ export const ManageNetworks = () => {
       {isCreating ? (
         <>
           <label htmlFor="name" className="block text-sm font-medium">
-            {"Name"}
+            {t("network_name")}
           </label>
           <div className="mt-4">
             <input
@@ -227,7 +227,7 @@ export const ManageNetworks = () => {
             htmlFor="addressPrefix"
             className="block text-sm font-medium mt-4"
           >
-            {"Address Prefix"}
+            {t("address_prefix")}
           </label>
           <div className="mt-4">
             <input
@@ -245,11 +245,11 @@ export const ManageNetworks = () => {
                 htmlFor="nativeCurrency"
                 className="block text-lg font-medium mt-4"
               >
-                {"Native currency"}
+                {t("native_currency")}
               </label>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{"Name"}</div>
+                <div className="text-sm font-medium mb-2">{t("currency_name")}</div>
                 <input
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   readOnly={!isCustom(selectedNetwork.name) && !isCreating}
@@ -261,7 +261,7 @@ export const ManageNetworks = () => {
               </div>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{"Symbol"}</div>
+                <div className="text-sm font-medium mb-2">{t("currency_symbol")}</div>
                 <input
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   readOnly={!isCustom(selectedNetwork.name) && !isCreating}
@@ -273,7 +273,7 @@ export const ManageNetworks = () => {
               </div>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{"Decimals"}</div>
+                <div className="text-sm font-medium mb-2">{t("currency_decimals")}</div>
                 <input
                   type="number"
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
@@ -290,12 +290,12 @@ export const ManageNetworks = () => {
           {selectedNetwork.rpc && (
             <>
               <label htmlFor="name" className="block text-lg font-medium mt-4">
-                {"RPC URLs"}
+                {t("rpc_urls")}
               </label>
               {(selectedNetwork.rpc.evm || selectedNetwork.rpc.evm === "") && (
                 <div className="mt-5">
                   <input
-                    placeholder={"EVM RPC URL"}
+                    placeholder={t("rpc_evm_placeholder") || ''}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.evm")}
@@ -306,7 +306,7 @@ export const ManageNetworks = () => {
                 selectedNetwork.rpc.wasm === "") && (
                 <div className="mt-5">
                   <input
-                    placeholder={"WASM RPC URL"}
+                    placeholder={t("rpc_wasm_placeholder") || ''}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.wasm")}
@@ -319,12 +319,12 @@ export const ManageNetworks = () => {
           {selectedNetwork.explorer && (
             <>
               <label htmlFor="name" className="block text-lg font-medium mt-4">
-                {"Explorer"}
+                {t("explorer")}
               </label>
               {selectedNetwork.explorer.evm && (
                 <div className="mt-5">
                   <input
-                    placeholder="EVM Explorer URL"
+                    placeholder={t("explorer_evm_placeholder") || ''}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.evm.url")}
@@ -334,7 +334,7 @@ export const ManageNetworks = () => {
               {selectedNetwork.explorer.wasm && (
                 <div className="mt-5">
                   <input
-                    placeholder="WASM Explorer URL"
+                    placeholder={t("explorer_wasm_placeholder") || ''}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.wasm.url")}
@@ -351,20 +351,20 @@ export const ManageNetworks = () => {
                   className="mt-5 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
                   onClick={() => deleteNetwork()}
                 >
-                  {"Delete"}
+                  {tCommon("delete")}
                 </button>
               )}
               <button
                 className="mt-5 ml-4 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
                 onClick={() => cancel()}
               >
-                {"Cancel"}
+                {tCommon("cancel")}
               </button>
               <button
                 className="mt-5 ml-4 inline-flex justify-center border border-custom-green-bg text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-custom-green-bg focus:outline-none focus:shadow-outline text-sm"
                 onClick={_onSubmit}
               >
-                {"Save"}
+                {tCommon("save")}
               </button>
             </div>
           )}

@@ -49,7 +49,8 @@
     "add": "追加",
     "manage": "管理",
     "cancel": "キャンセル",
-    "save": "保存"
+    "save": "保存",
+    "delete": "削除"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -153,7 +154,20 @@
     "title": "高度な"
   },
   "manage_networks": {
-    "title": "ネットワークを追加"
+    "title": "ネットワークを追加",
+    "new_network": "新しいネットワーク",
+    "network_name": "ネットワーク名",
+    "address_prefix": "アドレスプレフィックス",
+    "native_currency": "ネイティブ通貨",
+    "currency_name": "通貨名",
+    "currency_symbol": "シンボル",
+    "currency_decimals": "小数点以下の桁数",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "例: https://mainnet.infura.io/v3/your_project_id",
+    "rpc_wasm_placeholder": "例: wss://rpc.polkadot.io",
+    "explorer": "エクスプローラー",
+    "explorer_evm_placeholder": "例: https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "例: https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "連絡先",

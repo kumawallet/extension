@@ -49,7 +49,8 @@
     "add": "Añadir",
     "manage": "Administrar",
     "cancel": "Cancelar",
-    "save": "Guardar"
+    "save": "Guardar",
+    "delete": "Eliminar"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -153,7 +154,20 @@
     "title": "Avanzado"
   },
   "manage_networks": {
-    "title": "Adminsitrar redes"
+    "title": "Adminsitrar redes",
+    "new_network": "Nueva red",
+    "network_name": "Nombre de la red",
+    "address_prefix": "Prefijo de la dirección",
+    "native_currency": "Moneda nativa",
+    "currency_name": "Nombre de la moneda",
+    "currency_symbol": "Símbolo",
+    "currency_decimals": "Decimales",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "ej.: https://mainnet.infura.io/v3/your_project_id",
+    "rpc_wasm_placeholder": "ej.: wss://rpc.polkadot.io",
+    "explorer": "Explorador",
+    "explorer_evm_placeholder": "ej.: https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "ej.: https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "Contactos",
