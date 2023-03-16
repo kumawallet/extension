@@ -15,17 +15,17 @@ body,
 
 body {
   background: #212529;
-  color: white;
+  color: white;overflow: hidden;
 }
 
-/* body::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+body::-webkit-scrollbar {
+  display: none;
 }
 
-body::-webkit-scrollbar-thumb {
-  background-color: var(--bg-gray);
-  border-radius: 1rem;
-} */
+body {
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
+}
 
 .toast {
   background-color: var(--bg-gray) !important;
@@ -33,18 +33,3 @@ body::-webkit-scrollbar-thumb {
   color: #fff !important;
 }
 
-/* width */
-/* ::-webkit-scrollbar {
-  width: 10px;
-} */
-
-/* Track */
-/* ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-} */
-
-/* Handle on hover */
-/* ::-webkit-scrollbar-thumb {
-  background-color: var(--bg-gray);
-  border-radius: 1rem;
-} */

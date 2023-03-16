@@ -19,10 +19,11 @@ import {
 import { useAccountContext } from "../accountProvider";
 import Extension from "@src/Extension";
 import Record from "@src/storage/entities/activity/Record";
-import { AddressOrPair, SubmittableExtrinsic } from "@polkadot/api/types";
+import { AddressOrPair } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
+import { polkadotExtrinsic, Tx } from "@src/pages";
 
 interface InitialState {
   queue: newTx[];
@@ -98,12 +99,8 @@ const reducer = (state: InitialState, action: any): InitialState => {
   }
 };
 
-type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
-type evmTx = ethers.providers.TransactionResponse;
 interface newTx {
-  type: AccountType;
-  tx: polkadotExtrinsic | evmTx;
-  sender: AddressOrPair | ethers.Wallet;
+  tx: Tx;
   destinationAccount: string;
   amount: number;
 }
@@ -138,10 +135,11 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (state.queue.length > 0) {
-      const lasIndex = state.queue.length - 1;
-      const lastTx = state.queue[lasIndex];
+      const lastTx = state.queue[0];
 
-      if (lastTx.type === AccountType.WASM) {
+      console.log("to process:", lastTx);
+
+      if (lastTx.tx.type === AccountType.WASM) {
         processWasmTx(lastTx);
       } else {
         processEVMTx(lastTx);
@@ -164,42 +162,39 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [selectedAccount.key, api, selectedChain?.name]);
 
   useEffect(() => {
-    if (state.activity.length > 0 && !isSearching) {
-      setisSearching(true);
-      for (const activity of state.activity) {
-        if (activity.status === RecordStatus.PENDING) {
-          if (activity.reference === "wasm") {
-            searchTx(Number(activity?.fromBlock), activity.hash);
-          } else {
-            searchEvmTx(activity.hash);
-          }
-        }
-      }
-    }
+    // if (state.activity.length > 0 && !isSearching) {
+    //   setisSearching(true);
+    //   for (const activity of state.activity) {
+    //     if (activity.status === RecordStatus.PENDING) {
+    //       if (activity.reference === "wasm") {
+    //         searchTx(Number(activity?.fromBlock), activity.hash);
+    //       } else {
+    //         searchEvmTx(activity.hash);
+    //       }
+    //     }
+    //   }
+    // }
   }, [state.activity, isSearching]);
 
-  const processWasmTx = async ({
-    amount,
-    destinationAccount,
-    sender,
-    tx: extrinsic,
-    type,
-  }: newTx) => {
+  const processWasmTx = async ({ amount, destinationAccount, tx }: newTx) => {
+    const { sender, tx: _tx, type, aditional } = tx;
+
     const a = await (api as ApiPromise).rpc.chain.getBlock();
 
-    const unsub = await (extrinsic as polkadotExtrinsic)?.signAndSend(
+    console.log(aditional);
+
+    const unsub = await (_tx as polkadotExtrinsic)?.signAndSend(
       sender as AddressOrPair,
-      { tip: 0 },
+      { tip: Number(aditional?.tip) || undefined },
       async ({ events, txHash, status }: ISubmittableResult) => {
         if (String(status.type) === "Ready") {
           const hash = txHash.toString();
           const date = Date.now();
-          const reference = "wasm";
           const activity = {
             fromBlock: a.block.header.number.toString(),
             address: destinationAccount,
             type: RecordType.TRANSFER,
-            reference,
+            reference: type,
             hash,
             status: RecordStatus.PENDING,
             createdAt: date,
@@ -336,12 +331,10 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const processEVMTx = async ({
     amount,
     destinationAccount,
-    sender,
-    tx: evmTx,
-    type,
+    tx: _tx,
   }: newTx) => {
     try {
-      const tx = evmTx as ethers.providers.TransactionResponse;
+      const tx = _tx as ethers.providers.TransactionResponse;
 
       const date = Date.now();
 
@@ -350,7 +343,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       const activity = {
         address: destinationAccount,
         type: RecordType.TRANSFER,
-        reference: "evm",
+        reference: "EVM",
         hash: hash,
         status: RecordStatus.PENDING,
         createdAt: date,
@@ -391,9 +384,10 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       await Extension.updateActivity(hash, status, error);
     } catch (err) {
-      const code = err.data.replace("Reverted ", "");
-      let reason = ethers.utils.toUtf8String("0x" + code.substr(138));
-      showErrorToast(reason);
+      console.log(err);
+      // const code = err.data.replace("Reverted ", "");
+      // let reason = ethers.utils.toUtf8String("0x" + code.substr(138));
+      // showErrorToast(reason);
     }
   };
 
