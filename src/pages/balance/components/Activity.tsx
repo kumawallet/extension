@@ -36,6 +36,7 @@ export const Activity = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
   const [contacts, setContacts] = useState([] as Contact[]);
+  const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
 
   useEffect(() => {
@@ -47,8 +48,9 @@ export const Activity = () => {
   const getContacts = async () => {
     try {
       setIsLoading(true);
-      const contacts = await Extension.getContacts();
+      const { contacts, ownAccounts } = await Extension.getRegistryAddresses();
       setContacts(contacts);
+      setOwnAccounts(ownAccounts);
     } catch (error) {
       setContacts([]);
       showErrorToast(tCommon(error as string));
@@ -72,8 +74,9 @@ export const Activity = () => {
 
   const getContactName = (address: string) => {
     const contact = contacts.find((c) => c.address === address);
-    return contact
-      ? contact.name
+    const ownAccount = ownAccounts.find((c) => c.address === address);
+    return contact || ownAccount
+      ? contact?.name || ownAccount?.name
       : address.slice(0, 6) + "..." + address.slice(-4);
   };
 
