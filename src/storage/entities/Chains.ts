@@ -1,5 +1,5 @@
 import { AccountType } from "@src/accounts/types";
-import { MAINNETS, PARACHAINS, TESTNETS } from "@src/constants/chains";
+import { MAINNETS, TESTNETS } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
 
 export type Chain = {
@@ -31,7 +31,6 @@ export type Chain = {
 
 export default class Chains extends BaseEntity {
   mainnets: Chain[];
-  parachains: Chain[];
   testnets: Chain[];
   custom: Chain[];
 
@@ -40,7 +39,6 @@ export default class Chains extends BaseEntity {
   private constructor() {
     super();
     this.mainnets = MAINNETS;
-    this.parachains = PARACHAINS;
     this.testnets = TESTNETS;
     this.custom = [];
   }
@@ -59,7 +57,6 @@ export default class Chains extends BaseEntity {
   static async getDefaultValue<Chains>(): Promise<Chains> {
     const defaultChains = Chains.getInstance();
     defaultChains.mainnets = MAINNETS;
-    defaultChains.parachains = PARACHAINS;
     defaultChains.testnets = TESTNETS;
     return defaultChains as Chains;
   }
@@ -69,7 +66,6 @@ export default class Chains extends BaseEntity {
     if (!stored) throw new Error("failed_to_load_chains");
     const chains = Chains.getInstance();
     chains.mainnets = stored.mainnets;
-    chains.parachains = stored.parachains;
     chains.testnets = stored.testnets;
     chains.custom = stored.custom;
   }
@@ -97,8 +93,6 @@ export default class Chains extends BaseEntity {
     if (!chains) throw new Error("failed_to_get_chain_by_name");
     const chain = chains.mainnets.find((c) => c.name === chainName);
     if (chain) return chain;
-    const parachain = chains.parachains.find((c) => c.name === chainName);
-    if (parachain) return parachain;
     const testnet = chains.testnets.find((c) => c.name === chainName);
     if (testnet) return testnet;
     const custom = chains.custom.find((c) => c.name === chainName);
@@ -109,7 +103,6 @@ export default class Chains extends BaseEntity {
   getAll() {
     return [
       ...this.mainnets,
-      ...this.parachains,
       ...this.testnets,
       ...this.custom,
     ];
@@ -118,7 +111,6 @@ export default class Chains extends BaseEntity {
   isAlreadyAdded(chain: Chain) {
     return (
       this.mainnets.some((c) => c.name === chain.name) ||
-      this.parachains.some((c) => c.name === chain.name) ||
       this.testnets.some((c) => c.name === chain.name) ||
       this.custom.some((c) => c.name === chain.name)
     );

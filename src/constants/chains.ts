@@ -59,9 +59,6 @@ export const MAINNETS: Chain[] = [
     logo: "ethereum",
     supportedAccounts: [EVM],
   },
-];
-
-export const PARACHAINS: Chain[] = [
   {
     name: "Astar",
     rpc: {
@@ -259,10 +256,6 @@ export const CHAINS = [
   {
     name: "mainnets",
     chains: MAINNETS,
-  },
-  {
-    name: "parachains",
-    chains: PARACHAINS,
   },
   {
     name: "testnets",

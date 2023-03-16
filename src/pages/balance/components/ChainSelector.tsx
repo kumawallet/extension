@@ -107,7 +107,7 @@ export const ChainSelector = () => {
                 {Object.keys(chains).map((spec) => (
                   <div key={spec}>
                     {chains[
-                      spec as "mainnets" | "parachains" | "testnets" | "custom"
+                      spec as "mainnets" | "testnets" | "custom"
                     ].length > 0 && (
                       <div className="flex items-center gap-3 whitespace-nowrap">
                         <p className="text-[#808385] text-lg">
@@ -117,7 +117,7 @@ export const ChainSelector = () => {
                       </div>
                     )}
                     {chains[
-                      spec as "mainnets" | "parachains" | "testnets" | "custom"
+                      spec as "mainnets" | "testnets" | "custom"
                     ].map((chain, index) => (
                       <Menu.Item key={index.toString()}>
                         {({ close }) => (
