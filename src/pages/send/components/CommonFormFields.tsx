@@ -37,11 +37,7 @@ export const CommonFormFields = () => {
         <div className="flex flex-col gap-4 mb-3">
           <div>
             <p>{t("destination_account")}</p>
-            <Destination
-              onSelectedAccount={(account) =>
-                setValue("destinationAccount", account)
-              }
-            />
+            <Destination />
             <InputErrorMessage
               message={errors.destinationAccount?.message as string}
             />

@@ -67,11 +67,14 @@ export const Send = () => {
         .typeError(t("required") as string)
         .test("valid address", t("invalid_address") as string, (address) => {
           try {
+            console.log("address", address);
             if (!address) return false;
 
             if (isHex(address)) {
+              console.log("ishex");
               return isAddress(address);
             } else {
+              console.log("else");
               encodeAddress(decodeAddress(address));
             }
 
@@ -95,7 +98,7 @@ export const Send = () => {
       asset: selectedChain?.nativeCurrency,
     },
     resolver: yupResolver(schema),
-    mode: "onChange",
+    mode: "all",
   });
 
   const { getValues } = methods;

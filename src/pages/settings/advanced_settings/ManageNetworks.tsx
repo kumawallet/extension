@@ -11,7 +11,10 @@ import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number } from "yup";
-import { useNetworkContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
+import { getAccountType } from "../../../utils/account-utils";
+import { AccountType } from "@src/accounts/types";
+import { CHAINS } from "@src/constants/chains";
 
 const defaultValues: Chain = {
   name: "New Network",
@@ -65,7 +68,16 @@ const schema = object({
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
-  const { refreshNetworks } = useNetworkContext();
+  const {
+    state: { selectedChain },
+    refreshNetworks,
+    setSelectNetwork,
+  } = useNetworkContext();
+  const {
+    state: { selectedAccount },
+    getAllAccounts,
+    setSelectedAccount,
+  } = useAccountContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [networks, setNetworks] = useState({} as Chains);
@@ -142,7 +154,25 @@ export const ManageNetworks = () => {
     try {
       await Extension.removeCustomChain(selectedNetwork?.name as string);
       getNetworks();
-      refreshNetworks(selectedNetwork?.supportedAccounts);
+
+      const networkIsSelected = selectedChain.name === selectedNetwork?.name;
+
+      if (networkIsSelected) {
+        const actualAccountType = getAccountType(
+          selectedAccount.type
+        ) as AccountType;
+
+        if (actualAccountType !== "WASM") {
+          // default to polkadot
+          const accounts = await getAllAccounts([AccountType.WASM]);
+          await setSelectedAccount(accounts[0]);
+          setSelectNetwork(CHAINS[0].chains[0]);
+        } else {
+          // default to ethereum
+        }
+      }
+
+      // refreshNetworks(selectedNetwork?.supportedAccounts);
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
@@ -249,7 +279,9 @@ export const ManageNetworks = () => {
               </label>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{t("currency_name")}</div>
+                <div className="text-sm font-medium mb-2">
+                  {t("currency_name")}
+                </div>
                 <input
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   readOnly={!isCustom(selectedNetwork.name) && !isCreating}
@@ -261,7 +293,9 @@ export const ManageNetworks = () => {
               </div>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{t("currency_symbol")}</div>
+                <div className="text-sm font-medium mb-2">
+                  {t("currency_symbol")}
+                </div>
                 <input
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   readOnly={!isCustom(selectedNetwork.name) && !isCreating}
@@ -273,7 +307,9 @@ export const ManageNetworks = () => {
               </div>
 
               <div className="mt-5">
-                <div className="text-sm font-medium mb-2">{t("currency_decimals")}</div>
+                <div className="text-sm font-medium mb-2">
+                  {t("currency_decimals")}
+                </div>
                 <input
                   type="number"
                   className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
@@ -295,7 +331,7 @@ export const ManageNetworks = () => {
               {(selectedNetwork.rpc.evm || selectedNetwork.rpc.evm === "") && (
                 <div className="mt-5">
                   <input
-                    placeholder={t("rpc_evm_placeholder") || ''}
+                    placeholder={t("rpc_evm_placeholder") || ""}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.evm")}
@@ -306,7 +342,7 @@ export const ManageNetworks = () => {
                 selectedNetwork.rpc.wasm === "") && (
                 <div className="mt-5">
                   <input
-                    placeholder={t("rpc_wasm_placeholder") || ''}
+                    placeholder={t("rpc_wasm_placeholder") || ""}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.wasm")}
@@ -324,7 +360,7 @@ export const ManageNetworks = () => {
               {selectedNetwork.explorer.evm && (
                 <div className="mt-5">
                   <input
-                    placeholder={t("explorer_evm_placeholder") || ''}
+                    placeholder={t("explorer_evm_placeholder") || ""}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.evm.url")}
@@ -334,7 +370,7 @@ export const ManageNetworks = () => {
               {selectedNetwork.explorer.wasm && (
                 <div className="mt-5">
                   <input
-                    placeholder={t("explorer_wasm_placeholder") || ''}
+                    placeholder={t("explorer_wasm_placeholder") || ""}
                     className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.wasm.url")}

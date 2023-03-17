@@ -2,19 +2,22 @@ import { FC, useEffect, useState, useMemo } from "react";
 import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
+import { useAccountContext } from "@src/providers";
 
 interface DestionationProps {
   onSelectedAccount: (address: string) => void;
 }
 
-export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
-  const { register, setValue } = useFormContext();
-  const { onBlur, onChange, ...r } = register("destinationAccount");
+export const Destination: FC<DestionationProps> = () => {
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
-  const [destination, setDestination] = useState({
-    name: "",
-    address: "",
-  });
+  const { register, setValue } = useFormContext();
+  // const { onChange, ...r } = ;
+
+  const [destinationAddress, setDestinationAddress] = useState("");
+
   const [accountToSelect, setAccountToSelect] = useState<any>([]);
   const [isOpenOptions, setisOpenOptions] = useState(false);
 
@@ -39,37 +42,32 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
     })();
   }, []);
 
-  const onChangeAccount = (account: any) => {
-    let _account = account;
-    if (typeof _account === "string") {
-      _account = { address: account };
-    }
-    onSelectedAccount?.(_account);
-    setDestination(_account);
+  const onChangeAccount = (account: string) => {
+    // onSelectedAccount?.(account);
+    setDestinationAddress(account);
   };
 
   const filteredAddresses = useMemo(() => {
-    if (accountToSelect.length === 0) return [];
-    if (!destination?.address) return accountToSelect || [];
+    if (accountToSelect.length === 0 || !selectedAccount?.value?.address)
+      return [];
+    if (!destinationAddress) return accountToSelect || [];
 
     const [recent, contacts, ownAccounts] = accountToSelect;
 
     const filters = [];
 
     const filterdRecent = recent.values.filter((v: any) =>
-      v?.address
-        ?.toLowerCase()
-        .includes(destination.address.toLowerCase() || "")
+      v?.address?.toLowerCase().includes(destinationAddress.toLowerCase() || "")
     );
     const filterdContacts = contacts.values.filter((v: any) =>
-      v?.address
-        ?.toLowerCase()
-        .includes(destination.address.toLowerCase() || "")
+      v?.address?.toLowerCase().includes(destinationAddress.toLowerCase() || "")
     );
-    const filterdOwnAccounts = ownAccounts.values.filter((v: any) =>
-      v?.address
-        ?.toLowerCase()
-        .includes(destination.address.toLowerCase() || "")
+    const filterdOwnAccounts = ownAccounts.values.filter(
+      (v: any) =>
+        v?.address
+          ?.toLowerCase()
+          .includes(destinationAddress.toLowerCase() || "") &&
+        v?.address?.toLowerCase() !== selectedAccount?.value?.address
     );
 
     filterdRecent.length > 0 &&
@@ -91,31 +89,36 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
       });
 
     return filters;
-  }, [accountToSelect, destination]);
+  }, [accountToSelect, destinationAddress, selectedAccount?.value?.address]);
+
+  const { onChange, ...r } = { ...register("destinationAccount") };
 
   return (
     <Combobox
-      value={destination}
+      value={destinationAddress}
       onChange={(value) => {
         onChangeAccount(value);
-        setValue("destinationAccount", value?.address || "");
+        // setValue("destinationAccount", value);
+        onChange({
+          target: {
+            name: "destinationAccount",
+            value,
+          },
+          type: "string",
+        });
       }}
     >
       <div className="relative mt-1">
         <Combobox.Input
           autoComplete="off"
           className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+          {...r}
           onChange={({ target, type }) => {
+            console.log({
+              target,
+            });
             onChangeAccount(target.value);
             onChange({ target, type });
-          }}
-          {...r}
-          displayValue={(dest: any) => {
-            if (typeof dest === "string") {
-              return dest;
-            }
-
-            return dest?.address || "";
           }}
           onClick={() => setisOpenOptions(true)}
           onBlur={() => {
@@ -140,14 +143,14 @@ export const Destination: FC<DestionationProps> = ({ onSelectedAccount }) => {
                     {type.values.map((acc: any) => (
                       <Combobox.Option
                         key={acc.address}
-                        value={acc}
+                        value={acc.address}
                         className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1"
                         onClick={() => setisOpenOptions(false)}
                       >
                         <p className="font-light text-gray-100">{acc.name}</p>
                         <p className="text-gray-100 font-light text-sm text-ellipsis overflow-hidden">
                           {acc.address}
-                        </p>{" "}
+                        </p>
                       </Combobox.Option>
                     ))}
                   </div>
