@@ -57,6 +57,8 @@ export const ManageAssets = () => {
   useEffect(() => {
     if (!isEVM) {
       loadPolkadotAssets();
+    } else {
+      loadEvmAssets();
     }
   }, []);
 
@@ -105,6 +107,11 @@ export const ManageAssets = () => {
       );
     }
     setSelectedAsset(null);
+  };
+
+  const loadEvmAssets = async () => {
+    setchainSupportAsset(false);
+    return;
   };
 
   const addAsset = () => {

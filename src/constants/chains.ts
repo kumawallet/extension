@@ -212,7 +212,28 @@ export const TESTNETS: Chain[] = [
     supportedAccounts: [EVM, WASM],
   },
   {
-    name: "Contracts Testnet",
+    name: "Rococo",
+    rpc: {
+      wasm: "wss://rococo-rpc.polkadot.io",
+    },
+    addressPrefix: 42,
+
+    nativeCurrency: {
+      name: "roc",
+      symbol: "ROC",
+      decimals: 12,
+    },
+    explorer: {
+      wasm: {
+        name: "",
+        url: "https://rococo.subscan.io/",
+      },
+    },
+    logo: "rococo",
+    supportedAccounts: [WASM],
+  },
+  {
+    name: "Rockmine",
     rpc: {
       wasm: "wss://rococo-rockmine-rpc.polkadot.io",
     },
@@ -229,7 +250,7 @@ export const TESTNETS: Chain[] = [
         url: "https://rockmine.subscan.io/",
       },
     },
-    logo: "rococo",
+    logo: "rockmine",
     supportedAccounts: [WASM],
   },
   {
