@@ -15,7 +15,7 @@ import { WasmForm } from "./components/WasmForm";
 import { EvmForm } from "./components/EvmForm";
 import { AccountType } from "@src/accounts/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { ConfirmTx } from "./components";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BALANCE } from "../../routes/paths";
