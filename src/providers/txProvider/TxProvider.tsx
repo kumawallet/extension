@@ -165,8 +165,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
     const a = await (api as ApiPromise).rpc.chain.getBlock();
 
-    console.log(aditional);
-
     const unsub = await (_tx as polkadotExtrinsic)?.signAndSend(
       sender as AddressOrPair,
       { tip: Number(aditional?.tip) || undefined },

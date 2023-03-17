@@ -182,5 +182,9 @@
     "title": "Actividad",
     "empty": "No hay actividad",
     "search": "Busca por dirección, hash o referencia"
+  },
+  "receive": {
+    "title": "Comparte tu dirección",
+    "copied": "Copiada!"
   }
 }

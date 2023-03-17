@@ -3,7 +3,7 @@ import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
-import { SEND } from "@src/routes/paths";
+import { SEND, RECEIVE } from "@src/routes/paths";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -34,7 +34,9 @@ export const TotalBalance: FC<TotalBalanceProps> = ({
           <BsArrowUpRight />
           <p>{t("send")}</p>
         </button>
-        <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
+        <button
+          onClick={() => navigate(RECEIVE)}
+          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
           <BsArrowDownLeft />
           <p>{t("receive")}</p>
         </button>

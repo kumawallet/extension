@@ -8,6 +8,7 @@ import {
   Balance,
   ManageAssets,
   Send,
+  Receive,
   SignIn,
   SignMessage,
   Welcome,
@@ -33,6 +34,7 @@ import {
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
+  RECEIVE,
   RESTORE_PASSWORD,
   SEND,
   SETTINGS_ADVANCED,
@@ -125,6 +127,7 @@ export const Routes = () => {
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={SEND} element={<Send />} />
+        <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
 
         <Route

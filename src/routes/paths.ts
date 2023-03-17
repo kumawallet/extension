@@ -6,6 +6,7 @@ export const IMPORT_ACCOUNT = "/import-account";
 export const MANAGE_ASSETS = "/manage-assets";
 export const RESTORE_PASSWORD = "/restore-password";
 export const SEND = "/send";
+export const RECEIVE = "/receive";
 export const SETTINGS_ADVANCED = "/settings-advanced";
 export const SETTINGS_BUG = "/settings-bug";
 export const SETTINGS_CONTACTS = "/settings-contacts";

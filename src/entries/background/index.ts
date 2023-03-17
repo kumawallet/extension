@@ -4,8 +4,6 @@ import Extension from "../../Extension";
 const openPopUp = (params: any) => {
   const querys = makeQuerys(params);
 
-  // console.log(querys);
-
   return chrome.windows.create({
     url: chrome.runtime.getURL(`src/entries/popup/index.html${querys}`), // ?method="sign_message&params={}"
     type: "popup",
@@ -24,8 +22,6 @@ chrome.runtime.onMessage.addListener(async function (
   sendResponse
 ) {
   if (request.origin === "kuma") {
-    // console.log("bg listener", request);
-
     try {
       switch (request.method) {
         case "sign_message": {

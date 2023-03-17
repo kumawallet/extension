@@ -182,5 +182,9 @@
     "title": "Activity",
     "empty": "No activity yet",
     "search": "Search by transaction hash, address or reference"
+  },
+  "receive": {
+    "title": "Share your address",
+    "copied": "Copied!"
   }
 }

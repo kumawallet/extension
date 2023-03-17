@@ -15,7 +15,7 @@ import { WasmForm } from "./components/WasmForm";
 import { EvmForm } from "./components/EvmForm";
 import { AccountType } from "@src/accounts/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { ConfirmTx } from "./components";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BALANCE } from "../../routes/paths";
@@ -67,14 +67,11 @@ export const Send = () => {
         .typeError(t("required") as string)
         .test("valid address", t("invalid_address") as string, (address) => {
           try {
-            console.log("address", address);
             if (!address) return false;
 
             if (isHex(address)) {
-              console.log("ishex");
               return isAddress(address);
             } else {
-              console.log("else");
               encodeAddress(decodeAddress(address));
             }
 
