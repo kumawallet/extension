@@ -16,16 +16,15 @@ body,
 body {
   background: #212529;
   color: white;overflow: hidden;
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
+  overflow: auto;
 }
 
 body::-webkit-scrollbar {
   display: none;
 }
 
-body {
-  -ms-overflow-style: none;  
-  scrollbar-width: none; 
-}
 
 .toast {
   background-color: var(--bg-gray) !important;
