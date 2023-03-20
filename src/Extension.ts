@@ -18,6 +18,7 @@ import Activity from "./storage/entities/activity/Activity";
 import Chains, { Chain } from "./storage/entities/Chains";
 import Register from "./storage/entities/registry/Register";
 import { RecordStatus } from "./storage/entities/activity/types";
+import Assets from "./storage/entities/Assets";
 
 export default class Extension {
   private static async init(
@@ -197,7 +198,6 @@ export default class Extension {
     return Network.get();
   }
 
-  /* c8 ignore start */
   static async getGeneralSettings(): Promise<Setting[]> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
@@ -286,5 +286,12 @@ export default class Extension {
   ) {
     await Activity.updateRecordStatus(txHash, status, error);
   }
-  /* c8 ignore stop */
+
+  static async addAsset(chain: string, asset: any) {
+    return Assets.addAsset(chain, asset);
+  }
+
+  static async getAssetsByChain(chain: string) {
+    return Assets.getByChain(chain);
+  }
 }

@@ -1,4 +1,5 @@
 import {
+  AssetProvider,
   AccountProvider,
   AuthProvider,
   NetworkProvider,
@@ -16,7 +17,9 @@ export const Main = () => {
       <NetworkProvider>
         <AccountProvider>
           <TxProvider>
-            <Routes />
+            <AssetProvider>
+              <Routes />
+            </AssetProvider>
           </TxProvider>
           <ToastContainer theme="dark" />
         </AccountProvider>
