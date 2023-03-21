@@ -4,7 +4,6 @@ import {
   PropsWithChildren,
   useContext,
   useReducer,
-  useState,
 } from "react";
 import { useAccountContext } from "../accountProvider";
 import { useNetworkContext } from "../networkProvider";
@@ -20,10 +19,12 @@ import erc20Abi from "./erc20.abi.json";
 
 interface InitialState {
   assets: Asset[];
+  isLoadingAssets: boolean;
 }
 
 const initialState: InitialState = {
   assets: [],
+  isLoadingAssets: false,
 };
 
 interface AssetContext {
@@ -43,12 +44,26 @@ export interface Asset {
 
 const reducer = (state: InitialState, action: any) => {
   switch (action.type) {
+    case "loading-assets": {
+      return {
+        ...state,
+        assets: [],
+        isLoadingAssets: true,
+      };
+    }
+    case "end-loading": {
+      return {
+        ...state,
+        isLoadingAssets: false,
+      };
+    }
     case "set-assets": {
       const { assets } = action.payload;
 
       return {
         ...state,
         assets,
+        isLoadingAssets: false,
       };
     }
     default:
@@ -58,7 +73,6 @@ const reducer = (state: InitialState, action: any) => {
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     state: { api, selectedChain, rpc, type },
@@ -70,10 +84,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     dispatch({
-      type: "set-assets",
-      payload: {
-        assets: [],
-      },
+      type: "loading-assets",
     });
   }, [rpc, api]);
 
@@ -92,28 +103,37 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [rpc, selectedAccount, type, api]);
 
   const loadAssets = async () => {
-    const _nativeBalance = await getNativeAsset(
-      api,
-      selectedAccount,
-      selectedChain
-    );
-    const _assets = await getOtherAssets(api, type);
-
-    const assets: Asset[] = [
-      {
-        id: "-1",
-        ...selectedChain?.nativeCurrency,
-        balance: _nativeBalance,
-      },
-      ..._assets,
-    ];
-
     dispatch({
-      type: "set-assets",
-      payload: {
-        assets,
-      },
+      type: "loading-assets",
     });
+    try {
+      const _nativeBalance = await getNativeAsset(
+        api,
+        selectedAccount,
+        selectedChain
+      );
+      const _assets = await getOtherAssets();
+
+      const assets: Asset[] = [
+        {
+          id: "-1",
+          ...selectedChain?.nativeCurrency,
+          balance: _nativeBalance,
+        },
+        ..._assets,
+      ];
+
+      dispatch({
+        type: "set-assets",
+        payload: {
+          assets,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: "end-loading",
+      });
+    }
   };
 
   const getNativeAsset = async (
@@ -129,10 +149,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     return nativeAsset;
   };
 
-  const getOtherAssets = async (
-    api: ApiPromise | ethers.providers.JsonRpcProvider | null,
-    type: string
-  ) => {
+  const getOtherAssets = async () => {
     if (!type) return [];
 
     if (type === "WASM") {
@@ -145,55 +162,45 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const loadPolkadotAssets = async () => {
-    try {
-      const assetPallet: any = await (api as ApiPromise)?.query?.assets;
-      if (!assetPallet) {
-        return [];
-      }
-
-      const assets: any = await (assetPallet?.metadata as any).entries();
-
-      const formatedAssets = assets.map(
-        ([
-          {
-            args: [id],
-          },
-          asset,
-        ]: any) => {
-          return {
-            id: String(id),
-            name: u8aToString(asset?.name),
-            symbol: u8aToString(asset?.symbol),
-            decimals: Number(asset?.decimals),
-          };
-        }
-      );
-
-      await Promise.all(
-        formatedAssets.map((r: any, index: number) =>
-          assetPallet
-            ?.account(r.id, selectedAccount.value.address)
-            .then((r) => {
-              const result = r?.toJSON?.();
-              formatedAssets[index].balance = result?.balance
-                ? result?.balance / 10 ** formatedAssets[index].decimals
-                : 0;
-            })
-        )
-      );
-
-      return formatedAssets;
-    } catch (error) {
-      // showErrorToast(error);
-    } finally {
-      setIsLoading(false);
+    const assetPallet: any = await (api as ApiPromise)?.query?.assets;
+    if (!assetPallet) {
+      return [];
     }
+
+    const assets: any = await (assetPallet?.metadata as any).entries();
+
+    const formatedAssets = assets.map(
+      ([
+        {
+          args: [id],
+        },
+        asset,
+      ]: any) => {
+        return {
+          id: String(id),
+          name: u8aToString(asset?.name),
+          symbol: u8aToString(asset?.symbol),
+          decimals: Number(asset?.decimals),
+        };
+      }
+    );
+
+    await Promise.all(
+      formatedAssets.map((r: any, index: number) =>
+        assetPallet?.account(r.id, selectedAccount.value.address).then((r) => {
+          const result = r?.toJSON?.();
+          formatedAssets[index].balance = result?.balance
+            ? result?.balance / 10 ** formatedAssets[index].decimals
+            : 0;
+        })
+      )
+    );
+
+    return formatedAssets;
   };
 
   const loadEvmAssets = async () => {
     const assets = await Extension.getAssetsByChain(selectedChain.name);
-
-    console.log("assets", assets);
 
     if (assets.length > 0) {
       await Promise.all(
@@ -202,7 +209,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           const balance = await contract.balanceOf(
             selectedAccount.value.address
           );
-          console.log("balance", balance);
           const _balance = Number(balance) / 10 ** Number(asset?.decimals);
           assets[index].balance = _balance;
           assets[index].id = index;

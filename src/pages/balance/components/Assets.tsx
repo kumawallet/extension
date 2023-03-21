@@ -7,6 +7,7 @@ import { MANAGE_ASSETS } from "@src/routes/paths";
 import { BsArrowUpRight } from "react-icons/bs";
 import { Asset, useAssetContext } from "@src/providers/assetProvider";
 import { useNetworkContext } from "@src/providers";
+import { Loading } from "@src/components/common";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -15,7 +16,7 @@ export const Assets = () => {
     state: { type },
   } = useNetworkContext();
   const {
-    state: { assets },
+    state: { assets, isLoadingAssets },
   } = useAssetContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
@@ -49,6 +50,8 @@ export const Assets = () => {
           {t("show_all_assets")}
         </label>
       </div>
+
+      {isLoadingAssets && <Loading />}
 
       {filteredAsset.map((asset, index) => (
         <div

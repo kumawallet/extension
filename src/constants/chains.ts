@@ -60,6 +60,42 @@ export const MAINNETS: Chain[] = [
     supportedAccounts: [EVM],
   },
   {
+    name: "Polygon",
+    rpc: { evm: "https://polygon-rpc.com" },
+    addressPrefix: 1,
+    nativeCurrency: {
+      name: "Matic",
+      symbol: "Matic",
+      decimals: 18,
+    },
+    explorer: {
+      evm: {
+        name: "etherscan",
+        url: "https://polygonscan.com/",
+      },
+    },
+    logo: "ethereum",
+    supportedAccounts: [EVM],
+  },
+  {
+    name: "Binance",
+    rpc: { evm: "https://bsc-dataseed.binance.org/" },
+    addressPrefix: 1,
+    nativeCurrency: {
+      name: "BNB",
+      symbol: "BNB",
+      decimals: 18,
+    },
+    explorer: {
+      evm: {
+        name: "etherscan",
+        url: "https://bscscan.com/",
+      },
+    },
+    logo: "ethereum",
+    supportedAccounts: [EVM],
+  },
+  {
     name: "Astar",
     rpc: {
       evm: "https://evm.astar.network",
