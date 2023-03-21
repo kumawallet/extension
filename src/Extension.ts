@@ -19,6 +19,7 @@ import Chains, { Chain } from "./storage/entities/Chains";
 import Register from "./storage/entities/registry/Register";
 import { RecordStatus } from "./storage/entities/activity/types";
 import Assets from "./storage/entities/Assets";
+import TrustedSites from "./storage/entities/TrustedSites";
 
 export default class Extension {
   private static async init(
@@ -293,5 +294,13 @@ export default class Extension {
 
   static async getAssetsByChain(chain: string) {
     return Assets.getByChain(chain);
+  }
+
+  static async getTrustedSites(): Promise<string[]> {
+    return TrustedSites.getAll();
+  }
+
+  static async addTrustedSite(site: string) {
+    return TrustedSites.addSite(site);
   }
 }

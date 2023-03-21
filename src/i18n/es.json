@@ -50,7 +50,8 @@
     "manage": "Administrar",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "connect": "Conectar"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -186,5 +187,12 @@
   "receive": {
     "title": "Comparte tu dirección",
     "copied": "Copiada!"
+  },
+  "confirm_trusted_site": {
+    "title": "Acción requerida",
+    "new_site_warning": "Este sitio quiere conectarse a tu Kuma Wallet. Por favor revisa la información del sitio y asegúrate de confiar en él antes de conectarte.",
+    "do_you_trust_this_site": "¿Confías en este sitio?",
+    "site_will_be_trusted": "Confirmando este sitio será confiable en el futuro.",
+    "manage_trusted_sites": "Si quieres administrar los sitios confiables ve a la configuración de la extensión."
   }
 }

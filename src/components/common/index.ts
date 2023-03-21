@@ -5,3 +5,4 @@ export * from "./SucessMessage";
 export * from "./DecryptFAB";
 export * from "./FullScreenFAB";
 export * from "./Loading";
+export * from "./ConfirmTrustedSite";

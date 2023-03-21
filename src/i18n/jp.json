@@ -50,7 +50,8 @@
     "manage": "管理",
     "cancel": "キャンセル",
     "save": "保存",
-    "delete": "削除"
+    "delete": "削除",
+    "connect": "接続"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -186,5 +187,12 @@
   "receive": {
     "title": "アドレスを共有する",
     "copied": "コピーされました!"
+  },
+  "confirm_trusted_site": {
+    "title": "要対応",
+    "new_site_warning": "このサイトは、あなたの Kuma ウォレットに接続しようとしています。接続する前にサイト情報を確認し、信頼できるサイトであることを確認してください。",
+    "do_you_trust_this_site": "このサイトを信頼しますか?",
+    "site_will_be_trusted": "このサイトが今後信頼されることを確認しています。",
+    "manage_trusted_sites": "信頼済みサイトを管理したい場合は、拡張機能の設定に移動してください."
   }
 }
