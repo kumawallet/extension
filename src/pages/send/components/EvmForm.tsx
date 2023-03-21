@@ -3,7 +3,7 @@ import { Loading, LoadingButton } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { useNetworkContext } from "@src/providers";
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import { FC, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -39,7 +39,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const [evmTx, setEvmTx] = useState<evmTx | null>(null);
 
   const _api = api as ethers.providers.JsonRpcProvider;
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
   const amount = watch("amount");
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);

@@ -130,6 +130,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      console.log(error);
       dispatch({
         type: "end-loading",
       });
@@ -202,16 +203,23 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const loadEvmAssets = async () => {
     const assets = await Extension.getAssetsByChain(selectedChain.name);
 
+    console.log(assets);
+
     if (assets.length > 0) {
       await Promise.all(
         assets.map(async (asset, index) => {
-          const contract = new ethers.Contract(asset?.address, erc20Abi, api);
-          const balance = await contract.balanceOf(
-            selectedAccount.value.address
-          );
-          const _balance = Number(balance) / 10 ** Number(asset?.decimals);
-          assets[index].balance = _balance;
-          assets[index].id = index;
+          try {
+            const contract = new ethers.Contract(asset?.address, erc20Abi, api);
+            const balance = await contract.balanceOf(
+              selectedAccount.value.address
+            );
+            const _balance = Number(balance) / 10 ** Number(asset?.decimals);
+            assets[index].balance = _balance;
+            assets[index].id = index;
+          } catch (error) {
+            assets[index].balance = 0;
+            assets[index].id = index;
+          }
         })
       );
     }
