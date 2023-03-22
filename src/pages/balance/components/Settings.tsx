@@ -8,7 +8,7 @@ import {
   SETTINGS_GENERAL,
   //SETTINGS_ADVANCED,
   SETTINGS_CONTACTS,
-  //SETTINGS_SECURITY,
+  SETTINGS_SECURITY,
   //SETTINGS_BUG,
   SIGNIN,
 } from "@src/routes/paths";
@@ -27,10 +27,10 @@ const OPTIONS = [
     text: "contacts",
     href: SETTINGS_CONTACTS,
   },
-  //{
-  //  text: "security",
-  //  href: SETTINGS_SECURITY,
-  //},
+  {
+    text: "security",
+    href: SETTINGS_SECURITY,
+  },
   //{
   //  text: "bug_report",
   //  href: SETTINGS_BUG,

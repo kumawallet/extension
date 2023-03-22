@@ -9,7 +9,7 @@ import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Language, SettingKey } from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
-import { BsGear, BsPlus } from "react-icons/bs";
+import { BsGear } from "react-icons/bs";
 import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 
 export const General = () => {

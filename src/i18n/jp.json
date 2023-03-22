@@ -51,7 +51,9 @@
     "cancel": "キャンセル",
     "save": "保存",
     "delete": "削除",
-    "connect": "接続"
+    "connect": "接続",
+    "show": "表示",
+    "hide": "非表示"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -194,5 +196,10 @@
     "do_you_trust_this_site": "このサイトを信頼しますか?",
     "site_will_be_trusted": "このサイトが今後信頼されることを確認しています。",
     "manage_trusted_sites": "信頼済みサイトを管理したい場合は、拡張機能の設定に移動してください."
+  },
+  "security": {
+    "title": "セキュリティ",
+    "trusted_sites": "信頼済みサイト",
+    "no_trusted_sites": "信頼済みサイトはありません"
   }
 }
