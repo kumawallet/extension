@@ -1,7 +1,7 @@
 import { ICON_SIZE } from "@src/constants/icons";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../../components/common/PageWrapper";
 import { useToast } from "@src/hooks";
@@ -65,13 +65,21 @@ export const Security = () => {
       <div className="flex flex-col mt-5 gap-2">
         <div className="flex justify-between items-center">
           <p className="text-lg font-medium mb-5">{t("trusted_sites")}</p>
-          <button
-            type="button"
-            className="inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
-            onClick={toggleShowSites}
-          >
-            {showSites ? tCommon("hide") : tCommon("show")}
-          </button>
+          <div className="p-2">
+            {showSites ? (
+              <FiChevronUp
+                className="cursor-pointer"
+                size={ICON_SIZE}
+                onClick={toggleShowSites}
+              />
+            ) : (
+              <FiChevronDown
+                className="cursor-pointer"
+                size={ICON_SIZE}
+                onClick={toggleShowSites}
+              />
+            )}
+          </div>
         </div>
         {showSites && (
           <>
