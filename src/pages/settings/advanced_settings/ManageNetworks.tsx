@@ -3,18 +3,19 @@ import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
 import { InputErrorMessage, Loading } from "@src/components/common";
 import Extension from "@src/Extension";
 import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { object, string, number } from "yup";
+import { object, string, number, array } from "yup";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { getAccountType } from "../../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
+import { Listbox, Transition } from "@headlessui/react";
 
 const defaultValues: Chain = {
   name: "New Network",
@@ -36,7 +37,7 @@ const defaultValues: Chain = {
     },
   },
   logo: "",
-  supportedAccounts: [],
+  supportedAccounts: [AccountType.WASM],
   xcm: [],
 };
 
@@ -63,7 +64,14 @@ const schema = object({
       url: string().optional(),
     }),
   }),
+  supportedAccounts: array().required(),
 }).required();
+
+const SUPPORTED_CHAINS_TYPE = [
+  { id: 1, name: "WASM", value: [AccountType.WASM] },
+  { id: 2, name: "EVM", value: [AccountType.EVM] },
+  { id: 3, name: "WASM & EVM", value: [AccountType.WASM, AccountType.EVM] },
+];
 
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
@@ -78,6 +86,7 @@ export const ManageNetworks = () => {
     getAllAccounts,
     setSelectedAccount,
   } = useAccountContext();
+  const { showErrorToast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [networks, setNetworks] = useState({} as Chains);
@@ -85,7 +94,9 @@ export const ManageNetworks = () => {
   const [selectedNetwork, setSelectedNetwork] = useState(
     undefined as Chain | undefined
   );
-  const { showErrorToast } = useToast();
+  const [supportedAccounts, setSupportedAccounts] = useState(
+    SUPPORTED_CHAINS_TYPE[0]
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -128,6 +139,7 @@ export const ManageNetworks = () => {
     reset,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<Chain>({
     defaultValues,
@@ -191,6 +203,12 @@ export const ManageNetworks = () => {
     reset(defaultValues);
   };
 
+  const _supportedAccounts = getValues("supportedAccounts");
+
+  const showAddressPrefix = !isCreating
+    ? selectedNetwork?.supportedAccounts.includes(AccountType.WASM)
+    : _supportedAccounts.includes(AccountType.WASM);
+
   if (isLoading) {
     return (
       <PageWrapper>
@@ -251,23 +269,86 @@ export const ManageNetworks = () => {
             })}
         </select>
       )}
-      {selectedNetwork && (
-        <>
+
+      {isCreating && (
+        <div className="mt-4">
           <label
             htmlFor="addressPrefix"
             className="block text-sm font-medium mt-4"
           >
-            {t("address_prefix")}
+            {t("account_type_support")}
           </label>
-          <div className="mt-4">
-            <input
-              type="number"
-              className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-              {...register("addressPrefix")}
-            />
-            <InputErrorMessage message={errors.addressPrefix?.message} />
-          </div>
+          <Listbox
+            value={supportedAccounts}
+            onChange={(val) => {
+              setSupportedAccounts(val);
+              setValue("supportedAccounts", val.value);
+            }}
+          >
+            <div className="relative mt-1">
+              <Listbox.Button className="text-start relative border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
+                <span className="text-start">{supportedAccounts.name}</span>
+              </Listbox.Button>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-700 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-40">
+                  {SUPPORTED_CHAINS_TYPE.map((person, personIdx) => (
+                    <Listbox.Option
+                      key={personIdx}
+                      className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1"
+                      value={person}
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? "font-medium" : "font-normal"
+                            }`}
+                          >
+                            {person.name}
+                          </span>
+                          {selected ? (
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                              {/* <CheckIcon className="h-5 w-5" aria-hidden="true" /> */}
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
+          <InputErrorMessage message={errors.addressPrefix?.message} />
+        </div>
+      )}
+
+      {selectedNetwork && (
+        <>
+          {showAddressPrefix && (
+            <>
+              <label
+                htmlFor="addressPrefix"
+                className="block text-sm font-medium mt-4"
+              >
+                {t("address_prefix")}
+              </label>
+              <div className="mt-4">
+                <input
+                  type="number"
+                  className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                  {...register("addressPrefix")}
+                />
+                <InputErrorMessage message={errors.addressPrefix?.message} />
+              </div>
+            </>
+          )}
 
           {selectedNetwork.nativeCurrency && (
             <>

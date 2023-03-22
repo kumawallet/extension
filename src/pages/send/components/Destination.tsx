@@ -1,14 +1,10 @@
-import { FC, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
 import { useAccountContext } from "@src/providers";
 
-interface DestionationProps {
-  onSelectedAccount: (address: string) => void;
-}
-
-export const Destination: FC<DestionationProps> = () => {
+export const Destination = () => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
