@@ -163,6 +163,42 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const loadPolkadotAssets = async () => {
+    // const _assets = [
+    //   {
+    //     address: "5EbRksy6mm3ZxwV5mgx3j9n28nm4LShrXzNixkiJeYSWnqyH",
+    //   },
+    // ];
+
+    // const contract = new ContractPromise(api, metadata, _assets[0].address);
+
+    // console.log(contract.query);
+
+    // // const _gasLimit = api.registry.createType("WeightV2", {
+    // //   refTime: new BN("1000000000000"),
+    // //   proofSize: new BN("1000000000000"),
+    // // });
+
+    // const _gasLimit = api.registry.createType(
+    //   "WeightV2",
+    //   new BN("1000000000000")
+    // );
+
+    // console.log("gastLimit", _gasLimit);
+
+    // const balance = await contract.query.balanceOf(
+    //   selectedAccount.value.address,
+    //   {
+    //     gasLimit: _gasLimit,
+    //     storageDepositLimit: null,
+    //   },
+    //   selectedAccount.value.address
+    // );
+
+    // console.log("gas", balance.gasConsumed.toHuman());
+    // console.log("balance", balance.result.toHuman());
+
+    // return [];
+
     const assetPallet: any = await (api as ApiPromise)?.query?.assets;
     if (!assetPallet) {
       return [];

@@ -71,44 +71,46 @@ export const General = () => {
         />
         <p className="font-medium text-2xl">{t("title")}</p>
       </div>
-      {settings.map((setting, index) => {
-        switch (setting.name) {
-          case SettingKey.LANGUAGES:
-            return (
-              <div key={index} className="flex flex-col gap-2">
-                <p className="text-lg font-medium">{t(setting.name)}</p>
-                <select
-                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  onChange={(e) => saveLanguage(e.target.value)}
-                  value={selectedLanguage}
+      <div className="flex flex-col gap-5">
+        {settings.map((setting, index) => {
+          switch (setting.name) {
+            case SettingKey.LANGUAGES:
+              return (
+                <div key={index} className="flex flex-col gap-2">
+                  <p className="text-lg font-medium">{t(setting.name)}</p>
+                  <select
+                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    onChange={(e) => saveLanguage(e.target.value)}
+                    value={selectedLanguage}
+                  >
+                    {setting.isLanguageArray() &&
+                      (setting.value as Language[]).map((option, index) => (
+                        <option key={index} value={option.lang}>
+                          {`${option.name} (${option.englishName})`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              );
+            case SettingKey.MANAGE_NETWORKS:
+              return (
+                <div
+                  key={index}
+                  className="flex justify-between items-center gap-2"
                 >
-                  {setting.isLanguageArray() &&
-                    (setting.value as Language[]).map((option, index) => (
-                      <option key={index} value={option.lang}>
-                        {`${option.name} (${option.englishName})`}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            );
-          case SettingKey.MANAGE_NETWORKS:
-            return (
-              <div
-                key={index}
-                className="flex justify-between items-center gap-2"
-              >
-                <p className="text-lg font-medium">{t(setting.name)}</p>
-                <button
-                  type="button"
-                  className="mt-5 inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-                  onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
-                >
-                  <BsGear color="white" size={ICON_SIZE} />
-                </button>
-              </div>
-            );
-        }
-      })}
+                  <p className="text-lg font-medium">{t(setting.name)}</p>
+                  <button
+                    type="button"
+                    className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+                    onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
+                  >
+                    <BsGear color="white" size={ICON_SIZE} />
+                  </button>
+                </div>
+              );
+          }
+        })}
+      </div>
     </PageWrapper>
   );
 };

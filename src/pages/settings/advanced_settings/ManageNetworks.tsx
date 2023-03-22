@@ -174,17 +174,14 @@ export const ManageNetworks = () => {
           selectedAccount.type
         ) as AccountType;
 
+        await refreshNetworks();
+        setSelectNetwork(CHAINS[0].chains[0]);
         if (actualAccountType !== "WASM") {
           // default to polkadot
           const accounts = await getAllAccounts([AccountType.WASM]);
           await setSelectedAccount(accounts[0]);
-          setSelectNetwork(CHAINS[0].chains[0]);
-        } else {
-          // default to ethereum
         }
       }
-
-      // refreshNetworks(selectedNetwork?.supportedAccounts);
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }

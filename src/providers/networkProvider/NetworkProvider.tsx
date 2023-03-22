@@ -182,12 +182,9 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const refreshNetworks = async (supportedAccounts?: AccountType[]) => {
+  const refreshNetworks = async () => {
     try {
       const chains = await Extension.getAllChains();
-      if (!supportedAccounts) { 
-        // TODO
-      }
       dispatch({
         type: "refresh-networks",
         payload: { chains },
@@ -198,7 +195,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (state.rpc && state.type) {
+    if (state.rpc && state.type && !state.api) {
       (async () => {
         const api = await getProvider(state.rpc as string, state.type);
         dispatch({
@@ -210,7 +207,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         });
       })();
     }
-  }, [state.rpc, state.type]);
+  }, [state.rpc, state.type, state.api]);
 
   return (
     <NetworkContext.Provider
