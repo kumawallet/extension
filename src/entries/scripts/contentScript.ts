@@ -5,11 +5,12 @@ interface KumaProps {
 
 (window as any).kuma = {
   call: ({ method, params }: KumaProps) => {
+    const origin = window.location.origin;
     return new Promise((res, rej) => {
       window.postMessage({
         origin: "kuma",
-        method: method,
-        params: params,
+        method,
+        params: { ...params, origin },
       });
 
       window.addEventListener("message", async function response(e) {
