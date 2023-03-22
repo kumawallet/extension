@@ -92,7 +92,7 @@ export const Send = () => {
       to: selectedChain,
       destinationAccount: "",
       amount: 0,
-      asset: selectedChain?.nativeCurrency,
+      asset: {},
     },
     resolver: yupResolver(schema),
     mode: "all",
@@ -122,7 +122,7 @@ export const Send = () => {
         addTxToQueue({
           amount,
           destinationAccount,
-          tx: _tx,
+          tx: _tx as any,
         });
       }
       showSuccessToast(t("tx_send"));
@@ -132,8 +132,6 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      // const completeError = String(error);
-      // console.log(completeError);
       const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
       showErrorToast(_err || error);
     }

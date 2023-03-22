@@ -18,7 +18,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
 
   const {
-    state: { api, selectedChain },
+    state: { api },
   } = useNetworkContext();
 
   const {
@@ -30,15 +30,19 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { showErrorToast } = useToast();
 
   const [fee, setFee] = useState({
-    gasLimit: 0,
-    lastBaseFeePerGas: 0,
-    maxPriorityFeePerGas: 0,
+    "gas limit": "0",
+    "max fee per gas": "0",
+    "max base fee per gas": "0",
+    "max priority fee per gas": "0",
+    "estimated fee": "0",
+    "estimated total": "0",
   });
   const [isLoadingFee, setIsLoadingFee] = useState(false);
   const [wallet, setWallet] = useState<ethers.Wallet | null>(null);
   const [evmTx, setEvmTx] = useState<evmTx | null>(null);
 
   const _api = api as ethers.providers.JsonRpcProvider;
+
   const amount = watch("amount");
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
@@ -66,11 +70,30 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           _api.estimateGas(evmTx),
         ]);
 
-        setFee({
-          gasLimit: Number(gasLimit),
-          lastBaseFeePerGas: Number(feeData.lastBaseFeePerGas),
-          maxPriorityFeePerGas: Number(feeData.maxPriorityFeePerGas),
-        });
+        const _gasLimit = Number(gasLimit);
+        const _maxFeePerGas = Number(feeData.maxFeePerGas);
+        const _lastBaseFeePerGas = Number(feeData.lastBaseFeePerGas);
+        const _maxPriorityFeePerGas = Number(feeData.maxPriorityFeePerGas);
+
+        const avg = ethers.utils.formatUnits(
+          (_maxFeePerGas + _maxPriorityFeePerGas) / 2,
+          "gwei"
+        );
+
+        const _estimatedFee = ethers.utils.formatUnits(_gasLimit * avg, "gwei");
+
+        setFee((state) => ({
+          ...state,
+          "gas limit": ethers.utils.formatUnits(_gasLimit, "gwei").toString(),
+          "max fee per gas": ethers.utils.formatUnits(_maxFeePerGas).toString(),
+          "max base fee per gas": ethers.utils
+            .formatUnits(_lastBaseFeePerGas)
+            .toString(),
+          "max priority fee per gas": ethers.utils
+            .formatUnits(_maxPriorityFeePerGas)
+            .toString(),
+          "estimated fee": _estimatedFee.toString(),
+        }));
 
         setEvmTx((prevState) => ({
           ...prevState,
@@ -112,6 +135,15 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       sender: wallet as ethers.Wallet,
     });
   });
+
+  useEffect(() => {
+    const total = Number(amount) + Number(fee["estimated fee"]) || 0;
+
+    setFee((state) => ({
+      ...state,
+      "estimated total": String(total),
+    }));
+  }, [amount, fee["estimated fee"]]);
 
   return (
     <>

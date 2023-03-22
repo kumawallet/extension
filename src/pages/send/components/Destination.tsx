@@ -2,15 +2,19 @@ import { useEffect, useState, useMemo } from "react";
 import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
+import { transformAddress } from "@src/utils/account-utils";
+import { isHex } from "@polkadot/util";
 
 export const Destination = () => {
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
   const {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { register, setValue } = useFormContext();
-  // const { onChange, ...r } = ;
+  const { register } = useFormContext();
 
   const [destinationAddress, setDestinationAddress] = useState("");
 
@@ -18,28 +22,67 @@ export const Destination = () => {
   const [isOpenOptions, setisOpenOptions] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const { contacts, ownAccounts, recent } =
-        await Extension.getRegistryAddresses();
-      setAccountToSelect([
-        {
-          label: "recent",
-          values: recent,
-        },
-        {
-          label: "contacts",
-          values: contacts,
-        },
-        {
-          label: "own accounts",
-          values: ownAccounts,
-        },
-      ]);
-    })();
-  }, []);
+    if (selectedAccount.key && selectedChain?.name) {
+      (async () => {
+        const { contacts, ownAccounts, recent } =
+          await Extension.getRegistryAddresses();
+
+        const _ownAccounts = ownAccounts
+          .map((acc) =>
+            !isHex(acc.address)
+              ? {
+                  name: acc.name,
+                  address: transformAddress(
+                    acc.address,
+                    selectedChain?.addressPrefix
+                  ),
+                }
+              : acc
+          )
+          .filter((acc) => acc.address !== selectedAccount.value.address);
+
+        const _contacts = contacts.map((acc) =>
+          !isHex(acc.address)
+            ? {
+                name: acc.name,
+                address: transformAddress(
+                  acc.address,
+                  selectedChain?.addressPrefix
+                ),
+              }
+            : acc
+        );
+
+        const _recent = recent.map((acc) =>
+          !isHex(acc.address)
+            ? {
+                address: transformAddress(
+                  acc.address,
+                  selectedChain?.addressPrefix
+                ),
+              }
+            : acc
+        );
+
+        setAccountToSelect([
+          {
+            label: "recent",
+            values: _recent,
+          },
+          {
+            label: "contacts",
+            values: _contacts,
+          },
+          {
+            label: "own accounts",
+            values: _ownAccounts,
+          },
+        ]);
+      })();
+    }
+  }, [selectedAccount?.key, selectedChain?.name]);
 
   const onChangeAccount = (account: string) => {
-    // onSelectedAccount?.(account);
     setDestinationAddress(account);
   };
 
@@ -58,12 +101,8 @@ export const Destination = () => {
     const filterdContacts = contacts.values.filter((v: any) =>
       v?.address?.toLowerCase().includes(destinationAddress.toLowerCase() || "")
     );
-    const filterdOwnAccounts = ownAccounts.values.filter(
-      (v: any) =>
-        v?.address
-          ?.toLowerCase()
-          .includes(destinationAddress.toLowerCase() || "") &&
-        v?.address?.toLowerCase() !== selectedAccount?.value?.address
+    const filterdOwnAccounts = ownAccounts.values.filter((v: any) =>
+      v?.address?.toLowerCase().includes(destinationAddress.toLowerCase() || "")
     );
 
     filterdRecent.length > 0 &&
@@ -94,7 +133,6 @@ export const Destination = () => {
       value={destinationAddress}
       onChange={(value) => {
         onChangeAccount(value);
-        // setValue("destinationAccount", value);
         onChange({
           target: {
             name: "destinationAccount",
@@ -126,7 +164,7 @@ export const Destination = () => {
         {filteredAddresses.length > 0 && (
           <Combobox.Options
             static={isOpenOptions}
-            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50 px-2"
+            className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 px-2"
           >
             {filteredAddresses.map(
               (type: any) =>
@@ -140,11 +178,11 @@ export const Destination = () => {
                       <Combobox.Option
                         key={acc.address}
                         value={acc.address}
-                        className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1"
+                        className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1 font-extralight text-sm text-gray-300"
                         onClick={() => setisOpenOptions(false)}
                       >
-                        <p className="font-light text-gray-100">{acc.name}</p>
-                        <p className="text-gray-100 font-light text-sm text-ellipsis overflow-hidden">
+                        <p>{acc.name}</p>
+                        <p className="text-ellipsis overflow-hidden">
                           {acc.address}
                         </p>
                       </Combobox.Option>

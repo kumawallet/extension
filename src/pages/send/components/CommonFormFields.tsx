@@ -58,7 +58,9 @@ export const CommonFormFields = () => {
 
               <div className="w-4/12">
                 <SelectableAsset
-                  onChangeAsset={(asset) => setValue("asset", asset)}
+                  onChangeAsset={(asset) => {
+                    setValue("asset", asset);
+                  }}
                 />
               </div>
             </div>

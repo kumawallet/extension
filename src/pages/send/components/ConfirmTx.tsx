@@ -1,14 +1,13 @@
+import { FC } from "react";
 import { LoadingButton } from "@src/components/common";
 import { cropAccount } from "@src/utils/account-utils";
-import { FC } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Tx } from "../Send";
-import { useAccountContext } from "../../../providers/accountProvider/AccountProvider";
-import { useNetworkContext } from "../../../providers/networkProvider/NetworkProvider";
+import { useAccountContext } from "@src/providers";
 
 interface ConfirmTxProps {
   tx: Tx;
@@ -18,15 +17,12 @@ interface ConfirmTxProps {
 
 export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
   const {
-    state: { selectedChain },
-  } = useNetworkContext();
-  const {
     state: { selectedAccount },
   } = useAccountContext();
   const navigate = useNavigate();
   const { t } = useTranslation("send");
 
-  const { getValues } = useFormContext();
+  const { getValues, watch } = useFormContext();
 
   const amount = getValues("amount");
 
@@ -36,11 +32,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
   const originChainName = originAccount.name;
   const destinationChainName = originAccount.name;
 
-  const originCurrencyName = originAccount.nativeCurrency.name;
-  const destinationCurrencyName = originAccount.nativeCurrency.name;
-
-  const originCurrencySymbol = originAccount.nativeCurrency.symbol;
-  const destinationCurrencySymbol = originAccount.nativeCurrency.symbol;
+  const asset = watch("asset");
 
   return (
     <div className="mx-auto px-2">
@@ -54,7 +46,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
         <p className="text-xl">{t("title")}</p>
       </div>
       <div className="mb-5">
-        <p className="mb-2">Chains:</p>
+        {<p className="mb-2">{t("chains")}:</p>}{" "}
         <div className="flex justify-around items-center bg-[#212529] rounded-xl py-3 px-5">
           <div className="flex flex-col">
             <p>{originChainName}</p>
@@ -71,12 +63,12 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
         </div>
       </div>
       <div className="mb-5">
-        <p>Assets:</p>
+        <p>{t("assets")}:</p>
         <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
           <div className="flex flex-col">
-            <p>{originCurrencyName}</p>
+            <p>{asset?.name}</p>
             <p>
-              <span>{amount}</span> {originCurrencySymbol}
+              <span>{amount}</span> {asset?.symbol}
             </p>
           </div>
           <div className="flex gap-1">
@@ -84,15 +76,15 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
             <FaChevronRight />
           </div>
           <div className="flex flex-col">
-            <p>{destinationCurrencyName}</p>
+            <p>{asset?.name}</p>
             <p>
-              <span>{amount}</span> {destinationCurrencySymbol}
+              <span>{amount}</span> {asset?.symbol}
             </p>
           </div>
         </div>
       </div>
       <div className="mb-5">
-        <p>details:</p>
+        <p>{t("details")}:</p>
         <div className="flex bg-[#343A40] rounded-xl py-3 px-5">
           <p>Timestamp: Aug-08-2022 10:25:29 PM +UTC</p>
         </div>

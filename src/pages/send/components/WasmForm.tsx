@@ -53,6 +53,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const amount = watch("amount");
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
+  const currencySymbol = selectedChain?.nativeCurrency.symbol;
 
   useEffect(() => {
     (async () => {
@@ -109,8 +110,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
       const fee = partialFee.toNumber() / currencyUnits;
 
-      const currencySymbol = selectedChain?.nativeCurrency.symbol;
-
       const total = (partialFee.toNumber() + _amount) / currencyUnits;
 
       setFee({
@@ -125,7 +124,14 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     }
   };
 
+  const asset = watch("asset");
+
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
+
+  const stimatedTotal =
+    Number(fee["estimated total"]?.split(currencySymbol)?.[0]?.trim()) || 0;
+
+  const isEnoughToPay = stimatedTotal > 0 && stimatedTotal <= asset.balance;
 
   return (
     <>
@@ -163,9 +169,15 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         </div>
       )}
 
+      {canContinue && !isEnoughToPay && (
+        <p className="text-sm mt-2 text-red-500 text-center">
+          {t("insufficient_balance")}
+        </p>
+      )}
+
       <LoadingButton
         classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mt-7"
-        isDisabled={!canContinue}
+        isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
       >
         {t("continue")}
