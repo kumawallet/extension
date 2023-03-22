@@ -51,7 +51,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
-    "connect": "Connect"
+    "connect": "Connect",
+    "show": "Show",
+    "hide": "Hide"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -194,5 +196,10 @@
     "do_you_trust_this_site": "Do you trust this site?",
     "site_will_be_trusted": "By confirming this site will be trusted in the future.",
     "manage_trusted_sites": "If you want to manage the trusted sites go to the extension settings."
+  },
+  "security": {
+    "title": "Security",
+    "trusted_sites": "Trusted sites",
+    "no_trusted_sites": "No trusted sites"
   }
 }

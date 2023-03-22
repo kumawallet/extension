@@ -303,4 +303,8 @@ export default class Extension {
   static async addTrustedSite(site: string) {
     return TrustedSites.addSite(site);
   }
+
+  static async removeTrustedSite(site: string) {
+    return TrustedSites.removeSite(site);
+  }
 }

@@ -29,9 +29,22 @@ export default class TrustedSites extends BaseEntity {
     await TrustedSites.set<TrustedSites>(trustedSites);
   }
 
+  static async removeSite(url: string) {
+    const trustedSites = await TrustedSites.get<TrustedSites>();
+    if (!trustedSites) throw new Error("failed_to_remove_trusted_site");
+    trustedSites.removeSite(url);
+    await TrustedSites.set<TrustedSites>(trustedSites);
+  }
+
   addSite(url: string) {
     const site = this.data.find((site) => site === url);
     if (site) throw new Error("site_already_added");
     this.data.push(url);
+  }
+
+  removeSite(url: string) {
+    const site = this.data.find((site) => site === url);
+    if (!site) throw new Error("site_not_found");
+    this.data = this.data.filter((site) => site !== url);
   }
 }

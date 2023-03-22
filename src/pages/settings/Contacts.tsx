@@ -185,14 +185,16 @@ export const Contacts = () => {
                     key={index}
                     className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
                   >
-                    <div className="overflow-hidden text-ellipsis">
+                    <div className="overflow-hidden text-ellipsis w-[75%] break-all">
                       <p className="text-lg font-medium">{contact?.name}</p>
                       <p>{contact?.address}</p>
                     </div>
-                    <BsTrash
-                      className="text-lg"
-                      onClick={() => deleteContact(contact.address)}
-                    />
+                    <div className="w-[20%] flex justify-end">
+                      <BsTrash
+                        className="text-lg hover:text-custom-red-bg"
+                        onClick={() => deleteContact(contact.address)}
+                      />
+                    </div>
                   </div>
                 ))}
           </div>
