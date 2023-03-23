@@ -8,6 +8,7 @@ import { BsArrowUpRight } from "react-icons/bs";
 import { Asset, useAssetContext } from "@src/providers/assetProvider";
 import { useNetworkContext } from "@src/providers";
 import { Loading } from "@src/components/common";
+import Switch from 'react-switch';
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -38,17 +39,24 @@ export const Assets = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center mb-2 justify-end">
-        <input
-          id="default-checkbox"
-          type="checkbox"
-          value=""
-          className="w-4 h-4 rounded accent-custom-green-bg focus:ring-2 "
-          checked={showAllAssets}
-          onChange={() => setShowAllAssets(!showAllAssets)}
-        />
-        <label htmlFor="default-checkbox" className="ml-2 text-xs font-medium">
+        <label htmlFor="default-checkbox" className="mr-2 text-xs font-medium">
           {t("show_all_assets")}
         </label>
+        <Switch
+          id="default-switch"
+          className="react-switch"
+          checked={showAllAssets}
+          onChange={() => setShowAllAssets(!showAllAssets)}
+          onColor="#343A40"
+          onHandleColor="#469999"
+          handleDiameter={10}
+          height={16}
+          width={32}
+          uncheckedIcon={false}
+          checkedIcon={false}
+          boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+          activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+        />
       </div>
 
       {isLoadingAssets && <Loading />}

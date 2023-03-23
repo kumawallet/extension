@@ -136,7 +136,8 @@
     "send": "Enviar",
     "receive": "Recibir",
     "assets": "Activos",
-    "activity": "Actividad"
+    "activity": "Actividad",
+    "show_all_assets": "Mostrar todos los activos"
   },
   "settings": {
     "title": "Configuración",

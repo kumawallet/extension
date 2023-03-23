@@ -136,7 +136,8 @@
     "send": "送信",
     "receive": "受信",
     "assets": "資産",
-    "activity": "アクティビティ"
+    "activity": "アクティビティ",
+    "show_all_assets": "すべての資産を表示"
   },
   "settings": {
     "title": "設定",

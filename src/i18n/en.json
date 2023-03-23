@@ -136,7 +136,8 @@
     "send": "Send",
     "receive": "Receive",
     "assets": "Assets",
-    "activity": "Activity"
+    "activity": "Activity",
+    "show_all_assets": "Show all assets"
   },
   "settings": {
     "title": "Settings",
