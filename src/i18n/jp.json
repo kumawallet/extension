@@ -202,6 +202,8 @@
     "title": "セキュリティ",
     "trusted_sites": "信頼済みサイト",
     "no_trusted_sites": "信頼済みサイトはありません",
-    "search": "URLでサイトを検索する"
+    "search": "URLでサイトを検索する",
+    "credentials": "資格情報",
+    "restore_password": "パスワードを復元する"
   }
 }
