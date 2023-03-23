@@ -202,6 +202,8 @@
     "title": "Security",
     "trusted_sites": "Trusted sites",
     "no_trusted_sites": "No trusted sites",
-    "search": "Search sites by URL"
+    "search": "Search sites by URL",
+    "credentials": "Credentials",
+    "restore_password": "Restore password"
   }
 }

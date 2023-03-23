@@ -31,6 +31,7 @@ export const Contacts = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<AccountForm>({
     defaultValues: {
@@ -74,6 +75,7 @@ export const Contacts = () => {
       showErrorToast(tCommon(error as string));
     } finally {
       setIsCreateContact(false);
+      reset();
     }
   });
 
@@ -88,6 +90,26 @@ export const Contacts = () => {
 
   const toggleCreateContact = () => {
     setIsCreateContact(!isCreateContact);
+  };
+
+  const getGroupedContacts = () => {
+    const groupedContacts = contacts
+      .filter(
+        (contact) =>
+          contact.name.toLowerCase().includes(search.toLowerCase()) ||
+          contact.address.toLowerCase().includes(search.toLowerCase())
+      )
+      .reduce((acc: any, contact) => {
+        const firstLetter = contact.name.charAt(0).toUpperCase();
+        if (!acc[firstLetter]) {
+          acc[firstLetter] = [];
+        }
+        acc[firstLetter].push(contact);
+        return acc;
+      }, {});
+    return Object.entries(groupedContacts).sort(([letterA], [letterB]) =>
+      letterA.localeCompare(letterB)
+    );
   };
 
   if (isLoading) {
@@ -172,15 +194,10 @@ export const Contacts = () => {
                 </p>
               </div>
             )}
-            {contacts.length > 0 &&
-              contacts
-                .filter((contact) => {
-                  return (
-                    contact.name.toLowerCase().includes(search.toLowerCase()) ||
-                    contact.address.toLowerCase().includes(search.toLowerCase())
-                  );
-                })
-                .map((contact, index) => (
+            {getGroupedContacts().map(([letter, contacts]) => (
+              <section key={letter}>
+                <h3 className="text-lg font-medium my-2 text-custom-green-bg">{letter}</h3>
+                {(contacts as Contact[]).map((contact, index) => (
                   <div
                     key={index}
                     className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
@@ -197,6 +214,8 @@ export const Contacts = () => {
                     </div>
                   </div>
                 ))}
+              </section>
+            ))}
           </div>
         </>
       )}

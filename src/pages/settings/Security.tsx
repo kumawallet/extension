@@ -8,6 +8,7 @@ import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { BsTrash } from "react-icons/bs";
+import { RESTORE_PASSWORD } from "@src/routes/paths";
 
 export const Security = () => {
   const { t } = useTranslation("security");
@@ -119,6 +120,18 @@ export const Security = () => {
             )}
           </>
         )}
+        <div className="flex justify-between items-center">
+          <p className="text-lg font-medium mb-5">{t("credentials")}</p>
+          <div className="p-2">
+            <button
+              type="button"
+              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+              onClick={() => navigate(RESTORE_PASSWORD)}
+            >
+              {t("restore_password")}
+            </button>
+          </div>
+        </div>
       </div>
     </PageWrapper>
   );
