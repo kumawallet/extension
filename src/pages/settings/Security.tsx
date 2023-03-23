@@ -15,6 +15,7 @@ export const Security = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sites, setSites] = useState([] as string[]);
   const [showSites, setShowSites] = useState(false);
+  const [search, setSearch] = useState("" as string);
   const { showErrorToast } = useToast();
   const navigate = useNavigate();
 
@@ -83,22 +84,34 @@ export const Security = () => {
         </div>
         {showSites && (
           <>
-            {sites.map((site, index) => (
-              <div
-                className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2"
-                key={index}
-              >
-                <p className="text-custom-green-bg px-2 break-all w-[75%]">
-                  {site}
-                </p>
-                <div className="w-[20%] flex justify-end">
-                  <BsTrash
-                    className="text-lg hover:text-custom-red-bg"
-                    onClick={() => removeSite(site)}
-                  />
+            <input
+              id="search"
+              placeholder={t("search") || "Search"}
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+            />
+            {sites
+              .filter((site) =>
+                site.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((site, index) => (
+                <div
+                  className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2"
+                  key={index}
+                >
+                  <p className="text-custom-green-bg px-2 break-all w-[75%]">
+                    {site}
+                  </p>
+                  <div className="w-[20%] flex justify-end">
+                    <BsTrash
+                      className="text-lg hover:text-custom-red-bg"
+                      onClick={() => removeSite(site)}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             {sites.length === 0 && (
               <div className="flex justify-center items-center px-4 py-2">
                 <p className="text-sm text-gray-400">{t("no_trusted_sites")}</p>

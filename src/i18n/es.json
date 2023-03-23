@@ -200,6 +200,7 @@
   "security": {
     "title": "Seguridad",
     "trusted_sites": "Sitios confiables",
-    "no_trusted_sites": "No hay sitios confiables"
+    "no_trusted_sites": "No hay sitios confiables",
+    "search": "Buscar sitios por URL"
   }
 }
