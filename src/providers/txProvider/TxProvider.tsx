@@ -24,6 +24,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import { polkadotExtrinsic, Tx } from "@src/pages";
+import { useAssetContext } from "../assetProvider";
 
 interface InitialState {
   queue: newTx[];
@@ -120,6 +121,8 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const { loadAssets } = useAssetContext();
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isSearching, setisSearching] = useState(false);
@@ -226,6 +229,8 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
             status = RecordStatus.FAIL;
           } else {
             status = RecordStatus.SUCCESS;
+            console.log("should load assets");
+            loadAssets();
           }
           const hash = txHash.toString();
           dispatch({
@@ -355,6 +360,10 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       const status =
         result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
       const error = "";
+
+      if (status === RecordStatus.SUCCESS) {
+        loadAssets();
+      }
 
       dispatch({
         type: "update-activity-status",

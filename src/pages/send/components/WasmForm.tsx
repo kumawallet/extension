@@ -1,9 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useMemo } from "react";
 import { LoadingButton, Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
-import { useNetworkContext } from "@src/providers";
+import { useAssetContext, useNetworkContext } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import Extension from "@src/Extension";
 import { Keyring } from "@polkadot/keyring";
@@ -12,12 +12,14 @@ import { useToast } from "@src/hooks";
 import { AccountType } from "@src/accounts/types";
 import { NumericFormat } from "react-number-format";
 import { confirmTx, polkadotExtrinsic } from "../Send";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+import { BN } from "bn.js";
+import { formatBN } from "../../../utils/assets";
 
 const defaultFees = {
-  "estimated fee": "0",
-  "weight ref time": "0",
-  "weight proof size": "0",
-  "estimated total": "0",
+  "estimated fee": new BN("0"),
+  "estimated total": new BN("0"),
 };
 
 interface WasmFormProps {
@@ -37,6 +39,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     formState: { errors },
   } = useFormContext();
 
+  const {
+    state: { assets },
+  } = useAssetContext();
+
   const { showErrorToast } = useToast();
 
   const [fee, setFee] = useState(defaultFees);
@@ -51,9 +57,11 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const decimals = selectedChain?.nativeCurrency.decimals || 1;
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
+  const asset = watch("asset");
+  const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
-  const currencySymbol = selectedChain?.nativeCurrency.symbol;
+  const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
   useEffect(() => {
     (async () => {
@@ -91,47 +99,86 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     }, 1000);
 
     return () => clearTimeout(loadFees);
-  }, [amount, destinationAccount, destinationIsInvalid]);
+  }, [amount, destinationAccount, destinationIsInvalid, asset?.id]);
 
   const getFeeData = async () => {
+    if (!destinationAccount) return;
     try {
-      const _amount = Number(amount) * currencyUnits;
+      const _amount = isNativeAsset
+        ? amount * currencyUnits
+        : amount * 10 ** asset.decimals;
 
-      const extrinsic = await _api.tx.balances.transfer(
-        destinationAccount,
-        _amount
+      const bnAmount = new BN(
+        String(_amount.toLocaleString("fullwide", { useGrouping: false }))
       );
+
+      let extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>;
+
+      if (asset?.id === "-1") {
+        extrinsic = await _api.tx.balances.transfer(
+          destinationAccount,
+          bnAmount
+        );
+      } else {
+        extrinsic = await _api.tx.assets.transfer(
+          asset.id,
+          destinationAccount,
+          bnAmount
+        );
+      }
 
       setExtrinsic(extrinsic);
 
-      const { weight, partialFee } = await extrinsic.paymentInfo(
-        sender as KeyringPair
-      );
+      const { partialFee } = await extrinsic.paymentInfo(sender as KeyringPair);
 
-      const fee = partialFee.toNumber() / currencyUnits;
-
-      const total = (partialFee.toNumber() + _amount) / currencyUnits;
+      const amounToShow =
+        asset?.id === "-1" ? bnAmount.add(partialFee) : partialFee;
 
       setFee({
-        "estimated fee": `${fee} ${currencySymbol}`,
-        "weight ref time": String(weight.toJSON().refTime),
-        "weight proof size": String(weight.toJSON().proofSize),
-        "estimated total": `${total} ${currencySymbol}`,
+        "estimated fee": partialFee,
+        "estimated total": amounToShow,
       });
     } catch (error) {
+      console.log(error);
       showErrorToast(error);
       setFee(defaultFees);
     }
   };
 
-  const asset = watch("asset");
-
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
-  const stimatedTotal =
-    Number(fee["estimated total"]?.split(currencySymbol)?.[0]?.trim()) || 0;
+  const isEnoughToPay = useMemo(() => {
+    if (!asset?.id || !amount || !currencyUnits) return false;
 
-  const isEnoughToPay = stimatedTotal > 0 && stimatedTotal <= asset.balance;
+    const _amount = isNativeAsset
+      ? amount * currencyUnits
+      : amount * 10 ** asset.decimals;
+
+    const bnAmount = new BN(
+      _amount.toLocaleString("fullwide", { useGrouping: false })
+    );
+    const estimatedTotal = fee["estimated total"];
+    const BN0 = new BN("0");
+
+    if (isNativeAsset) {
+      const BNBalance = new BN(
+        (asset?.balance * currencyUnits).toLocaleString("fullwide", {
+          useGrouping: false,
+        })
+      );
+      return bnAmount.gt(BN0) && estimatedTotal.lte(BNBalance);
+    } else {
+      const BNBalance = new BN(String(asset?.balance * 10 ** asset.decimals));
+      const BNNativeBalance = new BN(
+        String(assets[0].balance * 10 ** assets[0].decimals)
+      );
+      return (
+        bnAmount.lte(BNBalance) &&
+        estimatedTotal.gt(BN0) &&
+        estimatedTotal.lte(BNNativeBalance)
+      );
+    }
+  }, [fee, asset, amount]);
 
   return (
     <>
@@ -160,12 +207,29 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         <Loading />
       ) : (
         <div className="flex flex-col gap-1">
-          {Object.keys(fee).map((key) => (
-            <div key={key} className="flex justify-between">
-              <p>{key}</p>
-              <p className="font-bold">{fee[key]}</p>
-            </div>
-          ))}
+          <div className="flex justify-between">
+            <p>{t("estimated_fee")}</p>
+            <p>{formatBN(fee["estimated fee"].toString(), decimals)}</p>
+          </div>
+          <div className="flex justify-between">
+            <p>{t("estimated_total")}</p>
+            {isNativeAsset ? (
+              <>
+                <p className="font-bold">
+                  {`${formatBN(fee["estimated total"].toString(), decimals)} `}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-bold">{`${amount} ${
+                  asset?.symbol
+                } + ${formatBN(
+                  fee["estimated total"].toString(),
+                  decimals
+                )} ${nativeSymbol}`}</p>
+              </>
+            )}
+          </div>
         </div>
       )}
 

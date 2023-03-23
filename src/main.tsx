@@ -16,11 +16,11 @@ export const Main = () => {
     <AuthProvider>
       <NetworkProvider>
         <AccountProvider>
-          <TxProvider>
-            <AssetProvider>
+          <AssetProvider>
+            <TxProvider>
               <Routes />
-            </AssetProvider>
-          </TxProvider>
+            </TxProvider>
+          </AssetProvider>
           <ToastContainer theme="dark" />
         </AccountProvider>
       </NetworkProvider>
