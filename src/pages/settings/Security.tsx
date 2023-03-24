@@ -1,5 +1,5 @@
 import { ICON_SIZE } from "@src/constants/icons";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -7,26 +7,75 @@ import { PageWrapper } from "../../components/common/PageWrapper";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
-import { BsTrash } from "react-icons/bs";
+import { BsEye, BsTrash } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
+import { Dialog, Transition } from "@headlessui/react";
+import { useAccountContext } from "@src/providers";
+import Account from "@src/storage/entities/Account";
 
 export const Security = () => {
   const { t } = useTranslation("security");
   const { t: tCommon } = useTranslation("common");
+  const { getSelectedAccount } = useAccountContext();
   const [isLoading, setIsLoading] = useState(true);
   const [sites, setSites] = useState([] as string[]);
   const [showSites, setShowSites] = useState(false);
   const [search, setSearch] = useState("" as string);
+  const [isOpen, setIsOpen] = useState(false);
+  const [privateKey, setPrivateKey] = useState("" as string);
+  const [hideKeys, setHideKeys] = useState(true);
+  const [account, setAccount] = useState(
+    undefined as Account | null | undefined
+  );
   const { showErrorToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
     getSites();
+    getAccount();
+    getPrivateKeyOrSeed();
   }, []);
+
+  const openModal = () => {
+    setIsOpen(true);
+    setHideKeys(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setHideKeys(true);
+  };
 
   const toggleShowSites = () => {
     setShowSites(!showSites);
+  };
+
+  const getAccount = async () => {
+    try {
+      const account = await getSelectedAccount();
+      setAccount(account);
+    } catch (error) {
+      showErrorToast(tCommon(error as string));
+    }
+  };
+
+  const getPrivateKeyOrSeed = async (): Promise<void> => {
+    try {
+      let privateKeyOrSeed: string | undefined =
+        await Extension.showPrivateKey();
+      if (!privateKeyOrSeed) {
+        privateKeyOrSeed = await Extension.showSeed();
+      }
+      if (!privateKeyOrSeed) {
+        throw new Error("no_private_key_or_seed");
+      }
+      setPrivateKey(privateKeyOrSeed);
+    } catch (error: unknown) {
+      if (typeof error === "string") {
+        showErrorToast(tCommon(error));
+      }
+    }
   };
 
   const getSites = async () => {
@@ -66,7 +115,7 @@ export const Security = () => {
       </div>
       <div className="flex flex-col mt-5 gap-2">
         <div className="flex justify-between items-center">
-          <p className="text-lg font-medium mb-5">{t("trusted_sites")}</p>
+          <p className="text-lg font-medium">{t("trusted_sites")}</p>
           <div className="p-2">
             {showSites ? (
               <FiChevronUp
@@ -121,7 +170,7 @@ export const Security = () => {
           </>
         )}
         <div className="flex justify-between items-center">
-          <p className="text-lg font-medium mb-5">{t("credentials")}</p>
+          <p className="text-lg font-medium">{t("credentials")}</p>
           <div className="p-2">
             <button
               type="button"
@@ -130,6 +179,96 @@ export const Security = () => {
             >
               {t("restore_password")}
             </button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <p className="text-lg font-medium">{t("show_account_keys")}</p>
+          <div className="p-2">
+            <div className="relative inset-0 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={openModal}
+                className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+              >
+                {t("show")}
+              </button>
+            </div>
+            <Transition appear show={isOpen} as={Fragment}>
+              <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+                <div className="fixed inset-0 overflow-y-auto">
+                  <div className="flex min-h-full items-center justify-center p-4 text-center">
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0 scale-95"
+                      enterTo="opacity-100 scale-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100 scale-100"
+                      leaveTo="opacity-0 scale-95"
+                    >
+                      <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-custom-gray-bg p-6 text-left align-middle shadow-xl transition-all">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-lg font-medium leading-6 text-white"
+                        >
+                          {account?.value.name}
+                        </Dialog.Title>
+                        <div className="flex flex-col mt-4">
+                          <p className="text-sm text-white text-center break-all rounded-lg border p-2 bg-custom-gray-bg border-custom-green-bg">
+                            {account?.value.address}
+                          </p>
+                          <div className="relative my-8">
+                            <textarea
+                              className="text-sm h-[100px] rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none relative select-none"
+                              value={privateKey}
+                              aria-readonly={true}
+                              readOnly={true}
+                              disabled
+                              onSelect={(e) => e.preventDefault()}
+                              onCopy={(e) => e.preventDefault()}
+                            />
+                            {hideKeys && (
+                              <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
+                                <button
+                                  className="flex flex-col items-center"
+                                  onClick={() => setHideKeys(false)}
+                                >
+                                  <p>{t("show_account_keys")}</p>
+                                  <BsEye size={18} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-custom-red-bg">
+                            {t("account_keys_description")}
+                          </p>
+                          <div className="mt-4 flex justify-end">
+                            <button
+                              type="button"
+                              onClick={closeModal}
+                              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-green-bg hover:bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                            >
+                              {tCommon("close")}
+                            </button>
+                          </div>
+                        </div>
+                      </Dialog.Panel>
+                    </Transition.Child>
+                  </div>
+                </div>
+              </Dialog>
+            </Transition>
           </div>
         </div>
       </div>

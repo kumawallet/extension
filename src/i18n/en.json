@@ -53,7 +53,9 @@
     "delete": "Delete",
     "connect": "Connect",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "open": "Open",
+    "close": "Close"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -204,6 +206,9 @@
     "no_trusted_sites": "No trusted sites",
     "search": "Search sites by URL",
     "credentials": "Credentials",
-    "restore_password": "Restore password"
+    "restore_password": "Restore password",
+    "show_account_keys": "Show account keys",
+    "show": "Show",
+    "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account."
   }
 }

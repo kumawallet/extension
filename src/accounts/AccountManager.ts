@@ -44,7 +44,7 @@ export default class AccountManager {
       const n = await Accounts.count();
       name = `Account ${n + 1}`;
     }
-    const value = { name, address, keyring: key };
+    const value = { name, address, keyring: keyring.key };
     const account = new Account(key, value);
     await Accounts.add(account);
     await Keyring.save(keyring);

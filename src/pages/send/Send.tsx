@@ -8,7 +8,6 @@ import { number, object, string } from "yup";
 import { useToast } from "@src/hooks";
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { useNavigate } from "react-router-dom";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { isHex } from "@polkadot/util";
 import { isAddress } from "ethers/lib/utils";
 import { WasmForm } from "./components/WasmForm";
@@ -19,6 +18,7 @@ import { ethers } from "ethers";
 import { ConfirmTx } from "./components";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BALANCE } from "../../routes/paths";
+import { FiChevronLeft } from "react-icons/fi";
 
 export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
 
@@ -144,7 +144,7 @@ export const Send = () => {
         {!tx ? (
           <div className="mx-auto">
             <div className="flex gap-3 items-center mb-7">
-              <BiLeftArrowAlt
+              <FiChevronLeft
                 size={26}
                 className="cursor-pointer"
                 onClick={() => navigate(-1)}
