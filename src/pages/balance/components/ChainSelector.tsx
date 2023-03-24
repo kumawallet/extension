@@ -89,6 +89,12 @@ export const ChainSelector = () => {
           data-testid="chain-button"
           className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
+          <img
+            src={`/images/${selectedChain.logo}.png`}
+            width={24}
+            height={24}
+            className="object-cover rounded-full"
+          />
           <p>{selectedChain?.name}</p>
           <BsChevronDown />
         </Menu.Button>
@@ -106,9 +112,8 @@ export const ChainSelector = () => {
               <div className="flex flex-col gap-1">
                 {Object.keys(chains).map((spec) => (
                   <div key={spec}>
-                    {chains[
-                      spec as "mainnets" | "testnets" | "custom"
-                    ].length > 0 && (
+                    {chains[spec as "mainnets" | "testnets" | "custom"].length >
+                      0 && (
                       <div className="flex items-center gap-3 whitespace-nowrap">
                         <p className="text-[#808385] text-lg">
                           {t(`chain_selector.${spec}`)}
@@ -116,30 +121,37 @@ export const ChainSelector = () => {
                         <div className="h-[1px] w-full bg-[#343A40]" />
                       </div>
                     )}
-                    {chains[
-                      spec as "mainnets" | "testnets" | "custom"
-                    ].map((chain, index) => (
-                      <Menu.Item key={index.toString()}>
-                        {({ close }) => (
-                          <div
-                            className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
-                            onClick={() => {
-                              selecteNetwork(chain, close);
-                            }}
-                          >
-                            <div className="w-5 h-5 rounded-full bg-gray-400" />
-                            <div className="flex gap-3 items-center">
-                              <p className="text-xl">{chain.name}</p>
-                              {chain.name === selectedChain?.name && (
-                                <p className="text-[#56DF53]">
-                                  {t("chain_selector.connected")}
-                                </p>
-                              )}
+                    {chains[spec as "mainnets" | "testnets" | "custom"].map(
+                      (chain, index) => (
+                        <Menu.Item key={index.toString()}>
+                          {({ close }) => (
+                            <div
+                              className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                              onClick={() => {
+                                selecteNetwork(chain, close);
+                              }}
+                            >
+                              <img
+                                src={`/images/${chain.logo}.png`}
+                                width={30}
+                                height={30}
+                                alt={chain.name}
+                                className="object-cover rounded-full"
+                              />
+                              {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
+                              <div className="flex gap-3 items-center">
+                                <p className="text-xl">{chain.name}</p>
+                                {chain.name === selectedChain?.name && (
+                                  <p className="text-[#56DF53]">
+                                    {t("chain_selector.connected")}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </Menu.Item>
-                    ))}
+                          )}
+                        </Menu.Item>
+                      )
+                    )}
                   </div>
                 ))}
               </div>
