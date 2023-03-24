@@ -2,13 +2,17 @@ import { AccountType } from "@src/accounts/types";
 import { Loading, LoadingButton } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
-import { useNetworkContext } from "@src/providers";
-import { ethers } from "ethers";
+import { useAssetContext, useNetworkContext } from "@src/providers";
+import { formatBN } from "@src/utils/assets";
+import { ethers, Wallet } from "ethers";
 import { FC, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { confirmTx, evmTx } from "../Send";
 import { CommonFormFields } from "./CommonFormFields";
+import erc20abi from "@src/constants/erc20.abi.json";
+
+const BN0 = ethers.BigNumber.from(0);
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -18,7 +22,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
 
   const {
-    state: { api },
+    state: { api, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -27,25 +31,33 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     formState: { errors },
   } = useFormContext();
 
+  const {
+    state: { assets },
+  } = useAssetContext();
+
   const { showErrorToast } = useToast();
 
   const [fee, setFee] = useState({
-    "gas limit": "0",
-    "max fee per gas": "0",
-    "max base fee per gas": "0",
-    "max priority fee per gas": "0",
-    "estimated fee": "0",
-    "estimated total": "0",
+    "gas limit": BN0,
+    "max fee per gas": BN0,
+    "max base fee per gas": BN0,
+    "max priority fee per gas": BN0,
+    "estimated fee": BN0,
+    "estimated total": BN0,
   });
   const [isLoadingFee, setIsLoadingFee] = useState(false);
   const [wallet, setWallet] = useState<ethers.Wallet | null>(null);
-  const [evmTx, setEvmTx] = useState<evmTx | null>(null);
+  const [evmTx, setEvmTx] = useState<evmTx | ethers.Contract | null>(null);
 
   const _api = api as ethers.providers.JsonRpcProvider;
-
+  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
+  const asset = watch("asset");
+  const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
+  const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
   useEffect(() => {
     (async () => {
@@ -61,66 +73,96 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   }, []);
 
   useEffect(() => {
-    if (!evmTx?.to) return;
+    if (destinationIsInvalid || !destinationAccount || amount <= 0) return;
     (async () => {
       setIsLoadingFee(true);
+
       try {
-        const [feeData, gasLimit] = await Promise.all([
-          _api.getFeeData(),
-          _api.estimateGas(evmTx),
-        ]);
+        const _amount = isNativeAsset
+          ? amount * currencyUnits
+          : amount * 10 ** asset.decimals;
 
-        const _gasLimit = Number(gasLimit);
-        const _maxFeePerGas = Number(feeData.maxFeePerGas);
-        const _lastBaseFeePerGas = Number(feeData.lastBaseFeePerGas);
-        const _maxPriorityFeePerGas = Number(feeData.maxPriorityFeePerGas);
-
-        const avg = ethers.utils.formatUnits(
-          (_maxFeePerGas + _maxPriorityFeePerGas) / 2,
-          "gwei"
+        const bnAmount = ethers.BigNumber.from(
+          _amount.toLocaleString("fullwide", { useGrouping: false })
         );
+        if (isNativeAsset) {
+          let tx: evmTx = {
+            to: destinationAccount,
+            value: bnAmount,
+          };
 
-        const _estimatedFee = ethers.utils.formatUnits(_gasLimit * avg, "gwei");
+          const [feeData, gasLimit] = await Promise.all([
+            _api.getFeeData(),
+            _api.estimateGas(tx),
+          ]);
 
-        setFee((state) => ({
-          ...state,
-          "gas limit": ethers.utils.formatUnits(_gasLimit, "gwei").toString(),
-          "max fee per gas": ethers.utils.formatUnits(_maxFeePerGas).toString(),
-          "max base fee per gas": ethers.utils
-            .formatUnits(_lastBaseFeePerGas)
-            .toString(),
-          "max priority fee per gas": ethers.utils
-            .formatUnits(_maxPriorityFeePerGas)
-            .toString(),
-          "estimated fee": _estimatedFee.toString(),
-        }));
+          const _gasLimit = gasLimit;
+          const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+          const _maxPriorityFeePerGas =
+            feeData.maxPriorityFeePerGas as ethers.BigNumber;
+          tx = {
+            ...tx,
+            gasLimit: _gasLimit,
+            maxFeePerGas: _maxFeePerGas,
+            maxPriorityFeePerGas: _maxPriorityFeePerGas,
+            type: 2,
+            value: bnAmount,
+          };
 
-        setEvmTx((prevState) => ({
-          ...prevState,
-          gasLimit,
-          maxFeePerGas: feeData.maxFeePerGas,
-          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-        }));
+          const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+          const estimatedTotal = avg.mul(_gasLimit);
+
+          setFee({
+            "gas limit": _gasLimit,
+            "max fee per gas": _maxFeePerGas,
+            "max priority fee per gas": _maxPriorityFeePerGas,
+            "estimated fee": avg,
+            "estimated total": estimatedTotal,
+          });
+
+          setEvmTx(tx);
+        } else {
+          console.log("load contract", asset);
+          const contract = new ethers.Contract(
+            asset?.address,
+            erc20abi,
+            wallet as Wallet
+          );
+
+          const feeData = await _api.getFeeData();
+          const gasLimit = await contract.estimateGas.transfer(
+            destinationAccount,
+            bnAmount
+          );
+
+          const _gasLimit = gasLimit;
+          const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+          const _maxPriorityFeePerGas =
+            feeData.maxPriorityFeePerGas as ethers.BigNumber;
+
+          const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+          const estimatedTotal = avg.mul(_gasLimit);
+
+          setFee({
+            "gas limit": _gasLimit,
+            "max fee per gas": feeData.maxFeePerGas as any,
+            "max priority fee per gas": feeData.maxPriorityFeePerGas as any,
+            "estimated fee": avg,
+            "estimated total": estimatedTotal,
+          });
+
+          setEvmTx(contract);
+          // const tx = await contract.transfer(destinationAccount, bnAmount, {
+          //   gasLimit: _gasLimit,
+          // });
+        }
       } catch (error) {
         showErrorToast(error);
       } finally {
         setIsLoadingFee(false);
       }
     })();
-  }, [evmTx?.to]);
-
-  useEffect(() => {
-    if (destinationIsInvalid) {
-      setEvmTx({});
-      return;
-    }
-
-    setEvmTx((prevState) => ({
-      ...prevState,
-      value: amount,
-      to: destinationAccount || "",
-    }));
-  }, [amount, destinationAccount, destinationIsInvalid]);
+  }, [destinationAccount, destinationIsInvalid, amount, asset?.id]);
 
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
@@ -129,21 +171,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       type: AccountType.EVM,
       tx: {
         ...evmTx,
-        value: amount,
       },
-      // aditional,
+      fee,
       sender: wallet as ethers.Wallet,
     });
   });
-
-  useEffect(() => {
-    const total = Number(amount) + Number(fee["estimated fee"]) || 0;
-
-    setFee((state) => ({
-      ...state,
-      "estimated total": String(total),
-    }));
-  }, [amount, fee["estimated fee"]]);
 
   return (
     <>
@@ -153,12 +185,39 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         <Loading />
       ) : (
         <div className="flex flex-col gap-1">
-          {Object.keys(fee).map((key) => (
-            <div key={key} className="flex justify-between">
-              <p>{key}</p>
-              <p className="font-bold">{fee[key]}</p>
-            </div>
-          ))}
+          <div className="flex justify-between">
+            <p>{t("gas_limit")}</p>
+            <p className="font-bold">{String(fee["gas limit"])} gwei</p>
+          </div>
+          <div className="flex justify-between">
+            <p>{t("estimated_fee")}</p>
+            <p className="font-bold">{`${formatBN(
+              fee["estimated fee"].toString(),
+              asset?.decimals
+            )} ${nativeSymbol}`}</p>
+          </div>
+          <div className="flex justify-between">
+            <p>{t("estimated_total")}</p>
+            {isNativeAsset ? (
+              <>
+                <p className="font-bold">
+                  {`${formatBN(
+                    fee["estimated total"].toString(),
+                    decimals
+                  )} ${nativeSymbol}`}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-bold">{`${amount} ${
+                  asset?.symbol
+                } + ${formatBN(
+                  fee["estimated total"].toString(),
+                  decimals
+                )} ${nativeSymbol}`}</p>
+              </>
+            )}
+          </div>
         </div>
       )}
 

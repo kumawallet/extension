@@ -15,7 +15,7 @@ import AccountEntity from "@src/storage/entities/Account";
 import { Chain } from "../../storage/entities/Chains";
 import { u8aToString } from "@polkadot/util";
 import Extension from "@src/Extension";
-import erc20Abi from "./erc20.abi.json";
+import erc20Abi from "@src/constants/erc20.abi.json";
 
 interface InitialState {
   assets: Asset[];

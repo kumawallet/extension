@@ -216,7 +216,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
             {isNativeAsset ? (
               <>
                 <p className="font-bold">
-                  {`${formatBN(fee["estimated total"].toString(), decimals)} `}
+                  {`${formatBN(
+                    fee["estimated total"].toString(),
+                    decimals
+                  )} ${nativeSymbol}`}
                 </p>
               </>
             ) : (

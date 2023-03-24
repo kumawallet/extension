@@ -100,6 +100,9 @@ export const Send = () => {
 
   const { getValues } = methods;
 
+  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const currencyUnits = 10 ** decimals;
+
   const sendTx = async () => {
     setIsLoading(true);
     const amount = getValues("amount");
@@ -113,12 +116,33 @@ export const Send = () => {
           tx,
         });
       } else {
-        const value = ethers.utils.parseEther(amount);
+        const asset = getValues("asset");
+        const isNativeAsset = asset?.id === "-1";
+        let _tx;
+        if (asset?.id === "-1") {
+          _tx = await tx?.sender.sendTransaction({
+            ...tx.tx,
+          });
+        } else {
+          const _amount = isNativeAsset
+            ? amount * currencyUnits
+            : amount * 10 ** asset.decimals;
 
-        const _tx = await tx?.sender.sendTransaction({
-          ...tx.tx,
-          value,
-        });
+          const bnAmount = ethers.BigNumber.from(
+            _amount.toLocaleString("fullwide", { useGrouping: false })
+          );
+
+          _tx = await (tx?.tx as ethers.Contract).transfer(
+            destinationAccount,
+            bnAmount,
+            {
+              gasLimit: tx.fee["gas limit"],
+              maxFeePerGas: tx.fee["max fee per gas"],
+              maxPriorityFeePerGas: tx.fee["max priority fee per gas"],
+              type: 2,
+            }
+          );
+        }
         addTxToQueue({
           amount,
           destinationAccount,
@@ -132,8 +156,8 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
-      showErrorToast(_err || error);
+      // const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
+      showErrorToast(error);
     }
     setIsLoading(false);
   };
