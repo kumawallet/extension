@@ -4531,13 +4531,6 @@ react-router@6.9.0:
   dependencies:
     "@remix-run/router" "1.4.0"
 
-react-switch@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/react-switch/-/react-switch-7.0.0.tgz#400990bb9822864938e343ed24f13276a617bdc0"
-  integrity sha512-KkDeW+cozZXI6knDPyUt3KBN1rmhoVYgAdCJqAh7st7tk8YE6N0iR89zjCWO8T8dUTeJGTR0KU+5CHCRMRffiA==
-  dependencies:
-    prop-types "^15.7.2"
-
 react-toastify@^9.1.1:
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-9.1.1.tgz#9280caea4a13dc1739c350d90660a630807bf10b"

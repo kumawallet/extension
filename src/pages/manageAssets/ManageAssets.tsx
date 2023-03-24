@@ -4,7 +4,6 @@ import {
   PageWrapper,
 } from "@src/components/common";
 import { useTranslation } from "react-i18next";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import { useNetworkContext } from "@src/providers/networkProvider/NetworkProvider";
@@ -16,6 +15,7 @@ import { number, object, string } from "yup";
 import { isHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { FiChevronLeft } from "react-icons/fi";
 
 interface AssetForm {
   address: string;
@@ -78,7 +78,7 @@ export const ManageAssets = () => {
     <>
       <PageWrapper>
         <div className="flex gap-3 items-center mb-7">
-          <BiLeftArrowAlt
+          <FiChevronLeft
             size={26}
             className="cursor-pointer"
             onClick={() => navigate(-1)}

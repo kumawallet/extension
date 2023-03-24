@@ -2,10 +2,9 @@ import { useState } from "react";
 import { PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import QRCode from "react-qr-code";
 import { QR_CODE_SIZE } from "@src/constants/icons";
-import { FiCopy } from "react-icons/fi";
+import { FiChevronLeft, FiCopy } from "react-icons/fi";
 import { useClick, useInteractions, useFloating } from "@floating-ui/react";
 import { useAccountContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
@@ -40,7 +39,7 @@ export const Receive = () => {
   return (
     <PageWrapper>
       <div className="flex gap-3 items-center mb-7">
-        <BiLeftArrowAlt
+        <FiChevronLeft
           size={26}
           className="cursor-pointer"
           onClick={() => navigate(-1)}

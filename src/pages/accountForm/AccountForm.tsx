@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
@@ -18,6 +17,7 @@ import {
   PageWrapper,
   SucessMessage,
 } from "@src/components/common";
+import { FiChevronLeft } from "react-icons/fi";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -183,7 +183,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     <PageWrapper>
       <div className="flex gap-3 items-center">
         {backButton && (
-          <BiLeftArrowAlt
+          <FiChevronLeft
             size={26}
             className="cursor-pointer"
             onClick={() => navigate(-1)}

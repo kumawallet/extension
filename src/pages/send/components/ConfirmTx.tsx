@@ -3,11 +3,11 @@ import { LoadingButton } from "@src/components/common";
 import { cropAccount } from "@src/utils/account-utils";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Tx } from "../Send";
 import { useAccountContext } from "@src/providers";
+import { FiChevronLeft } from "react-icons/fi";
 
 interface ConfirmTxProps {
   tx: Tx;
@@ -37,7 +37,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
   return (
     <div className="mx-auto px-2">
       <div className="flex gap-3 items-center mb-7">
-        <BiLeftArrowAlt
+        <FiChevronLeft
           size={26}
           className="cursor-pointer"
           onClick={() => navigate(-1)}

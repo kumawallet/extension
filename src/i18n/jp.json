@@ -53,7 +53,9 @@
     "delete": "削除",
     "connect": "接続",
     "show": "表示",
-    "hide": "非表示"
+    "hide": "非表示",
+    "open": "開く",
+    "close": "閉じる"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -204,6 +206,9 @@
     "no_trusted_sites": "信頼済みサイトはありません",
     "search": "URLでサイトを検索する",
     "credentials": "資格情報",
-    "restore_password": "パスワードを復元する"
+    "restore_password": "パスワードを復元する",
+    "show_account_keys": "アカウントキーを表示する",
+    "show": "表示",
+    "account_keys_description": "警告: このパスワードを機密に保つようにしてください。プライベートキーを共有すると、アカウントの資産が失われる可能性があります。"
   }
 }

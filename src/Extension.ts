@@ -143,14 +143,14 @@ export default class Extension {
 
   static async showPrivateKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.key) return undefined;
-    return Vault.showPrivateKey(selectedAccount.key);
+    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
+    return Vault.showPrivateKey(selectedAccount.value.keyring);
   }
 
   static async showSeed(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.key) return undefined;
-    return Vault.showSeed(selectedAccount.key);
+    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
+    return Vault.showSeed(selectedAccount.value.keyring);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {

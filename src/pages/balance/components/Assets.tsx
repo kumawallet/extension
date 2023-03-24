@@ -8,7 +8,7 @@ import { BsArrowUpRight } from "react-icons/bs";
 import { Asset, useAssetContext } from "@src/providers/assetProvider";
 import { useNetworkContext } from "@src/providers";
 import { Loading } from "@src/components/common";
-import Switch from 'react-switch';
+import { Switch } from "@headlessui/react";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -39,24 +39,27 @@ export const Assets = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center mb-2 justify-end">
-        <label htmlFor="default-checkbox" className="mr-2 text-xs font-medium">
-          {t("show_all_assets")}
-        </label>
-        <Switch
-          id="default-switch"
-          className="react-switch"
-          checked={showAllAssets}
-          onChange={() => setShowAllAssets(!showAllAssets)}
-          onColor="#343A40"
-          onHandleColor="#469999"
-          handleDiameter={10}
-          height={16}
-          width={32}
-          uncheckedIcon={false}
-          checkedIcon={false}
-          boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-          activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-        />
+        <Switch.Group>
+          <div className="flex items-center">
+            <Switch.Label className="mr-2 text-xs font-medium">
+              {t("show_all_assets")}
+            </Switch.Label>
+            <Switch
+              checked={showAllAssets}
+              onChange={() => setShowAllAssets(!showAllAssets)}
+              className={`${
+                showAllAssets ? "bg-custom-green-bg" : "bg-custom-gray-bg"
+              } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
+            >
+              <span className="sr-only">{t("show_all_assets")}</span>
+              <span
+                className={`${
+                  showAllAssets ? "translate-x-6" : "translate-x-1"
+                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
+              />
+            </Switch>
+          </div>
+        </Switch.Group>
       </div>
 
       {isLoadingAssets && <Loading />}
