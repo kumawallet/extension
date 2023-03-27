@@ -153,7 +153,8 @@
   "general_settings": {
     "title": "General",
     "languages": "Languages",
-    "manage_networks": "Manage networks"
+    "manage_networks": "Manage networks",
+    "show_testnets": "Show testnets"
   },
   "advanced_settings": {
     "title": "Advanced"

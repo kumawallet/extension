@@ -7,10 +7,15 @@ import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
-import { Language, SettingKey } from "@src/storage/entities/settings/types";
+import {
+  Language,
+  SettingKey,
+  SettingType,
+} from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
 import { BsGear } from "react-icons/bs";
 import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
+import { Switch } from "@headlessui/react";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -19,6 +24,7 @@ export const General = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState([] as Setting[]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [showTestnets, setShowTestnets] = useState(false);
   const { showErrorToast } = useToast();
 
   useEffect(() => {
@@ -30,13 +36,25 @@ export const General = () => {
     try {
       const settings = await Extension.getGeneralSettings();
       setSettings(settings);
-      setSelectedLanguage(getSelectedLanguage(settings[0].value as Language[]));
+      const laguagesSetting = getSettingByName(settings, SettingKey.LANGUAGES)
+        ?.value as Language[];
+      const showTestnetsSetting = getSettingByName(
+        settings,
+        SettingKey.SHOW_TESTNETS
+      )?.value as boolean;
+      setSelectedLanguage(getSelectedLanguage(laguagesSetting));
+      setShowTestnets(showTestnetsSetting);
     } catch (error) {
       setSettings([]);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getSettingByName = (settings: Setting[], name: SettingKey) => {
+    if (!settings) return undefined;
+    return settings.find((setting) => setting.name === name);
   };
 
   const getSelectedLanguage = (languages: Language[]) => {
@@ -52,6 +70,25 @@ export const General = () => {
       setSelectedLanguage(language);
       i18n.changeLanguage(language || "en");
       i18nCommon.changeLanguage(language || "en");
+    } catch (error) {
+      showErrorToast(tCommon(error as string));
+    }
+  };
+
+  const changeShowTestnets = async () => {
+    try {
+      const showTestnetsSetting = settings.find(
+        (setting) => setting.name === SettingKey.SHOW_TESTNETS
+      );
+      if (showTestnetsSetting) {
+        settings[settings.indexOf(showTestnetsSetting)].value = !showTestnets;
+        setShowTestnets(!showTestnets);
+        await Extension.updateSetting(
+          SettingType.GENERAL,
+          SettingKey.SHOW_TESTNETS,
+          !showTestnets
+        );
+      }
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
@@ -106,6 +143,37 @@ export const General = () => {
                   >
                     <BsGear color="white" size={ICON_SIZE} />
                   </button>
+                </div>
+              );
+            case SettingKey.SHOW_TESTNETS:
+              return (
+                <div
+                  key={index}
+                  className="flex justify-between items-center gap-2"
+                >
+                  <p className="text-lg font-medium">{t(setting.name)}</p>
+                  <div className="flex items-center justify-end">
+                    <Switch.Group>
+                      <div className="flex items-center">
+                        <Switch
+                          checked={showTestnets}
+                          onChange={changeShowTestnets}
+                          className={`${
+                            showTestnets
+                              ? "bg-custom-green-bg"
+                              : "bg-custom-gray-bg"
+                          } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
+                        >
+                          <span className="sr-only">{t("show_testnets")}</span>
+                          <span
+                            className={`${
+                              showTestnets ? "translate-x-6" : "translate-x-1"
+                            } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
+                          />
+                        </Switch>
+                      </div>
+                    </Switch.Group>
+                  </div>
                 </div>
               );
           }

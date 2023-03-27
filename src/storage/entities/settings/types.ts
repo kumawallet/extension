@@ -13,5 +13,6 @@ export enum SettingType {
 export enum SettingKey {
   LANGUAGES = "languages",
   MANAGE_NETWORKS = "manage_networks",
+  SHOW_TESTNETS = "show_testnets",
 }
 export type SettingValue = string | Language[] | number | boolean;

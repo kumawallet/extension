@@ -27,6 +27,7 @@ export default class Settings extends BaseEntity {
     );
     // this setting does not have a value (the true is just a placeholder)
     settings.addToGeneral(SettingKey.MANAGE_NETWORKS, true);
+    settings.addToGeneral(SettingKey.SHOW_TESTNETS, false);
     await Settings.set(settings);
   }
 

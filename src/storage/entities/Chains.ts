@@ -73,11 +73,8 @@ export default class Chains extends BaseEntity {
   static async saveCustomChain(chain: Chain) {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_save_custom_chain");
-    console.log("chains", chains);
-    console.log("chain", chain);
     if (chains.isAlreadyAdded(chain)) throw new Error("chain_already_added");
     chains.custom = [...chains.custom, chain];
-    console.log("chains updated", chains);
     await Chains.set<Chains>(chains);
   }
 

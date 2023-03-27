@@ -153,7 +153,8 @@
   "general_settings": {
     "title": "General",
     "languages": "Idiomas",
-    "manage_networks": "Adminsitrar redes"
+    "manage_networks": "Adminsitrar redes",
+    "show_testnets": "Mostrar redes de prueba"
   },
   "advanced_settings": {
     "title": "Avanzado"

@@ -10,7 +10,7 @@ import Auth from "./storage/Auth";
 import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
-import { SettingType } from "./storage/entities/settings/types";
+import { SettingKey, SettingType } from "./storage/entities/settings/types";
 import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
 import Record from "./storage/entities/activity/Record";
@@ -215,6 +215,19 @@ export default class Extension {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.getAll(SettingType.ADVANCED);
+  }
+
+  static async getSetting(type: SettingType, key: SettingKey): Promise<Setting | undefined> {
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
+    return settings.get(type, key);
+  }
+
+  static async updateSetting(type: SettingType, key: SettingKey, value: any) {
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
+    settings.update(type, key, value);
+    await Settings.set<Settings>(settings);
   }
 
   static async getContacts(): Promise<Contact[]> {
