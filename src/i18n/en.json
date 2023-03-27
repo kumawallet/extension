@@ -210,6 +210,9 @@
     "restore_password": "Restore password",
     "show_account_keys": "Show account keys",
     "show": "Show",
-    "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account."
+    "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account.",
+    "reset_wallet": "Reset Kuma Wallet",
+    "reset_wallet_warning": "Warning: This action will delete all your accounts and data from the extension. All your assets are safe as they are NOT stored on the extension. You will need to restore your accounts using the seed phrase.",
+    "reset": "Reset"
   }
 }

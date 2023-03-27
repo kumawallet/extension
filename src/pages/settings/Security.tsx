@@ -8,7 +8,7 @@ import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { BsEye, BsTrash } from "react-icons/bs";
-import { RESTORE_PASSWORD } from "@src/routes/paths";
+import { CREATE_ACCOUNT, RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
@@ -22,6 +22,7 @@ export const Security = () => {
   const [showSites, setShowSites] = useState(false);
   const [search, setSearch] = useState("" as string);
   const [isOpen, setIsOpen] = useState(false);
+  const [isResetOpen, setIsResetOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState("" as string);
   const [hideKeys, setHideKeys] = useState(true);
   const [account, setAccount] = useState(
@@ -45,6 +46,23 @@ export const Security = () => {
   const closeModal = () => {
     setIsOpen(false);
     setHideKeys(true);
+  };
+
+  const openResetModal = () => {
+    setIsResetOpen(true);
+  };
+
+  const closeResetModal = () => {
+    setIsResetOpen(false);
+  };
+
+  const resetWallet = async () => {
+    try {
+      await Extension.resetWallet();
+      navigate("/");
+    } catch (error) {
+      showErrorToast(tCommon(error as string));
+    }
   };
 
   const toggleShowSites = () => {
@@ -260,6 +278,71 @@ export const Security = () => {
                               className="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-green-bg hover:bg-custom-green-bg px-4 py-2 text-sm font-medium"
                             >
                               {tCommon("close")}
+                            </button>
+                          </div>
+                        </div>
+                      </Dialog.Panel>
+                    </Transition.Child>
+                  </div>
+                </div>
+              </Dialog>
+            </Transition>
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <p className="text-lg font-medium">{t("reset_wallet")}</p>
+          <div className="p-2">
+            <div className="relative inset-0 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={openResetModal}
+                className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
+              >
+                {t("reset")}
+              </button>
+            </div>
+            <Transition appear show={isResetOpen} as={Fragment}>
+              <Dialog as="div" className="relative z-10" onClose={closeResetModal}>
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+                <div className="fixed inset-0 overflow-y-auto">
+                  <div className="flex min-h-full items-center justify-center p-4 text-center">
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0 scale-95"
+                      enterTo="opacity-100 scale-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100 scale-100"
+                      leaveTo="opacity-0 scale-95"
+                    >
+                      <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-custom-gray-bg p-6 text-left align-middle shadow-xl transition-all">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-lg font-medium leading-6 text-white"
+                        >
+                          {t("reset_wallet")}
+                        </Dialog.Title>
+                        <div className="flex flex-col mt-4">
+                          <p className="text-sm font-medium text-custom-red-bg">
+                            {t("reset_wallet_warning")}
+                          </p>
+                          <div className="mt-4 flex justify-end">
+                            <button
+                              type="button"
+                              onClick={resetWallet}
+                              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-red-bg hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
+                            >
+                              {t("reset")}
                             </button>
                           </div>
                         </div>

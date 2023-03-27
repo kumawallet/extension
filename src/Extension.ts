@@ -104,6 +104,12 @@ export default class Extension {
     AccountManager.changeName(key, newName);
   }
 
+  static async resetWallet() {
+    if (!Auth.isUnlocked) throw new Error("wallet_not_unlocked");
+    await Storage.getInstance().resetWallet();
+    localStorage.removeItem("welcome");
+  }
+
   static async signIn(password: string) {
     try {
       const vault = await Vault.getEncryptedVault();

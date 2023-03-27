@@ -14,7 +14,6 @@ import { useToast } from "@src/hooks";
 import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
 import Chains, { Chain } from "@src/storage/entities/Chains";
-import { AccountType } from "@src/accounts/types";
 
 const initialState: InitialState = {
   chains: Chains.getInstance(),

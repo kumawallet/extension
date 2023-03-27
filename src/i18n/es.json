@@ -210,6 +210,9 @@
     "restore_password": "Restablecer contraseña",
     "show_account_keys": "Show account keys",
     "show": "Show",
-    "account_keys_description": "Advertencia: Mantén esta contraseña confidencial. Compartir tus claves privadas podría llevar a la pérdida de los activos de tu cuenta."
+    "account_keys_description": "Advertencia: Mantén esta contraseña confidencial. Compartir tus claves privadas podría llevar a la pérdida de los activos de tu cuenta.",
+    "reset_wallet": "Resetear Kuma Wallet",
+    "reset_wallet_warning": "Advertencia: Esta acción eliminará todas tus cuentas y datos de la extensión. Todos tus activos están seguros ya que NO se almacenan en la extensión. Necesitarás restaurar tus cuentas usando la frase semilla.",
+    "reset": "Resetear"
   }
 }
