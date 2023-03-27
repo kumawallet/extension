@@ -15,9 +15,7 @@ export const getNatitveAssetBalance = async (
       const { data }: any =
         (await api.query.system?.account(accountAddress)) || {};
 
-      _amount = data?.free;
-      const _decimals = 10 ** decimals;
-      _amount = _amount ? Number(_amount) / _decimals : 0;
+      return data.free;
     }
 
     if ("getBalance" in api) {
@@ -49,8 +47,12 @@ export const getAssetUSDPrice = async (assetName: string) => {
   }
 };
 
-export const formatAmountWithDecimals = (amount: number, decimals = 0) => {
-  return Number((amount || 0).toFixed(decimals));
+export const formatAmountWithDecimals = (
+  amount: number,
+  decimals = 0,
+  assetDecimals = 0
+) => {
+  return Number((amount / 10 ** assetDecimals || 0).toFixed(decimals));
 };
 
 export const formatBN = (bn: string, decimals: number) => {

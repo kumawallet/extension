@@ -39,6 +39,7 @@
     "@hookform/resolvers": "^2.9.11",
     "@metamask/browser-passworder": "^4.0.2",
     "@polkadot/api": "^9.14.2",
+    "@polkadot/api-contract": "^10.2.1",
     "@polkadot/ui-keyring": "^2.12.1",
     "@polkadot/util": "^10.4.2",
     "@polkadot/util-crypto": "^10.4.2",

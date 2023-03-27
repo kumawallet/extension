@@ -1,29 +1,30 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { ImCoinDollar } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
 import { BsArrowUpRight } from "react-icons/bs";
-import { Asset, useAssetContext } from "@src/providers/assetProvider";
-import { useNetworkContext } from "@src/providers";
+import { useAssetContext, useNetworkContext } from "@src/providers";
 import { Loading } from "@src/components/common";
 import { Switch } from "@headlessui/react";
+import { ApiPromise } from "@polkadot/api";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
-    state: { type },
+    state: { type, api },
   } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
+  const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    let _assets: Asset[] = assets;
+    let _assets: any[] = assets;
 
     if (!showAllAssets) {
       _assets = _assets.filter((asset) => {
@@ -35,6 +36,21 @@ export const Assets = () => {
 
     return _assets;
   }, [assets, showAllAssets]);
+
+  useEffect(() => {
+    if (!type || !api) {
+      setShowManageAssets(false);
+      return;
+    }
+
+    if (type === "EVM") {
+      setShowManageAssets(true);
+    }
+
+    if (type === "WASM" && (api as ApiPromise).query.contracts) {
+      setShowManageAssets(true);
+    }
+  }, [type, api]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -73,7 +89,11 @@ export const Assets = () => {
             <div className="w-6 h-6 bg-black rounded-full" />
             <div className="flex gap-1 items-center">
               <p className="font-bold text-xl">
-                {formatAmountWithDecimals(asset.balance, 6)}
+                {formatAmountWithDecimals(
+                  Number(asset.balance),
+                  6,
+                  asset.decimals
+                )}
               </p>
               <p className="tx-sm">{asset.symbol}</p>
             </div>
@@ -88,7 +108,7 @@ export const Assets = () => {
         </div>
       ))}
 
-      {type === "EVM" && (
+      {showManageAssets && (
         <div className="flex justify-center mt-2">
           <button
             className="flex gap-2 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-custom-green-bg hover:bg-opacity-30"

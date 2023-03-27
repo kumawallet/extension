@@ -3,7 +3,11 @@ import { LoadingButton, Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useAssetContext,
+  useNetworkContext,
+} from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import Extension from "@src/Extension";
 import { Keyring } from "@polkadot/keyring";
@@ -13,9 +17,11 @@ import { AccountType } from "@src/accounts/types";
 import { NumericFormat } from "react-number-format";
 import { confirmTx, polkadotExtrinsic } from "../Send";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { ISubmittableResult } from "@polkadot/types/types";
 import { BN } from "bn.js";
-import { formatBN } from "../../../utils/assets";
+import { formatBN } from "@src/utils/assets";
+import { ContractPromise } from "@polkadot/api-contract";
+import metadata from "@src/constants/metadata.json";
+import { ContractTx } from "@polkadot/api-contract/base/types";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -30,18 +36,22 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
 
   const {
+    state: { selectedAccount },
+  } = useAccountContext();
+
+  const {
     state: { selectedChain, api },
   } = useNetworkContext();
+
+  const {
+    state: { assets },
+  } = useAssetContext();
 
   const {
     handleSubmit,
     watch,
     formState: { errors },
   } = useFormContext();
-
-  const {
-    state: { assets },
-  } = useAssetContext();
 
   const { showErrorToast } = useToast();
 
@@ -62,6 +72,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
   const nativeSymbol = selectedChain?.nativeCurrency.symbol;
+
+  console.log(asset);
 
   useEffect(() => {
     (async () => {
@@ -112,30 +124,65 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         String(_amount.toLocaleString("fullwide", { useGrouping: false }))
       );
 
-      let extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>;
+      let extrinsic: SubmittableExtrinsic<"promise"> | ContractTx<"promise">;
+      let estimatedFee = new BN("0");
 
-      if (asset?.id === "-1") {
-        extrinsic = await _api.tx.balances.transfer(
+      if (asset?.address) {
+        // extrinsic from contract assets
+        const refTime = new BN("1000000000000");
+        const proofSize = new BN("1000000000000");
+        const contract = new ContractPromise(api, metadata, asset.address);
+        const { gasRequired } = await contract.query.transfer(
+          selectedAccount.value.address,
+          {
+            gasLimit: api.registry.createType("WeightV2", {
+              refTime,
+              proofSize,
+            }),
+          },
           destinationAccount,
           bnAmount
         );
+
+        extrinsic = await contract.tx.transfer(
+          {
+            gasLimit: api.registry.createType("WeightV2", gasRequired),
+          },
+          destinationAccount,
+          bnAmount
+        );
+
+        const { proofSize: _proofSize, refTime: _refTime } =
+          gasRequired.toJSON();
+
+        estimatedFee = new BN(String(_proofSize)).add(new BN(String(_refTime)));
       } else {
-        extrinsic = await _api.tx.assets.transfer(
-          asset.id,
-          destinationAccount,
-          bnAmount
+        if (asset?.id === "-1") {
+          extrinsic = await _api.tx.balances.transfer(
+            destinationAccount,
+            bnAmount
+          );
+        } else {
+          extrinsic = await _api.tx.assets.transfer(
+            asset.id,
+            destinationAccount,
+            bnAmount
+          );
+        }
+
+        const { partialFee } = await extrinsic.paymentInfo(
+          sender as KeyringPair
         );
+        estimatedFee = partialFee;
       }
 
       setExtrinsic(extrinsic);
 
-      const { partialFee } = await extrinsic.paymentInfo(sender as KeyringPair);
-
       const amounToShow =
-        asset?.id === "-1" ? bnAmount.add(partialFee) : partialFee;
+        asset?.id === "-1" ? bnAmount.add(estimatedFee) : estimatedFee;
 
       setFee({
-        "estimated fee": partialFee,
+        "estimated fee": estimatedFee,
         "estimated total": amounToShow,
       });
     } catch (error) {
@@ -148,35 +195,38 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
   const isEnoughToPay = useMemo(() => {
-    if (!asset?.id || !amount || !currencyUnits) return false;
+    if (!amount || !currencyUnits) return false;
 
-    const _amount = isNativeAsset
-      ? amount * currencyUnits
-      : amount * 10 ** asset.decimals;
+    try {
+      const _amount = isNativeAsset
+        ? amount * currencyUnits
+        : amount * 10 ** asset.decimals;
 
-    const bnAmount = new BN(
-      _amount.toLocaleString("fullwide", { useGrouping: false })
-    );
-    const estimatedTotal = fee["estimated total"];
-    const BN0 = new BN("0");
+      const bnAmount = new BN(
+        _amount.toLocaleString("fullwide", { useGrouping: false })
+      );
+      const estimatedTotal = fee["estimated total"];
+      const BN0 = new BN("0");
 
-    if (isNativeAsset) {
-      const BNBalance = new BN(
-        (asset?.balance * currencyUnits).toLocaleString("fullwide", {
-          useGrouping: false,
-        })
-      );
-      return bnAmount.gt(BN0) && estimatedTotal.lte(BNBalance);
-    } else {
-      const BNBalance = new BN(String(asset?.balance * 10 ** asset.decimals));
-      const BNNativeBalance = new BN(
-        String(assets[0].balance * 10 ** assets[0].decimals)
-      );
-      return (
-        bnAmount.lte(BNBalance) &&
-        estimatedTotal.gt(BN0) &&
-        estimatedTotal.lte(BNNativeBalance)
-      );
+      if (isNativeAsset) {
+        const BNBalance = new BN(
+          (asset?.balance * currencyUnits).toLocaleString("fullwide", {
+            useGrouping: false,
+          })
+        );
+        return bnAmount.gt(BN0) && estimatedTotal.lte(BNBalance);
+      } else {
+        const BNBalance = new BN(asset?.balance);
+        const nativeBalance = assets[0].balance;
+
+        return (
+          bnAmount.lte(BNBalance) &&
+          estimatedTotal.gt(BN0) &&
+          estimatedTotal.lte(nativeBalance)
+        );
+      }
+    } catch (error) {
+      return false;
     }
   }, [fee, asset, amount]);
 

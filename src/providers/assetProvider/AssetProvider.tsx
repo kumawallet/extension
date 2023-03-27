@@ -13,9 +13,11 @@ import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
 import { Chain } from "../../storage/entities/Chains";
-import { u8aToString } from "@polkadot/util";
+import { BN, hexToBn, u8aToString } from "@polkadot/util";
 import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
+import { ContractPromise } from "@polkadot/api-contract";
+import metadata from "@src/constants/metadata.json";
 
 interface InitialState {
   assets: Asset[];
@@ -130,7 +132,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      console.log(error);
       dispatch({
         type: "end-loading",
       });
@@ -163,83 +164,84 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const loadPolkadotAssets = async () => {
-    // const _assets = [
-    //   {
-    //     address: "5EbRksy6mm3ZxwV5mgx3j9n28nm4LShrXzNixkiJeYSWnqyH",
-    //   },
-    // ];
+    let assets: any[] = [];
 
-    // const contract = new ContractPromise(api, metadata, _assets[0].address);
-
-    // console.log(contract.query);
-
-    // // const _gasLimit = api.registry.createType("WeightV2", {
-    // //   refTime: new BN("1000000000000"),
-    // //   proofSize: new BN("1000000000000"),
-    // // });
-
-    // const _gasLimit = api.registry.createType(
-    //   "WeightV2",
-    //   new BN("1000000000000")
-    // );
-
-    // console.log("gastLimit", _gasLimit);
-
-    // const balance = await contract.query.balanceOf(
-    //   selectedAccount.value.address,
-    //   {
-    //     gasLimit: _gasLimit,
-    //     storageDepositLimit: null,
-    //   },
-    //   selectedAccount.value.address
-    // );
-
-    // console.log("gas", balance.gasConsumed.toHuman());
-    // console.log("balance", balance.result.toHuman());
-
-    // return [];
-
-    const assetPallet: any = await (api as ApiPromise)?.query?.assets;
-    if (!assetPallet) {
-      return [];
-    }
-
-    const assets: any = await (assetPallet?.metadata as any).entries();
-
-    const formatedAssets = assets.map(
-      ([
-        {
-          args: [id],
-        },
-        asset,
-      ]: any) => {
-        return {
-          id: String(id),
-          name: u8aToString(asset?.name),
-          symbol: u8aToString(asset?.symbol),
-          decimals: Number(asset?.decimals),
-        };
-      }
+    const _assetsFromStorage = await Extension.getAssetsByChain(
+      selectedChain.name
     );
+
+    const refTime = new BN("1000000000000");
+    const proofSize = new BN("1000000000000");
 
     await Promise.all(
-      formatedAssets.map((r: any, index: number) =>
-        assetPallet?.account(r.id, selectedAccount.value.address).then((r) => {
-          const result = r?.toJSON?.();
-          formatedAssets[index].balance = result?.balance
-            ? result?.balance / 10 ** formatedAssets[index].decimals
-            : 0;
-        })
-      )
+      _assetsFromStorage.map(async (asset, index) => {
+        try {
+          const contract = new ContractPromise(api, metadata, asset.address);
+          const { output } = await contract.query.balanceOf(
+            selectedAccount.value.address,
+            {
+              gasLimit: api.registry.createType("WeightV2", {
+                refTime,
+                proofSize,
+              }),
+            },
+            selectedAccount.value.address
+          );
+          _assetsFromStorage[index].balance = new BN(output?.toString());
+          _assetsFromStorage[index].id = index;
+        } catch (error) {
+          _assetsFromStorage[index].balance = 0;
+          _assetsFromStorage[index].id = index;
+        }
+      })
     );
 
-    return formatedAssets;
+    assets = [...assets, ..._assetsFromStorage];
+
+    const assetPallet: any = await (api as ApiPromise)?.query?.assets;
+
+    if (assetPallet) {
+      const assetsFromPallet: any = await (
+        assetPallet?.metadata as any
+      ).entries();
+
+      const formatedAssets = assetsFromPallet.map(
+        ([
+          {
+            args: [id],
+          },
+          asset,
+        ]: any) => {
+          return {
+            id: String(id),
+            name: u8aToString(asset?.name),
+            symbol: u8aToString(asset?.symbol),
+            decimals: Number(asset?.decimals),
+          };
+        }
+      );
+
+      await Promise.all(
+        formatedAssets.map((r: any, index: number) =>
+          assetPallet
+            ?.account(r.id, selectedAccount.value.address)
+            .then((r) => {
+              const result = r?.toJSON?.();
+              formatedAssets[index].balance = result?.balance
+                ? new BN(String(result?.balance))
+                : new BN("0");
+            })
+        )
+      );
+
+      assets = [...assets, ...formatedAssets];
+    }
+
+    return assets;
   };
 
   const loadEvmAssets = async () => {
     const assets = await Extension.getAssetsByChain(selectedChain.name);
-
-    console.log(assets);
 
     if (assets.length > 0) {
       await Promise.all(
