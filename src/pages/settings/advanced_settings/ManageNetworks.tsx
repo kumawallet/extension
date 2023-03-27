@@ -1,5 +1,5 @@
 import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
@@ -97,6 +97,7 @@ export const ManageNetworks = () => {
   const [supportedAccounts, setSupportedAccounts] = useState(
     SUPPORTED_CHAINS_TYPE[0]
   );
+  const [showNativeCurrency, setShowNativeCurrency] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -349,55 +350,76 @@ export const ManageNetworks = () => {
 
           {selectedNetwork.nativeCurrency && (
             <>
-              <label
-                htmlFor="nativeCurrency"
-                className="block text-lg font-medium mt-4"
-              >
-                {t("native_currency")}
-              </label>
-
-              <div className="mt-5">
-                <div className="text-sm font-medium mb-2">
-                  {t("currency_name")}
+              <div className="flex justify-between items-center mt-2 gap-2">
+                <label htmlFor="nativeCurrency" className="text-lg font-medium">
+                  {t("native_currency")}
+                </label>
+                <div className="p-2">
+                  {showNativeCurrency ? (
+                    <FiChevronUp
+                      className="cursor-pointer"
+                      size={ICON_SIZE}
+                      onClick={() => setShowNativeCurrency(!showNativeCurrency)}
+                    />
+                  ) : (
+                    <FiChevronDown
+                      className="cursor-pointer"
+                      size={ICON_SIZE}
+                      onClick={() => setShowNativeCurrency(!showNativeCurrency)}
+                    />
+                  )}
                 </div>
-                <input
-                  className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                  {...register("nativeCurrency.name")}
-                />
-                <InputErrorMessage
-                  message={errors.nativeCurrency?.name?.message}
-                />
               </div>
-
-              <div className="mt-5">
-                <div className="text-sm font-medium mb-2">
-                  {t("currency_symbol")}
-                </div>
-                <input
-                  className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                  {...register("nativeCurrency.symbol")}
-                />
-                <InputErrorMessage
-                  message={errors.nativeCurrency?.symbol?.message}
-                />
-              </div>
-
-              <div className="mt-5">
-                <div className="text-sm font-medium mb-2">
-                  {t("currency_decimals")}
-                </div>
-                <input
-                  type="number"
-                  className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                  {...register("nativeCurrency.decimals")}
-                />
-                <InputErrorMessage
-                  message={errors.nativeCurrency?.decimals?.message}
-                />
-              </div>
+              {showNativeCurrency && (
+                <>
+                  <div className="mt-5">
+                    <div className="text-sm font-medium mb-2">
+                      {t("currency_name")}
+                    </div>
+                    <input
+                      className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                      {...register("nativeCurrency.name")}
+                    />
+                    <InputErrorMessage
+                      message={errors.nativeCurrency?.name?.message}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center gap-4 mt-4">
+                    <div className="flex flex-col justify-between">
+                      <div className="text-sm font-medium mb-2">
+                        {t("currency_symbol")}
+                      </div>
+                      <input
+                        className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                        readOnly={
+                          !isCustom(selectedNetwork.name) && !isCreating
+                        }
+                        {...register("nativeCurrency.symbol")}
+                      />
+                      <InputErrorMessage
+                        message={errors.nativeCurrency?.symbol?.message}
+                      />
+                    </div>
+                    <div className="flex flex-col justify-between">
+                      <div className="text-sm font-medium mb-2">
+                        {t("currency_decimals")}
+                      </div>
+                      <input
+                        type="number"
+                        className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                        readOnly={
+                          !isCustom(selectedNetwork.name) && !isCreating
+                        }
+                        {...register("nativeCurrency.decimals")}
+                      />
+                      <InputErrorMessage
+                        message={errors.nativeCurrency?.decimals?.message}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 

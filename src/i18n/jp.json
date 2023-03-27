@@ -164,6 +164,7 @@
     "network_name": "ネットワーク名",
     "address_prefix": "アドレスプレフィックス",
     "native_currency": "ネイティブ通貨",
+    "account_type_support": "アカウントタイプのサポート",
     "currency_name": "通貨名",
     "currency_symbol": "シンボル",
     "currency_decimals": "小数点以下の桁数",

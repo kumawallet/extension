@@ -164,6 +164,7 @@
     "network_name": "Nombre de la red",
     "address_prefix": "Prefijo de la dirección",
     "native_currency": "Moneda nativa",
+    "account_type_support": "Tipo de cuenta soportado",
     "currency_name": "Nombre de la moneda",
     "currency_symbol": "Símbolo",
     "currency_decimals": "Decimales",
