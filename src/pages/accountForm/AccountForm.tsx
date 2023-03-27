@@ -18,6 +18,9 @@ import {
   SucessMessage,
 } from "@src/components/common";
 import { FiChevronLeft } from "react-icons/fi";
+import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -66,15 +69,16 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   } = useAccountContext();
 
   const { t } = useTranslation("account_form");
+  const { t: tCommon } = useTranslation("common");
   const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
 
   const navigate = useNavigate();
   const { isLoading, endLoading, starLoading } = useLoading();
-
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
+  const [showInsertSeedStep, setShowInsertSeedStep] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const togglePassword = () => {
     setPasswordType(passwordType === "password" ? "text" : "password");
@@ -85,6 +89,11 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     setConfirmPasswordType(
       confirmPasswordType === "password" ? "text" : "password"
     );
+  };
+
+  const submit = () => {
+    if (!generateSeed) _onSubmit();
+    setShowInsertSeedStep(true);
   };
 
   const schema = object({
@@ -192,167 +201,198 @@ export const AccountForm: FC<AddAccountFormProps> = ({
         <p className="text-xl">{title}</p>
       </div>
       <div className="flex flex-col gap-6 mt-5">
-        {generateSeed && (
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              {t("form.seed")}
-            </label>
-            <div className="relative">
-              <textarea
-                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none relative select-none"
-                value={seed}
-                aria-readonly={true}
-                readOnly={true}
-                disabled
-                onSelect={(e) => e.preventDefault()}
-                onCopy={(e) => e.preventDefault()}
-              />
-              {!showSeed && (
-                <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
-                  <button
-                    className="flex flex-col items-center"
-                    onClick={() => setShowSeed(true)}
-                  >
-                    <p>{t("form.show_seed")}</p>
-                    <BsEye size={18} />
-                  </button>
-                </div>
-              )}
-            </div>
-            <p className="text-gray-400 p-2 px-1"> {t("form.seed_message")}</p>
-          </div>
-        )}
-        {fields?.accountType && signUp && (
-          <div>
-            <label
-              htmlFor="accountType"
-              className="block text-sm font-medium mb-1"
-            >
-              {t("form.account_type")}
-            </label>
-            <select
-              id="accountType"
-              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              {...register("accountType")}
-            >
-              <option value={AccountType.EVM}>{t("form.evm_type")}</option>
-              <option value={AccountType.WASM}>{t("form.wasm_type")}</option>
-            </select>
-          </div>
-        )}
-        {fields?.privateKeyOrSeed && (
-          <div>
-            <label
-              htmlFor="privateKeyOrSeed"
-              className="block text-sm font-medium mb-1"
-            >
-              {!resetPassword
-                ? AccountType.EVM == watch("accountType")
-                  ? t("form.private_key")
-                  : t("form.seed_phrase")
-                : t("form.recovery_phrase")}
-            </label>
-            <input
-              data-testid="privateKeyOrSeed"
-              id="privateKeyOrSeed"
-              type={"password"}
-              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              {...register("privateKeyOrSeed")}
-            />
-            <InputErrorMessage message={errors.privateKeyOrSeed?.message} />
-          </div>
-        )}
-        {!resetPassword && (
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              {t("form.account_name")}
-            </label>
-            <input
-              id="name"
-              placeholder={t("form.account_name_placeholder") as string}
-              max={32}
-              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-              {...register("name")}
-              onKeyDown={({ key }) =>
-                key === "Enter" && !generateSeed && _onSubmit()
-              }
-            />
-          </div>
-        )}
-        {passwordIsRequired && (
+        {!showInsertSeedStep && (
           <>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("form.password")}
-              </label>
-              <div className="relative">
-                <input
-                  data-testid="password"
-                  id="password"
-                  min={8}
-                  onPaste={(e) => e.preventDefault()}
-                  type={passwordType}
-                  className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  {...register("password")}
-                />
-
-                <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
-                  onClick={togglePassword}
+            {generateSeed && (
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
                 >
-                  {passwordType === "password" ? (
-                    <BsEyeSlash className="cursor-pointer" size={20} />
-                  ) : (
-                    <BsEye className="cursor-pointer" size={20} />
+                  {t("form.recovery_phrase")}
+                </label>
+                <div className="relative">
+                  <textarea
+                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 h-[120px] md:h-[65px] border-gray-600 placeholder-gray-400 text-white resize-none relative select-none"
+                    value={seed}
+                    aria-readonly={true}
+                    readOnly={true}
+                    disabled
+                    onSelect={(e) => e.preventDefault()}
+                    onCopy={(e) => e.preventDefault()}
+                  />
+                  {!showSeed && (
+                    <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
+                      <button
+                        className="flex flex-col items-center"
+                        onClick={() => setShowSeed(true)}
+                      >
+                        <p>{tCommon("show")}</p>
+                        <BsEye size={18} />
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
+                <p className="text-gray-400 p-2 px-1">
+                  {" "}
+                  {t("form.seed_message")}
+                </p>
               </div>
-
-              {errors.password?.message ? (
-                <InputErrorMessage message={errors.password?.message} />
-              ) : (
-                <p className="text-gray-400 p-2 px-1"> {PASSWORD_RULES}</p>
-              )}
-            </div>
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("form.confirm_password")}
-              </label>
-              <div className="relative">
-                <input
-                  data-testid="confirmPassword"
-                  id="confirmPassword"
-                  onPaste={(e) => e.preventDefault()}
-                  type={confirmPasswordType}
-                  className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  {...register("confirmPassword")}
-                  onKeyDown={({ key }) => key === "Enter" && _onSubmit()}
-                />
-
-                <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
-                  onClick={toggleConfirmPassword}
+            )}
+            {fields?.accountType && signUp && (
+              <div>
+                <label
+                  htmlFor="accountType"
+                  className="block text-sm font-medium mb-1"
                 >
-                  {confirmPasswordType === "password" ? (
-                    <BsEyeSlash size={20} />
-                  ) : (
-                    <BsEye size={20} />
-                  )}
-                </button>
+                  {t("form.account_type")}
+                </label>
+                <select
+                  id="accountType"
+                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  {...register("accountType")}
+                >
+                  <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+                  <option value={AccountType.WASM}>
+                    {t("form.wasm_type")}
+                  </option>
+                </select>
               </div>
-              <InputErrorMessage message={errors.confirmPassword?.message} />
-            </div>
+            )}
+            {fields?.privateKeyOrSeed && (
+              <div>
+                <label
+                  htmlFor="privateKeyOrSeed"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {!resetPassword
+                    ? AccountType.EVM == watch("accountType")
+                      ? t("form.private_key")
+                      : t("form.seed_phrase")
+                    : t("form.recovery_phrase")}
+                </label>
+                <input
+                  data-testid="privateKeyOrSeed"
+                  id="privateKeyOrSeed"
+                  type={"password"}
+                  className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  {...register("privateKeyOrSeed")}
+                />
+                <InputErrorMessage message={errors.privateKeyOrSeed?.message} />
+              </div>
+            )}
+            {!resetPassword && (
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("form.account_name")}
+                </label>
+                <input
+                  id="name"
+                  placeholder={t("form.account_name_placeholder") as string}
+                  max={32}
+                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                  {...register("name")}
+                  onKeyDown={({ key }) =>
+                    key === "Enter" && !generateSeed && _onSubmit()
+                  }
+                />
+              </div>
+            )}
+            {passwordIsRequired && (
+              <>
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    {t("form.password")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      data-testid="password"
+                      id="password"
+                      min={8}
+                      onPaste={(e) => e.preventDefault()}
+                      type={passwordType}
+                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      {...register("password")}
+                    />
+
+                    <button
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
+                      onClick={togglePassword}
+                    >
+                      {passwordType === "password" ? (
+                        <BsEyeSlash className="cursor-pointer" size={20} />
+                      ) : (
+                        <BsEye className="cursor-pointer" size={20} />
+                      )}
+                    </button>
+                  </div>
+
+                  {errors.password?.message ? (
+                    <InputErrorMessage message={errors.password?.message} />
+                  ) : (
+                    <p className="text-gray-400 p-2 px-1"> {PASSWORD_RULES}</p>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    {t("form.confirm_password")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      data-testid="confirmPassword"
+                      id="confirmPassword"
+                      onPaste={(e) => e.preventDefault()}
+                      type={confirmPasswordType}
+                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      {...register("confirmPassword")}
+                      onKeyDown={({ key }) => key === "Enter" && _onSubmit()}
+                    />
+
+                    <button
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
+                      onClick={toggleConfirmPassword}
+                    >
+                      {confirmPasswordType === "password" ? (
+                        <BsEyeSlash size={20} />
+                      ) : (
+                        <BsEye size={20} />
+                      )}
+                    </button>
+                  </div>
+                  <InputErrorMessage
+                    message={errors.confirmPassword?.message}
+                  />
+                </div>
+              </>
+            )}
           </>
         )}
+        {showInsertSeedStep && (
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              {t("form.confirm_recovery_phrase")}
+            </label>
+            <DndProvider backend={HTML5Backend}>
+              <ConfirmRecoveryPhrase seed={seed} />
+            </DndProvider>
+          </div>
+        )}
         <div className="flex justify-end" data-testid="submitbtn">
-          <LoadingButton onClick={_onSubmit} isLoading={isLoading} isDisabled={!showSeed}>
-            {buttonText}
+          <LoadingButton
+            onClick={submit}
+            isLoading={isLoading}
+            isDisabled={generateSeed && !showSeed}
+          >
+            {generateSeed && !showInsertSeedStep ? t("form.next") : buttonText}
           </LoadingButton>
         </div>
       </div>

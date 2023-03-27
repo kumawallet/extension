@@ -8,7 +8,7 @@ import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { BsEye, BsTrash } from "react-icons/bs";
-import { CREATE_ACCOUNT, RESTORE_PASSWORD } from "@src/routes/paths";
+import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
@@ -60,6 +60,8 @@ export const Security = () => {
     try {
       await Extension.resetWallet();
       navigate("/");
+      // refresh page
+      window.location.reload();
     } catch (error) {
       showErrorToast(tCommon(error as string));
     }
