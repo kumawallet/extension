@@ -351,7 +351,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
           </>
         )}
         <div className="flex justify-end" data-testid="submitbtn">
-          <LoadingButton onClick={_onSubmit} isLoading={isLoading}>
+          <LoadingButton onClick={_onSubmit} isLoading={isLoading} isDisabled={!showSeed}>
             {buttonText}
           </LoadingButton>
         </div>
