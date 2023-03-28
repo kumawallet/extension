@@ -79,6 +79,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const [showSeed, setShowSeed] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
   const [showInsertSeedStep, setShowInsertSeedStep] = useState(false);
+  const [seedConfirmationIsValid, setSeedConfirmationIsValid] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const togglePassword = () => {
     setPasswordType(passwordType === "password" ? "text" : "password");
@@ -92,8 +93,11 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   };
 
   const submit = () => {
-    if (!generateSeed) _onSubmit();
-    setShowInsertSeedStep(true);
+    if (generateSeed && !showInsertSeedStep) {
+      handleSubmit(() => setShowInsertSeedStep(true))();
+    } else {
+      _onSubmit();
+    }
   };
 
   const schema = object({
@@ -296,7 +300,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                   {...register("name")}
                   onKeyDown={({ key }) =>
-                    key === "Enter" && !generateSeed && _onSubmit()
+                    key === "Enter" && !generateSeed && submit()
                   }
                 />
               </div>
@@ -354,7 +358,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       type={confirmPasswordType}
                       className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                       {...register("confirmPassword")}
-                      onKeyDown={({ key }) => key === "Enter" && _onSubmit()}
+                      onKeyDown={({ key }) => key === "Enter" && submit()}
                     />
 
                     <button
@@ -382,7 +386,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
               {t("form.confirm_recovery_phrase")}
             </label>
             <DndProvider backend={HTML5Backend}>
-              <ConfirmRecoveryPhrase seed={seed} />
+              <ConfirmRecoveryPhrase
+                seed={seed}
+                confirm={(confirm: boolean) =>
+                  setSeedConfirmationIsValid(confirm)
+                }
+              />
             </DndProvider>
           </div>
         )}
@@ -390,7 +399,10 @@ export const AccountForm: FC<AddAccountFormProps> = ({
           <LoadingButton
             onClick={submit}
             isLoading={isLoading}
-            isDisabled={generateSeed && !showSeed}
+            isDisabled={
+              (generateSeed && !showSeed) ||
+              (showInsertSeedStep && !seedConfirmationIsValid)
+            }
           >
             {generateSeed && !showInsertSeedStep ? t("form.next") : buttonText}
           </LoadingButton>

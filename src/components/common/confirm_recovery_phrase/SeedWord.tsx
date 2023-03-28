@@ -1,29 +1,18 @@
-import { CSSProperties, FC, memo } from "react";
+import { FC, memo } from "react";
 import { useDrop } from "react-dnd";
 
-const style: CSSProperties = {
-  height: "12rem",
-  width: "12rem",
-  marginRight: "1.5rem",
-  marginBottom: "1.5rem",
-  color: "white",
-  padding: "1rem",
-  textAlign: "center",
-  fontSize: "1rem",
-  lineHeight: "normal",
-  float: "left",
-};
-
 interface SeedWordProps {
-  onDrop: (seedWord: string) => void;
+  onDrop: (seedWord: { word: string; accept: string }) => void;
   word: string;
   accept: string;
+  index: number;
 }
 
 export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   onDrop,
   word,
   accept,
+  index,
 }: SeedWordProps) {
   const [{ isOver, canDrop }, drop] = useDrop({
     drop: onDrop,
@@ -35,20 +24,19 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   });
 
   const isActive = isOver && canDrop;
-  let backgroundColor = "#222";
+  let backgroundColor = 'bg-custom-gray-bg';
+  const borderColor = accept === "word" ? 'border-custom-green-bg' : 'border-custom-gray-bg';
   if (isActive) {
-    backgroundColor = "darkgreen";
-  } else if (canDrop) {
-    backgroundColor = "darkkhaki";
+    backgroundColor = "bg-custom-green-bg";
   }
 
   return (
     <div
       ref={drop}
-      className={`bg-[${backgroundColor}] w-auto bg-custom-gray-bg px-3 rounded-md py-2 text-center`}
+      className={`${backgroundColor} w-auto px-3 border ${borderColor} rounded-md py-2 text-center cursor-pointer`}
       data-testid="seedword"
     >
-      {word}
+      {word === "" ? <span>&nbsp;</span> : `${index}. ${word}`}
     </div>
   );
 });

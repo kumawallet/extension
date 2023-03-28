@@ -60,7 +60,6 @@ export const Security = () => {
     try {
       await Extension.resetWallet();
       navigate("/");
-      // refresh page
       window.location.reload();
     } catch (error) {
       showErrorToast(tCommon(error as string));

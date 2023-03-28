@@ -5,12 +5,15 @@ import { Word } from "./Word";
 
 interface ConfirmRecoveryPhraseProps {
   seed: string;
+  confirm: (confirmed: boolean) => void;
 }
 
 export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
-  function ConfirmRecoveryPhrase({ seed }: ConfirmRecoveryPhraseProps) {
+  function ConfirmRecoveryPhrase({
+    seed,
+    confirm,
+  }: ConfirmRecoveryPhraseProps) {
     const { t } = useTranslation("form.confirm_recovery_phrase");
-    const { t: tCommon } = useTranslation("common");
 
     const [seedWords, setSeedWords] = useState<any[]>([]);
     const [words, setWords] = useState<(string | undefined)[]>([]);
@@ -21,24 +24,41 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
       if (wordsFromSeed.length < 24) throw new Error("Invalid seed");
 
       const arrayLength = wordsFromSeed.length;
-      const wordsIndexesToRemove: number[] = [];
+      const wordsIndexesToRemove: { word: string; index: number }[] = [];
 
-      while (wordsIndexesToRemove.length < 3) {
+      while (wordsIndexesToRemove.length < 5) {
         const index = Math.floor(Math.random() * arrayLength);
-        if (!wordsIndexesToRemove.includes(index)) {
-          wordsIndexesToRemove.push(index);
+        const newWord = wordsFromSeed[index];
+        const invalidWord = wordsIndexesToRemove.find(
+          ({ word, index: i }) => index === i || word === newWord
+        );
+        if (!invalidWord) {
+          wordsIndexesToRemove.push({ index, word: newWord });
         }
       }
-
-      setWords(wordsIndexesToRemove.map((index) => wordsFromSeed[index]));
+      setWords(wordsIndexesToRemove.map(({ word }) => word));
 
       setSeedWords(
         wordsFromSeed.map((word, index) => ({
-          word,
-          accept: wordsIndexesToRemove.includes(index) ? "" : "word",
+          word: wordsIndexesToRemove.find(({ index: i }) => index === i)
+            ? ""
+            : word,
+          accept: !wordsIndexesToRemove.find(({ index: i }) => index === i)
+            ? ""
+            : "word",
         }))
       );
     }, [seed]);
+
+    useEffect(() => {
+      if (droppedWords.length === words.length) {
+        const confirmedSeed: string = seedWords
+          .map(({ word }) => word)
+          .join(" ");
+        const confirmed: boolean = confirmedSeed === seed;
+        confirm(confirmed);
+      }
+    }, [droppedWords, seedWords, seed, confirm]);
 
     function isDropped(word: string) {
       return droppedWords.indexOf(word) > -1;
@@ -46,30 +66,47 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
 
     const handleDrop = useCallback(
       (index: number, word: string) => {
-        setDroppedWords((prev) => [...prev, word]);
         const updatedSeedWords = [...seedWords];
+        const repeated = updatedSeedWords.findIndex(
+          ({ word: w, accept }) => w === word && accept === "word"
+        );
+        if (repeated > -1 && repeated !== index) {
+          updatedSeedWords[repeated].word = "";
+        }
+
+        if (updatedSeedWords[index].word !== "") {
+          const w = updatedSeedWords[index].word;
+          setDroppedWords((prev) => prev.filter((word) => word !== w));
+        }
         updatedSeedWords[index].word = word;
         setSeedWords(updatedSeedWords);
+        setDroppedWords((prev) => [...prev, word]);
       },
       [droppedWords, seedWords]
     );
 
-    console.log("seed word", seedWords);
-
     return (
-      <div>
+      <div className="mt-4">
+        <div className="flex justify-center items-center mb-4">
+          <p className="text-center">
+            {t("confirm_recovery_phrase_description")}
+          </p>
+        </div>
         <div className="grid grid-cols-3 gap-2">
           {seedWords.map(({ word, accept }, index) => (
             <SeedWord
               accept={accept}
-              onDrop={(seedWord: string) => handleDrop(index, seedWord?.word)}
+              onDrop={(seedWord: { word: string; accept: string }) =>
+                handleDrop(index, seedWord?.word)
+              }
               key={index}
               word={word}
+              index={index + 1}
             />
           ))}
         </div>
 
-        <div className="py-2 px-2 flex gap-2">
+        <div className="flex justify-center items-center mt-5 p-2 gap-2">
           {words.map((word, index) => (
             <Word
               isDropped={isDropped(word || "")}
