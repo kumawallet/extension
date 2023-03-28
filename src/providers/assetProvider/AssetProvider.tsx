@@ -82,11 +82,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     dispatch({
       type: "loading-assets",
     });
+    let assets: Asset[];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
 
-      const assets: Asset[] = [
+      assets = [
         {
           id: "-1",
           ...selectedChain?.nativeCurrency,
@@ -101,12 +102,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           assets,
         },
       });
-
-      getAssetsUSDPrice(assets);
     } catch (error) {
       dispatch({
         type: "end-loading",
       });
+    } finally {
+      getAssetsUSDPrice(assets);
     }
   };
 
