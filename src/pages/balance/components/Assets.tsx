@@ -14,7 +14,7 @@ export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
-    state: { type, api },
+    state: { type, api, selectedChain },
   } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
@@ -24,7 +24,7 @@ export const Assets = () => {
   const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    let _assets: any[] = assets;
+    let _assets = [...assets];
 
     if (!showAllAssets) {
       _assets = _assets.filter((asset) => {
@@ -86,7 +86,16 @@ export const Assets = () => {
           className="bg-[#343A40] px-5 py-4 rounded-xl flex items-center justify-between font-inter"
         >
           <div className="flex gap-2 items-center">
-            <div className="w-6 h-6 bg-black rounded-full" />
+            {asset.id === "-1" ? (
+              <img
+                src={`/images/${selectedChain.logo}.png`}
+                width={24}
+                height={24}
+                className="object-cover rounded-full"
+              />
+            ) : (
+              <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
+            )}
             <div className="flex gap-1 items-center">
               <p className="font-bold text-xl">
                 {formatAmountWithDecimals(

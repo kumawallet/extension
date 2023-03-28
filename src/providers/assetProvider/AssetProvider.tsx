@@ -3,48 +3,31 @@ import {
   FC,
   PropsWithChildren,
   useContext,
+  useEffect,
   useReducer,
 } from "react";
-import { useAccountContext } from "../accountProvider";
-import { useNetworkContext } from "../networkProvider";
-import { useEffect } from "react";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { getNatitveAssetBalance } from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
-import { Chain } from "../../storage/entities/Chains";
-import { BN, hexToBn, u8aToString } from "@polkadot/util";
+import { BN, u8aToString } from "@polkadot/util";
 import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-
-interface InitialState {
-  assets: Asset[];
-  isLoadingAssets: boolean;
-}
+import { useCallback } from "react";
+import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import { Action, Asset, AssetContext, InitialState } from "./types";
 
 const initialState: InitialState = {
   assets: [],
   isLoadingAssets: false,
 };
 
-interface AssetContext {
-  state: InitialState;
-  loadAssets: () => void;
-}
-
 const AssetContext = createContext({} as AssetContext);
 
-export interface Asset {
-  name: string;
-  symbol: string;
-  decimals: string;
-  id: string;
-  balance: number;
-}
-
-const reducer = (state: InitialState, action: any) => {
+export const reducer = (state: InitialState, action: Action) => {
   switch (action.type) {
     case "loading-assets": {
       return {
@@ -109,11 +92,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       type: "loading-assets",
     });
     try {
-      const _nativeBalance = await getNativeAsset(
-        api,
-        selectedAccount,
-        selectedChain
-      );
+      const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
 
       const assets: Asset[] = [
@@ -140,130 +119,134 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getNativeAsset = async (
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,
-    account: AccountEntity,
-    chain: Chain
+    account: AccountEntity
   ) => {
     const nativeAsset = await getNatitveAssetBalance(
       api,
-      account.value.address,
-      chain?.nativeCurrency.decimals || 1
+      account.value.address
     );
     return nativeAsset;
   };
 
-  const getOtherAssets = async () => {
+  const getOtherAssets = useCallback(async () => {
     if (!type) return [];
 
     if (type === "WASM") {
-      const assets = await loadPolkadotAssets();
-      return assets;
+      const [assetsFromPallet, assets] = await Promise.all([
+        loadAssetsFromStorage(),
+        loadPolkadotAssets(),
+      ]);
+      return [...assetsFromPallet, ...assets];
     } else {
-      const assets = await loadEvmAssets();
+      const assets = loadAssetsFromStorage();
       return assets;
     }
-  };
+  }, [type, api]);
 
-  const loadPolkadotAssets = async () => {
-    let assets: any[] = [];
+  const loadPolkadotAssets = useCallback(async () => {
+    const assetPallet = await (api as ApiPromise)?.query?.assets;
 
-    const _assetsFromStorage = await Extension.getAssetsByChain(
-      selectedChain.name
-    );
+    if (assetPallet?.metadata) {
+      const assetsFromPallet = await assetPallet.metadata.entries();
 
-    const refTime = new BN("1000000000000");
-    const proofSize = new BN("1000000000000");
-
-    await Promise.all(
-      _assetsFromStorage.map(async (asset, index) => {
-        try {
-          const contract = new ContractPromise(api, metadata, asset.address);
-          const { output } = await contract.query.balanceOf(
-            selectedAccount.value.address,
-            {
-              gasLimit: api.registry.createType("WeightV2", {
-                refTime,
-                proofSize,
-              }),
-            },
-            selectedAccount.value.address
-          );
-          _assetsFromStorage[index].balance = new BN(output?.toString());
-          _assetsFromStorage[index].id = index;
-        } catch (error) {
-          _assetsFromStorage[index].balance = 0;
-          _assetsFromStorage[index].id = index;
-        }
-      })
-    );
-
-    assets = [...assets, ..._assetsFromStorage];
-
-    const assetPallet: any = await (api as ApiPromise)?.query?.assets;
-
-    if (assetPallet) {
-      const assetsFromPallet: any = await (
-        assetPallet?.metadata as any
-      ).entries();
-
-      const formatedAssets = assetsFromPallet.map(
+      const formatedAssets: Asset[] = assetsFromPallet.map(
         ([
           {
             args: [id],
           },
           asset,
-        ]: any) => {
+        ]) => {
+          const _asset = asset as Partial<{
+            name: Uint8Array;
+            symbol: Uint8Array;
+            decimals: Uint8Array;
+          }>;
+
           return {
             id: String(id),
-            name: u8aToString(asset?.name),
-            symbol: u8aToString(asset?.symbol),
-            decimals: Number(asset?.decimals),
+            name: u8aToString(_asset?.name),
+            symbol: u8aToString(_asset?.symbol),
+            decimals: Number(_asset?.decimals),
+            balance: new BN("0"),
           };
         }
       );
 
       await Promise.all(
-        formatedAssets.map((r: any, index: number) =>
+        formatedAssets.map((r, index) =>
           assetPallet
             ?.account(r.id, selectedAccount.value.address)
-            .then((r) => {
-              const result = r?.toJSON?.();
-              formatedAssets[index].balance = result?.balance
-                ? new BN(String(result?.balance))
-                : new BN("0");
+            .then((asset) => {
+              const result = asset.toJSON() as Partial<{ balance: Uint8Array }>;
+              formatedAssets[index].balance =
+                (result?.balance && new BN(String(result?.balance))) ||
+                new BN("0");
             })
         )
       );
 
-      assets = [...assets, ...formatedAssets];
+      return formatedAssets;
     }
 
-    return assets;
-  };
+    return [];
+  }, [api]);
 
-  const loadEvmAssets = async () => {
-    const assets = await Extension.getAssetsByChain(selectedChain.name);
+  const loadAssetsFromStorage = useCallback(async () => {
+    const assetsFromStorage = await Extension.getAssetsByChain(
+      selectedChain.name
+    );
+    const assets: Asset[] = [];
 
-    if (assets.length > 0) {
+    if (assetsFromStorage.length > 0) {
+      const accountAddress = selectedAccount.value.address;
+
       await Promise.all(
-        assets.map(async (asset, index) => {
+        assetsFromStorage.map(async (asset, index) => {
+          assets[index] = {
+            balance: "",
+            id: String(index),
+            decimals: asset.decimals,
+            symbol: asset.symbol,
+          };
+
           try {
-            const contract = new ethers.Contract(asset?.address, erc20Abi, api);
-            const balance = await contract.balanceOf(
-              selectedAccount.value.address
-            );
-            const _balance = Number(balance) / 10 ** Number(asset?.decimals);
-            assets[index].balance = _balance;
-            assets[index].id = index;
+            if (type === "EVM") {
+              const contract = new ethers.Contract(
+                asset.address,
+                erc20Abi,
+                api
+              );
+              const balance = await contract.balanceOf(accountAddress);
+              assets[index].balance = ethers.utils.formatUnits(balance, 18);
+            } else {
+              const gasLimit = api.registry.createType("WeightV2", {
+                refTime: REF_TIME,
+                proofSize: PROOF_SIZE,
+              });
+
+              const contract = new ContractPromise(
+                api,
+                metadata,
+                asset.address
+              );
+              const { output } = await contract.query.balanceOf(
+                accountAddress,
+                {
+                  gasLimit,
+                },
+                accountAddress
+              );
+              assets[index].balance = new BN(output?.toString() || "0");
+            }
           } catch (error) {
-            assets[index].balance = 0;
-            assets[index].id = index;
+            assets[index].balance = new BN("0");
           }
         })
       );
     }
 
     return assets;
-  };
+  }, [selectedAccount, api, selectedChain, type]);
 
   return (
     <AssetContext.Provider

@@ -1,13 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
-import { ethers } from "ethers";
+import { BN } from "@polkadot/util";
+import { BigNumberish, ethers } from "ethers";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
-  accountAddress: string,
-  decimals: number
-): Promise<number> => {
+  accountAddress: string
+): Promise<BN | BigNumberish> => {
   try {
-    let _amount = 0;
+    const _amount = new BN("0");
 
     if (!api) return _amount;
 
@@ -15,17 +15,15 @@ export const getNatitveAssetBalance = async (
       const { data }: any =
         (await api.query.system?.account(accountAddress)) || {};
 
-      return data.free;
+      return data.free as BN;
     }
 
     if ("getBalance" in api) {
-      const etherAmount = ethers.utils.formatEther(
-        await api.getBalance(accountAddress)
-      );
-      _amount = Number(etherAmount);
+      const amount = await api.getBalance(accountAddress);
+      return amount;
     }
 
-    return Number(_amount);
+    return _amount;
   } catch (error) {
     console.error(error);
     return 0;

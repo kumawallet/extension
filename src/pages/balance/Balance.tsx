@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
-import { useAccountContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
 import { useLocation } from "react-router-dom";
@@ -15,13 +14,8 @@ export interface Asset {
 }
 
 export const Balance = () => {
-  const { state } = useLocation();
-
-  const {
-    state: { selectedAccount },
-  } = useAccountContext();
-
   const { t } = useTranslation("balance");
+  const { state } = useLocation();
 
   const TABS = useMemo(() => {
     return [
@@ -41,10 +35,7 @@ export const Balance = () => {
       <Header />
       <PageWrapper contentClassName="pt-6 pb-16">
         <div className="flex flex-col">
-          <TotalBalance
-            accountName={selectedAccount?.value?.name}
-            balance={0}
-          />
+          <TotalBalance />
 
           <Tab.Group defaultIndex={state?.tab === "activity" ? 1 : 0}>
             <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">
