@@ -33,7 +33,12 @@ export const Word: FC<WordProps> = memo(function Word({
   );
 
   return (
-    <div ref={drag} style={{ ...style, opacity }} data-testid="box">
+    <div
+      ref={drag}
+      className="bg-custom-green-bg bg-opacity-40 px-2 py-1 border border-dashed"
+      style={{ opacity }}
+      data-testid="box"
+    >
       {isDropped ? <s>{word}</s> : word}
     </div>
   );

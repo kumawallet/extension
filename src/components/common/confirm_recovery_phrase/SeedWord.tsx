@@ -16,13 +16,18 @@ const style: CSSProperties = {
 
 interface SeedWordProps {
   onDrop: (seedWord: string) => void;
+  word: string;
+  accept: string;
 }
 
 export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   onDrop,
+  word,
+  accept,
 }: SeedWordProps) {
   const [{ isOver, canDrop }, drop] = useDrop({
     drop: onDrop,
+    accept,
     collect: (monitor: any) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
@@ -40,10 +45,10 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   return (
     <div
       ref={drop}
-      style={{ ...style, backgroundColor }}
+      className={`bg-[${backgroundColor}] w-auto bg-custom-gray-bg px-3 rounded-md py-2 text-center`}
       data-testid="seedword"
     >
-      {isActive ? "Release to drop" : "Drag a word here"}
+      {word}
     </div>
   );
 });
