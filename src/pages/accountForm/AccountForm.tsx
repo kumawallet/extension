@@ -222,8 +222,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                     aria-readonly={true}
                     readOnly={true}
                     disabled
-                    onSelect={(e) => e.preventDefault()}
-                    onCopy={(e) => e.preventDefault()}
                   />
                   {!showSeed && (
                     <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">

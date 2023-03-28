@@ -111,7 +111,10 @@
       "password_hint": "パスワードは、少なくとも8文字、少なくとも1つの数字、大文字と小文字、特殊文字を含める必要があります。",
       "confirm_password": "パスワードを確認する",
       "confirm_password_hint": "パスワードが一致しません。",
-      "required": "必須"
+      "required": "必須",
+      "confirm_recovery_phrase": "リカバリーフレーズを確認する",
+      "confirm_recovery_phrase_description": "リカバリーフレーズを正しい順序で選択して確認してください。",
+      "next": "次へ"
     }
   },
   "balance": {

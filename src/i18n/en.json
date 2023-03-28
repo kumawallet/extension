@@ -111,7 +111,10 @@
       "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
       "confirm_password": "Confirm password",
       "confirm_password_hint": "Passwords don't match.",
-      "required": "required"
+      "required": "required",
+      "confirm_recovery_phrase": "Confirm recovery phrase",
+      "confirm_recovery_phrase_description": "Please confirm your recovery phrase by selecting the words in the correct order.",
+      "next": "Next"
     }
   },
   "balance": {

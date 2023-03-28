@@ -2,6 +2,7 @@ import { FC, memo, useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SeedWord } from "./SeedWord";
 import { Word } from "./Word";
+import { useToast } from "@src/hooks";
 
 interface ConfirmRecoveryPhraseProps {
   seed: string;
@@ -13,41 +14,49 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
     seed,
     confirm,
   }: ConfirmRecoveryPhraseProps) {
-    const { t } = useTranslation("form.confirm_recovery_phrase");
+    const { showErrorToast } = useToast();
+    const { t } = useTranslation("account_form");
+    const { t: tCommon } = useTranslation("common");
 
     const [seedWords, setSeedWords] = useState<any[]>([]);
     const [words, setWords] = useState<(string | undefined)[]>([]);
     const [droppedWords, setDroppedWords] = useState<string[]>([]);
 
     useEffect(() => {
-      const wordsFromSeed = seed.split(" ");
-      if (wordsFromSeed.length < 24) throw new Error("Invalid seed");
+      try {
+        const wordsFromSeed = seed.split(" ");
+        if (wordsFromSeed.length < 24)
+          throw new Error("invalid_recovery_phrase");
 
-      const arrayLength = wordsFromSeed.length;
-      const wordsIndexesToRemove: { word: string; index: number }[] = [];
+        const arrayLength = wordsFromSeed.length;
+        const wordsIndexesToRemove: { word: string; index: number }[] = [];
 
-      while (wordsIndexesToRemove.length < 5) {
-        const index = Math.floor(Math.random() * arrayLength);
-        const newWord = wordsFromSeed[index];
-        const invalidWord = wordsIndexesToRemove.find(
-          ({ word, index: i }) => index === i || word === newWord
-        );
-        if (!invalidWord) {
-          wordsIndexesToRemove.push({ index, word: newWord });
+        while (wordsIndexesToRemove.length < 5) {
+          const index = Math.floor(Math.random() * arrayLength);
+          const newWord = wordsFromSeed[index];
+          const invalidWord = wordsIndexesToRemove.find(
+            ({ word, index: i }) => index === i || word === newWord
+          );
+          if (!invalidWord) {
+            wordsIndexesToRemove.push({ index, word: newWord });
+          }
         }
-      }
-      setWords(wordsIndexesToRemove.map(({ word }) => word));
+        setWords(wordsIndexesToRemove.map(({ word }) => word));
 
-      setSeedWords(
-        wordsFromSeed.map((word, index) => ({
-          word: wordsIndexesToRemove.find(({ index: i }) => index === i)
-            ? ""
-            : word,
-          accept: !wordsIndexesToRemove.find(({ index: i }) => index === i)
-            ? ""
-            : "word",
-        }))
-      );
+        setSeedWords(
+          wordsFromSeed.map((word, index) => ({
+            word: wordsIndexesToRemove.find(({ index: i }) => index === i)
+              ? ""
+              : word,
+            accept: !wordsIndexesToRemove.find(({ index: i }) => index === i)
+              ? ""
+              : "word",
+          }))
+        );
+      } catch (error) {
+        showErrorToast(tCommon(error as string));
+        confirm(false);
+      }
     }, [seed]);
 
     useEffect(() => {
@@ -89,7 +98,7 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
       <div className="mt-4">
         <div className="flex justify-center items-center mb-4">
           <p className="text-center">
-            {t("confirm_recovery_phrase_description")}
+            {t("form.confirm_recovery_phrase_description")}
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2">
