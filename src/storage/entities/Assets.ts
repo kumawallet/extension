@@ -47,7 +47,6 @@ export default class Assets extends BaseEntity {
       (ast) => ast.address === asset.address
     );
 
-    console.log("asset found", _asset);
     if (_asset) throw new Error("asset_already_added");
 
     this.data[chain].push(asset);

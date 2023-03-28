@@ -122,7 +122,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
           setEvmTx(tx);
         } else {
-          console.log("load contract", asset);
           const contract = new ethers.Contract(
             asset?.address,
             erc20abi,

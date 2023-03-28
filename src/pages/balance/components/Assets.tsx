@@ -9,6 +9,7 @@ import { useAssetContext, useNetworkContext } from "@src/providers";
 import { Loading } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
+import { formatUSDAmount } from "../../../utils/assets";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -83,28 +84,35 @@ export const Assets = () => {
       {filteredAsset.map((asset, index) => (
         <div
           key={index.toString()}
-          className="bg-[#343A40] px-5 py-4 rounded-xl flex items-center justify-between font-inter"
+          className="bg-[#343A40] px-2 py-2 rounded-2xl flex items-center justify-between font-inter"
         >
           <div className="flex gap-2 items-center">
             {asset.id === "-1" ? (
               <img
                 src={`/images/${selectedChain.logo}.png`}
-                width={24}
+                width={32}
                 height={24}
                 className="object-cover rounded-full"
               />
             ) : (
-              <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
+              <div className="w-8 h-6 flex justify-center">
+                <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
+              </div>
             )}
-            <div className="flex gap-1 items-center">
-              <p className="font-bold text-xl">
-                {formatAmountWithDecimals(
-                  Number(asset.balance),
-                  6,
-                  asset.decimals
-                )}
-              </p>
-              <p className="tx-sm">{asset.symbol}</p>
+            <div className="flex flex-col">
+              <div className="flex gap-1 items-center">
+                <p className="font-bold text-xl">
+                  {formatAmountWithDecimals(
+                    Number(asset.balance),
+                    6,
+                    asset.decimals
+                  )}
+                </p>
+                <p className="tx-sm">{asset.symbol}</p>
+              </div>
+              <div className="text-xs text-gray-400">
+                {formatUSDAmount(asset.amount || 0)}
+              </div>
             </div>
           </div>
 

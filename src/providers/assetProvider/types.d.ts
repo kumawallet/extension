@@ -4,6 +4,8 @@ export interface Asset {
   id: string;
   balance: BN | ethers.BigNumberish;
   address?: string;
+  amount?: number;
+  name?: string;
 }
 
 export interface InitialState {
@@ -27,5 +29,11 @@ export type Action =
       type: "set-assets";
       payload: {
         assets: Asset[];
+      };
+    }
+  | {
+      type: "update-assets";
+      payload: {
+        assets: Assset[];
       };
     };

@@ -229,7 +229,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
             status = RecordStatus.FAIL;
           } else {
             status = RecordStatus.SUCCESS;
-            console.log("should load assets");
             loadAssets();
           }
           const hash = txHash.toString();

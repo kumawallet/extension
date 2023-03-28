@@ -32,14 +32,14 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       <div className="flex gap-3 justify-center">
         <button
           onClick={() => navigate(SEND)}
-          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg hover:bg-custom-gray-bg hover:bg-opacity-40"
+          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-1 py-1 rounded-xl hover:bg-custom-gray-bg hover:bg-opacity-40"
         >
           <BsArrowUpRight />
           <p>{t("send")}</p>
         </button>
         <button
           onClick={() => navigate(RECEIVE)}
-          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg hover:bg-custom-gray-bg hover:bg-opacity-40"
+          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-1 py-1 rounded-xl hover:bg-custom-gray-bg hover:bg-opacity-40"
         >
           <BsArrowDownLeft />
           <p>{t("receive")}</p>

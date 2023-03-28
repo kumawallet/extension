@@ -7,7 +7,11 @@ import {
   useReducer,
 } from "react";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { getNatitveAssetBalance } from "@src/utils/assets";
+import {
+  formatAmountWithDecimals,
+  getAssetUSDPrice,
+  getNatitveAssetBalance,
+} from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
@@ -51,6 +55,13 @@ export const reducer = (state: InitialState, action: Action) => {
         isLoadingAssets: false,
       };
     }
+    case "update-assets": {
+      const { assets } = action.payload;
+      return {
+        ...state,
+        assets,
+      };
+    }
     default:
       return state;
   }
@@ -66,26 +77,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
-
-  useEffect(() => {
-    dispatch({
-      type: "loading-assets",
-    });
-  }, [rpc, api]);
-
-  useEffect(() => {
-    if (
-      rpc &&
-      selectedAccount?.value?.address &&
-      selectedChain &&
-      type &&
-      api
-    ) {
-      if (selectedAccount?.type?.includes(type)) {
-        loadAssets();
-      }
-    }
-  }, [rpc, selectedAccount, type, api]);
 
   const loadAssets = async () => {
     dispatch({
@@ -110,6 +101,8 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           assets,
         },
       });
+
+      getAssetsUSDPrice(assets);
     } catch (error) {
       dispatch({
         type: "end-loading",
@@ -247,6 +240,67 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
     return assets;
   }, [selectedAccount, api, selectedChain, type]);
+
+  useEffect(() => {
+    dispatch({
+      type: "loading-assets",
+    });
+  }, [rpc, api]);
+
+  useEffect(() => {
+    if (
+      rpc &&
+      selectedAccount?.value?.address &&
+      selectedChain &&
+      type &&
+      api
+    ) {
+      if (selectedAccount?.type?.includes(type)) {
+        loadAssets();
+      }
+    }
+  }, [rpc, selectedAccount, type, api]);
+
+  const getAssetsUSDPrice = async (assets?: Asset[]) => {
+    try {
+      const copyAssets = [...(assets || state.assets)];
+
+      const addresToQuery = [];
+      for (const [index, asset] of copyAssets.entries()) {
+        if (asset.id === "-1" && asset.name && !asset.balance.isZero()) {
+          addresToQuery.push({
+            index,
+            asset,
+          });
+        }
+      }
+
+      await Promise.all(
+        addresToQuery.map(async ({ asset, index }) => {
+          if (asset.id === "-1") {
+            const price = await getAssetUSDPrice(asset.name as string);
+
+            const _balance = Number(
+              formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
+            );
+
+            copyAssets[index].amount = price * _balance;
+          }
+          return;
+        })
+      );
+
+      dispatch({
+        type: "update-assets",
+        payload: {
+          assets: copyAssets,
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+      //
+    }
+  };
 
   return (
     <AssetContext.Provider

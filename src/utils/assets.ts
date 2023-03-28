@@ -31,14 +31,15 @@ export const getNatitveAssetBalance = async (
 };
 
 export const getAssetUSDPrice = async (assetName: string) => {
+  const _assetName = assetName.toLowerCase();
   try {
     const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${assetName}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${_assetName}&vs_currencies=usd`
     );
 
     const json = await data.json();
 
-    return json?.[assetName]?.["usd"] || 0;
+    return json?.[_assetName]?.["usd"] || 0;
   } catch (error) {
     console.error(error);
     return 0;
@@ -73,4 +74,12 @@ export const formatBN = (bn: string, decimals: number) => {
   }
 
   return _number;
+};
+
+export const formatUSDAmount = (amount: number) => {
+  return amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 6,
+  });
 };
