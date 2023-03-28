@@ -3,7 +3,7 @@ import BaseEntity from "./BaseEntity";
 interface Asset {
   symbol: string;
   address: string;
-  decimales: number;
+  decimals: number;
 }
 
 export default class Assets extends BaseEntity {
