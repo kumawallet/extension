@@ -3,10 +3,9 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "../../components/common/PageWrapper";
-import { useToast } from "@src/hooks";
+import { PageWrapper, Loading, LoadingButton } from "@src/components/common";
+import { useToast, useLoading } from "@src/hooks";
 import Extension from "@src/Extension";
-import { Loading } from "@src/components/common";
 import { BsEye, BsTrash } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
@@ -17,6 +16,11 @@ export const Security = () => {
   const { t } = useTranslation("security");
   const { t: tCommon } = useTranslation("common");
   const { getSelectedAccount } = useAccountContext();
+  const {
+    isLoading: isLoadingReset,
+    starLoading: startLoadingReset,
+    endLoading: endLoadingReset,
+  } = useLoading();
   const [isLoading, setIsLoading] = useState(true);
   const [sites, setSites] = useState([] as string[]);
   const [showSites, setShowSites] = useState(false);
@@ -57,12 +61,13 @@ export const Security = () => {
   };
 
   const resetWallet = async () => {
+    startLoadingReset();
     try {
       await Extension.resetWallet();
-      navigate("/");
       window.location.reload();
     } catch (error) {
       showErrorToast(tCommon(error as string));
+      endLoadingReset();
     }
   };
 
@@ -303,7 +308,11 @@ export const Security = () => {
               </button>
             </div>
             <Transition appear show={isResetOpen} as={Fragment}>
-              <Dialog as="div" className="relative z-10" onClose={closeResetModal}>
+              <Dialog
+                as="div"
+                className="relative z-10"
+                onClose={!isLoadingReset ? closeResetModal : () => null}
+              >
                 <Transition.Child
                   as={Fragment}
                   enter="ease-out duration-300"
@@ -338,13 +347,13 @@ export const Security = () => {
                             {t("reset_wallet_warning")}
                           </p>
                           <div className="mt-4 flex justify-end">
-                            <button
-                              type="button"
+                            <LoadingButton
+                              isLoading={isLoadingReset}
                               onClick={resetWallet}
-                              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-red-bg hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
+                              classname="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-red-bg hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
                             >
                               {t("reset")}
-                            </button>
+                            </LoadingButton>
                           </div>
                         </div>
                       </Dialog.Panel>
