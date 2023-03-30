@@ -55,7 +55,8 @@
     "show": "表示",
     "hide": "非表示",
     "open": "開く",
-    "close": "閉じる"
+    "close": "閉じる",
+    "copied": "コピペ"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
