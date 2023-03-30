@@ -5,22 +5,25 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { Tx } from "../Send";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
+import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 
 interface ConfirmTxProps {
-  tx: Tx;
   onConfirm: () => void;
   isLoading: boolean;
 }
 
-export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
+export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading }) => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
-  const navigate = useNavigate();
   const { t } = useTranslation("send");
+  const navigate = useNavigate();
+
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
 
   const { getValues, watch } = useFormContext();
 
@@ -28,6 +31,11 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
 
   const destinationAccount = getValues("destinationAccount");
   const originAccount = getValues("from");
+
+  const { Icon: IconFrom, copyToClipboard: copyToClipboardFrom } =
+    useCopyToClipboard(selectedAccount.value.address || "");
+  const { Icon: IconTo, copyToClipboard: copyToClipboardTo } =
+    useCopyToClipboard(destinationAccount);
 
   const originChainName = originAccount.name;
   const destinationChainName = originAccount.name;
@@ -43,42 +51,119 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ tx, onConfirm, isLoading }) => {
           onClick={() => navigate(-1)}
         />
 
-        <p className="text-xl">{t("title")}</p>
+        <p className="text-xl">{t("transfer")}</p>
       </div>
       <div className="mb-5">
         {<p className="mb-2">{t("chains")}:</p>}{" "}
-        <div className="flex justify-around items-center bg-[#212529] rounded-xl py-3 px-5">
-          <div className="flex flex-col">
-            <p>{originChainName}</p>
-            <p>{cropAccount(selectedAccount.value.address || "")}</p>
+        <div
+          className="flex justify-around items-center bg-[#212529] rounded-xl py-3 px-5 gap-1"
+          style={{
+            boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+          }}
+        >
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex gap-2 items-center">
+              <img
+                src={`/images/${originAccount.logo}.png`}
+                width={29}
+                height={29}
+                className="object-cover rounded-full"
+              />
+              <p>{originChainName}</p>
+            </div>
+            <button
+              className="flex items-center gap-2"
+              onClick={copyToClipboardFrom}
+            >
+              <p className="text-[#FFC300]">
+                {cropAccount(selectedAccount.value.address || "")}
+              </p>
+              <IconFrom
+                messagePosition="right"
+                iconProps={{
+                  color: "#FFC300",
+                }}
+              />
+            </button>
           </div>
           <div className="flex gap-1">
             <FaChevronLeft />
             <FaChevronRight />
           </div>
-          <div className="flex flex-col">
-            <p>{destinationChainName}</p>
-            <p>{cropAccount(destinationAccount)}</p>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex gap-2 items-center">
+              <img
+                src={`/images/${originAccount.logo}.png`}
+                width={29}
+                height={29}
+                className="object-cover rounded-full"
+              />
+              <p>{destinationChainName}</p>
+            </div>
+            <button
+              className="flex items-center gap-2"
+              onClick={copyToClipboardTo}
+            >
+              <p className="text-[#FFC300]">
+                {cropAccount(destinationAccount)}
+              </p>
+              <IconTo
+                messagePosition="right"
+                iconProps={{
+                  color: "#FFC300",
+                }}
+              />
+            </button>
           </div>
         </div>
       </div>
       <div className="mb-5">
         <p>{t("assets")}:</p>
         <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
-          <div className="flex flex-col">
-            <p>{asset?.name}</p>
-            <p>
-              <span>{amount}</span> {asset?.symbol}
+          <div className="flex flex-col items-center">
+            <div className="flex gap-2 items-center">
+              {asset.id === "-1" ? (
+                <img
+                  src={`/images/${selectedChain.logo}.png`}
+                  width={32}
+                  height={24}
+                  className="object-cover rounded-full"
+                />
+              ) : (
+                <div className="w-8 h-6 flex justify-center">
+                  <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
+                </div>
+              )}
+              <p className="font-inter uppercase">{asset?.name}</p>
+            </div>
+            <p className="font-inter">
+              <span className=" font-bold text-[27px] mr-2">{amount}</span>
+              <span className="uppercase">{asset?.symbol}</span>
             </p>
           </div>
           <div className="flex gap-1">
             <FaChevronLeft />
             <FaChevronRight />
           </div>
-          <div className="flex flex-col">
-            <p>{asset?.name}</p>
-            <p>
-              <span>{amount}</span> {asset?.symbol}
+          <div className="flex flex-col items-center">
+            <div className="flex gap-2 items-center">
+              {asset.id === "-1" ? (
+                <img
+                  src={`/images/${selectedChain.logo}.png`}
+                  width={32}
+                  height={24}
+                  className="object-cover rounded-full"
+                />
+              ) : (
+                <div className="w-8 h-6 flex justify-center">
+                  <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
+                </div>
+              )}
+              <p className="font-inter uppercase">{asset?.name}</p>
+            </div>
+            <p className="font-inter">
+              <span className="font-bold text-[27px] mr-2">{amount}</span>
+              <span className="uppercase">{asset?.symbol}</span>
             </p>
           </div>
         </div>

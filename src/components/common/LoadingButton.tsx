@@ -1,4 +1,10 @@
-import { FC, HTMLAttributes, PropsWithChildren, SVGAttributes } from "react";
+import {
+  CSSProperties,
+  FC,
+  HTMLAttributes,
+  PropsWithChildren,
+  SVGAttributes,
+} from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface LoadinButtonProps {
@@ -7,6 +13,7 @@ interface LoadinButtonProps {
   isLoading?: boolean;
   onClick?: () => void;
   spinnerClassname?: SVGAttributes<SVGElement>["className"];
+  style?: CSSProperties;
 }
 
 const DEFAULT_CLASSNAME =
@@ -20,6 +27,7 @@ export const LoadingButton: FC<LoadinButtonProps & PropsWithChildren> = ({
   isLoading,
   onClick,
   spinnerClassname,
+  style,
 }) => {
   return (
     <button
@@ -28,6 +36,7 @@ export const LoadingButton: FC<LoadinButtonProps & PropsWithChildren> = ({
       } disabled:opacity-30 disabled:bg-gray-600`}
       onClick={onClick}
       disabled={isDisabled || isLoading}
+      style={style}
     >
       {isLoading ? (
         <AiOutlineLoading3Quarters

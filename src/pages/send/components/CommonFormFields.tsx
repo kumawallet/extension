@@ -21,12 +21,12 @@ export const CommonFormFields = () => {
       <div className="mx-auto">
         <div className="flex gap-2 justify-center items-end mb-4">
           <div className="px-2">
-            <p className="mb-2">From:</p>
+            <p className="mb-2 font-inter font-light">From:</p>
             <SelectableChain selectedChain={getValues("from")} />
           </div>
           <TbChevronRight size={26} className="mb-2" />
           <div className="px-2">
-            <p className="mb-2">To:</p>
+            <p className="mb-2 font-inter font-light">To:</p>
             <SelectableChain
               canSelectChain={true}
               selectedChain={getValues("to")}
@@ -44,9 +44,9 @@ export const CommonFormFields = () => {
           </div>
           <div>
             <p>{t("amount")}</p>
-            <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
+            <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
               <NumericFormat
-                className="bg-transparent w-8/12 outline-0"
+                className="bg-transparent w-7/12 outline-0 text-xl font-inter font-bold"
                 allowNegative={false}
                 allowLeadingZeros={false}
                 value={getValues("amount")}
@@ -56,7 +56,7 @@ export const CommonFormFields = () => {
                 allowedDecimalSeparators={["%"]}
               />
 
-              <div className="w-4/12">
+              <div className="w-5/12">
                 <SelectableAsset
                   onChangeAsset={(asset) => {
                     setValue("asset", asset);

@@ -221,9 +221,12 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <LoadingButton
-        classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mt-7"
+        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
         isDisabled={!canContinue}
         onClick={onSubmit}
+        style={{
+          boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        }}
       >
         {t("continue")}
       </LoadingButton>

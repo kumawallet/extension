@@ -145,7 +145,7 @@ export const Destination = () => {
       <div className="relative mt-1">
         <Combobox.Input
           autoComplete="off"
-          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+          className="bg-[#343A40] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5  border-gray-600 placeholder-gray-400 text-white"
           {...r}
           onChange={({ target, type }) => {
             console.log({
@@ -178,7 +178,7 @@ export const Destination = () => {
                       <Combobox.Option
                         key={acc.address}
                         value={acc.address}
-                        className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md overflow-hidden px-1 py-1 font-extralight text-sm text-gray-300"
+                        className="hover:bg-gray-400 hover:bg-opacity-20 cursor-pointer rounded-md overflow-hidden px-1 py-1 font-extralight text-sm text-gray-300"
                         onClick={() => setisOpenOptions(false)}
                       >
                         <p>{acc.name}</p>

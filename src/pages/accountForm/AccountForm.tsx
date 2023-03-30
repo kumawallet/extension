@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
-import { useLoading } from "@src/hooks";
+import { useLoading, useCopyToClipboard } from "@src/hooks";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
@@ -64,20 +64,22 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   onSubmitFn,
   callback,
 }) => {
+  const navigate = useNavigate();
+  const { t } = useTranslation("account_form");
+  const { t: tCommon } = useTranslation("common");
   const {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { t } = useTranslation("account_form");
-  const { t: tCommon } = useTranslation("common");
   const PASSWORD_RULES = t("form.password_hint");
   const passwordIsRequired = signUp || resetPassword;
 
-  const navigate = useNavigate();
   const { isLoading, endLoading, starLoading } = useLoading();
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
+  const { Icon, copyToClipboard } = useCopyToClipboard(seed);
+
   const [showInsertSeedStep, setShowInsertSeedStep] = useState(false);
   const [seedConfirmationIsValid, setSeedConfirmationIsValid] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
@@ -217,18 +219,24 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 </label>
                 <div className="relative">
                   <textarea
-                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 h-[120px] md:h-[65px] border-gray-600 placeholder-gray-400 text-white resize-none relative select-none"
+                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 h-[120px] md:h-[65px] border-gray-600 placeholder-gray-400 text-white resize-none relative select-none pr-10"
                     value={seed}
                     aria-readonly={true}
                     readOnly={true}
                     disabled
                   />
+                  <button
+                    className="absolute top-1/2 -translate-y-1/2 right-5"
+                    onClick={copyToClipboard}
+                  >
+                    <Icon messagePosition="right" />
+                  </button>
                   {!showSeed && (
-                    <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
-                      <button
-                        className="flex flex-col items-center"
-                        onClick={() => setShowSeed(true)}
-                      >
+                    <div
+                      className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-50"
+                      onClick={() => setShowSeed(true)}
+                    >
+                      <button className="flex flex-col items-center">
                         <p>{tCommon("show")}</p>
                         <BsEye size={18} />
                       </button>

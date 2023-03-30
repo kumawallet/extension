@@ -73,8 +73,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
   const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
-  console.log(asset);
-
   useEffect(() => {
     (async () => {
       const seed = await Extension.showSeed();
@@ -186,7 +184,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         "estimated total": amounToShow,
       });
     } catch (error) {
-      console.log(error);
       showErrorToast(error);
       setFee(defaultFees);
     }
@@ -236,7 +233,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
       <div className="mb-3">
         <p>{t("tip")}</p>
-        <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
+        <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
           <NumericFormat
             className="bg-transparent w-8/12 outline-0"
             allowNegative={false}
@@ -293,9 +290,12 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       )}
 
       <LoadingButton
-        classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mt-7"
+        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
+        style={{
+          boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        }}
       >
         {t("continue")}
       </LoadingButton>
