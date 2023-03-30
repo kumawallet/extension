@@ -22,6 +22,7 @@ import { formatBN } from "@src/utils/assets";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
 import { ContractTx } from "@polkadot/api-contract/base/types";
+import { Fees } from "./Fees";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -250,38 +251,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         </div>
       </div>
 
-      {isLoadingFee ? (
-        <Loading />
-      ) : (
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between">
-            <p>{t("estimated_fee")}</p>
-            <p>{formatBN(fee["estimated fee"].toString(), decimals)}</p>
-          </div>
-          <div className="flex justify-between">
-            <p>{t("estimated_total")}</p>
-            {isNativeAsset ? (
-              <>
-                <p className="font-bold">
-                  {`${formatBN(
-                    fee["estimated total"].toString(),
-                    decimals
-                  )} ${nativeSymbol}`}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-bold">{`${amount} ${
-                  asset?.symbol
-                } + ${formatBN(
-                  fee["estimated total"].toString(),
-                  decimals
-                )} ${nativeSymbol}`}</p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
 
       {canContinue && !isEnoughToPay && (
         <p className="text-sm mt-2 text-red-500 text-center">

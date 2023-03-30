@@ -10,14 +10,12 @@ import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { useNavigate } from "react-router-dom";
 import { isHex } from "@polkadot/util";
 import { isAddress } from "ethers/lib/utils";
-import { WasmForm } from "./components/WasmForm";
-import { EvmForm } from "./components/EvmForm";
 import { AccountType } from "@src/accounts/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ethers } from "ethers";
-import { ConfirmTx } from "./components";
+import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { BALANCE } from "../../routes/paths";
+import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
 
 export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;

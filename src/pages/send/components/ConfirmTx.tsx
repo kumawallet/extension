@@ -8,13 +8,16 @@ import { useNavigate } from "react-router-dom";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
+import { Tx } from "../Send";
+import { Fees } from "./Fees";
 
 interface ConfirmTxProps {
+  tx: Tx;
   onConfirm: () => void;
   isLoading: boolean;
 }
 
-export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading }) => {
+export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
@@ -170,8 +173,8 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading }) => {
       </div>
       <div className="mb-5">
         <p>{t("details")}:</p>
-        <div className="flex bg-[#343A40] rounded-xl py-3 px-5">
-          <p>Timestamp: Aug-08-2022 10:25:29 PM +UTC</p>
+        <div className="flex bg-[#343A40] rounded-xl py-3 px-5 w-full">
+          <Fees fee={tx?.fee || {}} />
         </div>
       </div>
       <LoadingButton

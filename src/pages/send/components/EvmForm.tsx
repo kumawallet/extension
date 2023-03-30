@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { confirmTx, evmTx } from "../Send";
 import { CommonFormFields } from "./CommonFormFields";
 import erc20abi from "@src/constants/erc20.abi.json";
+import { Fees } from "./Fees";
 
 const BN0 = ethers.BigNumber.from(0);
 
@@ -180,45 +181,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     <>
       <CommonFormFields />
 
-      {isLoadingFee ? (
-        <Loading />
-      ) : (
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-between">
-            <p>{t("gas_limit")}</p>
-            <p className="font-bold">{String(fee["gas limit"])} gwei</p>
-          </div>
-          <div className="flex justify-between">
-            <p>{t("estimated_fee")}</p>
-            <p className="font-bold">{`${formatBN(
-              fee["estimated fee"].toString(),
-              asset?.decimals
-            )} ${nativeSymbol}`}</p>
-          </div>
-          <div className="flex justify-between">
-            <p>{t("estimated_total")}</p>
-            {isNativeAsset ? (
-              <>
-                <p className="font-bold">
-                  {`${formatBN(
-                    fee["estimated total"].toString(),
-                    decimals
-                  )} ${nativeSymbol}`}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-bold">{`${amount} ${
-                  asset?.symbol
-                } + ${formatBN(
-                  fee["estimated total"].toString(),
-                  decimals
-                )} ${nativeSymbol}`}</p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
 
       <LoadingButton
         classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
