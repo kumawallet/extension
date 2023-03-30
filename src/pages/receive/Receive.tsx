@@ -16,7 +16,9 @@ export const Receive = () => {
   } = useAccountContext();
 
   const account = cropAccount(selectedAccount?.value?.address);
-  const { Icon, copyToClipboard } = useCopyToClipboard(account || "");
+  const { Icon, copyToClipboard } = useCopyToClipboard(
+    selectedAccount?.value?.address || ""
+  );
 
   return (
     <PageWrapper>

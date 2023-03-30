@@ -5,6 +5,8 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useState,
+  useCallback,
 } from "react";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import {
@@ -20,7 +22,6 @@ import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-import { useCallback } from "react";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 
@@ -62,6 +63,24 @@ export const reducer = (state: InitialState, action: Action) => {
         assets,
       };
     }
+    case "update-one-asset": {
+      const {
+        asset: { newValue, updatedBy, updatedByValue },
+      } = action.payload;
+      const assets = [...state.assets];
+
+      const index = assets.findIndex(
+        (asset) => asset[updatedBy] === updatedByValue
+      );
+      if (index > -1) {
+        assets[index].balance = newValue;
+      }
+
+      return {
+        ...state,
+        assets,
+      };
+    }
     default:
       return state;
   }
@@ -69,6 +88,7 @@ export const reducer = (state: InitialState, action: Action) => {
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [unsubscribers, setUnsubscribers] = useState([]);
 
   const {
     state: { api, selectedChain, rpc, type },
@@ -119,6 +139,25 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api,
       account.value.address
     );
+    if (type === "WASM") {
+      const unsub = await (api as ApiPromise).query.system.account(
+        selectedAccount.value.address,
+        ({ data, nonce }) => {
+          dispatch({
+            type: "update-one-asset",
+            payload: {
+              asset: {
+                updatedBy: "id",
+                updatedByValue: "-1",
+                newValue: new BN(data?.free || 0),
+              },
+            },
+          });
+        }
+      );
+      // susbcribrer addde
+      setUnsubscribers((state) => [...state, unsub]);
+    }
     return nativeAsset;
   };
 
@@ -170,11 +209,31 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         formatedAssets.map((r, index) =>
           assetPallet
             ?.account(r.id, selectedAccount.value.address)
-            .then((asset) => {
+            .then(async (asset) => {
               const result = asset.toJSON() as Partial<{ balance: Uint8Array }>;
+
               formatedAssets[index].balance =
                 (result?.balance && new BN(String(result?.balance))) ||
                 new BN("0");
+
+              const unsub = await assetPallet?.account(
+                r.id,
+                selectedAccount.value.address,
+                (data) => {
+                  dispatch({
+                    type: "update-one-asset",
+                    payload: {
+                      asset: {
+                        updatedBy: "id",
+                        updatedByValue: r.id,
+                        newValue: new BN(String(data.toJSON()?.balance || 0)),
+                      },
+                    },
+                  });
+                }
+              );
+              // susbcribrer added
+              setUnsubscribers((state) => [...state, unsub]);
             })
         )
       );
@@ -246,6 +305,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     dispatch({
       type: "loading-assets",
     });
+    if ((!rpc || !api) && unsubscribers.length > 0) {
+      for (const unsub of unsubscribers) {
+        unsub?.();
+      }
+      setUnsubscribers([]);
+    }
   }, [rpc, api]);
 
   useEffect(() => {

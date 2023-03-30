@@ -20,6 +20,7 @@ const commonManifest = {
     "scripting",
     "nativeMessaging",
     "tabs",
+    "notifications",
   ] as chrome.runtime.ManifestPermissions[],
   version: pkg.version,
 };

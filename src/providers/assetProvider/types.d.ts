@@ -36,4 +36,14 @@ export type Action =
       payload: {
         assets: Assset[];
       };
+    }
+  | {
+      type: "update-one-asset";
+      payload: {
+        asset: {
+          updatedBy: "id" | "address" | "name";
+          updatedByValue: string;
+          newValue: BN;
+        };
+      };
     };
