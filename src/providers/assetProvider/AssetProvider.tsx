@@ -24,6 +24,7 @@ import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
+import randomcolor from "randomcolor";
 
 const initialState: InitialState = {
   assets: [],
@@ -115,7 +116,11 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           ...selectedChain?.nativeCurrency,
           balance: _nativeBalance,
         },
-        ..._assets,
+        ..._assets.map((asset) => ({
+          ...asset,
+          // TODO: save this colors in storage
+          color: randomcolor(),
+        })),
       ];
 
       dispatch({

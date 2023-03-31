@@ -9,7 +9,8 @@ import { useAssetContext, useNetworkContext } from "@src/providers";
 import { Loading } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
-import { formatUSDAmount } from "../../../utils/assets";
+import { formatUSDAmount } from "@src/utils/assets";
+import { RiCopperCoinLine } from "react-icons/ri";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -95,9 +96,7 @@ export const Assets = () => {
                 className="object-cover rounded-full"
               />
             ) : (
-              <div className="w-8 h-6 flex justify-center">
-                <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
-              </div>
+              <RiCopperCoinLine size={32} color={asset.color || "#fff"} />
             )}
             <div className="flex flex-col">
               <div className="flex gap-1 items-center">
