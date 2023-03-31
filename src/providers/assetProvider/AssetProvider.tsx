@@ -146,9 +146,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       const unsub = await (api as ApiPromise).query.system.account(
         selectedAccount.value.address,
         ({ data, nonce }) => {
-          console.log(
-            `balance change ${data?.free} for address ${selectedAccount?.value?.address}`
-          );
           dispatch({
             type: "update-one-asset",
             payload: {
@@ -187,10 +184,13 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     if (!type) return [];
 
     if (type === "WASM") {
-      const [assetsFromPallet, assets] = await Promise.all([
+      const [assets, assetsFromPallet] = await Promise.all([
         loadAssetsFromStorage(),
         loadPolkadotAssets(),
       ]);
+
+      assets.length > 0 && listoToWasmContracts(assets);
+
       return [...assetsFromPallet, ...assets];
     } else {
       const assets = loadAssetsFromStorage();
@@ -353,6 +353,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                 metadata,
                 asset.address
               );
+
               const { output } = await contract.query.balanceOf(
                 accountAddress,
                 {
@@ -361,6 +362,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                 accountAddress
               );
               assets[index].balance = new BN(output?.toString() || "0");
+              assets[index].contract = contract;
             }
           } catch (error) {
             console.log(error);
@@ -383,7 +385,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const removeListeners = () => {
     if (unsubscribers.length > 0) {
       for (const unsub of unsubscribers) {
-        console.log("unsub ", unsub);
         unsub?.();
       }
       setUnsubscribers([]);
@@ -447,6 +448,41 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       console.log("error", error);
       //
     }
+  };
+
+  const listoToWasmContracts = async (assets: Asset[]) => {
+    const unsub = await (api as ApiPromise).rpc.chain.subscribeNewHeads(
+      async () => {
+        const gasLimit = api.registry.createType("WeightV2", {
+          refTime: REF_TIME,
+          proofSize: PROOF_SIZE,
+        });
+
+        for (const asset of assets) {
+          const { output } = await asset.contract.query.balanceOf(
+            selectedAccount?.value?.address,
+            {
+              gasLimit,
+            },
+            selectedAccount.value?.address
+          );
+          const balance = new BN(output?.toString() || "0");
+
+          dispatch({
+            type: "update-one-asset",
+            payload: {
+              asset: {
+                updatedBy: "address",
+                updatedByValue: asset.address as string,
+                newValue: balance,
+              },
+            },
+          });
+        }
+      }
+    );
+
+    setUnsubscribers((state) => [...state, unsub]);
   };
 
   return (
