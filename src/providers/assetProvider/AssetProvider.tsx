@@ -17,7 +17,7 @@ import {
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
-import { BN, u8aToString } from "@polkadot/util";
+import { BN, hexToBn, u8aToString } from "@polkadot/util";
 import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
@@ -72,13 +72,15 @@ export const reducer = (state: InitialState, action: Action) => {
       const index = assets.findIndex(
         (asset) => asset[updatedBy] === updatedByValue
       );
-      if (index > -1) {
+      if (index > -1 && !newValue.eq(assets[index].balance)) {
         assets[index].balance = newValue;
+        return {
+          ...state,
+          assets,
+        };
       }
-
       return {
         ...state,
-        assets,
       };
     }
     default:
@@ -102,7 +104,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     dispatch({
       type: "loading-assets",
     });
-    let assets: Asset[];
+    let assets: Asset[] = [];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
@@ -123,6 +125,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      console.log("error", error);
       dispatch({
         type: "end-loading",
       });
@@ -143,6 +146,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       const unsub = await (api as ApiPromise).query.system.account(
         selectedAccount.value.address,
         ({ data, nonce }) => {
+          console.log(
+            `balance change ${data?.free} for address ${selectedAccount?.value?.address}`
+          );
           dispatch({
             type: "update-one-asset",
             payload: {
@@ -157,6 +163,22 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       );
       // susbcribrer addde
       setUnsubscribers((state) => [...state, unsub]);
+    } else {
+      const _api = api as ethers.providers.JsonRpcProvider;
+      _api.on("block", () => {
+        _api.getBalance(account.value.address).then((balance) => {
+          dispatch({
+            type: "update-one-asset",
+            payload: {
+              asset: {
+                updatedBy: "id",
+                updatedByValue: "-1",
+                newValue: balance,
+              },
+            },
+          });
+        });
+      });
     }
     return nativeAsset;
   };
@@ -174,7 +196,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       const assets = loadAssetsFromStorage();
       return assets;
     }
-  }, [type, api]);
+  }, [type, api, selectedAccount]);
 
   const loadPolkadotAssets = useCallback(async () => {
     const assetPallet = await (api as ApiPromise)?.query?.assets;
@@ -212,21 +234,53 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
             .then(async (asset) => {
               const result = asset.toJSON() as Partial<{ balance: Uint8Array }>;
 
-              formatedAssets[index].balance =
-                (result?.balance && new BN(String(result?.balance))) ||
-                new BN("0");
+              let _balance = new BN("0");
+
+              if (result?.balance) {
+                if (typeof result?.balance === "number") {
+                  _balance = new BN(String(result?.balance));
+                }
+
+                if (
+                  typeof result.balance === "string" &&
+                  (result.balance as string).startsWith("0x")
+                ) {
+                  _balance = hexToBn(result.balance);
+                }
+              }
+
+              formatedAssets[index].balance = _balance;
 
               const unsub = await assetPallet?.account(
                 r.id,
                 selectedAccount.value.address,
                 (data) => {
+                  const result = data.toJSON() as Partial<{
+                    balance: Uint8Array;
+                  }>;
+
+                  let _balance = new BN("0");
+
+                  if (result?.balance) {
+                    if (typeof result?.balance === "number") {
+                      _balance = new BN(String(result?.balance));
+                    }
+
+                    if (
+                      typeof result.balance === "string" &&
+                      (result.balance as string).startsWith("0x")
+                    ) {
+                      _balance = hexToBn(result.balance);
+                    }
+                  }
+
                   dispatch({
                     type: "update-one-asset",
                     payload: {
                       asset: {
                         updatedBy: "id",
                         updatedByValue: r.id,
-                        newValue: new BN(String(data.toJSON()?.balance || 0)),
+                        newValue: _balance,
                       },
                     },
                   });
@@ -244,18 +298,19 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     return [];
   }, [api]);
 
-  const loadAssetsFromStorage = useCallback(async () => {
+  const loadAssetsFromStorage = async () => {
     const assetsFromStorage = await Extension.getAssetsByChain(
       selectedChain.name
     );
     const assets: Asset[] = [];
 
-    if (assetsFromStorage.length > 0) {
+    if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
       const accountAddress = selectedAccount.value.address;
 
       await Promise.all(
         assetsFromStorage.map(async (asset, index) => {
           assets[index] = {
+            address: asset.address,
             balance: "",
             id: String(index),
             decimals: asset.decimals,
@@ -270,7 +325,23 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                 api
               );
               const balance = await contract.balanceOf(accountAddress);
-              assets[index].balance = ethers.utils.formatUnits(balance, 18);
+              assets[index].balance = balance;
+              contract.on("Transfer", async (from, to) => {
+                const selfAddress = selectedAccount?.value?.address;
+                if (from === selfAddress || to === selfAddress) {
+                  const balance = await contract.balanceOf(accountAddress);
+                  dispatch({
+                    type: "update-one-asset",
+                    payload: {
+                      asset: {
+                        updatedBy: "id",
+                        updatedByValue: assets[index].id,
+                        newValue: balance,
+                      },
+                    },
+                  });
+                }
+              });
             } else {
               const gasLimit = api.registry.createType("WeightV2", {
                 refTime: REF_TIME,
@@ -292,6 +363,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               assets[index].balance = new BN(output?.toString() || "0");
             }
           } catch (error) {
+            console.log(error);
             assets[index].balance = new BN("0");
           }
         })
@@ -299,19 +371,28 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return assets;
-  }, [selectedAccount, api, selectedChain, type]);
+  };
 
   useEffect(() => {
     dispatch({
       type: "loading-assets",
     });
-    if ((!rpc || !api) && unsubscribers.length > 0) {
+    removeListeners();
+  }, [rpc, api]);
+
+  const removeListeners = () => {
+    if (unsubscribers.length > 0) {
       for (const unsub of unsubscribers) {
+        console.log("unsub ", unsub);
         unsub?.();
       }
       setUnsubscribers([]);
     }
-  }, [rpc, api]);
+  };
+
+  useEffect(() => {
+    removeListeners();
+  }, [selectedAccount?.key]);
 
   useEffect(() => {
     if (
@@ -333,7 +414,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const addresToQuery = [];
       for (const [index, asset] of copyAssets.entries()) {
-        if (asset.id === "-1" && asset.name && !asset.balance.isZero()) {
+        if (asset.id === "-1" && asset.name && !asset.balance.isZero?.()) {
           addresToQuery.push({
             index,
             asset,

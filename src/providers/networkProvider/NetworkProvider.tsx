@@ -128,6 +128,10 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       const rpc =
         network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
 
+      if (state.api && "getBalance" in state.api) {
+        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
+      }
+
       dispatch({
         type: "select-network",
         payload: {
@@ -168,6 +172,10 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const newRpc =
         state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"] || "";
+
+      if (state.api && "getBalance" in state.api) {
+        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
+      }
 
       const rpcAlreadyInUse = newRpc === state.rpc;
       if (rpcAlreadyInUse || !newRpc) return;
