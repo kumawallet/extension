@@ -3,7 +3,7 @@ import { formatAmountWithDecimals } from "@src/utils/assets";
 import { ImCoinDollar } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { MANAGE_ASSETS } from "@src/routes/paths";
+import { MANAGE_ASSETS, SEND } from "@src/routes/paths";
 import { BsArrowUpRight } from "react-icons/bs";
 import { useAssetContext, useNetworkContext } from "@src/providers";
 import { Loading, AssetIcon } from "@src/components/common";
@@ -109,7 +109,7 @@ export const Assets = () => {
             href="#"
             className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
           >
-            <BsArrowUpRight size={23} className="" />
+            <BsArrowUpRight size={23} onClick={() => navigate(SEND)} />
           </a>
         </div>
       ))}
