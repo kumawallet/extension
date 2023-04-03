@@ -2,7 +2,11 @@ import { useMemo, useState } from "react";
 import { PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNetworkContext, useTxContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useTxContext,
+} from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object, string } from "yup";
 import { useToast } from "@src/hooks";
@@ -17,6 +21,8 @@ import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
+import logo from "/logo.svg";
+import { TxToProcess } from "@src/entries/background";
 
 export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
 
@@ -45,8 +51,12 @@ export const Send = () => {
   const { showErrorToast, showSuccessToast } = useToast();
 
   const {
-    state: { selectedChain, type },
+    state: { selectedChain, type, api, rpc },
   } = useNetworkContext();
+
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
   const { addTxToQueue } = useTxContext();
 
@@ -106,47 +116,81 @@ export const Send = () => {
     const amount = getValues("amount");
     const destinationAccount = getValues("destinationAccount");
 
+    const { id } = await chrome.windows.getCurrent();
+
     try {
       if (tx?.type === AccountType.WASM) {
-        addTxToQueue({
-          amount,
-          destinationAccount,
+        const _tx: TxToProcess = {
+          amount: getValues("amount"),
+          originAddress: selectedAccount.value.address,
+          destinationAddress: getValues("destinationAccount"),
+          rpc,
+          asset: getValues("asset"),
+          destinationNetwork: selectedChain.name,
+          networkInfo: selectedChain,
+          originNetwork: selectedChain,
           tx,
+        };
+
+        await chrome.runtime.sendMessage({
+          from: "popup",
+          origin: "kuma",
+          method: "process_tx",
+          popupId: id,
+          tx: _tx,
         });
       } else {
         const asset = getValues("asset");
         const isNativeAsset = asset?.id === "-1";
         let _tx;
+        const _amount = isNativeAsset
+          ? amount * currencyUnits
+          : amount * 10 ** asset.decimals;
+        const bnAmount = ethers.BigNumber.from(
+          _amount.toLocaleString("fullwide", { useGrouping: false })
+        );
         if (asset?.id === "-1") {
           _tx = await tx?.sender.sendTransaction({
             ...tx.tx,
           });
         } else {
-          const _amount = isNativeAsset
-            ? amount * currencyUnits
-            : amount * 10 ** asset.decimals;
-
-          const bnAmount = ethers.BigNumber.from(
-            _amount.toLocaleString("fullwide", { useGrouping: false })
-          );
-
           _tx = await (tx?.tx as ethers.Contract).transfer(
             destinationAccount,
             bnAmount,
             {
-              gasLimit: tx.fee["gas limit"],
-              maxFeePerGas: tx.fee["max fee per gas"],
-              maxPriorityFeePerGas: tx.fee["max priority fee per gas"],
+              gasLimit: tx?.fee["gas limit"],
+              maxFeePerGas: tx?.fee["max fee per gas"],
+              maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
               type: 2,
             }
           );
         }
-        addTxToQueue({
-          amount,
-          destinationAccount,
-          tx: _tx as any,
-          asset,
+
+        const __tx: TxToProcess = {
+          amount: amount,
+          originAddress: selectedAccount.value.address,
+          destinationAddress: getValues("destinationAccount"),
+          rpc,
+          asset: getValues("asset"),
+          destinationNetwork: selectedChain.name,
+          networkInfo: selectedChain,
+          originNetwork: selectedChain,
+          tx: _tx.hash,
+        };
+
+        await chrome.runtime.sendMessage({
+          from: "popup",
+          origin: "kuma",
+          method: "process_tx",
+          popupId: id,
+          tx: __tx,
         });
+        // addTxToQueue({
+        //   amount,
+        //   destinationAccount,
+        //   tx: _tx as any,
+        //   asset,
+        // });
       }
       showSuccessToast(t("tx_send"));
       navigate(BALANCE, {

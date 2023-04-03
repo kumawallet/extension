@@ -235,7 +235,8 @@
     "chains": "チェーン",
     "assets": "資産の部",
     "details": "詳細",
-    "confirm": "確認"
+    "confirm": "確認",
+    "tx_send": "トランザクション送信"
   },
   "manage_assets": {
     "title": "アセットを管理する",

@@ -235,7 +235,8 @@
     "chains": "Cadenas",
     "assets": "Activos",
     "details": "Detalles",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "tx_send": "Transacción enviada"
   },
   "manage_assets": {
     "title": "Gestionar activos",

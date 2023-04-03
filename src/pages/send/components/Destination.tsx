@@ -148,9 +148,6 @@ export const Destination = () => {
           className="bg-[#343A40] text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5  border-gray-600 placeholder-gray-400 text-white"
           {...r}
           onChange={({ target, type }) => {
-            console.log({
-              target,
-            });
             onChangeAccount(target.value);
             onChange({ target, type });
           }}

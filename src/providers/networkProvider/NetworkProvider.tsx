@@ -26,7 +26,7 @@ const initialState: InitialState = {
 
 const NetworkContext = createContext({} as NetworkContext);
 
-const getProvider = (rpc: string, type: string) => {
+export const getProvider = (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc as string);
 

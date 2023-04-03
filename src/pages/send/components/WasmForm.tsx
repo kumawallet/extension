@@ -91,6 +91,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         tip: Number(aditional.tip) * currencyUnits || "0",
       },
       sender: sender as KeyringPair,
+      fee,
     });
   });
 

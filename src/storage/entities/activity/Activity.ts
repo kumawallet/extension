@@ -63,6 +63,7 @@ export default class Activity extends BaseEntity {
 
   getRecords(key: AccountKey, network: string): Record[] {
     const records = this.data[key] ? Object.values(this.data[key]) : [];
+    console.log(records);
     return records
       .filter((r) => r.network.toLowerCase() === network.toLowerCase())
       .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));

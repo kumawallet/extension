@@ -1,4 +1,3 @@
-import React from "react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { formatBN } from "@src/utils/assets";
@@ -30,7 +29,7 @@ export const Fees = ({ fee }: any) => {
 
       <div className="flex justify-between gap-2">
         <p>{t("estimated_fee")}</p>
-        <p>{formatBN(fee["estimated fee"].toString(), decimals)}</p>
+        <p>{formatBN(String(fee["estimated fee"]), decimals)}</p>
       </div>
 
       <div className="flex justify-between gap-2">
@@ -39,7 +38,7 @@ export const Fees = ({ fee }: any) => {
           <>
             <p className="font-bold">
               {`${formatBN(
-                fee["estimated total"].toString(),
+                String(fee["estimated total"]),
                 decimals
               )} ${nativeSymbol}`}
             </p>
@@ -47,7 +46,7 @@ export const Fees = ({ fee }: any) => {
         ) : (
           <>
             <p className="font-bold">{`${amount} ${asset?.symbol} + ${formatBN(
-              fee["estimated total"].toString(),
+              String(fee["estimated total"]),
               decimals
             )} ${nativeSymbol}`}</p>
           </>

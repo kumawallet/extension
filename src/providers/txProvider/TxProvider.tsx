@@ -5,33 +5,21 @@ import {
   useContext,
   useEffect,
   useReducer,
-  useState,
+  // useState,
 } from "react";
-import { useToast } from "@src/hooks";
-import { useTranslation } from "react-i18next";
-import { AccountType } from "@src/accounts/types";
-import {
-  RecordStatus,
-  RecordType,
-  TransferData,
-} from "@src/storage/entities/activity/types";
+import { RecordStatus } from "@src/storage/entities/activity/types";
 import { useAccountContext } from "../accountProvider";
 import Extension from "@src/Extension";
-import Record from "@src/storage/entities/activity/Record";
-import { AddressOrPair } from "@polkadot/api/types";
-import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
-import { polkadotExtrinsic, Tx } from "@src/pages";
-import { useAssetContext, useNetworkContext } from "..";
+import { Tx } from "@src/pages";
+import { useNetworkContext } from "..";
 
 interface InitialState {
-  queue: newTx[];
   activity: any[];
 }
 
 const initialState: InitialState = {
-  queue: [],
   activity: [],
 };
 
@@ -44,21 +32,6 @@ const TxContext = createContext({} as TxContext);
 
 const reducer = (state: InitialState, action: any): InitialState => {
   switch (action.type) {
-    // case "init": {
-    //   return {
-    //     ...action.payload,
-    //     isInit: false,
-    //   };
-    // }
-
-    case "add-tx-to-queue": {
-      const { tx } = action.payload;
-
-      return {
-        ...state,
-        queue: [...state.queue, tx],
-      };
-    }
     case "add-activity": {
       const { tx } = action.payload;
 
@@ -85,15 +58,6 @@ const reducer = (state: InitialState, action: any): InitialState => {
         activity,
       };
     }
-    case "remove-from-queue": {
-      const { index } = action.payload;
-      const queue = state.queue.filter((_, _index) => _index !== index);
-
-      return {
-        ...state,
-        queue,
-      };
-    }
     default:
       return state;
   }
@@ -105,14 +69,7 @@ interface newTx {
   amount: number;
 }
 
-interface ProcessWasmTxProps {
-  tx: newTx;
-}
-
 export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { t: tCommon } = useTranslation("common");
-  const { showErrorToast } = useToast();
-
   const {
     state: { api, selectedChain },
   } = useNetworkContext();
@@ -121,130 +78,18 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { loadAssets } = useAssetContext();
-
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [isSearching, setisSearching] = useState(false);
+  // const [isSearching, setisSearching] = useState(false);
 
-  const addTxToQueue = (newTx: newTx) => {
-    console.log("newTx", newTx);
+  const loadActivity = async () => {
+    const records = await Extension.getActivity();
     dispatch({
-      type: "add-tx-to-queue",
+      type: "init-activity",
       payload: {
-        tx: newTx,
+        activity: records,
       },
     });
-  };
-
-  useEffect(() => {
-    if (state.queue.length > 0) {
-      const lastTx = state.queue[0];
-
-      if (lastTx.tx.type === AccountType.WASM) {
-        processWasmTx(lastTx);
-      } else {
-        processEVMTx(lastTx);
-      }
-    }
-  }, [state.queue]);
-
-  useEffect(() => {
-    if (selectedAccount.key && selectedChain?.name && api) {
-      (async () => {
-        const records = await Extension.getActivity();
-        dispatch({
-          type: "init-activity",
-          payload: {
-            activity: records,
-          },
-        });
-        processPendingTxs(records);
-      })();
-    }
-  }, [selectedAccount.key, api, selectedChain?.name]);
-
-  const processWasmTx = async ({ amount, destinationAccount, tx }: newTx) => {
-    const { sender, tx: _tx, type, aditional } = tx;
-
-    const a = await (api as ApiPromise).rpc.chain.getBlock();
-
-    const unsub = await (_tx as polkadotExtrinsic)?.signAndSend(
-      sender as AddressOrPair,
-      { tip: Number(aditional?.tip) || undefined },
-      async ({ events, txHash, status }: ISubmittableResult) => {
-        if (String(status.type) === "Ready") {
-          const hash = txHash.toString();
-          const date = Date.now();
-          const activity = {
-            fromBlock: a.block.header.number.toString(),
-            address: destinationAccount,
-            type: RecordType.TRANSFER,
-            reference: type,
-            hash,
-            status: RecordStatus.PENDING,
-            createdAt: date,
-            lastUpdated: date,
-            error: undefined,
-            network: selectedChain?.name || "",
-            recipientNetwork: selectedChain?.name || "",
-            data: {
-              symbol: String(selectedChain?.nativeCurrency.symbol),
-              from: selectedAccount.value.address,
-              to: destinationAccount,
-              gas: "0",
-              gasPrice: "0",
-              value: String(amount),
-            } as TransferData,
-          };
-          dispatch({
-            type: "add-activity",
-            payload: {
-              tx: activity,
-            },
-          });
-          await Extension.addActivity(hash, activity as Record);
-        }
-        if (status.isFinalized) {
-          const failedEvents = events.filter(({ event }) =>
-            api.events.system.ExtrinsicFailed.is(event)
-          );
-          let status = RecordStatus.PENDING;
-          let error = undefined;
-          if (failedEvents.length > 0) {
-            failedEvents.forEach(
-              ({
-                event: {
-                  data: [_error, info],
-                },
-              }) => {
-                if (_error.isModule) {
-                  const decoded = api.registry.findMetaError(_error.asModule);
-                  const { docs, method, section } = decoded;
-                  error = `${section}.${method}: ${docs.join(" ")}`;
-                } else {
-                  error = _error.toString();
-                }
-              }
-            );
-            status = RecordStatus.FAIL;
-          } else {
-            status = RecordStatus.SUCCESS;
-            loadAssets();
-          }
-          const hash = txHash.toString();
-          dispatch({
-            type: "update-activity-status",
-            payload: {
-              hash,
-              status,
-              error,
-            },
-          });
-          await Extension.updateActivity(hash, status, error);
-          unsub();
-        }
-      }
-    );
+    return records;
   };
 
   const searchTx = async (blockNumber: any, extHash: any) => {
@@ -314,80 +159,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const processEVMTx = async ({
-    amount,
-    destinationAccount,
-    tx: _tx,
-    asset,
-  }: newTx) => {
-    try {
-      const tx = _tx as ethers.providers.TransactionResponse;
-
-      const date = Date.now();
-
-      const hash = tx.hash;
-
-      const activity = {
-        address: destinationAccount,
-        type: RecordType.TRANSFER,
-        reference: "EVM",
-        hash: hash,
-        status: RecordStatus.PENDING,
-        createdAt: date,
-        lastUpdated: date,
-        error: undefined,
-        network: selectedChain?.name || "",
-        recipientNetwork: selectedChain?.name || "",
-        data: {
-          asset: {
-            id: asset?.id,
-            color: asset?.color || "#fff",
-          },
-          symbol: String(selectedChain?.nativeCurrency.symbol),
-          from: selectedAccount.value.address,
-          to: destinationAccount,
-          gas: "0",
-          gasPrice: "0",
-          value: String(amount),
-        } as TransferData,
-      };
-
-      console.log("activity ", activity);
-      dispatch({
-        type: "add-activity",
-        payload: {
-          tx: activity,
-        },
-      });
-      await Extension.addActivity(tx.hash, activity as Record);
-
-      const result = await tx.wait();
-
-      const status =
-        result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
-      const error = "";
-
-      if (status === RecordStatus.SUCCESS) {
-        loadAssets();
-      }
-
-      dispatch({
-        type: "update-activity-status",
-        payload: {
-          hash: hash,
-          status,
-          error,
-        },
-      });
-      await Extension.updateActivity(hash, status, error);
-    } catch (err) {
-      console.log(err);
-      // const code = err.data.replace("Reverted ", "");
-      // let reason = ethers.utils.toUtf8String("0x" + code.substr(138));
-      // showErrorToast(reason);
-    }
-  };
-
   const searchEvmTx = async (hash: string) => {
     const txReceipt = await (
       api as ethers.providers.JsonRpcProvider
@@ -412,7 +183,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const processPendingTxs = async (activityArray: any[]) => {
     for (const activity of activityArray) {
       if (activity.status === RecordStatus.PENDING) {
-        if (activity.reference === "wasm") {
+        if (activity.reference === "WASM") {
           searchTx(Number(activity?.fromBlock), activity.hash);
         } else {
           searchEvmTx(activity.hash);
@@ -421,11 +192,42 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const activityListener = ({ origin, method }: any) => {
+    if (origin === "kuma" && method === "update_activity") {
+      loadActivity();
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAccount.key && selectedChain?.name && api) {
+      (async () => {
+        const records = await loadActivity();
+        dispatch({
+          type: "init-activity",
+          payload: {
+            activity: records,
+          },
+        });
+        processPendingTxs(records);
+      })();
+    }
+  }, [selectedAccount.key, api, selectedChain?.name]);
+
+  useEffect(() => {
+    if (!api) return;
+    chrome.runtime.onMessage.addListener(activityListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(activityListener);
+    };
+  }, [api]);
+
   return (
     <TxContext.Provider
       value={{
         state,
-        addTxToQueue,
+        addTxToQueue: () => {
+          //
+        },
       }}
     >
       {children}

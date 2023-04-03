@@ -235,7 +235,8 @@
     "chains": "Chains",
     "assets": "Assets",
     "details": "Details",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "tx_send": "Transaction sent"
   },
   "manage_assets": {
     "title": "Manage Assets",
