@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useAssetContext } from "@src/providers";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -18,7 +18,16 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
+  const {
+    state: { assets },
+  } = useAssetContext();
+
   const navigate = useNavigate();
+
+  const totalBalance = assets.reduce(
+    (total, item) => total + (item.amount || 0),
+    0
+  );
 
   return (
     <div className="mx-auto">
@@ -27,7 +36,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
-        <p className="text-5xl">{formatAmountWithDecimals(0, 5)}</p>
+        <p className="text-5xl">{formatAmountWithDecimals(totalBalance, 5)}</p>
       </div>
       <div className="flex gap-3 justify-center">
         <button

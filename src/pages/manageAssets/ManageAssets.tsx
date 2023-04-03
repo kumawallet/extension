@@ -1,3 +1,4 @@
+import { useMemo, useEffect } from "react";
 import {
   InputErrorMessage,
   LoadingButton,
@@ -6,11 +7,9 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
-import { useNetworkContext } from "@src/providers/networkProvider/NetworkProvider";
-import { useMemo, useEffect } from "react";
-import Extension from "../../Extension";
-import { BALANCE } from "../../routes/paths";
-import { useAssetContext } from "@src/providers/assetProvider";
+import Extension from "@src/Extension";
+import { BALANCE } from "@src/routes/paths";
+import { useAssetContext, useNetworkContext } from "@src/providers";
 import { number, object, string } from "yup";
 import { isHex, u8aToHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
@@ -141,7 +140,7 @@ export const ManageAssets = () => {
           </div>
           <div className="flex justify-end" data-testid="submitbtn">
             <LoadingButton onClick={onSubmit} isLoading={isSubmitting}>
-              {t("create_asset")}
+              {t("add")}
             </LoadingButton>
           </div>
         </div>

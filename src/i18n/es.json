@@ -143,7 +143,8 @@
     "receive": "Recibir",
     "assets": "Activos",
     "activity": "Actividad",
-    "show_all_assets": "Mostrar todos los activos"
+    "show_all_assets": "Mostrar todos los activos",
+    "manage_assets": "Administrar activos"
   },
   "settings": {
     "title": "Configuración",
@@ -219,5 +220,28 @@
     "reset_wallet": "Resetear Kuma Wallet",
     "reset_wallet_warning": "Advertencia: Esta acción eliminará todas tus cuentas y datos de la extensión. Todos tus activos están seguros ya que NO se almacenan en la extensión. Necesitarás restaurar tus cuentas usando la frase semilla.",
     "reset": "Resetear"
+  },
+  "send": {
+    "title": "Enviar token",
+    "from": "Desde",
+    "to:": "Para",
+    "destination_account": "Cuenta destino",
+    "amount": "Monto",
+    "gas_limit": "Limite de gas",
+    "estimated_fee": "Tasa estimada",
+    "estimated_total": "Total estimado",
+    "tip": "Tip (opcional)",
+    "transfer": "Transferencia",
+    "chains": "Cadenas",
+    "assets": "Activos",
+    "details": "Detalles",
+    "confirm": "Confirmar"
+  },
+  "manage_assets": {
+    "title": "Gestionar activos",
+    "address": "Dirección",
+    "symbol": "Símbolo",
+    "decimals": "Decimales",
+    "add": "Agregar"
   }
 }

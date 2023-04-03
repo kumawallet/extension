@@ -143,7 +143,8 @@
     "receive": "受信",
     "assets": "資産",
     "activity": "アクティビティ",
-    "show_all_assets": "すべての資産を表示"
+    "show_all_assets": "すべての資産を表示",
+    "manage_assets": "資産の管理"
   },
   "settings": {
     "title": "設定",
@@ -219,5 +220,28 @@
     "reset_wallet": "ウォレットをリセットする",
     "reset_wallet_warning": "警告: この操作を行うと、すべてのアカウントとデータが拡張機能から削除されます。すべての資産は拡張機能に保存されないため安全です。シード フレーズを使用してアカウントをリセットする必要があります。",
     "reset": "リセット"
+  },
+  "send": {
+    "title": "トークンを送信する",
+    "from": "から",
+    "to:": "への",
+    "destination_account": "デスティネーションアカウント",
+    "amount": "金額",
+    "gas_limit": "ガスリミット",
+    "estimated_fee": "見積もり料金",
+    "estimated_total": "見積もり合計",
+    "tip": "チップ（オプション）",
+    "transfer": "転送",
+    "chains": "チェーン",
+    "assets": "資産の部",
+    "details": "詳細",
+    "confirm": "確認"
+  },
+  "manage_assets": {
+    "title": "アセットを管理する",
+    "address": "アドレス",
+    "symbol": "シンボル",
+    "decimals": "小数点",
+    "add": "追加"
   }
 }
