@@ -194,7 +194,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         loadPolkadotAssets(),
       ]);
 
-      assets.length > 0 && listoToWasmContracts(assets);
+      assets.length > 0 && listWasmContracts(assets);
 
       return [...assetsFromPallet, ...assets];
     } else {
@@ -380,13 +380,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     return assets;
   };
 
-  useEffect(() => {
-    dispatch({
-      type: "loading-assets",
-    });
-    removeListeners();
-  }, [rpc, api]);
-
   const removeListeners = () => {
     if (unsubscribers.length > 0) {
       for (const unsub of unsubscribers) {
@@ -395,24 +388,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       setUnsubscribers([]);
     }
   };
-
-  useEffect(() => {
-    removeListeners();
-  }, [selectedAccount?.key]);
-
-  useEffect(() => {
-    if (
-      rpc &&
-      selectedAccount?.value?.address &&
-      selectedChain &&
-      type &&
-      api
-    ) {
-      if (selectedAccount?.type?.includes(type)) {
-        loadAssets();
-      }
-    }
-  }, [rpc, selectedAccount, type, api]);
 
   const getAssetsUSDPrice = async (assets?: Asset[]) => {
     try {
@@ -455,7 +430,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const listoToWasmContracts = async (assets: Asset[]) => {
+  const listWasmContracts = async (assets: Asset[]) => {
     const unsub = await (api as ApiPromise).rpc.chain.subscribeNewHeads(
       async () => {
         const gasLimit = api.registry.createType("WeightV2", {
@@ -489,6 +464,42 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
     setUnsubscribers((state) => [...state, unsub]);
   };
+
+  useEffect(() => {
+    dispatch({
+      type: "loading-assets",
+    });
+    removeListeners();
+  }, [rpc, api]);
+
+  useEffect(() => {
+    removeListeners();
+  }, [selectedAccount?.key]);
+
+  useEffect(() => {
+    if (
+      rpc &&
+      selectedAccount?.value?.address &&
+      selectedChain &&
+      type &&
+      api
+    ) {
+      if (selectedAccount?.type?.includes(type)) {
+        loadAssets();
+      }
+    }
+  }, [rpc, selectedAccount, type, api]);
+
+  useEffect(() => {
+    let interval;
+    if (state.assets.length > 0) {
+      interval = setInterval(() => {
+        getAssetsUSDPrice(state.assets);
+      }, 60000);
+    }
+
+    return () => clearInterval(interval);
+  }, [state.assets]);
 
   return (
     <AssetContext.Provider
