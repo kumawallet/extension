@@ -7,11 +7,16 @@ import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
-import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
-import { useNetworkContext, useTxContext } from "@src/providers";
+import {
+  useNetworkContext,
+  useTxContext,
+  useAccountContext,
+} from "@src/providers";
 import Chains from "@src/storage/entities/Chains";
+import { AssetIcon } from "@src/components/common/AssetIcon";
+import { FaChevronRight } from "react-icons/fa";
 
-const chpiColor = {
+const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
   [RecordStatus.SUCCESS]: "bg-green-600",
   [RecordStatus.PENDING]: "bg-yellow-600",
@@ -155,14 +160,24 @@ export const Activity = () => {
           ({ address, status, lastUpdated, data, network, hash }) => (
             <div
               key={hash}
-              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
+              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-2 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
             >
               <div className="flex items-center justify-between gap-3">
-                <BsArrowUpRight size={24} color={getStatusColor(status)} />
+                <a
+                  className="text-custom-green-bg hover:bg-custom-green-bg hover:bg-opacity-30 rounded-full p-1"
+                  href={getLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <BsArrowUpRight size={23} color={getStatusColor(status)} />
+                </a>
                 <div className="overflow-hidden text-ellipsis px-1">
-                  <p className="text-sm">{getContactName(address)}</p>
-                  <p>
-                    {`${formatDate(lastUpdated as number)} - `}
+                  <p className="text-xs">{getContactName(address)}</p>
+                  <p className="text-xs">{`${formatDate(
+                    lastUpdated as number
+                  )} - `}</p>
+                  {/* <p>
+                    
                     <a
                       className="text-custom-green-bg hover:text-white text-sm"
                       href={getLink(network, hash)}
@@ -171,10 +186,10 @@ export const Activity = () => {
                     >
                       {tCommon("view_in_scanner")}
                     </a>
-                  </p>
+                  </p> */}
                   <p
                     className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
-                      chpiColor[status as RecordStatus]
+                      chipColor[status as RecordStatus]
                     }`}
                   >
                     {status}
@@ -185,9 +200,14 @@ export const Activity = () => {
                 <p className="text-sm whitespace-nowrap mb-1">
                   {getValue(data)}
                 </p>
-                <div className="flex justify-evenly">
-                  <div className="w-5 h-5 rounded-full bg-gray-400" />
-                  <div className="w-5 h-5 rounded-full bg-gray-400" />
+                <div className="flex justify-evenly items-center gap-1">
+                  <AssetIcon
+                    asset={data.fromAssetId || data.asset}
+                    width={20}
+                  />
+                  <FaChevronRight size={16} />
+
+                  <AssetIcon asset={data.toAssetId || data.asset} width={20} />
                 </div>
               </div>
             </div>

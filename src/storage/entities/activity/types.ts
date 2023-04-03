@@ -9,9 +9,15 @@ export enum RecordStatus {
   FAIL = "fail",
 }
 
+type AssetRecord = {
+  id: string;
+  colot: string;
+};
+
 export type RecordData = CallData | TransferData;
 
 export type CallData = {
+  asset: AssetRecord;
   symbol: string;
   from: string;
   to: string;
@@ -22,6 +28,7 @@ export type CallData = {
 };
 
 export type TransferData = {
+  asset: AssetRecord;
   symbol: string;
   from: string;
   to: string;
@@ -31,6 +38,8 @@ export type TransferData = {
 };
 
 export type XCM = {
+  fromAsset: AssetRecord;
+  toAsset: AssetRecord;
   symbol: string;
   from: string;
   to: string;
@@ -38,4 +47,4 @@ export type XCM = {
   gas: string;
   gasPrice: string;
   message: string;
-}
+};

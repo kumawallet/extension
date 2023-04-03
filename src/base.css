@@ -40,3 +40,14 @@ body::-webkit-scrollbar {
   color: #fff !important;
 }
 
+.active-tab::after {
+  content: "";
+  width: 12px;
+  height: 1px;
+  background: #fff;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%);
+  background: #469999;
+}

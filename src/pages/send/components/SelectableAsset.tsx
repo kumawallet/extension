@@ -3,7 +3,7 @@ import { Listbox } from "@headlessui/react";
 import { useAssetContext } from "@src/providers";
 import { FiChevronDown } from "react-icons/fi";
 import { Asset } from "@src/providers/assetProvider/types";
-import { useNetworkContext } from "../../../providers/networkProvider/NetworkProvider";
+import { AssetIcon } from "@src/components/common/AssetIcon";
 
 interface SelectableAssetProps {
   onChangeAsset: (asset: Asset) => void;
@@ -12,10 +12,6 @@ interface SelectableAssetProps {
 export const SelectableAsset: FC<SelectableAssetProps> = ({
   onChangeAsset,
 }) => {
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
-
   const {
     state: { assets },
   } = useAssetContext();
@@ -42,18 +38,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>
       <div className="relative mt-1">
         <Listbox.Button className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex items-center gap-1 w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
-          {selectedAsset?.id === "-1" ? (
-            <img
-              src={`/images/${selectedChain.logo}.png`}
-              width={32}
-              height={24}
-              className="object-cover rounded-full"
-            />
-          ) : (
-            <div className="w-8 h-6 flex justify-center">
-              <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
-            </div>
-          )}
+          <AssetIcon asset={selectedAsset} width={25} />
           <span className="block truncate font-inter">
             {selectedAsset?.symbol || ""}
           </span>
@@ -72,18 +57,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
               disabled={false}
               className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md flex items-center gap-2 py-2"
             >
-              {asset.id === "-1" ? (
-                <img
-                  src={`/images/${selectedChain.logo}.png`}
-                  width={32}
-                  height={24}
-                  className="object-cover rounded-full"
-                />
-              ) : (
-                <div className="w-8 h-6 flex justify-center">
-                  <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
-                </div>
-              )}
+              <AssetIcon asset={asset} width={28} />
               <span className="font-inter">{asset.symbol}</span>
             </Listbox.Option>
           ))}

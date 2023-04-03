@@ -1,4 +1,3 @@
-import { useToast } from "../../hooks";
 import {
   createContext,
   FC,
@@ -8,9 +7,9 @@ import {
   useReducer,
   useState,
 } from "react";
+import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
 import { AccountType } from "@src/accounts/types";
-import { useNetworkContext } from "../networkProvider/NetworkProvider";
 import {
   RecordStatus,
   RecordType,
@@ -24,7 +23,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import { polkadotExtrinsic, Tx } from "@src/pages";
-import { useAssetContext } from "../assetProvider";
+import { useAssetContext, useNetworkContext } from "..";
 
 interface InitialState {
   queue: newTx[];
@@ -128,6 +127,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [isSearching, setisSearching] = useState(false);
 
   const addTxToQueue = (newTx: newTx) => {
+    console.log("newTx", newTx);
     dispatch({
       type: "add-tx-to-queue",
       payload: {
@@ -318,6 +318,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     amount,
     destinationAccount,
     tx: _tx,
+    asset,
   }: newTx) => {
     try {
       const tx = _tx as ethers.providers.TransactionResponse;
@@ -338,6 +339,10 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
         network: selectedChain?.name || "",
         recipientNetwork: selectedChain?.name || "",
         data: {
+          asset: {
+            id: asset?.id,
+            color: asset?.color || "#fff",
+          },
           symbol: String(selectedChain?.nativeCurrency.symbol),
           from: selectedAccount.value.address,
           to: destinationAccount,
@@ -346,6 +351,8 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
           value: String(amount),
         } as TransferData,
       };
+
+      console.log("activity ", activity);
       dispatch({
         type: "add-activity",
         payload: {

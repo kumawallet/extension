@@ -145,6 +145,7 @@ export const Send = () => {
           amount,
           destinationAccount,
           tx: _tx as any,
+          asset,
         });
       }
       showSuccessToast(t("tx_send"));

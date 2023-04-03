@@ -10,6 +10,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { Tx } from "../Send";
 import { Fees } from "./Fees";
+import { AssetIcon } from "@src/components/common/AssetIcon";
 
 interface ConfirmTxProps {
   tx: Tx;
@@ -125,18 +126,8 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
         <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
           <div className="flex flex-col items-center">
             <div className="flex gap-2 items-center">
-              {asset.id === "-1" ? (
-                <img
-                  src={`/images/${selectedChain.logo}.png`}
-                  width={32}
-                  height={24}
-                  className="object-cover rounded-full"
-                />
-              ) : (
-                <div className="w-8 h-6 flex justify-center">
-                  <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
-                </div>
-              )}
+              <AssetIcon asset={asset} width={30} />
+
               <p className="font-inter uppercase">{asset?.name}</p>
             </div>
             <p className="font-inter">
@@ -150,18 +141,8 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
           </div>
           <div className="flex flex-col items-center">
             <div className="flex gap-2 items-center">
-              {asset.id === "-1" ? (
-                <img
-                  src={`/images/${selectedChain.logo}.png`}
-                  width={32}
-                  height={24}
-                  className="object-cover rounded-full"
-                />
-              ) : (
-                <div className="w-8 h-6 flex justify-center">
-                  <div className="w-6 h-6 bg-gray-400 bg-opacity-40 rounded-full" />
-                </div>
-              )}
+              <AssetIcon asset={asset} width={30} />
+
               <p className="font-inter uppercase">{asset?.name}</p>
             </div>
             <p className="font-inter">

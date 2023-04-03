@@ -6,17 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
 import { BsArrowUpRight } from "react-icons/bs";
 import { useAssetContext, useNetworkContext } from "@src/providers";
-import { Loading } from "@src/components/common";
+import { Loading, AssetIcon } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
 import { formatUSDAmount } from "@src/utils/assets";
-import { RiCopperCoinLine } from "react-icons/ri";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
-    state: { type, api, selectedChain },
+    state: { type, api },
   } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
@@ -88,16 +87,7 @@ export const Assets = () => {
           className="bg-[#343A40] px-2 py-2 rounded-2xl flex items-center justify-between font-inter"
         >
           <div className="flex gap-2 items-center">
-            {asset.id === "-1" ? (
-              <img
-                src={`/images/${selectedChain.logo}.png`}
-                width={32}
-                height={24}
-                className="object-cover rounded-full"
-              />
-            ) : (
-              <RiCopperCoinLine size={32} color={asset.color || "#fff"} />
-            )}
+            <AssetIcon asset={asset} width={32} />
             <div className="flex flex-col">
               <div className="flex gap-1 items-center">
                 <p className="font-bold text-xl">
@@ -127,7 +117,7 @@ export const Assets = () => {
       {showManageAssets && (
         <div className="flex justify-center mt-2">
           <button
-            className="flex gap-2 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-custom-green-bg hover:bg-opacity-30"
+            className="flex gap-1 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-custom-green-bg hover:bg-opacity-30"
             onClick={() => navigate(MANAGE_ASSETS)}
           >
             <ImCoinDollar />
