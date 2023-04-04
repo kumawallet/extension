@@ -236,7 +236,9 @@
     "assets": "Activos",
     "details": "Detalles",
     "confirm": "Confirmar",
-    "tx_send": "Transacción enviada"
+    "tx_send": "Transacción enviada",
+    "insufficient_balance": "Balance insuficiente"
+
   },
   "manage_assets": {
     "title": "Gestionar activos",

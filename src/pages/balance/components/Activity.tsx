@@ -196,8 +196,8 @@ export const Activity = () => {
                   </p>
                 </div>
               </div>
-              <div className="text-lg px-1">
-                <p className="text-sm whitespace-nowrap mb-1">
+              <div className="flex flex-col text-lg px-1">
+                <p className="text-sm whitespace-nowrap mb-1 text-center">
                   {getValue(data)}
                 </p>
                 <div className="flex justify-evenly items-center gap-1">

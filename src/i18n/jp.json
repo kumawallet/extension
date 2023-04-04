@@ -236,7 +236,9 @@
     "assets": "資産の部",
     "details": "詳細",
     "confirm": "確認",
-    "tx_send": "トランザクション送信"
+    "tx_send": "トランザクション送信",
+    "insufficient_balance": "残高不足"
+
   },
   "manage_assets": {
     "title": "アセットを管理する",

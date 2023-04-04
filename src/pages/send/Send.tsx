@@ -2,66 +2,36 @@ import { useMemo, useState } from "react";
 import { PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  useAccountContext,
-  useNetworkContext,
-  useTxContext,
-} from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object, string } from "yup";
-import { useToast } from "@src/hooks";
+import { useLoading, useToast } from "@src/hooks";
 import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { useNavigate } from "react-router-dom";
 import { isHex } from "@polkadot/util";
 import { isAddress } from "ethers/lib/utils";
 import { AccountType } from "@src/accounts/types";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { ethers } from "ethers";
 import { ConfirmTx, WasmForm, EvmForm } from "./components";
-import { KeyringPair } from "@polkadot/keyring/types";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import logo from "/logo.svg";
-import { TxToProcess } from "@src/entries/background";
-
-export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
-
-export type evmTx =
-  ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
-
-export type Tx =
-  | {
-      type: AccountType.WASM;
-      tx: polkadotExtrinsic;
-      aditional: object;
-      sender: KeyringPair;
-    }
-  | {
-      type: AccountType.EVM;
-      tx: evmTx;
-      aditional?: object;
-      sender: ethers.Wallet;
-    };
-
-export type confirmTx = ({ type, tx, aditional }: Tx) => void;
+import { SendForm, Tx, TxToProcess } from "@src/types";
+import { BigNumber, Contract } from "ethers";
 
 export const Send = () => {
   const { t } = useTranslation("send");
   const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useToast();
+  const { isLoading, starLoading, endLoading } = useLoading();
 
   const {
-    state: { selectedChain, type, api, rpc },
+    state: { selectedChain, type, rpc },
   } = useNetworkContext();
 
   const {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { addTxToQueue } = useTxContext();
-
   const [tx, setTx] = useState<Tx | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const schema = useMemo(() => {
     return object({
@@ -94,7 +64,7 @@ export const Send = () => {
     }).required();
   }, []);
 
-  const methods = useForm<any>({
+  const methods = useForm<SendForm>({
     defaultValues: {
       from: selectedChain,
       to: selectedChain,
@@ -112,50 +82,52 @@ export const Send = () => {
   const currencyUnits = 10 ** decimals;
 
   const sendTx = async () => {
-    setIsLoading(true);
+    starLoading();
     const amount = getValues("amount");
-    const destinationAccount = getValues("destinationAccount");
+    const destinationAddress = getValues("destinationAccount");
+    const originAddress = selectedAccount.value.address;
+    const asset = getValues("asset");
+    const destinationNetwork = selectedChain.name;
 
     const { id } = await chrome.windows.getCurrent();
 
+    const txToSend: Partial<TxToProcess> = {
+      amount,
+      originAddress,
+      destinationAddress,
+      rpc: rpc as string,
+      asset,
+      destinationNetwork,
+      networkInfo: selectedChain,
+      originNetwork: selectedChain,
+    };
+
     try {
       if (tx?.type === AccountType.WASM) {
-        const _tx: TxToProcess = {
-          amount: getValues("amount"),
-          originAddress: selectedAccount.value.address,
-          destinationAddress: getValues("destinationAccount"),
-          rpc,
-          asset: getValues("asset"),
-          destinationNetwork: selectedChain.name,
-          networkInfo: selectedChain,
-          originNetwork: selectedChain,
-          tx,
+        txToSend.tx = {
+          txHash: tx.tx.toHex(),
+          aditional: tx.aditional,
+          type: AccountType.WASM,
         };
-
-        await chrome.runtime.sendMessage({
-          from: "popup",
-          origin: "kuma",
-          method: "process_tx",
-          popupId: id,
-          tx: _tx,
-        });
       } else {
-        const asset = getValues("asset");
         const isNativeAsset = asset?.id === "-1";
+
         let _tx;
         const _amount = isNativeAsset
           ? amount * currencyUnits
           : amount * 10 ** asset.decimals;
-        const bnAmount = ethers.BigNumber.from(
+
+        const bnAmount = BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
         );
-        if (asset?.id === "-1") {
+
+        if (isNativeAsset) {
           _tx = await tx?.sender.sendTransaction({
             ...tx.tx,
           });
         } else {
-          _tx = await (tx?.tx as ethers.Contract).transfer(
-            destinationAccount,
+          _tx = await (tx?.tx as Contract).transfer(
+            destinationAddress,
             bnAmount,
             {
               gasLimit: tx?.fee["gas limit"],
@@ -166,32 +138,22 @@ export const Send = () => {
           );
         }
 
-        const __tx: TxToProcess = {
-          amount: amount,
-          originAddress: selectedAccount.value.address,
-          destinationAddress: getValues("destinationAccount"),
-          rpc,
-          asset: getValues("asset"),
-          destinationNetwork: selectedChain.name,
-          networkInfo: selectedChain,
-          originNetwork: selectedChain,
-          tx: _tx.hash,
+        txToSend.tx = {
+          txHash: _tx.hash,
+          type: AccountType.EVM,
         };
-
-        await chrome.runtime.sendMessage({
-          from: "popup",
-          origin: "kuma",
-          method: "process_tx",
-          popupId: id,
-          tx: __tx,
-        });
-        // addTxToQueue({
-        //   amount,
-        //   destinationAccount,
-        //   tx: _tx as any,
-        //   asset,
-        // });
       }
+
+      console.log("to send:", txToSend);
+
+      await chrome.runtime.sendMessage({
+        from: "popup",
+        origin: "kuma",
+        method: "process_tx",
+        popupId: id,
+        tx: txToSend,
+      });
+
       showSuccessToast(t("tx_send"));
       navigate(BALANCE, {
         state: {
@@ -202,7 +164,7 @@ export const Send = () => {
       // const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
       showErrorToast(error);
     }
-    setIsLoading(false);
+    endLoading();
   };
 
   return (

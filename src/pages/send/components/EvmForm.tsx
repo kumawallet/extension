@@ -1,19 +1,18 @@
+import { FC, useEffect, useMemo, useState } from "react";
 import { AccountType } from "@src/accounts/types";
 import { Loading, LoadingButton } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { useAssetContext, useNetworkContext } from "@src/providers";
-import { formatBN } from "@src/utils/assets";
-import { ethers, Wallet } from "ethers";
-import { FC, useEffect, useState } from "react";
+import { Contract, ethers, Wallet, BigNumber } from "ethers";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { confirmTx, evmTx } from "../Send";
 import { CommonFormFields } from "./CommonFormFields";
 import erc20abi from "@src/constants/erc20.abi.json";
 import { Fees } from "./Fees";
-
-const BN0 = ethers.BigNumber.from(0);
+import { confirmTx, evmTx, EVMFee } from "@src/types";
+import { BN } from "bn.js";
+import { BigNumber0 } from "@src/constants/assets";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -27,28 +26,27 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   } = useNetworkContext();
 
   const {
+    state: { assets },
+  } = useAssetContext();
+
+  const {
     handleSubmit,
     watch,
     formState: { errors },
   } = useFormContext();
 
-  const {
-    state: { assets },
-  } = useAssetContext();
-
   const { showErrorToast } = useToast();
 
-  const [fee, setFee] = useState({
-    "gas limit": BN0,
-    "max fee per gas": BN0,
-    "max base fee per gas": BN0,
-    "max priority fee per gas": BN0,
-    "estimated fee": BN0,
-    "estimated total": BN0,
+  const [fee, setFee] = useState<EVMFee>({
+    "gas limit": BigNumber0,
+    "max fee per gas": BigNumber0,
+    "max priority fee per gas": BigNumber0,
+    "estimated fee": BigNumber0,
+    "estimated total": BigNumber0,
   });
   const [isLoadingFee, setIsLoadingFee] = useState(false);
   const [wallet, setWallet] = useState<ethers.Wallet | null>(null);
-  const [evmTx, setEvmTx] = useState<evmTx | ethers.Contract | null>(null);
+  const [evmTx, setEvmTx] = useState<evmTx | Contract | null>(null);
 
   const _api = api as ethers.providers.JsonRpcProvider;
   const decimals = selectedChain?.nativeCurrency.decimals || 1;
@@ -58,7 +56,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
-  const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
   useEffect(() => {
     (async () => {
@@ -111,7 +108,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           };
 
           const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
-          const estimatedTotal = avg.mul(_gasLimit);
+          const estimatedTotal = avg.mul(_gasLimit).add(bnAmount);
 
           setFee({
             "gas limit": _gasLimit,
@@ -145,16 +142,14 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
           setFee({
             "gas limit": _gasLimit,
-            "max fee per gas": feeData.maxFeePerGas as any,
-            "max priority fee per gas": feeData.maxPriorityFeePerGas as any,
+            "max fee per gas": feeData.maxFeePerGas as BigNumber,
+            "max priority fee per gas":
+              feeData.maxPriorityFeePerGas as BigNumber,
             "estimated fee": avg,
             "estimated total": estimatedTotal,
           });
 
           setEvmTx(contract);
-          // const tx = await contract.transfer(destinationAccount, bnAmount, {
-          //   gasLimit: _gasLimit,
-          // });
         }
       } catch (error) {
         showErrorToast(error);
@@ -169,13 +164,42 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const onSubmit = handleSubmit(async () => {
     confirmTx({
       type: AccountType.EVM,
-      tx: {
-        ...evmTx,
-      },
+      tx: evmTx as evmTx,
       fee,
       sender: wallet as ethers.Wallet,
     });
   });
+
+  const isEnoughToPay = useMemo(() => {
+    if (!amount || !currencyUnits) return false;
+
+    try {
+      const _amount = isNativeAsset
+        ? amount * currencyUnits
+        : amount * 10 ** asset.decimals;
+
+      const bnAmount = new BN(
+        _amount.toLocaleString("fullwide", { useGrouping: false })
+      );
+      const estimatedTotal = fee["estimated total"];
+      const BN0 = new BN("0");
+      const nativeBalance = assets[0].balance;
+
+      if (isNativeAsset) {
+        return bnAmount.gt(BN0) && estimatedTotal.lte(nativeBalance);
+      } else {
+        const BNBalance = new BN(asset?.balance);
+
+        return (
+          bnAmount.lte(BNBalance) &&
+          estimatedTotal.gt(BigNumber0) &&
+          estimatedTotal.lte(nativeBalance)
+        );
+      }
+    } catch (error) {
+      return false;
+    }
+  }, [fee, asset, amount]);
 
   return (
     <>
@@ -183,9 +207,15 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
       {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
 
+      {canContinue && !isEnoughToPay && (
+        <p className="text-sm mt-2 text-red-500 text-center">
+          {t("insufficient_balance")}
+        </p>
+      )}
+
       <LoadingButton
         classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
-        isDisabled={!canContinue}
+        isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{
           boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",

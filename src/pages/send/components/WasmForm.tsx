@@ -15,14 +15,12 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { useToast } from "@src/hooks";
 import { AccountType } from "@src/accounts/types";
 import { NumericFormat } from "react-number-format";
-import { confirmTx, polkadotExtrinsic } from "../Send";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "bn.js";
-import { formatBN } from "@src/utils/assets";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-import { ContractTx } from "@polkadot/api-contract/base/types";
 import { Fees } from "./Fees";
+import { confirmTx, polkadotExtrinsic } from "@src/types";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -72,7 +70,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
-  const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
   useEffect(() => {
     (async () => {
@@ -124,7 +121,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         String(_amount.toLocaleString("fullwide", { useGrouping: false }))
       );
 
-      let extrinsic: SubmittableExtrinsic<"promise"> | ContractTx<"promise">;
+      let extrinsic: SubmittableExtrinsic<"promise"> | unknown;
       let estimatedFee = new BN("0");
 
       if (asset?.address) {
@@ -144,7 +141,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
           bnAmount
         );
 
-        extrinsic = await contract.tx.transfer(
+        extrinsic = contract.tx.transfer(
           {
             gasLimit: api.registry.createType("WeightV2", gasRequired),
           },
@@ -158,21 +155,18 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         estimatedFee = new BN(String(_proofSize)).add(new BN(String(_refTime)));
       } else {
         if (asset?.id === "-1") {
-          extrinsic = await _api.tx.balances.transfer(
-            destinationAccount,
-            bnAmount
-          );
+          extrinsic = _api.tx.balances.transfer(destinationAccount, bnAmount);
         } else {
-          extrinsic = await _api.tx.assets.transfer(
+          extrinsic = _api.tx.assets.transfer(
             asset.id,
             destinationAccount,
             bnAmount
           );
         }
 
-        const { partialFee } = await extrinsic.paymentInfo(
-          sender as KeyringPair
-        );
+        const { partialFee } = await (
+          extrinsic as SubmittableExtrinsic<"promise">
+        ).paymentInfo(sender as KeyringPair);
         estimatedFee = partialFee;
       }
 
@@ -206,17 +200,12 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       );
       const estimatedTotal = fee["estimated total"];
       const BN0 = new BN("0");
+      const nativeBalance = assets[0].balance;
 
       if (isNativeAsset) {
-        const BNBalance = new BN(
-          (asset?.balance * currencyUnits).toLocaleString("fullwide", {
-            useGrouping: false,
-          })
-        );
-        return bnAmount.gt(BN0) && estimatedTotal.lte(BNBalance);
+        return bnAmount.gt(BN0) && estimatedTotal.lte(nativeBalance);
       } else {
         const BNBalance = new BN(asset?.balance);
-        const nativeBalance = assets[0].balance;
 
         return (
           bnAmount.lte(BNBalance) &&

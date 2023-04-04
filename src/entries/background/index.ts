@@ -9,30 +9,11 @@ import { makeQuerys } from "@src/utils/utils";
 import { ethers } from "ethers";
 import Extension from "@src/Extension";
 import notificationIcon from "/icon-128.png";
-import { BN } from "@polkadot/util";
 import { ApiPromise } from "@polkadot/api";
 import { AddressOrPair } from "@polkadot/api/types";
-import { Asset, polkadotExtrinsic } from "@src/pages";
-import { Chain } from "@src/storage/entities/Chains";
 import { getProvider } from "@src/providers/networkProvider";
 import { Keyring } from "@polkadot/keyring";
-
-export interface TxToProcess {
-  amount: BN;
-  originAddress: string;
-  destinationAddress: string;
-  rpc: string;
-  originNetwork: string;
-  destinationNetwork: string;
-  networkInfo: Chain;
-  asset: Asset;
-  tx: {
-    sender: AddressOrPair;
-    type: any;
-    aditional: any;
-    tx: polkadotExtrinsic;
-  };
-}
+import { TxToProcess } from "@src/types";
 
 const openPopUp = (params: any) => {
   const querys = makeQuerys(params);
@@ -154,7 +135,8 @@ const processWasmTx = async ({
   tx,
   rpc,
 }: TxToProcess) => {
-  const { tx: _tx, type, aditional } = tx;
+  const { txHash, type, aditional } = tx;
+
   const api = await getProvider(rpc, AccountType.WASM);
   const { block } = await (api as ApiPromise).rpc.chain.getBlock();
 
@@ -163,7 +145,7 @@ const processWasmTx = async ({
   const sender = keyring.addFromMnemonic(seed as string);
 
   const unsub = await (api as ApiPromise)
-    ?.tx(_tx)
+    ?.tx(txHash)
     ?.signAndSend(
       sender as AddressOrPair,
       { tip: Number(aditional?.tip) || undefined },
@@ -250,13 +232,15 @@ const processEVMTx = async ({
   tx,
   rpc,
 }: TxToProcess) => {
+  const { txHash } = tx;
+
   try {
     const api = (await getProvider(
       rpc,
       AccountType.EVM
     )) as ethers.providers.JsonRpcProvider;
 
-    const txReceipt = await api.getTransaction(tx);
+    const txReceipt = await api.getTransaction(txHash);
     const date = Date.now();
     const activity = {
       address: originAddress,
@@ -282,15 +266,15 @@ const processEVMTx = async ({
         },
       } as TransferData,
     };
-    await Extension.addActivity(tx, activity as Record);
+    await Extension.addActivity(txHash, activity as Record);
     sendUpdateActivityMessage();
     const result = await txReceipt.wait();
     const status =
       result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
     const error = "";
 
-    await Extension.updateActivity(tx, status, error);
-    sendNotification(`tx ${status}`, tx);
+    await Extension.updateActivity(txHash, status, error);
+    sendNotification(`tx ${status}`, txHash);
     sendUpdateActivityMessage();
   } catch (error) {
     console.error(error);

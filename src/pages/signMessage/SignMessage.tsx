@@ -54,9 +54,6 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
         const signer = keyring.addFromMnemonic(mnemonic as string);
         const _message = await signer.sign(message);
         signedMessage = u8aToHex(_message);
-
-        console.log("sign wasm:");
-        console.log(signedMessage);
       }
 
       if (type.toLowerCase() === "evm") {
@@ -68,8 +65,6 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
         );
 
         signedMessage = await signer.signMessage(message);
-        console.log("sign evm:");
-        console.log(signedMessage);
       }
 
       const { id } = await chrome.windows.getCurrent();
