@@ -27,7 +27,7 @@ export default class CacheAuth extends BaseEntity {
     await CacheAuth.get<CacheAuth>();
   }
 
-  static fromData<CacheAuth>(data: { [key: string]: any }): CacheAuth {
+  static fromData<CacheAuth>(data: { [key: string]: unknown }): CacheAuth {
     const entity = CacheAuth.getInstance();
     Object.keys(data).forEach((key) => {
       (entity as any)[key] = data[key];

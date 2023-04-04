@@ -1,6 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
-import { utils, providers, Wallet, BigNumberish, BigNumber } from "ethers";
+import { utils, providers, Wallet, BigNumber } from "ethers";
 import { AccountType } from "./accounts/types";
 import { Asset } from "./pages";
 import { Chain } from "./storage/entities/Chains";
@@ -59,11 +59,11 @@ export interface TxToProcess {
   originNetwork: string;
   destinationNetwork: string;
   networkInfo: Chain;
-  asset: Asset;
+  asset: Asset & { id: string; color: string };
   rpc: string;
   tx: {
     txHash: string;
-    aditional?: object;
+    aditional?: Record<string, unknown>;
     type: AccountType;
   };
 }

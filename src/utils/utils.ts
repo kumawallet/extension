@@ -28,7 +28,7 @@ export const parseIncomingQuery = (query: string) => {
   return _obj;
 };
 
-export const makeQuerys = (params: any) => {
+export const makeQuerys = (params: Record<string, string>) => {
   return (
     "?" +
     Object.keys(params)

@@ -15,7 +15,7 @@ import { getProvider } from "@src/providers/networkProvider";
 import { Keyring } from "@polkadot/keyring";
 import { TxToProcess } from "@src/types";
 
-const openPopUp = (params: any) => {
+const openPopUp = (params: unknown) => {
   const querys = makeQuerys(params);
 
   return chrome.windows.create({
@@ -116,7 +116,7 @@ const getSelectedAccount = () => {
   return Extension.getSelectedAccount();
 };
 
-const processTx = (tx: any) => {
+const processTx = (tx: TxToProcess) => {
   if (tx?.tx.type === AccountType.WASM) {
     processWasmTx(tx);
   } else {
@@ -129,7 +129,7 @@ const processWasmTx = async ({
   asset,
   originAddress,
   destinationAddress,
-  originNetwork,
+  // originNetwork,
   destinationNetwork,
   networkInfo,
   tx,
@@ -137,14 +137,14 @@ const processWasmTx = async ({
 }: TxToProcess) => {
   const { txHash, type, aditional } = tx;
 
-  const api = await getProvider(rpc, AccountType.WASM);
-  const { block } = await (api as ApiPromise).rpc.chain.getBlock();
+  const api = (await getProvider(rpc, AccountType.WASM)) as ApiPromise;
+  const { block } = await api.rpc.chain.getBlock();
 
   const seed = await Extension.showSeed();
   const keyring = new Keyring({ type: "sr25519" });
   const sender = keyring.addFromMnemonic(seed as string);
 
-  const unsub = await (api as ApiPromise)
+  const unsub = await api
     ?.tx(txHash)
     ?.signAndSend(
       sender as AddressOrPair,
@@ -153,7 +153,8 @@ const processWasmTx = async ({
         if (String(status.type) === "Ready") {
           const hash = txHash.toString();
           const date = Date.now();
-          const activity = {
+
+          const activity: Partial<Record> = {
             fromBlock: block.header.number.toString(),
             address: originAddress,
             type: RecordType.TRANSFER,
@@ -178,11 +179,8 @@ const processWasmTx = async ({
               },
             } as TransferData,
           };
-          await Extension.addActivity(hash, activity as any);
-          chrome.runtime.sendMessage({
-            origin: "kuma",
-            method: "update_activity",
-          });
+          await Extension.addActivity(hash, activity as Record);
+          sendUpdateActivityMessage();
         }
         if (status.isFinalized) {
           const failedEvents = events.filter(({ event }) =>
@@ -194,9 +192,9 @@ const processWasmTx = async ({
             failedEvents.forEach(
               ({
                 event: {
-                  data: [_error, info],
+                  data: [_error],
                 },
-              }) => {
+              }: any) => {
                 if (_error.isModule) {
                   const decoded = api?.registry.findMetaError(_error.asModule);
                   const { docs, method, section } = decoded;
@@ -226,7 +224,7 @@ const processEVMTx = async ({
   asset,
   originAddress,
   destinationAddress,
-  originNetwork,
+  // originNetwork,
   destinationNetwork,
   networkInfo,
   tx,
@@ -242,11 +240,11 @@ const processEVMTx = async ({
 
     const txReceipt = await api.getTransaction(txHash);
     const date = Date.now();
-    const activity = {
+    const activity: Partial<Record> = {
       address: originAddress,
       type: RecordType.TRANSFER,
       reference: AccountType.EVM,
-      hash: tx,
+      hash: txHash,
       status: RecordStatus.PENDING,
       createdAt: date,
       lastUpdated: date,
@@ -277,6 +275,8 @@ const processEVMTx = async ({
     sendNotification(`tx ${status}`, txHash);
     sendUpdateActivityMessage();
   } catch (error) {
+    sendNotification(`tx failed`, txHash);
+    await Extension.updateActivity(txHash, RecordStatus.FAIL, String(error));
     console.error(error);
   }
 };

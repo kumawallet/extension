@@ -6,7 +6,7 @@ interface KumaProps {
 (window as any).kuma = {
   call: ({ method, params }: KumaProps) => {
     const origin = window.location.origin;
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       window.postMessage({
         origin: "kuma",
         method,
