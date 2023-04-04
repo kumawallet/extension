@@ -7,9 +7,47 @@ import {
   selectedEVMAccountMock,
   accountsMocks,
 } from "./tests/mocks/account-mocks";
+import { SettingType } from "./storage/entities/settings/types";
+import { SettingKey } from "./storage/entities/settings/types";
+import { CHAINS } from "./constants/chains";
+import Record from "./storage/entities/activity/Record";
 const accountManageMock = {
   saveBackup: vi.fn(),
 };
+
+const getSettingsMock = {
+  get: vi.fn().mockReturnValue({
+    general: {
+      languages: {
+        value: [
+          {
+            lang: "English",
+            code: "en",
+          },
+        ],
+      },
+    },
+  }),
+  getAll: vi.fn().mockReturnValue({
+    general: {
+      languages: {
+        value: [
+          {
+            lang: "English",
+            code: "en",
+          },
+        ],
+      },
+    },
+  }),
+};
+
+const contactsMock = [
+  {
+    name: "test",
+    address: "0x123",
+  },
+];
 
 describe("Extension", () => {
   beforeAll(() => {
@@ -378,7 +416,9 @@ describe("Extension", () => {
         "./storage/entities/SelectedAccount"
       );
       _SelectedAccount.default.get = vi.fn().mockReturnValue({
-        key: "EVM--12345",
+        value: {
+          keyring: "EVM-12345",
+        },
       });
 
       const _Vault = await import("./storage/entities/Vault");
@@ -406,7 +446,9 @@ describe("Extension", () => {
         "./storage/entities/SelectedAccount"
       );
       _SelectedAccount.default.get = vi.fn().mockReturnValue({
-        key: "EVM--12345",
+        value: {
+          keyring: "EVM-12345",
+        },
       });
 
       const _Vault = await import("./storage/entities/Vault");
@@ -585,5 +627,439 @@ describe("Extension", () => {
 
     const result = await Extension.getNetwork();
     expect(result).toMatchObject(selectedEVMChainMock);
+  });
+
+  it("should get network", async () => {
+    const _Network = (await import("./storage/entities/Network")).default;
+    const get = vi.fn();
+    _Network.get = get;
+
+    Extension.getNetwork();
+
+    expect(get).toHaveBeenCalled();
+  });
+
+  describe("getGeneralSettings", () => {
+    it("should return general settings", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(getSettingsMock);
+      _Settings.get = get;
+
+      const result = await Extension.getGeneralSettings();
+      expect(result).toMatchObject(getSettingsMock.getAll());
+    });
+
+    it("should return error", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(undefined);
+      _Settings.get = get;
+
+      try {
+        await Extension.getGeneralSettings();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_settings");
+      }
+    });
+  });
+
+  describe("getAdvancedSettings", () => {
+    it("should return general settings", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(getSettingsMock);
+      _Settings.get = get;
+
+      const result = await Extension.getAdvancedSettings();
+      expect(result).toMatchObject(getSettingsMock.getAll());
+    });
+
+    it("should return error", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(undefined);
+      _Settings.get = get;
+
+      try {
+        await Extension.getAdvancedSettings();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_settings");
+      }
+    });
+  });
+
+  describe("getSetting", () => {
+    it("should return general settings", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(getSettingsMock);
+      _Settings.get = get;
+
+      const result = await Extension.getSetting(
+        SettingType.GENERAL,
+        SettingKey["LANGUAGES"]
+      );
+      expect(result).toMatchObject(getSettingsMock.get());
+    });
+
+    it("should return error", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+      const get = vi.fn().mockReturnValue(undefined);
+      _Settings.get = get;
+
+      try {
+        await Extension.getSetting(
+          SettingType.GENERAL,
+          SettingKey["LANGUAGES"]
+        );
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_settings");
+      }
+    });
+  });
+
+  describe("updateSetting", () => {
+    it("should return settings", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+
+      const set = vi.fn();
+      const update = vi.fn();
+      const get = vi.fn().mockReturnValue({
+        update,
+        set,
+      });
+      _Settings.get = get;
+      _Settings.set = set;
+
+      await Extension.updateSetting(
+        SettingType.GENERAL,
+        SettingKey["LANGUAGES"],
+        "en"
+      );
+      expect(set).toHaveBeenCalled();
+    });
+
+    it("should return error", async () => {
+      const _Settings = (await import("./storage/entities/settings/Settings"))
+        .default;
+
+      const get = vi.fn().mockReturnValue(undefined);
+      _Settings.get = get;
+
+      try {
+        await Extension.updateSetting(
+          SettingType.GENERAL,
+          SettingKey["LANGUAGES"],
+          "en"
+        );
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_settings");
+      }
+    });
+  });
+
+  describe("getContacts", () => {
+    it("should return contacts", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+
+      const get = vi.fn().mockReturnValue({
+        getAllContacts: vi.fn().mockReturnValue(contactsMock),
+      });
+      _Registry.get = get;
+
+      const result = await Extension.getContacts();
+      expect(result).toMatchObject(contactsMock);
+    });
+    it("should return error", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+
+      const get = vi.fn().mockReturnValue(undefined);
+      _Registry.get = get;
+
+      try {
+        await Extension.getContacts();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_registry");
+      }
+    });
+  });
+
+  describe("getRegistryAddresses", () => {
+    it("should return registry addresses", async () => {
+      const contactsMock = [
+        {
+          value: {
+            name: "account1",
+            address: "0x12345",
+          },
+        },
+      ];
+
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+      const get = vi.fn().mockReturnValue({
+        getAllContacts: () => contactsMock,
+        getRecent: () => [],
+      });
+      _Registry.get = get;
+
+      const _Network = (await import("./storage/entities/Network")).default;
+      const getNetwork = vi.fn().mockReturnValue({
+        chain: {
+          supportedAccounts: [],
+        },
+      });
+      _Network.get = getNetwork;
+
+      const _AccountManage = (await import("./accounts/AccountManager"))
+        .default;
+      const getAll = vi.fn().mockReturnValue({
+        getAll: () => {
+          return [];
+        },
+      });
+
+      _AccountManage.getAll = getAll;
+
+      const result = await Extension.getRegistryAddresses();
+      expect(result.contacts).toMatchObject(contactsMock);
+    });
+
+    it("should return registry error", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+
+      const get = vi.fn().mockReturnValue(undefined);
+      _Registry.get = get;
+
+      try {
+        await Extension.getRegistryAddresses();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_registry");
+      }
+    });
+
+    it("should return network error", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+      const get = vi.fn().mockReturnValue({});
+      _Registry.get = get;
+
+      const _Network = (await import("./storage/entities/Network")).default;
+      const getNetwork = vi.fn().mockReturnValue({ chain: undefined });
+      _Network.get = getNetwork;
+
+      try {
+        await Extension.getRegistryAddresses();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_network");
+      }
+    });
+
+    it("should return network error", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+      const get = vi.fn().mockReturnValue({});
+      _Registry.get = get;
+
+      const _Network = (await import("./storage/entities/Network")).default;
+      const getNetwork = vi.fn().mockReturnValue({
+        chain: {
+          supportedAccounts: [],
+        },
+      });
+      _Network.get = getNetwork;
+
+      const _AccountManage = (await import("./accounts/AccountManager"))
+        .default;
+      const getAll = vi.fn().mockReturnValue(undefined);
+
+      _AccountManage.getAll = getAll;
+
+      try {
+        await Extension.getRegistryAddresses();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_accounts");
+      }
+    });
+  });
+
+  describe("save contact", () => {
+    it("should save contact", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+      const get = vi.fn().mockReturnValue({
+        addContact: vi.fn(),
+      });
+      const set = vi.fn();
+      _Registry.get = get;
+      _Registry.set = set;
+
+      await Extension.saveContact({
+        name: "account1",
+        address: "0x12345",
+      });
+      expect(set).toHaveBeenCalled();
+    });
+
+    it("should return error", async () => {
+      const _Registry = (await import("./storage/entities/registry/Registry"))
+        .default;
+      const get = vi.fn().mockReturnValue(undefined);
+      _Registry.get = get;
+
+      try {
+        await Extension.saveContact({
+          name: "account1",
+          address: "0x12345",
+        });
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_registry");
+      }
+    });
+  });
+
+  it("removeContact", async () => {
+    const _Registry = (await import("./storage/entities/registry/Registry"))
+      .default;
+    const removeContact = vi.fn();
+    _Registry.removeContact = removeContact;
+
+    await Extension.removeContact("0x12345");
+    expect(removeContact).toHaveBeenCalled();
+  });
+
+  it("getActivity", async () => {
+    const _Activity = (await import("./storage/entities/activity/Activity"))
+      .default;
+    const getRecords = vi.fn();
+
+    _Activity.getRecords = getRecords;
+
+    await Extension.getActivity();
+    expect(getRecords).toHaveBeenCalled();
+  });
+
+  describe("getAllChains", () => {
+    it("should return all chains", async () => {
+      const _Chains = (await import("./storage/entities/Chains")).default;
+
+      const get = vi.fn().mockReturnValue(CHAINS);
+      _Chains.get = get;
+
+      const result = await Extension.getAllChains();
+      expect(result).toMatchObject(CHAINS);
+    });
+
+    it("should return error", async () => {
+      const _Chains = (await import("./storage/entities/Chains")).default;
+
+      const get = vi.fn().mockReturnValue(undefined);
+      _Chains.get = get;
+
+      try {
+        await Extension.getAllChains();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_chains");
+      }
+    });
+  });
+
+  it("saveCustomChain", async () => {
+    const _Chains = (await import("./storage/entities/Chains")).default;
+
+    const saveCustomChain = vi.fn();
+    _Chains.saveCustomChain = saveCustomChain;
+
+    Extension.saveCustomChain(CHAINS[0].chains[0]);
+    expect(saveCustomChain).toHaveBeenCalled();
+  });
+
+  it("removeCustomChain", async () => {
+    const _Chains = (await import("./storage/entities/Chains")).default;
+
+    const removeCustomChain = vi.fn();
+    _Chains.removeCustomChain = removeCustomChain;
+
+    Extension.removeCustomChain(CHAINS[0].chains[0].name);
+    expect(removeCustomChain).toHaveBeenCalled();
+  });
+
+  describe("getXCMChains", () => {
+    it("should return xcm chains", async () => {
+      const _Chains = (await import("./storage/entities/Chains")).default;
+
+      const getByName = vi.fn().mockReturnValue({ xcm: ["moonbeam"] });
+      const get = vi.fn().mockReturnValue({
+        getAll: () => ({
+          filter: vi.fn().mockReturnValue(CHAINS[0].chains),
+        }),
+      });
+      _Chains.getByName = getByName;
+      _Chains.get = get;
+
+      const result = await Extension.getXCMChains(CHAINS[0].chains[0].name);
+      expect(result).toMatchObject(CHAINS[0].chains);
+    });
+
+    it("should return chain error", async () => {
+      const _Chains = (await import("./storage/entities/Chains")).default;
+
+      const getByName = vi.fn().mockReturnValue({ xcm: undefined });
+      _Chains.getByName = getByName;
+
+      try {
+        await Extension.getXCMChains(CHAINS[0].chains[0].name);
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_chain");
+      }
+    });
+
+    it("should return chains error", async () => {
+      const _Chains = (await import("./storage/entities/Chains")).default;
+
+      const getByName = vi.fn().mockReturnValue({ xcm: [] });
+      const get = vi.fn().mockReturnValue(undefined);
+      _Chains.getByName = getByName;
+      _Chains.get = get;
+
+      try {
+        await Extension.getXCMChains(CHAINS[0].chains[0].name);
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: failed_to_get_chains");
+      }
+    });
+  });
+
+  it("addActivity", async () => {
+    const _Activity = (await import("./storage/entities/activity/Activity"))
+      .default;
+    const addRecord = vi.fn();
+    _Activity.addRecord = addRecord;
+
+    const _Registry = (await import("./storage/entities/registry/Registry"))
+      .default;
+    const addRecent = vi.fn();
+    _Registry.addRecent = addRecent;
+
+    await Extension.addActivity("0x1234", {} as Record);
+    expect(addRecent).toHaveBeenCalled();
   });
 });
