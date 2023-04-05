@@ -51,6 +51,15 @@ describe("Balance", () => {
           },
         },
       }),
+      useAssetContext: vi.fn().mockReturnValue({
+        state: {
+          assets: [
+            {
+              amount: 0,
+            },
+          ],
+        },
+      }),
     }));
 
     vi.mock("@src/hooks", () => ({
@@ -66,6 +75,7 @@ describe("Balance", () => {
     }));
 
     vi.mock("react-router-dom", () => ({
+      useLocation: () => vi.fn(),
       useNavigate: () => vi.fn(),
     }));
   });

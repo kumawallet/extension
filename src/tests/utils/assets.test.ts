@@ -21,12 +21,8 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(
-        api as ApiPromise,
-        "0x123",
-        2
-      );
-      expect(result).toEqual(0.1);
+      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      expect(result).toEqual(10);
     });
 
     it("should use ethereum api", async () => {
@@ -39,10 +35,9 @@ describe("assets", () => {
 
       const result = await getNatitveAssetBalance(
         api as ethers.providers.JsonRpcProvider,
-        "0x123",
-        2
+        "0x123"
       );
-      expect(result).toEqual(10);
+      expect(result).toEqual(2);
     });
   });
 });
