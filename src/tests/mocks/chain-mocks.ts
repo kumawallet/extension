@@ -8,3 +8,7 @@ export const selectedMultiSupportChain = CHAINS[1].chains[0];
 export const rpcMock = "wss://test";
 export const ethApiMock = {} as ethers.providers.JsonRpcProvider;
 export const wasmApiMock = {} as ApiPromise;
+
+export const chainsMock = CHAINS.map((c) => ({
+  [c.name]: c.chains,
+}));

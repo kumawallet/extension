@@ -10,6 +10,7 @@ import {
 } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
+import { chainsMock } from "@src/tests/mocks/chain-mocks";
 
 const renderCoponent = () => {
   return render(
@@ -26,6 +27,9 @@ describe("ChainSelector", () => {
     vi.mock("@src/Extension", () => ({
       default: {
         getAllAccounts: vi.fn().mockReturnValue(accountsMocks),
+        getSetting: vi.fn().mockReturnValue({
+          value: true,
+        }),
       },
     }));
     vi.mock("@src/providers", () => ({
@@ -51,7 +55,11 @@ describe("ChainSelector", () => {
           api: {
             query: {},
           },
-          chains: CHAINS,
+          chains: {
+            [CHAINS[0].name]: CHAINS[0].chains,
+            [CHAINS[1].name]: CHAINS[1].chains,
+            custom: [],
+          },
         },
         setSelectNetwork: () => setSelectNetwork(),
       }),
