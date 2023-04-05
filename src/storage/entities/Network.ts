@@ -1,5 +1,5 @@
-import { Chain } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
+import { Chain } from "./Chains";
 
 export default class Network extends BaseEntity {
   chain: Chain | null;

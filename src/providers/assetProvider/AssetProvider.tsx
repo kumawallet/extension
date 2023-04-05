@@ -25,6 +25,7 @@ import metadata from "@src/constants/metadata.json";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
+import { IAsset } from "@src/types";
 
 const initialState: InitialState = {
   assets: [],
@@ -91,7 +92,8 @@ export const reducer = (state: InitialState, action: Action) => {
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [unsubscribers, setUnsubscribers] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [unsubscribers, setUnsubscribers] = useState<any[]>([]);
 
   const {
     state: { api, selectedChain, rpc, type },
@@ -150,7 +152,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     if (type === "WASM") {
       const unsub = await (api as ApiPromise).query.system.account(
         selectedAccount.value.address,
-        ({ data, nonce }) => {
+        ({ data }: { data: { free: string } }) => {
           dispatch({
             type: "update-one-asset",
             payload: {
@@ -259,10 +261,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               const unsub = await assetPallet?.account(
                 r.id,
                 selectedAccount.value.address,
-                (data) => {
-                  const result = data.toJSON() as Partial<{
+                (data: {
+                  toJSON: () => Partial<{
                     balance: Uint8Array;
                   }>;
+                }) => {
+                  const result = data.toJSON();
 
                   let _balance = new BN("0");
 
@@ -307,7 +311,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     const assetsFromStorage = await Extension.getAssetsByChain(
       selectedChain.name
     );
-    const assets: Asset[] = [];
+    const assets: IAsset[] = [];
 
     if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
       const accountAddress = selectedAccount.value.address;
@@ -430,7 +434,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const listWasmContracts = async (assets: Asset[]) => {
+  const listWasmContracts = async (assets: IAsset[]) => {
     const unsub = await (api as ApiPromise).rpc.chain.subscribeNewHeads(
       async () => {
         const gasLimit = api.registry.createType("WeightV2", {
@@ -439,7 +443,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         });
 
         for (const asset of assets) {
-          const { output } = await asset.contract.query.balanceOf(
+          const { output } = await (
+            asset.contract as ContractPromise
+          ).query.balanceOf(
             selectedAccount?.value?.address,
             {
               gasLimit,
@@ -491,7 +497,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [rpc, selectedAccount, type, api]);
 
   useEffect(() => {
-    let interval;
+    let interval: NodeJS.Timer;
     if (state.assets.length > 0) {
       interval = setInterval(() => {
         getAssetsUSDPrice(state.assets);

@@ -1,5 +1,5 @@
 import { AccountType } from "@src/accounts/types";
-import Record from "@src/storage/entities/activity/Record";
+import { default as IRecord } from "@src/storage/entities/activity/Record";
 import {
   RecordStatus,
   RecordType,
@@ -15,7 +15,7 @@ import { getProvider } from "@src/providers/networkProvider";
 import { Keyring } from "@polkadot/keyring";
 import { TxToProcess } from "@src/types";
 
-const openPopUp = (params: unknown) => {
+const openPopUp = (params: Record<string, string>) => {
   const querys = makeQuerys(params);
 
   return chrome.windows.create({
@@ -154,7 +154,7 @@ const processWasmTx = async ({
           const hash = txHash.toString();
           const date = Date.now();
 
-          const activity: Partial<Record> = {
+          const activity: Partial<IRecord> = {
             fromBlock: block.header.number.toString(),
             address: originAddress,
             type: RecordType.TRANSFER,
@@ -179,7 +179,7 @@ const processWasmTx = async ({
               },
             } as TransferData,
           };
-          await Extension.addActivity(hash, activity as Record);
+          await Extension.addActivity(hash, activity as IRecord);
           sendUpdateActivityMessage();
         }
         if (status.isFinalized) {
@@ -240,7 +240,7 @@ const processEVMTx = async ({
 
     const txReceipt = await api.getTransaction(txHash);
     const date = Date.now();
-    const activity: Partial<Record> = {
+    const activity: Partial<IRecord> = {
       address: originAddress,
       type: RecordType.TRANSFER,
       reference: AccountType.EVM,
@@ -264,7 +264,7 @@ const processEVMTx = async ({
         },
       } as TransferData,
     };
-    await Extension.addActivity(txHash, activity as Record);
+    await Extension.addActivity(txHash, activity as IRecord);
     sendUpdateActivityMessage();
     const result = await txReceipt.wait();
     const status =

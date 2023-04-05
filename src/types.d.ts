@@ -4,6 +4,7 @@ import { utils, providers, Wallet, BigNumber } from "ethers";
 import { AccountType } from "./accounts/types";
 import { Asset } from "./pages";
 import { Chain } from "./storage/entities/Chains";
+import { ContractPromise } from "@polkadot/api-contract";
 
 export type polkadotExtrinsic =
   | SubmittableExtrinsic<"promise">
@@ -43,12 +44,20 @@ export type Tx =
 
 export type confirmTx = ({ type, tx, aditional, fee }: Tx) => void;
 
+export type IAsset = Partial<Asset> & {
+  id: string;
+  color?: string;
+  contract?: ContractPromise;
+  address?: string;
+  balance: BN | string;
+};
+
 export interface SendForm {
   from: Chain;
   to: Chain;
   destinationAccount: string;
   amount: number;
-  asset: Asset;
+  asset: object;
 }
 
 export interface TxToProcess {
@@ -59,11 +68,13 @@ export interface TxToProcess {
   originNetwork: string;
   destinationNetwork: string;
   networkInfo: Chain;
-  asset: Asset & { id: string; color: string };
+  asset: IAsset;
   rpc: string;
   tx: {
     txHash: string;
-    aditional?: Record<string, unknown>;
+    aditional?: {
+      tip?: BN | string;
+    };
     type: AccountType;
   };
 }

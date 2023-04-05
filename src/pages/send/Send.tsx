@@ -14,7 +14,7 @@ import { AccountType } from "@src/accounts/types";
 import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import { SendForm, Tx, TxToProcess } from "@src/types";
+import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
 import { BigNumber, Contract } from "ethers";
 
 export const Send = () => {
@@ -86,7 +86,7 @@ export const Send = () => {
     const amount = getValues("amount");
     const destinationAddress = getValues("destinationAccount");
     const originAddress = selectedAccount.value.address;
-    const asset = getValues("asset");
+    const asset = getValues("asset") as IAsset;
     const destinationNetwork = selectedChain.name;
 
     const { id } = await chrome.windows.getCurrent();
@@ -115,7 +115,7 @@ export const Send = () => {
         let _tx;
         const _amount = isNativeAsset
           ? amount * currencyUnits
-          : amount * 10 ** asset.decimals;
+          : amount * 10 ** (asset.decimals as number);
 
         const bnAmount = BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })

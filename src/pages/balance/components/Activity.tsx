@@ -15,6 +15,7 @@ import {
 import Chains from "@src/storage/entities/Chains";
 import { AssetIcon } from "@src/components/common/AssetIcon";
 import { FaChevronRight } from "react-icons/fa";
+import { IAsset } from "@src/types";
 
 const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -201,13 +202,10 @@ export const Activity = () => {
                   {getValue(data)}
                 </p>
                 <div className="flex justify-evenly items-center gap-1">
-                  <AssetIcon
-                    asset={data.fromAssetId || data.asset}
-                    width={20}
-                  />
+                  <AssetIcon asset={data.asset as IAsset} width={20} />
                   <FaChevronRight size={16} />
 
-                  <AssetIcon asset={data.toAssetId || data.asset} width={20} />
+                  <AssetIcon asset={data.asset as IAsset} width={20} />
                 </div>
               </div>
             </div>

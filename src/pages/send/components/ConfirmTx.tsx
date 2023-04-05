@@ -8,9 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
-import { Tx } from "../Send";
 import { Fees } from "./Fees";
 import { AssetIcon } from "@src/components/common/AssetIcon";
+import { Tx } from "@src/types";
 
 interface ConfirmTxProps {
   tx: Tx;

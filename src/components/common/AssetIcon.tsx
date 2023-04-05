@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { useNetworkContext } from "@src/providers";
-import { Asset } from "@src/providers/assetProvider/types";
 import { RiCopperCoinLine } from "react-icons/ri";
+import { IAsset } from "@src/types";
 
 interface AssetIconProps {
-  asset: Asset | null;
+  asset: IAsset | null;
   width: number;
 }
 
