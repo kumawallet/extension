@@ -144,8 +144,6 @@ export const Send = () => {
         };
       }
 
-      console.log("to send:", txToSend);
-
       await chrome.runtime.sendMessage({
         from: "popup",
         origin: "kuma",

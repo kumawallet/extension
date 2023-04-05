@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Chain, CHAINS } from "@src/constants/chains";
 import { ethApiMock, selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import { NetworkProvider, reducer, useNetworkContext } from "./NetworkProvider";
 import { vi } from "vitest";
@@ -20,9 +19,11 @@ import {
 import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
+import Chains, { Chain } from "@src/storage/entities/Chains";
+import { CHAINS } from "@src/constants/chains";
 
 const initialState: InitialState = {
-  chains: CHAINS,
+  chains: Chains.getInstance(),
   selectedChain: null,
   api: null,
   rpc: "",
@@ -36,6 +37,10 @@ const testIds = {
   getSelectedBtn: "get-selected-btn",
   newRpcBtn: "new-rpc-btn",
 };
+
+const chainsMock = CHAINS.map((c) => ({
+  [c.name]: c.chains,
+}));
 
 interface TestComponentProps {
   newChain?: Chain;
@@ -77,7 +82,20 @@ const renderComponent = (props?: TestComponentProps) => {
 
 describe("NetworkProvider", () => {
   beforeAll(async () => {
-    vi.mock("@src/Extension");
+    vi.mock("@src/storage/entities/Chains", () => ({
+      default: {
+        getInstance: vi.fn().mockReturnValue({
+          mainnets: [],
+          testnets: [],
+          custom: [],
+        }),
+      },
+    }));
+    vi.mock("@src/Extension", () => ({
+      default: {
+        getAllChains: vi.fn().mockReturnValue(() => chainsMock),
+      },
+    }));
     vi.mock("ethers", () => ({
       ethers: {
         providers: {
@@ -98,12 +116,17 @@ describe("NetworkProvider", () => {
         selectedChain: selectedWASMChainMock,
         rpc: rpcMock,
         type: "WASM",
+        chains: chainsMock as unknown as Chains,
       };
       const newState = reducer(initialState, {
         type: "init",
         payload,
       });
-      expect(newState).toContain(payload);
+      expect(newState).toEqual({
+        ...payload,
+        init: true,
+        api: null,
+      });
     });
     describe("select-network", () => {
       it("with rpc and type", () => {
@@ -276,8 +299,11 @@ describe("NetworkProvider", () => {
       Extension.default.getSelectedAccount = vi
         .fn()
         .mockResolvedValue(selectedWASMAccountMock);
+      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
 
-      renderComponent();
+      renderComponent({
+        type: selectedWASMAccountMock.type,
+      });
       await act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
       });
@@ -291,13 +317,16 @@ describe("NetworkProvider", () => {
       );
     });
     it("should set new rpc if chain support WASM and EVM", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default = {
-        getSelectedAccount: vi.fn().mockResolvedValue(selectedWASMAccountMock),
-        getNetwork: vi
-          .fn()
-          .mockResolvedValue({ chain: selectedMultiSupportChain }),
-      };
+      const Extension = await import("@src/Extension");
+      Extension.default.getSelectedAccount = vi
+        .fn()
+        .mockResolvedValue(selectedWASMAccountMock);
+      Extension.default.getNetwork = vi
+        .fn()
+        .mockResolvedValue({ chain: selectedMultiSupportChain });
+
+      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
+
       renderComponent({
         type: selectedEVMAccountMock.type,
       });
