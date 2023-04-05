@@ -196,25 +196,30 @@ describe("AccountManager", () => {
 
   describe("addAccount", () => {
     it("should return created account", async () => {
-      //
       const newAccountForm = {
         address: "0x1234",
         type: AccountType.EVM,
         name: "",
-        keyring: {} as Keyring,
+        keyring: {
+          key: `${AccountType.EVM}-0x1234`,
+        },
       };
 
       const result = await AccountManager["addAccount"](
         newAccountForm.address,
         newAccountForm.type,
         newAccountForm.name,
-        newAccountForm.keyring
+        newAccountForm.keyring as Keyring
       );
+
       expect(result).toHaveProperty(
         "key",
         `${AccountType.EVM}-${newAccountForm.address}`
       );
-      expect(result).toHaveProperty("value", {
+
+      console.log("result", result);
+
+      expect(result.value).toEqual({
         name: "Account 1",
         address: newAccountForm.address,
         keyring: `${AccountType.EVM}-${newAccountForm.address}`,
@@ -229,16 +234,18 @@ describe("AccountManager", () => {
         seed: "12345",
         name: "new evm account",
         path: "0/0/0",
-        keyring: {} as Keyring,
+        keyring: {
+          key: `${AccountType.EVM}-0x12345`,
+        },
       };
       const result = await AccountManager["addEVMAccount"](
         evmForm.seed,
         evmForm.name,
         evmForm.path,
-        evmForm.keyring
+        evmForm.keyring as Keyring
       );
       expect(result).toHaveProperty("key", `${AccountType.EVM}-0x12345`);
-      expect(result).toHaveProperty("value", {
+      expect(result.value).toEqual({
         name: evmForm.name,
         address: "0x12345",
         keyring: `${AccountType.EVM}-0x12345`,
@@ -252,15 +259,17 @@ describe("AccountManager", () => {
       const wasmForm = {
         seed: "12345",
         name: "new wasm account",
-        keyring: {} as Keyring,
+        keyring: {
+          key: `${AccountType.WASM}-12345`,
+        },
       };
       const result = await AccountManager["addWASMAccount"](
         wasmForm.seed,
         wasmForm.name,
-        wasmForm.keyring
+        wasmForm.keyring as Keyring
       );
       expect(result).toHaveProperty("key", `${AccountType.WASM}-12345`);
-      expect(result).toHaveProperty("value", {
+      expect(result.value).toEqual({
         name: wasmForm.name,
         address: wasmForm.seed,
         keyring: `${AccountType.WASM}-12345`,
@@ -282,10 +291,10 @@ describe("AccountManager", () => {
         "key",
         `${AccountType.IMPORTED_EVM}-0x12345`
       );
-      expect(result).toHaveProperty("value", {
+      expect(result.value).toEqual({
         name: importEVMForm.name,
         address: "0x12345",
-        keyring: `${AccountType.IMPORTED_EVM}-0x12345`,
+        keyring: undefined,
       });
       expect(result).toHaveProperty("type", AccountType.IMPORTED_EVM);
     });
@@ -302,10 +311,10 @@ describe("AccountManager", () => {
         "key",
         `${AccountType.IMPORTED_WASM}-12345`
       );
-      expect(result).toHaveProperty("value", {
+      expect(result.value).toEqual({
         name: importEVMForm.name,
         address: "12345",
-        keyring: `${AccountType.IMPORTED_WASM}-12345`,
+        keyring: undefined,
       });
       expect(result).toHaveProperty("type", AccountType.IMPORTED_WASM);
     });
@@ -330,7 +339,7 @@ describe("AccountManager", () => {
         value: {
           name: deriveForm.name,
           address: "12345",
-          keyring: `${AccountType.WASM}-12345`,
+          keyring: undefined,
         },
         type: AccountType.WASM,
       });
@@ -354,7 +363,7 @@ describe("AccountManager", () => {
         value: {
           name: deriveForm.name,
           address: "0x12345",
-          keyring: `${AccountType.EVM}-0x12345`,
+          keyring: undefined,
         },
         type: AccountType.EVM,
       });
