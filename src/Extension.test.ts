@@ -11,6 +11,8 @@ import { SettingType } from "./storage/entities/settings/types";
 import { SettingKey } from "./storage/entities/settings/types";
 import { CHAINS } from "./constants/chains";
 import Record from "./storage/entities/activity/Record";
+import { RecordStatus } from "./storage/entities/activity/types";
+import { Asset } from "./pages";
 const accountManageMock = {
   saveBackup: vi.fn(),
 };
@@ -162,6 +164,22 @@ describe("Extension", () => {
       );
       expect(result).toBe(true);
     });
+
+    it("should create accounts with isSignUp in false", async () => {
+      const AccountMannager = await import("./accounts/AccountManager");
+      AccountMannager.default.saveBackup = accountManageMock.saveBackup;
+
+      const _Auth = await import("./storage/Auth");
+      _Auth.default.isUnlocked = true;
+
+      const result = await Extension.createAccounts(
+        "1 2 3 4 5",
+        "name",
+        "12345",
+        false
+      );
+      expect(result).toBe(true);
+    });
     it("should throw seed_required error", async () => {
       try {
         await Extension.createAccounts("", "", "");
@@ -277,6 +295,33 @@ describe("Extension", () => {
     Extension.changeAccountName("EVM-1234", "newname");
 
     expect(changeName).toHaveBeenCalled();
+  });
+
+  describe("reset wallet", () => {
+    it("should reset wallet", async () => {
+      const _Auth = await import("./storage/Auth");
+      _Auth.default.isUnlocked = true;
+
+      const resetWallet = vi.fn();
+      const _Storage = await import("./storage/Storage");
+      _Storage.default.getInstance = vi.fn().mockReturnValue({
+        resetWallet: resetWallet,
+      });
+
+      await Extension.resetWallet();
+      expect(resetWallet).toHaveBeenCalled();
+    });
+    it("should throw error", async () => {
+      const _Auth = await import("./storage/Auth");
+      _Auth.default.isUnlocked = false;
+
+      try {
+        await Extension.resetWallet();
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: wallet_not_unlocked");
+      }
+    });
   });
 
   describe("sign in", () => {
@@ -1061,5 +1106,63 @@ describe("Extension", () => {
 
     await Extension.addActivity("0x1234", {} as Record);
     expect(addRecent).toHaveBeenCalled();
+  });
+
+  it("updateActivity", async () => {
+    const _Activity = (await import("./storage/entities/activity/Activity"))
+      .default;
+    const updateRecordStatus = vi.fn();
+    _Activity.updateRecordStatus = updateRecordStatus;
+
+    await Extension.updateActivity("0x1234", RecordStatus.SUCCESS);
+    expect(updateRecordStatus).toHaveBeenCalled();
+  });
+
+  it("addAsset", async () => {
+    const _Assets = (await import("./storage/entities/Assets")).default;
+    const addAsset = vi.fn();
+    _Assets.addAsset = addAsset;
+
+    await Extension.addAsset(CHAINS[0].chains[0].name, {} as Asset);
+    expect(addAsset).toHaveBeenCalled();
+  });
+
+  it("getAssetsByChain", async () => {
+    const _Assets = (await import("./storage/entities/Assets")).default;
+    const getByChain = vi.fn();
+    _Assets.getByChain = getByChain;
+
+    await Extension.getAssetsByChain(CHAINS[0].chains[0].name);
+    expect(getByChain).toHaveBeenCalled();
+  });
+
+  it("getTrustedSites", async () => {
+    const _TrustedSites = (await import("./storage/entities/TrustedSites"))
+      .default;
+    const getAll = vi.fn();
+    _TrustedSites.getAll = getAll;
+
+    Extension.getTrustedSites();
+    expect(getAll).toHaveBeenCalled();
+  });
+
+  it("addTrustedSite", async () => {
+    const _TrustedSites = (await import("./storage/entities/TrustedSites"))
+      .default;
+    const addSite = vi.fn();
+    _TrustedSites.addSite = addSite;
+
+    Extension.addTrustedSite("https://test.com");
+    expect(addSite).toHaveBeenCalled();
+  });
+
+  it("removeTrustedSite", async () => {
+    const _TrustedSites = (await import("./storage/entities/TrustedSites"))
+      .default;
+    const removeSite = vi.fn();
+    _TrustedSites.removeSite = removeSite;
+
+    Extension.removeTrustedSite("https://test.com");
+    expect(removeSite).toHaveBeenCalled();
   });
 });
