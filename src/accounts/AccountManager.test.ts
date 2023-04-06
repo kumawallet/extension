@@ -217,8 +217,6 @@ describe("AccountManager", () => {
         `${AccountType.EVM}-${newAccountForm.address}`
       );
 
-      console.log("result", result);
-
       expect(result.value).toEqual({
         name: "Account 1",
         address: newAccountForm.address,
