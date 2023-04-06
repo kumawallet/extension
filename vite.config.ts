@@ -20,17 +20,17 @@ const stylesDir = resolve(root, "styles");
 const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
 
-console.log(`
- __    __                                          __       __            __  __              __     
-/  |  /  |                                        /  |  _  /  |          /  |/  |            /  |    
-$$ | /$$/  __    __  _____  ____    ______        $$ | / \\ $$ |  ______  $$ |$$ |  ______   _$$ |_   
-$$ |/$$/  /  |  /  |/     \\\\/    \\  /     \\       $$ |/$  \\$$ | /      \\ $$ |$$ | /      \\ / $$   |  
-$$  $$<   $$ |  $$ |$$$$$$ $$$$  | $$$$$$  |      $$ /$$$  $$ | $$$$$$  |$$ |$$ |/$$$$$$  |$$$$$$/   
-$$$$$  \\  $$ |  $$ |$$ | $$ | $$ | /    $$ |      $$ $$/$$ $$ | /    $$ |$$ |$$ |$$    $$ |  $$ | __ 
-$$ |$$  \\ $$ \\__$$ |$$ | $$ | $$ |/$$$$$$$ |      $$$$/  $$$$ |/$$$$$$$ |$$ |$$ |$$$$$$$$/   $$ |/  |
-$$ | $$  |$$    $$/ $$ | $$ | $$ |$$    $$ |      $$$/    $$$ |$$    $$ |$$ |$$ |$$       |  $$  $$/ 
-$$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/  $$$$$$$/    $$$$/  
-`);
+// console.log(`
+//  __    __                                          __       __            __  __              __
+// /  |  /  |                                        /  |  _  /  |          /  |/  |            /  |
+// $$ | /$$/  __    __  _____  ____    ______        $$ | / \\ $$ |  ______  $$ |$$ |  ______   _$$ |_
+// $$ |/$$/  /  |  /  |/     \\\\/    \\  /     \\       $$ |/$  \\$$ | /      \\ $$ |$$ | /      \\ / $$   |
+// $$  $$<   $$ |  $$ |$$$$$$ $$$$  | $$$$$$  |      $$ /$$$  $$ | $$$$$$  |$$ |$$ |/$$$$$$  |$$$$$$/
+// $$$$$  \\  $$ |  $$ |$$ | $$ | $$ | /    $$ |      $$ $$/$$ $$ | /    $$ |$$ |$$ |$$    $$ |  $$ | __
+// $$ |$$  \\ $$ \\__$$ |$$ | $$ | $$ |/$$$$$$$ |      $$$$/  $$$$ |/$$$$$$$ |$$ |$$ |$$$$$$$$/   $$ |/  |
+// $$ | $$  |$$    $$/ $$ | $$ | $$ |$$    $$ |      $$$/    $$$ |$$    $$ |$$ |$$ |$$       |  $$  $$/
+// $$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/  $$$$$$$/    $$$$/
+// `);
 
 export default defineConfig({
   test: {
@@ -38,21 +38,13 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "src/tests/setup.ts",
     coverage: {
-      reporter: ['text', 'html', 'lcov', 'text-summary'],
+      reporter: ["text", "html", "lcov", "text-summary"],
       exclude: [
         ...(configDefaults.coverage.exclude as string[]),
         "**/src/tests/mocks/**",
         "**/src/constants/**",
         "**/src/routes/**",
         "**/src/components/common/**",
-
-        "**/src/pages/balance/components/Activity.tsx",
-
-        "**/src/storage/entities/activity/**",
-        "**/src/storage/entities/registry/**",
-        "**/src/storage/entities/settings/{Setting,Settings,types}.ts",
-
-        "**/src/storage/entities/Chains.ts",
       ],
     },
   },
