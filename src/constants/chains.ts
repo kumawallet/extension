@@ -211,71 +211,71 @@ export const TESTNETS: Chain[] = [
     logo: "astar",
     supportedAccounts: [EVM, WASM],
   },
-  // {
-  //   name: "Rococo",
-  //   rpc: {
-  //     wasm: "wss://rococo-rpc.polkadot.io",
-  //   },
-  //   addressPrefix: 42,
+  {
+    name: "Rococo",
+    rpc: {
+      wasm: "wss://rococo-rpc.polkadot.io",
+    },
+    addressPrefix: 42,
 
-  //   nativeCurrency: {
-  //     name: "roc",
-  //     symbol: "ROC",
-  //     decimals: 12,
-  //   },
-  //   explorer: {
-  //     wasm: {
-  //       name: "",
-  //       url: "https://rococo.subscan.io/",
-  //     },
-  //   },
-  //   logo: "rococo",
-  //   supportedAccounts: [WASM],
-  // },
+    nativeCurrency: {
+      name: "roc",
+      symbol: "ROC",
+      decimals: 12,
+    },
+    explorer: {
+      wasm: {
+        name: "",
+        url: "https://rococo.subscan.io/",
+      },
+    },
+    logo: "rococo",
+    supportedAccounts: [WASM],
+  },
 
-  // {
-  //   name: "Rococo contracts",
-  //   rpc: {
-  //     wasm: "wss://rococo-contracts-rpc.polkadot.io",
-  //   },
-  //   addressPrefix: 42,
+  {
+    name: "Rococo contracts",
+    rpc: {
+      wasm: "wss://rococo-contracts-rpc.polkadot.io",
+    },
+    addressPrefix: 42,
 
-  //   nativeCurrency: {
-  //     name: "roc",
-  //     symbol: "ROC",
-  //     decimals: 12,
-  //   },
-  //   explorer: {
-  //     wasm: {
-  //       name: "",
-  //       url: "https://rococo.subscan.io/",
-  //     },
-  //   },
-  //   logo: "rococo",
-  //   supportedAccounts: [WASM],
-  // },
+    nativeCurrency: {
+      name: "roc",
+      symbol: "ROC",
+      decimals: 12,
+    },
+    explorer: {
+      wasm: {
+        name: "",
+        url: "https://rococo.subscan.io/",
+      },
+    },
+    logo: "rococo",
+    supportedAccounts: [WASM],
+  },
 
-  // {
-  //   name: "Rockmine",
-  //   rpc: {
-  //     wasm: "wss://rococo-rockmine-rpc.polkadot.io",
-  //   },
-  //   addressPrefix: 42,
+  {
+    name: "Rockmine",
+    rpc: {
+      wasm: "wss://rococo-rockmine-rpc.polkadot.io",
+    },
+    addressPrefix: 42,
 
-  //   nativeCurrency: {
-  //     name: "roc",
-  //     symbol: "ROC",
-  //     decimals: 12,
-  //   },
-  //   explorer: {
-  //     wasm: {
-  //       name: "",
-  //       url: "https://rockmine.subscan.io/",
-  //     },
-  //   },
-  //   logo: "rockmine",
-  //   supportedAccounts: [WASM],
-  // },
+    nativeCurrency: {
+      name: "roc",
+      symbol: "ROC",
+      decimals: 12,
+    },
+    explorer: {
+      wasm: {
+        name: "",
+        url: "https://rockmine.subscan.io/",
+      },
+    },
+    logo: "rococo",
+    supportedAccounts: [WASM],
+  },
   {
     name: "Goerli",
     rpc: { evm: "https://goerli.infura.io/v3/" },
@@ -294,73 +294,94 @@ export const TESTNETS: Chain[] = [
     logo: "ethereum",
     supportedAccounts: [EVM],
   },
+
+  // {
+  //   name: "Relay",
+  //   rpc: {
+  //     wasm: "ws://127.0.0.1:9900/",
+  //   },
+  //   addressPrefix: 42,
+
+  //   nativeCurrency: {
+  //     name: "roc",
+  //     symbol: "ROC",
+  //     decimals: 12,
+  //   },
+  //   explorer: {
+  //     wasm: {
+  //       name: "",
+  //       url: "",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [WASM],
+  // },
+  // {
+  //   name: "Parachain",
+  //   rpc: {
+  //     wasm: "ws://127.0.0.1:9920/",
+  //   },
+  //   addressPrefix: 42,
+
+  //   nativeCurrency: {
+  //     name: "roc",
+  //     symbol: "ROC",
+  //     decimals: 12,
+  //   },
+  //   explorer: {
+  //     wasm: {
+  //       name: "",
+  //       url: "",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [WASM],
+  // },
+
+  // {
+  //   name: "Eth goerly alchemy",
+  //   rpc: {
+  //     evm: "https://eth-goerli.g.alchemy.com/v2/5_BItbroYpOXQnEhKDDFOoctfqifxjoH",
+  //   },
+  //   addressPrefix: 0,
+
+  //   nativeCurrency: {
+  //     name: "ETH",
+  //     symbol: "ETH",
+  //     decimals: 18,
+  //   },
+  //   explorer: {
+  //     evm: {
+  //       name: "",
+  //       url: "https://goerli.etherscan.io/",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [EVM],
+  // },
+
+  // {
+  //   name: "Hadrhat",
+  //   rpc: {
+  //     evm: "http://localhost:8545",
+  //   },
+  //   addressPrefix: 0,
+
+  //   nativeCurrency: {
+  //     name: "HardhatETH",
+  //     symbol: "HardhatETH",
+  //     decimals: 18,
+  //   },
+  //   explorer: {
+  //     evm: {
+  //       name: "",
+  //       url: "https://goerli.etherscan.io/",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [EVM],
+  // },
 ];
-
-// export const LOCAL = [
-//   {
-//     name: "Eth goerly alchemy",
-//     rpc: {
-//       evm: "https://eth-goerli.g.alchemy.com/v2/5_BItbroYpOXQnEhKDDFOoctfqifxjoH",
-//     },
-//     addressPrefix: 0,
-
-//     nativeCurrency: {
-//       name: "ETH",
-//       symbol: "ETH",
-//       decimals: 18,
-//     },
-//     explorer: {
-//       evm: {
-//         name: "",
-//         url: "https://goerli.etherscan.io/",
-//       },
-//     },
-//     logo: "rococo",
-//     supportedAccounts: [EVM],
-//   },
-//   {
-//     name: "Relay",
-//     rpc: {
-//       wasm: "ws://127.0.0.1:9900/",
-//     },
-//     addressPrefix: 42,
-
-//     nativeCurrency: {
-//       name: "roc",
-//       symbol: "ROC",
-//       decimals: 12,
-//     },
-//     explorer: {
-//       wasm: {
-//         name: "",
-//         url: "",
-//       },
-//     },
-//     logo: "rococo",
-//     supportedAccounts: [WASM],
-//   },
-//   {
-//     name: "Parachain",
-//     rpc: {
-//       wasm: "ws://127.0.0.1:9920/",
-//     },
-//     addressPrefix: 42,
-
-//     nativeCurrency: {
-//       name: "roc",
-//       symbol: "ROC",
-//       decimals: 12,
-//     },
-//     explorer: {
-//       wasm: {
-//         name: "",
-//         url: "",
-//       },
-//     },
-//     logo: "rococo",
-//     supportedAccounts: [WASM],
-//   },
-// ];
 
 export const CHAINS = [
   {
@@ -371,10 +392,6 @@ export const CHAINS = [
     name: "testnets",
     chains: TESTNETS,
   },
-  // {
-  //   name: "local",
-  //   chains: LOCAL,
-  // },
 ];
 
 export const DEFAULT_WASM_CHAIN = CHAINS[0].chains[0];
