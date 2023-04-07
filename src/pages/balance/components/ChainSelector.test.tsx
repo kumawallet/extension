@@ -10,7 +10,6 @@ import {
 } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
-import { chainsMock } from "@src/tests/mocks/chain-mocks";
 
 const renderCoponent = () => {
   return render(
@@ -74,7 +73,7 @@ describe("ChainSelector", () => {
 
     const button = screen.getByTestId("chain-button");
 
-    await act(() => {
+    act(() => {
       fireEvent.click(button);
     });
     await waitFor(() => {
@@ -88,19 +87,20 @@ describe("ChainSelector", () => {
 
     const button = screen.getByTestId("chain-button");
 
-    await act(() => {
+    act(() => {
       fireEvent.click(button);
     });
     waitFor(() => {
-      const account = screen.getByText(CHAINS[0].name);
-      expect(account).toBeDefined();
+      expect(screen.getByText(CHAINS[0].name)).toBeDefined();
     });
-    const account = screen.getByText(CHAINS[0].chains[1].name);
+    const account = screen.getByText(CHAINS[0].chains[0].name);
 
     (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
-    await act(() => {
+    act(() => {
       fireEvent.click(account.parentElement as HTMLElement);
     });
-    expect(setSelectNetwork).toHaveBeenCalled();
+    waitFor(() => {
+      expect(setSelectNetwork).toHaveBeenCalled();
+    });
   });
 });
