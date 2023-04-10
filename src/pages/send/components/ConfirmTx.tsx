@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { Fees } from "./Fees";
@@ -24,10 +24,6 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
   } = useAccountContext();
   const { t } = useTranslation("send");
   const navigate = useNavigate();
-
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
 
   const { getValues, watch } = useFormContext();
 
@@ -65,7 +61,10 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
             boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
           }}
         >
-          <div className="flex flex-col items-center gap-2">
+          <div
+            data-testid="origin-chain"
+            className="flex flex-col items-center gap-2"
+          >
             <div className="flex gap-2 items-center">
               <img
                 src={`/images/${originAccount.logo}.png`}
@@ -94,7 +93,10 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
             <FaChevronLeft />
             <FaChevronRight />
           </div>
-          <div className="flex flex-col items-center gap-2">
+          <div
+            data-testid="destination-chain"
+            className="flex flex-col items-center gap-2"
+          >
             <div className="flex gap-2 items-center">
               <img
                 src={`/images/${originAccount.logo}.png`}
@@ -124,7 +126,10 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
       <div className="mb-5">
         <p>{t("assets")}:</p>
         <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
-          <div className="flex flex-col items-center">
+          <div
+            data-testid="origin-asset"
+            className="flex flex-col items-center"
+          >
             <div className="flex gap-2 items-center">
               <AssetIcon asset={asset} width={30} />
 
@@ -139,7 +144,10 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
             <FaChevronLeft />
             <FaChevronRight />
           </div>
-          <div className="flex flex-col items-center">
+          <div
+            data-testid="destination-asset"
+            className="flex flex-col items-center"
+          >
             <div className="flex gap-2 items-center">
               <AssetIcon asset={asset} width={30} />
 

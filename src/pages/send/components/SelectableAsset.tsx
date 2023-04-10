@@ -36,7 +36,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
 
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>
-      <div className="relative mt-1">
+      <div className="relative mt-1" data-testid="select-asset">
         <Listbox.Button className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex items-center gap-1 w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
           <AssetIcon asset={selectedAsset} width={25} />
           <span className="block truncate font-inter">
