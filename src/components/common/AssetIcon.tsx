@@ -13,7 +13,7 @@ export const AssetIcon: FC<AssetIconProps> = ({ asset, width }) => {
     state: { selectedChain },
   } = useNetworkContext();
 
-  if (!asset) return null;
+  if (!asset || !selectedChain) return null;
 
   return (
     <>

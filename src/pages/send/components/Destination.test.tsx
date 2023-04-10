@@ -1,14 +1,7 @@
 import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
 import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import i18n from "@src/utils/i18n";
-import {
-  act,
-  fireEvent,
-  getAllByText,
-  getByText,
-  render,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Destination } from "./Destination";
 
