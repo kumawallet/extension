@@ -36,7 +36,9 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
-        <p className="text-5xl">{formatAmountWithDecimals(totalBalance, 5)}</p>
+        <p className="text-5xl" data-testid="balance">
+          {formatAmountWithDecimals(totalBalance, 5)}
+        </p>
       </div>
       <div className="flex gap-3 justify-center">
         <button
