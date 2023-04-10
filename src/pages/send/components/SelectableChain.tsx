@@ -1,18 +1,20 @@
 import { FC, useState } from "react";
 import { Listbox } from "@headlessui/react";
+import { Chain } from "@src/storage/entities/Chains";
 
 interface SelectableChainProps {
   canSelectChain?: boolean;
-  selectedChain: any;
-  optionChains?: any[];
+  selectedChain: Chain;
+  optionChains?: Chain[];
 }
 
 export const SelectableChain: FC<SelectableChainProps> = ({
   canSelectChain = false,
   selectedChain,
-  optionChains = [],
 }) => {
-  const [chain, setChain] = useState(selectedChain || { name: "default" });
+  const [chain, setChain] = useState(selectedChain);
+
+  if (!selectedChain?.name) return null;
 
   return (
     <Listbox value={chain} onChange={setChain} defaultValue={selectedChain}>
@@ -32,7 +34,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
           />
           <span>{chain.name}</span>
         </Listbox.Button>
-        {canSelectChain && optionChains?.length > 0 && (
+        {/* {canSelectChain && optionChains?.length > 0 && (
           <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
             {optionChains?.map((chain) => (
               <Listbox.Option key={chain.name} value={optionChains}>
@@ -40,7 +42,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
               </Listbox.Option>
             ))}
           </Listbox.Options>
-        )}
+        )} */}
       </div>
     </Listbox>
   );
