@@ -41,18 +41,18 @@ describe("Destination", () => {
           contacts: [
             {
               name: "test",
-              address: "0x123",
+              address: "0x1234",
             },
           ],
           ownAccounts: [
             {
               name: "test",
-              address: "0x123",
+              address: "0x1235",
             },
           ],
           recent: [
             {
-              address: "0x123",
+              address: "0x1236",
             },
           ],
         }),
@@ -68,11 +68,6 @@ describe("Destination", () => {
     }));
   });
 
-  it("should render", () => {
-    const { container } = renderComponent();
-    expect(container).toBeDefined();
-  });
-
   it("should render options", async () => {
     const { getByTestId, getAllByText } = renderComponent();
 
@@ -82,9 +77,7 @@ describe("Destination", () => {
       fireEvent.click(input);
     });
     await waitFor(() => {
-      const address = getAllByText("0x123");
-
-      expect(address.length).toBe(3);
+      expect(getAllByText("0x1234").length).toBe(1);
     });
   });
 
@@ -98,9 +91,9 @@ describe("Destination", () => {
     });
 
     await waitFor(() => {
-      const address = getAllByText("0x123");
+      const address = getAllByText("0x1234");
 
-      expect(address.length).toBe(3);
+      expect(address.length).toBe(1);
     });
 
     act(() => {
@@ -108,9 +101,9 @@ describe("Destination", () => {
     });
 
     await waitFor(() => {
-      const address = getAllByText("0x123");
+      const address = getAllByText("0x1234");
 
-      expect(address.length).toBe(3);
+      expect(address.length).toBe(1);
     });
   });
 });

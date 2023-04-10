@@ -56,9 +56,11 @@ describe("Actvity", () => {
     }));
   });
 
-  it("should render", () => {
-    const { container } = renderComponent();
-    expect(container).toBeDefined();
+  it("should render", async () => {
+    const { getByTestId } = renderComponent();
+    await waitFor(() => {
+      expect(getByTestId("search-input")).toBeDefined();
+    });
   });
 
   it("should filter by network", async () => {

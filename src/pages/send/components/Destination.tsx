@@ -122,7 +122,7 @@ export const Destination = () => {
 
     filterdOwnAccounts.length > 0 &&
       filters.push({
-        label: "contacts",
+        label: "own accounts",
         values: filterdOwnAccounts,
       });
 

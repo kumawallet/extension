@@ -1,8 +1,18 @@
 import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
 import { fireEvent, render } from "@testing-library/react";
 import { Receive } from "./Receive";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@src/utils/i18n";
 
 const copyToClipboard = vi.fn();
+
+const renderComponent = () => {
+  return render(
+    <I18nextProvider i18n={i18n}>
+      <Receive />
+    </I18nextProvider>
+  );
+};
 
 describe("Receive", () => {
   beforeAll(() => {
@@ -28,12 +38,12 @@ describe("Receive", () => {
   });
 
   it("should render", () => {
-    const { getByTestId } = render(<Receive />);
+    const { getByTestId } = renderComponent();
     expect(getByTestId("account-button")).toBeDefined();
   });
 
   it("should copy to clipboard", () => {
-    const { getByTestId } = render(<Receive />);
+    const { getByTestId } = renderComponent();
     const accountButton = getByTestId("account-button");
 
     fireEvent.click(accountButton);

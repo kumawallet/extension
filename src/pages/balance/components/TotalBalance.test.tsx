@@ -45,8 +45,6 @@ describe("TotalBalance", () => {
 
     const balance = getByTestId("balance");
 
-    console.log(balance.innerHTML);
-
     expect(balance.innerHTML).include("100");
   });
 });
