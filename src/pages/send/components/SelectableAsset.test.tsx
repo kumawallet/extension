@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  getByText,
-  render,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { SelectableAsset } from "./SelectableAsset";
 import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 
@@ -82,10 +76,5 @@ describe("SelectableAsset", () => {
     });
 
     expect(onChangeAsset).toBeCalledTimes(2);
-    // expect(onChangeAsset).toBeCalledWith({
-    //   id: "2",
-    //   symbol: "USDT",
-    //   balance: 2,
-    // });
   });
 });
