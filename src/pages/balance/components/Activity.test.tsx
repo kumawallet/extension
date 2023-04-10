@@ -65,7 +65,7 @@ describe("Actvity", () => {
     const { container, getByTestId } = renderComponent();
 
     await waitFor(() => {
-      expect(getByTestId("search-input")).toBeDefined;
+      expect(getByTestId("search-input")).toBeDefined();
     });
 
     const searchInput = await getByTestId("search-input");
