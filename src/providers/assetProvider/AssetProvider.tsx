@@ -27,7 +27,7 @@ import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
 import { IAsset } from "@src/types";
 
-const initialState: InitialState = {
+export const initialState: InitialState = {
   assets: [],
   isLoadingAssets: false,
 };
@@ -91,10 +91,6 @@ export const reducer = (state: InitialState, action: Action) => {
 };
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [unsubscribers, setUnsubscribers] = useState<any[]>([]);
-
   const {
     state: { api, selectedChain, rpc, type },
   } = useNetworkContext();
@@ -103,15 +99,19 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     state: { selectedAccount },
   } = useAccountContext();
 
+  const [state, dispatch] = useReducer(reducer, initialState);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [unsubscribers, setUnsubscribers] = useState<any[]>([]);
+
   const loadAssets = async () => {
     dispatch({
       type: "loading-assets",
     });
+
     let assets: Asset[] = [];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
-
       assets = [
         {
           id: "-1",
@@ -124,15 +124,15 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           color: randomcolor(),
         })),
       ];
-
       dispatch({
         type: "set-assets",
         payload: {
           assets,
         },
       });
+
+      return assets;
     } catch (error) {
-      console.log("error", error);
       dispatch({
         type: "end-loading",
       });
@@ -149,6 +149,8 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api,
       account.value.address
     );
+
+    // suscribers for native asset balance update
     if (type === "WASM") {
       const unsub = await (api as ApiPromise).query.system.account(
         selectedAccount.value.address,
@@ -184,6 +186,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         });
       });
     }
+
     return nativeAsset;
   };
 
@@ -430,7 +433,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       });
     } catch (error) {
       console.log("error", error);
-      //
     }
   };
 
