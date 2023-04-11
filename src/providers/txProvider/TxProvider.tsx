@@ -7,11 +7,10 @@ import {
   useReducer,
 } from "react";
 import { RecordStatus } from "@src/storage/entities/activity/types";
-import { useAccountContext } from "../accountProvider";
 import Extension from "@src/Extension";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
-import { useNetworkContext } from "..";
+import { useNetworkContext, useAccountContext } from "@src/providers";
 import { Action, InitialState, TxContext } from "./types";
 import Record from "@src/storage/entities/activity/Record";
 
@@ -21,7 +20,7 @@ const initialState: InitialState = {
 
 const TxContext = createContext({} as TxContext);
 
-const reducer = (state: InitialState, action: Action): InitialState => {
+export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "init-activity": {
       const { activity } = action.payload;

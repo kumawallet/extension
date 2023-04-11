@@ -20,6 +20,6 @@ export type Action =
       payload: {
         hash: string;
         status: RecordStatus;
-        error: string;
+        error: string | undefined;
       };
     };

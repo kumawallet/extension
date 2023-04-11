@@ -11,7 +11,7 @@ export enum RecordStatus {
 
 type AssetRecord = {
   id: string;
-  color: string;
+  color?: string;
 };
 
 export type RecordData = CallData | TransferData;
