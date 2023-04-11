@@ -237,7 +237,8 @@
     "details": "詳細",
     "confirm": "確認",
     "tx_send": "トランザクション送信",
-    "insufficient_balance": "残高不足"
+    "insufficient_balance": "残高不足",
+    "continue": "続き"
 
   },
   "manage_assets": {

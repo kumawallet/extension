@@ -107,7 +107,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             value: bnAmount,
           };
 
-          const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+          const avg = _maxFeePerGas
+            .add(_maxPriorityFeePerGas)
+            .div(ethers.BigNumber.from(2));
           const estimatedTotal = avg.mul(_gasLimit).add(bnAmount);
 
           setFee({

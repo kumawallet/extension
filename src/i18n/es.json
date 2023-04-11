@@ -237,7 +237,9 @@
     "details": "Detalles",
     "confirm": "Confirmar",
     "tx_send": "Transacción enviada",
-    "insufficient_balance": "Balance insuficiente"
+    "insufficient_balance": "Balance insuficiente",
+    "continue": "Continuar"
+
 
   },
   "manage_assets": {
