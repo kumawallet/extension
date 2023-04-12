@@ -188,15 +188,15 @@ describe("AssetProvider", () => {
       }),
     }));
 
-    vi.mock("@src/utils/asset", async () => {
-      const assetUtils = (await vi.importActual("@src/utils/asset")) as Record<
+    vi.mock("@src/utils/assets", async () => {
+      const assetUtils = (await vi.importActual("@src/utils/assets")) as Record<
         string,
         string
       >;
 
       return {
         ...assetUtils,
-        getAssetUSDPrice: () => 1,
+        getAssetUSDPrice: vi.fn(),
       };
     });
   });
