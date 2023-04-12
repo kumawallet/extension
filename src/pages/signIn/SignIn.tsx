@@ -6,6 +6,7 @@ import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
 import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
+import { BsEye, BsEyeSlash } from "react-icons/bs";
 
 export const SignIn = () => {
   const { t } = useTranslation("sign_in");
@@ -15,6 +16,11 @@ export const SignIn = () => {
   const { showErrorToast } = useToast();
 
   const [password, setPassword] = useState("");
+
+  const [passwordType, setPasswordType] = useState("password");
+  const togglePassword = () => {
+    setPasswordType(passwordType === "password" ? "text" : "password");
+  };
 
   const isValid = useMemo(() => {
     return password && password.length >= 8;
@@ -34,17 +40,30 @@ export const SignIn = () => {
       <div className="flex flex-col">
         <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
         <p className="text-center text-xl mb-6">{t("welcome")}</p>
-        <input
-          id="password"
-          min={8}
-          placeholder={t("password_placeholder") as string}
-          onPaste={(e) => e.preventDefault()}
-          type={"password"}
-          value={password}
-          className="mb-10 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-          onChange={({ target }) => setPassword(target.value)}
-          onKeyDown={({ key }) => key === "Enter" && signIn()}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            min={8}
+            placeholder={t("password_placeholder") as string}
+            onPaste={(e) => e.preventDefault()}
+            type={"password"}
+            value={password}
+            className="mb-10 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+            onChange={({ target }) => setPassword(target.value)}
+            onKeyDown={({ key }) => key === "Enter" && signIn()}
+          />
+
+          <button
+            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
+            onClick={togglePassword}
+          >
+            {passwordType === "password" ? (
+              <BsEyeSlash className="cursor-pointer" size={20} />
+            ) : (
+              <BsEye className="cursor-pointer" size={20} />
+            )}
+          </button>
+        </div>
         <button
           aria-disabled={!isValid}
           disabled={!isValid}
