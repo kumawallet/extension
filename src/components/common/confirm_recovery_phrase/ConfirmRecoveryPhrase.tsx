@@ -115,7 +115,7 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
           ))}
         </div>
 
-        <div className="flex justify-center items-center mt-5 p-2 gap-2">
+        <div className="flex justify-center flex-wrap items-center mt-5 p-2 gap-2">
           {words.map((word, index) => (
             <Word
               isDropped={isDropped(word || "")}
