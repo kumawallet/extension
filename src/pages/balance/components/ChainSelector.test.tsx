@@ -1,13 +1,7 @@
 import { CHAINS } from "@src/constants/chains";
 import { accountsMocks } from "@src/tests/mocks/account-mocks";
 import i18n from "@src/utils/i18n";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
 
@@ -69,31 +63,31 @@ describe("ChainSelector", () => {
   });
 
   it("should render", async () => {
-    renderCoponent();
+    const { getByTestId, getByText } = renderCoponent();
 
-    const button = screen.getByTestId("chain-button");
+    const button = getByTestId("chain-button");
 
     act(() => {
       fireEvent.click(button);
     });
     await waitFor(() => {
-      const account = screen.getByText(CHAINS[0].chains[0].name);
+      const account = getByText(CHAINS[0].chains[0].name);
       expect(account).toBeDefined();
     });
   });
 
   it("should change account", async () => {
-    renderCoponent();
+    const { getByText, getByTestId } = renderCoponent();
 
-    const button = screen.getByTestId("chain-button");
+    const button = getByTestId("chain-button");
 
     act(() => {
       fireEvent.click(button);
     });
-    waitFor(() => {
-      expect(screen.getByText(CHAINS[0].name)).toBeDefined();
+    await waitFor(() => {
+      expect(getByText(CHAINS[0].chains[0].name)).toBeDefined();
     });
-    const account = screen.getByText(CHAINS[0].chains[0].name);
+    const account = getByText(CHAINS[0].chains[0].name);
 
     (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
     act(() => {

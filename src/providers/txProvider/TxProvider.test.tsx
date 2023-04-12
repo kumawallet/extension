@@ -6,7 +6,7 @@ import {
   selectedEVMChainMock,
   selectedWASMChainMock,
 } from "@src/tests/mocks/chain-mocks";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 
 const activiyMock: Partial<Record>[] = [
   {
@@ -223,9 +223,11 @@ describe("TxProvider", () => {
 
     const { findByTestId } = renderComponent();
 
-    const activity = await findByTestId(testIds.activity);
+    await waitFor(async () => {
+      const activity = await findByTestId(testIds.activity);
 
-    expect(activity.innerHTML).toEqual(JSON.stringify(activiyMock));
+      expect(activity.innerHTML).toEqual(JSON.stringify(activiyMock));
+    });
   });
 
   it("should load evm activity", async () => {
@@ -254,16 +256,20 @@ describe("TxProvider", () => {
 
     const { findByTestId } = renderComponent();
 
-    const activity = await findByTestId(testIds.activity);
+    await waitFor(async () => {
+      const activity = await findByTestId(testIds.activity);
 
-    expect(activity.innerHTML).toEqual(
-      JSON.stringify([
-        {
-          ...activiyMock[0],
-          reference: "EVM",
-        },
-      ])
-    );
+      expect(activity.innerHTML).toEqual(
+        JSON.stringify([
+          {
+            ...activiyMock[0],
+            reference: "EVM",
+            status: RecordStatus.SUCCESS,
+            error: "",
+          },
+        ])
+      );
+    });
   });
 
   describe("reducer", () => {
