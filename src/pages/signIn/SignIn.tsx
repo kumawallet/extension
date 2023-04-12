@@ -40,15 +40,15 @@ export const SignIn = () => {
       <div className="flex flex-col">
         <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
         <p className="text-center text-xl mb-6">{t("welcome")}</p>
-        <div className="relative">
+        <div className="relative mb-10">
           <input
             id="password"
             min={8}
             placeholder={t("password_placeholder") as string}
             onPaste={(e) => e.preventDefault()}
-            type={"password"}
+            type={passwordType}
             value={password}
-            className="mb-10 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+            className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
             onChange={({ target }) => setPassword(target.value)}
             onKeyDown={({ key }) => key === "Enter" && signIn()}
           />
