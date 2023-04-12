@@ -99,7 +99,7 @@ describe("ChainSelector", () => {
     act(() => {
       fireEvent.click(account.parentElement as HTMLElement);
     });
-    waitFor(() => {
+    await waitFor(() => {
       expect(setSelectNetwork).toHaveBeenCalled();
     });
   });
