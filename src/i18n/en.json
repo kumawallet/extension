@@ -246,5 +246,10 @@
     "symbol": "Symbol",
     "decimals": "Decimals",
     "add": "Add"
+  },
+  "sign_message": {
+    "title": "Sign message",
+    "cancel": "Cancel",
+    "sign": "Sign"
   }
 }

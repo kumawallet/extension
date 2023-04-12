@@ -239,7 +239,6 @@
     "tx_send": "トランザクション送信",
     "insufficient_balance": "残高不足",
     "continue": "続き"
-
   },
   "manage_assets": {
     "title": "アセットを管理する",
@@ -247,5 +246,10 @@
     "symbol": "シンボル",
     "decimals": "小数点",
     "add": "追加"
+  },
+  "sign_message": {
+    "title": "サインメッセージ",
+    "cancel": "キャンセル",
+    "sign": "ちょうこう"
   }
 }

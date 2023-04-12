@@ -239,8 +239,6 @@
     "tx_send": "Transacción enviada",
     "insufficient_balance": "Balance insuficiente",
     "continue": "Continuar"
-
-
   },
   "manage_assets": {
     "title": "Gestionar activos",
@@ -248,5 +246,10 @@
     "symbol": "Símbolo",
     "decimals": "Decimales",
     "add": "Agregar"
+  },
+  "sign_message": {
+    "title": "Firmar mensaje",
+    "cancel": "Cancelar",
+    "sign": "Firmar"
   }
 }
