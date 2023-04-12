@@ -116,6 +116,7 @@ export const General = () => {
                 <div key={index} className="flex flex-col gap-2">
                   <p className="text-lg font-medium">{t(setting.name)}</p>
                   <select
+                    data-testid="language-select"
                     className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     onChange={(e) => saveLanguage(e.target.value)}
                     value={selectedLanguage}
@@ -137,6 +138,7 @@ export const General = () => {
                 >
                   <p className="text-lg font-medium">{t(setting.name)}</p>
                   <button
+                    data-testid="manage-networks-button"
                     type="button"
                     className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
                     onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
@@ -156,6 +158,7 @@ export const General = () => {
                     <Switch.Group>
                       <div className="flex items-center">
                         <Switch
+                          data-testid="show-testnets-switch"
                           checked={showTestnets}
                           onChange={changeShowTestnets}
                           className={`${
