@@ -29,20 +29,20 @@ describe("WasmForm", () => {
         state: {
           api: {
             registry: {
-              createType: () => new BN("100000000"),
+              createType: () => new BN("1000000"),
             },
             tx: {
               balances: {
                 transfer: () => ({
                   paymentInfo: {
-                    partialFee: new BN("100000000"),
+                    partialFee: new BN("1000000"),
                   },
                 }),
               },
               assets: {
                 create: () => ({
                   paymentInfo: {
-                    partialFee: new BN("100000000"),
+                    partialFee: new BN("1000000"),
                   },
                 }),
               },
@@ -93,9 +93,10 @@ describe("WasmForm", () => {
             case "asset":
               return {
                 id: "-1",
-                name: "Ethereum",
-                symbol: "ETH",
+                name: "DOT",
+                symbol: "DOT",
                 decimals: 18,
+                balance: new BN("1000000000000000000"),
               };
             case "destinationAccount":
               return "0x123";
