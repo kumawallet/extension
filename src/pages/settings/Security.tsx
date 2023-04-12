@@ -140,7 +140,7 @@ export const Security = () => {
       <div className="flex flex-col mt-5 gap-2">
         <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("trusted_sites")}</p>
-          <div className="p-2">
+          <div className="p-2" data-testid="show-sites">
             {showSites ? (
               <FiChevronUp
                 className="cursor-pointer"
