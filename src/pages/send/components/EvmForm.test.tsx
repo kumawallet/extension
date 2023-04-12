@@ -55,7 +55,7 @@ describe("EvmForm", () => {
 
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({
-        handleSubmit: (cb) => {
+        handleSubmit: (cb: () => void) => {
           cb();
         },
         formState: {
@@ -93,7 +93,7 @@ describe("EvmForm", () => {
   it("should call confirmTx", async () => {
     const ethres = (await import("ethers")) as Record<string, any>;
 
-    ethres.BigNumber.from = (value: any) => new BN(value);
+    ethres.BigNumber.from = (value: string) => new BN(value);
     ethres.ethers.Wallet = vi.fn();
     ethres.ethers.Contract = vi.fn().mockReturnValue({
       estimateGas: vi.fn().mockReturnValue({

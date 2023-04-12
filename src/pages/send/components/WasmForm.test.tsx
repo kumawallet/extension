@@ -80,7 +80,7 @@ describe("WasmForm", () => {
 
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({
-        handleSubmit: (cb) => {
+        handleSubmit: (cb: () => void) => {
           cb();
         },
         formState: {
@@ -173,7 +173,7 @@ describe("WasmForm", () => {
   it("should call confirmTx with created asset", async () => {
     const rhf = (await import("react-hook-form")) as any;
     rhf.useFormContext = () => ({
-      handleSubmit: (cb) => {
+      handleSubmit: (cb: () => void) => {
         cb();
       },
       formState: {
