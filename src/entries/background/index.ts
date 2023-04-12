@@ -14,12 +14,15 @@ import { AddressOrPair } from "@polkadot/api/types";
 import { getProvider } from "@src/providers/networkProvider";
 import { Keyring } from "@polkadot/keyring";
 import { TxToProcess } from "@src/types";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 const openPopUp = (params: Record<string, string>) => {
   const querys = makeQuerys(params);
 
-  return chrome.windows.create({
-    url: chrome.runtime.getURL(`src/entries/popup/index.html${querys}`), // ?method="sign_message&params={}"
+  return WebAPI.windows.create({
+    url: WebAPI.runtime.getURL(`src/entries/popup/index.html${querys}`), // ?method="sign_message&params={}"
     type: "popup",
     top: 0,
     left: 0,
@@ -30,7 +33,8 @@ const openPopUp = (params: Record<string, string>) => {
 };
 
 // read messages from content
-chrome.runtime.onMessage.addListener(async function (request, sender) {
+WebAPI.runtime.onMessage.addListener(async function (request, sender) {
+  console.log("chrome.runtime listener");
   if (request.origin === "kuma") {
     try {
       switch (request.method) {
@@ -95,7 +99,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender) {
   }
 });
 
-chrome.runtime.onConnect.addListener(function (port) {
+WebAPI.runtime.onConnect.addListener(function (port) {
   if (port.name === "sign_message") {
     port.onDisconnect.addListener(async function (port) {
       const queries = port.sender?.url?.split("?")[1];

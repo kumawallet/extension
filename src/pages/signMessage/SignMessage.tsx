@@ -11,6 +11,9 @@ import { ethers } from "ethers";
 import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { parseIncomingQuery } from "@src/utils/utils";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 interface SignMessageProps {
   query: string;
@@ -40,7 +43,7 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
   };
 
   useEffect(() => {
-    chrome.runtime.connect({ name: "sign_message" });
+    WebAPI.runtime.connect({ name: "sign_message" });
     getTrustedSites();
   }, []);
 
@@ -67,9 +70,9 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
         signedMessage = await signer.signMessage(message);
       }
 
-      const { id } = await chrome.windows.getCurrent();
+      const { id } = await WebAPI.windows.getCurrent();
 
-      await chrome.runtime.sendMessage({
+      await WebAPI.runtime.sendMessage({
         from: "popup",
         origin: metadata.origin,
         method: `${metadata.method}_response`,
@@ -85,9 +88,9 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
   };
 
   const onClose = async () => {
-    const { id } = await chrome.windows.getCurrent();
+    const { id } = await WebAPI.windows.getCurrent();
 
-    await chrome.runtime.sendMessage({
+    await WebAPI.runtime.sendMessage({
       from: "popup",
       origin: metadata.origin,
       method: `${metadata.method}_response`,

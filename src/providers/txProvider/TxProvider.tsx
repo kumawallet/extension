@@ -13,6 +13,9 @@ import { ethers } from "ethers";
 import { useNetworkContext, useAccountContext } from "@src/providers";
 import { Action, InitialState, TxContext } from "./types";
 import Record from "@src/storage/entities/activity/Record";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 const initialState: InitialState = {
   activity: [],
@@ -199,9 +202,9 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (!api) return;
-    chrome.runtime.onMessage.addListener(activityListener);
+    WebAPI.runtime.onMessage.addListener(activityListener);
     return () => {
-      chrome.runtime.onMessage.removeListener(activityListener);
+      WebAPI.runtime.onMessage.removeListener(activityListener);
     };
   }, [api]);
 

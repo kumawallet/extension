@@ -16,6 +16,9 @@ import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
 import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
 import { BigNumber, Contract } from "ethers";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -89,7 +92,7 @@ export const Send = () => {
     const asset = getValues("asset") as IAsset;
     const destinationNetwork = selectedChain.name;
 
-    const { id } = await chrome.windows.getCurrent();
+    const { id } = await WebAPI.windows.getCurrent();
 
     const txToSend: Partial<TxToProcess> = {
       amount,
@@ -144,7 +147,7 @@ export const Send = () => {
         };
       }
 
-      await chrome.runtime.sendMessage({
+      await WebAPI.runtime.sendMessage({
         from: "popup",
         origin: "kuma",
         method: "process_tx",

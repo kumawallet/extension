@@ -233,49 +233,49 @@ export const TESTNETS: Chain[] = [
     supportedAccounts: [WASM],
   },
 
-  {
-    name: "Rococo contracts",
-    rpc: {
-      wasm: "wss://rococo-contracts-rpc.polkadot.io",
-    },
-    addressPrefix: 42,
+  // {
+  //   name: "Rococo contracts",
+  //   rpc: {
+  //     wasm: "wss://rococo-contracts-rpc.polkadot.io",
+  //   },
+  //   addressPrefix: 42,
 
-    nativeCurrency: {
-      name: "roc",
-      symbol: "ROC",
-      decimals: 12,
-    },
-    explorer: {
-      wasm: {
-        name: "",
-        url: "https://rococo.subscan.io/",
-      },
-    },
-    logo: "rococo",
-    supportedAccounts: [WASM],
-  },
+  //   nativeCurrency: {
+  //     name: "roc",
+  //     symbol: "ROC",
+  //     decimals: 12,
+  //   },
+  //   explorer: {
+  //     wasm: {
+  //       name: "",
+  //       url: "https://rococo.subscan.io/",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [WASM],
+  // },
 
-  {
-    name: "Rockmine",
-    rpc: {
-      wasm: "wss://rococo-rockmine-rpc.polkadot.io",
-    },
-    addressPrefix: 42,
+  // {
+  //   name: "Rockmine",
+  //   rpc: {
+  //     wasm: "wss://rococo-rockmine-rpc.polkadot.io",
+  //   },
+  //   addressPrefix: 42,
 
-    nativeCurrency: {
-      name: "roc",
-      symbol: "ROC",
-      decimals: 12,
-    },
-    explorer: {
-      wasm: {
-        name: "",
-        url: "https://rockmine.subscan.io/",
-      },
-    },
-    logo: "rococo",
-    supportedAccounts: [WASM],
-  },
+  //   nativeCurrency: {
+  //     name: "roc",
+  //     symbol: "ROC",
+  //     decimals: 12,
+  //   },
+  //   explorer: {
+  //     wasm: {
+  //       name: "",
+  //       url: "https://rockmine.subscan.io/",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [WASM],
+  // },
   {
     name: "Goerli",
     rpc: { evm: "https://goerli.infura.io/v3/" },
