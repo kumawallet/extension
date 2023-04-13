@@ -1,10 +1,11 @@
-import { getWebAPI } from "@src/utils/env";
+const getWebAPI = (): typeof chrome => {
+  return navigator.userAgent.match(/chrome|chromium|crios/i) ? chrome : browser;
+};
 
 const WebAPI = getWebAPI();
 
 function inject() {
   const file = chrome.runtime.getURL("src/entries/scripts/index.js");
-
   const script = document.createElement("script");
   script.setAttribute("type", "text/javascript");
   script.setAttribute("src", file);
