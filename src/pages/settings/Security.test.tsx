@@ -54,6 +54,10 @@ describe("Security", () => {
       expect(container).toBeDefined();
     });
 
+    await waitFor(() => {
+      expect(getByTestId("show-sites")).toBeDefined();
+    });
+
     const showSitesContainer = getByTestId("show-sites");
 
     act(() => {
