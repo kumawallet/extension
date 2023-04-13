@@ -14,7 +14,12 @@ import { AddressOrPair } from "@polkadot/api/types";
 import { getProvider } from "@src/providers/networkProvider";
 import { Keyring } from "@polkadot/keyring";
 import { TxToProcess } from "@src/types";
-import { getWebAPI } from "@src/utils/env";
+
+const getWebAPI = (): typeof chrome => {
+  return navigator.userAgent.match(/chrome|chromium|crios/i)
+    ? chrome
+    : window.browser;
+};
 
 const WebAPI = getWebAPI();
 
@@ -32,9 +37,9 @@ const openPopUp = (params: Record<string, string>) => {
   });
 };
 
-// read messages from content
+// // read messages from content
 WebAPI.runtime.onMessage.addListener(async function (request, sender) {
-  console.log("chrome.runtime listener");
+  console.log("browser.runtime listener");
   if (request.origin === "kuma") {
     try {
       switch (request.method) {
@@ -50,12 +55,12 @@ WebAPI.runtime.onMessage.addListener(async function (request, sender) {
 
         case "sign_message_response": {
           if (request.from !== "popup") return;
-          await chrome.tabs.sendMessage(Number(request.toTabId), {
+          await WebAPI.tabs.sendMessage(Number(request.toTabId), {
             ...request,
             from: "bg",
           });
           if (request.fromWindowId)
-            await chrome.windows.remove(request.fromWindowId as number);
+            await WebAPI.windows.remove(request.fromWindowId as number);
 
           return;
         }
@@ -63,7 +68,7 @@ WebAPI.runtime.onMessage.addListener(async function (request, sender) {
         case "get_account_info": {
           getSelectedAccount()
             .then(async (res) => {
-              await chrome.tabs.sendMessage(Number(sender.tab?.id), {
+              await WebAPI.tabs.sendMessage(Number(sender.tab?.id), {
                 origin: "kuma",
                 method: `${request.method}_response`,
                 response: {
@@ -84,7 +89,7 @@ WebAPI.runtime.onMessage.addListener(async function (request, sender) {
       }
     } catch (error) {
       console.log(error);
-      await chrome.tabs.sendMessage(Number(request.toTabId), {
+      await WebAPI.tabs.sendMessage(Number(request.toTabId), {
         ...{
           ...request,
           method: `${request.method}_response`,
@@ -106,7 +111,7 @@ WebAPI.runtime.onConnect.addListener(function (port) {
       const { tabId, origin, method } = Object.fromEntries(
         new URLSearchParams(queries)
       );
-      await chrome.tabs.sendMessage(Number(tabId), {
+      await WebAPI.tabs.sendMessage(Number(tabId), {
         origin,
         method: `${method}_response`,
         response: null,
@@ -140,14 +145,11 @@ const processWasmTx = async ({
   rpc,
 }: TxToProcess) => {
   const { txHash, type, aditional } = tx;
-
   const api = (await getProvider(rpc, AccountType.WASM)) as ApiPromise;
   const { block } = await api.rpc.chain.getBlock();
-
   const seed = await Extension.showSeed();
   const keyring = new Keyring({ type: "sr25519" });
   const sender = keyring.addFromMnemonic(seed as string);
-
   const unsub = await api
     ?.tx(txHash)
     ?.signAndSend(
@@ -157,7 +159,6 @@ const processWasmTx = async ({
         if (String(status.type) === "Ready") {
           const hash = txHash.toString();
           const date = Date.now();
-
           const activity: Partial<IRecord> = {
             fromBlock: block.header.number.toString(),
             address: originAddress,
@@ -213,7 +214,6 @@ const processWasmTx = async ({
             status = RecordStatus.SUCCESS;
           }
           const hash = txHash.toString();
-
           await Extension.updateActivity(hash, status, error);
           sendNotification(`tx ${status}`, hash);
           sendUpdateActivityMessage();
@@ -235,13 +235,11 @@ const processEVMTx = async ({
   rpc,
 }: TxToProcess) => {
   const { txHash } = tx;
-
   try {
     const api = (await getProvider(
       rpc,
       AccountType.EVM
     )) as ethers.providers.JsonRpcProvider;
-
     const txReceipt = await api.getTransaction(txHash);
     const date = Date.now();
     const activity: Partial<IRecord> = {
@@ -274,7 +272,6 @@ const processEVMTx = async ({
     const status =
       result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
     const error = "";
-
     await Extension.updateActivity(txHash, status, error);
     sendNotification(`tx ${status}`, txHash);
     sendUpdateActivityMessage();
@@ -286,7 +283,7 @@ const processEVMTx = async ({
 };
 
 const sendNotification = (title: string, message: string) => {
-  chrome.notifications.create("id", {
+  WebAPI.notifications.create("id", {
     title,
     message,
     iconUrl: notificationIcon,
@@ -295,7 +292,7 @@ const sendNotification = (title: string, message: string) => {
 };
 
 const sendUpdateActivityMessage = () => {
-  chrome.runtime.sendMessage({
+  WebAPI.runtime.sendMessage({
     origin: "kuma",
     method: "update_activity",
   });

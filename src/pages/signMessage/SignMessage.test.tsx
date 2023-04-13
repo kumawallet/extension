@@ -28,15 +28,6 @@ describe("SignMessage", () => {
 
     vi.mock("@src/Extension");
 
-    // vi.mock("@src/Extension", () => ({
-    //   default: {
-    //     getTrustedSites: vi.fn().mockReturnValue(["http://vitest.local"]),
-    //     showSeed: () => "test seed",
-    //     showPrivateKey: () => "test private key",
-    //     addTrustedSite: vi.fn(),
-    //   },
-    // }));
-
     vi.mock("@polkadot/keyring", () => {
       return {
         Keyring: class {
@@ -47,30 +38,25 @@ describe("SignMessage", () => {
       };
     });
 
-    // vi.mock("ethers", () => ({
-    //   ethers: {
-    //     Wallet: class {
-    //       constructor(privateKey: string, provider: any) {
-    //         return {
-    //           signMessage: vi.fn().mockReturnValue("test signature"),
-    //         };
-    //       }
-    //     },
-    //   },
-    // }));
     vi.mock("ethers");
 
-    window.chrome = {
-      runtime: {
-        connect: vi.fn(),
-        sendMessage: () => sendMessage(),
-      },
-      windows: {
-        getCurrent: vi.fn().mockReturnValue({
-          id: 1,
-        }),
-      },
-    } as any;
+    vi.mock("@src/utils/env", () => ({
+      getWebAPI: () => ({
+        windows: {
+          getCurrent: () => ({
+            id: 1,
+          }),
+        },
+        runtime: {
+          sendMessage: () => sendMessage(),
+          connect: () => null,
+          onMessage: {
+            addListener: () => null,
+            removeListener: () => null,
+          },
+        },
+      }),
+    }));
   });
 
   it("should sign evm message", async () => {

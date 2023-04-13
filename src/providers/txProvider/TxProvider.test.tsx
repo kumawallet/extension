@@ -136,17 +136,25 @@ describe("TxProvider", () => {
       }),
     }));
 
-    vi.mock("@src/Extension");
-
-    // mock chrome.runtime
-    global.chrome = {
-      runtime: {
-        onMessage: {
-          addListener: () => null,
-          removeListener: () => null,
+    vi.mock("@src/utils/env", () => ({
+      getWebAPI: () => ({
+        windows: {
+          getCurrent: () => ({
+            id: 1,
+          }),
         },
-      },
-    } as any;
+        runtime: {
+          sendMessage: () => null,
+          connect: () => null,
+          onMessage: {
+            addListener: () => null,
+            removeListener: () => null,
+          },
+        },
+      }),
+    }));
+
+    vi.mock("@src/Extension");
   });
 
   it("should load wasm activity", async () => {
@@ -231,6 +239,23 @@ describe("TxProvider", () => {
   });
 
   it("should load evm activity", async () => {
+    // const envUtils = await import("@src/utils/env");
+    // envUtils.getWebAPI = () => ({
+    //   windows: {
+    //     getCurrent: () => ({
+    //       id: 1,
+    //     }),
+    //   },
+    //   runtime: {
+    //     sendMessage: () => null,
+    //     connect: () => null,
+    //     onMessage: {
+    //       addListener: () => null,
+    //       removeListener: () => null,
+    //     },
+    //   },
+    // });
+
     const _Extension = (await import("@src/Extension")).default;
     _Extension.getActivity = vi.fn().mockReturnValue([
       {
