@@ -1,5 +1,7 @@
 const getWebAPI = (): typeof chrome => {
-  return navigator.userAgent.match(/chrome|chromium|crios/i) ? chrome : browser;
+  return navigator.userAgent.match(/chrome|chromium|crios/i)
+    ? chrome
+    : window.browser;
 };
 
 const WebAPI = getWebAPI();
