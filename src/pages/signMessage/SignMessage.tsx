@@ -12,6 +12,7 @@ import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { parseIncomingQuery } from "@src/utils/utils";
 import { getWebAPI } from "@src/utils/env";
+import { useToast } from "@src/hooks";
 
 const WebAPI = getWebAPI();
 
@@ -29,6 +30,8 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const { showErrorToast } = useToast();
 
   const { params, ...metadata } = parseIncomingQuery(query);
   const { message, origin } = params as any;
@@ -83,7 +86,7 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
         },
       });
     } catch (error) {
-      console.log(error);
+      showErrorToast(error);
     }
   };
 
