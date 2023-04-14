@@ -250,6 +250,8 @@
   "sign_message": {
     "title": "Firmar mensaje",
     "cancel": "Cancelar",
-    "sign": "Firmar"
+    "sign": "Firmar",
+    "account": "Cuenta",
+    "message": "Mensaje"
   }
 }

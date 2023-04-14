@@ -250,6 +250,8 @@
   "sign_message": {
     "title": "サインメッセージ",
     "cancel": "キャンセル",
-    "sign": "ちょうこう"
+    "sign": "ちょうこう",
+    "account": "アカウント",
+    "message": "メッセージ"
   }
 }

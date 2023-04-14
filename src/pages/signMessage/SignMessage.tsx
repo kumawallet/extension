@@ -128,13 +128,29 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
           <div className="flex gap-3 items-center mb-7">
             <p className="text-xl">{t("title")}</p>
           </div>
-          <div>
-            <p>Account:</p>
-            <p>{selectedAccount?.value?.address || ""}</p>
+          <div className="mb-4">
+            <label htmlFor="account" className="block text-sm font-medium mb-1">
+              {t("account")}:
+            </label>
+            <input
+              id="account"
+              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              readOnly
+              aria-disabled
+              value={selectedAccount?.value?.address || ""}
+            />
           </div>
           <div>
-            <p>Message:</p>
-            <p>{message || ""}</p>
+            <label htmlFor="message" className="block text-sm font-medium mb-1">
+              {t("message")}:
+            </label>
+            <textarea
+              id="message"
+              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
+              readOnly
+              aria-disabled
+              value={message || ""}
+            />
           </div>
         </div>
         <div className="flex gap-2 justify-end">
