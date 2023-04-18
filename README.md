@@ -161,6 +161,38 @@ npm test
 We hope to provide a comprehensive user experience with Kuma Wallet, making it a one-stop solution for all cross-chain asset management needs. To achieve this goal, we have implemented a variety of features that will make the user experience as smooth and intuitive as possible.
 But just in case you need help, we have created a [user guide](https://docs.kumawallet.io/) to help you get started.
 
+## Integrate Kuma Wallet to your application
+
+To integrate Kuma Wallet to your application, follow the example below.
+
+### Example
+
+```javascript
+// In a context where 'window' is available (e.g. the application that wants to integrate Kuma Wallet)
+
+// Check if Kuma Wallet is installed
+const isKumaWalletInstalled = !!window.kuma;
+
+// Sign a message
+const signMessage = async (message: string) => {
+  if (isKumaWalletInstalled) {
+    const response = await window.kuma.call({
+      method: "sign_message",
+      params: {
+        message,
+      }
+    })
+    console.log(response?.message);
+  }
+}
+```
+
+When attempting to sign a message in Kuma Wallet, a pop-up will appear requesting the user's confirmation. The first step in the confirmation process involves verifying that the site is secure.
+
+![trust-site](./images/trust-site.png)
+
+![sign-message](./images/sign-message.png)
+
 ## Contributing
 
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
