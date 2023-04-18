@@ -377,7 +377,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               assets[index].contract = contract;
             }
           } catch (error) {
-            console.log(error);
             assets[index].balance = new BN("0");
           }
         })

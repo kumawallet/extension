@@ -78,7 +78,9 @@ describe("Contacts", () => {
 
     act(() => {
       fireEvent.change(nameInput, { target: { value: "alice" } });
-      fireEvent.change(addressInput, { target: { value: "0x123" } });
+      fireEvent.change(addressInput, {
+        target: { value: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627" },
+      });
     });
 
     const saveButton = getByTestId("save");

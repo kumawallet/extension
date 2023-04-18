@@ -6,18 +6,21 @@ import { stringToU8a } from "@polkadot/util";
 import { AccountType } from "@src/accounts/types";
 import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
 import { en } from "@src/i18n";
+import { parseIncomingQuery } from "@src/utils/utils";
 
 const sendMessage = vi.fn();
 
 const renderComponent = () => {
+  const query = `?params=${JSON.stringify({
+    message: "message",
+    origin: "http://vitest.local",
+  })}`;
+
+  const { params, ...metadata } = parseIncomingQuery(query);
+
   return render(
     <I18nextProvider i18n={i18n}>
-      <SignMessage
-        query={`?params=${JSON.stringify({
-          message: "message",
-          origin: "http://vitest.local",
-        })}`}
-      />
+      <SignMessage params={params} metadata={metadata} onClose={vi.fn()} />
     </I18nextProvider>
   );
 };

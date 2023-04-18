@@ -31,6 +31,7 @@ const defaultValues: AssetForm = {
 
 export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
+  const { t: tCommon } = useTranslation("common");
   const {
     state: { selectedChain, type },
   } = useNetworkContext();
@@ -43,7 +44,7 @@ export const ManageAssets = () => {
     return object({
       address: string().test(
         "adress validation",
-        t("invalid_address") as string,
+        tCommon("invalid_address") as string,
         (val) => {
           try {
             return type === "EVM"

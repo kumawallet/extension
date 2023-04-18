@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import Extension from "@src/Extension";
@@ -8,7 +8,11 @@ import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 
-export const SignIn = () => {
+interface SignInProps {
+  afterSignIn?: () => void;
+}
+
+export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   const { t } = useTranslation("sign_in");
   const { t: tCommon } = useTranslation("common");
 
@@ -29,6 +33,10 @@ export const SignIn = () => {
   const signIn = async () => {
     try {
       await Extension?.signIn(password);
+      if (afterSignIn) {
+        afterSignIn();
+        return;
+      }
       navigate(BALANCE);
     } catch (error) {
       showErrorToast(tCommon(error as string));

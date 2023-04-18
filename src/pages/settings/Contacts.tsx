@@ -7,11 +7,13 @@ import Contact from "@src/storage/entities/registry/Contact";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
-import { Loading } from "@src/components/common";
+import { InputErrorMessage, Loading } from "@src/components/common";
 import { BsTrash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
+import { isHex } from "@polkadot/util";
 
 interface AccountForm {
   name: string;
@@ -25,10 +27,36 @@ export const Contacts = () => {
 
   const schema = object({
     name: string().required(t("required") as string),
-    address: string().required(t("required") as string),
+    address: string()
+      .typeError(t("required") as string)
+      .test(
+        "valid address",
+        tCommon("invalid_address") as string,
+        (address) => {
+          try {
+            if (!address) return false;
+
+            if (isHex(address)) {
+              return isAddress(address);
+            } else {
+              encodeAddress(decodeAddress(address));
+            }
+
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
+      )
+      .required(t("required") as string),
   }).required();
 
-  const { register, handleSubmit, reset } = useForm<AccountForm>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AccountForm>({
     defaultValues: {
       name: "",
       address: "",
@@ -124,7 +152,7 @@ export const Contacts = () => {
             <button
               data-testid="new-contact"
               type="button"
-              className="mt-5 inline-flex justify-between items-center rounded-lg border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm"
+              className="inline-flex justify-between items-center rounded-lg border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm"
               onClick={() => toggleCreateContact()}
             >
               <span>{t("new_contact")} </span>
@@ -134,28 +162,36 @@ export const Contacts = () => {
       </div>
       {isCreateContact ? (
         <>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
-            {t("name")}
-          </label>
-          <input
-            data-testid="name"
-            id="name"
-            placeholder="Insert contact name"
-            max={32}
-            min={1}
-            className="mb-5 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-            {...register("name")}
-          />
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
-            {t("address")}
-          </label>
-          <input
-            data-testid="address"
-            id="address"
-            placeholder="Insert address"
-            className="mb-5 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-            {...register("address")}
-          />
+          <div className="mb-5">
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              {t("name")}
+            </label>
+            <input
+              data-testid="name"
+              id="name"
+              placeholder="Insert contact name"
+              max={32}
+              min={1}
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              {...register("name")}
+            />
+            <InputErrorMessage message={errors.name?.message} />
+          </div>
+
+          <div className="mb-5">
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              {t("address")}
+            </label>
+            <input
+              data-testid="address"
+              id="address"
+              placeholder="Insert address"
+              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              {...register("address")}
+            />
+            <InputErrorMessage message={errors.address?.message} />
+          </div>
+
           <div className="flex justify-end">
             <button
               type="button"

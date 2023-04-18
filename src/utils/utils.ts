@@ -16,7 +16,9 @@ export const formatDate = (date: number) => {
 };
 
 export const parseIncomingQuery = (query: string) => {
-  const _obj = Object.fromEntries(new URLSearchParams(query));
+  const _obj: { [key: string]: any } = Object.fromEntries(
+    new URLSearchParams(query)
+  );
 
   Object.keys(_obj).forEach((key) => {
     const atribute = _obj[key];

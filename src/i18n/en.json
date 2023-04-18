@@ -56,7 +56,8 @@
     "hide": "Hide",
     "open": "Open",
     "close": "Close",
-    "copied": "Copied"
+    "copied": "Copied",
+    "invalid_address": "Invalid address"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",

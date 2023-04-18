@@ -22,6 +22,7 @@ const WebAPI = getWebAPI();
 
 export const Send = () => {
   const { t } = useTranslation("send");
+  const { t: tCommon } = useTranslation("common");
   const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useToast();
   const { isLoading, starLoading, endLoading } = useLoading();
@@ -46,21 +47,25 @@ export const Send = () => {
         .required(t("required") as string),
       destinationAccount: string()
         .typeError(t("required") as string)
-        .test("valid address", t("invalid_address") as string, (address) => {
-          try {
-            if (!address) return false;
+        .test(
+          "valid address",
+          tCommon("invalid_address") as string,
+          (address) => {
+            try {
+              if (!address) return false;
 
-            if (isHex(address)) {
-              return isAddress(address);
-            } else {
-              encodeAddress(decodeAddress(address));
+              if (isHex(address)) {
+                return isAddress(address);
+              } else {
+                encodeAddress(decodeAddress(address));
+              }
+
+              return true;
+            } catch (error) {
+              return false;
             }
-
-            return true;
-          } catch (error) {
-            return false;
           }
-        })
+        )
         .required(t("required") as string),
       amount: number().required(t("required") as string),
       asset: object().required(t("required") as string),

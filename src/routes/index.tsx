@@ -50,6 +50,7 @@ import {
 import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
 import { isProduction } from "@src/utils/env";
+import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -112,7 +113,11 @@ export const Routes = () => {
         <RRoutes>
           <Route
             path={SIGN_MESSAGE}
-            element={<SignMessage query={location.search} />}
+            element={
+              <ValidationWrapper query={location.search}>
+                <SignMessage />
+              </ValidationWrapper>
+            }
           />
         </RRoutes>
       </MemoryRouter>

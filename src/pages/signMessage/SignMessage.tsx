@@ -1,28 +1,32 @@
-import { FC, useEffect, useState } from "react";
-import {
-  ConfirmTrustedSite,
-  LoadingButton,
-  PageWrapper,
-} from "@src/components/common";
+import { FC } from "react";
+import { LoadingButton, PageWrapper } from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
-import { parseIncomingQuery } from "@src/utils/utils";
 import { getWebAPI } from "@src/utils/env";
 import { useToast } from "@src/hooks";
 
 const WebAPI = getWebAPI();
 
 interface SignMessageProps {
-  query: string;
+  params?: {
+    message: string;
+  };
+  onClose?: () => void;
+  metadata?: Record<string, string>;
 }
 
-export const SignMessage: FC<SignMessageProps> = ({ query }) => {
+export const SignMessage: FC<SignMessageProps> = ({
+  params,
+  metadata,
+  onClose,
+}) => {
+  const { message } = params as { message: string };
+
   const { t } = useTranslation("sign_message");
-  const [trustedSites, setTrustedSites] = useState<string[]>([]);
 
   const {
     state: { api, type },
@@ -32,23 +36,6 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
   } = useAccountContext();
 
   const { showErrorToast } = useToast();
-
-  const { params, ...metadata } = parseIncomingQuery(query);
-  const { message, origin } = params as any;
-
-  const getTrustedSites = async () => {
-    const sites = await Extension.getTrustedSites();
-    setTrustedSites(sites);
-  };
-
-  const isTrustedSite = () => {
-    return trustedSites.includes(origin);
-  };
-
-  useEffect(() => {
-    WebAPI.runtime.connect({ name: "sign_message" });
-    getTrustedSites();
-  }, []);
 
   const sign = async () => {
     try {
@@ -77,10 +64,10 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
 
       await WebAPI.runtime.sendMessage({
         from: "popup",
-        origin: metadata.origin,
-        method: `${metadata.method}_response`,
+        origin: metadata?.origin,
+        method: `${metadata?.method}_response`,
         fromWindowId: id,
-        toTabId: metadata.tabId,
+        toTabId: metadata?.tabId,
         response: {
           message: signedMessage,
         },
@@ -89,37 +76,6 @@ export const SignMessage: FC<SignMessageProps> = ({ query }) => {
       showErrorToast(error);
     }
   };
-
-  const onClose = async () => {
-    const { id } = await WebAPI.windows.getCurrent();
-
-    await WebAPI.runtime.sendMessage({
-      from: "popup",
-      origin: metadata.origin,
-      method: `${metadata.method}_response`,
-      fromWindowId: id,
-      toTabId: metadata.tabId,
-      response: null,
-    });
-  };
-
-  const saveTrustedSite = async () => {
-    const trustedSites = await Extension.getTrustedSites();
-    if (trustedSites && !trustedSites.includes(origin)) {
-      await Extension.addTrustedSite(origin);
-      setTrustedSites([...trustedSites, origin]);
-    }
-  };
-
-  if (!isTrustedSite()) {
-    return (
-      <ConfirmTrustedSite
-        confirm={saveTrustedSite}
-        cancel={onClose}
-        origin={origin}
-      />
-    );
-  }
 
   return (
     <PageWrapper contentClassName="h-full">
