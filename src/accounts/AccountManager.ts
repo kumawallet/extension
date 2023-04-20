@@ -10,7 +10,9 @@ import Account from "@src/storage/entities/Account";
 import Accounts from "@src/storage/entities/Accounts";
 import { AccountType, AccountKey } from "./types";
 
+// AUDIT: use line breaks to improve readability
 export default class AccountManager {
+
   private static formatAddress(address: string, type: AccountType): AccountKey {
     if (
       address.startsWith("WASM") ||
@@ -20,6 +22,7 @@ export default class AccountManager {
       return address as AccountKey;
     }
     return `${type}-${address}`;
+
   }
   private static async getImportedEVMAddress(privateKey: string) {
     const wallet = new ethers.Wallet(privateKey);
@@ -27,12 +30,14 @@ export default class AccountManager {
     const seed = wallet.mnemonic?.phrase || "";
     return { address, privateKey, seed };
   }
+
   private static async getImportedWASMAddress(seed: string) {
     const wallet = PolkadotKeyring.addUri(seed, Auth.password);
     const { address } = wallet.json || {};
     const privateKey = wallet.pair.meta.privateKey?.toString() || "";
     return { address, seed, privateKey };
   }
+
   private static async addAccount(
     address: string,
     type: AccountType,
@@ -50,6 +55,7 @@ export default class AccountManager {
     await Keyring.save(keyring);
     return account;
   }
+
   static async addEVMAccount(
     seed: string,
     name: string,
@@ -60,9 +66,11 @@ export default class AccountManager {
     const { address, privateKey } =
       ethers.Wallet.fromMnemonic(seed, path || ACCOUNT_PATH) || {};
     const key = AccountManager.formatAddress(address, type);
+    // AUDIT: Bug, keyring is adding the same seed/privateKey always.
     const _keyring = keyring || new Keyring(key, type, seed, privateKey);
     return AccountManager.addAccount(address, type, name, _keyring);
   }
+
   static async addWASMAccount(
     seed: string,
     name: string,
@@ -75,6 +83,7 @@ export default class AccountManager {
     const _keyring = keyring || new Keyring(key, type, seed, "");
     return AccountManager.addAccount(address, type, name, _keyring);
   }
+
   static async importAccount({
     name,
     privateKeyOrSeed,
@@ -108,6 +117,7 @@ export default class AccountManager {
     const keyring = new Keyring(key, type, seed, privateKey);
     return AccountManager.addAccount(address, type, name, keyring);
   }
+
   static async derive(
     name: string,
     vault: Vault,
@@ -119,6 +129,7 @@ export default class AccountManager {
     keyring.increaseAccountQuantity();
     let path;
     switch (_type) {
+      // AUDIT: better to move responsability to deriveAccount to the KeyRing class
       case AccountType.EVM:
         path = keyring.path.slice(0, -1) + keyring.accountQuantity;
         return AccountManager.addEVMAccount(keyring.seed, name, path, keyring);
@@ -129,19 +140,23 @@ export default class AccountManager {
         throw new Error("account_type_not_supported");
     }
   }
+
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("account_key_required");
     return Accounts.getAccount(key);
   }
+  
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("account_not_found");
     account.value.name = newName;
     return Accounts.update(account);
   }
+
   static async remove(key: AccountKey): Promise<void> {
     await Accounts.removeAccount(key);
   }
+
   static async getAll(
     type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
@@ -162,6 +177,7 @@ export default class AccountManager {
     }
     return accounts;
   }
+
   static async areAccountsInitialized(accounts: Accounts): Promise<boolean> {
     const accountsList = await accounts.getAll();
     return (
@@ -171,12 +187,15 @@ export default class AccountManager {
       ).length > 0
     );
   }
+
   static async saveBackup(recoveryPhrase: string): Promise<void> {
+    // AUDIT: check if recovery phrase is valid, not just empty, could lead to unexpected behavior. bip39 validateMnemonic
     if (!recoveryPhrase) throw new Error("recovery_phrase_required");
     const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
     const backup = new BackUp(encrypted);
     await BackUp.set(backup);
   }
+  
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string

@@ -2,6 +2,9 @@ import { AccountKey, AccountType } from "@src/accounts/types";
 import { ACCOUNT_PATH } from "../../utils/constants";
 import Vault from "./Vault";
 
+// AUDIT: shouldn't a keyring have multiple keys?
+// AUDIT: why is it storing the seed? It should only store the private key
+// AUDIT: by definition a keyring holds keys, in this case privateKeys. The name is misleading.
 export default class Keyring {
   readonly #key: AccountKey;
   readonly #type: AccountType;

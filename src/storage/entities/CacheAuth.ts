@@ -53,6 +53,7 @@ export default class CacheAuth extends BaseEntity {
       }
       const salt = await Storage.getInstance().getSalt();
       const encrypted = await Auth.generateSaltedHash(salt, Auth.password);
+      // AUDIT: This is the only place where the password is stored in memory, and encrypted with a salt.
       CacheAuth.save(encrypted);
       await CacheAuth.set<CacheAuth>(CacheAuth.getInstance());
     } catch (error) {
@@ -66,6 +67,8 @@ export default class CacheAuth extends BaseEntity {
     try {
       await CacheAuth.get<CacheAuth>();
       const salt = await Storage.getInstance().getSalt();
+      // AUDIT: why is it calling Auth? why not directly handle inside CacheAuth?
+      // AUDIT:   internally Auth.loadAuthFromCache() it's calling CacheAuth
       await Auth.loadAuthFromCache(salt);
     } catch (error) {
       console.error(error);

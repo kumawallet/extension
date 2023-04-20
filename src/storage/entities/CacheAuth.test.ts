@@ -141,6 +141,8 @@ describe("CacheAuth", () => {
   describe("hasExpired", () => {
     it("should return hasExpired as false", async () => {
       const cacheInstance = CacheAuth.getInstance();
+      // AUDIT: caché expiration should be true when 0. Could lead to unexpected behaviour since it's not clear what 0 means.
+      // AUDIT: also, when creating a new instance, the timeout is set to 0. This means that the cache is always expired.
       cacheInstance.timeout = 0;
       cacheInstance.isUnlocked = false;
       cacheInstance.password = undefined;

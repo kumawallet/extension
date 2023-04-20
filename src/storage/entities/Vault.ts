@@ -31,6 +31,8 @@ export default class Vault extends BaseEntity {
   static async get<Vault>(): Promise<Vault | undefined> {
     const stored = await Storage.getInstance().storage.get(this.name);
     if (!stored || !stored[this.name]) return this.getDefaultValue();
+    // AUDIT: the Auth class should be responsible for checking if the user is logged in, not the vault.
+    // AUDIT:   then unencrypt it with the password
     if (!Auth.password || !Auth.isUnlocked) {
       await CacheAuth.loadFromCache();
     }
@@ -65,7 +67,8 @@ export default class Vault extends BaseEntity {
   addKeyring(keyring: Keyring) {
     this.keyrings[keyring.key] = keyring;
   }
-
+  
+  // AUDIT: method not being used, remove them, it's actually better not to break encapsulation
   getKeyring(key: AccountKey) {
     return this.keyrings[key];
   }
@@ -78,10 +81,12 @@ export default class Vault extends BaseEntity {
     delete this.keyrings[key];
   }
 
+  // AUDIT: method not being used, remove them, it's actually better not to break encapsulation
   setKeyrings(keyrings: { [key: AccountKey]: Keyring }) {
     this.keyrings = keyrings;
   }
 
+  // AUDIT: method not being used
   getAll() {
     return Object.keys(this.keyrings).map((key) => {
       const { type, seed, privateKey, accountQuantity } =

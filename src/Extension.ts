@@ -29,9 +29,15 @@ export default class Extension {
   ) {
     try {
       await Auth.getInstance().signUp(password);
+      // AUDIT: executes #isUnlocked = true;
       await Storage.getInstance().init(force);
       await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
+      // AUDIT: password is being encrypted with salt and cached.
+      // AUDIT: at the same time it's being encrypted w/the recovery phrase and saved in persistent storage, to decrypt all the Vault(keyrings). 
+      // AUDIT:   This should be avoided in case of a security breach, as the storage can be exposed, All the Keyrings are encrypted with this password.
+      // AUDIT:   Recovery mecanism is done with the recovery phrase, which re-generates all the private_keys.
+      // AUDIT: review further, could lead to a security issue in the long run when handling password in different places, keep it consistent.
     } catch (error) {
       console.error(error);
       throw new Error(error as string);
@@ -43,6 +49,8 @@ export default class Extension {
     name: string,
     password?: string,
     isSignUp = true
+    // AUDIT: redundant parameter, every createAccount call is a signUp. 
+    // AUDIT: Not tested in tests. Could lead to unexpected behaviour when called with false.
   ) {
     if (!seed) throw new Error("seed_required");
     if (isSignUp) {
@@ -75,10 +83,12 @@ export default class Extension {
     accountType: AccountType,
     isSignUp = true
   ) {
+    //AUDIT: not taking into account if i load the seed, works only with the private key
+    //AUDIT: repeated code from createAccounts, refactor suggested
     if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
       if (!password) throw new Error("password_required");
-      await this.init(password, privateKeyOrSeed, true);
+      await this.init(password, privateKeyOrSeed, true);  
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_import_account");
@@ -91,6 +101,7 @@ export default class Extension {
   }
 
   static async restorePassword(recoveryPhrase: string, newPassword: string) {
+    // AUDIT: could use here bip39.validateMnemonic(recoveryPhrase) to validate the recovery phrase
     if (!recoveryPhrase) throw new Error("private_key_or_seed_required");
     if (!newPassword) throw new Error("password_required");
     await AccountManager.restorePassword(recoveryPhrase, newPassword);
@@ -192,6 +203,7 @@ export default class Extension {
   }
 
   static async setSelectedAccount(account: Account) {
+    // AUDIT: should this be treated as a singleton or do we want to create a SelectedAccount each time?
     const selected = new SelectedAccount();
     selected.fromAccount(account);
     await SelectedAccount.set<SelectedAccount>(selected);

@@ -44,6 +44,7 @@ export default class Auth {
 
   static async loadAuthFromCache(salt: string) {
     const { password, isUnlocked } = CacheAuth.getInstance();
+    // AUDIT: when cacheauth expired should sign out directly, why is it checking if password is falsy?
     if (!password || (await CacheAuth.hasExpired())) {
       Auth.getInstance().signOut();
       return;
@@ -53,6 +54,7 @@ export default class Auth {
     Auth.isUnlocked = isUnlocked;
   }
 
+  // AUDIT: should be performing loadAuthFromCache before Auth.validate(); or validate should perform loadAuthFromCache.
   async decryptVault(vault: string) {
     Auth.validate();
     return passworder.decrypt(this.#password as string, vault);
@@ -74,6 +76,7 @@ export default class Auth {
         password,
         vault
       )) as Vault;
+      // AUDIT: in a future version check if the decrypted vault is valid instead of just checking if it is falsy, could present problems when upgrading passworder
       if (!decryptedVault) {
         throw new Error("invalid_credentials");
       }
@@ -93,9 +96,11 @@ export default class Auth {
   async encryptBackup(recoveryPhrase: string) {
     try {
       if (!this.#password) throw new Error("login_required");
+      // AUDIT: passworder.encrypt(password, data)
       return passworder.encrypt(recoveryPhrase, this.#password);
     } catch (error) {
       // console.error(error);
+      // AUDIT: missleading error, should be failed_to_encrypt_backup
       throw new Error("failed_to_save_backup");
     }
   }
@@ -105,6 +110,7 @@ export default class Auth {
       return passworder.decrypt(recoveryPhrase, backup);
     } catch (error) {
       // console.error(error);
+      // AUDIT: missleading error, should be failed_to_decrypt_backup
       throw new Error("failed_to_restore_backup");
     }
   }

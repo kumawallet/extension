@@ -10,6 +10,7 @@ export default class SelectedAccount extends BaseEntity {
 
   constructor() {
     super();
+    // AUDIT: creating default invalid objects is a bad practice, why not pass the parameters and create a valid object?
     this.key = "EVM-0x000000000";
     this.value = {} as AccountValue;
     this.type = AccountType.EVM;
