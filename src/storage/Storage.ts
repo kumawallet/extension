@@ -44,12 +44,11 @@ export default class Storage {
     return `${appName}-${platform}-${userAgent}-${language}-${extensionId}`;
   }
 
-  async init(force = false) {
-    if (!force) {
-      if (await Vault.alreadySignedUp()) {
-        throw new Error("already_signed_up");
-      }
+  async init() {
+    if (await Vault.alreadySignedUp()) {
+      throw new Error("already_signed_up");
     }
+
     await this.#storage.clear();
     await Vault.init();
     await Network.init();

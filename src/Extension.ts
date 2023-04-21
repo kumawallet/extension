@@ -25,12 +25,11 @@ export default class Extension {
   private static async init(
     password: string,
     recoveryPhrase: string,
-    force?: boolean
   ) {
     try {
       await Auth.getInstance().signUp(password);
       // AUDIT: executes #isUnlocked = true;
-      await Storage.getInstance().init(force);
+      await Storage.getInstance().init();
       await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
       // AUDIT: password is being encrypted with salt and cached.
@@ -55,7 +54,7 @@ export default class Extension {
     if (!seed) throw new Error("seed_required");
     if (isSignUp) {
       if (!password) throw new Error("password_required");
-      await this.init(password, seed, true);
+      await this.init(password, seed);
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_create_accounts");
@@ -88,7 +87,7 @@ export default class Extension {
     if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
       if (!password) throw new Error("password_required");
-      await this.init(password, privateKeyOrSeed, true);  
+      await this.init(password, privateKeyOrSeed);  
     }
     const isUnlocked = await Extension.isUnlocked();
     if (!isUnlocked) throw new Error("failed_to_import_account");
