@@ -211,27 +211,27 @@ export const TESTNETS: Chain[] = [
     logo: "astar",
     supportedAccounts: [EVM, WASM],
   },
-  {
-    name: "Rococo",
-    rpc: {
-      wasm: "wss://rococo-rpc.polkadot.io",
-    },
-    addressPrefix: 42,
+  // {
+  //   name: "Rococo",
+  //   rpc: {
+  //     wasm: "wss://rococo-rpc.polkadot.io",
+  //   },
+  //   addressPrefix: 42,
 
-    nativeCurrency: {
-      name: "roc",
-      symbol: "ROC",
-      decimals: 12,
-    },
-    explorer: {
-      wasm: {
-        name: "",
-        url: "https://rococo.subscan.io/",
-      },
-    },
-    logo: "rococo",
-    supportedAccounts: [WASM],
-  },
+  //   nativeCurrency: {
+  //     name: "roc",
+  //     symbol: "ROC",
+  //     decimals: 12,
+  //   },
+  //   explorer: {
+  //     wasm: {
+  //       name: "",
+  //       url: "https://rococo.subscan.io/",
+  //     },
+  //   },
+  //   logo: "rococo",
+  //   supportedAccounts: [WASM],
+  // },
 
   // {
   //   name: "Rococo contracts",
