@@ -161,7 +161,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               asset: {
                 updatedBy: "id",
                 updatedByValue: "-1",
-                newValue: new BN(data?.free || 0),
+                newValue: new BN(String(data?.free) || 0),
               },
             },
           });
@@ -190,7 +190,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     return nativeAsset;
   };
 
-  const getOtherAssets = useCallback(async () => {
+  const getOtherAssets = async () => {
     if (!type) return [];
 
     if (type === "WASM") {
@@ -206,9 +206,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       const assets = loadAssetsFromStorage();
       return assets;
     }
-  }, [type, api, selectedAccount]);
+  };
 
-  const loadPolkadotAssets = useCallback(async () => {
+  const loadPolkadotAssets = async () => {
     const assetPallet = await (api as ApiPromise)?.query?.assets;
 
     if (assetPallet?.metadata) {
@@ -308,7 +308,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     return [];
-  }, [api]);
+  };
 
   const loadAssetsFromStorage = async () => {
     const assetsFromStorage = await Extension.getAssetsByChain(
