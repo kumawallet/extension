@@ -29,10 +29,10 @@ export default class Accounts extends BaseEntity {
     await Accounts.set<Accounts>(accounts);
   }
 
-  static async add(account: Account): Promise<void> {
+  static async save(account: Account): Promise<void> {
     const accounts = await Accounts.get<Accounts>();
     if (!accounts) throw new Error("failed_to_add_account");
-    if (accounts.allreadyExists(account.key)) {
+    if (accounts.alreadyExists(account.key)) {
       throw new Error("account_already_exists");
     }
     accounts.add(account);
@@ -76,7 +76,7 @@ export default class Accounts extends BaseEntity {
     this.data[key].value = value;
   }
 
-  allreadyExists(key: AccountKey) {
+  alreadyExists(key: AccountKey) {
     return this.data[key] !== undefined;
   }
 

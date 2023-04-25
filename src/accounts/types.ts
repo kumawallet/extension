@@ -8,5 +8,5 @@ export type AccountKey = `${AccountType}-${string}`;
 export type AccountValue = {
   name: string;
   address: string;
-  keyring: AccountKey;
+  keyring: AccountType;
 };

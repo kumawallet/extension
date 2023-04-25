@@ -77,7 +77,7 @@ export default class Settings extends BaseEntity {
     this.data[type][key].value = value;
   }
 
-  allreadyExists(type: SettingType, key: SettingKey) {
+  alreadyExists(type: SettingType, key: SettingKey) {
     return this.data[type][key] !== undefined;
   }
 }

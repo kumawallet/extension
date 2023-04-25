@@ -416,7 +416,7 @@ describe("Vault", () => {
 
     const vault = new Vault();
     vault.addKeyring(newKeyring as Keyring);
-    const result = vault.allreadyExists(newKeyring.key);
+    const result = vault.alreadyExists(newKeyring.key);
     expect(result).toBe(true);
   });
 });

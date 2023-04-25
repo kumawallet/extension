@@ -104,7 +104,7 @@ describe("Settings", () => {
     settings.addToSecurity(SettingKey.MANAGE_NETWORKS, "test");
 
     expect(
-      settings.allreadyExists(SettingType.SECURITY, SettingKey.MANAGE_NETWORKS)
+      settings.alreadyExists(SettingType.SECURITY, SettingKey.MANAGE_NETWORKS)
     ).toBeTruthy();
   });
 });

@@ -5,7 +5,6 @@ export default class BaseEntity {
     return;
   }
 
-  // AUDIT: maybe should be called getEmptyValue? creating invalid objects is a bad practice
   static async getDefaultValue<T>(): Promise<T | undefined> {
     return undefined as T;
   }

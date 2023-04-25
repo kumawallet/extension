@@ -6,10 +6,11 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "@src/hooks";
-import Extension from "@src/Extension";
-import { AccountFormType } from "@src/pages";
+import { useToast } from "../../hooks";
+import Extension from "../../Extension";
+import { AccountFormType } from "../../pages";
 import { Action, AuthContext as IAuthContext, InitialState } from "./types";
+import { AccountType } from "../../accounts/types";
 
 const initialState: InitialState = {
   isInit: true,
@@ -62,7 +63,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         name,
         privateKeyOrSeed,
         password,
-        accountType,
+        accountType as AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM,
         isSignUp
       );
 

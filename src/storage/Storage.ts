@@ -10,17 +10,15 @@ import Chains from "./entities/Chains";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
-export type Browser = typeof chrome | typeof window.browser;
-
 export default class Storage {
   readonly #storage: chrome.storage.StorageArea;
-  readonly #browser: Browser;
 
   private static instance: Storage;
 
   private constructor() {
-    this.#browser = isChrome ? chrome : window.browser;
-    this.#storage = this.#browser.storage.local;
+    this.#storage = isChrome
+      ? chrome.storage.local
+      : window.browser.storage.local;
   }
 
   static getInstance() {
@@ -32,16 +30,6 @@ export default class Storage {
 
   get storage() {
     return this.#storage;
-  }
-
-  get browser() {
-    return this.#browser;
-  }
-
-  async getSalt() {
-    const { appName, platform, userAgent, language } = navigator;
-    const extensionId = this.#browser.runtime.id;
-    return `${appName}-${platform}-${userAgent}-${language}-${extensionId}`;
   }
 
   async init() {

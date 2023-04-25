@@ -7,7 +7,6 @@ import Accounts from "./storage/entities/Accounts";
 import Account from "./storage/entities/Account";
 import Vault from "./storage/entities/Vault";
 import Auth from "./storage/Auth";
-import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
 import { SettingKey, SettingType } from "./storage/entities/settings/types";
@@ -22,25 +21,37 @@ import Assets from "./storage/entities/Assets";
 import TrustedSites from "./storage/entities/TrustedSites";
 
 export default class Extension {
-  private static async init(
-    password: string,
-    recoveryPhrase: string,
-  ) {
+  private static validatePassword(password: string) {
+    if (!password) throw new Error("password_required");
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+    if (!passwordRegex.test(password)) throw new Error("password_invalid");
+  }
+
+  private static validatePrivateKeyOrSeed(privateKeyOrSeed: string) {
+    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
+    const privateKeyOrSeedRegex =
+      /^(0x)?[0-9a-fA-F]{64}|^([a-zA-Z]+ )+[a-zA-Z]+$/;
+    if (!privateKeyOrSeedRegex.test(privateKeyOrSeed))
+      throw new Error("private_key_or_seed_invalid");
+  }
+
+  private static async signUp(password = "", privateKeyOrSeed: string) {
     try {
-      await Auth.getInstance().signUp(password);
-      // AUDIT: executes #isUnlocked = true;
+      Extension.validatePassword(password);
+      Extension.validatePrivateKeyOrSeed(privateKeyOrSeed);
+      Auth.getInstance().setAuth(password);
+      //  await AccountManager.saveBackup(recoveryPhrase);
       await Storage.getInstance().init();
-      await CacheAuth.cachePassword();
-      await AccountManager.saveBackup(recoveryPhrase);
-      // AUDIT: password is being encrypted with salt and cached.
-      // AUDIT: at the same time it's being encrypted w/the recovery phrase and saved in persistent storage, to decrypt all the Vault(keyrings). 
-      // AUDIT:   This should be avoided in case of a security breach, as the storage can be exposed, All the Keyrings are encrypted with this password.
-      // AUDIT:   Recovery mecanism is done with the recovery phrase, which re-generates all the private_keys.
-      // AUDIT: review further, could lead to a security issue in the long run when handling password in different places, keep it consistent.
     } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
+      Storage.getInstance().resetWallet();
+      Auth.signOut();
+      throw error;
     }
+  }
+
+  static async isAuthorized() {
+    const isUnlocked = await Extension.isUnlocked();
+    if (!isUnlocked) throw new Error("failed_to_import_account");
   }
 
   static async createAccounts(
@@ -48,19 +59,22 @@ export default class Extension {
     name: string,
     password?: string,
     isSignUp = true
-    // AUDIT: redundant parameter, every createAccount call is a signUp. 
-    // AUDIT: Not tested in tests. Could lead to unexpected behaviour when called with false.
   ) {
-    if (!seed) throw new Error("seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("password_required");
-      await this.init(password, seed);
+      await Extension.signUp(password, seed);
     }
-    const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("failed_to_create_accounts");
-
-    const evmAccount = await AccountManager.addEVMAccount(seed, name);
-    const wasmAccount = await AccountManager.addWASMAccount(seed, name);
+    await Extension.isAuthorized();
+    const { evmName, wasmName } = await AccountManager.getDefaultNames(name);
+    const evmAccount = await AccountManager.addAccount(
+      AccountType.EVM,
+      seed,
+      evmName
+    );
+    const wasmAccount = await AccountManager.addAccount(
+      AccountType.WASM,
+      seed,
+      wasmName
+    );
 
     const selectedAccount = await Extension.getSelectedAccount();
 
@@ -79,30 +93,24 @@ export default class Extension {
     name: string,
     privateKeyOrSeed: string,
     password: string | undefined,
-    accountType: AccountType,
+    type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM,
     isSignUp = true
   ) {
-    //AUDIT: not taking into account if i load the seed, works only with the private key
-    //AUDIT: repeated code from createAccounts, refactor suggested
-    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("password_required");
-      await this.init(password, privateKeyOrSeed);  
+      await Extension.signUp(password, privateKeyOrSeed);
     }
-    const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("failed_to_import_account");
-    const account = await AccountManager.importAccount({
+    await Extension.isAuthorized();
+    const account = await AccountManager.importAccount(
       name,
       privateKeyOrSeed,
-      accountType,
-    });
+      type
+    );
     this.setSelectedAccount(account);
   }
 
   static async restorePassword(recoveryPhrase: string, newPassword: string) {
-    // AUDIT: could use here bip39.validateMnemonic(recoveryPhrase) to validate the recovery phrase
-    if (!recoveryPhrase) throw new Error("private_key_or_seed_required");
-    if (!newPassword) throw new Error("password_required");
+    Extension.validatePassword(newPassword);
+    Extension.validatePrivateKeyOrSeed(recoveryPhrase);
     await AccountManager.restorePassword(recoveryPhrase, newPassword);
   }
 
@@ -124,10 +132,9 @@ export default class Extension {
     try {
       const vault = await Vault.getEncryptedVault();
       if (!vault) throw new Error("failed_to_sign_in");
-      await Auth.getInstance().signIn(password, vault);
-      await CacheAuth.cachePassword();
+      await Auth.signIn(password, vault);
     } catch (error) {
-      Auth.getInstance().signOut();
+      Auth.signOut();
       throw error;
     }
   }
@@ -148,25 +155,20 @@ export default class Extension {
   }
 
   static async signOut() {
-    Auth.getInstance().signOut();
-    await CacheAuth.clear();
+    Auth.signOut();
   }
 
   static async isUnlocked() {
-    await CacheAuth.loadFromCache();
+    await Auth.loadFromCache();
     return Auth.isUnlocked;
   }
 
-  static async showPrivateKey(): Promise<string | undefined> {
+  static async showKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
-    return Vault.showPrivateKey(selectedAccount.value.keyring);
-  }
-
-  static async showSeed(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
-    return Vault.showSeed(selectedAccount.value.keyring);
+    if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
+    const { keyring: id, address } = selectedAccount.value;
+    const keyring = await Vault.getKeyring(id);
+    return keyring.getPrivateKey(address);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -183,11 +185,9 @@ export default class Extension {
 
   static async deriveAccount(
     name: string,
-    accountType: AccountType
+    type: AccountType
   ): Promise<Account> {
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_derive_account");
-    const account = await AccountManager.derive(name, vault, accountType);
+    const account = await AccountManager.derive(name, type);
     await this.setSelectedAccount(account);
     return account;
   }
@@ -202,10 +202,9 @@ export default class Extension {
   }
 
   static async setSelectedAccount(account: Account) {
-    // AUDIT: should this be treated as a singleton or do we want to create a SelectedAccount each time?
-    const selected = new SelectedAccount();
-    selected.fromAccount(account);
-    await SelectedAccount.set<SelectedAccount>(selected);
+    await SelectedAccount.set<SelectedAccount>(
+      SelectedAccount.fromAccount(account)
+    );
   }
 
   static async getSelectedAccount(): Promise<Account | undefined> {
@@ -228,7 +227,10 @@ export default class Extension {
     return settings.getAll(SettingType.ADVANCED);
   }
 
-  static async getSetting(type: SettingType, key: SettingKey): Promise<Setting | undefined> {
+  static async getSetting(
+    type: SettingType,
+    key: SettingKey
+  ): Promise<Setting | undefined> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.get(type, key);

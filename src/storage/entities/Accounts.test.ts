@@ -66,7 +66,7 @@ describe("Account", () => {
           return {
             update: vi.fn(),
             remove: () => remove(),
-            allreadyExists: () => false,
+            alreadyExists: () => false,
             add: () => add(),
           };
         }
@@ -117,7 +117,7 @@ describe("Account", () => {
     it("should add account", async () => {
       const BaseEntity = await import("./BaseEntity");
       BaseEntity.default.get = vi.fn().mockReturnValue({
-        allreadyExists: () => false,
+        alreadyExists: () => false,
         add: () => add(),
       });
 
@@ -140,7 +140,7 @@ describe("Account", () => {
     it("should return  failed_to_add_account error", async () => {
       const BaseEntity = await import("./BaseEntity");
       BaseEntity.default.get = vi.fn().mockReturnValue({
-        allreadyExists: () => true,
+        alreadyExists: () => true,
       });
 
       try {
@@ -212,9 +212,9 @@ describe("Account", () => {
     });
   });
 
-  it("should return false allreadyExists", () => {
+  it("should return false alreadyExists", () => {
     const accounts = new Accounts();
-    const response = accounts.allreadyExists(accountMock.key);
+    const response = accounts.alreadyExists(accountMock.key);
     expect(response).toBe(false);
   });
 

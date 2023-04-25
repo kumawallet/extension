@@ -1,5 +1,3 @@
-import Auth from "../Auth";
-import Storage from "../Storage";
 import BaseEntity from "./BaseEntity";
 
 export default class CacheAuth extends BaseEntity {
@@ -35,44 +33,14 @@ export default class CacheAuth extends BaseEntity {
     return entity as CacheAuth;
   }
 
-  private static save(password: string) {
+  save(password: string) {
     try {
-      CacheAuth.getInstance().password = password;
-      CacheAuth.getInstance().isUnlocked = true;
-      CacheAuth.getInstance().timeout =
-        new Date().getTime() + 1000 * 60 * 60 * 24;
+      this.password = password;
+      this.isUnlocked = true;
+      // TODO - this should be configurable
+      this.timeout = new Date().getTime() + 1000 * 60 * 30;
     } catch (error) {
       throw new Error(error as string);
-    }
-  }
-
-  static async cachePassword() {
-    try {
-      if (!Auth.password) {
-        return;
-      }
-      const salt = await Storage.getInstance().getSalt();
-      const encrypted = await Auth.generateSaltedHash(salt, Auth.password);
-      // AUDIT: This is the only place where the password is stored in memory, and encrypted with a salt.
-      CacheAuth.save(encrypted);
-      await CacheAuth.set<CacheAuth>(CacheAuth.getInstance());
-    } catch (error) {
-      console.error(error);
-      CacheAuth.clear();
-      throw new Error("failed_to_cache_password");
-    }
-  }
-
-  static async loadFromCache() {
-    try {
-      await CacheAuth.get<CacheAuth>();
-      const salt = await Storage.getInstance().getSalt();
-      // AUDIT: why is it calling Auth? why not directly handle inside CacheAuth?
-      // AUDIT:   internally Auth.loadAuthFromCache() it's calling CacheAuth
-      await Auth.loadAuthFromCache(salt);
-    } catch (error) {
-      console.error(error);
-      CacheAuth.clear();
     }
   }
 
@@ -83,11 +51,10 @@ export default class CacheAuth extends BaseEntity {
     CacheAuth.set<CacheAuth>(CacheAuth.getInstance());
   }
 
-  static async hasExpired() {
+  static hasExpired(): boolean {
     const now = new Date().getTime();
     const cache = CacheAuth.getInstance();
-    const hasExpired =
-      cache.isUnlocked && cache.password && cache.timeout < now;
+    const hasExpired = cache.timeout < now;
     if (hasExpired) CacheAuth.clear();
     return hasExpired;
   }
