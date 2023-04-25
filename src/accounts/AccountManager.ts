@@ -10,7 +10,6 @@ import { AccountType, AccountKey } from "./types";
 import { getAccountType } from "../utils/account-utils";
 import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
-import ImportedKeyring from "@src/storage/entities/keyrings/imported/ImportedKeyring";
 
 export default class AccountManager {
   static getDefaultNames(name: string) {
@@ -49,7 +48,8 @@ export default class AccountManager {
     keyring: SupportedKeyring
   ): Promise<Account> {
     const key = AccountManager.formatAddress(address, type);
-    const value = { name, address, keyring: keyring.type };
+    const _name = await AccountManager.getValidName(name);
+    const value = { name: _name, address, keyring: keyring.type };
     const account = new Account(key, value);
     await Accounts.save(account);
     await Vault.saveKeyring(keyring);
@@ -62,11 +62,10 @@ export default class AccountManager {
     name: string,
     keyring?: HDKeyring
   ): Promise<Account> {
-    const _name = await AccountManager.getValidName(name);
     const _keyring =
       keyring || ((await Vault.getKeyring(type, seed)) as HDKeyring);
     const address = _keyring.deriveKeyPair();
-    return AccountManager.createAccount(_name, address, type, _keyring);
+    return AccountManager.createAccount(name, address, type, _keyring);
   }
 
   static async importAccount(
