@@ -431,7 +431,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
     }
   };
 

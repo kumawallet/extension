@@ -1,10 +1,11 @@
 import { AccountType } from "@src/accounts/types";
-import HDKeyPair from "./HDKeyPair";
 import Keyring from "../Keyring";
+import { HDKeyPair } from "../types";
 
 export default abstract class HDKeyring extends Keyring {
   abstract type: AccountType;
   readonly #mnemonic: string;
+  keyPairs: { [address: string]: HDKeyPair };
 
   constructor(mnemonic: string) {
     super();
@@ -12,6 +13,7 @@ export default abstract class HDKeyring extends Keyring {
       throw new Error("Invalid mnemonic");
     }
     this.#mnemonic = mnemonic;
+    this.keyPairs = {};
   }
 
   get mnemonic() {
@@ -27,15 +29,13 @@ export default abstract class HDKeyring extends Keyring {
   deriveKeyPair(): string {
     const path = this.getNextAccountPath();
     const address = this.getAddress(path);
-    const keyPair = new HDKeyPair(path);
-    this.addKeyPair(address, keyPair);
+    this.addKeyPair(address, { path });
     return address;
   }
 
   toJSON() {
     return {
       mnemonic: this.#mnemonic,
-      accountQuantity: this.accountQuantity,
       keyPairs: this.keyPairs,
     };
   }

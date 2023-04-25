@@ -1,26 +1,17 @@
 import { AccountType } from "@src/accounts/types";
-import HDKeyPair from "./hd/HDKeyPair";
-import KeyPair from "./imported/KeyPair";
+import { KeyPair, HDKeyPair } from "./types";
 
 export default abstract class Keyring {
   abstract readonly type: AccountType;
-  protected keyPairs: { [address: string]: KeyPair | HDKeyPair } = {};
-  protected accountQuantity = 0;
-
-  increaseAccountQuantity() {
-    this.accountQuantity++;
-  }
-
-  decreaseAccountQuantity() {
-    this.accountQuantity--;
-  }
+  keyPairs: { [address: string]: KeyPair | HDKeyPair } = {};
 
   addKeyPair(address: string, keyPair: KeyPair | HDKeyPair): void {
     this.keyPairs[address] = keyPair;
-    this.increaseAccountQuantity();
   }
 
-  abstract getPrivateKey(address: string): string;
+  getAccountIndex() {
+    return Object.keys(this.keyPairs).length;
+  }
 
-  abstract fromJSON(json: any): void;
+  abstract getKey(address: string): string;
 }

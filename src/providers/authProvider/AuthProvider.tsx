@@ -10,7 +10,7 @@ import { useToast } from "../../hooks";
 import Extension from "../../Extension";
 import { AccountFormType } from "../../pages";
 import { Action, AuthContext as IAuthContext, InitialState } from "./types";
-import { AccountType } from "../../accounts/types";
+import { AccountType } from "@src/accounts/types";
 
 const initialState: InitialState = {
   isInit: true,
@@ -23,6 +23,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     default:
       return state;
   }
+};
+
+const getImportedType = (type: AccountType) => {
+  if (type === AccountType.EVM) return AccountType.IMPORTED_EVM;
+  if (type === AccountType.WASM) return AccountType.IMPORTED_WASM;
+  return type;
 };
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -59,11 +65,12 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       if (!password && !isUnlocked) throw new Error("password_required");
       if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
       if (!accountType) throw new Error("account_type_required");
+      const type = getImportedType(accountType);
       await Extension.importAccount(
         name,
         privateKeyOrSeed,
         password,
-        accountType as AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM,
+        type,
         isSignUp
       );
 

@@ -7,6 +7,8 @@ import Accounts from "./entities/Accounts";
 import Registry from "./entities/registry/Registry";
 import Activity from "./entities/activity/Activity";
 import Chains from "./entities/Chains";
+import Auth from "./Auth";
+import AccountManager from "@src/accounts/AccountManager";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
@@ -32,21 +34,23 @@ export default class Storage {
     return this.#storage;
   }
 
-  async init() {
+  static async init(password: string, privateKeyOrSeed: string) {
     if (await Vault.alreadySignedUp()) {
       throw new Error("already_signed_up");
     }
 
-    await this.#storage.clear();
-    await Vault.init();
-    await Network.init();
-    await Settings.init();
-    await Accounts.init();
-    await BackUp.init();
+    await Storage.getInstance().#storage.clear();
     await CacheAuth.init();
+    await Auth.getInstance().setAuth(password);
+    await Network.init();
+    await Chains.init();
+    await Settings.init();
     await Registry.init();
     await Activity.init();
-    await Chains.init();
+    await Vault.init();
+    await Accounts.init();
+    await BackUp.init();
+    await AccountManager.saveBackup(privateKeyOrSeed);
   }
 
   async resetWallet() {

@@ -8,6 +8,9 @@ import HDKeyring from "../storage/entities/keyrings/hd/HDKeyring";
 import { SupportedKeyring } from "../storage/entities/keyrings/types";
 import { AccountType, AccountKey } from "./types";
 import { getAccountType } from "../utils/account-utils";
+import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
+import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
+import ImportedKeyring from "@src/storage/entities/keyrings/imported/ImportedKeyring";
 
 export default class AccountManager {
   static getDefaultNames(name: string) {
@@ -60,7 +63,8 @@ export default class AccountManager {
     keyring?: HDKeyring
   ): Promise<Account> {
     const _name = await AccountManager.getValidName(name);
-    const _keyring = keyring || Vault.createHDKeyring(type, seed);
+    const _keyring =
+      keyring || ((await Vault.getKeyring(type, seed)) as HDKeyring);
     const address = _keyring.deriveKeyPair();
     return AccountManager.createAccount(_name, address, type, _keyring);
   }
@@ -70,7 +74,9 @@ export default class AccountManager {
     privateKeyOrSeed: string,
     type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM
   ): Promise<Account> {
-    const keyring = Vault.createImportedKeyring(type);
+    const keyring = (await Vault.getKeyring(type)) as
+      | ImportedEVMKeyring
+      | ImportedWASMKeyring;
     const { address, keyPair } = await keyring.getImportedData(
       privateKeyOrSeed
     );
@@ -147,17 +153,7 @@ export default class AccountManager {
   ): Promise<void> {
     const backup = await BackUp.get<BackUp>();
     if (!backup || !backup.data) throw new Error("backup_not_found");
-    const decryptedBackup = await Auth.decryptBackup(
-      backup.data,
-      privateKeyOrSeed
-    );
-    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
-    Auth.isUnlocked = true;
-    Auth.password = decryptedBackup as string;
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_restore_password");
-    Auth.password = password;
-    await Vault.set(vault);
+    await Auth.restorePassword(backup.data, password, privateKeyOrSeed);
     await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }

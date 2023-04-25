@@ -21,7 +21,7 @@ export default class Auth {
     return Auth.getInstance().isUnlocked;
   }
 
-  static set isUnlocked(isUnlocked: boolean) {
+  private static set isUnlocked(isUnlocked: boolean) {
     Auth.getInstance().isUnlocked = isUnlocked;
   }
 
@@ -33,20 +33,16 @@ export default class Auth {
     Auth.getInstance().password = password;
   }
 
-  static isAuthorized() {
-    return Auth.isUnlocked && !Auth.password;
+  static isSessionActive() {
+    return Auth.isUnlocked && Auth.password;
   }
 
-  static async cachePassword() {
+  private static async cacheSession() {
     try {
       if (!Auth.password) {
-        return;
+        Auth.signOut();
       }
-      const salt = passworder.generateSalt();
-      const encrypted = await passworder.encrypt(salt, Auth.password);
-      const cache = CacheAuth.getInstance();
-      cache.save(encrypted);
-      await CacheAuth.set<CacheAuth>(cache);
+      await CacheAuth.unlock();
     } catch (error) {
       CacheAuth.clear();
       throw new Error("failed_to_cache_password");
@@ -56,42 +52,43 @@ export default class Auth {
   static async loadFromCache() {
     try {
       await CacheAuth.get<CacheAuth>();
-      const { password, isUnlocked } = CacheAuth.getInstance();
+      const { isUnlocked } = CacheAuth.getInstance();
       const hasExpired = await CacheAuth.hasExpired();
-      if (hasExpired || !password) {
+      if (hasExpired) {
         Auth.signOut();
         return;
       }
-      const salt = passworder.generateSalt();
-      const decrypted = await passworder.decrypt(salt, password);
-      Auth.password = decrypted as string;
       Auth.isUnlocked = isUnlocked;
     } catch (error) {
       CacheAuth.clear();
+      console.error(error);
+      throw new Error("failed_to_load_from_cache");
     }
   }
 
   async decryptVault(vault: string) {
-    if (!Auth.isAuthorized) throw new Error("login_required");
+    if (!Auth.isSessionActive) throw new Error("login_required");
     return passworder.decrypt(this.password as string, vault);
   }
 
   async encryptVault(vault: Vault) {
-    if (!Auth.isAuthorized) throw new Error("login_required");
+    if (!Auth.isSessionActive) throw new Error("login_required");
     return passworder.encrypt(this.password as string, vault);
   }
 
-  async validatePassword(password: string, vault: string) {
+  async validatePassword(password: string) {
+    const vault = await Vault.getEncryptedVault();
+    if (!vault) throw new Error("vault_not_found");
     const decryptedVault = (await passworder.decrypt(password, vault)) as Vault;
     if (Vault.isInvalid(decryptedVault)) {
       throw new Error("invalid_credentials");
     }
   }
 
-  static async signIn(password: string, vault: string) {
+  static async signIn(password: string) {
     const auth = Auth.getInstance();
     try {
-      await auth.validatePassword(password, vault);
+      await auth.validatePassword(password);
       auth.setAuth(password);
     } catch (error) {
       Auth.signOut();
@@ -102,7 +99,7 @@ export default class Auth {
   async setAuth(password: string) {
     this.password = password;
     this.isUnlocked = true;
-    Auth.cachePassword();
+    await Auth.cacheSession();
   }
 
   static signOut() {
@@ -127,5 +124,19 @@ export default class Auth {
     } catch (error) {
       throw new Error("failed_to_restore_backup");
     }
+  }
+
+  static async restorePassword(
+    backup: string,
+    password: string,
+    recoveryPhrase: string
+  ) {
+    const decryptedBackup = await Auth.decryptBackup(backup, recoveryPhrase);
+    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
+    Auth.isUnlocked = true;
+    Auth.password = decryptedBackup as string;
+    const vault = await Vault.getInstance();
+    Auth.password = password;
+    await Vault.set(vault);
   }
 }

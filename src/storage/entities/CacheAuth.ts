@@ -1,22 +1,15 @@
 import BaseEntity from "./BaseEntity";
 
 export default class CacheAuth extends BaseEntity {
-  password: string | undefined;
-  isUnlocked: boolean;
-  timeout: number;
-
-  private constructor() {
+  private constructor(public isUnlocked: boolean, public timeout: number) {
     super();
-    this.password = undefined;
-    this.isUnlocked = false;
-    this.timeout = 0;
   }
 
   private static instance: CacheAuth;
 
   public static getInstance() {
     if (!CacheAuth.instance) {
-      CacheAuth.instance = new CacheAuth();
+      CacheAuth.instance = new CacheAuth(false, 0);
     }
     return CacheAuth.instance;
   }
@@ -33,19 +26,14 @@ export default class CacheAuth extends BaseEntity {
     return entity as CacheAuth;
   }
 
-  save(password: string) {
-    try {
-      this.password = password;
-      this.isUnlocked = true;
-      // TODO - this should be configurable
-      this.timeout = new Date().getTime() + 1000 * 60 * 30;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+  static async unlock() {
+    const cache = CacheAuth.getInstance();
+    cache.isUnlocked = true;
+    cache.timeout = new Date().getTime() + 1000 * 60 * 30;
+    await CacheAuth.set<CacheAuth>(cache);
   }
 
   static async clear() {
-    CacheAuth.getInstance().password = undefined;
     CacheAuth.getInstance().isUnlocked = false;
     CacheAuth.getInstance().timeout = 0;
     CacheAuth.set<CacheAuth>(CacheAuth.getInstance());

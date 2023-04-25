@@ -1,24 +1,21 @@
 import { AccountType } from "../../../../accounts/types";
-import KeyPair from "./KeyPair";
 import Keyring from "../Keyring";
+import { KeyPair } from "../types";
 
 export default abstract class ImportedKeyring extends Keyring {
+  keyPairs: { [address: string]: KeyPair };
 
-  getPrivateKey(address: string): string {
+  constructor() {
+    super();
+    this.keyPairs = {};
+  }
+
+  getKey(address: string): string {
     const keyPair = this.keyPairs[address] as KeyPair;
     if (!keyPair) {
       throw new Error("Key pair not found");
     }
-    return keyPair?.getKey();
-  }
-
-  fromJSON(json: any): void {
-    this.accountQuantity = json.accountQuantity;
-    this.keyPairs = {};
-    Object.keys(json.keyPairs).forEach((address) => {
-      const keyPair = json.keyPairs[address] as KeyPair;
-      this.addKeyPair(address, keyPair);
-    });
+    return keyPair.key;
   }
 
   abstract getImportedData(

@@ -39,9 +39,7 @@ export default class Extension {
     try {
       Extension.validatePassword(password);
       Extension.validatePrivateKeyOrSeed(privateKeyOrSeed);
-      Auth.getInstance().setAuth(password);
-      //  await AccountManager.saveBackup(recoveryPhrase);
-      await Storage.getInstance().init();
+      await Storage.init(password, privateKeyOrSeed);
     } catch (error) {
       Storage.getInstance().resetWallet();
       Auth.signOut();
@@ -51,7 +49,7 @@ export default class Extension {
 
   static async isAuthorized() {
     const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("failed_to_import_account");
+    if (!isUnlocked) throw new Error("unauthorized");
   }
 
   static async createAccounts(
@@ -129,14 +127,7 @@ export default class Extension {
   }
 
   static async signIn(password: string) {
-    try {
-      const vault = await Vault.getEncryptedVault();
-      if (!vault) throw new Error("failed_to_sign_in");
-      await Auth.signIn(password, vault);
-    } catch (error) {
-      Auth.signOut();
-      throw error;
-    }
+    await Auth.signIn(password);
   }
 
   static alreadySignedUp() {
@@ -159,16 +150,18 @@ export default class Extension {
   }
 
   static async isUnlocked() {
-    await Auth.loadFromCache();
+    if (!Auth.isUnlocked) {
+      await Auth.loadFromCache();
+    }
     return Auth.isUnlocked;
   }
 
   static async showKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
     if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
-    const { keyring: id, address } = selectedAccount.value;
-    const keyring = await Vault.getKeyring(id);
-    return keyring.getPrivateKey(address);
+    const { keyring: type, address } = selectedAccount.value;
+    const keyring = await Vault.getKeyring(type);
+    return keyring.getKey(address);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -193,8 +186,6 @@ export default class Extension {
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_set_network");
     const network = Network.getInstance();
     network.set(chain);
     await Network.set<Network>(network);

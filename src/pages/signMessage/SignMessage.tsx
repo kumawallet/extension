@@ -41,7 +41,7 @@ export const SignMessage: FC<SignMessageProps> = ({
     try {
       let signedMessage = "";
       if (type.toLowerCase() === "wasm") {
-        const mnemonic = await Extension.showSeed();
+        const mnemonic = await Extension.showKey();
         const keyring = new Keyring({ type: "sr25519" });
 
         const signer = keyring.addFromMnemonic(mnemonic as string);
@@ -50,7 +50,7 @@ export const SignMessage: FC<SignMessageProps> = ({
       }
 
       if (type.toLowerCase() === "evm") {
-        const pk = await Extension.showPrivateKey();
+        const pk = await Extension.showKey();
 
         const signer = new ethers.Wallet(
           pk as string,

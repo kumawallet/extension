@@ -86,11 +86,7 @@ export const Security = () => {
 
   const getPrivateKeyOrSeed = async (): Promise<void> => {
     try {
-      let privateKeyOrSeed: string | undefined =
-        await Extension.showPrivateKey();
-      if (!privateKeyOrSeed) {
-        privateKeyOrSeed = await Extension.showSeed();
-      }
+      const privateKeyOrSeed: string | undefined = await Extension.showKey();
       if (!privateKeyOrSeed) {
         throw new Error("no_private_key_or_seed");
       }

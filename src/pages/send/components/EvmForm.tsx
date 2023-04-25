@@ -59,7 +59,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
   useEffect(() => {
     (async () => {
-      const pk = await Extension.showPrivateKey();
+      const pk = await Extension.showKey();
 
       const wallet = new ethers.Wallet(
         pk as string,

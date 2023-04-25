@@ -13,3 +13,16 @@ export type SupportedKeyring =
 export type Keyrings = {
   [key in AccountType]: SupportedKeyring | undefined;
 };
+
+export interface KeyringJSON{
+  fromJSON: (json: SupportedKeyring) => SupportedKeyring;
+}
+
+export interface KeyPair {
+  publicKey: string;
+  key: string;
+}
+
+export interface HDKeyPair {
+  path: string;
+}
