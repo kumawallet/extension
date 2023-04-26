@@ -86,9 +86,14 @@ export const Security = () => {
 
   const getPrivateKeyOrSeed = async (): Promise<void> => {
     try {
-      const privateKeyOrSeed: string | undefined = await Extension.showKey();
+      let privateKeyOrSeed: string | undefined = await Extension.showKey();
       if (!privateKeyOrSeed) {
         throw new Error("no_private_key_or_seed");
+      }
+      // For wasm keys, the private key is followed by a slash and the account index
+      if (privateKeyOrSeed.includes("/")) {
+        const index = privateKeyOrSeed.indexOf("/");
+        privateKeyOrSeed = privateKeyOrSeed.substring(0, index);
       }
       setPrivateKey(privateKeyOrSeed);
     } catch (error: unknown) {
