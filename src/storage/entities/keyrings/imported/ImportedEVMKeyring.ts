@@ -8,8 +8,8 @@ export default class ImportedEVMKeyring extends ImportedKeyring {
 
   async getImportedData(privateKey: string) {
     const wallet = new ethers.Wallet(privateKey);
-    const { address, publicKey } = wallet || {};
-    const keyPair = { key: privateKey, publicKey };
+    const { address } = wallet || {};
+    const keyPair = { key: privateKey };
     return { address, keyPair };
   }
 
@@ -17,8 +17,8 @@ export default class ImportedEVMKeyring extends ImportedKeyring {
     const { keyPairs } = json as ImportedKeyring;
     const keyring = new ImportedEVMKeyring();
     Object.keys(keyPairs).forEach((address) => {
-      const { key, publicKey } = keyPairs[address];
-      keyring.addKeyPair(address, { key, publicKey });
+      const { key } = keyPairs[address];
+      keyring.addKeyPair(address, { key });
     });
     return keyring;
   }

@@ -19,7 +19,6 @@ export interface KeyringJSON{
 }
 
 export interface KeyPair {
-  publicKey: string;
   key: string;
 }
 

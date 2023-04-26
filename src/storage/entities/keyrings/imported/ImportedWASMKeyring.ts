@@ -9,8 +9,8 @@ export default class ImportedWASMKeyring extends ImportedKeyring {
 
   async getImportedData(seed: string) {
     const wallet = PolkadotKeyring.addUri(seed, Auth.password);
-    const { address, publicKey } = wallet.pair || {};
-    const keyPair = { key: seed, publicKey: publicKey?.toString() };
+    const { address } = wallet.pair || {};
+    const keyPair = { key: seed };
     return { address, keyPair };
   }
 
@@ -18,8 +18,8 @@ export default class ImportedWASMKeyring extends ImportedKeyring {
     const { keyPairs } = json as ImportedKeyring;
     const keyring = new ImportedWASMKeyring();
     Object.keys(keyPairs).forEach((address) => {
-      const { key, publicKey } = keyPairs[address];
-      keyring.addKeyPair(address, { key: key, publicKey: publicKey });
+      const { key } = keyPairs[address];
+      keyring.addKeyPair(address, { key });
     });
     return keyring;
   }
