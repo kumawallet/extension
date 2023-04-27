@@ -29,7 +29,7 @@ export default class Auth {
     return Auth.getInstance().password;
   }
 
-  static set password(password: string | undefined) {
+  private static set password(password: string | undefined) {
     Auth.getInstance().password = password;
   }
 
@@ -83,7 +83,7 @@ export default class Auth {
     return passworder.encrypt(this.password as string, vault);
   }
 
-  async validatePassword(password: string) {
+  private async validatePassword(password: string) {
     const vault = await Vault.getEncryptedVault();
     if (!vault) throw new Error("vault_not_found");
     const decryptedVault = (await passworder.decrypt(password, vault)) as Vault;
