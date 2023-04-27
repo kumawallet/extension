@@ -15,6 +15,7 @@ import {
   InputErrorMessage,
   LoadingButton,
   PageWrapper,
+  ReEnterPassword,
   SucessMessage,
 } from "@src/components/common";
 import { FiChevronLeft } from "react-icons/fi";
@@ -196,6 +197,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   return (
     <PageWrapper>
+      {!signUp && <ReEnterPassword />}
+
       <div className="flex gap-3 items-center">
         {backButton && (
           <FiChevronLeft
@@ -233,7 +236,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   </button>
                   {!showSeed && (
                     <div
-                      className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-50"
+                      className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-10"
                       onClick={() => setShowSeed(true)}
                     >
                       <button className="flex flex-col items-center">

@@ -6,4 +6,5 @@ export * from "./InputErroMessage";
 export * from "./Loading";
 export * from "./LoadingButton";
 export * from "./PageWrapper";
+export * from "./ReEnterPassword";
 export * from "./SucessMessage";

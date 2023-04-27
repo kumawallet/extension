@@ -3,7 +3,12 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper, Loading, LoadingButton } from "@src/components/common";
+import {
+  PageWrapper,
+  Loading,
+  LoadingButton,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useToast, useLoading } from "@src/hooks";
 import Extension from "@src/Extension";
 import { BsEye, BsTrash } from "react-icons/bs";
@@ -218,6 +223,7 @@ export const Security = () => {
                 {t("show")}
               </button>
             </div>
+            {isOpen && <ReEnterPassword />}
             <Transition appear show={isOpen} as={Fragment}>
               <Dialog as="div" className="relative z-10" onClose={closeModal}>
                 <Transition.Child
