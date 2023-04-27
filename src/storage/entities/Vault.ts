@@ -26,7 +26,6 @@ export default class Vault {
     const vault = new Vault();
     const stored = await Storage.getInstance().storage.get(this.name);
     if (!stored || !stored[this.name]) throw new Error("vault_not_found");
-    if (!Auth.isSessionActive) await Auth.loadFromCache();
     const data = (await Auth.getInstance().decryptVault(
       stored[this.name]
     )) as Vault;

@@ -148,11 +148,8 @@ export default class Extension {
     Auth.signOut();
   }
 
-  static async isUnlocked() {
-    if (!Auth.isUnlocked) {
-      await Auth.loadFromCache();
-    }
-    return Auth.isUnlocked;
+  static async isSessionActive() {
+    return Auth.isSessionActive();
   }
 
   static async showKey(): Promise<string | undefined> {

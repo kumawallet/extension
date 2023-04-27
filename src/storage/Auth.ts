@@ -33,13 +33,20 @@ export default class Auth {
     Auth.getInstance().password = password;
   }
 
-  static isSessionActive() {
-    return Auth.isUnlocked && Auth.password;
+  static async isSessionActive(): Promise<boolean> {
+    if (!Auth.isUnlocked) {
+      await Auth.loadFromCache();
+    }
+    return Auth.isUnlocked;
+  }
+
+  static isAuthorized() {
+    return Auth.password !== undefined;
   }
 
   private static async cacheSession() {
     try {
-      if (!Auth.password) {
+      if (!Auth.isAuthorized()) {
         Auth.signOut();
       }
       await CacheAuth.unlock();
@@ -67,12 +74,12 @@ export default class Auth {
   }
 
   async decryptVault(vault: string) {
-    if (!Auth.isSessionActive) throw new Error("login_required");
+    if (!Auth.isAuthorized()) throw new Error("login_required");
     return passworder.decrypt(this.password as string, vault);
   }
 
   async encryptVault(vault: Vault) {
-    if (!Auth.isSessionActive) throw new Error("login_required");
+    if (!Auth.isAuthorized()) throw new Error("login_required");
     return passworder.encrypt(this.password as string, vault);
   }
 
