@@ -9,7 +9,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 export const ReEnterPassword = () => {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("re_enter_password");
   const navigate = useNavigate();
   const { isLoading, starLoading, endLoading } = useLoading();
   const { showErrorToast } = useToast();
@@ -23,11 +23,7 @@ export const ReEnterPassword = () => {
 
   useEffect(() => {
     (() => {
-      try {
-        Extension.isAuthorized();
-      } catch (error) {
-        setShowDialog(true);
-      }
+      setShowDialog(!Extension.isAuthorized());
     })();
   }, []);
 
@@ -83,7 +79,10 @@ export const ReEnterPassword = () => {
                   </div>
                 </Dialog.Title>
                 <div className="mt-4">
-                  <div className="relative">
+                  <label className="text-sm font-medium text-gray-400">
+                    {t("re_enter_password_text")}
+                  </label>
+                  <div className="relative mt-4">
                     <input
                       placeholder={t("password") as string}
                       max={32}
@@ -111,7 +110,7 @@ export const ReEnterPassword = () => {
                     isLoading={isLoading}
                     isDisabled={isLoading}
                   >
-                    {t("signIn")}
+                    {t("confirm")}
                   </LoadingButton>
                 </div>
               </Dialog.Panel>

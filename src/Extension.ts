@@ -49,16 +49,6 @@ export default class Extension {
     return Auth.isAuthorized();
   }
 
-  private static getDefaultNames(name: string) {
-    let evmName = name;
-    let wasmName = name;
-    if (name === "") {
-      evmName = AccountManager.getDefaultName(AccountType.EVM);
-      wasmName = AccountManager.getDefaultName(AccountType.WASM);
-    }
-    return { evmName, wasmName };
-  }
-
   static async createAccounts(
     seed: string,
     name: string,
@@ -68,16 +58,15 @@ export default class Extension {
     if (isSignUp) {
       await Extension.signUp(password, seed);
     }
-    const { evmName, wasmName } = Extension.getDefaultNames(name);
-    const evmAccount = await AccountManager.addAccount(
-      AccountType.EVM,
-      seed,
-      evmName
-    );
     const wasmAccount = await AccountManager.addAccount(
       AccountType.WASM,
       seed,
-      wasmName
+      name
+    );
+    const evmAccount = await AccountManager.addAccount(
+      AccountType.EVM,
+      seed,
+      name
     );
 
     const selectedAccount = await Extension.getSelectedAccount();

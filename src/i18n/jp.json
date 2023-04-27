@@ -254,5 +254,11 @@
     "sign": "ちょうこう",
     "account": "アカウント",
     "message": "メッセージ"
+  },
+  "re_enter_password": {
+    "title": "パスワードを再入力してください",
+    "password": "パスワード",
+    "confirm": "確認",
+    "re_enter_password_text": "このアクションを確認するためにパスワードを再入力してください."
   }
 }

@@ -5,9 +5,6 @@ export const PASSWORD_REGEX =
 export const PRIVATE_KEY_OR_SEED_REGEX =
   /^(0x)?[0-9a-fA-F]{64}|^([a-zA-Z]+ )+[a-zA-Z]+$/;
 
-export const EVM_DEFAULT_NAME = "Ethereum Account";
-export const WASM_DEFAULT_NAME = "Polkadot/Kusama Account";
-
 export const LANGUAGES = [
   { lang: "en", name: "English", englishName: "English" },
   { lang: "es", name: "Español", englishName: "Spanish" },

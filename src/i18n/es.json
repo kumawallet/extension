@@ -254,5 +254,11 @@
     "sign": "Firmar",
     "account": "Cuenta",
     "message": "Mensaje"
+  },
+  "re_enter_password": {
+    "title": "Re-ingrese la contraseña",
+    "password": "Contraseña",
+    "confirm": "Confirmar",
+    "re_enter_password_text": "Re-ingrese su contraseña para confirmar esta acción."
   }
 }

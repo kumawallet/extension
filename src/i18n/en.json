@@ -254,5 +254,11 @@
     "sign": "Sign",
     "account": "Account",
     "message": "Message"
+  },
+  "re_enter_password": {
+    "title": "Re-enter password",
+    "password": "Password",
+    "confirm": "Confirm",
+    "re_enter_password_text": "Please re-enter your password to confirm this action."
   }
 }
