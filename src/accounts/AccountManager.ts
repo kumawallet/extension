@@ -10,16 +10,20 @@ import { AccountType, AccountKey } from "./types";
 import { getAccountType } from "../utils/account-utils";
 import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
+import { EVM_DEFAULT_NAME, WASM_DEFAULT_NAME } from "@src/utils/constants";
 
 export default class AccountManager {
-  static getDefaultNames(name: string) {
-    let evmName = "Ethereum Account";
-    let wasmName = "Polkadot Account";
-    if (name && name !== "") {
-      evmName = name;
-      wasmName = name;
+  static getDefaultName(type: AccountType) {
+    switch (type) {
+      case AccountType.EVM:
+      case AccountType.IMPORTED_EVM:
+        return EVM_DEFAULT_NAME;
+      case AccountType.WASM:
+      case AccountType.IMPORTED_WASM:
+        return WASM_DEFAULT_NAME;
+      default:
+        throw new Error("Invalid account type");
     }
-    return { evmName, wasmName };
   }
 
   private static formatAddress(address: string, type: AccountType): AccountKey {

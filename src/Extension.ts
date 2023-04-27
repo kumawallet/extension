@@ -19,26 +19,24 @@ import Register from "./storage/entities/registry/Register";
 import { RecordStatus } from "./storage/entities/activity/types";
 import Assets from "./storage/entities/Assets";
 import TrustedSites from "./storage/entities/TrustedSites";
+import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./utils/constants";
 
 export default class Extension {
-  private static validatePassword(password: string) {
+  private static validatePasswordFormat(password: string) {
     if (!password) throw new Error("password_required");
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    if (!passwordRegex.test(password)) throw new Error("password_invalid");
+    if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
   }
 
-  private static validatePrivateKeyOrSeed(privateKeyOrSeed: string) {
+  private static validatePrivateKeyOrSeedFormat(privateKeyOrSeed: string) {
     if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
-    const privateKeyOrSeedRegex =
-      /^(0x)?[0-9a-fA-F]{64}|^([a-zA-Z]+ )+[a-zA-Z]+$/;
-    if (!privateKeyOrSeedRegex.test(privateKeyOrSeed))
+    if (!PRIVATE_KEY_OR_SEED_REGEX.test(privateKeyOrSeed))
       throw new Error("private_key_or_seed_invalid");
   }
 
   private static async signUp(password = "", privateKeyOrSeed: string) {
     try {
-      Extension.validatePassword(password);
-      Extension.validatePrivateKeyOrSeed(privateKeyOrSeed);
+      Extension.validatePasswordFormat(password);
+      Extension.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
       await Storage.init(password, privateKeyOrSeed);
     } catch (error) {
       Storage.getInstance().resetWallet();
@@ -51,6 +49,16 @@ export default class Extension {
     return Auth.isAuthorized();
   }
 
+  private static getDefaultNames(name: string) {
+    let evmName = name;
+    let wasmName = name;
+    if (name === "") {
+      evmName = AccountManager.getDefaultName(AccountType.EVM);
+      wasmName = AccountManager.getDefaultName(AccountType.WASM);
+    }
+    return { evmName, wasmName };
+  }
+
   static async createAccounts(
     seed: string,
     name: string,
@@ -60,7 +68,7 @@ export default class Extension {
     if (isSignUp) {
       await Extension.signUp(password, seed);
     }
-    const { evmName, wasmName } = await AccountManager.getDefaultNames(name);
+    const { evmName, wasmName } = Extension.getDefaultNames(name);
     const evmAccount = await AccountManager.addAccount(
       AccountType.EVM,
       seed,
@@ -104,8 +112,8 @@ export default class Extension {
   }
 
   static async restorePassword(recoveryPhrase: string, newPassword: string) {
-    Extension.validatePassword(newPassword);
-    Extension.validatePrivateKeyOrSeed(recoveryPhrase);
+    Extension.validatePasswordFormat(newPassword);
+    Extension.validatePrivateKeyOrSeedFormat(recoveryPhrase);
     await AccountManager.restorePassword(recoveryPhrase, newPassword);
   }
 
@@ -118,6 +126,9 @@ export default class Extension {
   }
 
   static async resetWallet() {
+    if (!Extension.isAuthorized) {
+      throw new Error("not_authorized");
+    }
     await Storage.getInstance().resetWallet();
     localStorage.removeItem("welcome");
   }
