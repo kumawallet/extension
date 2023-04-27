@@ -47,9 +47,8 @@ export default class Extension {
     }
   }
 
-  static async isAuthorized() {
-    const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("unauthorized");
+  static isAuthorized() {
+    if (!Auth.password) throw new Error("unauthorized");
   }
 
   static async createAccounts(
@@ -61,7 +60,7 @@ export default class Extension {
     if (isSignUp) {
       await Extension.signUp(password, seed);
     }
-    await Extension.isAuthorized();
+    Extension.isAuthorized();
     const { evmName, wasmName } = await AccountManager.getDefaultNames(name);
     const evmAccount = await AccountManager.addAccount(
       AccountType.EVM,
@@ -97,7 +96,7 @@ export default class Extension {
     if (isSignUp) {
       await Extension.signUp(password, privateKeyOrSeed);
     }
-    await Extension.isAuthorized();
+    Extension.isAuthorized();
     const account = await AccountManager.importAccount(
       name,
       privateKeyOrSeed,
