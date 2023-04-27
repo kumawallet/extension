@@ -120,7 +120,7 @@ export default class Extension {
   }
 
   static async resetWallet() {
-    if (!Auth.isUnlocked) throw new Error("wallet_not_unlocked");
+    Extension.isAuthorized();
     await Storage.getInstance().resetWallet();
     localStorage.removeItem("welcome");
   }
