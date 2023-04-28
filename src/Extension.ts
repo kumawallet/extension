@@ -110,8 +110,9 @@ export default class Extension {
     AccountManager.remove(key);
   }
 
-  static changeAccountName(key: AccountKey, newName: string) {
-    AccountManager.changeName(key, newName);
+  static async changeAccountName(key: AccountKey, newName: string) {
+    const account = await AccountManager.changeName(key, newName);
+    await SelectedAccount.set<SelectedAccount>(account);
   }
 
   static async resetWallet() {
