@@ -58,6 +58,7 @@ export interface SendForm {
   destinationAccount: string;
   amount: number;
   asset: object;
+  isXcm: boolean;
 }
 
 export interface TxToProcess {

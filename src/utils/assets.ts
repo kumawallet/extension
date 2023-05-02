@@ -25,23 +25,23 @@ export const getNatitveAssetBalance = async (
 
     return _amount;
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return 0;
   }
 };
 
-export const getAssetUSDPrice = async (assetName: string) => {
-  const _assetName = assetName.toLowerCase();
+export const getAssetUSDPrice = async (query: string) => {
+  const _query = query.toLowerCase();
   try {
     const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_assetName}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=usd`
     );
 
     const json = await data.json();
 
-    return json?.[_assetName]?.["usd"] || 0;
+    return json?.[_query]?.["usd"] || 0;
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return 0;
   }
 };

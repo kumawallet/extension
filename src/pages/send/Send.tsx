@@ -79,6 +79,7 @@ export const Send = () => {
       destinationAccount: "",
       amount: 0,
       asset: {},
+      isXcm: false,
     },
     resolver: yupResolver(schema),
     mode: "all",

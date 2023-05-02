@@ -14,12 +14,14 @@ export const Destination = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
 
   const [destinationAddress, setDestinationAddress] = useState("");
 
   const [accountToSelect, setAccountToSelect] = useState<any>([]);
   const [isOpenOptions, setisOpenOptions] = useState(false);
+
+  const isXcm = watch("isXcm");
 
   useEffect(() => {
     if (selectedAccount.key && selectedChain?.name) {
@@ -27,19 +29,23 @@ export const Destination = () => {
         const { contacts, ownAccounts, recent } =
           await Extension.getRegistryAddresses();
 
-        const _ownAccounts = ownAccounts
-          .map((acc) =>
-            !isHex(acc.address)
-              ? {
-                  name: acc.name,
-                  address: transformAddress(
-                    acc.address,
-                    selectedChain?.addressPrefix
-                  ),
-                }
-              : acc
-          )
-          .filter((acc) => acc.address !== selectedAccount.value.address);
+        let _ownAccounts = ownAccounts.map((acc) =>
+          !isHex(acc.address)
+            ? {
+                name: acc.name,
+                address: transformAddress(
+                  acc.address,
+                  selectedChain?.addressPrefix
+                ),
+              }
+            : acc
+        );
+
+        if (!isXcm) {
+          _ownAccounts = _ownAccounts.filter(
+            (acc) => acc.address !== selectedAccount.value.address
+          );
+        }
 
         const _contacts = contacts.map((acc) =>
           !isHex(acc.address)
@@ -80,7 +86,7 @@ export const Destination = () => {
         ]);
       })();
     }
-  }, [selectedAccount?.key, selectedChain?.name]);
+  }, [selectedAccount?.key, selectedChain?.name, isXcm]);
 
   const onChangeAccount = (account: string) => {
     setDestinationAddress(account);

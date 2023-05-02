@@ -6,15 +6,42 @@ import { NumericFormat } from "react-number-format";
 import { Destination } from "./Destination";
 import { SelectableAsset } from "./SelectableAsset";
 import { SelectableChain } from "./SelectableChain";
+import { useNetworkContext } from "@src/providers";
+import { useEffect, useState } from "react";
+import { XCM_MAPPING } from "@src/constants/xcm";
+import Extension from "../../../Extension";
 
 export const CommonFormFields = () => {
   const { t } = useTranslation("send");
+
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
 
   const {
     setValue,
     getValues,
     formState: { errors },
   } = useFormContext();
+
+  const [destinationChains, setDestinationChains] = useState<any[]>([]);
+
+  const getDestinationChains = async () => {
+    let chains = [selectedChain];
+
+    if (selectedChain.xcm) {
+      const xcmChains = await Extension.getXCMChains(selectedChain.name);
+      chains = [...chains, ...xcmChains];
+    }
+
+    setDestinationChains(chains);
+  };
+
+  useEffect(() => {
+    if (selectedChain.name) {
+      getDestinationChains();
+    }
+  }, [selectedChain]);
 
   return (
     <>
@@ -30,7 +57,7 @@ export const CommonFormFields = () => {
             <SelectableChain
               canSelectChain={true}
               selectedChain={getValues("to")}
-              optionChains={[]}
+              optionChains={destinationChains}
             />
           </div>
         </div>
