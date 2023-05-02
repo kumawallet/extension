@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -93,6 +93,7 @@ export const Contacts = () => {
 
       const contact = new Contact(name, address);
       await Extension.saveContact(contact);
+      setSearch("");
       getContacts();
     } catch (error) {
       showErrorToast(tCommon(error as string));
@@ -115,7 +116,7 @@ export const Contacts = () => {
     setIsCreateContact(!isCreateContact);
   };
 
-  const getGroupedContacts = () => {
+  const groupedContacts = useMemo(() => {
     const groupedContacts = contacts
       .filter(
         (contact) =>
@@ -133,7 +134,7 @@ export const Contacts = () => {
     return Object.entries(groupedContacts).sort(([letterA], [letterB]) =>
       letterA.localeCompare(letterB)
     );
-  };
+  }, [contacts, search]);
 
   if (isLoading) {
     return <Loading />;
@@ -229,7 +230,7 @@ export const Contacts = () => {
                 </p>
               </div>
             )}
-            {getGroupedContacts().map(([letter, contacts]) => (
+            {groupedContacts.map(([letter, contacts]) => (
               <section key={letter}>
                 <h3 className="text-lg font-medium my-2 text-custom-green-bg">
                   {letter}
