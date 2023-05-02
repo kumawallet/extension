@@ -411,15 +411,16 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       await Promise.all(
         addresToQuery.map(async ({ asset, index }) => {
-          if (asset.id === "-1") {
-            const price = await getAssetUSDPrice(asset.name as string);
+          const query = asset.id === "-1" ? selectedChain.name : asset.name;
 
-            const _balance = Number(
-              formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
-            );
+          const price = await getAssetUSDPrice(query as string).catch(() => 0);
 
-            copyAssets[index].amount = price * _balance;
-          }
+          const _balance = Number(
+            formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
+          );
+
+          copyAssets[index].amount = price * _balance;
+
           return;
         })
       );
