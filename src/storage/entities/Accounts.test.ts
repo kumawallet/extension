@@ -7,7 +7,7 @@ const accountMock = {
   value: {
     name: "derived evm",
     address: "0x12345",
-    keyring: "EVM-12345" as AccountKey,
+    keyring: "EVM" as AccountType,
   },
 };
 
@@ -121,7 +121,7 @@ describe("Account", () => {
         add: () => add(),
       });
 
-      await Accounts.add(accountMock);
+      await Accounts.save(accountMock);
       expect(add).toHaveBeenCalled();
     });
 
@@ -130,7 +130,7 @@ describe("Account", () => {
       BaseEntity.default.get = vi.fn().mockReturnValue(undefined);
 
       try {
-        await Accounts.add(accountMock);
+        await Accounts.save(accountMock);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: failed_to_add_account");
@@ -144,7 +144,7 @@ describe("Account", () => {
       });
 
       try {
-        await Accounts.add(accountMock);
+        await Accounts.save(accountMock);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: account_already_exists");
@@ -198,7 +198,7 @@ describe("Account", () => {
   it("should update", () => {
     const newValue: AccountValue = {
       address: "0x789",
-      keyring: "EVM-0x789",
+      keyring: "EVM" as AccountType,
       name: "imported-evm",
     };
 

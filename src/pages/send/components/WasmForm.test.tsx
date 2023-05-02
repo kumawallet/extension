@@ -109,7 +109,7 @@ describe("WasmForm", () => {
 
     vi.mock("@src/Extension", () => ({
       default: {
-        showSeed: vi.fn().mockResolvedValue("privatekey"),
+        showKey: vi.fn().mockResolvedValue("privatekey"),
       },
     }));
 

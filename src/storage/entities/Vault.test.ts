@@ -1,6 +1,6 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import { ACCOUNT_PATH } from "@src/utils/constants";
-import Keyring from "./Keyring";
+import Keyring from "./keyrings/Keyring";
 import Vault from "./Vault";
 
 const storageSet = vi.fn();
@@ -89,11 +89,6 @@ describe("Vault", () => {
     });
   });
 
-  it("should instance", () => {
-    const vault = new Vault();
-    expect(vault.keyrings).toMatchObject({});
-  });
-
   it("should init", async () => {
     await Vault.init();
     expect(storageSet).toBeCalled();
@@ -156,37 +151,19 @@ describe("Vault", () => {
   });
 
   describe("get", () => {
-    it("should return stored vault", async () => {
-      const Storage = await import("../Storage");
-      Storage.default.getInstance = vi.fn().mockImplementation(() => ({
-        storage: {
-          get: () => ({
-            Vault: {},
-          }),
-        },
-      }));
-
-      const Auth = await import("../Auth");
-      Auth.default.password = "12345";
-      Auth.default.isUnlocked = true;
-      Auth.default.getInstance = vi.fn().mockReturnValue({
-        decryptVault: () => "decrypted",
-      });
-
-      const result = await Vault.get();
-      expect(result).toMatchObject({});
-    });
-
-    it("should return default valut", async () => {
+    it("should return default vault", async () => {
       const Storage = await import("../Storage");
       Storage.default.getInstance = vi.fn().mockImplementation(() => ({
         storage: {
           get: () => undefined,
         },
       }));
-
-      const result = await Vault.get();
-      expect(result).toBe(undefined);
+      try {
+        await Vault.getInstance();
+        throw new Error("test failed");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: vault_not_found");
+      }
     });
 
     it("should return invalid_credentials", async () => {
@@ -200,19 +177,43 @@ describe("Vault", () => {
       }));
 
       const Auth = await import("../Auth");
-      Auth.default.password = "12345";
-      Auth.default.isUnlocked = true;
       Auth.default.getInstance = vi.fn().mockReturnValue({
         decryptVault: () => undefined,
       });
 
       try {
-        await Vault.get();
-        throw new Error("bad test");
+        await Vault.getInstance();
+        throw new Error("test failed");
       } catch (error) {
-        expect(String(error)).toEqual("Error: invalid_credentials");
+        expect(String(error)).toEqual("Error: vault_not_found");
       }
     });
+  });
+
+  it("should return stored vault", async () => {
+    const Storage = await import("../Storage");
+    Storage.default.getInstance = vi.fn().mockImplementation(() => ({
+      storage: {
+        get: () => ({
+          Vault: {
+            keyrings: {
+              EVM: undefined,
+              WASM: undefined,
+              IMPORTED_EVM: undefined,
+              IMPORTED_WASM: undefined,
+            },
+          },
+        }),
+      },
+    }));
+
+    const Auth = await import("../Auth");
+    Auth.default.getInstance = vi.fn().mockReturnValue({
+      decryptVault: () => "decrypted",
+    });
+
+    const result = await Vault.getInstance();
+    expect(result).toMatchObject({});
   });
 
   it("set", async () => {
@@ -221,76 +222,19 @@ describe("Vault", () => {
       encryptVault: vi.fn().mockImplementation(() => ""),
     }));
 
-    await Vault.set({});
+    await Vault.set({
+      keyrings: {
+        EVM: undefined,
+        WASM: undefined,
+        IMPORTED_EVM: undefined,
+        IMPORTED_WASM: undefined,
+      },
+    } as Vault);
     expect(storageSet).toHaveBeenCalled();
   });
 
-  describe("showPrivateKey", () => {
-    const key = "EVM-123";
-
-    it("should return privateKey", async () => {
-      const privateKey = "priv-key";
-
-      const _Vault = await import("./Vault");
-      _Vault.default.get = vi.fn().mockImplementation(() => ({
-        keyrings: {
-          [key]: {
-            privateKey,
-          },
-        },
-      }));
-
-      const result = await Vault.showPrivateKey(key);
-      expect(result).toBe(privateKey);
-    });
-
-    it("should return error", async () => {
-      const _Vault = await import("./Vault");
-      _Vault.default.get = vi.fn().mockImplementation(() => undefined);
-
-      try {
-        await Vault.showPrivateKey(key);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_show_private_key");
-      }
-    });
-  });
-
-  describe("showSeed", () => {
-    const key = "EVM-123";
-
-    it("should return seed", async () => {
-      const seed = "seed";
-
-      const _Vault = await import("./Vault");
-      _Vault.default.get = vi.fn().mockImplementation(() => ({
-        keyrings: {
-          [key]: {
-            seed,
-          },
-        },
-      }));
-
-      const result = await Vault.showSeed(key);
-      expect(result).toBe(seed);
-    });
-
-    it("should return error", async () => {
-      const _Vault = await import("./Vault");
-      _Vault.default.get = vi.fn().mockImplementation(() => undefined);
-
-      try {
-        await Vault.showSeed(key);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_show_private_key");
-      }
-    });
-  });
-
-  it("should return isEmpty as true", () => {
-    const vault = new Vault();
+  it("should return isEmpty as true", async () => {
+    const vault = await Vault.getInstance();
     const result = vault.isEmpty();
     expect(result).toBe(true);
   });

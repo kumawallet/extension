@@ -67,8 +67,7 @@ describe("SignMessage", () => {
     Extension.getTrustedSites = vi
       .fn()
       .mockReturnValue(["http://vitest.local"]);
-    Extension.showSeed = () => "test seed";
-    Extension.showPrivateKey = () => "test private key";
+    Extension.showKey = () => "test key";
     Extension.addTrustedSite = vi.fn();
 
     const providers = (await import("@src/providers")) as Record<string, any>;
