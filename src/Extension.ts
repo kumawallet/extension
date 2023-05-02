@@ -116,7 +116,7 @@ export default class Extension {
   }
 
   static async resetWallet() {
-    if (!Extension.isAuthorized) {
+    if (!Auth.isAuthorized()) {
       throw new Error("not_authorized");
     }
     await Storage.getInstance().resetWallet();

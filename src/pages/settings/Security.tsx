@@ -223,7 +223,7 @@ export const Security = () => {
                 {t("show")}
               </button>
             </div>
-            {isOpen && <ReEnterPassword />}
+            {isOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isOpen} as={Fragment}>
               <Dialog as="div" className="relative z-10" onClose={closeModal}>
                 <Transition.Child

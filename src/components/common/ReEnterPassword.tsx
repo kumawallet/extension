@@ -8,7 +8,7 @@ import Extension from "@src/Extension";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
-export const ReEnterPassword = () => {
+export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
   const { t } = useTranslation("re_enter_password");
   const navigate = useNavigate();
   const { isLoading, starLoading, endLoading } = useLoading();
@@ -32,6 +32,7 @@ export const ReEnterPassword = () => {
     try {
       await Extension?.signIn(password);
       setShowDialog(false);
+      await cb?.();
     } catch (error) {
       showErrorToast(error);
     }
