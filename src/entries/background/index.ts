@@ -163,7 +163,7 @@ const processWasmTx = async ({
             const date = Date.now();
             const activity: Partial<IRecord> = {
               fromBlock: block.header.number.toString(),
-              address: originAddress,
+              address: destinationAddress,
               type: RecordType.TRANSFER,
               reference: type,
               hash,

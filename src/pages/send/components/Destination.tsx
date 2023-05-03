@@ -29,55 +29,56 @@ export const Destination = () => {
         const { contacts, ownAccounts, recent } =
           await Extension.getRegistryAddresses();
 
-        let _ownAccounts = ownAccounts.map((acc) =>
-          !isHex(acc.address)
-            ? {
-                name: acc.name,
-                address: transformAddress(
-                  acc.address,
-                  selectedChain?.addressPrefix
-                ),
-              }
-            : acc
-        );
+        let _ownAccounts = [];
+        // let _ownAccounts = ownAccounts.map((acc) =>
+        //   !isHex(acc.address)
+        //     ? {
+        //         name: acc.name,
+        //         address: transformAddress(
+        //           acc.address,
+        //           selectedChain?.addressPrefix
+        //         ),
+        //       }
+        //     : acc
+        // );
 
         if (!isXcm) {
-          _ownAccounts = _ownAccounts.filter(
+          _ownAccounts = ownAccounts.filter(
             (acc) => acc.address !== selectedAccount.value.address
           );
         }
 
-        const _contacts = contacts.map((acc) =>
-          !isHex(acc.address)
-            ? {
-                name: acc.name,
-                address: transformAddress(
-                  acc.address,
-                  selectedChain?.addressPrefix
-                ),
-              }
-            : acc
-        );
+        // const _contacts = contacts.map((acc) =>
+        //   !isHex(acc.address)
+        //     ? {
+        //         name: acc.name,
+        //         address: transformAddress(
+        //           acc.address,
+        //           selectedChain?.addressPrefix
+        //         ),
+        //       }
+        //     : acc
+        // );
 
-        const _recent = recent.map((acc) =>
-          !isHex(acc.address)
-            ? {
-                address: transformAddress(
-                  acc.address,
-                  selectedChain?.addressPrefix
-                ),
-              }
-            : acc
-        );
+        // const _recent = recent.map((acc) =>
+        //   !isHex(acc.address)
+        //     ? {
+        //         address: transformAddress(
+        //           acc.address,
+        //           selectedChain?.addressPrefix
+        //         ),
+        //       }
+        //     : acc
+        // );
 
         setAccountToSelect([
           {
             label: "recent",
-            values: _recent,
+            values: recent,
           },
           {
             label: "contacts",
-            values: _contacts,
+            values: contacts,
           },
           {
             label: "own accounts",

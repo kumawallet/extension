@@ -114,16 +114,18 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const isXcm = getValues("isXcm");
 
       if (isXcm) {
-        const { method, pallet, getValues } =
-          XCM_MAPPING[selectedChain.name][to.name];
-
-        const values = getValues(destinationAccount, bnAmount);
+        const { method, pallet, extrinsicValues } = XCM_MAPPING[
+          selectedChain.name
+        ][to.name]({
+          address: destinationAccount,
+          amount: bnAmount,
+        });
 
         extrinsic = _api.tx[pallet][method](
-          ...Object.keys(values).map((key) => values[key])
+          ...Object.keys(extrinsicValues)
+            .filter((key) => extrinsicValues[key] !== null)
+            .map((key) => extrinsicValues[key])
         );
-
-        // const provider = new Provider({})
 
         const { partialFee } = await (
           extrinsic as SubmittableExtrinsic<"promise">
@@ -185,7 +187,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         "estimated total": amounToShow,
       });
     } catch (error) {
-      console.log(error);
       showErrorToast(error);
       setFee(defaultFees);
     }

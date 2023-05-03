@@ -31,7 +31,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
     >
       <div className="relative mt-1">
         <Listbox.Button
-          className="flex justify-center bg-[#212529] rounded-xl py-3 px-6 items-center gap-2 cursor-default"
+          className="min-w-[150px] flex justify-center bg-[#212529] rounded-xl py-3 px-6 items-center gap-2 cursor-default"
           read-only={Boolean(canSelectChain).toString()}
           style={{
             boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
