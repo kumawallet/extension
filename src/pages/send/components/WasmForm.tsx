@@ -119,6 +119,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         ][to.name]({
           address: destinationAccount,
           amount: bnAmount,
+          assetSymbol: asset.symbol,
         });
 
         extrinsic = _api.tx[pallet][method](
@@ -253,7 +254,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       <CommonFormFields />
 
       <div className="mb-3">
-        <p>{t("tip")}</p>
+        <p className="text-xs">{t("tip")}</p>
         <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
           <NumericFormat
             className="bg-transparent w-8/12 outline-0"

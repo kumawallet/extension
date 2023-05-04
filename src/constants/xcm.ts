@@ -142,7 +142,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
   [RELAY_CHAINS.POLKADOT as string]: {
     [POLKADOT_PARACHAINS.ASTAR.name as string]: ({ address, amount }) => ({
       pallet: XCM.pallets.XCM_PALLET.NAME,
-      method: XCM.pallets.XCM_PALLET.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
+      method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
       extrinsicValues: {
         dest: getDest({
           parachainId: POLKADOT_PARACHAINS.ASTAR.id,
@@ -200,8 +200,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
     [PARACHAINS.MOONBEAM]: ({ address, amount, assetSymbol }) => {
       let assets = null;
-
-      switch (assetSymbol?.toLocaleLowerCase()) {
+      switch (assetSymbol?.toLowerCase()) {
         case "astr": {
           assets = getAssets({
             fungible: amount,
@@ -272,7 +271,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       let assets = null;
       let weightLimit = null;
 
-      switch (assetSymbol?.toLocaleLowerCase()) {
+      switch (assetSymbol?.toLowerCase()) {
         case "sdn": {
           method =
             XCM.pallets.POLKADOT_XCM.methods.LIMITED_RESERVE_TRANSFER_ASSETS;

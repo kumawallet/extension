@@ -6,7 +6,6 @@ import {
   useEffect,
   useReducer,
   useState,
-  useCallback,
 } from "react";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import {
