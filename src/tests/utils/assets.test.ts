@@ -10,6 +10,17 @@ import {
 import { ethers } from "ethers";
 
 describe("assets", () => {
+  beforeAll(() => {
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          eth: {
+            usd: 1000,
+          },
+        }),
+    });
+  });
+
   describe("getNatitveAssetBalance", () => {
     it("should use polkadot api", async () => {
       const api = {
@@ -76,15 +87,6 @@ describe("assets", () => {
   describe("get asset USD price", () => {
     it("should return eth price", async () => {
       // mock fetch
-
-      global.fetch = vi.fn().mockReturnValue({
-        json: () =>
-          Promise.resolve({
-            ethereum: {
-              usd: 1000,
-            },
-          }),
-      });
 
       const result = await getAssetUSDPrice("eth");
       expect(result).toEqual(1000);
