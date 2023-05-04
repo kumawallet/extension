@@ -4,6 +4,7 @@ import {
   formatAmountWithDecimals,
   formatBN,
   formatUSDAmount,
+  getAssetUSDPrice,
   getNatitveAssetBalance,
 } from "@src/utils/assets";
 import { ethers } from "ethers";
@@ -70,5 +71,23 @@ describe("assets", () => {
   it("should format usd amount", () => {
     const result = formatUSDAmount(10);
     expect(result).toEqual("$10.00");
+  });
+
+  describe("get asset USD price", () => {
+    it("should return eth price", async () => {
+      // mock fetch
+
+      global.fetch = vi.fn().mockReturnValue({
+        json: () =>
+          Promise.resolve({
+            ethereum: {
+              usd: 1000,
+            },
+          }),
+      });
+
+      const result = await getAssetUSDPrice("eth");
+      expect(result).toEqual(1000);
+    });
   });
 });
