@@ -419,7 +419,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
             formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
           );
 
-          copyAssets[index].amount = price * _balance;
+          copyAssets[index].amount = Number((price * _balance).toFixed(2));
 
           return;
         })

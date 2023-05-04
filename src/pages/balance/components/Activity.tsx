@@ -13,9 +13,8 @@ import {
   useAccountContext,
 } from "@src/providers";
 import Chains from "@src/storage/entities/Chains";
-import { AssetIcon } from "@src/components/common/AssetIcon";
 import { FaChevronRight } from "react-icons/fa";
-import { IAsset } from "@src/types";
+import { NetworkIcon } from "./NetworkIcon";
 
 const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -27,7 +26,7 @@ export const Activity = () => {
   const { t } = useTranslation("activity");
 
   const {
-    state: { type },
+    state: { type, chains },
   } = useNetworkContext();
 
   const {
@@ -136,6 +135,8 @@ export const Activity = () => {
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
+  const allChains = chains.getAll();
+
   if (isLoading) {
     return <Loading />;
   }
@@ -159,7 +160,15 @@ export const Activity = () => {
           </div>
         )}
         {filteredRecords.map(
-          ({ address, status, lastUpdated, data, network, hash }) => (
+          ({
+            address,
+            status,
+            lastUpdated,
+            data,
+            network,
+            hash,
+            recipientNetwork,
+          }) => (
             <div
               key={hash}
               className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-2 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
@@ -203,10 +212,17 @@ export const Activity = () => {
                   {getValue(data)}
                 </p>
                 <div className="flex justify-evenly items-center gap-1">
-                  <AssetIcon asset={data.asset as IAsset} width={20} />
-                  <FaChevronRight size={16} />
-
-                  <AssetIcon asset={data.asset as IAsset} width={20} />
+                  <NetworkIcon
+                    networkName={network}
+                    width={16}
+                    chains={allChains}
+                  />
+                  <FaChevronRight size={14} />
+                  <NetworkIcon
+                    networkName={recipientNetwork}
+                    chains={allChains}
+                    width={16}
+                  />
                 </div>
               </div>
             </div>

@@ -107,6 +107,8 @@ export const getBeneficiary = ({
 
   const accountId = isHex ? address : u8aToHex(decodeAddress(address));
 
+  const accountKey = account === "AccountId32" ? "id" : "key";
+
   return {
     [version]: {
       parents: 0,
@@ -114,7 +116,7 @@ export const getBeneficiary = ({
         X1: {
           [account]: {
             network: "Any",
-            id: accountId,
+            [accountKey]: accountId,
           },
         },
       },

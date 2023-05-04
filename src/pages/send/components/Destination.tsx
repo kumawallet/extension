@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { transformAddress } from "@src/utils/account-utils";
 import { isHex } from "@polkadot/util";
+import Contact from "@src/storage/entities/registry/Contact";
 
 export const Destination = () => {
   const {
@@ -29,47 +30,15 @@ export const Destination = () => {
         const { contacts, ownAccounts, recent } =
           await Extension.getRegistryAddresses();
 
-        let _ownAccounts = [];
-        // let _ownAccounts = ownAccounts.map((acc) =>
-        //   !isHex(acc.address)
-        //     ? {
-        //         name: acc.name,
-        //         address: transformAddress(
-        //           acc.address,
-        //           selectedChain?.addressPrefix
-        //         ),
-        //       }
-        //     : acc
-        // );
+        let _ownAccounts: Contact[] = [];
 
         if (!isXcm) {
           _ownAccounts = ownAccounts.filter(
-            (acc) => acc.address !== selectedAccount.value.address
+            (acc) => acc.name !== selectedAccount.value.name
           );
+        } else {
+          _ownAccounts = ownAccounts;
         }
-
-        // const _contacts = contacts.map((acc) =>
-        //   !isHex(acc.address)
-        //     ? {
-        //         name: acc.name,
-        //         address: transformAddress(
-        //           acc.address,
-        //           selectedChain?.addressPrefix
-        //         ),
-        //       }
-        //     : acc
-        // );
-
-        // const _recent = recent.map((acc) =>
-        //   !isHex(acc.address)
-        //     ? {
-        //         address: transformAddress(
-        //           acc.address,
-        //           selectedChain?.addressPrefix
-        //         ),
-        //       }
-        //     : acc
-        // );
 
         setAccountToSelect([
           {

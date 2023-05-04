@@ -96,7 +96,7 @@ export const Send = () => {
     const destinationAddress = getValues("destinationAccount");
     const originAddress = selectedAccount.value.address;
     const asset = getValues("asset") as IAsset;
-    const destinationNetwork = selectedChain.name;
+    const destinationNetwork = getValues("to").name;
 
     const { id } = await WebAPI.windows.getCurrent();
 

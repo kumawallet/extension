@@ -73,7 +73,7 @@ export const CommonFormFields = () => {
             <p>{t("amount")}</p>
             <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
               <NumericFormat
-                className="bg-transparent w-7/12 outline-0 text-xl font-inter font-bold"
+                className="bg-transparent w-7/12 outline-0 text-xl font-inter font-bold outline-none"
                 allowNegative={false}
                 allowLeadingZeros={false}
                 value={getValues("amount")}
