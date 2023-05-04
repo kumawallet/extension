@@ -128,7 +128,6 @@ export const Balance = () => {
   return (
     <>
       <Header />
-      <button onClick={test}>test</button>
       <PageWrapper contentClassName="pt-6 pb-16">
         <div className="flex flex-col">
           <TotalBalance />
