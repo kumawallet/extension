@@ -314,6 +314,7 @@ export const Security = () => {
                 {t("reset")}
               </button>
             </div>
+            {isResetOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isResetOpen} as={Fragment}>
               <Dialog
                 as="div"
