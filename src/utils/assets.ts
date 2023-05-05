@@ -41,7 +41,6 @@ export const getAssetUSDPrice = async (assetName: string) => {
 
     return json?.[_assetName]?.["usd"] || 0;
   } catch (error) {
-    console.log("error", error);
     return 0;
   }
 };

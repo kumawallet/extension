@@ -52,8 +52,13 @@ describe("assets", () => {
     });
 
     it("should return same amount", async () => {
-      const api = null;
-      const result = await getNatitveAssetBalance(api, "0x123");
+      const api = {} as unknown;
+      const result = await getNatitveAssetBalance(api as null, "0x123");
+      expect(result).toEqual(BN0);
+    });
+
+    it("should return same amount", async () => {
+      const result = await getNatitveAssetBalance(null, "0x123");
       expect(result).toEqual(BN0);
     });
 
@@ -90,6 +95,20 @@ describe("assets", () => {
 
       const result = await getAssetUSDPrice("eth");
       expect(result).toEqual(1000);
+    });
+
+    it("should return 0", async () => {
+      // mock fetch
+      const result = await getAssetUSDPrice("moonbeam");
+      expect(result).toEqual(0);
+    });
+
+    it("should throw error", async () => {
+      // mock fetch
+      global.fetch = vi.fn().mockRejectedValue(new Error("error"));
+
+      const result = await getAssetUSDPrice("eth");
+      expect(result).toEqual(0);
     });
   });
 });
