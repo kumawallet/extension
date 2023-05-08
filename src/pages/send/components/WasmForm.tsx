@@ -211,11 +211,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     return () => clearTimeout(loadFees);
   }, [amount, destinationAccount, destinationIsInvalid, asset?.id, to?.name]);
 
-  useEffect(() => {
-    // setIsXcm(to.name !== selectedChain.name);
-    setValue("isXcm", to.name !== selectedChain.name);
-  }, [to]);
-
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
   const isEnoughToPay = useMemo(() => {
@@ -247,7 +242,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     } catch (error) {
       return false;
     }
-  }, [fee, asset, amount]);
+  }, [fee, asset, amount, isNativeAsset]);
 
   return (
     <>

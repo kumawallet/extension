@@ -1,4 +1,4 @@
-import { BN, u8aToHex } from "@polkadot/util";
+import { BN, hexToU8a, numberToHex, u8aToHex } from "@polkadot/util";
 import {
   KUSAMA_PARACHAINS,
   PARACHAINS,
@@ -7,6 +7,9 @@ import {
 } from "./chains";
 import { decodeAddress } from "@polkadot/util-crypto";
 import { BN0 } from "./assets";
+import xTokensAbi from "@src/abi/xtokens_moonbeam_abi.json";
+import { BigNumberish } from "ethers";
+import keyring from "@polkadot/ui-keyring";
 
 export const XCM = {
   pallets: {
@@ -94,7 +97,7 @@ export const getAssets = ({
 
 interface ExtrinsicValues {
   address: string;
-  amount: BN;
+  amount: BN | BigNumberish;
   assetSymbol?: string;
 }
 
@@ -124,13 +127,20 @@ export const getBeneficiary = ({
   };
 };
 
-interface MapResponse {
+export interface MapResponseXCM {
   pallet: string;
   method: string;
   extrinsicValues: any;
 }
 
-type Map = (props: ExtrinsicValues) => MapResponse;
+export interface MapResponseEVM {
+  contractAddress: string;
+  abi: string;
+  method: string;
+  extrinsicValues: any;
+}
+
+type Map = (props: ExtrinsicValues) => MapResponseXCM | MapResponseEVM;
 
 interface IXCM_MAPPING {
   [key: string]: {
@@ -177,6 +187,68 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         },
       },
     }),
+  },
+
+  [PARACHAINS.MOONBEAM]: {
+    [RELAY_CHAINS.POLKADOT]: ({ address, amount }) => {
+      const _address =
+        "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
+          amount: amount.toString(),
+          destination: [1, [_address]],
+          weight: "1000000000", // Weight
+        },
+      };
+    },
+
+    [PARACHAINS.ASTAR]: ({ address, amount, assetSymbol }) => {
+      const addressIsHex = address.startsWith("0x");
+
+      const _address = addressIsHex
+        ? "0x03" + address.slice(2) + "00"
+        : "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      let currency_address = "";
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "astr": {
+          currency_address = "0x0000000000000000000000000000000000000802";
+          break;
+        }
+        case "xcastr": {
+          currency_address = "0xFfFFFfffA893AD19e540E172C10d78D4d479B5Cf";
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address, //asset address
+          amount: amount.toString(),
+          destination: [
+            1,
+            [
+              "0x00" +
+                "0000" +
+                numberToHex(POLKADOT_PARACHAINS.ASTAR.id).split("0x")[1],
+              _address,
+            ],
+          ],
+          weight: "4000000000", // Weight
+        },
+      };
+    },
   },
 
   [PARACHAINS.ASTAR]: {

@@ -170,7 +170,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       setUnsubscribers((state) => [...state, unsub]);
     } else {
       const _api = api as ethers.providers.JsonRpcProvider;
-      _api.removeAllListeners("block");
+      _api.off("block");
 
       _api.on("block", () => {
         _api.getBalance(account.value.address).then((balance) => {
@@ -346,6 +346,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                 const selfAddress = selectedAccount?.value?.address;
                 if (from === selfAddress || to === selfAddress) {
                   const balance = await contract.balanceOf(accountAddress);
+
                   dispatch({
                     type: "update-one-asset",
                     payload: {

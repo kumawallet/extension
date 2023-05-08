@@ -137,10 +137,10 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const setSelectedAccount = async (account: Account) => {
+  const setSelectedAccount = async (account: Account, changeRpc = true) => {
     try {
       await Extension.setSelectedAccount(account);
-      await setNewRpc(account.type);
+      changeRpc && (await setNewRpc(account.type));
       dispatch({
         type: "set-selected-account",
         payload: {
