@@ -73,8 +73,8 @@ export const ChainSelector = () => {
         changeChain(chain);
       } else {
         const accounts = await getAllAccounts(chain.supportedAccounts);
-        await setSelectedAccount(accounts[0]);
         changeChain(chain);
+        await setSelectedAccount(accounts[0], false);
       }
     }
 
