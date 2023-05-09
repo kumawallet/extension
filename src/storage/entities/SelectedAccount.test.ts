@@ -41,16 +41,6 @@ describe("SelectedAccount", () => {
     }));
   });
 
-  it("should instance", () => {
-    const selectedAccount = new SelectedAccount();
-
-    expect(selectedAccount).toMatchObject({
-      key: "EVM-0x000000000",
-      value: {},
-      type: "EVM",
-    });
-  });
-
   it("fromAccount", () => {
     const account = {
       key: "EVM-0x000000000",
@@ -58,8 +48,7 @@ describe("SelectedAccount", () => {
       type: "EVM",
     };
 
-    const selectedAccount = new SelectedAccount();
-    selectedAccount.fromAccount(account as Account);
+    const selectedAccount = SelectedAccount.fromAccount(account as Account);
     expect(selectedAccount).toMatchObject(account);
   });
 

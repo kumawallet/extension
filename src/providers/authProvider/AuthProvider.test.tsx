@@ -156,7 +156,7 @@ describe("AuthProvider", () => {
   describe("importAccount", () => {
     it("should return true", async () => {
       const Extension = await import("@src/Extension");
-      Extension.default.isUnlocked = vi.fn().mockReturnValue(true);
+      Extension.default.isSessionActive = vi.fn().mockReturnValue(true);
 
       renderComponent(mockAccountForm);
 
@@ -173,7 +173,7 @@ describe("AuthProvider", () => {
 
     it("should return password_required error", async () => {
       const Extension = await import("@src/Extension");
-      Extension.default.isUnlocked = vi.fn().mockReturnValue(false);
+      Extension.default.isSessionActive = vi.fn().mockReturnValue(false);
 
       renderComponent({ ...mockAccountForm, password: "" });
 
@@ -220,7 +220,7 @@ describe("AuthProvider", () => {
   describe("deriveAccount", () => {
     it("should return true", async () => {
       const Extension = await import("@src/Extension");
-      Extension.default.isUnlocked = vi.fn().mockReturnValue(true);
+      Extension.default.isSessionActive = vi.fn().mockReturnValue(true);
       renderComponent(mockAccountForm);
 
       await act(() => {

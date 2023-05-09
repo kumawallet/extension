@@ -6,10 +6,11 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "@src/hooks";
-import Extension from "@src/Extension";
-import { AccountFormType } from "@src/pages";
+import { useToast } from "../../hooks";
+import Extension from "../../Extension";
+import { AccountFormType } from "../../pages";
 import { Action, AuthContext as IAuthContext, InitialState } from "./types";
+import { AccountType } from "@src/accounts/types";
 
 const initialState: InitialState = {
   isInit: true,
@@ -22,6 +23,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     default:
       return state;
   }
+};
+
+const getImportedType = (type: AccountType) => {
+  if (type === AccountType.EVM) return AccountType.IMPORTED_EVM;
+  if (type === AccountType.WASM) return AccountType.IMPORTED_WASM;
+  return type;
 };
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -54,15 +61,16 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     isSignUp,
   }: AccountFormType) => {
     try {
-      const isUnlocked = await Extension.isUnlocked();
-      if (!password && !isUnlocked) throw new Error("password_required");
+      const isSessionActive = await Extension.isSessionActive();
+      if (!password && !isSessionActive) throw new Error("password_required");
       if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
       if (!accountType) throw new Error("account_type_required");
+      const type = getImportedType(accountType);
       await Extension.importAccount(
         name,
         privateKeyOrSeed,
         password,
-        accountType,
+        type,
         isSignUp
       );
 
@@ -75,8 +83,8 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const deriveAccount = async ({ name, accountType }: AccountFormType) => {
     try {
-      const isUnlocked = await Extension.isUnlocked();
-      if (!isUnlocked) throw new Error("failed_to_derive_account");
+      const isSessionActive = await Extension.isSessionActive();
+      if (!isSessionActive) throw new Error("failed_to_derive_account");
       if (!accountType) throw new Error("account_type_required");
       await Extension.deriveAccount(name, accountType);
       return true;

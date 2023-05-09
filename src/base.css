@@ -33,6 +33,10 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+.scroll-accounts-list::-webkit-scrollbar {
+  display: none;
+}
+
 
 .toast {
   background-color: var(--bg-gray) !important;

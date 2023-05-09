@@ -451,7 +451,7 @@ describe("Extension", () => {
     const _CacheAuth = await import("./storage/entities/CacheAuth");
     _CacheAuth.default.loadFromCache = vi.fn();
 
-    const result = await Extension.isUnlocked();
+    const result = await Extension.isSessionActive();
     expect(result).toBe(true);
   });
 

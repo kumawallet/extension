@@ -31,8 +31,7 @@ describe("Security", () => {
     vi.mock("@src/Extension", () => ({
       default: {
         resetWallet: () => vi.fn(),
-        showPrivateKey: () => "",
-        showSeed: () => "seed",
+        showKey: () => "key",
         getTrustedSites: () => getTrustedSites(),
         removeTrustedSite: () => removeTrustedSite(),
       },

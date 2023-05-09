@@ -5,10 +5,16 @@ import Vault from "./entities/Vault";
 const DECRYPTED = "decrypted";
 const ENCRYPTED = "encrypted";
 
+const fakePassword = "Asdasd123123!";
+const fakeBackup = "fakeBackup";
+
 describe("Auth", () => {
   beforeAll(() => {
     vi.mock("./entities/Vault", () => ({
-      default: {},
+      default: {
+        getEncryptedVault: vi.fn().mockResolvedValue(ENCRYPTED),
+        isInvalid: vi.fn().mockImplementation(() => false),
+      },
     }));
     vi.mock("./entities/CacheAuth", () => ({
       default: {},
@@ -26,8 +32,7 @@ describe("Auth", () => {
   });
 
   afterEach(() => {
-    Auth.password = undefined;
-    Auth.isUnlocked = false;
+    Auth.signOut();
   });
 
   it("should instance", () => {
@@ -36,30 +41,58 @@ describe("Auth", () => {
   });
 
   it("should return isUnlocked", () => {
-    Auth.isUnlocked = true;
-    expect(Auth.isUnlocked).toBe(true);
+    expect(Auth.isUnlocked).toBe(false);
   });
 
   it("should return password", () => {
-    const password = "12345";
-    Auth.password = password;
-    expect(Auth.password).toBe(password);
+    expect(Auth.password).toBe(undefined);
   });
 
-  it("should return login required", () => {
-    try {
-      Auth.validate();
-      throw new Error("bad test");
-    } catch (error) {
-      expect(String(error)).toEqual("Error: login_required");
-    }
+  it("should return isSessionActive", async () => {
+    const mockCache = {
+      isUnlocked: true,
+      timeout: new Date().getTime() + 1000 * 60 * 60 * 24,
+    };
+
+    const cacheAuth = await import("./entities/CacheAuth");
+    cacheAuth.default.getInstance = vi
+      .fn()
+      .mockImplementation(() => mockCache);
+    cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
+    await Auth.isSessionActive();
+    expect(Auth.isUnlocked).toBe(false);
+  });
+
+  it("should return isSessionActive", async () => {
+    const mockCache = {
+      isUnlocked: false,
+      timeout: new Date().getTime() + 1000 * 60 * 60 * 24,
+    };
+
+    const cacheAuth = await import("./entities/CacheAuth");
+    cacheAuth.default.getInstance = vi
+      .fn()
+      .mockImplementation(() => mockCache);
+    cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
+    await Auth.isSessionActive();
+    expect(Auth.isUnlocked).toBe(true);
+  });
+
+  it("should return false if there is no password", () => {
+    expect(Auth.isAuthorized()).toBe(false);
+  });
+
+  it("should return true if there is a password", () => {
+    // TODO: Mock CacheAuth.get and CacheAuth.set
+    Auth.getInstance().setAuth(fakePassword);
+    expect(Auth.isAuthorized()).toBe(true);
   });
 
   describe("loadAuthFromCache", () => {
-    it("should set password and isUnlocked from cache", async () => {
+    it("should set isUnlocked from cache", async () => {
       const mockCache = {
-        password: "12345",
         isUnlocked: true,
+        timeout: new Date().getTime() + 1000 * 60 * 60 * 24,
       };
 
       const cacheAuth = await import("./entities/CacheAuth");
@@ -68,15 +101,14 @@ describe("Auth", () => {
         .mockImplementation(() => mockCache);
       cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => false);
 
-      await Auth.loadAuthFromCache("123");
-      expect(Auth.password).toEqual(DECRYPTED);
+      await Auth.loadFromCache();
       expect(Auth.isUnlocked).toBe(true);
     });
 
     it("should signOut", async () => {
       const mockCache = {
-        password: "",
-        isUnlocked: false,
+        isUnlocked: true,
+        timeout: new Date().getTime() - 1000 * 60 * 60 * 24,
       };
 
       const cacheAuth = await import("./entities/CacheAuth");
@@ -84,15 +116,20 @@ describe("Auth", () => {
         .fn()
         .mockImplementation(() => mockCache);
       cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
+      cacheAuth.default.set = vi.fn();
 
-      const result = await Auth.loadAuthFromCache("123");
-      expect(result).toEqual(undefined);
+      await Auth.loadFromCache();
+      expect(Auth.isUnlocked).toBe(false);
+      expect(Auth.password).toBe(undefined);
     });
   });
 
   it("decryptVault", async () => {
-    Auth.password = "12345";
-    Auth.isUnlocked = true;
+    const cacheAuth = await import("./entities/CacheAuth");
+    cacheAuth.default.unlock = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve());
+    Auth.getInstance().setAuth(fakePassword);
 
     const auth = Auth.getInstance();
 
@@ -101,69 +138,52 @@ describe("Auth", () => {
   });
 
   it("encryptVault", async () => {
-    Auth.password = "12345";
-    Auth.isUnlocked = true;
+    const cacheAuth = await import("./entities/CacheAuth");
+    cacheAuth.default.unlock = vi
+      .fn()
+      .mockImplementation(() => Promise.resolve());
+    Auth.getInstance().setAuth(fakePassword);
 
     const auth = Auth.getInstance();
 
-    const encrypted = await auth.encryptVault({} as typeof Vault);
+    const encrypted = await auth.encryptVault({} as Vault);
     expect(encrypted).toEqual(ENCRYPTED);
   });
 
-  it("signUp", () => {
-    const auth = Auth.getInstance();
-    auth.signUp("12345");
-    expect(Auth.password).toBe("12345");
-    expect(Auth.isUnlocked).toBe(true);
-  });
-
   describe("signIn", () => {
-    afterAll(async () => {
+    it("should signIn", async () => {
       const passworder = await import("@metamask/browser-passworder");
       passworder.default.decrypt = vi.fn().mockReturnValue(DECRYPTED);
-    });
-    it("should signIn", async () => {
-      const auth = Auth.getInstance();
-      await auth.signIn("12345", "{vault}");
-      expect(Auth.password).toEqual("12345");
+      await Auth.signIn(fakePassword);
+      expect(Auth.password).toEqual(fakePassword);
       expect(Auth.isUnlocked).toBe(true);
     });
 
     it("should throw decrypt error", async () => {
       const passworder = await import("@metamask/browser-passworder");
       passworder.default.decrypt = vi.fn().mockReturnValue(null);
-
+      const vault = await import("./entities/Vault");
+      vault.default.isInvalid = vi.fn().mockReturnValue(true);
       try {
-        const auth = Auth.getInstance();
-        await auth.signIn("12345", "{vault}");
-        throw new Error("bad test");
+        await Auth.signIn(fakePassword);
+        throw new Error("test failed");
       } catch (error) {
         expect(String(error)).toEqual("Error: invalid_credentials");
       }
     });
   });
 
-  it("should sign out", async () => {
-    const auth = Auth.getInstance();
-    await auth.signIn("12345", "{vault}");
-    auth.signOut();
-    expect(Auth.password).toBe(undefined);
-    expect(Auth.isUnlocked).toBe(false);
-  });
-
   describe("encryptBackup", () => {
     it("should return encrypted backup", async () => {
-      const auth = Auth.getInstance();
-      await auth.signIn("12345", "{vault}");
+      await Auth.signIn(fakePassword);
 
-      const encryped = await auth.encryptBackup("1 2 3 4 5");
-      expect(encryped).toEqual("encrypted");
+      const encryped = await Auth.getInstance().encryptBackup(fakeBackup);
+      expect(encryped).toEqual(ENCRYPTED);
     });
 
     it("should return error", async () => {
-      const auth = Auth.getInstance();
       try {
-        await auth.encryptBackup("1 2 3 4 5");
+        await Auth.getInstance().encryptBackup(fakeBackup);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: failed_to_save_backup");
@@ -178,7 +198,7 @@ describe("Auth", () => {
     });
 
     it("should return encrypted backup", async () => {
-      const decrypted = await Auth.decryptBackup("{backup}", "1 2 3 4 5");
+      const decrypted = await Auth.decryptBackup("{backup}", fakeBackup);
       expect(decrypted).toEqual(DECRYPTED);
     });
 
@@ -188,16 +208,11 @@ describe("Auth", () => {
         throw new Error("failed to decrypt");
       });
       try {
-        await Auth.decryptBackup("{backup}", "1 2 3 4 5");
+        await Auth.decryptBackup("{backup}", fakeBackup);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: failed_to_restore_backup");
       }
     });
-  });
-
-  it("should encrypt salt", async () => {
-    const result = await Auth.generateSaltedHash("salt", "12345");
-    expect(result).toEqual(ENCRYPTED);
   });
 });

@@ -83,7 +83,7 @@ describe("Keyring", () => {
         addKeyring: vi.fn(),
       }));
       const vaultSet = vi.fn().mockImplementation(() => ({}));
-      const Vault = await import("./Vault");
+      const Vault = await import("../Vault");
       Vault.default.set = vaultSet;
       Vault.default.get = vaultGet;
 
@@ -95,7 +95,7 @@ describe("Keyring", () => {
 
     it("should throw error", async () => {
       const vaultGet = vi.fn().mockImplementation(() => null);
-      const Vault = await import("./Vault");
+      const Vault = await import("../Vault");
       Vault.default.get = vaultGet;
 
       try {
@@ -113,7 +113,7 @@ describe("Keyring", () => {
         removeKeyring: vi.fn(),
       }));
       const vaultSet = vi.fn().mockImplementation(() => ({}));
-      const Vault = await import("./Vault");
+      const Vault = await import("../Vault");
       Vault.default.set = vaultSet;
       Vault.default.get = vaultGet;
 
@@ -125,7 +125,7 @@ describe("Keyring", () => {
 
     it("should throw error", async () => {
       const vaultGet = vi.fn().mockImplementation(() => null);
-      const Vault = await import("./Vault");
+      const Vault = await import("../Vault");
       Vault.default.get = vaultGet;
 
       try {

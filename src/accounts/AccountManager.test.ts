@@ -376,7 +376,7 @@ describe("AccountManager", () => {
       expect(result).toMatchObject(selectedEVMAccountMock);
     });
 
-    it("shoud show error", async () => {
+    it("should show error", async () => {
       try {
         await AccountManager["getAccount"]("" as AccountKey);
         throw new Error("bad test");

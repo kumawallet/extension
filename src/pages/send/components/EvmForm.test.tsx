@@ -83,7 +83,7 @@ describe("EvmForm", () => {
 
     vi.mock("@src/Extension", () => ({
       default: {
-        showPrivateKey: vi.fn().mockResolvedValue("privatekey"),
+        showKey: vi.fn().mockResolvedValue("privatekey"),
       },
     }));
 

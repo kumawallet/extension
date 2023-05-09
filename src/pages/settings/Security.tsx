@@ -3,7 +3,12 @@ import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper, Loading, LoadingButton } from "@src/components/common";
+import {
+  PageWrapper,
+  Loading,
+  LoadingButton,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useToast, useLoading } from "@src/hooks";
 import Extension from "@src/Extension";
 import { BsEye, BsTrash } from "react-icons/bs";
@@ -86,13 +91,14 @@ export const Security = () => {
 
   const getPrivateKeyOrSeed = async (): Promise<void> => {
     try {
-      let privateKeyOrSeed: string | undefined =
-        await Extension.showPrivateKey();
-      if (!privateKeyOrSeed) {
-        privateKeyOrSeed = await Extension.showSeed();
-      }
+      let privateKeyOrSeed: string | undefined = await Extension.showKey();
       if (!privateKeyOrSeed) {
         throw new Error("no_private_key_or_seed");
+      }
+      // For wasm keys, the private key is followed by a slash and the account index
+      if (privateKeyOrSeed.includes("/")) {
+        const index = privateKeyOrSeed.indexOf("/");
+        privateKeyOrSeed = privateKeyOrSeed.substring(0, index);
       }
       setPrivateKey(privateKeyOrSeed);
     } catch (error: unknown) {
@@ -217,6 +223,7 @@ export const Security = () => {
                 {t("show")}
               </button>
             </div>
+            {isOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isOpen} as={Fragment}>
               <Dialog as="div" className="relative z-10" onClose={closeModal}>
                 <Transition.Child
@@ -307,6 +314,7 @@ export const Security = () => {
                 {t("reset")}
               </button>
             </div>
+            {isResetOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isResetOpen} as={Fragment}>
               <Dialog
                 as="div"

@@ -98,9 +98,9 @@ export const Routes = () => {
       setHomeRoute(<AddAccount />);
       return;
     }
-    const isUnlocked = await Extension.isUnlocked();
+    const isSessionActive = await Extension.isSessionActive();
 
-    if (!isUnlocked) {
+    if (!isSessionActive) {
       setHomeRoute(<SignIn />);
       return;
     }

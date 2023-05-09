@@ -78,7 +78,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
   useEffect(() => {
     (async () => {
-      const seed = await Extension.showSeed();
+      const seed = await Extension.showKey();
       const keyring = new Keyring({ type: "sr25519" });
       const sender = keyring.addFromMnemonic(seed as string);
       setSender(sender);

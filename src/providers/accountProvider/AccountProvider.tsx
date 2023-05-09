@@ -15,7 +15,7 @@ import { useNetworkContext } from "../networkProvider/NetworkProvider";
 import { transformAddress } from "@src/utils/account-utils";
 import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "@src/constants/chains";
 import Account from "@src/storage/entities/Account";
-import { AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { useAuthContext } from "../authProvider/AuthProvider";
 import { Action, AccountContext, InitialState } from "./types";
 
@@ -60,6 +60,34 @@ const reducer = (state: InitialState, action: Action): InitialState => {
         },
       };
     }
+    case "update-account-name": {
+      const { name } = action.payload;
+      const {
+        selectedAccount: { key },
+      } = state;
+      return {
+        ...state,
+        accounts: state.accounts.map((account) => {
+          if (account.key === key) {
+            return {
+              ...account,
+              value: {
+                ...account.value,
+                name,
+              },
+            };
+          }
+          return account;
+        }),
+        selectedAccount: {
+          ...state.selectedAccount,
+          value: {
+            ...state.selectedAccount.value,
+            name,
+          },
+        },
+      };
+    }
     default:
       return state;
   }
@@ -97,6 +125,16 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       showErrorToast(tCommon(error as string));
       return [];
     }
+  };
+
+  const updateAccountName = async (accountKey: AccountKey, name: string) => {
+    await Extension.changeAccountName(accountKey, name);
+    dispatch({
+      type: "update-account-name",
+      payload: {
+        name,
+      },
+    });
   };
 
   const getSelectedAccount = async () => {
@@ -195,6 +233,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         deriveAccount,
         importAccount,
         createAccount,
+        updateAccountName,
       }}
     >
       {children}

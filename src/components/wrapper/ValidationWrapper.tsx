@@ -27,10 +27,10 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
   const { origin } = params as any;
 
   const [trustedSites, setTrustedSites] = useState<string[]>([]);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isSessionActive, setIsSessionActive] = useState(false);
 
   const {
-    state: { api, type },
+    state: { api },
   } = useNetworkContext();
   const {
     state: { selectedAccount },
@@ -73,8 +73,8 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
       starLoading();
 
       if (selectedAccount && selectedAccount) {
-        const isUnlocked = await Extension.isUnlocked();
-        setIsUnlocked(isUnlocked);
+        const isSessionActive = await Extension.isSessionActive();
+        setIsSessionActive(isSessionActive);
 
         await getTrustedSites();
 
@@ -87,7 +87,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
     return null;
   }
 
-  if (!isUnlocked) {
+  if (!isSessionActive) {
     return <SignIn />;
   }
 

@@ -7,7 +7,6 @@ import Accounts from "./storage/entities/Accounts";
 import Account from "./storage/entities/Account";
 import Vault from "./storage/entities/Vault";
 import Auth from "./storage/Auth";
-import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
 import { SettingKey, SettingType } from "./storage/entities/settings/types";
@@ -20,22 +19,34 @@ import Register from "./storage/entities/registry/Register";
 import { RecordStatus } from "./storage/entities/activity/types";
 import Assets from "./storage/entities/Assets";
 import TrustedSites from "./storage/entities/TrustedSites";
+import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./utils/constants";
 
 export default class Extension {
-  private static async init(
-    password: string,
-    recoveryPhrase: string,
-    force?: boolean
-  ) {
+  private static validatePasswordFormat(password: string) {
+    if (!password) throw new Error("password_required");
+    if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
+  }
+
+  private static validatePrivateKeyOrSeedFormat(privateKeyOrSeed: string) {
+    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
+    if (!PRIVATE_KEY_OR_SEED_REGEX.test(privateKeyOrSeed))
+      throw new Error("private_key_or_seed_invalid");
+  }
+
+  private static async signUp(password = "", privateKeyOrSeed: string) {
     try {
-      await Auth.getInstance().signUp(password);
-      await Storage.getInstance().init(force);
-      await CacheAuth.cachePassword();
-      await AccountManager.saveBackup(recoveryPhrase);
+      Extension.validatePasswordFormat(password);
+      Extension.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
+      await Storage.init(password, privateKeyOrSeed);
     } catch (error) {
-      console.error(error);
-      throw new Error(error as string);
+      Storage.getInstance().resetWallet();
+      Auth.signOut();
+      throw error;
     }
+  }
+
+  static isAuthorized(): boolean {
+    return Auth.isAuthorized();
   }
 
   static async createAccounts(
@@ -44,16 +55,19 @@ export default class Extension {
     password?: string,
     isSignUp = true
   ) {
-    if (!seed) throw new Error("seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("password_required");
-      await this.init(password, seed, true);
+      await Extension.signUp(password, seed);
     }
-    const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("failed_to_create_accounts");
-
-    const evmAccount = await AccountManager.addEVMAccount(seed, name);
-    const wasmAccount = await AccountManager.addWASMAccount(seed, name);
+    const wasmAccount = await AccountManager.addAccount(
+      AccountType.WASM,
+      seed,
+      name
+    );
+    const evmAccount = await AccountManager.addAccount(
+      AccountType.EVM,
+      seed,
+      name
+    );
 
     const selectedAccount = await Extension.getSelectedAccount();
 
@@ -72,27 +86,23 @@ export default class Extension {
     name: string,
     privateKeyOrSeed: string,
     password: string | undefined,
-    accountType: AccountType,
+    type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM,
     isSignUp = true
   ) {
-    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
     if (isSignUp) {
-      if (!password) throw new Error("password_required");
-      await this.init(password, privateKeyOrSeed, true);
+      await Extension.signUp(password, privateKeyOrSeed);
     }
-    const isUnlocked = await Extension.isUnlocked();
-    if (!isUnlocked) throw new Error("failed_to_import_account");
-    const account = await AccountManager.importAccount({
+    const account = await AccountManager.importAccount(
       name,
       privateKeyOrSeed,
-      accountType,
-    });
+      type
+    );
     this.setSelectedAccount(account);
   }
 
   static async restorePassword(recoveryPhrase: string, newPassword: string) {
-    if (!recoveryPhrase) throw new Error("private_key_or_seed_required");
-    if (!newPassword) throw new Error("password_required");
+    Extension.validatePasswordFormat(newPassword);
+    Extension.validatePrivateKeyOrSeedFormat(recoveryPhrase);
     await AccountManager.restorePassword(recoveryPhrase, newPassword);
   }
 
@@ -100,26 +110,21 @@ export default class Extension {
     AccountManager.remove(key);
   }
 
-  static changeAccountName(key: AccountKey, newName: string) {
-    AccountManager.changeName(key, newName);
+  static async changeAccountName(key: AccountKey, newName: string) {
+    const account = await AccountManager.changeName(key, newName);
+    await SelectedAccount.set<SelectedAccount>(account);
   }
 
   static async resetWallet() {
-    if (!Auth.isUnlocked) throw new Error("wallet_not_unlocked");
+    if (!Auth.isAuthorized()) {
+      throw new Error("not_authorized");
+    }
     await Storage.getInstance().resetWallet();
     localStorage.removeItem("welcome");
   }
 
   static async signIn(password: string) {
-    try {
-      const vault = await Vault.getEncryptedVault();
-      if (!vault) throw new Error("failed_to_sign_in");
-      await Auth.getInstance().signIn(password, vault);
-      await CacheAuth.cachePassword();
-    } catch (error) {
-      Auth.getInstance().signOut();
-      throw error;
-    }
+    await Auth.signIn(password);
   }
 
   static alreadySignedUp() {
@@ -138,25 +143,19 @@ export default class Extension {
   }
 
   static async signOut() {
-    Auth.getInstance().signOut();
-    await CacheAuth.clear();
+    Auth.signOut();
   }
 
-  static async isUnlocked() {
-    await CacheAuth.loadFromCache();
-    return Auth.isUnlocked;
+  static async isSessionActive() {
+    return Auth.isSessionActive();
   }
 
-  static async showPrivateKey(): Promise<string | undefined> {
+  static async showKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
-    return Vault.showPrivateKey(selectedAccount.value.keyring);
-  }
-
-  static async showSeed(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
-    return Vault.showSeed(selectedAccount.value.keyring);
+    if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
+    const { keyring: type, address } = selectedAccount.value;
+    const keyring = await Vault.getKeyring(type);
+    return keyring.getKey(address);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -173,18 +172,14 @@ export default class Extension {
 
   static async deriveAccount(
     name: string,
-    accountType: AccountType
+    type: AccountType
   ): Promise<Account> {
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_derive_account");
-    const account = await AccountManager.derive(name, vault, accountType);
+    const account = await AccountManager.derive(name, type);
     await this.setSelectedAccount(account);
     return account;
   }
 
   static async setNetwork(chain: Chain): Promise<boolean> {
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_set_network");
     const network = Network.getInstance();
     network.set(chain);
     await Network.set<Network>(network);
@@ -192,9 +187,9 @@ export default class Extension {
   }
 
   static async setSelectedAccount(account: Account) {
-    const selected = new SelectedAccount();
-    selected.fromAccount(account);
-    await SelectedAccount.set<SelectedAccount>(selected);
+    await SelectedAccount.set<SelectedAccount>(
+      SelectedAccount.fromAccount(account)
+    );
   }
 
   static async getSelectedAccount(): Promise<Account | undefined> {
@@ -217,7 +212,10 @@ export default class Extension {
     return settings.getAll(SettingType.ADVANCED);
   }
 
-  static async getSetting(type: SettingType, key: SettingKey): Promise<Setting | undefined> {
+  static async getSetting(
+    type: SettingType,
+    key: SettingKey
+  ): Promise<Setting | undefined> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.get(type, key);
