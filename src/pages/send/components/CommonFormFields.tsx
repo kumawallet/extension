@@ -8,8 +8,7 @@ import { SelectableAsset } from "./SelectableAsset";
 import { SelectableChain } from "./SelectableChain";
 import { useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
-import { XCM_MAPPING } from "@src/constants/xcm";
-import Extension from "../../../Extension";
+import Extension from "@src/Extension";
 
 export const CommonFormFields = () => {
   const { t } = useTranslation("send");
@@ -21,8 +20,11 @@ export const CommonFormFields = () => {
   const {
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useFormContext();
+
+  const to = watch("to");
 
   const [destinationChains, setDestinationChains] = useState<any[]>([]);
 
@@ -42,6 +44,10 @@ export const CommonFormFields = () => {
       getDestinationChains();
     }
   }, [selectedChain]);
+
+  useEffect(() => {
+    setValue("isXcm", to.name !== selectedChain.name);
+  }, [to]);
 
   return (
     <>

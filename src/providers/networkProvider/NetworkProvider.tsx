@@ -129,7 +129,9 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
 
       if (state.api && "getBalance" in state.api) {
-        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
+        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners(
+          "block"
+        );
       }
 
       dispatch({

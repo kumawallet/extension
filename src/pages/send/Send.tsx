@@ -17,6 +17,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
 import { BigNumber, Contract } from "ethers";
 import { getWebAPI } from "@src/utils/env";
+import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
 
 const WebAPI = getWebAPI();
 
@@ -97,8 +98,8 @@ export const Send = () => {
     const originAddress = selectedAccount.value.address;
     const asset = getValues("asset") as IAsset;
     const destinationNetwork = getValues("to").name;
-
-    const { id } = await WebAPI.windows.getCurrent();
+    const isXcm = getValues("isXcm");
+    const to = getValues("to");
 
     const txToSend: Partial<TxToProcess> = {
       amount,
@@ -130,7 +131,25 @@ export const Send = () => {
           _amount.toLocaleString("fullwide", { useGrouping: false })
         );
 
-        if (isNativeAsset) {
+        if (isXcm) {
+          const { method, extrinsicValues } = XCM_MAPPING[selectedChain.name][
+            to.name
+          ]({
+            address: destinationAddress,
+            amount: bnAmount,
+          }) as MapResponseEVM;
+
+          // TODO: refactor
+          _tx = await (tx?.tx as Contract)[method](
+            ...Object.keys(extrinsicValues).map((key) => extrinsicValues[key]),
+            {
+              gasLimit: tx?.fee["gas limit"],
+              maxFeePerGas: tx?.fee["max fee per gas"],
+              maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
+              type: 2,
+            }
+          );
+        } else if (isNativeAsset) {
           _tx = await tx?.sender.sendTransaction({
             ...tx.tx,
           });
@@ -142,7 +161,6 @@ export const Send = () => {
               gasLimit: tx?.fee["gas limit"],
               maxFeePerGas: tx?.fee["max fee per gas"],
               maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
-              type: 2,
             }
           );
         }
@@ -152,6 +170,8 @@ export const Send = () => {
           type: AccountType.EVM,
         };
       }
+
+      const { id } = await WebAPI.windows.getCurrent();
 
       await WebAPI.runtime.sendMessage({
         from: "popup",
@@ -168,7 +188,6 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      // const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
       showErrorToast(error);
     }
     endLoading();
