@@ -59,7 +59,7 @@ export const getAssets = ({
   parents = 0,
 }: {
   version?: "V0" | "V1" | "V2" | "V3";
-  fungible: BN;
+  fungible: BN | BigNumberish | string;
   interior?: "Here" | any;
   parents?: 0 | 1;
 }) => {
@@ -97,7 +97,7 @@ export const getAssets = ({
 
 interface ExtrinsicValues {
   address: string;
-  amount: BN | BigNumberish;
+  amount: BN | BigNumberish | string;
   assetSymbol?: string;
 }
 
@@ -202,7 +202,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
           amount: amount.toString(),
           destination: [1, [_address]],
-          weight: "1000000000", // Weight
+          weight: "4000000000", // Weight
         },
       };
     },
@@ -223,6 +223,68 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         }
         case "xcastr": {
           currency_address = "0xFfFFFfffA893AD19e540E172C10d78D4d479B5Cf";
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address, //asset address
+          amount: amount.toString(),
+          destination: [
+            1,
+            [
+              "0x00" +
+                "0000" +
+                numberToHex(POLKADOT_PARACHAINS.ASTAR.id).split("0x")[1],
+              _address,
+            ],
+          ],
+          weight: "4000000000", // Weight
+        },
+      };
+    },
+  },
+
+  [PARACHAINS.MOONRIVER]: {
+    [RELAY_CHAINS.KUSAMA]: ({ address, amount }) => {
+      const _address =
+        "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
+          amount: amount.toString(),
+          destination: [1, [_address]],
+          weight: "4000000000", // Weight
+        },
+      };
+    },
+
+    [PARACHAINS.SHIDEN]: ({ address, amount, assetSymbol }) => {
+      const addressIsHex = address.startsWith("0x");
+
+      const _address = addressIsHex
+        ? "0x03" + address.slice(2) + "00"
+        : "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      let currency_address = "";
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "sdn": {
+          currency_address = "0x0000000000000000000000000000000000000802";
+          break;
+        }
+        case "xcsdn": {
+          currency_address = "0xFFFfffFF0Ca324C842330521525E7De111F38972";
           break;
         }
         default:
