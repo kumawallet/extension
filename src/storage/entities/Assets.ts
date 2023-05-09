@@ -1,3 +1,4 @@
+import { defaultAssetConfig } from "@src/constants/assets";
 import BaseEntity from "./BaseEntity";
 
 interface Asset {
@@ -13,7 +14,7 @@ export default class Assets extends BaseEntity {
 
   constructor() {
     super();
-    this.data = {};
+    this.data = defaultAssetConfig;
   }
 
   static async getDefaultValue<Assets>(): Promise<Assets> {
