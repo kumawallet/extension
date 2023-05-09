@@ -1,4 +1,4 @@
-import { BN, hexToU8a, numberToHex, u8aToHex } from "@polkadot/util";
+import { BN, numberToHex, u8aToHex } from "@polkadot/util";
 import {
   KUSAMA_PARACHAINS,
   PARACHAINS,
@@ -9,7 +9,6 @@ import { decodeAddress } from "@polkadot/util-crypto";
 import { BN0 } from "./assets";
 import xTokensAbi from "@src/abi/xtokens_moonbeam_abi.json";
 import { BigNumberish } from "ethers";
-import keyring from "@polkadot/ui-keyring";
 
 export const XCM = {
   pallets: {
@@ -149,8 +148,8 @@ interface IXCM_MAPPING {
 }
 
 export const XCM_MAPPING: IXCM_MAPPING = {
-  [RELAY_CHAINS.POLKADOT as string]: {
-    [POLKADOT_PARACHAINS.ASTAR.name as string]: ({ address, amount }) => ({
+  [RELAY_CHAINS.POLKADOT]: {
+    [POLKADOT_PARACHAINS.ASTAR.name]: ({ address, amount }) => ({
       pallet: XCM.pallets.XCM_PALLET.NAME,
       method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
       extrinsicValues: {
@@ -166,7 +165,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         feeAssetItem: 0,
       },
     }),
-    [POLKADOT_PARACHAINS.MOONBEAM.name as string]: ({ address, amount }) => ({
+    [POLKADOT_PARACHAINS.MOONBEAM.name]: ({ address, amount }) => ({
       pallet: XCM.pallets.XCM_PALLET.NAME,
       method: XCM.pallets.XCM_PALLET.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
       extrinsicValues: {
@@ -465,5 +464,24 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         },
       };
     },
+  },
+};
+
+export const XCM_ASSETS_MAPPING = {
+  [PARACHAINS.MOONBEAM]: {
+    [RELAY_CHAINS.POLKADOT]: ["xcDOT"],
+    [PARACHAINS.ASTAR]: ["GLMR", "xcASTR"],
+  },
+  [PARACHAINS.ASTAR]: {
+    [RELAY_CHAINS.POLKADOT]: ["DOT"],
+    [PARACHAINS.MOONBEAM]: ["ASTR", "GLMR"],
+  },
+  [PARACHAINS.MOONRIVER]: {
+    [RELAY_CHAINS.KUSAMA]: ["xcKSM"],
+    [PARACHAINS.SHIDEN]: ["MOVR", "xcSDN"],
+  },
+  [PARACHAINS.SHIDEN]: {
+    [RELAY_CHAINS.KUSAMA]: ["KSM"],
+    [PARACHAINS.MOONRIVER]: ["SDN", "MOVR"],
   },
 };
