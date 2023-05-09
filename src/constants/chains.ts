@@ -159,6 +159,24 @@ const MOONRIVER = {
     name: "Moonriver",
     symbol: "MOVR",
     decimals: 18,
+    rpc: {
+      evm: "https://rpc.api.moonriver.moonbeam.network",
+    },
+    addressPrefix: 1284,
+    nativeCurrency: {
+      name: "Moonriver",
+      symbol: "MOVR",
+      decimals: 18,
+    },
+
+    explorer: {
+      evm: {
+        name: "moonscan",
+        url: "https://moonriver.moonscan.io/",
+      },
+    },
+    logo: "moonriver",
+    supportedAccounts: [EVM],
   },
 
   explorer: {

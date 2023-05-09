@@ -196,7 +196,9 @@ describe("AssetProvider", () => {
 
       return {
         ...assetUtils,
-        getAssetUSDPrice: vi.fn(),
+        getAssetUSDPrice: vi.fn().mockReturnValue({
+          catch: () => 0,
+        }),
       };
     });
   });
