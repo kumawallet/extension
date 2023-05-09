@@ -1,5 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
+import { BN0 } from "@src/constants/assets";
 import { BigNumberish, ethers } from "ethers";
 
 export const getNatitveAssetBalance = async (
@@ -7,7 +8,7 @@ export const getNatitveAssetBalance = async (
   accountAddress: string
 ): Promise<BN | BigNumberish> => {
   try {
-    const _amount = new BN("0");
+    const _amount = BN0;
 
     if (!api) return _amount;
 
@@ -25,23 +26,21 @@ export const getNatitveAssetBalance = async (
 
     return _amount;
   } catch (error) {
-    console.error(error);
-    return 0;
+    return BN0;
   }
 };
 
-export const getAssetUSDPrice = async (assetName: string) => {
-  const _assetName = assetName.toLowerCase();
+export const getAssetUSDPrice = async (query: string) => {
+  const _query = query.toLowerCase();
   try {
     const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_assetName}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=usd`
     );
 
     const json = await data.json();
 
-    return json?.[_assetName]?.["usd"] || 0;
+    return json?.[_query]?.["usd"] || 0;
   } catch (error) {
-    console.error(error);
     return 0;
   }
 };

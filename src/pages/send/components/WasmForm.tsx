@@ -21,6 +21,8 @@ import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
 import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
+import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import { XCM_MAPPING } from "@src/constants/xcm";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -49,6 +51,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const {
     handleSubmit,
     watch,
+    setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -67,6 +71,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
   const asset = watch("asset");
+  const to = watch("to");
   const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
@@ -92,24 +97,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     });
   });
 
-  useEffect(() => {
-    if (destinationIsInvalid) {
-      setFee(defaultFees);
-      return;
-    }
-
-    if (!destinationAccount || amount <= 0) return;
-
-    setIsLoadingFee(true);
-
-    const loadFees = setTimeout(async () => {
-      await getFeeData();
-      setIsLoadingFee(false);
-    }, 1000);
-
-    return () => clearTimeout(loadFees);
-  }, [amount, destinationAccount, destinationIsInvalid, asset?.id]);
-
   const getFeeData = async () => {
     if (!destinationAccount) return;
     try {
@@ -124,17 +111,38 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       let extrinsic: SubmittableExtrinsic<"promise"> | unknown;
       let estimatedFee = new BN("0");
 
-      if (asset?.address) {
+      const isXcm = getValues("isXcm");
+
+      if (isXcm) {
+        const { method, pallet, extrinsicValues } = XCM_MAPPING[
+          selectedChain.name
+        ][to.name]({
+          address: destinationAccount,
+          amount: bnAmount,
+          assetSymbol: asset.symbol,
+        });
+
+        extrinsic = _api.tx[pallet][method](
+          ...Object.keys(extrinsicValues)
+            .filter((key) => extrinsicValues[key] !== null)
+            .map((key) => extrinsicValues[key])
+        );
+
+        const { partialFee } = await (
+          extrinsic as SubmittableExtrinsic<"promise">
+        ).paymentInfo(sender as KeyringPair);
+
+        estimatedFee = partialFee;
+      } else if (asset?.address) {
         // extrinsic from contract assets
-        const refTime = new BN("1000000000000");
-        const proofSize = new BN("1000000000000");
+
         const contract = new ContractPromise(api, metadata, asset.address);
         const { gasRequired } = await contract.query.transfer(
           selectedAccount.value.address,
           {
             gasLimit: api.registry.createType("WeightV2", {
-              refTime,
-              proofSize,
+              refTime: REF_TIME,
+              proofSize: PROOF_SIZE,
             }),
           },
           destinationAccount,
@@ -185,6 +193,24 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     }
   };
 
+  useEffect(() => {
+    if (destinationIsInvalid) {
+      setFee(defaultFees);
+      return;
+    }
+
+    if (!destinationAccount || amount <= 0) return;
+
+    setIsLoadingFee(true);
+
+    const loadFees = setTimeout(async () => {
+      await getFeeData();
+      setIsLoadingFee(false);
+    }, 1000);
+
+    return () => clearTimeout(loadFees);
+  }, [amount, destinationAccount, destinationIsInvalid, asset?.id, to?.name]);
+
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
   const isEnoughToPay = useMemo(() => {
@@ -216,14 +242,14 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     } catch (error) {
       return false;
     }
-  }, [fee, asset, amount]);
+  }, [fee, asset, amount, isNativeAsset]);
 
   return (
     <>
       <CommonFormFields />
 
       <div className="mb-3">
-        <p>{t("tip")}</p>
+        <p className="text-xs">{t("tip")}</p>
         <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
           <NumericFormat
             className="bg-transparent w-8/12 outline-0"

@@ -36,6 +36,7 @@ const testIds = {
   selectedBtn: "select-btn",
   getSelectedBtn: "get-selected-btn",
   newRpcBtn: "new-rpc-btn",
+  refreshNetworksBtn: "refresh-networks-btn",
 };
 
 const chainsMock = CHAINS.map((c) => ({
@@ -48,8 +49,13 @@ interface TestComponentProps {
 }
 
 const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
-  const { getSelectedNetwork, setNewRpc, setSelectNetwork, state } =
-    useNetworkContext();
+  const {
+    getSelectedNetwork,
+    setNewRpc,
+    setSelectNetwork,
+    refreshNetworks,
+    state,
+  } = useNetworkContext();
 
   return (
     <>
@@ -65,6 +71,11 @@ const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
         data-testid={testIds.newRpcBtn}
         onClick={() => setNewRpc(type as string)}
       />
+      <button
+        data-testid={testIds.refreshNetworksBtn}
+        onClick={() => refreshNetworks()}
+      />
+
       <p data-testid={testIds.state}>{JSON.stringify(state)}</p>
     </>
   );
@@ -192,6 +203,19 @@ describe("NetworkProvider", () => {
           payload: {} as any,
         });
         expect(newState).toContain(initialState);
+      });
+    });
+
+    describe("refresh-networks", () => {
+      it("should refresh networks", () => {
+        const payload = {
+          chains: chainsMock as unknown as Chains,
+        };
+        const newState = reducer(initialState, {
+          type: "refresh-networks",
+          payload,
+        });
+        expect(newState).toContain(payload);
       });
     });
   });
@@ -343,6 +367,27 @@ describe("NetworkProvider", () => {
           JSON.parse(screen.getByTestId(testIds.state).innerHTML)
         ).toHaveProperty("rpc", selectedMultiSupportChain.rpc.evm)
       );
+    });
+  });
+
+  describe("refreshNetworks", () => {
+    it("should refresh networks", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
+      renderComponent();
+      await waitFor(() => {
+        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
+        expect(state.chains).toEqual(chainsMock);
+      });
+    });
+    it("should show error", async () => {
+      const Extension: any = await import("@src/Extension");
+      Extension.default.getAllChains = vi.fn().mockRejectedValue("no_network");
+      renderComponent();
+      await waitFor(() => {
+        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
+        expect(state.chains).toContain([]);
+      });
     });
   });
 });

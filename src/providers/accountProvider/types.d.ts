@@ -12,7 +12,7 @@ interface AccountContext {
   state: InitialState;
   getAllAccounts: (type?: AccountType[] | null) => Promise<Account[]>;
   getSelectedAccount: () => Promise<Account | undefined | null>;
-  setSelectedAccount: (account: Account) => void;
+  setSelectedAccount: (account: Account, changeRpc?: boolean) => void;
   deriveAccount: (account: AccountFormType) => Promise<boolean>;
   importAccount: (account: AccountFormType) => Promise<boolean>;
   createAccount: (account: AccountFormType) => Promise<boolean>;

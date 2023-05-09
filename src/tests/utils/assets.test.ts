@@ -1,15 +1,24 @@
 import { ApiPromise } from "@polkadot/api";
+import { BN0 } from "@src/constants/assets";
 import {
   formatAmountWithDecimals,
   formatBN,
   formatUSDAmount,
+  getAssetUSDPrice,
   getNatitveAssetBalance,
 } from "@src/utils/assets";
 import { ethers } from "ethers";
 
 describe("assets", () => {
   beforeAll(() => {
-    vi.mock("ethers");
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () =>
+        Promise.resolve({
+          eth: {
+            usd: 1000,
+          },
+        }),
+    });
   });
 
   describe("getNatitveAssetBalance", () => {
@@ -17,7 +26,7 @@ describe("assets", () => {
       const api = {
         query: {
           system: {
-            account: vi.fn().mockReturnValue({
+            account: () => ({
               data: {
                 free: 10,
               },
@@ -31,9 +40,6 @@ describe("assets", () => {
     });
 
     it("should use ethereum api", async () => {
-      const ethers = await import("ethers");
-      ethers.ethers.utils.formatEther = vi.fn().mockReturnValue(10);
-
       const api = {
         getBalance: vi.fn().mockReturnValue(2),
       } as unknown;
@@ -43,6 +49,28 @@ describe("assets", () => {
         "0x123"
       );
       expect(result).toEqual(2);
+    });
+
+    it("should return same amount", async () => {
+      const api = {} as unknown;
+      const result = await getNatitveAssetBalance(api as null, "0x123");
+      expect(result).toEqual(BN0);
+    });
+
+    it("should return same amount", async () => {
+      const result = await getNatitveAssetBalance(null, "0x123");
+      expect(result).toEqual(BN0);
+    });
+
+    it("should throw error", async () => {
+      const api = {
+        getBalance: () => {
+          throw new Error("error");
+        },
+      } as unknown;
+
+      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      expect(result).toEqual(BN0);
     });
   });
 
@@ -59,5 +87,28 @@ describe("assets", () => {
   it("should format usd amount", () => {
     const result = formatUSDAmount(10);
     expect(result).toEqual("$10.00");
+  });
+
+  describe("get asset USD price", () => {
+    it("should return eth price", async () => {
+      // mock fetch
+
+      const result = await getAssetUSDPrice("eth");
+      expect(result).toEqual(1000);
+    });
+
+    it("should return 0", async () => {
+      // mock fetch
+      const result = await getAssetUSDPrice("moonbeam");
+      expect(result).toEqual(0);
+    });
+
+    it("should throw error", async () => {
+      // mock fetch
+      global.fetch = vi.fn().mockRejectedValue(new Error("error"));
+
+      const result = await getAssetUSDPrice("eth");
+      expect(result).toEqual(0);
+    });
   });
 });

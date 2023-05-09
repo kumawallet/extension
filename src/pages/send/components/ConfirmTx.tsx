@@ -38,9 +38,10 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
     useCopyToClipboard(destinationAccount);
 
   const originChainName = originAccount.name;
-  const destinationChainName = originAccount.name;
 
   const asset = watch("asset");
+
+  const destinationChain = getValues("to");
 
   return (
     <div className="mx-auto px-2">
@@ -99,12 +100,12 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
           >
             <div className="flex gap-2 items-center">
               <img
-                src={`/images/${originAccount.logo}.png`}
+                src={`/images/${destinationChain.logo}.png`}
                 width={29}
                 height={29}
                 className="object-cover rounded-full"
               />
-              <p>{destinationChainName}</p>
+              <p>{destinationChain.name}</p>
             </div>
             <button
               className="flex items-center gap-2"

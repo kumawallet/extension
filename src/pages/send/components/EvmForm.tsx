@@ -11,8 +11,8 @@ import { CommonFormFields } from "./CommonFormFields";
 import erc20abi from "@src/constants/erc20.abi.json";
 import { Fees } from "./Fees";
 import { confirmTx, evmTx, EVMFee } from "@src/types";
-import { BN } from "bn.js";
 import { BigNumber0 } from "@src/constants/assets";
+import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -32,6 +32,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const {
     handleSubmit,
     watch,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -83,7 +84,54 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         const bnAmount = ethers.BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
         );
-        if (isNativeAsset) {
+
+        const isXcm = getValues("isXcm");
+        const to = getValues("to");
+
+        if (isXcm) {
+          const { method, abi, contractAddress, extrinsicValues } = XCM_MAPPING[
+            selectedChain.name
+          ][to.name]({
+            address: destinationAccount,
+            amount: bnAmount,
+          }) as MapResponseEVM;
+
+          const contract = new ethers.Contract(
+            contractAddress,
+            abi,
+            wallet as Wallet
+          );
+
+          const feeData = await _api.getFeeData();
+          const gasLimit = await contract.estimateGas[method](
+            ...Object.keys(extrinsicValues).map((key) => extrinsicValues[key])
+          ).catch((e) => {
+            return BigNumber.from("21000");
+          });
+
+          const _gasLimit = gasLimit;
+          const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+          const _maxPriorityFeePerGas =
+            feeData.maxPriorityFeePerGas as ethers.BigNumber;
+
+          const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+          let estimatedTotal = avg.mul(_gasLimit);
+
+          if (isNativeAsset) {
+            estimatedTotal = estimatedTotal.add(bnAmount);
+          }
+
+          setFee({
+            "gas limit": _gasLimit,
+            "max fee per gas": feeData.maxFeePerGas as BigNumber,
+            "max priority fee per gas":
+              feeData.maxPriorityFeePerGas as BigNumber,
+            "estimated fee": avg,
+            "estimated total": estimatedTotal,
+          });
+
+          setEvmTx(contract);
+        } else if (isNativeAsset) {
           let tx: evmTx = {
             to: destinationAccount,
             value: bnAmount,
@@ -154,6 +202,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
+        console.error(error);
         showErrorToast(error);
       } finally {
         setIsLoadingFee(false);
@@ -177,20 +226,19 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
     try {
       const _amount = isNativeAsset
-        ? amount * currencyUnits
-        : amount * 10 ** asset.decimals;
+        ? Number(amount) * currencyUnits
+        : Number(amount) * 10 ** asset.decimals;
 
-      const bnAmount = new BN(
+      const bnAmount = BigNumber.from(
         _amount.toLocaleString("fullwide", { useGrouping: false })
       );
       const estimatedTotal = fee["estimated total"];
-      const BN0 = new BN("0");
       const nativeBalance = assets[0].balance;
 
       if (isNativeAsset) {
-        return bnAmount.gt(BN0) && estimatedTotal.lte(nativeBalance);
+        return bnAmount.gt(BigNumber0) && estimatedTotal.lte(nativeBalance);
       } else {
-        const BNBalance = new BN(asset?.balance);
+        const BNBalance = BigNumber.from(asset?.balance);
 
         return (
           bnAmount.lte(BNBalance) &&
@@ -201,7 +249,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     } catch (error) {
       return false;
     }
-  }, [fee, asset, amount]);
+  }, [fee, asset, amount, isNativeAsset]);
 
   return (
     <>
