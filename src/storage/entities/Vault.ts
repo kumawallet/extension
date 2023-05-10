@@ -1,6 +1,6 @@
 import Storage from "../Storage";
 import Auth from "../Auth";
-import { AccountType } from "../../accounts/types";
+import { AccountType } from "@src/accounts/types";
 import { Keyrings, SupportedKeyring } from "./keyrings/types";
 import EVMKeyring from "./keyrings/hd/EVMKeyring";
 import WASMKeyring from "./keyrings/hd/WASMKeyring";

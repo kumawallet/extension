@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import HDKeyring from "./HDKeyring";
-import { AccountType } from "../../../../accounts/types";
+import { AccountType } from "@src/accounts/types";
 import { HDKeyPair, SupportedKeyring } from "../types";
 
 export default class EVMKeyring extends HDKeyring {
