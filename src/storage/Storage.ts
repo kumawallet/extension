@@ -8,7 +8,7 @@ import Registry from "./entities/registry/Registry";
 import Activity from "./entities/activity/Activity";
 import Chains from "./entities/Chains";
 import Auth from "./Auth";
-import AccountManager from "@src/accounts/AccountManager";
+import AccountManager from "../accounts/AccountManager";
 
 const isChrome = navigator.userAgent.match(/chrome|chromium|crios/i);
 
