@@ -55,6 +55,19 @@ describe("EvmForm", () => {
 
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({
+        getValues: (value: string) => {
+          if (value === "isXcm") {
+            return false;
+          }
+
+          if (value === "to") {
+            return {
+              address: "0x123",
+            };
+          }
+
+          return null;
+        },
         handleSubmit: (cb: () => void) => {
           cb();
         },

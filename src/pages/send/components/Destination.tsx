@@ -3,8 +3,6 @@ import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { transformAddress } from "@src/utils/account-utils";
-import { isHex } from "@polkadot/util";
 import Contact from "@src/storage/entities/registry/Contact";
 
 export const Destination = () => {

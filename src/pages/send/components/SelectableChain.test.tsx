@@ -4,6 +4,14 @@ import { render } from "@testing-library/react";
 import { Chain } from "@src/storage/entities/Chains";
 
 describe("SelectableChain", () => {
+  beforeAll(() => {
+    vi.mock("react-hook-form", () => ({
+      useFormContext: () => ({
+        setValue: vi.fn(),
+      }),
+    }));
+  });
+
   it("should render", () => {
     const { getByText } = render(
       <SelectableChain selectedChain={selectedEVMChainMock} />

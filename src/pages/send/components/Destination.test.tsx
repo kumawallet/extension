@@ -57,6 +57,7 @@ describe("Destination", () => {
         register: vi.fn().mockReturnValue({
           onChange: vi.fn(),
         }),
+        watch: vi.fn().mockReturnValue(true),
       }),
     }));
   });

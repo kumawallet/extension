@@ -21,6 +21,9 @@ describe("Actvity", () => {
       useNetworkContext: () => ({
         state: {
           type: AccountType.EVM,
+          chains: {
+            getAll: vi.fn().mockReturnValue([]),
+          },
         },
       }),
       useTxContext: () => ({
@@ -35,28 +38,29 @@ describe("Actvity", () => {
       }),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
-        getRegistryAddresses: vi.fn().mockReturnValue({
-          contacts: [],
-          ownAccounts: [],
-        }),
-        getAllChains: vi.fn().mockReturnValue({
-          getAll: vi.fn().mockReturnValue([
-            {
-              name: "test",
-              explorer: {
-                evm: "http://test.com",
-                wasm: "wss://test.com",
-              },
-            },
-          ]),
-        }),
-      },
-    }));
+    vi.mock("@src/Extension");
   });
 
   it("should render", async () => {
+    const Extension = (await import("@src/Extension")).default;
+
+    Extension.getAllChains = vi.fn().mockReturnValue({
+      getAll: vi.fn().mockReturnValue([
+        {
+          name: "test",
+          explorer: {
+            evm: "http://test.com",
+            wasm: "wss://test.com",
+          },
+        },
+      ]),
+    });
+
+    Extension.getRegistryAddresses = vi.fn().mockReturnValue({
+      contacts: [],
+      ownAccounts: [],
+    });
+
     const { getByTestId } = renderComponent();
     await waitFor(() => {
       expect(getByTestId("search-input")).toBeDefined();
