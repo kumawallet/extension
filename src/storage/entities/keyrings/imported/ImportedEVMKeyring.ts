@@ -1,4 +1,4 @@
-import { AccountType } from "../../../../accounts/types";
+import { AccountType } from "@src/accounts/types";
 import { SupportedKeyring } from "../types";
 import ImportedKeyring from "./ImportedKeyring";
 import { ethers } from "ethers";

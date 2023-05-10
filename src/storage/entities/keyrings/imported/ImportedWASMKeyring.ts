@@ -1,5 +1,5 @@
-import Auth from "../../../../storage/Auth";
-import { AccountType } from "../../../../accounts/types";
+import Auth from "@src/storage/Auth";
+import { AccountType } from "@src/accounts/types";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import ImportedKeyring from "./ImportedKeyring";
 import { SupportedKeyring } from "../types";
