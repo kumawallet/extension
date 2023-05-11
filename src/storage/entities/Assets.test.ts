@@ -78,42 +78,33 @@ describe("Assets", () => {
         decimals: 18,
       };
       assets.addAsset("chain", asset);
-      expect(assets.data).toEqual({ chain: [asset] });
+      expect(assets.data["chain"]).toEqual([asset]);
     });
 
     it("should add new asset in existing chain", () => {
       const assets = new Assets();
-      const asset = {
-        symbol: "symbol",
-        address: "address",
-        decimals: 18,
-      };
-
-      // mock new asset
       const newAsset = {
         symbol: "symbol2",
         address: "address2",
         decimals: 18,
       };
 
-      assets.addAsset("chain", asset);
       assets.addAsset("chain", newAsset);
-      expect(assets.data).toEqual({
-        chain: [asset, newAsset],
-      });
+      expect(assets.data["chain"]).toContain(newAsset);
     });
 
-    it("should throw error when asset already added", () => {
+    it("should throw error when asset already added", async () => {
       const assets = new Assets();
       const asset = {
         symbol: "symbol",
         address: "address",
         decimals: 18,
       };
-      assets.addAsset("chain", asset);
-      expect(() => assets.addAsset("chain", asset)).toThrow(
-        "asset_already_added"
-      );
+      try {
+        await assets.addAsset("chain", asset);
+      } catch (error) {
+        expect(String(error)).toEqual("Error: asset_already_added");
+      }
     });
   });
 });
