@@ -193,6 +193,25 @@ When attempting to sign a message in Kuma Wallet, a pop-up will appear requestin
 
 ![sign-message](./images/sign-message.png)
 
+## XCM - Supported transactions
+
+| Transactions | Astar     | Moonbeam | Polkadot | Shiden  | Moonriver | Kusama  |
+|--------------|-----------|----------|----------|---------|-----------|---------|
+| Astar        | Native    | XCM (E)  | XCM (W)  |---------|-----------|---------|
+| Moonbeam     | XCM (W)   | Native   | XCM (W)  |---------|-----------|---------|
+| Polkadot     | XCM (W)   | XCM (E)  | Native   |---------|-----------|---------|
+| Shiden       |-----------|----------|----------| Native  | XCM (E)   | XCM (W) |
+| Moonriver    |-----------|----------|----------| XCM (W) | Native    | XCM (W) |
+| Kusama       |-----------|----------|----------| XCM (W) | XCM (E)   | Native  |
+
+**Native**: In this case moving assets between the same chain is supported but it does not require any XCM message.
+
+**XCM (W)**: XCM transactions are supported using a WASM account.
+
+**XCM (E)**: XCM transactions are supported using an EVM account.
+
+**Note**: XCM allow assets to be transferred between chains meaning, for example, that some DOT can be moved from the relay-chain to some parachain or even between parachains. But, it does NOT support moving tokens to a different relay-chain/parachains ecosystem. In other words, DOT cannot be sent to Kusama using XCM.
+
 ## Contributing
 
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
