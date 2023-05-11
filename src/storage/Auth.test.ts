@@ -3,19 +3,22 @@ import { vi } from "vitest";
 import Vault from "./entities/Vault";
 
 const DECRYPTED = "decrypted";
-const ENCRYPTED = "encrypted";
 
 const fakePassword = "Asdasd123123!";
 const fakeBackup = "fakeBackup";
 
 describe("Auth", () => {
   beforeAll(() => {
-    vi.mock("./entities/Vault", () => ({
-      default: {
-        getEncryptedVault: vi.fn().mockResolvedValue(ENCRYPTED),
-        isInvalid: vi.fn().mockImplementation(() => false),
-      },
-    }));
+    vi.mock("./entities/Vault", () => {
+      const ENCRYPTED = "encrypted";
+
+      return {
+        default: {
+          getEncryptedVault: vi.fn().mockResolvedValue(ENCRYPTED),
+          isInvalid: vi.fn().mockImplementation(() => false),
+        },
+      };
+    });
     vi.mock("./entities/CacheAuth", () => ({
       default: {},
     }));
@@ -55,9 +58,7 @@ describe("Auth", () => {
     };
 
     const cacheAuth = await import("./entities/CacheAuth");
-    cacheAuth.default.getInstance = vi
-      .fn()
-      .mockImplementation(() => mockCache);
+    cacheAuth.default.getInstance = vi.fn().mockImplementation(() => mockCache);
     cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
     await Auth.isSessionActive();
     expect(Auth.isUnlocked).toBe(false);
@@ -70,9 +71,7 @@ describe("Auth", () => {
     };
 
     const cacheAuth = await import("./entities/CacheAuth");
-    cacheAuth.default.getInstance = vi
-      .fn()
-      .mockImplementation(() => mockCache);
+    cacheAuth.default.getInstance = vi.fn().mockImplementation(() => mockCache);
     cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
     await Auth.isSessionActive();
     expect(Auth.isUnlocked).toBe(true);

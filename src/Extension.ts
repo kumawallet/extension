@@ -137,7 +137,6 @@ export default class Extension {
       if (!accounts) return false;
       return AccountManager.areAccountsInitialized(accounts);
     } catch (error) {
-      console.error(error);
       return false;
     }
   }
