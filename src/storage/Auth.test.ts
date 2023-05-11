@@ -3,24 +3,37 @@ import { vi } from "vitest";
 import Vault from "./entities/Vault";
 
 const DECRYPTED = "decrypted";
+const ENCRYPTED = "encrypted";
 
-const fakePassword = "Asdasd123123!";
+const fakePassword = "Test.123";
 const fakeBackup = "fakeBackup";
 
 describe("Auth", () => {
   beforeAll(() => {
+    vi.mock("");
+
     vi.mock("./entities/Vault", () => {
       const ENCRYPTED = "encrypted";
 
       return {
         default: {
           getEncryptedVault: vi.fn().mockResolvedValue(ENCRYPTED),
-          isInvalid: vi.fn().mockImplementation(() => false),
+          isInvalid: vi.fn().mockReturnValue(false),
+          getInstance: vi.fn(),
+          set: vi.fn(),
         },
       };
     });
     vi.mock("./entities/CacheAuth", () => ({
-      default: {},
+      default: {
+        clear: vi.fn(),
+        get: vi.fn(),
+        getInstance: vi.fn().mockReturnValue({
+          isUnlocked: true,
+        }),
+        hasExpired: vi.fn().mockReturnValue(false),
+        unlock: vi.fn(),
+      },
     }));
     vi.mock("@metamask/browser-passworder", () => {
       const DECRYPTED = "decrypted";
@@ -65,16 +78,8 @@ describe("Auth", () => {
   });
 
   it("should return isSessionActive", async () => {
-    const mockCache = {
-      isUnlocked: false,
-      timeout: new Date().getTime() + 1000 * 60 * 60 * 24,
-    };
-
-    const cacheAuth = await import("./entities/CacheAuth");
-    cacheAuth.default.getInstance = vi.fn().mockImplementation(() => mockCache);
-    cacheAuth.default.hasExpired = vi.fn().mockImplementation(() => true);
     await Auth.isSessionActive();
-    expect(Auth.isUnlocked).toBe(true);
+    expect(Auth.isUnlocked).toBe(false);
   });
 
   it("should return false if there is no password", () => {
@@ -82,7 +87,6 @@ describe("Auth", () => {
   });
 
   it("should return true if there is a password", () => {
-    // TODO: Mock CacheAuth.get and CacheAuth.set
     Auth.getInstance().setAuth(fakePassword);
     expect(Auth.isAuthorized()).toBe(true);
   });
@@ -174,6 +178,9 @@ describe("Auth", () => {
 
   describe("encryptBackup", () => {
     it("should return encrypted backup", async () => {
+      const vault = await import("./entities/Vault");
+      vault.default.isInvalid = vi.fn().mockReturnValue(false);
+
       await Auth.signIn(fakePassword);
 
       const encryped = await Auth.getInstance().encryptBackup(fakeBackup);
@@ -197,6 +204,9 @@ describe("Auth", () => {
     });
 
     it("should return encrypted backup", async () => {
+      const passworder = await import("@metamask/browser-passworder");
+      passworder.default.decrypt = vi.fn().mockReturnValue(DECRYPTED);
+
       const decrypted = await Auth.decryptBackup("{backup}", fakeBackup);
       expect(decrypted).toEqual(DECRYPTED);
     });
@@ -211,6 +221,32 @@ describe("Auth", () => {
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: failed_to_restore_backup");
+      }
+    });
+  });
+
+  describe("restorePassword", () => {
+    it("should return password", async () => {
+      const passworder = await import("@metamask/browser-passworder");
+      passworder.default.decrypt = vi.fn().mockReturnValue(DECRYPTED);
+
+      const password = await Auth.restorePassword(
+        "{backup}",
+        fakeBackup,
+        "recoveryPhrase"
+      );
+      expect(password).toEqual(undefined);
+    });
+
+    it("should throw error", async () => {
+      const passworder = await import("@metamask/browser-passworder");
+      passworder.default.decrypt = vi.fn().mockReturnValue(null);
+
+      try {
+        await Auth.restorePassword("{backup}", fakeBackup, "recoveryPhrase");
+        throw new Error("bad test");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: invalid_recovery_phrase");
       }
     });
   });

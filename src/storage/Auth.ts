@@ -68,7 +68,6 @@ export default class Auth {
       Auth.isUnlocked = isUnlocked;
     } catch (error) {
       CacheAuth.clear();
-      console.error(error);
       throw new Error("failed_to_load_from_cache");
     }
   }
