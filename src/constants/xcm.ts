@@ -467,7 +467,13 @@ export const XCM_MAPPING: IXCM_MAPPING = {
   },
 };
 
-export const XCM_ASSETS_MAPPING = {
+interface IXCM_ASSETS_MAPPING {
+  [key: string]: {
+    [key: string]: string[];
+  };
+}
+
+export const XCM_ASSETS_MAPPING: IXCM_ASSETS_MAPPING = {
   [PARACHAINS.MOONBEAM]: {
     [RELAY_CHAINS.POLKADOT]: ["xcDOT"],
     [PARACHAINS.ASTAR]: ["GLMR", "xcASTR"],
