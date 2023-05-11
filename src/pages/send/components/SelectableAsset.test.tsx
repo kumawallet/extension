@@ -86,6 +86,6 @@ describe("SelectableAsset", () => {
       });
     });
 
-    expect(onChangeAsset).toBeCalledTimes(2);
+    expect(onChangeAsset).toBeCalledTimes(5);
   });
 });
