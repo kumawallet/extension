@@ -287,11 +287,11 @@ describe("NetworkProvider", () => {
       Extension.default.getNetwork = vi
         .fn()
         .mockResolvedValue({ chain: selectedWASMChainMock });
-      renderComponent();
+      renderComponent({ newChain: selectedWASMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
       });
-      waitFor(() =>
+      await waitFor(() =>
         expect(screen.getByTestId(testIds.state).innerHTML).contains(
           selectedWASMChainMock.name
         )
@@ -302,14 +302,12 @@ describe("NetworkProvider", () => {
       Extension.default.getNetwork = vi
         .fn()
         .mockRejectedValue("no_default_network");
-      renderComponent();
+      renderComponent({ newChain: selectedWASMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
       });
-      waitFor(() =>
-        expect(screen.getByTestId(testIds.state).innerHTML).contains(
-          selectedWASMChainMock.name
-        )
+      await waitFor(() =>
+        expect(screen.getByTestId(testIds.state).innerHTML).contains(null)
       );
     });
   });
