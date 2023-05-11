@@ -37,6 +37,14 @@ describe("Storage", () => {
       },
     }));
 
+    vi.mock("./Auth", () => ({
+      default: {
+        getInstance: vi.fn().mockImplementation(() => ({
+          setAuth: vi.fn(),
+        })),
+      },
+    }));
+
     vi.mock("./entities/Vault", () => ({
       default: {
         init: vi.fn(),
@@ -77,6 +85,12 @@ describe("Storage", () => {
     vi.mock("./entities/activity/Activity", () => ({
       default: {
         init: vi.fn(),
+      },
+    }));
+
+    vi.mock("../accounts/AccountManager", () => ({
+      default: {
+        saveBackup: vi.fn(),
       },
     }));
 
