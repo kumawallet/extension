@@ -28,11 +28,11 @@ describe("EvmForm", () => {
       useNetworkContext: () => ({
         state: {
           api: {
-            getGasPrice: vi.fn().mockReturnValue(new BN("1000000000")),
-            estimateGas: vi.fn().mockReturnValue(new BN("21000")),
+            getGasPrice: vi.fn().mockReturnValue(BigNumber.from("1000000000")),
+            estimateGas: vi.fn().mockReturnValue(BigNumber.from("21000")),
             getFeeData: vi.fn().mockReturnValue({
-              maxFeePerGas: new BN("1000000000"),
-              maxPriorityFeePerGas: new BN("1000000000"),
+              maxFeePerGas: BigNumber.from("1000000000"),
+              maxPriorityFeePerGas: BigNumber.from("1000000000"),
             }),
           },
           selectedChain: selectedEVMChainMock,
@@ -46,7 +46,7 @@ describe("EvmForm", () => {
               name: "Ethereum",
               symbol: "ETH",
               decimals: 18,
-              balance: new BN("1000000000000000000"),
+              balance: BigNumber.from("1000000000000000000"),
             },
           ],
         },
@@ -100,20 +100,20 @@ describe("EvmForm", () => {
       },
     }));
 
-    vi.mock("ethers");
+    vi.mock("ethers", async () => {
+      const ethers = (await vi.importActual("ethers")) as any;
+
+      return {
+        ...ethers,
+        ethers: {
+          ...ethers.ethers,
+          Wallet: class Wallet {},
+        },
+      };
+    });
   });
 
   it("should call confirmTx", async () => {
-    const ethres = (await import("ethers")) as Record<string, any>;
-
-    ethres.BigNumber.from = (value: string) => new BN(value);
-    ethres.ethers.Wallet = vi.fn();
-    ethres.ethers.Contract = vi.fn().mockReturnValue({
-      estimateGas: vi.fn().mockReturnValue({
-        transfer: vi.fn().mockReturnValue(new BN("500000")),
-      }),
-    });
-
     const { getByText } = renderComponent();
 
     const button = getByText(en.send.continue) as HTMLButtonElement;

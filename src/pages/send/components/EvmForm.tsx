@@ -78,8 +78,8 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
       try {
         const _amount = isNativeAsset
-          ? amount * currencyUnits
-          : amount * 10 ** asset.decimals;
+          ? Number(amount) * currencyUnits
+          : Number(amount) * 10 ** asset.decimals;
 
         const bnAmount = ethers.BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
@@ -143,9 +143,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           ]);
 
           const _gasLimit = gasLimit;
-          const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+          const _maxFeePerGas = feeData.maxFeePerGas as BigNumber;
           const _maxPriorityFeePerGas =
-            feeData.maxPriorityFeePerGas as ethers.BigNumber;
+            feeData.maxPriorityFeePerGas as BigNumber;
           tx = {
             ...tx,
             gasLimit: _gasLimit,
@@ -157,7 +157,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
           const avg = _maxFeePerGas
             .add(_maxPriorityFeePerGas)
-            .div(ethers.BigNumber.from(2));
+            .div(BigNumber.from(BigNumber.from(2)));
           const estimatedTotal = avg.mul(_gasLimit).add(bnAmount);
 
           setFee({
@@ -187,7 +187,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           const _maxPriorityFeePerGas =
             feeData.maxPriorityFeePerGas as ethers.BigNumber;
 
-          const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+          const avg = _maxFeePerGas
+            .add(_maxPriorityFeePerGas)
+            .div(BigNumber.from(2));
           const estimatedTotal = avg.mul(_gasLimit);
 
           setFee({
@@ -202,7 +204,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
-        console.error(error);
         showErrorToast(error);
       } finally {
         setIsLoadingFee(false);

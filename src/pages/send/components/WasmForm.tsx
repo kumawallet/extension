@@ -22,7 +22,7 @@ import metadata from "@src/constants/metadata.json";
 import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
-import { XCM_MAPPING } from "@src/constants/xcm";
+import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -51,7 +51,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const {
     handleSubmit,
     watch,
-    setValue,
     getValues,
     formState: { errors },
   } = useFormContext();
@@ -120,7 +119,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
           address: destinationAccount,
           amount: bnAmount,
           assetSymbol: asset.symbol,
-        });
+        }) as MapResponseXCM;
 
         extrinsic = _api.tx[pallet][method](
           ...Object.keys(extrinsicValues)
@@ -240,6 +239,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
+      console.log("error ", error);
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);

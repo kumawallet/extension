@@ -148,6 +148,44 @@ describe("WasmForm", () => {
   });
 
   it("should call confirmTx", async () => {
+    const rhf = (await import("react-hook-form")) as any;
+    rhf.useFormContext = () => ({
+      handleSubmit: (cb: () => void) => {
+        cb();
+      },
+      formState: {
+        errors: {},
+      },
+      getValues: (value: string) => {
+        switch (value) {
+          case "isXcm":
+            return false;
+
+          default:
+            return "";
+        }
+      },
+      watch: (field: string) => {
+        switch (field) {
+          case "amount":
+            return "0.00005";
+          case "asset":
+            return {
+              id: "10",
+              address: "0x123",
+              name: "Ethereum",
+              symbol: "ETH",
+              decimals: 18,
+              balance: new BN("1000000000000000000"),
+            };
+          case "destinationAccount":
+            return "0x123";
+          default:
+            return "";
+        }
+      },
+    });
+
     const pKeyring = (await import("@polkadot/keyring")) as any;
     pKeyring.Keyring = class {
       constructor() {
@@ -178,6 +216,15 @@ describe("WasmForm", () => {
       },
       formState: {
         errors: {},
+      },
+      getValues: (value: string) => {
+        switch (value) {
+          case "isXcm":
+            return false;
+
+          default:
+            return "";
+        }
       },
       watch: (field: string) => {
         switch (field) {
