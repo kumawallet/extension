@@ -187,7 +187,7 @@ const MOONRIVER = {
   },
   logo: "moonriver",
   supportedAccounts: [EVM],
-  xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.ASTAR],
+  xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.SHIDEN],
 };
 
 const SHIDEN = {
@@ -214,7 +214,7 @@ const SHIDEN = {
   },
   logo: "shiden",
   supportedAccounts: [EVM, WASM],
-  xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.MOONBEAM],
+  xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.MOONRIVER],
 };
 
 // TESTNETS
