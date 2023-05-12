@@ -6,12 +6,13 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { AccountProvider, useAccountContext } from "./AccountProvider";
+import { AccountProvider, useAccountContext, reducer } from "./AccountProvider";
 import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
 import Account from "@src/storage/entities/Account";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { AccountFormType } from "@src/pages";
+import { InitialState } from "./types";
 
 const testIds = {
   createAccount: "create-account",
@@ -20,6 +21,7 @@ const testIds = {
   getSelectedAccount: "get-selected-account",
   getAllAccounts: "get-all-accounts",
   setSelectedAccount: "set-selected-account",
+  updateAccountName: "update-account-name",
 };
 
 const TestComponent = () => {
@@ -30,6 +32,7 @@ const TestComponent = () => {
     getSelectedAccount,
     importAccount,
     setSelectedAccount,
+    updateAccountName,
   } = useAccountContext();
 
   return (
@@ -58,6 +61,10 @@ const TestComponent = () => {
         data-testid={testIds.deriveAccount}
         onClick={() => deriveAccount({} as AccountFormType)}
       />
+      <button
+        data-testid={testIds.updateAccountName}
+        onClick={() => updateAccountName("EVM-123", "newName")}
+      />
     </>
   );
 };
@@ -75,6 +82,7 @@ const renderComponent = () => {
 const createAccount = vi.fn().mockReturnValue(true);
 const deriveAccount = vi.fn().mockReturnValue(true);
 const importAccount = vi.fn().mockReturnValue(true);
+const changeAccountName = vi.fn();
 
 const setSelectedAccount = vi.fn();
 const getSelectedAccount = vi.fn();
@@ -110,8 +118,51 @@ describe("AccountProvider", () => {
         getSelectedAccount: () => getSelectedAccount(),
         getNetwork: () => getNetwork(),
         getAllAccounts: () => getAllAccounts(),
+        changeAccountName: () => changeAccountName(),
       },
     }));
+  });
+
+  describe("reducer", () => {
+    it("should set accounts", () => {
+      const state = {
+        accounts: [],
+        isLoadingAccounts: true,
+        selectedAccount: {
+          address: "0x123",
+        },
+      } as unknown as InitialState;
+
+      const result = reducer(state, {
+        type: "change-selected-address-format",
+        payload: {
+          address: "0x1234",
+        },
+      });
+      expect(result.selectedAccount.value.address).toEqual("0x1234");
+    });
+
+    it("should update account name", () => {
+      const account = {
+        key: "key",
+        name: "originalName",
+      } as unknown as Account;
+
+      const state = {
+        accounts: [account],
+        isLoadingAccounts: true,
+        selectedAccount: account,
+      } as unknown as InitialState;
+
+      const result = reducer(state, {
+        type: "update-account-name",
+        payload: {
+          name: "newName",
+        },
+      });
+      expect(result.accounts[0].value.name).toEqual("newName");
+      expect(result.selectedAccount.value.name).toEqual("newName");
+    });
   });
 
   it("should create account", async () => {
@@ -176,5 +227,25 @@ describe("AccountProvider", () => {
       fireEvent.click(btn);
     });
     await waitFor(() => expect(getAllAccounts).toHaveBeenCalled());
+  });
+
+  it("should change account name", async () => {
+    renderComponent();
+
+    const btn = screen.getByTestId(testIds.updateAccountName);
+    act(() => {
+      fireEvent.click(btn);
+    });
+    await waitFor(() => expect(changeAccountName).toHaveBeenCalled());
+  });
+
+  it("should set selected account", async () => {
+    renderComponent();
+
+    const btn = screen.getByTestId(testIds.setSelectedAccount);
+    act(() => {
+      fireEvent.click(btn);
+    });
+    await waitFor(() => expect(setSelectedAccount).toHaveBeenCalled());
   });
 });

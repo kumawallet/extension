@@ -55,4 +55,25 @@ describe("EVMKeyring", () => {
 
     expect(keyring.mnemonic).toBe(mockMnemonic);
   });
+
+  it("should throw error if mnemonic is invalid", () => {
+    try {
+      new EVMKeyring("invalid mnemonic");
+    } catch (error) {
+      expect(String(error)).toEqual("Error: Invalid mnemonic");
+    }
+  });
+
+  it("should derive key pair", () => {
+    const evmKeyring = new EVMKeyring(mockMnemonic);
+    const address = evmKeyring.deriveKeyPair();
+    expect(address).toBe("0x8792ae3fe19523E842888fE26a119d319a9A5Db5");
+  });
+
+  it("should return json object", () => {
+    const evmKeyring = new EVMKeyring(mockMnemonic);
+    const result = evmKeyring.toJSON();
+
+    expect(result.mnemonic).toBe(mockMnemonic);
+  });
 });

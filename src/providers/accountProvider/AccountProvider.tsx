@@ -27,7 +27,7 @@ const initialState: InitialState = {
 
 const AccountContext = createContext({} as AccountContext);
 
-const reducer = (state: InitialState, action: Action): InitialState => {
+export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "set-accounts": {
       const { accounts } = action.payload;
