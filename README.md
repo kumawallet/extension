@@ -10,7 +10,6 @@ Kuma Wallet
 [![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
 [![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
 [![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -197,8 +196,11 @@ When attempting to sign a message in Kuma Wallet, a pop-up will appear requestin
 
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
 
+## Localization
+Kuma currently only supports English, Spanish and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/blockcoders/kuma-wallet/tree/main/src/i18n) folder.
+
 ## Credits
 
-We want to thanks the Web3 Foundation for their support and the Polkadot team for their help and guidance. We also want to thank the Astar team for their support on Beta testing and the Polkadot community for their feedback and support.
-This project was a really great learning experience for us and we hope to continue to contribute to the Polkadot ecosystem.
-Our core developers team has been working on this project for more than 6 months and we are really proud of the result. We hope you will enjoy using Kuma Wallet as much as we enjoyed building it. 
+We want to thanks the [Web3 Foundation](https://web3.foundation/) for their support and the [Polkadot](https://polkadot.network/) team for their help and guidance. We also want to thank the [Astar](https://astar.network/) team for their support on Beta testing and the Polkadot community for their feedback and support.
+
+This project was a really great learning experience for us and we hope to continue to contribute to the Polkadot ecosystem. Our core developers team has been working on this project for more than 6 months and we are really proud of the result. We hope you will enjoy using Kuma Wallet as much as we enjoyed building it. 

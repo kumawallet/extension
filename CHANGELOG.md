@@ -8,3 +8,7 @@ Published by **[blockcoders](https://github.com/blockcoders)** on **2023/03/12**
 - [#3](https://github.com/blockcoders/kuma-wallet/pull/3) Refactor front
 - [#2](https://github.com/blockcoders/kuma-wallet/pull/2) Develop refactor
 - [#1](https://github.com/blockcoders/kuma-wallet/pull/1) Storage refactor
+
+## 0.1.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/05/12**
+- [#8](https://github.com/blockcoders/kuma-wallet/pull/6) Milestone 2

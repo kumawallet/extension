@@ -106,7 +106,7 @@ describe("EvmForm", () => {
     const button = getByText(en.send.continue) as HTMLButtonElement;
 
     await waitFor(() => {
-      expect(button.disabled).toEqual(false);
+      expect(button.disabled).toBeFalsy();
     });
 
     act(() => {
