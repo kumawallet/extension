@@ -57,7 +57,8 @@
     "open": "Abrir",
     "close": "Cerrar",
     "copied": "Copiado",
-    "invalid_address": "Dirección inválida"
+    "invalid_address": "Dirección inválida",
+    "error": "Occurrió un error"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",

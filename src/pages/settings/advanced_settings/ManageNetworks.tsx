@@ -16,6 +16,7 @@ import { getAccountType } from "../../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
 import { Listbox, Transition } from "@headlessui/react";
+import { captureError } from "@src/utils/error-handling";
 
 const defaultValues: Chain = {
   name: "New Network",
@@ -112,6 +113,7 @@ export const ManageNetworks = () => {
       setSelectedNetwork(selectedNetwork);
       setValue("name", selectedNetwork.name);
     } catch (error) {
+      captureError(error);
       setNetworks({} as Chains);
       showErrorToast(tCommon(error as string));
     } finally {
@@ -154,6 +156,7 @@ export const ManageNetworks = () => {
       setIsCreating(false);
       refreshNetworks();
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   });
@@ -184,6 +187,7 @@ export const ManageNetworks = () => {
         }
       }
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };

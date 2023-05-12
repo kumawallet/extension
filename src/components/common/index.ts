@@ -8,3 +8,4 @@ export * from "./LoadingButton";
 export * from "./PageWrapper";
 export * from "./ReEnterPassword";
 export * from "./SucessMessage";
+export * from "./Error";

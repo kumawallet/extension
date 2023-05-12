@@ -14,6 +14,7 @@ import { useToast } from "@src/hooks";
 import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
 import Chains, { Chain } from "@src/storage/entities/Chains";
+import { captureError } from "@src/utils/error-handling";
 
 const initialState: InitialState = {
   chains: Chains.getInstance(),
@@ -113,6 +114,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           },
         });
       } catch (error) {
+        captureError(error);
         showErrorToast(tCommon(error as string));
       }
     })();
@@ -144,6 +146,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -161,6 +164,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedNetwork;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -187,6 +191,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: { api: null, rpc: newRpc, type: _type },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -199,6 +204,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: { chains },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };

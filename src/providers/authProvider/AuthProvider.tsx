@@ -11,6 +11,7 @@ import Extension from "../../Extension";
 import { AccountFormType } from "../../pages";
 import { Action, AuthContext as IAuthContext, InitialState } from "./types";
 import { AccountType } from "@src/accounts/types";
+import { captureError } from "@src/utils/error-handling";
 
 const initialState: InitialState = {
   isInit: true,
@@ -48,6 +49,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await Extension.createAccounts(seed, name, password, isSignUp);
       return true;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return false;
     }
@@ -76,6 +78,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return true;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return false;
     }
@@ -89,6 +92,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await Extension.deriveAccount(name, accountType);
       return true;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return false;
     }
@@ -104,6 +108,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       await Extension.restorePassword(recoveryPhrase, newPassword);
       return true;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return false;
     }

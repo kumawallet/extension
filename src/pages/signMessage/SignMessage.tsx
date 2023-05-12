@@ -8,6 +8,7 @@ import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { getWebAPI } from "@src/utils/env";
 import { useToast } from "@src/hooks";
+import { captureError } from "@src/utils/error-handling";
 
 const WebAPI = getWebAPI();
 
@@ -73,6 +74,7 @@ export const SignMessage: FC<SignMessageProps> = ({
         },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(error);
     }
   };

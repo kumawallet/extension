@@ -25,6 +25,7 @@ import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
 import { IAsset } from "@src/types";
+import { captureError } from "@src/utils/error-handling";
 
 export const initialState: InitialState = {
   assets: [],
@@ -132,6 +133,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return assets;
     } catch (error) {
+      captureError(error);
       dispatch({
         type: "end-loading",
       });
@@ -382,6 +384,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               assets[index].contract = contract;
             }
           } catch (error) {
+            captureError(error);
             assets[index].balance = new BN("0");
           }
         })
@@ -437,6 +440,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      captureError(error);
       console.error("error", error);
     }
   };

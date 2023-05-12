@@ -2,6 +2,7 @@ import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
 import { BigNumberish, ethers } from "ethers";
+import { captureError } from "./error-handling";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -26,6 +27,7 @@ export const getNatitveAssetBalance = async (
 
     return _amount;
   } catch (error) {
+    captureError(error);
     return BN0;
   }
 };
@@ -41,6 +43,7 @@ export const getAssetUSDPrice = async (query: string) => {
 
     return json?.[_query]?.["usd"] || 0;
   } catch (error) {
+    captureError(error);
     return 0;
   }
 };

@@ -7,6 +7,7 @@ import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
 import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
+import { captureError } from "@src/utils/error-handling";
 
 interface SignInProps {
   afterSignIn?: () => void;
@@ -39,6 +40,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
       }
       navigate(BALANCE);
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };

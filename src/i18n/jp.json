@@ -57,7 +57,8 @@
     "open": "開く",
     "close": "閉じる",
     "copied": "コピペ",
-    "invalid_address": "むこうアドレス"
+    "invalid_address": "むこうアドレス",
+    "error": "エラーが発生しました"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",

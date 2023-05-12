@@ -18,6 +18,7 @@ import Account from "@src/storage/entities/Account";
 import { AccountKey, AccountType } from "@src/accounts/types";
 import { useAuthContext } from "../authProvider/AuthProvider";
 import { Action, AccountContext, InitialState } from "./types";
+import { captureError } from "@src/utils/error-handling";
 
 const initialState: InitialState = {
   accounts: [],
@@ -122,6 +123,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return [];
     }
@@ -171,6 +173,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedAccount;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -195,6 +198,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
