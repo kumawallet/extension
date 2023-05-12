@@ -1,4 +1,3 @@
-import { Chain } from "@src/constants/chains";
 import { AccountKey, AccountType } from "./accounts/types";
 import Storage from "./storage/Storage";
 import AccountManager from "./accounts/AccountManager";
@@ -11,13 +10,16 @@ import Auth from "./storage/Auth";
 import CacheAuth from "./storage/entities/CacheAuth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
-import { SettingType } from "./storage/entities/settings/types";
+import { SettingKey, SettingType } from "./storage/entities/settings/types";
 import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
 import Record from "./storage/entities/activity/Record";
 import Activity from "./storage/entities/activity/Activity";
-import Chains from "./storage/entities/Chains";
+import Chains, { Chain } from "./storage/entities/Chains";
 import Register from "./storage/entities/registry/Register";
+import { RecordStatus } from "./storage/entities/activity/types";
+import Assets from "./storage/entities/Assets";
+import TrustedSites from "./storage/entities/TrustedSites";
 
 export default class Extension {
   private static async init(
@@ -102,6 +104,12 @@ export default class Extension {
     AccountManager.changeName(key, newName);
   }
 
+  static async resetWallet() {
+    if (!Auth.isUnlocked) throw new Error("wallet_not_unlocked");
+    await Storage.getInstance().resetWallet();
+    localStorage.removeItem("welcome");
+  }
+
   static async signIn(password: string) {
     try {
       const vault = await Vault.getEncryptedVault();
@@ -141,14 +149,14 @@ export default class Extension {
 
   static async showPrivateKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.key) return undefined;
-    return Vault.showPrivateKey(selectedAccount.key);
+    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
+    return Vault.showPrivateKey(selectedAccount.value.keyring);
   }
 
   static async showSeed(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount.key) return undefined;
-    return Vault.showSeed(selectedAccount.key);
+    if (!selectedAccount || !selectedAccount.value.keyring) return undefined;
+    return Vault.showSeed(selectedAccount.value.keyring);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
@@ -197,7 +205,6 @@ export default class Extension {
     return Network.get();
   }
 
-  /* c8 ignore start */
   static async getGeneralSettings(): Promise<Setting[]> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
@@ -208,6 +215,19 @@ export default class Extension {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.getAll(SettingType.ADVANCED);
+  }
+
+  static async getSetting(type: SettingType, key: SettingKey): Promise<Setting | undefined> {
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
+    return settings.get(type, key);
+  }
+
+  static async updateSetting(type: SettingType, key: SettingKey, value: any) {
+    const settings = await Settings.get<Settings>();
+    if (!settings) throw new Error("failed_to_get_settings");
+    settings.update(type, key, value);
+    await Settings.set<Settings>(settings);
   }
 
   static async getContacts(): Promise<Contact[]> {
@@ -250,10 +270,18 @@ export default class Extension {
     return Activity.getRecords();
   }
 
-  static async getAllChains(): Promise<Chain[]> {
+  static async getAllChains(): Promise<Chains> {
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
-    return chains.getAll();
+    return chains;
+  }
+
+  static async saveCustomChain(chain: Chain) {
+    await Chains.saveCustomChain(chain);
+  }
+
+  static async removeCustomChain(chainName: string) {
+    await Chains.removeCustomChain(chainName);
   }
 
   static async getXCMChains(chainName: string): Promise<Chain[]> {
@@ -270,5 +298,32 @@ export default class Extension {
     const register = new Register(address, Date.now());
     await Registry.addRecent(network, register);
   }
-  /* c8 ignore stop */
+
+  static async updateActivity(
+    txHash: string,
+    status: RecordStatus,
+    error?: string | undefined
+  ) {
+    await Activity.updateRecordStatus(txHash, status, error);
+  }
+
+  static async addAsset(chain: string, asset: any) {
+    return Assets.addAsset(chain, asset);
+  }
+
+  static async getAssetsByChain(chain: string) {
+    return Assets.getByChain(chain);
+  }
+
+  static async getTrustedSites(): Promise<string[]> {
+    return TrustedSites.getAll();
+  }
+
+  static async addTrustedSite(site: string) {
+    return TrustedSites.addSite(site);
+  }
+
+  static async removeTrustedSite(site: string) {
+    return TrustedSites.removeSite(site);
+  }
 }

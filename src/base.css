@@ -1,6 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+}
 
 :root {
   --bg-gray: #343a40;
@@ -15,17 +23,16 @@ body,
 
 body {
   background: #212529;
-  color: white;
+  color: white;overflow: hidden;
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
+  overflow: auto;
 }
 
-/* body::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+body::-webkit-scrollbar {
+  display: none;
 }
 
-body::-webkit-scrollbar-thumb {
-  background-color: var(--bg-gray);
-  border-radius: 1rem;
-} */
 
 .toast {
   background-color: var(--bg-gray) !important;
@@ -33,18 +40,14 @@ body::-webkit-scrollbar-thumb {
   color: #fff !important;
 }
 
-/* width */
-/* ::-webkit-scrollbar {
-  width: 10px;
-} */
-
-/* Track */
-/* ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-} */
-
-/* Handle on hover */
-/* ::-webkit-scrollbar-thumb {
-  background-color: var(--bg-gray);
-  border-radius: 1rem;
-} */
+.active-tab::after {
+  content: "";
+  width: 12px;
+  height: 1px;
+  background: #fff;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%);
+  background: #469999;
+}

@@ -7,16 +7,16 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Chain, CHAINS } from "@src/constants/chains";
 import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "@src/hooks";
 import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
+import Chains, { Chain } from "@src/storage/entities/Chains";
 
 const initialState: InitialState = {
-  chains: CHAINS,
+  chains: Chains.getInstance(),
   selectedChain: null,
   api: null,
   rpc: "",
@@ -26,7 +26,7 @@ const initialState: InitialState = {
 
 const NetworkContext = createContext({} as NetworkContext);
 
-const getProvider = (rpc: string, type: string) => {
+export const getProvider = (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc as string);
 
@@ -37,10 +37,11 @@ const getProvider = (rpc: string, type: string) => {
 export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "init": {
-      const { selectedChain, rpc, type } = action.payload;
+      const { selectedChain, rpc, type, chains } = action.payload;
 
       return {
         ...state,
+        chains,
         selectedChain,
         rpc,
         init: true,
@@ -68,6 +69,13 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         type: type || state.type,
       };
     }
+    case "refresh-networks": {
+      const { chains } = action.payload;
+      return {
+        ...state,
+        chains,
+      };
+    }
     default:
       return state;
   }
@@ -82,28 +90,23 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     (async () => {
       try {
+        const chains = await Extension.getAllChains();
         const selectedNetwork = await Extension.getNetwork();
         let selectedChain = null;
         let rpc = "";
         let type = "";
 
-        // console.log("selectedNetwork", selectedNetwork);
-
         if (selectedNetwork?.chain?.name) {
           const account = await Extension.getSelectedAccount();
-          // console.log("selectedAccount", account);
           selectedChain = selectedNetwork?.chain;
           type = getAccountType(account?.type);
           rpc = selectedChain.rpc[type.toLowerCase() as "evm" | "wasm"] || "";
         }
 
-        // console.log({
-        //   rpc,
-        // });
-
         dispatch({
           type: "init",
           payload: {
+            chains,
             selectedChain,
             rpc,
             type: type.toUpperCase(),
@@ -124,6 +127,10 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       const accountType = getAccountType(account?.type)?.toLowerCase();
       const rpc =
         network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
+
+      if (state.api && "getBalance" in state.api) {
+        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
+      }
 
       dispatch({
         type: "select-network",
@@ -166,6 +173,10 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       const newRpc =
         state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"] || "";
 
+      if (state.api && "getBalance" in state.api) {
+        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
+      }
+
       const rpcAlreadyInUse = newRpc === state.rpc;
       if (rpcAlreadyInUse || !newRpc) return;
 
@@ -178,8 +189,20 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const refreshNetworks = async () => {
+    try {
+      const chains = await Extension.getAllChains();
+      dispatch({
+        type: "refresh-networks",
+        payload: { chains },
+      });
+    } catch (error) {
+      showErrorToast(tCommon(error as string));
+    }
+  };
+
   useEffect(() => {
-    if (state.rpc && state.type) {
+    if (state.rpc && state.type && !state.api) {
       (async () => {
         const api = await getProvider(state.rpc as string, state.type);
         dispatch({
@@ -191,7 +214,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         });
       })();
     }
-  }, [state.rpc, state.type]);
+  }, [state.rpc, state.type, state.api]);
 
   return (
     <NetworkContext.Provider
@@ -200,6 +223,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         setSelectNetwork,
         getSelectedNetwork,
         setNewRpc,
+        refreshNetworks,
       }}
     >
       {children}

@@ -10,7 +10,6 @@ Kuma Wallet
 [![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
 [![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
 [![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 ## Descripción del proyecto
@@ -156,6 +155,38 @@ npm test
 
 Esperamos brindar una experiencia de usuario integral con Kuma Wallet, convirtiéndola en una solución integral para todas las necesidades de gestión de activos entre cadenas. Para lograr este objetivo, hemos implementado una variedad de funciones que harán que la experiencia del usuario sea lo más fluida e intuitiva posible.
 Pero en caso de que necesite ayuda, hemos creado una [guía del usuario] (https://docs.kumawallet.io/) para ayudarlo a comenzar.
+
+## Integrar Kuma Wallet a su aplicación
+
+Para integrar Kuma Wallet a su aplicación, siga el ejemplo a continuación.
+
+### Ejemplo
+
+```javascript
+// En un contexto donde 'window' esté disponible (por ejemplo, la aplicación que desea integrar Kuma Wallet)
+// Verifique si Kuma Wallet está instalado
+const isKumaWalletInstalled = !!window.kuma;
+
+// Firmar un mensaje
+const signMessage = async (message: string) => {
+  if (isKumaWalletInstalled) {
+    const response = await window.kuma.call({
+      method: "sign_message",
+      params: {
+        message,
+      }
+    })
+    console.log(response?.message);
+  }
+}
+```
+
+Al intentar firmar un mensaje en Kuma Wallet, aparecerá una ventana emergente que solicitará la confirmación del usuario. El primer paso en el proceso de confirmación consiste en verificar que el sitio sea seguro.
+
+![trust-site](./images/trust-site.png)
+
+![sign-message](./images/sign-message.png)
+
 
 ## Contribuyendo
 

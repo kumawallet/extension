@@ -1,8 +1,7 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { Chain } from "@src/constants/chains";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { getAccountType } from "@src/utils/account-utils";
@@ -10,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
+import { Chain } from "@src/storage/entities/Chains";
+import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 
 export const ChainSelector = () => {
   const navigate = useNavigate();
@@ -27,6 +28,18 @@ export const ChainSelector = () => {
   const [chainToChange, setChainToChange] = useState<Chain | null>(null);
   const [openModal, setopenModal] = useState(false);
   const [needToCreateAccount, setNeedToCreateAccount] = useState(false);
+  const [showTestnets, setShowTestnets] = useState(false);
+
+  useEffect(() => {
+    getSettings();
+  }, []);
+
+  const getSettings = async () => {
+    const showTestnets = (
+      await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
+    )?.value as boolean;
+    setShowTestnets(showTestnets);
+  };
 
   const selecteNetwork = async (chain: Chain, close: () => void) => {
     let chainTypeIsSupportedBySelectedAccount = false;
@@ -60,8 +73,8 @@ export const ChainSelector = () => {
         changeChain(chain);
       } else {
         const accounts = await getAllAccounts(chain.supportedAccounts);
-        await setSelectedAccount(accounts[0]);
         changeChain(chain);
+        await setSelectedAccount(accounts[0], false);
       }
     }
 
@@ -82,6 +95,11 @@ export const ChainSelector = () => {
     }, 500);
   };
 
+  const filteredChains = {
+    ...chains,
+    testnets: showTestnets ? chains.testnets : [],
+  };
+
   return (
     <>
       <Menu>
@@ -89,6 +107,12 @@ export const ChainSelector = () => {
           data-testid="chain-button"
           className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
+          <img
+            src={`/images/${selectedChain.logo}.png`}
+            width={24}
+            height={24}
+            className="object-cover rounded-full"
+          />
           <p>{selectedChain?.name}</p>
           <BsChevronDown />
         </Menu.Button>
@@ -104,15 +128,20 @@ export const ChainSelector = () => {
           <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
             <div className="px-6 py-2 pt-2 text-start">
               <div className="flex flex-col gap-1">
-                {chains?.map((spec) => (
-                  <div key={spec.name}>
-                    <div className="flex items-center gap-3 whitespace-nowrap">
-                      <p className="text-[#808385] text-lg">
-                        {t(`chain_selector.${spec.name}`)}
-                      </p>
-                      <div className="h-[1px] w-full bg-[#343A40]" />
-                    </div>
-                    {spec.chains.map((chain, index) => (
+                {Object.keys(filteredChains).map((spec) => (
+                  <div key={spec}>
+                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
+                      .length > 0 && (
+                      <div className="flex items-center gap-3 whitespace-nowrap">
+                        <p className="text-[#808385] text-lg">
+                          {t(`chain_selector.${spec}`)}
+                        </p>
+                        <div className="h-[1px] w-full bg-[#343A40]" />
+                      </div>
+                    )}
+                    {filteredChains[
+                      spec as "mainnets" | "testnets" | "custom"
+                    ].map((chain, index) => (
                       <Menu.Item key={index.toString()}>
                         {({ close }) => (
                           <div
@@ -121,7 +150,14 @@ export const ChainSelector = () => {
                               selecteNetwork(chain, close);
                             }}
                           >
-                            <div className="w-5 h-5 rounded-full bg-gray-400" />
+                            <img
+                              src={`/images/${chain.logo}.png`}
+                              width={30}
+                              height={30}
+                              alt={chain.name}
+                              className="object-cover rounded-full"
+                            />
+                            {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
                             <div className="flex gap-3 items-center">
                               <p className="text-xl">{chain.name}</p>
                               {chain.name === selectedChain?.name && (

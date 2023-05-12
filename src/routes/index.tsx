@@ -8,7 +8,9 @@ import {
   Balance,
   ManageAssets,
   Send,
+  Receive,
   SignIn,
+  SignMessage,
   Welcome,
 } from "@src/pages";
 import {
@@ -32,6 +34,7 @@ import {
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
+  RECEIVE,
   RESTORE_PASSWORD,
   SEND,
   SETTINGS_ADVANCED,
@@ -41,11 +44,13 @@ import {
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
   SIGNIN,
+  SIGN_MESSAGE,
 } from "./paths";
 
 import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
 import { isProduction } from "@src/utils/env";
+import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -102,6 +107,23 @@ export const Routes = () => {
     setHomeRoute(<Balance />);
   };
 
+  if (location.search) {
+    return (
+      <MemoryRouter initialEntries={[SIGN_MESSAGE]}>
+        <RRoutes>
+          <Route
+            path={SIGN_MESSAGE}
+            element={
+              <ValidationWrapper query={location.search}>
+                <SignMessage />
+              </ValidationWrapper>
+            }
+          />
+        </RRoutes>
+      </MemoryRouter>
+    );
+  }
+
   return (
     <MemoryRouter>
       <RRoutes>
@@ -110,6 +132,7 @@ export const Routes = () => {
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={SEND} element={<Send />} />
+        <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
 
         <Route

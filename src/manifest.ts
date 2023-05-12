@@ -8,7 +8,6 @@ const commonManifest = {
       matches: ["http://*/*", "https://*/*", "<all_urls>"],
       run_at: "document_end",
       js: ["src/entries/content/index.js"],
-      css: ["contentStyle.css"],
     },
   ],
   icons: {
@@ -19,6 +18,9 @@ const commonManifest = {
     "storage",
     "activeTab",
     "scripting",
+    "nativeMessaging",
+    "tabs",
+    "notifications",
   ] as chrome.runtime.ManifestPermissions[],
   version: pkg.version,
 };
@@ -60,12 +62,13 @@ const manifestV3: chrome.runtime.ManifestV3 = {
 const manifestV2: chrome.runtime.ManifestV2 = {
   ...commonManifest,
   manifest_version: 2,
+
   browser_action: {
     default_popup: POPUP,
     default_title: "Open the popup",
   },
   background: {
-    page: BACKGROUND,
+    page: "src/entries/background/index.html",
     persistent: false,
   },
   content_security_policy: SECURITY,

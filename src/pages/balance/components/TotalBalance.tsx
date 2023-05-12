@@ -1,44 +1,61 @@
 import { FC } from "react";
-// import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
-// import { useTranslation } from "react-i18next";
+import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
+import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
-// import { useNavigate } from "react-router-dom";
-// import { SEND } from "@src/routes/paths";
+import { useNavigate } from "react-router-dom";
+import { SEND, RECEIVE } from "@src/routes/paths";
+import { useAccountContext, useAssetContext } from "@src/providers";
 
 interface TotalBalanceProps {
   balance?: number;
   accountName?: string;
 }
 
-export const TotalBalance: FC<TotalBalanceProps> = ({
-  balance = 0,
-  accountName = "",
-}) => {
-  // const { t } = useTranslation("balance");
-  // const navigate = useNavigate();
+export const TotalBalance: FC<TotalBalanceProps> = () => {
+  const { t } = useTranslation("balance");
+
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
+
+  const {
+    state: { assets },
+  } = useAssetContext();
+
+  const navigate = useNavigate();
+
+  const totalBalance = assets.reduce(
+    (total, item) => total + (item.amount || 0),
+    0
+  );
 
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-center">
-        <p className="text-2xl mb-4">{accountName || ""}</p>
+        <p className="text-2xl mb-4">{selectedAccount?.value?.name || ""}</p>
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
         <p className="text-2xl">$</p>
-        <p className="text-5xl">{formatAmountWithDecimals(balance, 5)}</p>
+        <p className="text-5xl" data-testid="balance">
+          {formatAmountWithDecimals(totalBalance, 5)}
+        </p>
       </div>
-      {/* <div className="flex gap-3 justify-center">
+      <div className="flex gap-3 justify-center">
         <button
           onClick={() => navigate(SEND)}
-          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg"
+          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40"
         >
           <BsArrowUpRight />
           <p>{t("send")}</p>
         </button>
-        <button className="flex gap-1 items-center text-custom-green-bg font-bold text-lg">
+        <button
+          onClick={() => navigate(RECEIVE)}
+          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40"
+        >
           <BsArrowDownLeft />
           <p>{t("receive")}</p>
         </button>
-      </div> */}
+      </div>
     </div>
   );
 };

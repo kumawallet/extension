@@ -47,7 +47,17 @@
     "address_required": "Dirección requerida",
     "view_in_scanner": "Ver en el escáner",
     "add": "Añadir",
-    "manage": "Administrar"
+    "manage": "Administrar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "connect": "Conectar",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "open": "Abrir",
+    "close": "Cerrar",
+    "copied": "Copiado",
+    "invalid_address": "Dirección inválida"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -103,7 +113,10 @@
       "password_hint": "La contraseña debe contener al menos ocho caracteres, al menos un número, tanto letras minúsculas como mayúsculas y caracteres especiales.",
       "confirm_password": "Confirmar contraseña",
       "confirm_password_hint": "Las contraseñas no coinciden.",
-      "required": "requerido"
+      "required": "requerido",
+      "confirm_recovery_phrase": "Confirmar frase de recuperación",
+      "confirm_recovery_phrase_description": "Por favor confirma tu frase de recuperación seleccionando las palabras en el orden correcto.",
+      "next": "Siguiente"
     }
   },
   "balance": {
@@ -116,9 +129,9 @@
       "import_account": "Importar",
       "cancel": "Cancelar",
       "change": "Cambiar",
-      "mainnets": "Redes principales (mainnets)",
-      "parachains": "Redes secundarias (parachains)",
-      "testnets": "Redes de prueba (testnets)",
+      "mainnets": "Redes principales",
+      "testnets": "Redes de prueba",
+      "custom": "Personalizadas",
       "evm_type": "cuenta tipo Ethereum (EVM)",
       "wasm_type": "cuenta tipo Polkadot (WASM)"
     },
@@ -130,7 +143,9 @@
     "send": "Enviar",
     "receive": "Recibir",
     "assets": "Activos",
-    "activity": "Actividad"
+    "activity": "Actividad",
+    "show_all_assets": "Mostrar todos los activos",
+    "manage_assets": "Administrar activos"
   },
   "settings": {
     "title": "Configuración",
@@ -143,14 +158,29 @@
   },
   "general_settings": {
     "title": "General",
-    "languages": "Idiomas"
+    "languages": "Idiomas",
+    "manage_networks": "Adminsitrar redes",
+    "show_testnets": "Mostrar redes de prueba"
   },
   "advanced_settings": {
-    "title": "Avanzado",
-    "manage_networks": "Adminsitrar redes"
+    "title": "Avanzado"
   },
   "manage_networks": {
-    "title": "Adminsitrar redes"
+    "title": "Adminsitrar redes",
+    "new_network": "Nueva red",
+    "network_name": "Nombre de la red",
+    "address_prefix": "Prefijo de la dirección",
+    "native_currency": "Moneda nativa",
+    "account_type_support": "Tipo de cuenta soportado",
+    "currency_name": "Nombre de la moneda",
+    "currency_symbol": "Símbolo",
+    "currency_decimals": "Decimales",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "ej.: https://mainnet.infura.io/v3/your_project_id",
+    "rpc_wasm_placeholder": "ej.: wss://rpc.polkadot.io",
+    "explorer": "Explorador",
+    "explorer_evm_placeholder": "ej.: https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "ej.: https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "Contactos",
@@ -159,11 +189,70 @@
     "save_contact": "Guardar contacto",
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
-    "search": "Buscar contactos por nombre o dirección"
+    "search": "Buscar contactos por nombre o dirección",
+    "new_contact": "Nuevo contacto"
   },
   "activity": {
     "title": "Actividad",
     "empty": "No hay actividad",
     "search": "Busca por dirección, hash o referencia"
+  },
+  "receive": {
+    "title": "Comparte tu dirección",
+    "copied": "Copiada!"
+  },
+  "confirm_trusted_site": {
+    "title": "Acción requerida",
+    "new_site_warning": "Este sitio quiere conectarse a tu Kuma Wallet. Por favor revisa la información del sitio y asegúrate de confiar en él antes de conectarte.",
+    "do_you_trust_this_site": "¿Confías en este sitio?",
+    "site_will_be_trusted": "Confirmando este sitio será confiable en el futuro.",
+    "manage_trusted_sites": "Si quieres administrar los sitios confiables ve a la configuración de la extensión."
+  },
+  "security": {
+    "title": "Seguridad",
+    "trusted_sites": "Sitios confiables",
+    "no_trusted_sites": "No hay sitios confiables",
+    "search": "Buscar sitios por URL",
+    "credentials": "Credenciales",
+    "restore_password": "Restablecer contraseña",
+    "show_account_keys": "Show account keys",
+    "show": "Show",
+    "account_keys_description": "Advertencia: Mantén esta contraseña confidencial. Compartir tus claves privadas podría llevar a la pérdida de los activos de tu cuenta.",
+    "reset_wallet": "Resetear Kuma Wallet",
+    "reset_wallet_warning": "Advertencia: Esta acción eliminará todas tus cuentas y datos de la extensión. Todos tus activos están seguros ya que NO se almacenan en la extensión. Necesitarás restaurar tus cuentas usando la frase semilla.",
+    "reset": "Resetear"
+  },
+  "send": {
+    "title": "Enviar token",
+    "from": "Desde",
+    "to:": "Para",
+    "destination_account": "Cuenta destino",
+    "amount": "Monto",
+    "gas_limit": "Limite de gas",
+    "estimated_fee": "Tasa estimada",
+    "estimated_total": "Total estimado",
+    "tip": "Tip (opcional)",
+    "transfer": "Transferencia",
+    "chains": "Cadenas",
+    "assets": "Activos",
+    "details": "Detalles",
+    "confirm": "Confirmar",
+    "tx_send": "Transacción enviada",
+    "insufficient_balance": "Balance insuficiente",
+    "continue": "Continuar"
+  },
+  "manage_assets": {
+    "title": "Gestionar activos",
+    "address": "Dirección",
+    "symbol": "Símbolo",
+    "decimals": "Decimales",
+    "add": "Agregar"
+  },
+  "sign_message": {
+    "title": "Firmar mensaje",
+    "cancel": "Cancelar",
+    "sign": "Firmar",
+    "account": "Cuenta",
+    "message": "Mensaje"
   }
 }

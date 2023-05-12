@@ -1,50 +1,41 @@
-import {
-  InputErrorMessage,
-  Loading,
-  LoadingButton,
-  PageWrapper,
-} from "@src/components/common";
+import { useMemo, useState } from "react";
+import { PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
-import { TbChevronRight } from "react-icons/tb";
-import { SelectableChain } from "./components/SelectableChain";
-import Extension from "@src/Extension";
-import { Destination } from "./components/Destination";
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { SelectableAsset } from "./components/SelectableAsset";
-import { NumericFormat } from "react-number-format";
 import { FormProvider, useForm } from "react-hook-form";
-import { useNetworkContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object, string } from "yup";
-import { ethers } from "ethers";
-import { useToast } from "@src/hooks";
-import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
-import { ApiPromise } from "@polkadot/api";
-import { decodeAddress, encodeAddress, Keyring } from "@polkadot/keyring";
-import Record from "@src/storage/entities/activity/Record";
-import {
-  RecordType,
-  RecordStatus,
-  TransferData,
-} from "@src/storage/entities/activity/types";
+import { useLoading, useToast } from "@src/hooks";
+import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { useNavigate } from "react-router-dom";
-import { BALANCE } from "@src/routes/paths";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { isHex } from "@polkadot/util";
 import { isAddress } from "ethers/lib/utils";
+import { AccountType } from "@src/accounts/types";
+import { ConfirmTx, WasmForm, EvmForm } from "./components";
+import { BALANCE } from "@src/routes/paths";
+import { FiChevronLeft } from "react-icons/fi";
+import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
+import { BigNumber, Contract } from "ethers";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 export const Send = () => {
   const { t } = useTranslation("send");
+  const { t: tCommon } = useTranslation("common");
   const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useToast();
+  const { isLoading, starLoading, endLoading } = useLoading();
 
   const {
-    state: { selectedChain, api },
+    state: { selectedChain, type, rpc },
   } = useNetworkContext();
 
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const [tx, setTx] = useState<Tx | null>(null);
 
   const schema = useMemo(() => {
     return object({
@@ -56,344 +47,156 @@ export const Send = () => {
         .required(t("required") as string),
       destinationAccount: string()
         .typeError(t("required") as string)
-        .test("valid address", t("invalid_address") as string, (address) => {
-          try {
-            if (!address) return false;
+        .test(
+          "valid address",
+          tCommon("invalid_address") as string,
+          (address) => {
+            try {
+              if (!address) return false;
 
-            if (isHex(address)) {
-              return isAddress(address);
-            } else {
-              encodeAddress(decodeAddress(address));
+              if (isHex(address)) {
+                return isAddress(address);
+              } else {
+                encodeAddress(decodeAddress(address));
+              }
+
+              return true;
+            } catch (error) {
+              return false;
             }
-
-            return true;
-          } catch (error) {
-            return false;
           }
-        })
+        )
         .required(t("required") as string),
       amount: number().required(t("required") as string),
       asset: object().required(t("required") as string),
     }).required();
   }, []);
 
-  const methods = useForm<any>({
+  const methods = useForm<SendForm>({
     defaultValues: {
       from: selectedChain,
       to: selectedChain,
       destinationAccount: "",
       amount: 0,
-      asset: selectedChain?.nativeCurrency,
+      asset: {},
     },
     resolver: yupResolver(schema),
-    mode: "onChange",
-  });
-  const {
-    handleSubmit,
-    getValues,
-    setValue,
-    watch,
-    formState: { errors },
-  } = methods;
-
-  const amount = watch("amount");
-  const destinationAccount = watch("destinationAccount");
-  const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
-
-  console.log({
-    destinationIsInvalid,
-    destinationAccount,
-    errors,
+    mode: "all",
   });
 
-  const [extrinsic, setExtrinsic] = useState<any>(null);
-  const [evmFees, setEvmFees] = useState<any>({});
-  const [wasmFees, setWasmFees] = useState<any>({});
-  const [loadingFee, setLoadingFee] = useState(false);
-  const [isSendingTx, setIsSendingTx] = useState(false);
-  const [evmTx, setEvmTx] = useState<
-    ethers.utils.Deferrable<ethers.providers.TransactionRequest>
-  >({
-    to: "",
-    value: 0,
-    maxPriorityFeePerGas: 0,
-    maxFeePerGas: 0,
-  });
+  const { getValues } = methods;
 
-  const onSubmit = handleSubmit(async (data) => {
-    setIsSendingTx(true);
+  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const currencyUnits = 10 ** decimals;
+
+  const sendTx = async () => {
+    starLoading();
+    const amount = getValues("amount");
+    const destinationAddress = getValues("destinationAccount");
+    const originAddress = selectedAccount.value.address;
+    const asset = getValues("asset") as IAsset;
+    const destinationNetwork = selectedChain.name;
+
+    const { id } = await WebAPI.windows.getCurrent();
+
+    const txToSend: Partial<TxToProcess> = {
+      amount,
+      originAddress,
+      destinationAddress,
+      rpc: rpc as string,
+      asset,
+      destinationNetwork,
+      networkInfo: selectedChain,
+      originNetwork: selectedChain,
+    };
+
     try {
-      let hash = "";
-      let date;
-      let reference = "";
+      if (tx?.type === AccountType.WASM) {
+        txToSend.tx = {
+          txHash: tx.tx.toHex(),
+          aditional: tx.aditional,
+          type: AccountType.WASM,
+        };
+      } else {
+        const isNativeAsset = asset?.id === "-1";
 
-      if (selectedAccount.type.includes("EVM")) {
-        const pk = await Extension.showPrivateKey();
+        let _tx;
+        const _amount = isNativeAsset
+          ? amount * currencyUnits
+          : amount * 10 ** (asset.decimals as number);
 
-        const wallet = new ethers.Wallet(
-          pk as string,
-          api as ethers.providers.JsonRpcProvider
+        const bnAmount = BigNumber.from(
+          _amount.toLocaleString("fullwide", { useGrouping: false })
         );
 
-        const res = await wallet.sendTransaction({
-          ...evmTx,
-          value: Number(
-            Number(evmTx.value) *
-              10 ** (selectedChain?.nativeCurrency?.decimals || 1)
-          ),
-        });
-
-        hash = res.hash;
-        date = Date.now();
-        reference = "evm";
-      } else {
-        const seed = await Extension.showSeed();
-
-        const keyring = new Keyring({ type: "sr25519" });
-        const sender = keyring.addFromMnemonic(seed as string);
-        const res = await extrinsic?.signAndSend(sender);
-
-        hash = res.toHuman();
-        date = Date.now();
-        reference = "wasm";
-      }
-
-      const activity = {
-        address: destinationAccount.address,
-        type: RecordType.TRANSFER,
-        reference,
-        hash,
-        status: RecordStatus.PENDING,
-        createdAt: date,
-        lastUpdated: date,
-        error: undefined,
-        network: selectedChain?.name || "",
-        recipientNetwork: selectedChain?.name || "",
-        data: {
-          symbol: String(selectedChain?.nativeCurrency.symbol),
-          from: selectedAccount.value.address,
-          to: destinationAccount.address,
-          gas: "0",
-          gasPrice: "0",
-          value: amount,
-        } as TransferData,
-      };
-
-      await Extension.addActivity(hash, activity as Record);
-      showSuccessToast(t("tx_saved"));
-      navigate(BALANCE);
-    } catch (error) {
-      console.log(error);
-      showErrorToast(error as string);
-    } finally {
-      setIsSendingTx(false);
-    }
-  });
-
-  const formatEthAmount = useCallback(
-    (amount: any, unitName?: any) => {
-      return ethers.utils.formatUnits(
-        amount,
-        unitName || (selectedChain?.nativeCurrency.decimals as number)
-      );
-    },
-    [selectedChain?.nativeCurrency.decimals]
-  );
-
-  useEffect(() => {
-    if (!evmTx?.to) return;
-    (async () => {
-      try {
-        if (selectedAccount.type.includes("EVM")) {
-          const [feeData, gasLimit] = await Promise.all([
-            (api as ethers.providers.JsonRpcProvider).getFeeData(),
-            (api as ethers.providers.JsonRpcProvider).estimateGas(evmTx),
-          ]);
-
-          setEvmFees({
-            gasLimit: gasLimit,
-            lastBaseFeePerGas: feeData.lastBaseFeePerGas,
-            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+        if (isNativeAsset) {
+          _tx = await tx?.sender.sendTransaction({
+            ...tx.tx,
           });
-
-          setEvmTx(
-            (prevState) =>
-              ({
-                ...prevState,
-                gasLimit,
-                maxFeePerGas: feeData.maxFeePerGas,
-                maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
-              } as any)
+        } else {
+          _tx = await (tx?.tx as Contract).transfer(
+            destinationAddress,
+            bnAmount,
+            {
+              gasLimit: tx?.fee["gas limit"],
+              maxFeePerGas: tx?.fee["max fee per gas"],
+              maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
+              type: 2,
+            }
           );
         }
-      } catch (error) {
-        showErrorToast(error);
-      } finally {
-        setLoadingFee(false);
+
+        txToSend.tx = {
+          txHash: _tx.hash,
+          type: AccountType.EVM,
+        };
       }
-    })();
-  }, [evmTx?.to]);
 
-  useEffect(() => {
-    if (destinationIsInvalid) {
-      setEvmTx({});
-      setWasmFees({});
-      return;
+      await WebAPI.runtime.sendMessage({
+        from: "popup",
+        origin: "kuma",
+        method: "process_tx",
+        popupId: id,
+        tx: txToSend,
+      });
+
+      showSuccessToast(t("tx_send"));
+      navigate(BALANCE, {
+        state: {
+          tab: "activity",
+        },
+      });
+    } catch (error) {
+      // const _err = String(error).split('\\"message\\":\\"')[1].split('\\"}')[0];
+      showErrorToast(error);
     }
-
-    if (selectedAccount.type.includes("EVM")) {
-      setEvmTx((prevState) => ({
-        ...prevState,
-        value: amount,
-        to: destinationAccount?.address || "",
-      }));
-      return;
-    }
-
-    if (!destinationAccount || amount <= 0) return;
-
-    setLoadingFee(true);
-
-    const getData = setTimeout(async () => {
-      try {
-        const currencyUnits =
-          10 ** (selectedChain?.nativeCurrency.decimals || 1);
-
-        const _amount = Number(amount) * currencyUnits;
-
-        const extrinsic = await (api as ApiPromise).tx.balances.transfer(
-          destinationAccount.address,
-          _amount
-        );
-
-        setExtrinsic(extrinsic);
-
-        const seed = await Extension.showSeed();
-
-        const keyring = new Keyring({ type: "sr25519" });
-        const sender = keyring.addFromMnemonic(seed as string);
-
-        const { weight, partialFee } = await extrinsic.paymentInfo(sender);
-
-        const fee = partialFee.toNumber() / currencyUnits;
-
-        const currencySymbol = selectedChain?.nativeCurrency.symbol;
-
-        const total = (partialFee.toNumber() + _amount) / currencyUnits;
-
-        setWasmFees({
-          "estimated fee": `${fee} ${currencySymbol}`,
-          "weight ref time": weight.toJSON().refTime,
-          "weight proof size": weight.toJSON().proofSize,
-          "estimated total": `${total} ${currencySymbol}`,
-        });
-      } catch (error) {
-        console.error(error);
-      }
-      setLoadingFee(false);
-    }, 1000);
-
-    return () => clearTimeout(getData);
-  }, [amount, destinationAccount?.address, destinationIsInvalid]);
-
-  const originAccountIsEVM = selectedAccount.type.includes("EVM");
-
-  const canContinue =
-    (Number(amount) > 0 && destinationAccount?.address) || loadingFee;
+    endLoading();
+  };
 
   return (
-    <PageWrapper contentClassName="bg-[#29323C]">
+    <PageWrapper contentClassName="bg-[#29323C] h-full">
       <FormProvider {...methods}>
-        <div className="mx-auto">
-          <div className="flex gap-3 items-center mb-7">
-            <BiLeftArrowAlt
-              size={26}
-              className="cursor-pointer"
-              onClick={() => navigate(-1)}
-            />
-
-            <p className="text-xl">{t("title")}</p>
-          </div>
-
-          <div className="flex gap-2 justify-center items-end mb-4">
-            <div className="px-2">
-              <p className="mb-2">From:</p>
-              <SelectableChain selectedChain={getValues("from")} />
-            </div>
-            <TbChevronRight size={26} className="mb-2" />
-            <div className="px-2">
-              <p className="mb-2">To:</p>
-              <SelectableChain
-                canSelectChain={true}
-                selectedChain={getValues("to")}
-                optionChains={[]}
+        {!tx ? (
+          <div className="mx-auto">
+            <div className="flex gap-3 items-center mb-7">
+              <FiChevronLeft
+                size={26}
+                className="cursor-pointer"
+                onClick={() => navigate(-1)}
               />
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 mb-3">
-            <div>
-              <p>{t("destination_account")}</p>
-              <Destination
-                onSelectedAccount={(account) =>
-                  // setValue("destinationAccount", account)
-                  null
-                }
-              />
-              <InputErrorMessage
-                message={errors.destinationAccount?.message as string}
-              />
-            </div>
-            <div>
-              <p>{t("amount")}</p>
-              <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
-                <NumericFormat
-                  className="bg-transparent w-8/12 outline-0"
-                  allowNegative={false}
-                  allowLeadingZeros={false}
-                  value={getValues("amount")}
-                  onValueChange={({ value }) => {
-                    setValue("amount", value);
-                  }}
-                  allowedDecimalSeparators={["%"]}
-                />
 
-                <div className="w-4/12">
-                  <SelectableAsset
-                    onChangeAsset={(asset) => setValue("asset", asset)}
-                  />
-                </div>
-              </div>
-              <InputErrorMessage message={errors.amount?.message as string} />
+              <p className="text-xl">{t("title")}</p>
             </div>
-            {loadingFee ? (
-              <Loading />
+
+            {type === "WASM" ? (
+              <WasmForm confirmTx={setTx} />
             ) : (
-              <div className="flex flex-col gap-1">
-                {Object.keys(originAccountIsEVM ? evmFees : wasmFees).map(
-                  (key) => (
-                    <div key={key} className="flex justify-between">
-                      <p>{key}</p>
-                      <p>
-                        {originAccountIsEVM
-                          ? `${Number(evmFees[key])} gwei`
-                          : wasmFees[key]}
-                      </p>
-                    </div>
-                  )
-                )}
-              </div>
+              <EvmForm confirmTx={setTx} />
             )}
           </div>
-
-          <LoadingButton
-            classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
-            onClick={onSubmit}
-            isLoading={isSendingTx}
-            isDisabled={!canContinue}
-          >
-            {t("continue")}
-          </LoadingButton>
-        </div>
+        ) : (
+          <ConfirmTx tx={tx} onConfirm={sendTx} isLoading={isLoading} />
+        )}
       </FormProvider>
     </PageWrapper>
   );

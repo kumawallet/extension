@@ -47,7 +47,17 @@
     "address_required": "Address is required",
     "view_in_scanner": "Explore",
     "add": "Add",
-    "manage": "Manage"
+    "manage": "Manage",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "connect": "Connect",
+    "show": "Show",
+    "hide": "Hide",
+    "open": "Open",
+    "close": "Close",
+    "copied": "Copied",
+    "invalid_address": "Invalid address"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -93,9 +103,9 @@
       "evm_type": "Ethereum like account (EVM)",
       "wasm_type": "Polkadot like account (WASM)",
       "private_key": "Private key",
-      "private_key_validation": "Invalidad Private Key",
+      "private_key_validation": "Invalid Private Key",
       "seed_phrase": "Seed Phrase",
-      "seed_phrasey_validation": "Invalidad Seed Phrase",
+      "seed_phrasey_validation": "Invalid Seed Phrase",
       "recovery_phrase": "Recovery Phrase",
       "account_name": "Account Name (optional)",
       "account_name_placeholder": "Max 32 characters",
@@ -103,7 +113,10 @@
       "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
       "confirm_password": "Confirm password",
       "confirm_password_hint": "Passwords don't match.",
-      "required": "required"
+      "required": "required",
+      "confirm_recovery_phrase": "Confirm recovery phrase",
+      "confirm_recovery_phrase_description": "Please confirm your recovery phrase by selecting the words in the correct order.",
+      "next": "Next"
     }
   },
   "balance": {
@@ -116,9 +129,9 @@
       "import_account": "Import",
       "cancel": "Cancel",
       "change": "Change",
-      "mainnets": "Relay chains",
-      "parachains": "Parachains",
+      "mainnets": "Mainnets",
       "testnets": "Testnets",
+      "custom": "Custom",
       "evm_type": "Ethereum like account (EVM)",
       "wasm_type": "Polkadot like account (WASM)"
     },
@@ -130,7 +143,9 @@
     "send": "Send",
     "receive": "Receive",
     "assets": "Assets",
-    "activity": "Activity"
+    "activity": "Activity",
+    "show_all_assets": "Show all assets",
+    "manage_assets": "Manage assets"
   },
   "settings": {
     "title": "Settings",
@@ -143,14 +158,29 @@
   },
   "general_settings": {
     "title": "General",
-    "languages": "Languages"
+    "languages": "Languages",
+    "manage_networks": "Manage networks",
+    "show_testnets": "Show testnets"
   },
   "advanced_settings": {
-    "title": "Advanced",
-    "manage_networks": "Manage networks"
+    "title": "Advanced"
   },
   "manage_networks": {
-    "title": "Manage networks"
+    "title": "Manage networks",
+    "new_network": "New network",
+    "network_name": "Network name",
+    "address_prefix": "Address prefix",
+    "native_currency": "Native currency",
+    "account_type_support": "Account type support",
+    "currency_name": "Currency name",
+    "currency_symbol": "Symbol",
+    "currency_decimals": "Decimals",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "i.e. https://mainnet.infura.io/v3/your-api-key",
+    "rpc_wasm_placeholder": "i.e. wss://rpc.polkadot.io",
+    "explorer": "Explorer",
+    "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "Contacts",
@@ -159,11 +189,70 @@
     "save_contact": "Save contact",
     "insert_name": "Insert contact name",
     "insert_address": "Insert address",
-    "search": "Search contacts by name or address"
+    "search": "Search contacts by name or address",
+    "new_contact": "New contact"
   },
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
     "search": "Search by transaction hash, address or reference"
+  },
+  "receive": {
+    "title": "Share your address",
+    "copied": "Copied!"
+  },
+  "confirm_trusted_site": {
+    "title": "Action Required",
+    "new_site_warning": "This site wants to connect to your Kuma Wallet. Please review the site's information and make sure you trust it before connecting.",
+    "do_you_trust_this_site": "Do you trust this site?",
+    "site_will_be_trusted": "By confirming this site will be trusted in the future.",
+    "manage_trusted_sites": "If you want to manage the trusted sites go to the extension settings."
+  },
+  "security": {
+    "title": "Security",
+    "trusted_sites": "Trusted sites",
+    "no_trusted_sites": "No trusted sites",
+    "search": "Search sites by URL",
+    "credentials": "Credentials",
+    "restore_password": "Restore password",
+    "show_account_keys": "Show account keys",
+    "show": "Show",
+    "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account.",
+    "reset_wallet": "Reset Kuma Wallet",
+    "reset_wallet_warning": "Warning: This action will delete all your accounts and data from the extension. All your assets are safe as they are NOT stored on the extension. You will need to restore your accounts using the seed phrase.",
+    "reset": "Reset"
+  },
+  "send": {
+    "title": "Send token",
+    "from": "From",
+    "to:": "To",
+    "destination_account": "Destination account",
+    "amount": "Amount",
+    "gas_limit": "Gas limit",
+    "estimated_fee": "Estimated fee",
+    "estimated_total": "Estimated total",
+    "tip": "Tip (optional)",
+    "transfer": "Transfer",
+    "chains": "Chains",
+    "assets": "Assets",
+    "details": "Details",
+    "confirm": "Confirm",
+    "tx_send": "Transaction sent",
+    "insufficient_balance": "Insufficient balance",
+    "continue": "Continue"
+  },
+  "manage_assets": {
+    "title": "Manage Assets",
+    "address": "Address",
+    "symbol": "Symbol",
+    "decimals": "Decimals",
+    "add": "Add"
+  },
+  "sign_message": {
+    "title": "Sign message",
+    "cancel": "Cancel",
+    "sign": "Sign",
+    "account": "Account",
+    "message": "Message"
   }
 }

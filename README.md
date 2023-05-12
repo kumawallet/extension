@@ -10,7 +10,6 @@ Kuma Wallet
 [![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
 [![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
 [![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
-[![vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/kuma-wallet)](https://snyk.io/test/github/blockcoders/kuma-wallet)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -161,12 +160,47 @@ npm test
 We hope to provide a comprehensive user experience with Kuma Wallet, making it a one-stop solution for all cross-chain asset management needs. To achieve this goal, we have implemented a variety of features that will make the user experience as smooth and intuitive as possible.
 But just in case you need help, we have created a [user guide](https://docs.kumawallet.io/) to help you get started.
 
+## Integrate Kuma Wallet to your application
+
+To integrate Kuma Wallet to your application, follow the example below.
+
+### Example
+
+```javascript
+// In a context where 'window' is available (e.g. the application that wants to integrate Kuma Wallet)
+
+// Check if Kuma Wallet is installed
+const isKumaWalletInstalled = !!window.kuma;
+
+// Sign a message
+const signMessage = async (message: string) => {
+  if (isKumaWalletInstalled) {
+    const response = await window.kuma.call({
+      method: "sign_message",
+      params: {
+        message,
+      }
+    })
+    console.log(response?.message);
+  }
+}
+```
+
+When attempting to sign a message in Kuma Wallet, a pop-up will appear requesting the user's confirmation. The first step in the confirmation process involves verifying that the site is secure.
+
+![trust-site](./images/trust-site.png)
+
+![sign-message](./images/sign-message.png)
+
 ## Contributing
 
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
 
+## Localization
+Kuma currently only supports English, Spanish and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/blockcoders/kuma-wallet/tree/main/src/i18n) folder.
+
 ## Credits
 
-We want to thanks the Web3 Foundation for their support and the Polkadot team for their help and guidance. We also want to thank the Astar team for their support on Beta testing and the Polkadot community for their feedback and support.
-This project was a really great learning experience for us and we hope to continue to contribute to the Polkadot ecosystem.
-Our core developers team has been working on this project for more than 6 months and we are really proud of the result. We hope you will enjoy using Kuma Wallet as much as we enjoyed building it. 
+We want to thanks the [Web3 Foundation](https://web3.foundation/) for their support and the [Polkadot](https://polkadot.network/) team for their help and guidance. We also want to thank the [Astar](https://astar.network/) team for their support on Beta testing and the Polkadot community for their feedback and support.
+
+This project was a really great learning experience for us and we hope to continue to contribute to the Polkadot ecosystem. Our core developers team has been working on this project for more than 6 months and we are really proud of the result. We hope you will enjoy using Kuma Wallet as much as we enjoyed building it. 

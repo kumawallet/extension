@@ -4,6 +4,7 @@ export default abstract class Record {
   hash: string;
   type: RecordType;
   reference?: string;
+  fromBlock?: string;
   address: string;
   status: RecordStatus;
   createdAt?: number;

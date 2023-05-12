@@ -47,7 +47,17 @@
     "address_required": "住所が必要です",
     "view_in_scanner": "スキャナーで表示",
     "add": "追加",
-    "manage": "管理"
+    "manage": "管理",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "connect": "接続",
+    "show": "表示",
+    "hide": "非表示",
+    "open": "開く",
+    "close": "閉じる",
+    "copied": "コピペ",
+    "invalid_address": "むこうアドレス"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
@@ -103,7 +113,10 @@
       "password_hint": "パスワードは、少なくとも8文字、少なくとも1つの数字、大文字と小文字、特殊文字を含める必要があります。",
       "confirm_password": "パスワードを確認する",
       "confirm_password_hint": "パスワードが一致しません。",
-      "required": "必須"
+      "required": "必須",
+      "confirm_recovery_phrase": "リカバリーフレーズを確認する",
+      "confirm_recovery_phrase_description": "リカバリーフレーズを正しい順序で選択して確認してください。",
+      "next": "次へ"
     }
   },
   "balance": {
@@ -116,9 +129,9 @@
       "import_account": "インポート",
       "cancel": "キャンセル",
       "change": "変更",
-      "mainnets": "リレーチェーン",
-      "parachains": "パラチェーン",
+      "mainnets": "メインネット",
       "testnets": "テストネット",
+      "custom": "カスタム",
       "evm_type": "Ethereum風アカウント (EVM)",
       "wasm_type": "Polkadot風アカウント (WASM)"
     },
@@ -130,7 +143,9 @@
     "send": "送信",
     "receive": "受信",
     "assets": "資産",
-    "activity": "アクティビティ"
+    "activity": "アクティビティ",
+    "show_all_assets": "すべての資産を表示",
+    "manage_assets": "資産の管理"
   },
   "settings": {
     "title": "設定",
@@ -143,14 +158,29 @@
   },
   "general_settings": {
     "title": "一般",
-    "languages": "言語"
+    "languages": "言語",
+    "manage_networks": "ネットワークを追加",
+    "show_testnets": "テストネットを表示"
   },
   "advanced_settings": {
-    "title": "高度な",
-    "manage_networks": "ネットワークを追加"
+    "title": "高度な"
   },
   "manage_networks": {
-    "title": "ネットワークを追加"
+    "title": "ネットワークを追加",
+    "new_network": "新しいネットワーク",
+    "network_name": "ネットワーク名",
+    "address_prefix": "アドレスプレフィックス",
+    "native_currency": "ネイティブ通貨",
+    "account_type_support": "アカウントタイプのサポート",
+    "currency_name": "通貨名",
+    "currency_symbol": "シンボル",
+    "currency_decimals": "小数点以下の桁数",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "例: https://mainnet.infura.io/v3/your_project_id",
+    "rpc_wasm_placeholder": "例: wss://rpc.polkadot.io",
+    "explorer": "エクスプローラー",
+    "explorer_evm_placeholder": "例: https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "例: https://polkascan.io/pre/kusama/transaction/"
   },
   "contacts": {
     "title": "連絡先",
@@ -159,11 +189,70 @@
     "save_contact": "連絡先を保存する",
     "insert_name": "連絡先の名前を入力してください",
     "insert_address": "連絡先の住所を入力してください",
-    "search": "名前または住所で連絡先を検索する"
+    "search": "名前または住所で連絡先を検索する",
+    "new_contact": "新しい連絡先"
   },
   "activity": {
     "title": "アクティビティ",
     "empty": "アクティビティはありません",
     "search": "ハッシュ、アドレスまたは参照"
+  },
+  "receive": {
+    "title": "アドレスを共有する",
+    "copied": "コピーされました!"
+  },
+  "confirm_trusted_site": {
+    "title": "要対応",
+    "new_site_warning": "このサイトは、あなたの Kuma ウォレットに接続しようとしています。接続する前にサイト情報を確認し、信頼できるサイトであることを確認してください。",
+    "do_you_trust_this_site": "このサイトを信頼しますか?",
+    "site_will_be_trusted": "このサイトが今後信頼されることを確認しています。",
+    "manage_trusted_sites": "信頼済みサイトを管理したい場合は、拡張機能の設定に移動してください."
+  },
+  "security": {
+    "title": "セキュリティ",
+    "trusted_sites": "信頼済みサイト",
+    "no_trusted_sites": "信頼済みサイトはありません",
+    "search": "URLでサイトを検索する",
+    "credentials": "資格情報",
+    "restore_password": "パスワードを復元する",
+    "show_account_keys": "アカウントキーを表示する",
+    "show": "表示",
+    "account_keys_description": "警告: このパスワードを機密に保つようにしてください。プライベートキーを共有すると、アカウントの資産が失われる可能性があります。",
+    "reset_wallet": "ウォレットをリセットする",
+    "reset_wallet_warning": "警告: この操作を行うと、すべてのアカウントとデータが拡張機能から削除されます。すべての資産は拡張機能に保存されないため安全です。シード フレーズを使用してアカウントをリセットする必要があります。",
+    "reset": "リセット"
+  },
+  "send": {
+    "title": "トークンを送信する",
+    "from": "から",
+    "to:": "への",
+    "destination_account": "デスティネーションアカウント",
+    "amount": "金額",
+    "gas_limit": "ガスリミット",
+    "estimated_fee": "見積もり料金",
+    "estimated_total": "見積もり合計",
+    "tip": "チップ（オプション）",
+    "transfer": "転送",
+    "chains": "チェーン",
+    "assets": "資産の部",
+    "details": "詳細",
+    "confirm": "確認",
+    "tx_send": "トランザクション送信",
+    "insufficient_balance": "残高不足",
+    "continue": "続き"
+  },
+  "manage_assets": {
+    "title": "アセットを管理する",
+    "address": "アドレス",
+    "symbol": "シンボル",
+    "decimals": "小数点",
+    "add": "追加"
+  },
+  "sign_message": {
+    "title": "サインメッセージ",
+    "cancel": "キャンセル",
+    "sign": "ちょうこう",
+    "account": "アカウント",
+    "message": "メッセージ"
   }
 }

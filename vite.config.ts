@@ -9,7 +9,7 @@ import copyContentStyle from "./utils/plugins/copy-content-style";
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
-import { isChrome } from "./src/utils/env";
+import { isChrome, isProduction } from "./src/utils/env";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");
@@ -20,17 +20,19 @@ const stylesDir = resolve(root, "styles");
 const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
 const publicDir = resolve(__dirname, "public");
 
-console.log(`
- __    __                                          __       __            __  __              __     
-/  |  /  |                                        /  |  _  /  |          /  |/  |            /  |    
-$$ | /$$/  __    __  _____  ____    ______        $$ | / \\ $$ |  ______  $$ |$$ |  ______   _$$ |_   
-$$ |/$$/  /  |  /  |/     \\\\/    \\  /     \\       $$ |/$  \\$$ | /      \\ $$ |$$ | /      \\ / $$   |  
-$$  $$<   $$ |  $$ |$$$$$$ $$$$  | $$$$$$  |      $$ /$$$  $$ | $$$$$$  |$$ |$$ |/$$$$$$  |$$$$$$/   
-$$$$$  \\  $$ |  $$ |$$ | $$ | $$ | /    $$ |      $$ $$/$$ $$ | /    $$ |$$ |$$ |$$    $$ |  $$ | __ 
-$$ |$$  \\ $$ \\__$$ |$$ | $$ | $$ |/$$$$$$$ |      $$$$/  $$$$ |/$$$$$$$ |$$ |$$ |$$$$$$$$/   $$ |/  |
-$$ | $$  |$$    $$/ $$ | $$ | $$ |$$    $$ |      $$$/    $$$ |$$    $$ |$$ |$$ |$$       |  $$  $$/ 
-$$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/  $$$$$$$/    $$$$/  
-`);
+if (isProduction) {
+  console.log(`
+   __    __                                          __       __            __  __              __
+  /  |  /  |                                        /  |  _  /  |          /  |/  |            /  |
+  $$ | /$$/  __    __  _____  ____    ______        $$ | / \\ $$ |  ______  $$ |$$ |  ______   _$$ |_
+  $$ |/$$/  /  |  /  |/     \\\\/    \\  /     \\       $$ |/$  \\$$ | /      \\ $$ |$$ | /      \\ / $$   |
+  $$  $$<   $$ |  $$ |$$$$$$ $$$$  | $$$$$$  |      $$ /$$$  $$ | $$$$$$  |$$ |$$ |/$$$$$$  |$$$$$$/
+  $$$$$  \\  $$ |  $$ |$$ | $$ | $$ | /    $$ |      $$ $$/$$ $$ | /    $$ |$$ |$$ |$$    $$ |  $$ | __
+  $$ |$$  \\ $$ \\__$$ |$$ | $$ | $$ |/$$$$$$$ |      $$$$/  $$$$ |/$$$$$$$ |$$ |$$ |$$$$$$$$/   $$ |/  |
+  $$ | $$  |$$    $$/ $$ | $$ | $$ |$$    $$ |      $$$/    $$$ |$$    $$ |$$ |$$ |$$       |  $$  $$/
+  $$/   $$/  $$$$$$/  $$/  $$/  $$/  $$$$$$$/       $$/      $$/  $$$$$$$/ $$/ $$/  $$$$$$$/    $$$$/
+  `);
+}
 
 export default defineConfig({
   test: {
@@ -38,21 +40,13 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "src/tests/setup.ts",
     coverage: {
-      reporter: ['text', 'html', 'lcov', 'text-summary'],
+      reporter: ["text", "html", "lcov", "text-summary"],
       exclude: [
         ...(configDefaults.coverage.exclude as string[]),
         "**/src/tests/mocks/**",
         "**/src/constants/**",
         "**/src/routes/**",
         "**/src/components/common/**",
-
-        "**/src/pages/balance/components/Activity.tsx",
-
-        "**/src/storage/entities/activity/**",
-        "**/src/storage/entities/registry/**",
-        "**/src/storage/entities/settings/{Setting,Settings,types}.ts",
-
-        "**/src/storage/entities/Chains.ts",
       ],
     },
   },
@@ -71,13 +65,15 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
     outDir,
-    sourcemap: process.env.__DEV__ === "true",
+    // sourcemap: process.env.__DEV__ === "true",
     rollupOptions: {
       input: {
         devtools: resolve(entriesDir, "devtools", "index.html"),
         panel: resolve(entriesDir, "panel", "index.html"),
         content: resolve(entriesDir, "content", "index.ts"),
-        background: resolve(entriesDir, "background", "index.ts"),
+        background: isChrome
+          ? resolve(entriesDir, "background", "index.ts")
+          : resolve(entriesDir, "background", "index.html"),
         popup: resolve(entriesDir, "popup", "index.html"),
         newtab: resolve(entriesDir, "newtab", "index.html"),
         options: resolve(entriesDir, "options", "index.html"),

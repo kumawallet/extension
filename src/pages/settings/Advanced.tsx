@@ -8,9 +8,6 @@ import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Loading } from "@src/components/common";
-import { SettingKey } from "@src/storage/entities/settings/types";
-import { BsPlus } from "react-icons/bs";
-import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 
 export const Advanced = () => {
   const { t } = useTranslation("advanced_settings");
@@ -52,25 +49,11 @@ export const Advanced = () => {
         <p className="font-medium text-2xl">{t("title")}</p>
       </div>
       {settings.map((setting, index) => {
-        switch (setting.name) {
-          case SettingKey.MANAGE_NETWORKS:
-            return (
-              <div
-                key={index}
-                className="flex justify-between items-center gap-2"
-              >
-                <p className="text-lg font-medium">{t(setting.name)}</p>
-                <button
-                  type="button"
-                  className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
-                  onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
-                >
-                  <span>{tCommon('manage')} </span>
-                  <BsPlus size={ICON_SIZE} />
-                </button>
-              </div>
-            );
-        }
+        return (
+          <div key={index}>
+            <p>{setting.name}</p>
+          </div>
+        );
       })}
     </PageWrapper>
   );

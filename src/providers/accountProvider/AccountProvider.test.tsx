@@ -11,6 +11,7 @@ import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
 import Account from "@src/storage/entities/Account";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
+import { AccountFormType } from "@src/pages";
 
 const testIds = {
   createAccount: "create-account",
@@ -47,15 +48,15 @@ const TestComponent = () => {
       />
       <button
         data-testid={testIds.createAccount}
-        onClick={() => createAccount({} as any)}
+        onClick={() => createAccount({} as AccountFormType)}
       />
       <button
         data-testid={testIds.importAccount}
-        onClick={() => importAccount({} as any)}
+        onClick={() => importAccount({} as AccountFormType)}
       />
       <button
         data-testid={testIds.deriveAccount}
-        onClick={() => deriveAccount({} as any)}
+        onClick={() => deriveAccount({} as AccountFormType)}
       />
     </>
   );
@@ -117,40 +118,54 @@ describe("AccountProvider", () => {
     renderComponent();
 
     const btn = await screen.findByTestId(testIds.createAccount);
-    await act(() => {
+    act(() => {
       fireEvent.click(btn);
     });
-    expect(createAccount).toHaveBeenCalled();
+    await waitFor(() => expect(createAccount).toHaveBeenCalled());
   });
 
   it("should import account", async () => {
     renderComponent();
 
     const btn = await screen.findByTestId(testIds.importAccount);
-    await act(() => {
+    act(() => {
       fireEvent.click(btn);
     });
-    expect(importAccount).toHaveBeenCalled();
+    await waitFor(() => expect(importAccount).toHaveBeenCalled());
   });
 
   it("should derive account", async () => {
     renderComponent();
 
     const btn = await screen.findByTestId(testIds.deriveAccount);
-    await act(() => {
+    act(() => {
       fireEvent.click(btn);
     });
-    expect(deriveAccount).toHaveBeenCalled();
+    await waitFor(() => expect(deriveAccount).toHaveBeenCalled());
   });
 
   it("should call get selected account", async () => {
+    const Extension = (await import("@src/Extension")).default;
+
+    const getNetwork = vi.fn().mockReturnValue({
+      chain: CHAINS[0].chains[2],
+    });
+
+    Extension.getSelectedAccount = vi
+      .fn()
+      .mockReturnValue(selectedEVMAccountMock);
+
+    Extension.getNetwork = getNetwork;
+
     renderComponent();
 
     const btn = await screen.findByTestId(testIds.getSelectedAccount);
-    await act(() => {
+    act(() => {
       fireEvent.click(btn);
     });
-    expect(getSelectedAccount).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(getNetwork).toHaveBeenCalled();
+    });
   });
 
   it("should call get all accounts", async () => {
@@ -160,6 +175,6 @@ describe("AccountProvider", () => {
     act(() => {
       fireEvent.click(btn);
     });
-    waitFor(() => expect(getAllAccounts).toHaveBeenCalled());
+    await waitFor(() => expect(getAllAccounts).toHaveBeenCalled());
   });
 });

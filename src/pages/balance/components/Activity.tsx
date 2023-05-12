@@ -3,43 +3,63 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
-import Record from "@src/storage/entities/activity/Record";
 import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
 import Contact from "@src/storage/entities/registry/Contact";
 import { formatDate } from "@src/utils/utils";
-import { CHAINS } from "@src/constants/chains";
-import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
+import {
+  useNetworkContext,
+  useTxContext,
+  useAccountContext,
+} from "@src/providers";
+import Chains from "@src/storage/entities/Chains";
+import { AssetIcon } from "@src/components/common/AssetIcon";
+import { FaChevronRight } from "react-icons/fa";
+import { IAsset } from "@src/types";
+
+const chipColor = {
+  [RecordStatus.FAIL]: "bg-red-600",
+  [RecordStatus.SUCCESS]: "bg-green-600",
+  [RecordStatus.PENDING]: "bg-yellow-600",
+};
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
 
   const {
+    state: { type },
+  } = useNetworkContext();
+
+  const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const {
+    state: { activity },
+  } = useTxContext();
 
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
-  const [records, setRecords] = useState([] as Record[]);
+  const [networks, setNetworks] = useState({} as Chains);
   const [contacts, setContacts] = useState([] as Contact[]);
+  const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
 
   useEffect(() => {
     if (selectedAccount) {
-      getActivity();
       getContacts();
     }
+    getNetworks();
   }, [selectedAccount.key]);
 
-  const getActivity = async () => {
+  const getNetworks = async () => {
     try {
       setIsLoading(true);
-      const records = await Extension.getActivity();
-      setRecords(records);
+      const networks = await Extension.getAllChains();
+      setNetworks(networks);
     } catch (error) {
-      console.error(error);
-      setRecords([]);
+      setNetworks({} as Chains);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
@@ -49,8 +69,9 @@ export const Activity = () => {
   const getContacts = async () => {
     try {
       setIsLoading(true);
-      const contacts = await Extension.getContacts();
+      const { contacts, ownAccounts } = await Extension.getRegistryAddresses();
       setContacts(contacts);
+      setOwnAccounts(ownAccounts);
     } catch (error) {
       setContacts([]);
       showErrorToast(tCommon(error as string));
@@ -60,18 +81,24 @@ export const Activity = () => {
   };
 
   const getLink = (network: string, hash: string) => {
-    const { explorers } =
-      CHAINS.flatMap((chainType) => chainType.chains).find(
-        (chain) => chain.name.toLowerCase() === network.toLowerCase()
-      ) || {};
-    const { url } = explorers?.[0] || {};
-    return `${url}tx/${hash}`;
+    const { explorer } =
+      networks
+        .getAll()
+        .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
+      {};
+    const { evm, wasm } = explorer || {};
+    if (type.toLowerCase() === "wasm") {
+      return `${wasm?.url}extrinsic/${hash}`;
+    } else {
+      return `${evm?.url}tx/${hash}`;
+    }
   };
 
   const getContactName = (address: string) => {
     const contact = contacts.find((c) => c.address === address);
-    return contact
-      ? contact.name
+    const ownAccount = ownAccounts.find((c) => c.address === address);
+    return contact || ownAccount
+      ? contact?.name || ownAccount?.name
       : address.slice(0, 6) + "..." + address.slice(-4);
   };
 
@@ -96,9 +123,9 @@ export const Activity = () => {
   const filteredRecords = useMemo(() => {
     const _search = search.trim().toLocaleLowerCase();
 
-    if (!_search) return records;
+    if (!_search) return activity;
 
-    return records
+    return activity
       .filter(({ hash, reference, address }) => {
         return (
           hash.toLowerCase().includes(_search) ||
@@ -107,7 +134,7 @@ export const Activity = () => {
         );
       })
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
-  }, [search, records]);
+  }, [search, activity]);
 
   if (isLoading) {
     return <Loading />;
@@ -116,6 +143,7 @@ export const Activity = () => {
   return (
     <>
       <input
+        data-testid="search-input"
         id="search"
         placeholder={t("search") || "Search"}
         className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
@@ -125,7 +153,7 @@ export const Activity = () => {
       />
 
       <div className="flex flex-col my-5 overflow-y-auto h-full">
-        {records.length === 0 && (
+        {activity.length === 0 && (
           <div className="flex justify-center items-center mt-5">
             <p className="text-lg font-medium">{t("empty")}</p>
           </div>
@@ -134,30 +162,51 @@ export const Activity = () => {
           ({ address, status, lastUpdated, data, network, hash }) => (
             <div
               key={hash}
-              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-1 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition"
+              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-2 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
             >
-              <div className="flex items-center gap-1">
-                <BsArrowUpRight size={20} color={getStatusColor(status)} />
-                <div className="overflow-hidden text-ellipsis py-4 px-1">
-                  <p className="text-sm">{getContactName(address)}</p>
-                  <p>
-                    {`${formatDate(lastUpdated as number)} - `}
+              <div className="flex items-center justify-between gap-3">
+                <a
+                  className="text-custom-green-bg hover:bg-custom-green-bg hover:bg-opacity-30 rounded-full p-1"
+                  href={getLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <BsArrowUpRight size={23} color={getStatusColor(status)} />
+                </a>
+                <div className="overflow-hidden text-ellipsis px-1">
+                  <p className="text-xs">{getContactName(address)}</p>
+                  <p className="text-xs">{`${formatDate(
+                    lastUpdated as number
+                  )} - `}</p>
+                  {/* <p>
+                    
                     <a
                       className="text-custom-green-bg hover:text-white text-sm"
                       href={getLink(network, hash)}
+                      target="_blank"
+                      rel="noreferrer"
                     >
                       {tCommon("view_in_scanner")}
                     </a>
+                  </p> */}
+                  <p
+                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
+                      chipColor[status as RecordStatus]
+                    }`}
+                  >
+                    {status}
                   </p>
                 </div>
               </div>
-              <div className="text-lg px-1">
-                <p className="text-sm whitespace-nowrap mb-1">
+              <div className="flex flex-col text-lg px-1">
+                <p className="text-sm whitespace-nowrap mb-1 text-center">
                   {getValue(data)}
                 </p>
-                <div className="flex justify-evenly">
-                  <div className="w-5 h-5 rounded-full bg-gray-400" />
-                  <div className="w-5 h-5 rounded-full bg-gray-400" />
+                <div className="flex justify-evenly items-center gap-1">
+                  <AssetIcon asset={data.asset as IAsset} width={20} />
+                  <FaChevronRight size={16} />
+
+                  <AssetIcon asset={data.asset as IAsset} width={20} />
                 </div>
               </div>
             </div>

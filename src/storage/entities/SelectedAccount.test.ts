@@ -65,7 +65,7 @@ describe("SelectedAccount", () => {
 
   it("getDefaultValue", async () => {
     vi.spyOn(SelectedAccount, "set").mockImplementation(async () => {
-      console.log;
+      null;
     });
 
     const result = await SelectedAccount.getDefaultValue();

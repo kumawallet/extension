@@ -14,3 +14,32 @@ export const formatDate = (date: number) => {
 
   return formattedDate;
 };
+
+export const parseIncomingQuery = (query: string) => {
+  const _obj: { [key: string]: any } = Object.fromEntries(
+    new URLSearchParams(query)
+  );
+
+  Object.keys(_obj).forEach((key) => {
+    const atribute = _obj[key];
+    if (atribute.startsWith("{") && atribute.endsWith("}")) {
+      _obj[key] = JSON.parse(atribute);
+    }
+  });
+
+  return _obj;
+};
+
+export const makeQuerys = (params: Record<string, string>) => {
+  return (
+    "?" +
+    Object.keys(params)
+      .map((key) => {
+        if (typeof params[key] === "object") {
+          return `${key}=${JSON.stringify(params[key])}`;
+        }
+        return `${key}=${encodeURIComponent(params[key])}`;
+      })
+      .join("&")
+  );
+};

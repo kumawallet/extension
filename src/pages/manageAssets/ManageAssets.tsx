@@ -1,174 +1,154 @@
-import { Loading, LoadingButton, PageWrapper } from "@src/components/common";
+import { useMemo, useEffect } from "react";
+import {
+  InputErrorMessage,
+  LoadingButton,
+  PageWrapper,
+} from "@src/components/common";
 import { useTranslation } from "react-i18next";
-import { BiLeftArrowAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext } from "@src/providers/accountProvider/AccountProvider";
-import { useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
-import { useNetworkContext } from "@src/providers/networkProvider/NetworkProvider";
-import { ApiPromise } from "@polkadot/api";
-import { u8aToString } from "@polkadot/util";
+import Extension from "@src/Extension";
+import { BALANCE } from "@src/routes/paths";
+import { useAssetContext, useNetworkContext } from "@src/providers";
+import { number, object, string } from "yup";
+import { isHex, u8aToHex } from "@polkadot/util";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { FiChevronLeft } from "react-icons/fi";
+import { decodeAddress } from "@polkadot/util-crypto";
 
-type assetId = string | number;
-type accountId32 = string;
-
-type MetadaObject = {
-  entries: () => Promise<any>;
-};
-
-type MetadataFunction = (assetId: assetId) => Promise<any>;
-
-// TODO: move to global instance?
-interface AssetPallet {
-  account: (assetId: assetId, accountId32: accountId32) => Promise<any>;
-  asset: (assetId?: assetId) => null | object;
-  metadata: MetadataFunction | MetadaObject;
-}
-
-interface AssetToSelect {
-  name: string;
+interface AssetForm {
+  address: string;
+  decimals: number;
   symbol: string;
-  decimals: string;
-  id: string;
 }
+
+const defaultValues: AssetForm = {
+  address: "",
+  symbol: "",
+  decimals: 0,
+};
 
 export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
+  const { t: tCommon } = useTranslation("common");
   const {
-    state: { api, selectedChain },
+    state: { selectedChain, type },
   } = useNetworkContext();
-  const {
-    state: { selectedAccount },
-  } = useAccountContext();
+  const { loadAssets } = useAssetContext();
 
   const navigate = useNavigate();
   const { showErrorToast } = useToast();
-  const isEVM = selectedAccount.type.includes("EVM");
 
-  const [chainSupportAsset, setchainSupportAsset] = useState(false);
-  const [loading, setIsLoading] = useState(true);
-  const [assetPallet, setAssetPallet] = useState<null | AssetPallet>(null);
-  const [search, setSearch] = useState("");
-  const [assetToSelect, setAssetToSelect] = useState<AssetToSelect[]>([]);
-  const [selectedAsset, setSelectedAsset] = useState<AssetToSelect | null>(
-    null
-  );
+  const schema = useMemo(() => {
+    return object({
+      address: string().test(
+        "adress validation",
+        tCommon("invalid_address") as string,
+        (val) => {
+          try {
+            return type === "EVM"
+              ? isHex(val)
+              : !!u8aToHex(decodeAddress(val as string));
+          } catch (error) {
+            return false;
+          }
+        }
+      ),
+      decimals: number()
+        .typeError(t("invalid_number") as string)
+        .required(t("required") as string),
+      symbol: string().required(t("required") as string),
+    });
+  }, [t, type]);
 
-  useEffect(() => {
-    if (!isEVM) {
-      loadPolkadotAssets();
-    }
-  }, []);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<AssetForm>({
+    defaultValues,
+    resolver: yupResolver(schema),
+  });
 
-  const loadPolkadotAssets = async () => {
+  const onSubmit = handleSubmit(async (data) => {
     try {
-      const assetPallet: any = await (api as ApiPromise)?.query?.assets;
-      if (!assetPallet) {
-        setchainSupportAsset(false);
-        return;
-      }
-
-      setAssetPallet(assetPallet);
-      setchainSupportAsset(true);
+      await Extension.addAsset(selectedChain.name, data);
+      loadAssets();
+      navigate(BALANCE);
     } catch (error) {
       showErrorToast(error);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  });
 
-  const searchPolkadotAsset = async () => {
-    if (!search) {
-      const assets: any = await (
-        assetPallet?.metadata as MetadaObject
-      ).entries();
-      setAssetToSelect(
-        assets.map(
-          ([
-            {
-              args: [id],
-            },
-            asset,
-          ]: any) => {
-            return {
-              id: Number(id),
-              name: u8aToString(asset?.name),
-              symbol: u8aToString(asset?.symbol),
-              decimals: Number(asset?.decimals),
-            };
-          }
-        )
-      );
-    } else {
-      const assetMetadata = await (assetPallet?.metadata as MetadataFunction)(
-        search
-      );
+  useEffect(() => {
+    if (type === "WASM" && selectedChain) {
+      setValue("decimals", selectedChain?.nativeCurrency?.decimals);
     }
-    setSelectedAsset(null);
-  };
-
-  const addAsset = () => {
-    console.log("TODO: call method to save asset");
-  };
+  }, [selectedChain, type]);
 
   return (
     <>
       <PageWrapper>
         <div className="flex gap-3 items-center mb-7">
-          <BiLeftArrowAlt
+          <FiChevronLeft
             size={26}
             className="cursor-pointer"
             onClick={() => navigate(-1)}
           />
           <p className="text-xl">{t("title")}</p>
         </div>
-        <div className="py-12">
-          {loading && <Loading />}
-          {!loading && !chainSupportAsset && (
-            <p>
-              {t("this_chain_only_support_native_asset")}{" "}
-              {selectedChain?.nativeCurrency.name || ""}
-            </p>
-          )}
-          {!loading && chainSupportAsset && (
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">
-                {t("search_asset")}
-              </label>
-              <input
-                className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-                value={search}
-                onChange={({ target }) => setSearch(target.value)}
-                onKeyDown={({ key }) =>
-                  key === "Enter" && searchPolkadotAsset()
-                }
-              />
-              <div className="flex flex-col gap-4">
-                {assetToSelect.map((asset) => (
-                  <button
-                    className={`flex flex-col px-2 py-1 rounded-xl ${
-                      asset?.id === selectedAsset?.id &&
-                      "bg-custom-green-bg bg-opacity-40"
-                    } hover:bg-custom-green-bg hover:bg-opacity-40`}
-                    key={asset.id}
-                    onClick={() => setSelectedAsset(asset)}
-                  >
-                    <span>{asset.name}</span>
-                    <span>Symbol: {asset.symbol}</span>
-                    <span>decimals: {asset.decimals}</span>
-                    <span>id: {asset.id}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="flex flex-col gap-2">
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium mb-1">
+              {t("address")}
+            </label>
+            <input
+              data-testid="address"
+              id="address"
+              {...register("address")}
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            />
+            <InputErrorMessage message={errors.address?.message} />
+          </div>
+
+          <div>
+            <label htmlFor="symbol" className="block text-sm font-medium mb-1">
+              {t("symbol")}
+            </label>
+            <input
+              data-testid="symbol"
+              id="symbol"
+              {...register("symbol")}
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            />
+            <InputErrorMessage message={errors.symbol?.message} />
+          </div>
+
+          <div>
+            <label
+              htmlFor="decimals"
+              className="block text-sm font-medium mb-1"
+            >
+              {t("decimals")}
+            </label>
+            <input
+              data-testid="decimals"
+              disabled={type === "WASM"}
+              id="decimals"
+              {...register("decimals")}
+              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white disabled:opacity-60"
+            />
+            <InputErrorMessage message={errors.decimals?.message} />
+          </div>
+          <div className="flex justify-end" data-testid="submitbtn">
+            <LoadingButton onClick={onSubmit} isLoading={isSubmitting}>
+              {t("add")}
+            </LoadingButton>
+          </div>
         </div>
       </PageWrapper>
-      <footer className="fixed bottom-0 left-0 right-0 py-2 bg-[#343A40] px-2 flex justify-center w-full">
-        <LoadingButton isDisabled={!selectedAsset} onClick={addAsset}>
-          Add Asset
-        </LoadingButton>
-      </footer>
     </>
   );
 };

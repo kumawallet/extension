@@ -1,32 +1,12 @@
 import { AccountType } from "@src/accounts/types";
+import { Chain } from "@src/storage/entities/Chains";
 
 const WASM = "WASM" as AccountType.WASM;
 const EVM = "EVM" as AccountType.EVM;
-export interface Chain {
-  name: string;
-  chain?: string;
-  addressPrefix?: number;
-  rpc: {
-    wasm?: string;
-    evm?: string;
-  };
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-  explorers: {
-    name: string;
-    url: string;
-  }[];
-  supportedAccounts: AccountType[];
-  xcm?: string[];
-}
 
 export const MAINNETS: Chain[] = [
   {
     name: "Polkadot",
-    chain: "substrate",
     rpc: { wasm: "wss://rpc.polkadot.io" },
     addressPrefix: 0,
     nativeCurrency: {
@@ -34,17 +14,17 @@ export const MAINNETS: Chain[] = [
       symbol: "DOT",
       decimals: 10,
     },
-    explorers: [
-      {
+    logo: "polkadot",
+    explorer: {
+      wasm: {
         name: "subscan",
         url: "https://polkadot.subscan.io/",
       },
-    ],
+    },
     supportedAccounts: [WASM],
   },
   {
     name: "Kusama",
-    chain: "substrate",
     rpc: { wasm: "wss://kusama-rpc.polkadot.io" },
     addressPrefix: 2,
     nativeCurrency: {
@@ -52,17 +32,17 @@ export const MAINNETS: Chain[] = [
       symbol: "KSM",
       decimals: 12,
     },
-    explorers: [
-      {
+    logo: "kusama",
+    explorer: {
+      wasm: {
         name: "subscanß",
         url: "https://kusama.subscan.io/",
       },
-    ],
+    },
     supportedAccounts: [WASM],
   },
   {
     name: "Ethereum",
-    chain: "ethereum",
     rpc: { evm: "https://eth.llamarpc.com" },
     addressPrefix: 1,
     nativeCurrency: {
@@ -70,20 +50,17 @@ export const MAINNETS: Chain[] = [
       symbol: "ETH",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "etherscan",
         url: "https://etherscan.io/",
       },
-    ],
+    },
+    logo: "ethereum",
     supportedAccounts: [EVM],
   },
-];
-
-export const PARACHAINS: Chain[] = [
   {
     name: "Astar",
-    chain: "ASTR",
     rpc: {
       evm: "https://evm.astar.network",
       wasm: "wss://rpc.astar.network",
@@ -94,20 +71,23 @@ export const PARACHAINS: Chain[] = [
       symbol: "ASTR",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "subscan",
         url: "https://astar.subscan.io/",
       },
-    ],
+      wasm: {
+        name: "subscan",
+        url: "https://astar.subscan.io/",
+      },
+    },
+    logo: "astar",
     supportedAccounts: [WASM, EVM],
   },
   {
     name: "Moonbeam",
-    chain: "MOON",
     rpc: {
       evm: "https://rpc.api.moonbeam.network",
-      wasm: "wss://wss.api.moonbeam.network",
     },
     addressPrefix: 1284,
     nativeCurrency: {
@@ -115,21 +95,20 @@ export const PARACHAINS: Chain[] = [
       symbol: "GLMR",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "moonscan",
         url: "https://moonbeam.moonscan.io/",
       },
-    ],
-    supportedAccounts: [EVM, WASM],
+    },
+    logo: "moonbeam",
+    supportedAccounts: [EVM],
   },
 
   {
     name: "Moonriver",
-    chain: "MOON",
     rpc: {
       evm: "https://rpc.api.moonriver.moonbeam.network",
-      wasm: "wss://wss.api.moonriver.moonbeam.network",
     },
     addressPrefix: 1284,
     nativeCurrency: {
@@ -138,17 +117,17 @@ export const PARACHAINS: Chain[] = [
       decimals: 18,
     },
 
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "moonscan",
         url: "https://moonriver.moonscan.io/",
       },
-    ],
+    },
+    logo: "moonriver",
     supportedAccounts: [EVM],
   },
   {
     name: "Shiden",
-    chain: "SDN",
     rpc: {
       evm: "https://evm.shiden.astar.network",
       wasm: "wss://shiden.api.onfinality.io/public-ws",
@@ -159,12 +138,17 @@ export const PARACHAINS: Chain[] = [
       symbol: "SDN",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "subscan",
         url: "https://shiden.subscan.io/",
       },
-    ],
+      wasm: {
+        name: "subscan",
+        url: "https://shiden.subscan.io/",
+      },
+    },
+    logo: "shiden",
     supportedAccounts: [EVM, WASM],
   },
 ];
@@ -172,10 +156,8 @@ export const PARACHAINS: Chain[] = [
 export const TESTNETS: Chain[] = [
   {
     name: "Moonbase Alpha",
-    chain: "MOON",
     rpc: {
       evm: "https://rpc.api.moonbase.moonbeam.network",
-      wasm: "wss://wss.api.moonbase.moonbeam.network",
     },
     addressPrefix: 1287,
     nativeCurrency: {
@@ -183,17 +165,17 @@ export const TESTNETS: Chain[] = [
       symbol: "DEV",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "moonscan",
         url: "https://moonbase.moonscan.io/",
       },
-    ],
-    supportedAccounts: [EVM, WASM],
+    },
+    logo: "moonbeam",
+    supportedAccounts: [EVM],
   },
   {
     name: "Shibuya",
-    chain: "substrate",
     rpc: {
       evm: "https://evm.shibuya.astar.network",
       wasm: "wss://shibuya-rpc.dwellir.com",
@@ -205,38 +187,21 @@ export const TESTNETS: Chain[] = [
     },
     addressPrefix: 5,
 
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "subscan",
         url: "https://shibuya.subscan.io/",
       },
-    ],
+      wasm: {
+        name: "subscan",
+        url: "https://shibuya.subscan.io/",
+      },
+    },
+    logo: "astar",
     supportedAccounts: [EVM, WASM],
   },
   {
-    name: "Contracts Testnet",
-    chain: "Rococo",
-    rpc: {
-      wasm: "wss://rococo-rockmine-rpc.polkadot.io",
-    },
-    addressPrefix: 42,
-
-    nativeCurrency: {
-      name: "roc",
-      symbol: "ROC",
-      decimals: 12,
-    },
-    explorers: [
-      {
-        name: "",
-        url: "",
-      },
-    ],
-    supportedAccounts: [WASM],
-  },
-  {
     name: "Goerli",
-    chain: "goerli",
     rpc: { evm: "https://goerli.infura.io/v3/" },
     addressPrefix: 5,
     nativeCurrency: {
@@ -244,12 +209,13 @@ export const TESTNETS: Chain[] = [
       symbol: "GoerliETH",
       decimals: 18,
     },
-    explorers: [
-      {
+    explorer: {
+      evm: {
         name: "etherscan",
         url: "https://goerli.etherscan.io/",
       },
-    ],
+    },
+    logo: "ethereum",
     supportedAccounts: [EVM],
   },
 ];
@@ -258,10 +224,6 @@ export const CHAINS = [
   {
     name: "mainnets",
     chains: MAINNETS,
-  },
-  {
-    name: "parachains",
-    chains: PARACHAINS,
   },
   {
     name: "testnets",
