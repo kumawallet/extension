@@ -42,4 +42,34 @@ describe("ImportedEVMKeyring", () => {
       },
     });
   });
+
+  describe("getKey", () => {
+    it("should return key", () => {
+      const importEVMKeyring = new ImportedEVMKeyring();
+      importEVMKeyring.addKeyPair(
+        "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
+        {
+          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
+        }
+      );
+
+      const key = importEVMKeyring.getKey(
+        "0x6BdD86284810AddBAA184f74B35d568087bB04eE"
+      );
+
+      expect(key).toEqual(
+        "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2"
+      );
+    });
+
+    it("should throw error", () => {
+      const importEVMKeyring = new ImportedEVMKeyring();
+
+      try {
+        importEVMKeyring.getKey("invalid key");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: Key pair not found");
+      }
+    });
+  });
 });

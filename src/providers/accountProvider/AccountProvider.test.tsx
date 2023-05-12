@@ -6,12 +6,20 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { AccountProvider, useAccountContext } from "./AccountProvider";
+import { AccountProvider, useAccountContext, reducer } from "./AccountProvider";
 import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
 import Account from "@src/storage/entities/Account";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { AccountFormType } from "@src/pages";
+import { AccountType } from "@src/accounts/types";
+import { InitialState } from "./types";
+
+const initialStateMock = {
+  accounts: [],
+  isLoadingAccounts: true,
+  selectedAccount: {} as Account,
+};
 
 const testIds = {
   createAccount: "create-account",
@@ -112,6 +120,48 @@ describe("AccountProvider", () => {
         getAllAccounts: () => getAllAccounts(),
       },
     }));
+  });
+
+  describe("reducer", () => {
+    it("should set accounts", () => {
+      const state = {
+        accounts: [],
+        isLoadingAccounts: true,
+        selectedAccount: {
+          address: "0x123",
+        },
+      } as unknown as InitialState;
+
+      const result = reducer(state, {
+        type: "change-selected-address-format",
+        payload: {
+          address: "0x1234",
+        },
+      });
+      expect(result.selectedAccount.value.address).toEqual("0x1234");
+    });
+
+    it("should update account name", () => {
+      const account = {
+        key: "key",
+        name: "originalName",
+      } as unknown as Account;
+
+      const state = {
+        accounts: [account],
+        isLoadingAccounts: true,
+        selectedAccount: account,
+      } as unknown as InitialState;
+
+      const result = reducer(state, {
+        type: "update-account-name",
+        payload: {
+          name: "newName",
+        },
+      });
+      expect(result.accounts[0].value.name).toEqual("newName");
+      expect(result.selectedAccount.value.name).toEqual("newName");
+    });
   });
 
   it("should create account", async () => {
