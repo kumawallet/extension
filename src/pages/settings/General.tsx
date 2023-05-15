@@ -119,7 +119,7 @@ export const General = () => {
                     data-testid="language-select"
                     className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     onChange={(e) => saveLanguage(e.target.value)}
-                    value={selectedLanguage}
+                    value={selectedLanguage || ""}
                   >
                     {setting.isLanguageArray() &&
                       (setting.value as Language[]).map((option, index) => (
@@ -159,7 +159,7 @@ export const General = () => {
                       <div className="flex items-center">
                         <Switch
                           data-testid="show-testnets-switch"
-                          checked={showTestnets}
+                          checked={showTestnets || false}
                           onChange={changeShowTestnets}
                           className={`${
                             showTestnets

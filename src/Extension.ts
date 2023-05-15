@@ -33,7 +33,6 @@ export default class Extension {
       await CacheAuth.cachePassword();
       await AccountManager.saveBackup(recoveryPhrase);
     } catch (error) {
-      console.error(error);
       throw new Error(error as string);
     }
   }
@@ -132,7 +131,6 @@ export default class Extension {
       if (!accounts) return false;
       return AccountManager.areAccountsInitialized(accounts);
     } catch (error) {
-      console.error(error);
       return false;
     }
   }
@@ -217,7 +215,10 @@ export default class Extension {
     return settings.getAll(SettingType.ADVANCED);
   }
 
-  static async getSetting(type: SettingType, key: SettingKey): Promise<Setting | undefined> {
+  static async getSetting(
+    type: SettingType,
+    key: SettingKey
+  ): Promise<Setting | undefined> {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     return settings.get(type, key);
