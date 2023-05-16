@@ -1,5 +1,9 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import { LoadingButton, Loading } from "@src/components/common";
+import {
+  LoadingButton,
+  Loading,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -75,14 +79,12 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
 
-  useEffect(() => {
-    (async () => {
-      const seed = await Extension.showKey();
-      const keyring = new Keyring({ type: "sr25519" });
-      const sender = keyring.addFromMnemonic(seed as string);
-      setSender(sender);
-    })();
-  }, []);
+  const loadSender = async () => {
+    const seed = await Extension.showKey();
+    const keyring = new Keyring({ type: "sr25519" });
+    const sender = keyring.addFromMnemonic(seed as string);
+    setSender(sender);
+  };
 
   const onSubmit = handleSubmit(async () => {
     confirmTx({
@@ -193,6 +195,12 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   };
 
   useEffect(() => {
+    if (Extension.isAuthorized()) {
+      loadSender();
+    }
+  }, []);
+
+  useEffect(() => {
     if (destinationIsInvalid) {
       setFee(defaultFees);
       return;
@@ -247,6 +255,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   return (
     <>
       <CommonFormFields />
+      <ReEnterPassword cb={loadSender} />
 
       <div className="mb-3">
         <p className="text-xs">{t("tip")}</p>

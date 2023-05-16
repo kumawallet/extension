@@ -1,6 +1,10 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import { AccountType } from "@src/accounts/types";
-import { Loading, LoadingButton } from "@src/components/common";
+import {
+  Loading,
+  LoadingButton,
+  ReEnterPassword,
+} from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { useAssetContext, useNetworkContext } from "@src/providers";
@@ -58,17 +62,21 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
 
+  const loadSender = async () => {
+    const pk = await Extension.showKey();
+
+    const wallet = new ethers.Wallet(
+      pk as string,
+      api as ethers.providers.JsonRpcProvider
+    );
+
+    setWallet(wallet);
+  };
+
   useEffect(() => {
-    (async () => {
-      const pk = await Extension.showKey();
-
-      const wallet = new ethers.Wallet(
-        pk as string,
-        api as ethers.providers.JsonRpcProvider
-      );
-
-      setWallet(wallet);
-    })();
+    if (Extension.isAuthorized()) {
+      loadSender();
+    }
   }, []);
 
   useEffect(() => {
@@ -94,6 +102,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           ][to.name]({
             address: destinationAccount,
             amount: bnAmount,
+            assetSymbol: asset.symbol,
           }) as MapResponseEVM;
 
           const contract = new ethers.Contract(
@@ -255,6 +264,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   return (
     <>
       <CommonFormFields />
+      <ReEnterPassword cb={loadSender} />
 
       {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
 

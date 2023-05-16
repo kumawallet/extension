@@ -137,6 +137,7 @@ export const Send = () => {
           ]({
             address: destinationAddress,
             amount: bnAmount,
+            assetSymbol: asset.symbol,
           }) as MapResponseEVM;
 
           // TODO: refactor
