@@ -175,6 +175,49 @@ const ETHEREUM = {
   supportedAccounts: [EVM],
 };
 
+const POLYGON = {
+  name: "Polygon Mainnet",
+  chain: "Polygon",
+  icon: "polygon",
+  rpc: {
+    evm: "https://polygon-rpc.com/",
+  },
+  nativeCurrency: {
+    name: "MATIC",
+    symbol: "MATIC",
+    decimals: 18,
+  },
+  explorer: {
+    evm: {
+      name: "polygonscan",
+      url: "https://polygonscan.com",
+    },
+  },
+  logo: "polygon",
+  supportedAccounts: [EVM],
+};
+
+const BINANCE = {
+  name: "Binance Smart Chain Mainnet",
+  chain: "BSC",
+  rpc: {
+    evm: "https://bsc-dataseed1.binance.org",
+  },
+  nativeCurrency: {
+    name: "Binance Chain Native Token",
+    symbol: "BNB",
+    decimals: 18,
+  },
+  logo: "binance",
+  explorer: {
+    evm: {
+      name: "bscscan",
+      url: "https://bscscan.com",
+    },
+  },
+  supportedAccounts: [EVM],
+};
+
 const MOONRIVER = {
   name: "Moonriver",
   rpc: {
@@ -326,6 +369,8 @@ export const MAINNETS: Chain[] = [
   MOONRIVER,
   SHIDEN,
   ETHEREUM,
+  POLYGON,
+  BINANCE,
 ];
 
 export const TESTNETS: Chain[] = [MOONBASE_ALPHA, SHIBUYA, GOERLI];
