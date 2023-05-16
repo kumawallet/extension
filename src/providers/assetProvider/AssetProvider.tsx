@@ -212,7 +212,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const loadPolkadotAssets = async () => {
-    const assetPallet = await (api as ApiPromise)?.query?.assets;
+    const assetPallet = (api as ApiPromise)?.query?.assets;
 
     if (assetPallet?.metadata) {
       const assetsFromPallet = await assetPallet.metadata.entries();

@@ -14,9 +14,14 @@ export const enum PARACHAINS {
   MOONBEAM = "Moonbeam",
   SHIDEN = "Shiden",
   MOONRIVER = "Moonriver",
+  ACALA = "Acala",
 }
 
 export const POLKADOT_PARACHAINS = {
+  ACALA: {
+    name: PARACHAINS.ACALA,
+    id: 2000,
+  },
   ASTAR: {
     name: PARACHAINS.ASTAR,
     id: 2006,
@@ -109,6 +114,28 @@ const MOONBEAM = {
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR],
 };
 
+// const ACALA = {
+//   name: "Acala",
+//   rpc: {
+//     wasm: "ws://localhost:9930", // change
+//   },
+//   addressPrefix: 10,
+//   nativeCurrency: {
+//     name: "ACA",
+//     symbol: "ACA",
+//     decimals: 12,
+//   },
+//   logo: "acala",
+//   explorer: {
+//     wasm: {
+//       name: "subscan",
+//       url: "https://acala.subscan.io/",
+//     },
+//   },
+//   supportedAccounts: [WASM],
+//   // xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
+// };
+
 const KUSAMA = {
   name: "Kusama",
   rpc: { wasm: "wss://kusama-rpc.polkadot.io" },
@@ -121,7 +148,7 @@ const KUSAMA = {
   logo: "kusama",
   explorer: {
     wasm: {
-      name: "subscanß",
+      name: "subscan",
       url: "https://kusama.subscan.io/",
     },
   },
@@ -294,6 +321,7 @@ export const MAINNETS: Chain[] = [
   POLKADOT,
   KUSAMA,
   ASTAR,
+  ACALA,
   MOONBEAM,
   MOONRIVER,
   SHIDEN,

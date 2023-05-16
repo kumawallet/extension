@@ -27,6 +27,12 @@ export const XCM = {
         LIMITED_RESERVE_TRANSFER_ASSETS: "limitedReserveTransferAssets",
       },
     },
+    X_TOKENS: {
+      NAME: "xTokens",
+      methods: {
+        TRANSFER: "transfer",
+      },
+    },
   },
 };
 
@@ -104,6 +110,7 @@ export const getBeneficiary = ({
   address = "",
   version = "V1",
   account = "AccountId32",
+  parents = 0,
 }) => {
   const isHex = address.startsWith("0x");
 
@@ -113,7 +120,7 @@ export const getBeneficiary = ({
 
   return {
     [version]: {
-      parents: 0,
+      parents,
       interior: {
         X1: {
           [account]: {
@@ -216,7 +223,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       let currency_address = "";
 
       switch (assetSymbol?.toLowerCase()) {
-        case "astr": {
+        case "glmr": {
           currency_address = "0x0000000000000000000000000000000000000802";
           break;
         }
@@ -248,27 +255,8 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         },
       };
     },
-  },
 
-  [PARACHAINS.MOONRIVER]: {
-    [RELAY_CHAINS.KUSAMA]: ({ address, amount }) => {
-      const _address =
-        "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
-
-      return {
-        contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
-        method: "transfer",
-        extrinsicValues: {
-          currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
-          amount: amount.toString(),
-          destination: [1, [_address]],
-          weight: "4000000000", // Weight
-        },
-      };
-    },
-
-    [PARACHAINS.SHIDEN]: ({ address, amount, assetSymbol }) => {
+    [PARACHAINS.ACALA]: ({ address, amount, assetSymbol }) => {
       const addressIsHex = address.startsWith("0x");
 
       const _address = addressIsHex
@@ -278,12 +266,12 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       let currency_address = "";
 
       switch (assetSymbol?.toLowerCase()) {
-        case "sdn": {
+        case "glmr": {
           currency_address = "0x0000000000000000000000000000000000000802";
           break;
         }
-        case "xcsdn": {
-          currency_address = "0xFFFfffFF0Ca324C842330521525E7De111F38972";
+        case "xcaca": {
+          currency_address = "0xffffFFffa922Fef94566104a6e5A35a4fCDDAA9f";
           break;
         }
         default:
@@ -302,7 +290,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
             [
               "0x00" +
                 "0000" +
-                numberToHex(POLKADOT_PARACHAINS.ASTAR.id).split("0x")[1],
+                numberToHex(POLKADOT_PARACHAINS.ACALA.id).split("0x")[1],
               _address,
             ],
           ],
@@ -310,6 +298,24 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         },
       };
     },
+  },
+
+  [PARACHAINS.ACALA]: {
+    [RELAY_CHAINS.POLKADOT]: ({ address, amount }) => ({
+      pallet: XCM.pallets.X_TOKENS.NAME,
+      method: XCM.pallets.X_TOKENS.methods.TRANSFER,
+      extrinsicValues: {
+        currencyId: {
+          Token: "DOT",
+        },
+        amount,
+        beneficiary: getBeneficiary({
+          address,
+          parents: 1,
+        }),
+        destWeightLimit: "Unlimited",
+      },
+    }),
   },
 
   [PARACHAINS.ASTAR]: {
@@ -375,6 +381,119 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           assets,
           feeAssetItem: 0,
           weightLimit: "Unlimited",
+        },
+      };
+    },
+
+    [PARACHAINS.ACALA]: ({ address, amount, assetSymbol }) => {
+      let assets = null;
+      let method = null;
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "astr": {
+          method = XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS;
+          assets = getAssets({
+            fungible: amount,
+          });
+          break;
+        }
+        case "aca": {
+          method = XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS;
+          assets = getAssets({
+            fungible: amount,
+            interior: {
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.ACALA.id,
+                },
+                {
+                  GeneralKey: "0x0000",
+                },
+              ],
+            },
+          });
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+      return {
+        pallet: XCM.pallets.POLKADOT_XCM.NAME,
+        method,
+        extrinsicValues: {
+          dest: getDest({
+            parents: 1,
+            parachainId: POLKADOT_PARACHAINS.ACALA.id,
+          }),
+          beneficiary: getBeneficiary({
+            address,
+            account: "AccountKey20",
+          }),
+          assets,
+          feeAssetItem: 0,
+          weightLimit: "Unlimited",
+        },
+      };
+    },
+  },
+
+  [PARACHAINS.MOONRIVER]: {
+    [RELAY_CHAINS.KUSAMA]: ({ address, amount }) => {
+      const _address =
+        "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
+          amount: amount.toString(),
+          destination: [1, [_address]],
+          weight: "4000000000", // Weight
+        },
+      };
+    },
+
+    [PARACHAINS.SHIDEN]: ({ address, amount, assetSymbol }) => {
+      const addressIsHex = address.startsWith("0x");
+
+      const _address = addressIsHex
+        ? "0x03" + address.slice(2) + "00"
+        : "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
+
+      let currency_address = "";
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "movr": {
+          currency_address = "0x0000000000000000000000000000000000000802";
+          break;
+        }
+        case "xcsdn": {
+          currency_address = "0xFFFfffFF0Ca324C842330521525E7De111F38972";
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+
+      return {
+        contractAddress: "0x0000000000000000000000000000000000000804",
+        abi: xTokensAbi as any,
+        method: "transfer",
+        extrinsicValues: {
+          currency_address, //asset address
+          amount: amount.toString(),
+          destination: [
+            1,
+            [
+              "0x00" +
+                "0000" +
+                numberToHex(POLKADOT_PARACHAINS.ASTAR.id).split("0x")[1],
+              _address,
+            ],
+          ],
+          weight: "4000000000", // Weight
         },
       };
     },
@@ -477,10 +596,17 @@ export const XCM_ASSETS_MAPPING: IXCM_ASSETS_MAPPING = {
   [PARACHAINS.MOONBEAM]: {
     [RELAY_CHAINS.POLKADOT]: ["xcDOT"],
     [PARACHAINS.ASTAR]: ["GLMR", "xcASTR"],
+    [PARACHAINS.ACALA]: ["GLMR", "xcACA"],
   },
   [PARACHAINS.ASTAR]: {
     [RELAY_CHAINS.POLKADOT]: ["DOT"],
     [PARACHAINS.MOONBEAM]: ["ASTR", "GLMR"],
+    [PARACHAINS.ACALA]: ["ASTR", "ACA"],
+  },
+  [PARACHAINS.ACALA]: {
+    [RELAY_CHAINS.POLKADOT]: ["DOT"],
+    [PARACHAINS.ASTAR]: ["ACA", "ASTR"],
+    [PARACHAINS.MOONBEAM]: ["ACA", "GLMR"],
   },
   [PARACHAINS.MOONRIVER]: {
     [RELAY_CHAINS.KUSAMA]: ["xcKSM"],
