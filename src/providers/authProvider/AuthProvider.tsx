@@ -99,13 +99,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const restorePassword = async ({
-    privateKeyOrSeed: recoveryPhrase,
+    privateKeyOrSeed,
     password: newPassword,
   }: AccountFormType) => {
     try {
-      if (!recoveryPhrase) throw new Error("recovery_phrase_required");
+      if (!privateKeyOrSeed) throw new Error("recovery_phrase_required");
       if (!newPassword) throw new Error("password_required");
-      await Extension.restorePassword(recoveryPhrase, newPassword);
+      await Extension.restorePassword(privateKeyOrSeed, newPassword);
       return true;
     } catch (error) {
       captureError(error);

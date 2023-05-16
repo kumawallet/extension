@@ -114,27 +114,27 @@ const MOONBEAM = {
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR],
 };
 
-// const ACALA = {
-//   name: "Acala",
-//   rpc: {
-//     wasm: "ws://localhost:9930", // change
-//   },
-//   addressPrefix: 10,
-//   nativeCurrency: {
-//     name: "ACA",
-//     symbol: "ACA",
-//     decimals: 12,
-//   },
-//   logo: "acala",
-//   explorer: {
-//     wasm: {
-//       name: "subscan",
-//       url: "https://acala.subscan.io/",
-//     },
-//   },
-//   supportedAccounts: [WASM],
-//   // xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
-// };
+const ACALA = {
+  name: "Acala",
+  rpc: {
+    wasm: "ws://localhost:9930", // change
+  },
+  addressPrefix: 10,
+  nativeCurrency: {
+    name: "ACA",
+    symbol: "ACA",
+    decimals: 12,
+  },
+  logo: "acala",
+  explorer: {
+    wasm: {
+      name: "subscan",
+      url: "https://acala.subscan.io/",
+    },
+  },
+  supportedAccounts: [WASM],
+  // xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
+};
 
 const KUSAMA = {
   name: "Kusama",

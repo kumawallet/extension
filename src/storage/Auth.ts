@@ -115,18 +115,18 @@ export default class Auth {
     CacheAuth.clear();
   }
 
-  async encryptBackup(recoveryPhrase: string) {
+  async encryptBackup(privateKeyOrSeed: string) {
     try {
       if (!this.password) throw new Error("login_required");
-      return passworder.encrypt(recoveryPhrase, this.password);
+      return passworder.encrypt(privateKeyOrSeed, this.password);
     } catch (error) {
       throw new Error("failed_to_save_backup");
     }
   }
 
-  static async decryptBackup(backup: string, recoveryPhrase: string) {
+  static async decryptBackup(backup: string, privateKeyOrSeed: string) {
     try {
-      return passworder.decrypt(recoveryPhrase, backup);
+      return passworder.decrypt(privateKeyOrSeed, backup);
     } catch (error) {
       throw new Error("failed_to_restore_backup");
     }
@@ -135,9 +135,9 @@ export default class Auth {
   static async restorePassword(
     backup: string,
     password: string,
-    recoveryPhrase: string
+    privateKeyOrSeed: string
   ) {
-    const decryptedBackup = await Auth.decryptBackup(backup, recoveryPhrase);
+    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
     Auth.isUnlocked = true;
     Auth.password = decryptedBackup as string;

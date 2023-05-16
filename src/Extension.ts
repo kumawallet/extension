@@ -100,10 +100,10 @@ export default class Extension {
     this.setSelectedAccount(account);
   }
 
-  static async restorePassword(recoveryPhrase: string, newPassword: string) {
+  static async restorePassword(privateKeyOrSeed: string, newPassword: string) {
     Extension.validatePasswordFormat(newPassword);
-    Extension.validatePrivateKeyOrSeedFormat(recoveryPhrase);
-    await AccountManager.restorePassword(recoveryPhrase, newPassword);
+    Extension.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
+    await AccountManager.restorePassword(privateKeyOrSeed, newPassword);
   }
 
   static removeAccount(key: AccountKey) {

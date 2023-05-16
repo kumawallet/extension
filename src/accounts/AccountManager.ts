@@ -126,12 +126,12 @@ export default class AccountManager {
     );
   }
 
-  static async saveBackup(recoveryPhrase: string): Promise<void> {
-    if (!recoveryPhrase) throw new Error("recovery_phrase_required");
-    if (!ethers.utils.isValidMnemonic(recoveryPhrase)) {
-      throw new Error("invalid_recovery_phrase");
-    }
-    const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
+  static async saveBackup(privateKeyOrSeed: string): Promise<void> {
+    if (!privateKeyOrSeed) throw new Error("recovery_phrase_required");
+    // if (!ethers.utils.isValidMnemonic(privateKeyOrSeed)) {
+    //   throw new Error("invalid_recovery_phrase");
+    // }
+    const encrypted = await Auth.getInstance().encryptBackup(privateKeyOrSeed);
     const backup = new BackUp(encrypted);
     await BackUp.set(backup);
   }
