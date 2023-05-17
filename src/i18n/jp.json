@@ -102,7 +102,7 @@
       "account_type": "アカウントタイプ",
       "show_seed": "シードを表示",
       "evm_type": "Ethereum風アカウント (EVM)",
-      "wasm_type": "Polkadot風アカウント (WASM)",
+      "wasm_type": "Polkadot風アカウント (Wasm)",
       "private_key": "プライベートキー",
       "private_key_invalid": "無効なプライベートキー",
       "seed_phrase": "シードフレーズ",
@@ -134,7 +134,7 @@
       "testnets": "テストネット",
       "custom": "カスタム",
       "evm_type": "Ethereum風アカウント (EVM)",
-      "wasm_type": "Polkadot風アカウント (WASM)"
+      "wasm_type": "Polkadot風アカウント (Wasm)"
     },
     "accounts": {
       "accounts": "アカウント",
