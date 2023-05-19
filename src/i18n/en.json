@@ -102,7 +102,7 @@
       "account_type": "Account type",
       "show_seed": "Show seed",
       "evm_type": "Ethereum like account (EVM)",
-      "wasm_type": "Polkadot like account (WASM)",
+      "wasm_type": "Polkadot like account (Wasm)",
       "private_key": "Private key",
       "private_key_validation": "Invalid Private Key",
       "seed_phrase": "Seed Phrase",
@@ -134,7 +134,7 @@
       "testnets": "Testnets",
       "custom": "Custom",
       "evm_type": "Ethereum like account (EVM)",
-      "wasm_type": "Polkadot like account (WASM)"
+      "wasm_type": "Polkadot like account (Wasm)"
     },
     "accounts": {
       "accounts": "Accounts",

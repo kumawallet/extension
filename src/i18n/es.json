@@ -102,7 +102,7 @@
       "account_type": "Tipo de cuenta",
       "show_seed": "Mostrar semilla",
       "evm_type": "Cuenta tipo Ethereum (EVM)",
-      "wasm_type": "Cuenta tipo Polkadot (WASM)",
+      "wasm_type": "Cuenta tipo Polkadot (Wasm)",
       "private_key": "Clave privada",
       "private_key_validation": "Clave privada inválida",
       "seed_phrase": "Frase semilla",
@@ -134,7 +134,7 @@
       "testnets": "Redes de prueba",
       "custom": "Personalizadas",
       "evm_type": "cuenta tipo Ethereum (EVM)",
-      "wasm_type": "cuenta tipo Polkadot (WASM)"
+      "wasm_type": "cuenta tipo Polkadot (Wasm)"
     },
     "accounts": {
       "accounts": "Cuentas",

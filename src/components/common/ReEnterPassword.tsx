@@ -7,6 +7,7 @@ import { BsEye, BsEyeSlash } from "react-icons/bs";
 import Extension from "@src/Extension";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { captureError } from "@src/utils/error-handling";
 
 export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
   const { t } = useTranslation("re_enter_password");
@@ -34,6 +35,7 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
       setShowDialog(false);
       await cb?.();
     } catch (error) {
+      captureError(error);
       showErrorToast(error);
     }
     endLoading();
