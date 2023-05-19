@@ -193,6 +193,25 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         },
       },
     }),
+    [POLKADOT_PARACHAINS.ACALA.name]: ({ address, amount }) => ({
+      pallet: XCM.pallets.XCM_PALLET.NAME,
+      method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
+      extrinsicValues: {
+        dest: getDest({
+          parachainId: POLKADOT_PARACHAINS.ACALA.id,
+          version: "V0",
+        }),
+        beneficiary: getBeneficiary({
+          address,
+          version: "V0",
+        }),
+        asssets: getAssets({
+          fungible: amount,
+          version: "V0",
+        }),
+        feeAssetItem: 0,
+      },
+    }),
   },
 
   [PARACHAINS.MOONBEAM]: {
@@ -309,13 +328,114 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           Token: "DOT",
         },
         amount,
-        beneficiary: getBeneficiary({
+        dest: getBeneficiary({
           address,
           parents: 1,
         }),
         destWeightLimit: "Unlimited",
       },
     }),
+
+    [PARACHAINS.ASTAR]: ({ address, amount, assetSymbol }) => {
+      let currencyId = null;
+      const destWeightLimit = "Unlimited";
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "aca": {
+          currencyId = {
+            Token: "ACA",
+          };
+          break;
+        }
+
+        case "astr": {
+          currencyId = {
+            ForeignAsset: 2,
+          };
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+
+      return {
+        pallet: XCM.pallets.X_TOKENS.NAME,
+        method: XCM.pallets.X_TOKENS.methods.TRANSFER,
+        extrinsicValues: {
+          currencyId,
+          amount,
+          dest: {
+            V1: {
+              parents: 1,
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.ASTAR.id,
+                },
+                {
+                  AccountId32: {
+                    network: "Any",
+                    id: address,
+                  },
+                },
+              ],
+            },
+          },
+          destWeightLimit,
+        },
+      };
+    },
+
+    [PARACHAINS.MOONBEAM]: ({ address, amount, assetSymbol }) => {
+      let currencyId = null;
+      let destWeightLimit: any = "Unlimited";
+
+      switch (assetSymbol?.toLowerCase()) {
+        case "aca": {
+          currencyId = {
+            Token: "ACA",
+          };
+          destWeightLimit = {
+            Limited: 1_000_000_000,
+          };
+          break;
+        }
+
+        case "glmr": {
+          currencyId = {
+            ForeignAsset: 0,
+          };
+          break;
+        }
+        default:
+          throw new Error("Invalid asset symbol");
+      }
+
+      return {
+        pallet: XCM.pallets.X_TOKENS.NAME,
+        method: XCM.pallets.X_TOKENS.methods.TRANSFER,
+        extrinsicValues: {
+          currencyId,
+          amount,
+          dest: {
+            V1: {
+              parents: 1,
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
+                },
+                {
+                  AccountKey20: {
+                    network: "Any",
+                    id: address,
+                  },
+                },
+              ],
+            },
+          },
+          destWeightLimit,
+        },
+      };
+    },
   },
 
   [PARACHAINS.ASTAR]: {
@@ -427,11 +547,9 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           }),
           beneficiary: getBeneficiary({
             address,
-            account: "AccountKey20",
           }),
           assets,
           feeAssetItem: 0,
-          weightLimit: "Unlimited",
         },
       };
     },

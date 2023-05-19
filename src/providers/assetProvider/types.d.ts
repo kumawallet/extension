@@ -6,6 +6,7 @@ export interface Asset {
   address?: string;
   amount?: number;
   name?: string;
+  aditionalData?: Record<string, unknown>;
 }
 
 export interface InitialState {

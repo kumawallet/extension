@@ -61,7 +61,7 @@ export const POLKADOT = {
     },
   },
   supportedAccounts: [WASM],
-  xcm: [PARACHAINS.ASTAR, PARACHAINS.MOONBEAM],
+  xcm: [PARACHAINS.ASTAR, PARACHAINS.MOONBEAM, PARACHAINS.ACALA],
 };
 
 export const ASTAR = {
@@ -88,7 +88,7 @@ export const ASTAR = {
   },
   logo: "astar",
   supportedAccounts: [WASM, EVM],
-  xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM],
+  xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ACALA],
 };
 
 const MOONBEAM = {
@@ -111,12 +111,13 @@ const MOONBEAM = {
   },
   logo: "moonbeam",
   supportedAccounts: [EVM],
-  xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR],
+  xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR, PARACHAINS.ACALA],
 };
 
 const ACALA = {
   name: "Acala",
   rpc: {
+    // wasm: "wss://acala-rpc-0.aca-api.network",
     wasm: "ws://localhost:9930", // change
   },
   addressPrefix: 10,
@@ -133,7 +134,7 @@ const ACALA = {
     },
   },
   supportedAccounts: [WASM],
-  // xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
+  xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
 };
 
 const KUSAMA = {

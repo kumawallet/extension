@@ -12,11 +12,12 @@ import {
   formatAmountWithDecimals,
   getAssetUSDPrice,
   getNatitveAssetBalance,
+  getWasmAssets,
 } from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
-import { BN, hexToBn, u8aToString } from "@polkadot/util";
+import { BN } from "@polkadot/util";
 import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
@@ -212,105 +213,29 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const loadPolkadotAssets = async () => {
-    const assetPallet = (api as ApiPromise)?.query?.assets;
-
-    if (assetPallet?.metadata) {
-      const assetsFromPallet = await assetPallet.metadata.entries();
-
-      const formatedAssets: Asset[] = assetsFromPallet.map(
-        ([
-          {
-            args: [id],
+    const { assets, unsubs } = await getWasmAssets(
+      api as ApiPromise,
+      selectedChain.name,
+      selectedAccount.value.address,
+      (assetId: string, newValue: BN) => {
+        dispatch({
+          type: "update-one-asset",
+          payload: {
+            asset: {
+              updatedBy: "id",
+              updatedByValue: assetId,
+              newValue: newValue,
+            },
           },
-          asset,
-        ]) => {
-          const _asset = asset as Partial<{
-            name: Uint8Array;
-            symbol: Uint8Array;
-            decimals: Uint8Array;
-          }>;
+        });
+      }
+    );
 
-          return {
-            id: String(id),
-            name: u8aToString(_asset?.name),
-            symbol: u8aToString(_asset?.symbol),
-            decimals: Number(_asset?.decimals),
-            balance: new BN("0"),
-          };
-        }
-      );
+    unsubs &&
+      unsubs?.length > 0 &&
+      setUnsubscribers((state) => [...state, ...unsubs]);
 
-      await Promise.all(
-        formatedAssets.map((r, index) =>
-          assetPallet
-            ?.account(r.id, selectedAccount.value.address)
-            .then(async (asset) => {
-              const result = asset.toJSON() as Partial<{ balance: Uint8Array }>;
-
-              let _balance = new BN("0");
-
-              if (result?.balance) {
-                if (typeof result?.balance === "number") {
-                  _balance = new BN(String(result?.balance));
-                }
-
-                if (
-                  typeof result.balance === "string" &&
-                  (result.balance as string).startsWith("0x")
-                ) {
-                  _balance = hexToBn(result.balance);
-                }
-              }
-
-              formatedAssets[index].balance = _balance;
-
-              const unsub = await assetPallet?.account(
-                r.id,
-                selectedAccount.value.address,
-                (data: {
-                  toJSON: () => Partial<{
-                    balance: Uint8Array;
-                  }>;
-                }) => {
-                  const result = data.toJSON();
-
-                  let _balance = new BN("0");
-
-                  if (result?.balance) {
-                    if (typeof result?.balance === "number") {
-                      _balance = new BN(String(result?.balance));
-                    }
-
-                    if (
-                      typeof result.balance === "string" &&
-                      (result.balance as string).startsWith("0x")
-                    ) {
-                      _balance = hexToBn(result.balance);
-                    }
-                  }
-
-                  dispatch({
-                    type: "update-one-asset",
-                    payload: {
-                      asset: {
-                        updatedBy: "id",
-                        updatedByValue: r.id,
-                        newValue: _balance,
-                      },
-                    },
-                  });
-                }
-              );
-              // susbcribrer added
-              setUnsubscribers((state) => [...state, unsub]);
-            })
-        )
-      );
-
-      return formatedAssets;
-    }
-
-    return [];
+    return assets;
   };
 
   const loadAssetsFromStorage = async () => {
@@ -441,7 +366,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       });
     } catch (error) {
       captureError(error);
-      console.error("error", error);
     }
   };
 
