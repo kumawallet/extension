@@ -116,7 +116,6 @@ export const Send = () => {
       if (tx?.type === AccountType.WASM) {
         txToSend.tx = {
           txHash: tx.tx.toHex(),
-          aditional: tx.aditional,
           type: AccountType.WASM,
         };
       } else {

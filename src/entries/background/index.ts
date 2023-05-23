@@ -146,86 +146,79 @@ const processWasmTx = async ({
   rpc,
 }: TxToProcess) => {
   try {
-    const { txHash, type, aditional } = tx;
+    const { txHash, type } = tx;
     const api = (await getProvider(rpc, AccountType.WASM)) as ApiPromise;
     const { block } = await api.rpc.chain.getBlock();
-    const seed = await Extension.showKey();
-    const keyring = new Keyring({ type: "sr25519" });
-    const sender = keyring.addFromMnemonic(seed as string);
+
     const unsub = await api
       ?.tx(txHash)
-      ?.signAndSend(
-        sender as AddressOrPair,
-        { tip: Number(aditional?.tip) || undefined },
-        async ({ events, txHash, status }) => {
-          if (String(status.type) === "Ready") {
-            const hash = txHash.toString();
-            const date = Date.now();
-            const activity: Partial<IRecord> = {
-              fromBlock: block.header.number.toString(),
-              address: destinationAddress,
-              type: RecordType.TRANSFER,
-              reference: type,
-              hash,
-              status: RecordStatus.PENDING,
-              createdAt: date,
-              lastUpdated: date,
-              error: undefined,
-              network: networkInfo.name,
-              recipientNetwork: destinationNetwork,
-              data: {
-                from: originAddress,
-                to: destinationAddress,
-                gas: "",
-                gasPrice: "",
-                symbol: asset.symbol,
-                value: String(amount),
-                asset: {
-                  id: asset.id,
-                  color: asset.color,
-                },
-              } as TransferData,
-            };
-            await Extension.addActivity(hash, activity as IRecord);
-            sendUpdateActivityMessage();
-          }
-          if (status.isFinalized) {
-            const failedEvents = events.filter(({ event }) =>
-              api?.events.system.ExtrinsicFailed.is(event)
-            );
-            let status = RecordStatus.PENDING;
-            let error = undefined;
-            if (failedEvents.length > 0) {
-              failedEvents.forEach(
-                ({
-                  event: {
-                    data: [_error],
-                  },
-                }: any) => {
-                  if (_error.isModule) {
-                    const decoded = api?.registry.findMetaError(
-                      _error.asModule
-                    );
-                    const { docs, method, section } = decoded;
-                    error = `${section}.${method}: ${docs.join(" ")}`;
-                  } else {
-                    error = _error.toString();
-                  }
-                }
-              );
-              status = RecordStatus.FAIL;
-            } else {
-              status = RecordStatus.SUCCESS;
-            }
-            const hash = txHash.toString();
-            await Extension.updateActivity(hash, status, error);
-            sendNotification(`tx ${status}`, hash);
-            sendUpdateActivityMessage();
-            unsub();
-          }
+      ?.send(async ({ events, txHash, status }) => {
+        if (String(status.type) === "Ready") {
+          const hash = txHash.toString();
+          const date = Date.now();
+          const activity: Partial<IRecord> = {
+            fromBlock: block.header.number.toString(),
+            address: destinationAddress,
+            type: RecordType.TRANSFER,
+            reference: type,
+            hash,
+            status: RecordStatus.PENDING,
+            createdAt: date,
+            lastUpdated: date,
+            error: undefined,
+            network: networkInfo.name,
+            recipientNetwork: destinationNetwork,
+            data: {
+              from: originAddress,
+              to: destinationAddress,
+              gas: "",
+              gasPrice: "",
+              symbol: asset.symbol,
+              value: String(amount),
+              asset: {
+                id: asset.id,
+                color: asset.color,
+              },
+            } as TransferData,
+          };
+          await Extension.addActivity(hash, activity as IRecord);
+          sendUpdateActivityMessage();
         }
-      );
+        if (status.isFinalized) {
+          const failedEvents = events.filter(({ event }) =>
+            api?.events.system.ExtrinsicFailed.is(event)
+          );
+          let status = RecordStatus.PENDING;
+          let error = undefined;
+          if (failedEvents.length > 0) {
+            failedEvents.forEach(
+              ({
+                event: {
+                  data: [_error],
+                },
+              }: any) => {
+                if (_error.isModule) {
+                  const decoded = api?.registry.findMetaError(_error.asModule);
+                  const { docs, method, section } = decoded;
+                  error = `${section}.${method}: ${docs.join(" ")}`;
+                } else {
+                  error = _error.toString();
+                }
+              }
+            );
+            status = RecordStatus.FAIL;
+          } else {
+            status = RecordStatus.SUCCESS;
+          }
+          const hash = txHash.toString();
+          await Extension.updateActivity(hash, status, error);
+          sendNotification(`tx ${status}`, hash);
+          sendUpdateActivityMessage();
+          unsub();
+        }
+      });
   } catch (error) {
+    console.log("error", error);
     sendNotification(`tx error`, "");
   }
 };

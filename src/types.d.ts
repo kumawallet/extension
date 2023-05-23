@@ -30,8 +30,8 @@ export type Tx =
   | {
       type: AccountType.WASM;
       tx: polkadotExtrinsic;
-      aditional: object;
-      sender: KeyringPair;
+      // aditional: object;
+      // sender: KeyringPair;
       fee: WasmFee;
     }
   | {
@@ -42,7 +42,7 @@ export type Tx =
       fee: EVMFee;
     };
 
-export type confirmTx = ({ type, tx, aditional, fee }: Tx) => void;
+export type confirmTx = ({ type, tx, fee }: Tx) => void;
 
 export type IAsset = Partial<Asset> & {
   id: string;
