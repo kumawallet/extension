@@ -106,15 +106,23 @@ interface ExtrinsicValues {
   assetSymbol?: string;
 }
 
+const transformAddress = (address: string) => {
+  const isHex = address.startsWith("0x");
+
+  const accountId = isHex ? address : u8aToHex(decodeAddress(address));
+
+  return {
+    accountId,
+  };
+};
+
 export const getBeneficiary = ({
   address = "",
   version = "V1",
   account = "AccountId32",
   parents = 0,
 }) => {
-  const isHex = address.startsWith("0x");
-
-  const accountId = isHex ? address : u8aToHex(decodeAddress(address));
+  const { accountId } = transformAddress(address);
 
   const accountKey = account === "AccountId32" ? "id" : "key";
 
@@ -199,11 +207,11 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       extrinsicValues: {
         dest: getDest({
           parachainId: POLKADOT_PARACHAINS.ACALA.id,
-          version: "V0",
+          version: "V1",
         }),
         beneficiary: getBeneficiary({
           address,
-          version: "V0",
+          version: "V1",
         }),
         asssets: getAssets({
           fungible: amount,
@@ -358,6 +366,8 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           throw new Error("Invalid asset symbol");
       }
 
+      const { accountId } = transformAddress(address);
+
       return {
         pallet: XCM.pallets.X_TOKENS.NAME,
         method: XCM.pallets.X_TOKENS.methods.TRANSFER,
@@ -367,17 +377,19 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           dest: {
             V1: {
               parents: 1,
-              X2: [
-                {
-                  Parachain: POLKADOT_PARACHAINS.ASTAR.id,
-                },
-                {
-                  AccountId32: {
-                    network: "Any",
-                    id: address,
+              interior: {
+                X2: [
+                  {
+                    Parachain: POLKADOT_PARACHAINS.ASTAR.id,
                   },
-                },
-              ],
+                  {
+                    AccountId32: {
+                      network: "Any",
+                      id: accountId,
+                    },
+                  },
+                ],
+              },
             },
           },
           destWeightLimit,
@@ -410,6 +422,8 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           throw new Error("Invalid asset symbol");
       }
 
+      const { accountId } = transformAddress(address);
+
       return {
         pallet: XCM.pallets.X_TOKENS.NAME,
         method: XCM.pallets.X_TOKENS.methods.TRANSFER,
@@ -419,17 +433,19 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           dest: {
             V1: {
               parents: 1,
-              X2: [
-                {
-                  Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
-                },
-                {
-                  AccountKey20: {
-                    network: "Any",
-                    id: address,
+              interior: {
+                X2: [
+                  {
+                    Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
                   },
-                },
-              ],
+                  {
+                    AccountKey20: {
+                      network: "Any",
+                      id: accountId,
+                    },
+                  },
+                ],
+              },
             },
           },
           destWeightLimit,

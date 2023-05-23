@@ -87,13 +87,16 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   };
 
   const onSubmit = handleSubmit(async () => {
+    const signedTx = await (extrinsic as polkadotExtrinsic)?.signAsync(
+      sender as KeyringPair,
+      {
+        tip: Number(aditional.tip) * currencyUnits || "0",
+      }
+    );
+
     confirmTx({
       type: AccountType.WASM,
-      tx: extrinsic as polkadotExtrinsic,
-      aditional: {
-        tip: Number(aditional.tip) * currencyUnits || "0",
-      },
-      sender: sender as KeyringPair,
+      tx: signedTx as polkadotExtrinsic,
       fee,
     });
   });

@@ -216,7 +216,14 @@ export const getWasmAssets = async (
             }
 
             if (result?.free) {
-              balance = new BN(String(result?.free));
+              if (
+                typeof result?.free === "string" &&
+                result.free?.startsWith("0x")
+              ) {
+                balance = hexToBn(result.free);
+              } else {
+                balance = new BN(String(result?.free));
+              }
             }
 
             dispatch(asset.id, balance);

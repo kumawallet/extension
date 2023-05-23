@@ -43,8 +43,10 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
         xcmAssets.includes(symbol)
       );
 
-      setSelectedAsset(filteredAssets[0]);
-      onChangeAsset(filteredAssets[0]);
+      const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
+
+      setSelectedAsset(_assets[0]);
+      onChangeAsset(_assets[0]);
     } else {
       if (assets.length > 0) {
         setSelectedAsset(assets[0]);
