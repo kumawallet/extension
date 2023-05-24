@@ -441,7 +441,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
                   {
                     AccountKey20: {
                       network: "Any",
-                      id: accountId,
+                      key: accountId,
                     },
                   },
                 ],
