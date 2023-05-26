@@ -10,8 +10,6 @@ import { ethers } from "ethers";
 import Extension from "@src/Extension";
 import notificationIcon from "/icon-128.png";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { AddressOrPair } from "@polkadot/api/types";
-import { Keyring } from "@polkadot/keyring";
 import { TxToProcess } from "@src/types";
 
 export const getProvider = (rpc: string, type: string) => {
@@ -44,7 +42,7 @@ const openPopUp = (params: Record<string, string>) => {
   });
 };
 
-// // read messages from content
+// read messages from content
 WebAPI.runtime.onMessage.addListener(async function (request, sender) {
   if (request.origin === "kuma") {
     try {
@@ -54,11 +52,13 @@ WebAPI.runtime.onMessage.addListener(async function (request, sender) {
           return;
         }
 
+        case "call_contract":
         case "sign_message": {
           await openPopUp({ ...request, tabId: sender.tab?.id });
           return;
         }
 
+        case "call_contract_response":
         case "sign_message_response": {
           if (request.from !== "popup") return;
           await WebAPI.tabs.sendMessage(Number(request.toTabId), {
@@ -218,7 +218,6 @@ const processWasmTx = async ({
         }
       });
   } catch (error) {
-    console.log("error", error);
     sendNotification(`tx error`, "");
   }
 };

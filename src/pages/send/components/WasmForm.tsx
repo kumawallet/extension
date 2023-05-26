@@ -250,7 +250,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
-      console.log("error ", error);
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);

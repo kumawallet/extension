@@ -60,6 +60,8 @@ export const formatAmountWithDecimals = (
 export const formatBN = (bn: string, decimals: number) => {
   let _number = bn;
 
+  if (!decimals) return "0";
+
   if (_number.length < decimals) {
     const dif = decimals - _number.length;
     for (let index = 0; index < dif + 1; index++) {

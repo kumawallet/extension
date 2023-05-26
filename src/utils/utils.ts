@@ -22,8 +22,13 @@ export const parseIncomingQuery = (query: string) => {
 
   Object.keys(_obj).forEach((key) => {
     const atribute = _obj[key];
+
     if (atribute.startsWith("{") && atribute.endsWith("}")) {
-      _obj[key] = JSON.parse(atribute);
+      const btoa = (atribute as string)
+        .replace("{", "")
+        .replace("}", "")
+        .trim();
+      _obj[key] = JSON.parse(atob(btoa));
     }
   });
 
@@ -36,7 +41,7 @@ export const makeQuerys = (params: Record<string, string>) => {
     Object.keys(params)
       .map((key) => {
         if (typeof params[key] === "object") {
-          return `${key}=${JSON.stringify(params[key])}`;
+          return `${key}={${btoa(JSON.stringify(params[key]))}}`;
         }
         return `${key}=${encodeURIComponent(params[key])}`;
       })

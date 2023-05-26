@@ -9,7 +9,7 @@ export const Error = () => {
     <PageWrapper contentClassName="bg-[#29323C] h-full">
       <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40 rotate-180" />
       <p className="font-medium text-2xl md:text-3xl mb-2 text-center">
-        {t("error_message")}
+        {t("error")}
       </p>
     </PageWrapper>
   );

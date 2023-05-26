@@ -12,6 +12,7 @@ import {
   SignIn,
   SignMessage,
   Welcome,
+  CallContract,
 } from "@src/pages";
 import {
   Advanced,
@@ -30,6 +31,7 @@ import {
 import {
   ADD_ACCOUNT,
   BALANCE,
+  CALL_CONTRACT,
   CREATE_ACCOUNT,
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
@@ -51,6 +53,18 @@ import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
 import { isProduction } from "@src/utils/env";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
+
+const getInitialEntry = (query: string) => {
+  if (query.includes("sign_message")) {
+    return SIGN_MESSAGE;
+  }
+
+  if (query.includes("call_contract")) {
+    return CALL_CONTRACT;
+  }
+
+  return "";
+};
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -109,16 +123,28 @@ export const Routes = () => {
 
   if (location.search) {
     return (
-      <MemoryRouter initialEntries={[SIGN_MESSAGE]}>
+      <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
         <RRoutes>
-          <Route
-            path={SIGN_MESSAGE}
-            element={
-              <ValidationWrapper query={location.search}>
-                <SignMessage />
-              </ValidationWrapper>
-            }
-          />
+          {location.search.includes("sign_message") && (
+            <Route
+              path={SIGN_MESSAGE}
+              element={
+                <ValidationWrapper query={location.search}>
+                  <SignMessage />
+                </ValidationWrapper>
+              }
+            />
+          )}
+          {location.search.includes("call_contract") && (
+            <Route
+              path={CALL_CONTRACT}
+              element={
+                <ValidationWrapper query={location.search}>
+                  <CallContract />
+                </ValidationWrapper>
+              }
+            />
+          )}
         </RRoutes>
       </MemoryRouter>
     );

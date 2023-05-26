@@ -8,3 +8,4 @@ export * from "./settings";
 export * from "./signIn";
 export * from "./signMessage";
 export * from "./welcome";
+export * from "./callContract";

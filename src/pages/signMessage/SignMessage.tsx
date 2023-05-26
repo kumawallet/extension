@@ -1,5 +1,9 @@
 import { FC } from "react";
-import { LoadingButton, PageWrapper } from "@src/components/common";
+import {
+  LoadingButton,
+  PageWrapper,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import Extension from "@src/Extension";
@@ -81,6 +85,8 @@ export const SignMessage: FC<SignMessageProps> = ({
 
   return (
     <PageWrapper contentClassName="h-full">
+      <ReEnterPassword />
+
       <div className="flex flex-col mx-auto h-full py-3">
         <div className="flex-1">
           <div className="flex gap-3 items-center mb-7">
