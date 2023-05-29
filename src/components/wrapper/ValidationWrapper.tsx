@@ -36,7 +36,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { isLoading, starLoading, endLoading } = useLoading();
+  const { isLoading, starLoading, endLoading } = useLoading(true);
 
   const getTrustedSites = async () => {
     const sites = await Extension.getTrustedSites();
@@ -70,9 +70,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
 
   useEffect(() => {
     (async () => {
-      starLoading();
-
-      if (selectedAccount && selectedAccount) {
+      if (selectedAccount?.value?.address && api) {
         const isSessionActive = await Extension.isSessionActive();
         setIsSessionActive(isSessionActive);
 

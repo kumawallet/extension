@@ -105,7 +105,7 @@ export const ChainSelector = () => {
       <Menu>
         <Menu.Button
           data-testid="chain-button"
-          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
         >
           <img
             src={`/images/${selectedChain.logo}.png`}
@@ -113,7 +113,7 @@ export const ChainSelector = () => {
             height={24}
             className="object-cover rounded-full"
           />
-          <p>{selectedChain?.name}</p>
+          <p className="overflow-hidden text-ellipsis">{selectedChain?.name}</p>
           <BsChevronDown />
         </Menu.Button>
         <Transition
