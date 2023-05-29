@@ -46,12 +46,12 @@ export const KUSAMA_PARACHAINS = {
 // MAINNETS
 export const POLKADOT = {
   name: "Polkadot",
-  rpc: { wasm: "ws://127.0.0.1:9900" }, // change
+  rpc: { wasm: "wss://rpc.polkadot.io" },
   addressPrefix: 0,
   nativeCurrency: {
     name: "DOT",
     symbol: "DOT",
-    decimals: 12, // change
+    decimals: 10,
   },
   logo: "polkadot",
   explorer: {
@@ -67,8 +67,8 @@ export const POLKADOT = {
 export const ASTAR = {
   name: "Astar",
   rpc: {
-    evm: "http://127.0.0.1:8920", // change
-    wasm: "ws://127.0.0.1:9920", // change
+    evm: "https://evm.astar.network",
+    wasm: "wss://rpc.astar.network",
   },
   addressPrefix: 5,
   nativeCurrency: {
@@ -94,8 +94,7 @@ export const ASTAR = {
 const MOONBEAM = {
   name: "Moonbeam",
   rpc: {
-    evm: "http://localhost:8910", // change
-    wasm: "ws://127.0.0.1:9920", // change
+    evm: "https://rpc.api.moonbeam.network",
   },
   addressPrefix: 1284,
   nativeCurrency: {
@@ -117,8 +116,7 @@ const MOONBEAM = {
 const ACALA = {
   name: "Acala",
   rpc: {
-    // wasm: "wss://acala-rpc-0.aca-api.network",
-    wasm: "ws://localhost:9930", // change
+    wasm: "wss://acala-rpc-0.aca-api.network",
   },
   addressPrefix: 10,
   nativeCurrency: {
