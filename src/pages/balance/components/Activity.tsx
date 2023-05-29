@@ -187,17 +187,6 @@ export const Activity = () => {
                   <p className="text-xs">{`${formatDate(
                     lastUpdated as number
                   )} - `}</p>
-                  {/* <p>
-                    
-                    <a
-                      className="text-custom-green-bg hover:text-white text-sm"
-                      href={getLink(network, hash)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {tCommon("view_in_scanner")}
-                    </a>
-                  </p> */}
                   <p
                     className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
                       chipColor[status as RecordStatus]

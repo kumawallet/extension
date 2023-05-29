@@ -72,12 +72,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     state: { selectedAccount },
   } = useAccountContext();
 
-  const PASSWORD_RULES = t("form.password_hint");
+  const PASSWORD_RULES = t("form.password_requirements");
   const passwordIsRequired = signUp || resetPassword;
 
   const { isLoading, endLoading, starLoading } = useLoading();
   const [isSuccessful, setIsSuccessful] = useState(false);
-  const [showSeed, setShowSeed] = useState(false);
+  const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
   const { Icon, copyToClipboard } = useCopyToClipboard(seed);
 
@@ -122,7 +122,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             ),
             otherwise: string().test(
               "wasm validation",
-              t("form.seed_phrasey_validation") as string,
+              t("form.seed_phrase_validation") as string,
               (val) => {
                 return mnemonicValidate(val || "");
               }
@@ -144,7 +144,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       ? string()
           .oneOf(
             [ref("password"), null],
-            t("form.confirm_password_hint") as string
+            t("form.confirm_password_requirements") as string
           )
           .required(t("form.required") as string)
       : string().notRequired(),
@@ -234,10 +234,10 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   >
                     <Icon messagePosition="right" />
                   </button>
-                  {!showSeed && (
+                  {!showRecoveryPhrase && (
                     <div
                       className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-10"
-                      onClick={() => setShowSeed(true)}
+                      onClick={() => setShowRecoveryPhrase(true)}
                     >
                       <button className="flex flex-col items-center">
                         <p>{tCommon("show")}</p>
@@ -247,8 +247,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   )}
                 </div>
                 <p className="text-gray-400 p-2 px-1">
-                  {" "}
-                  {t("form.seed_message")}
+                  {t("form.recovery_phrase_warning")}
                 </p>
               </div>
             )}
@@ -265,9 +264,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   {...register("accountType")}
                 >
-                  <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+                  <option value={AccountType.EVM}>{tCommon("evm_type")}</option>
                   <option value={AccountType.WASM}>
-                    {t("form.wasm_type")}
+                    {tCommon("wasm_type")}
                   </option>
                 </select>
               </div>
@@ -409,7 +408,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             onClick={submit}
             isLoading={isLoading}
             isDisabled={
-              (generateSeed && !showSeed) ||
+              (generateSeed && !showRecoveryPhrase) ||
               (showInsertSeedStep && !seedConfirmationIsValid)
             }
           >

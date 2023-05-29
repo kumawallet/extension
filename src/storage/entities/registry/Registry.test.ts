@@ -182,7 +182,7 @@ describe("Registry", () => {
       const set = vi.fn();
       _BaseEntity.get = get;
       _BaseEntity.set = set;
-      await Registry.addRecent("test", {
+      await Registry.addRecentAddress("test", {
         address: "",
         timestamp: 0,
       });
@@ -194,7 +194,7 @@ describe("Registry", () => {
       const get = vi.fn().mockReturnValue(undefined);
       _BaseEntity.get = get;
       expect(
-        Registry.addRecent("test", {
+        Registry.addRecentAddress("test", {
           address: "",
           timestamp: 0,
         })
@@ -214,14 +214,14 @@ describe("Registry", () => {
         data: { contacts: { test: { address: "test" } } },
       });
       _BaseEntity.get = get;
-      expect(Registry.getRecent("test")).resolves.toEqual([]);
+      expect(Registry.getRecentAddresses("test")).resolves.toEqual([]);
     });
     it("should throw registry error", async () => {
       const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
         .default;
       const get = vi.fn().mockReturnValue(undefined);
       _BaseEntity.get = get;
-      expect(Registry.getRecent("test")).rejects.toThrowError(
+      expect(Registry.getRecentAddresses("test")).rejects.toThrowError(
         "failed_to_get_recent"
       );
     });
@@ -245,7 +245,7 @@ describe("Registry", () => {
     const registry = new Registry();
 
     registry.addContact({ address: "test" } as Contact);
-    registry.addRecent("test", {
+    registry.addRecentAddress("test", {
       address: "",
       timestamp: 0,
     });
@@ -258,7 +258,7 @@ describe("Registry", () => {
     const registry = new Registry();
 
     registry.addContact({ address: "test" } as Contact);
-    expect(registry.getRecent("test")).toEqual([]);
+    expect(registry.getRecentAddresses("test")).toEqual([]);
   });
 
   it("get all contacts", () => {

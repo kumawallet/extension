@@ -1,0 +1,232 @@
+{
+  "common": {
+    "evm_type": "Ethereum Account (EVM)",
+    "wasm_type": "Polkadot Account (Wasm)",
+    "save": "Salvare",
+    "cancel": "Annullare",
+    "delete": "Eliminare",
+    "connect": "Connettere",
+    "show": "Mostrare",
+    "close": "Chiudere",
+    "copied": "Copiato",
+    "password_required": "La password è richiesta",
+    "account_type_required": "Tipo di account richiesto",
+    "login_required": "Accesso richiesto",
+    "failed_to_create_account": "Impossibile creare l'account",
+    "failed_to_import_account": "Impossibile importare l'account",
+    "failed_to_derive_account": "Impossibile derivare l'account",
+    "failed_to_update_account": "Impossibile aggiornare l'account",
+    "failed_to_remove_account": "Impossibile rimuovere l'account",
+    "failed_to_get_settings": "Impossibile ottenere le impostazioni",
+    "failed_to_update_setting": "Failed to update setting",
+    "failed_to_restore_password": "Impossibile resettare la password",
+    "failed_to_cache_password": "Accesso non riuscito",
+    "failed_to_add_contact": "Impossibile aggiungere il contatto",
+    "failed_to_get_contact": "Impossibile ottenere il contatto",
+    "failed_to_update_contact": "Impossibile aggiornare il contatto",
+    "failed_to_remove_contact": "Impossibile rimuovere il contatto",
+    "failed_to_get_addresses": "Impossibile ottenere gli indirizzi",
+    "invalid_recovery_phrase": "Frase di recupero non valida",
+    "invalid_credentials": "Credenziali non valide",
+    "invalid_address": "Indirizzo non valido",
+    "accounts_not_found": "Accounts non trovati",
+    "network_not_found": "Rete non trovata",
+    "contact_not_found": "Contatto non trovato",
+    "no_contacts_found": "Nessun contatto trovato"
+  },
+  "welcome": {
+    "welcome_message": "Benvenuto a Kuma Wallet",
+    "description": "Tutti i tuoi assets in un unico posto",
+    "button_text": "Iniziare"
+  },
+  "add_account": {
+    "title": "Aggiungere un account",
+    "import_wallet": "Importa wallet",
+    "create_wallet": "Crea wallet"
+  },
+  "sign_in": {
+    "welcome": "Bentornato",
+    "password_placeholder": "Scribe la tua password",
+    "signin_button_text": "Accedere",
+    "forgot_password": "Hai dimenticato la password?"
+  },
+  "account_form": {
+    "import": {
+      "title": "Importare Account",
+      "button_text": "Importare",
+      "submit_message": "Account importato"
+    },
+    "create_or_derivate": {
+      "title": "Creare Account",
+      "button_text": "Creare",
+      "submit_message": "Account creato"
+    },
+    "restore": {
+      "title": "Resettare Password",
+      "button_text": "Resettare",
+      "submit_message": "Password resettata"
+    },
+    "form": {
+      "continue_button_text": "Continuare",
+      "recovery_phrase_warning": "Questa è la chiave del tuo account e l'unico modo per riottenere l'accesso nel caso in cui avessi dimenticato la password. Assicurati di salvarla in un posto sicuro poiché non potrai più vederla." ,      
+      "account_type": "Tipo di account",
+      "private_key": "Chiave privata",
+      "private_key_validation": "Chiave privata non valida",
+      "seed_phrase": "Frase di recupero",
+      "seed_phrase_validation": "Frase di recupero non valida",
+      "recovery_phrase": "Frase di recupero",
+      "account_name": "Nome dell'account (opzionale)",
+      "account_name_placeholder": "Massimo 32 caratteri",
+      "password": "Password",
+      "password_requirements": "La password deve contenere almeno otto caratteri, almeno un numero, sia lettere minuscole che maiuscole e caratteri speciali.",
+      "confirm_password": "Conferma password",
+      "confirm_password_requirements": "Le passwords non corrispondono",
+      "required": "Richiesto",
+      "confirm_recovery_phrase": "Confirmare la frase di recupero",
+      "confirm_recovery_phrase_description": "Per favore, conferma la tua frase di recupero selezionando le parole nell'ordine corretto.",
+      "next": "Prossimo"
+    }
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "connesso",
+      "change_to": "cambiare a",
+      "create_or_import_warning": "Questa rete supporta solo {{supported_type}}, per favore creare o importare un account supportato.",
+      "network_change_warning": "L'account selezionato verrà modificato perché la rete a cui vuoi cambiare non supporta l'attuale tipo di account. Sei sicuro di voler cambiare la rete?",
+      "create_account": "Creare",
+      "import_account": "Importare",
+      "change": "Cambiare",
+      "mainnets": "Mainnets",
+      "testnets": "Testnets",
+      "custom": "Personalizzato"
+    },
+    "accounts": {
+      "accounts": "Accounts",
+      "import": "Importare",
+      "create": "Creare"
+    },
+    "send": "Inviare",
+    "receive": "Ricevere",
+    "assets": "Assets",
+    "activity": "Attività",
+    "show_all_assets": "Mostrare tutti gli assets",
+    "manage_assets": "Gestire gli assets"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "general": "Generale",
+    "advanced": "Avanzate",
+    "contacts": "Contatti",
+    "security": "Sicurezza",
+    "bug_report": "Segnalazione bug",
+    "sign_out": "Disconnettere"
+  },
+  "general_settings": {
+    "title": "Generale",
+    "languages": "Lingue",
+    "manage_networks": "Gestire le reti",
+    "show_testnets": "Mostrare le testnets"
+  },
+  "advanced_settings": {
+    "title": "Avanzate"
+  },
+  "manage_networks": {
+    "title": "Gestire le reti",
+    "new_network": "Nuova rete",
+    "network_name": "Nome della rete",
+    "address_prefix": "Prefisso dell'indirizzo",
+    "native_currency": "Valuta nativa",
+    "account_type_support": "Tipo di account supportato",
+    "currency_name": "Nome",
+    "currency_symbol": "Simbolo",
+    "currency_decimals": "Decimali",
+    "rpc_urls": "RPC URLs",
+    "rpc_evm_placeholder": "i.e. https://mainnet.infura.io/v3/your-api-key",
+    "rpc_wasm_placeholder": "i.e. wss://rpc.polkadot.io",
+    "explorer": "Esploratore",
+    "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
+  },
+  "contacts": {
+    "title": "Contatti",
+    "name": "Nome",
+    "address": "Indirizzo",
+    "save_contact": "Salvare il contatto",
+    "insert_name": "Inserire il nome",
+    "insert_address": "Inserire l'indirizzo",
+    "search": "Cercare per nome o indirizzo",
+    "new_contact": "Nuovo contatto"
+  },
+  "activity": {
+    "title": "Attività",
+    "empty": "Non ci sono attività recenti",
+    "search": "Cerca per hash della transazione o indirizzo"
+  },
+  "receive": {
+    "title": "Condividere il tuo indirizzo"
+  },
+  "confirm_trusted_site": {
+    "title": "Azione richiesta",
+    "new_site_warning": "Questo sito desidera connettersi al tuo Kuma Wallet. Si prega di rivedere le informazioni del sito e assicurarsi che siano attendibili prima di connettersi.",
+    "do_you_trust_this_site": "Ti fidi di questo sito?",
+    "site_will_be_trusted": "Confermando questo sito sarà considerato attendibile in futuro.",
+    "manage_trusted_sites": "Se desideri gestire i siti attendibili, vai su Impostazioni > Sicurezza."
+  },
+  "security": {
+    "title": "Sicurezza",
+    "trusted_sites": "Siti attendibili",
+    "no_trusted_sites": "Nessun sito attendibile",
+    "search": "Cercare siti per URL",
+    "credentials": "Credenziali",
+    "restore_password": "Resettare la password",
+    "show_account_keys": "Mostrare le chiavi dell'account",
+    "account_keys_description": "Avvertenza: mantieni riservata questa password. La condivisione delle tue chiavi private potrebbe portare al furto di risorse dal tuo account.",
+    "reset_wallet": "Resettare Kuma Wallet",
+    "reset_wallet_warning": "Avviso: questa azione eliminerà tutti i tuoi account e dati dall'estensione. Tutte le tue risorse sono al sicuro in quanto NON sono memorizzate sull'estensione. Dovrai ripristinare i tuoi account utilizzando la frase di recupero.",
+    "reset": "Resettare"
+  },
+  "send": {
+    "title": "Invia token",
+    "from": "Da",
+    "to:": "A",
+    "destination_account": "Account di destinazione",
+    "amount": "Quantità",
+    "gas_limit": "Limite di gas",
+    "estimated_fee": "Tassa stimata",
+    "estimated_total": "Totale stimato",
+    "tip": "Mancia (opzionale)",
+    "transfer": "Trasferimento",
+    "chains": "Reti",
+    "assets": "Assets",
+    "details": "Dettagli",
+    "confirm": "Confermare",
+    "tx_send": "Transazione inviata",
+    "insufficient_balance": "Fondi insufficienti",
+    "continue": "Continua",
+    "invalid_address": "Indirizzo non valido",
+    "invalid_contract_address": "Indirizzo del contratto non valido",
+    "invalid_method": "Metodo non valido",
+    "invalid_params": "Parametri non validi",
+    "invalid_abi": "ABI non valido",
+    "contract_error": "Si è verificato un errore con il contratto"
+  },
+  "manage_assets": {
+    "title": "Gestire gli assets",
+    "address": "Indirizzo",
+    "symbol": "Simbolo",
+    "decimals": "Decimali",
+    "add": "Aggiungere"
+  },
+  "sign_message": {
+    "title": "Firma del messaggio",
+    "sign": "Firma",
+    "account": "Account",
+    "message": "Messaggio"
+  },
+  "re_enter_password": {
+    "title": "Reinserire la password",
+    "password": "Password",
+    "confirm": "Confermare",
+    "re_enter_password_text": "Reinserire la password per confermare questa azione."
+  }
+}

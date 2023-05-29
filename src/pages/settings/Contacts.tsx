@@ -14,6 +14,7 @@ import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { isHex } from "@polkadot/util";
+import { captureError } from "@src/utils/error-handling";
 
 interface AccountForm {
   name: string;
@@ -81,6 +82,7 @@ export const Contacts = () => {
       setContacts(contacts);
     } catch (error) {
       setContacts([]);
+      captureError(error);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
@@ -96,6 +98,7 @@ export const Contacts = () => {
       setSearch("");
       getContacts();
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsCreateContact(false);

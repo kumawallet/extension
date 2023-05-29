@@ -4,8 +4,13 @@ import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import Contact from "@src/storage/entities/registry/Contact";
+import { captureError } from "@src/utils/error-handling";
+import { useToast } from "@src/hooks";
+import { useTranslation } from "react-i18next";
 
 export const Destination = () => {
+  const { showErrorToast } = useToast();
+  const { t } = useTranslation("common");
   const {
     state: { selectedChain },
   } = useNetworkContext();
@@ -25,33 +30,39 @@ export const Destination = () => {
   useEffect(() => {
     if (selectedAccount.key && selectedChain?.name) {
       (async () => {
-        const { contacts, ownAccounts, recent } =
-          await Extension.getRegistryAddresses();
-
-        let _ownAccounts: Contact[] = [];
-
-        if (!isXcm) {
-          _ownAccounts = ownAccounts.filter(
-            (acc) => acc.name !== selectedAccount.value.name
-          );
-        } else {
-          _ownAccounts = ownAccounts;
+        try {
+          const { contacts, ownAccounts, recent } =
+            await Extension.getRegistryAddresses();
+  
+          let _ownAccounts: Contact[] = [];
+  
+          if (!isXcm) {
+            _ownAccounts = ownAccounts.filter(
+              (acc) => acc.name !== selectedAccount.value.name
+            );
+          } else {
+            _ownAccounts = ownAccounts;
+          }
+  
+          setAccountToSelect([
+            {
+              label: "recent",
+              values: recent,
+            },
+            {
+              label: "contacts",
+              values: contacts,
+            },
+            {
+              label: "own accounts",
+              values: _ownAccounts,
+            },
+          ]);
+          
+        } catch (error) {
+          captureError(error);
+          showErrorToast(t("failed_to_get_addresses"));
         }
-
-        setAccountToSelect([
-          {
-            label: "recent",
-            values: recent,
-          },
-          {
-            label: "contacts",
-            values: contacts,
-          },
-          {
-            label: "own accounts",
-            values: _ownAccounts,
-          },
-        ]);
       })();
     }
   }, [selectedAccount?.key, selectedChain?.name, isXcm]);

@@ -39,7 +39,7 @@ export default class Registry extends BaseEntity {
 
   static async changeContactName(address: string, name: string) {
     const registry = await Registry.get<Registry>();
-    if (!registry) throw new Error("failed_to_change_contact_name");
+    if (!registry) throw new Error("failed_to_update_contact");
     const contact = registry.getContact(address);
     if (!contact) throw new Error("contact_not_found");
     contact.name = name;
@@ -53,17 +53,17 @@ export default class Registry extends BaseEntity {
     await Registry.set<Registry>(registry);
   }
 
-  static async addRecent(network: string, register: Register) {
+  static async addRecentAddress(network: string, register: Register) {
     const registry = await Registry.get<Registry>();
-    if (!registry) throw new Error("failed_to_add_recent");
-    registry.addRecent(network, register);
+    if (!registry) throw new Error("failed_to_add_recent_address");
+    registry.addRecentAddress(network, register);
     await Registry.set<Registry>(registry);
   }
 
-  static async getRecent(network: string): Promise<Register[]> {
+  static async getRecentAddresses(network: string): Promise<Register[]> {
     const registry = await Registry.get<Registry>();
-    if (!registry) throw new Error("failed_to_get_recent");
-    return registry.getRecent(network);
+    if (!registry) throw new Error("failed_to_get_recent_addresses");
+    return registry.getRecentAddresses(network);
   }
 
   addContact(contact: Contact) {
@@ -74,7 +74,7 @@ export default class Registry extends BaseEntity {
     return this.data.contacts[address];
   }
 
-  addRecent(network: string, register: Register) {
+  addRecentAddress(network: string, register: Register) {
     if (!this.data.recent[network]) {
       this.data.recent[network] = [] as unknown as [Register];
     }
@@ -99,7 +99,7 @@ export default class Registry extends BaseEntity {
     this.data.recent[network].push(register);
   }
 
-  getRecent(network: string): Register[] {
+  getRecentAddresses(network: string): Register[] {
     return (
       this.data.recent?.[network]?.sort(
         (a: Register, b: Register) => b.timestamp - a.timestamp

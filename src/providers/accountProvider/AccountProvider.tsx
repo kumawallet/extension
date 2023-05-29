@@ -130,13 +130,18 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const updateAccountName = async (accountKey: AccountKey, name: string) => {
-    await Extension.changeAccountName(accountKey, name);
-    dispatch({
-      type: "update-account-name",
-      payload: {
-        name,
-      },
-    });
+    try {
+      await Extension.changeAccountName(accountKey, name);
+      dispatch({
+        type: "update-account-name",
+        payload: {
+          name,
+        },
+      });
+    } catch (error) {
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_account"));
+    }
   };
 
   const getSelectedAccount = async () => {

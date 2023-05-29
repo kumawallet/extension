@@ -9,4 +9,5 @@ export const LANGUAGES = [
   { lang: "en", name: "English", englishName: "English" },
   { lang: "es", name: "Español", englishName: "Spanish" },
   { lang: "jp", name: "日本語", englishName: "Japanese" },
+  { lang: "it", name: "Italiano", englishName: "Italian" },
 ];
