@@ -11,10 +11,12 @@ import { parseIncomingQuery } from "@src/utils/utils";
 const sendMessage = vi.fn();
 
 const renderComponent = () => {
-  const query = `?params=${JSON.stringify({
-    message: "message",
-    origin: "http://vitest.local",
-  })}`;
+  const query = `?params={${btoa(
+    JSON.stringify({
+      message: "message",
+      origin: "http://vitest.local",
+    })
+  )}}`;
 
   const { params, ...metadata } = parseIncomingQuery(query);
 
@@ -60,6 +62,10 @@ describe("SignMessage", () => {
         },
       }),
     }));
+
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => vi.fn(),
+    }));
   });
 
   it("should sign evm message", async () => {
@@ -69,6 +75,7 @@ describe("SignMessage", () => {
       .mockReturnValue(["http://vitest.local"]);
     Extension.showKey = () => "test key";
     Extension.addTrustedSite = vi.fn();
+    Extension.isAuthorized = vi.fn().mockReturnValue(true);
 
     const providers = (await import("@src/providers")) as Record<string, any>;
 

@@ -97,6 +97,7 @@ describe("EvmForm", () => {
     vi.mock("@src/Extension", () => ({
       default: {
         showKey: vi.fn().mockResolvedValue("privatekey"),
+        isAuthorized: vi.fn().mockReturnValue(true),
       },
     }));
 
@@ -111,6 +112,10 @@ describe("EvmForm", () => {
         },
       };
     });
+
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => vi.fn(),
+    }));
   });
 
   it("should call confirmTx", async () => {

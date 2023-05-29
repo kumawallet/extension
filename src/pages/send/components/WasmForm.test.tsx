@@ -37,6 +37,7 @@ describe("WasmForm", () => {
                   paymentInfo: {
                     partialFee: new BN("1000000"),
                   },
+                  signAsync: () => "",
                 }),
               },
               assets: {
@@ -110,6 +111,7 @@ describe("WasmForm", () => {
     vi.mock("@src/Extension", () => ({
       default: {
         showKey: vi.fn().mockResolvedValue("privatekey"),
+        isAuthorized: vi.fn().mockReturnValue(true),
       },
     }));
 
@@ -132,6 +134,7 @@ describe("WasmForm", () => {
                 paymentInfo: {
                   partialFee: new BN("100000000"),
                 },
+                signAsync: () => "",
               }),
             },
           };
@@ -145,6 +148,10 @@ describe("WasmForm", () => {
 
     // mock keyring
     vi.mock("@polkadot/keyring");
+
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => vi.fn(),
+    }));
   });
 
   it("should call confirmTx", async () => {
