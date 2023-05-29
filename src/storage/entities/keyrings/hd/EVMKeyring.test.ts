@@ -1,4 +1,5 @@
 import EVMKeyring from "./EVMKeyring";
+import { SupportedKeyring } from "../types";
 
 const mockMnemonic =
   "bag decide skirt parent embody rebuild parrot vapor bind dance assist say film swallow color";
@@ -51,7 +52,7 @@ describe("EVMKeyring", () => {
           path: "m/44'/60'/0'/0/0",
         },
       },
-    } as any);
+    } as unknown as SupportedKeyring);
 
     expect(keyring.mnemonic).toBe(mockMnemonic);
   });

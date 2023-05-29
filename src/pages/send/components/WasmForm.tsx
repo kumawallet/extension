@@ -128,8 +128,32 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
         extrinsic = _api.tx[pallet][method](
           ...Object.keys(extrinsicValues)
-            .filter((key) => extrinsicValues[key] !== null)
-            .map((key) => extrinsicValues[key])
+            .filter(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "dest"
+                    | "beneficiary"
+                    | "assets"
+                    | "feeAssetItem"
+                    | "currencyId"
+                    | "amount"
+                    | "destWeightLimit"
+                ] !== null
+            )
+            .map(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "dest"
+                    | "beneficiary"
+                    | "assets"
+                    | "feeAssetItem"
+                    | "currencyId"
+                    | "amount"
+                    | "destWeightLimit"
+                ]
+            )
         );
 
         const { partialFee } = await (

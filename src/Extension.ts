@@ -9,7 +9,11 @@ import Vault from "./storage/entities/Vault";
 import Auth from "./storage/Auth";
 import SelectedAccount from "./storage/entities/SelectedAccount";
 import Settings from "./storage/entities/settings/Settings";
-import { SettingKey, SettingType } from "./storage/entities/settings/types";
+import {
+  SettingKey,
+  SettingType,
+  SettingValue,
+} from "./storage/entities/settings/types";
 import Registry from "./storage/entities/registry/Registry";
 import Contact from "./storage/entities/registry/Contact";
 import Record from "./storage/entities/activity/Record";
@@ -220,7 +224,11 @@ export default class Extension {
     return settings.get(type, key);
   }
 
-  static async updateSetting(type: SettingType, key: SettingKey, value: any) {
+  static async updateSetting(
+    type: SettingType,
+    key: SettingKey,
+    value: SettingValue
+  ) {
     const settings = await Settings.get<Settings>();
     if (!settings) throw new Error("failed_to_get_settings");
     settings.update(type, key, value);
@@ -304,7 +312,10 @@ export default class Extension {
     await Activity.updateRecordStatus(txHash, status, error);
   }
 
-  static async addAsset(chain: string, asset: any) {
+  static async addAsset(
+    chain: string,
+    asset: { symbol: string; address: string; decimals: number }
+  ) {
     return Assets.addAsset(chain, asset);
   }
 

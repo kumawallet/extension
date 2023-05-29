@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import Auth from "../storage/Auth";
 import Vault from "../storage/entities/Vault";
 import BackUp from "../storage/entities/BackUp";

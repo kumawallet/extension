@@ -141,7 +141,16 @@ export const Send = () => {
 
           // TODO: refactor
           _tx = await (tx?.tx as Contract)[method](
-            ...Object.keys(extrinsicValues).map((key) => extrinsicValues[key]),
+            ...Object.keys(extrinsicValues).map(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "currency_address"
+                    | "amount"
+                    | "destination"
+                    | "weight"
+                ]
+            ),
             {
               gasLimit: tx?.fee["gas limit"],
               maxFeePerGas: tx?.fee["max fee per gas"],

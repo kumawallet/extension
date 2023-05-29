@@ -22,7 +22,11 @@ const renderComponent = () => {
 
   return render(
     <I18nextProvider i18n={i18n}>
-      <SignMessage params={params} metadata={metadata} onClose={vi.fn()} />
+      <SignMessage
+        params={params as unknown as { message: string }}
+        metadata={metadata}
+        onClose={vi.fn()}
+      />
     </I18nextProvider>
   );
 };

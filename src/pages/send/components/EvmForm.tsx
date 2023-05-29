@@ -107,14 +107,23 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
           const contract = new ethers.Contract(
             contractAddress,
-            abi,
+            abi as string,
             wallet as Wallet
           );
 
           const feeData = await _api.getFeeData();
           const gasLimit = await contract.estimateGas[method](
-            ...Object.keys(extrinsicValues).map((key) => extrinsicValues[key])
-          ).catch((e) => {
+            ...Object.keys(extrinsicValues).map(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "currency_address"
+                    | "amount"
+                    | "destination"
+                    | "weight"
+                ]
+            )
+          ).catch(() => {
             return BigNumber.from("21000");
           });
 

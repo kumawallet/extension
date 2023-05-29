@@ -1,3 +1,4 @@
+import { SupportedKeyring } from "../types";
 import WASMKeyring from "./WASMKeyring";
 
 const mockMnemonic =
@@ -67,7 +68,7 @@ describe("WASMKeyring", () => {
           path: "/0",
         },
       },
-    } as any);
+    } as unknown as SupportedKeyring);
 
     expect(keyring.mnemonic).toBe(mockMnemonic);
   });

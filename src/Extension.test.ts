@@ -1,8 +1,7 @@
-import { AccountType, AccountKey } from "./accounts/types";
+import { AccountType } from "./accounts/types";
 import Extension from "./Extension";
-import { chainsMock, selectedEVMChainMock } from "./tests/mocks/chain-mocks";
+import { selectedEVMChainMock } from "./tests/mocks/chain-mocks";
 import { expect } from "vitest";
-import Account from "./storage/entities/Account";
 import {
   selectedEVMAccountMock,
   accountsMocks,
@@ -12,7 +11,6 @@ import { SettingKey } from "./storage/entities/settings/types";
 import { CHAINS } from "./constants/chains";
 import Record from "./storage/entities/activity/Record";
 import { RecordStatus } from "./storage/entities/activity/types";
-import { Asset } from "./pages";
 import { selectedWASMChainMock } from "./tests/mocks/chain-mocks";
 const accountManageMock = {
   saveBackup: vi.fn(),
@@ -953,7 +951,10 @@ describe("Extension", () => {
     const addAsset = vi.fn();
     _Assets.addAsset = addAsset;
 
-    await Extension.addAsset(CHAINS[0].chains[0].name, {} as Asset);
+    await Extension.addAsset(
+      CHAINS[0].chains[0].name,
+      {} as unknown as { symbol: string; address: string; decimals: number }
+    );
     expect(addAsset).toHaveBeenCalled();
   });
 

@@ -4,6 +4,13 @@ import { BN0 } from "@src/constants/assets";
 import { BigNumberish, ethers } from "ethers";
 import { captureError } from "./error-handling";
 import { Asset } from "@src/providers/assetProvider/types";
+import {
+  GenericStorageEntryFunction,
+  PromiseResult,
+  StorageEntryBase,
+  StorageEntryPromiseOverloads,
+} from "@polkadot/api/types";
+import { AnyTuple } from "@polkadot/types-codec/types";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -15,10 +22,12 @@ export const getNatitveAssetBalance = async (
     if (!api) return _amount;
 
     if ("query" in api) {
-      const { data }: any =
-        (await api.query.system?.account(accountAddress)) || {};
+      const { data } =
+        ((await api.query.system?.account(accountAddress)) as unknown as {
+          data: { free: BN };
+        }) || {};
 
-      return data.free as BN;
+      return data.free;
     }
 
     if ("getBalance" in api) {
@@ -96,10 +105,14 @@ export const getWasmAssets = async (
   dispatch: (assetId: string, newValue: BN) => void
 ) => {
   const assets: Asset[] = [];
-  const unsubs: any[] = [];
+  const unsubs: unknown[] = [];
   try {
     let assetPallet = null;
-    let balanceMethod: any = null;
+    let balanceMethod:
+      | (PromiseResult<GenericStorageEntryFunction> &
+          StorageEntryBase<"promise", GenericStorageEntryFunction, AnyTuple> &
+          StorageEntryPromiseOverloads)
+      | null = null;
 
     switch (chainName) {
       case "Acala":
@@ -127,18 +140,22 @@ export const getWasmAssets = async (
         decimals: number;
       };
 
-      const id = metadata.args[0]?.id
-        ? String(metadata.args[0]?.id)
+      const id = (metadata.args[0] as unknown as { id: number })?.id
+        ? String((metadata.args[0] as unknown as { id: number })?.id)
         : metadata.args[0].toString();
       const name = hexToString(jsonAsset?.name || "");
       const symbol = hexToString(jsonAsset?.symbol || "");
       const balance = BN0;
       const decimals = Number(jsonAsset?.decimals || 0);
 
-      let aditionalData: any = null;
+      let aditionalData: Asset["aditionalData"] = null;
 
       if (chainName === "Acala") {
-        const token = metadata.args[0].toJSON() as any;
+        const token = metadata.args[0].toJSON() as {
+          nativeAssetId?: { token: string };
+          foreignAssetId?: string;
+          stableAssetId?: string;
+        };
 
         if (
           !token?.nativeAssetId &&

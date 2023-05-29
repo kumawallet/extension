@@ -10,6 +10,8 @@ import { BN0 } from "./assets";
 import xTokensAbi from "@src/abi/xtokens_moonbeam_abi.json";
 import { BigNumberish } from "ethers";
 
+type Version = "V0" | "V1" | "V2" | "V3";
+
 export const XCM = {
   pallets: {
     XCM_PALLET: {
@@ -40,7 +42,11 @@ export const getDest = ({
   parents = 0,
   parachainId = null,
   version = "V1",
-}: any) => {
+}: {
+  parents?: number;
+  parachainId?: number | null;
+  version?: Version;
+}) => {
   return {
     [version]: {
       parents,
@@ -63,9 +69,9 @@ export const getAssets = ({
   interior = "Here",
   parents = 0,
 }: {
-  version?: "V0" | "V1" | "V2" | "V3";
+  version?: Version;
   fungible: BN | BigNumberish | string;
-  interior?: "Here" | any;
+  interior?: "Here" | unknown;
   parents?: 0 | 1;
 }) => {
   if (version === "V1") {
@@ -144,14 +150,27 @@ export const getBeneficiary = ({
 export interface MapResponseXCM {
   pallet: string;
   method: string;
-  extrinsicValues: any;
+  extrinsicValues: {
+    dest?: unknown;
+    beneficiary?: unknown;
+    assets?: unknown;
+    feeAssetItem?: number;
+    currencyId?: unknown;
+    amount?: unknown | string;
+    destWeightLimit?: string | { Limited: number };
+  };
 }
 
 export interface MapResponseEVM {
   contractAddress: string;
-  abi: string;
+  abi: string | unknown;
   method: string;
-  extrinsicValues: any;
+  extrinsicValues: {
+    currency_address: string;
+    amount: string;
+    destination: unknown;
+    weight: string;
+  };
 }
 
 type Map = (props: ExtrinsicValues) => MapResponseXCM | MapResponseEVM;
@@ -170,13 +189,13 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       extrinsicValues: {
         dest: getDest({
           parachainId: POLKADOT_PARACHAINS.ASTAR.id,
-        }),
+        }) as unknown,
         beneficiary: getBeneficiary({
           address,
-        }),
-        asssets: getAssets({
+        }) as unknown,
+        assets: getAssets({
           fungible: amount,
-        }),
+        }) as unknown,
         feeAssetItem: 0,
       },
     }),
@@ -186,15 +205,15 @@ export const XCM_MAPPING: IXCM_MAPPING = {
       extrinsicValues: {
         dest: getDest({
           parachainId: POLKADOT_PARACHAINS.MOONBEAM.id,
-        }),
+        }) as unknown,
         beneficiary: getBeneficiary({
           address,
           account: "AccountKey20",
-        }),
-        asssets: getAssets({
+        }) as unknown,
+        assets: getAssets({
           fungible: amount,
           version: "V0",
-        }),
+        }) as unknown,
         feeAssetItem: 0,
         weightLimit: {
           Limited: 1_000_000_000,
@@ -208,15 +227,15 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         dest: getDest({
           parachainId: POLKADOT_PARACHAINS.ACALA.id,
           version: "V1",
-        }),
+        }) as unknown,
         beneficiary: getBeneficiary({
           address,
           version: "V1",
-        }),
-        asssets: getAssets({
+        }) as unknown,
+        assets: getAssets({
           fungible: amount,
           version: "V0",
-        }),
+        }) as unknown,
         feeAssetItem: 0,
       },
     }),
@@ -229,12 +248,12 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
       return {
         contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
+        abi: xTokensAbi,
         method: "transfer",
         extrinsicValues: {
           currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
           amount: amount.toString(),
-          destination: [1, [_address]],
+          destination: [1, [_address]] as unknown,
           weight: "4000000000", // Weight
         },
       };
@@ -264,7 +283,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
       return {
         contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
+        abi: xTokensAbi,
         method: "transfer",
         extrinsicValues: {
           currency_address, //asset address
@@ -307,7 +326,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
       return {
         contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
+        abi: xTokensAbi,
         method: "transfer",
         extrinsicValues: {
           currency_address, //asset address
@@ -399,7 +418,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
     [PARACHAINS.MOONBEAM]: ({ address, amount, assetSymbol }) => {
       let currencyId = null;
-      let destWeightLimit: any = "Unlimited";
+      let destWeightLimit: string | { Limited: number } = "Unlimited";
 
       switch (assetSymbol?.toLowerCase()) {
         case "aca": {
@@ -447,7 +466,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
                 ],
               },
             },
-          },
+          } as unknown,
           destWeightLimit,
         },
       };
@@ -578,7 +597,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
       return {
         contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
+        abi: xTokensAbi as unknown,
         method: "transfer",
         extrinsicValues: {
           currency_address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080", //asset address
@@ -613,7 +632,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
 
       return {
         contractAddress: "0x0000000000000000000000000000000000000804",
-        abi: xTokensAbi as any,
+        abi: xTokensAbi as unknown,
         method: "transfer",
         extrinsicValues: {
           currency_address, //asset address

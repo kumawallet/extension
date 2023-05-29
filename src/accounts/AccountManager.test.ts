@@ -8,16 +8,8 @@ import {
   selectedWASMAccountMock,
 } from "@src/tests/mocks/account-mocks";
 import Accounts from "@src/storage/entities/Accounts";
-import Vault from "@src/storage/entities/Vault";
 import { SupportedKeyring } from "@src/storage/entities/keyrings/types";
 import HDKeyring from "@src/storage/entities/keyrings/hd/HDKeyring";
-
-const evmWalletResponseMock = {
-  address: "0x12345",
-  mnemonic: {
-    phrase: "1 2 3 4 5",
-  },
-};
 
 const wasmWalletResponseMock = {
   json: {

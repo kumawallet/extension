@@ -11,6 +11,7 @@ import Extension from "@src/Extension";
 import notificationIcon from "/icon-128.png";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { TxToProcess } from "@src/types";
+import { BN } from "@polkadot/util";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
@@ -196,13 +197,41 @@ const processWasmTx = async ({
                 event: {
                   data: [_error],
                 },
-              }: any) => {
+              }: {
+                event: {
+                  data: Partial<{
+                    isModule: boolean;
+                    asModule:
+                      | Uint8Array
+                      | {
+                          error: BN;
+                          index: BN;
+                        }
+                      | {
+                          error: BN | Uint8Array;
+                          index: BN;
+                        };
+                    toString: () => string;
+                  }>[];
+                };
+              }) => {
                 if (_error.isModule) {
-                  const decoded = api?.registry.findMetaError(_error.asModule);
+                  const decoded = api.registry.findMetaError(
+                    _error.asModule as
+                      | Uint8Array
+                      | {
+                          error: BN;
+                          index: BN;
+                        }
+                      | {
+                          error: BN | Uint8Array;
+                          index: BN;
+                        }
+                  );
                   const { docs, method, section } = decoded;
                   error = `${section}.${method}: ${docs.join(" ")}`;
                 } else {
-                  error = _error.toString();
+                  error = _error.toString?.();
                 }
               }
             );

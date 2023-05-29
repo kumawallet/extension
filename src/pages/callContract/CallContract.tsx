@@ -70,7 +70,9 @@ export const CallContract: FC<CallContractProps> = ({
     state: { selectedAccount },
   } = useAccountContext();
 
-  const [fees, setFees] = useState({});
+  const [fees, setFees] = useState<
+    typeof defaultEVMFees | typeof defaultWasmFees
+  >({} as typeof defaultEVMFees | typeof defaultWasmFees);
   const [tx, setTx] = useState<any>(null);
   const [canSign, setCanSign] = useState(false);
 
@@ -358,7 +360,9 @@ export const CallContract: FC<CallContractProps> = ({
             {type === "EVM" && (
               <div className="flex justify-between gap-2">
                 <p>{t("gas_limit")}</p>
-                <p className="font-bold">{String(fees["gas limit"])} gwei</p>
+                <p className="font-bold">
+                  {String((fees as typeof defaultEVMFees)["gas limit"])} gwei
+                </p>
               </div>
             )}
 
