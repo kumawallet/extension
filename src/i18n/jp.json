@@ -240,7 +240,13 @@
     "confirm": "確認",
     "tx_send": "トランザクション送信",
     "insufficient_balance": "残高不足",
-    "continue": "続き"
+    "continue": "続き",
+    "invalid_address": "無効なアドレス",
+    "invalid_contract_address": "無効なコントラクトアドレス",
+    "invalid_method": "無効なメソッド",
+    "invalid_params": "無効なパラメータ",
+    "invalid_abi": "無効なABI",
+    "contract_error": "コントラクトエラー"
   },
   "manage_assets": {
     "title": "アセットを管理する",

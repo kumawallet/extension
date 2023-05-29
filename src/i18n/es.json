@@ -240,7 +240,13 @@
     "confirm": "Confirmar",
     "tx_send": "Transacción enviada",
     "insufficient_balance": "Balance insuficiente",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "invalid_address": "Dirección inválida",
+    "invalid_contract_address": "Dirección de contrato inválida",
+    "invalid_method": "Método inválido",
+    "invalid_params": "Parámetros inválidos",
+    "invalid_abi": "ABI inválido",
+    "contract_error": "Ocurrio un error con el contrato"
   },
   "manage_assets": {
     "title": "Gestionar activos",

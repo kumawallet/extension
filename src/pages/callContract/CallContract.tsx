@@ -72,6 +72,7 @@ export const CallContract: FC<CallContractProps> = ({
 
   const [fees, setFees] = useState({});
   const [tx, setTx] = useState<any>(null);
+  const [canSign, setCanSign] = useState(false);
 
   useEffect(() => {
     if (!type) return;
@@ -136,6 +137,8 @@ export const CallContract: FC<CallContractProps> = ({
           });
         }
       } else {
+        if (!address.startsWith("0x")) throw new Error("invalid_address");
+
         const seed = await Extension.showKey();
         const wallet = new ethers.Wallet(
           seed as string,
@@ -180,8 +183,34 @@ export const CallContract: FC<CallContractProps> = ({
           setTx(contract);
         }
       }
+      setCanSign(true);
     } catch (error) {
-      showErrorToast(error);
+      const _error = String(error);
+
+      if (
+        _error.includes("Invalid decoded address") ||
+        _error.includes("bad address")
+      ) {
+        return showErrorToast(t("invalid_contract_address"));
+      }
+
+      if (_error.includes("is not a function")) {
+        return showErrorToast(t("invalid_method"));
+      }
+
+      if (
+        _error.includes("arguments") ||
+        _error.includes("Unknown type") ||
+        _error.includes("argument")
+      ) {
+        return showErrorToast(t("invalid_params"));
+      }
+
+      if (_error.includes("map")) {
+        return showErrorToast(t("invalid_abi"));
+      }
+
+      showErrorToast(t("contract_error"));
     }
     endLoading();
   };
@@ -304,12 +333,7 @@ export const CallContract: FC<CallContractProps> = ({
           <div>
             <div className="mb-5">
               <p>{t("method")}:</p>
-              <div
-                className="flex bg-gray-700 border-gray-600 rounded-xl p-4"
-                style={{
-                  boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                }}
-              >
+              <div className="flex bg-gray-700 border-gray-600 rounded-xl p-4">
                 <p className="text-ellipsis overflow-hidden">{method}()</p>
               </div>
             </div>
@@ -317,12 +341,7 @@ export const CallContract: FC<CallContractProps> = ({
             {Object.keys(contractParams).length > 0 && (
               <>
                 <p>{t("params")}:</p>
-                <div
-                  className="flex flex-col gap-2 p-4 bg-gray-700 border-gray-600"
-                  style={{
-                    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                  }}
-                >
+                <div className="flex flex-col gap-2 p-4 bg-gray-700 border-gray-600">
                   {Object.keys(contractParams).map((key, index) => (
                     <p key={index} className="overflow-hidden text-ellipsis">
                       {key}: {String(contractParams[key])}
@@ -375,7 +394,7 @@ export const CallContract: FC<CallContractProps> = ({
             {t("cancel")}
           </LoadingButton>
           <LoadingButton
-            isDisabled={isLoading}
+            isDisabled={isLoading || !canSign}
             isLoading={isLoading}
             onClick={send}
           >
