@@ -682,7 +682,7 @@ describe("Extension", () => {
         .default;
       const get = vi.fn().mockReturnValue({
         getAllContacts: () => contactsMock,
-        getRecent: () => [],
+        getRecentAddresses: () => [],
       });
       _Registry.get = get;
 
@@ -774,35 +774,15 @@ describe("Extension", () => {
     it("should save contact", async () => {
       const _Registry = (await import("./storage/entities/registry/Registry"))
         .default;
-      const get = vi.fn().mockReturnValue({
-        addContact: vi.fn(),
-      });
-      const set = vi.fn();
-      _Registry.get = get;
-      _Registry.set = set;
+      const addContact = vi.fn();
+
+      _Registry.addContact = addContact;
 
       await Extension.saveContact({
         name: "account1",
         address: "0x12345",
       });
-      expect(set).toHaveBeenCalled();
-    });
-
-    it("should return error", async () => {
-      const _Registry = (await import("./storage/entities/registry/Registry"))
-        .default;
-      const get = vi.fn().mockReturnValue(undefined);
-      _Registry.get = get;
-
-      try {
-        await Extension.saveContact({
-          name: "account1",
-          address: "0x12345",
-        });
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_registry");
-      }
+      expect(addContact).toHaveBeenCalled();
     });
   });
 

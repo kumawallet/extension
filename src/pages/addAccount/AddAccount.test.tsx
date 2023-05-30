@@ -5,7 +5,7 @@ import i18n from "@src/utils/i18n";
 import { AddAccount } from "./AddAccount";
 import en from "@src/i18n/en.json";
 
-const useNavigateMock = vi.fn();
+const create = vi.fn();
 
 const renderComponent = () => {
   return render(
@@ -17,9 +17,14 @@ const renderComponent = () => {
 
 describe("AddAccount", () => {
   beforeAll(() => {
-    vi.mock("react-router-dom", () => ({
-      useNavigate: () => () => useNavigateMock(),
-    }));
+    (window.chrome as any) = {
+      runtime: {
+        getURL: vi.fn(),
+      },
+      tabs: {
+        create: () => create(),
+      },
+    };
   });
   it("should render", () => {
     renderComponent();
@@ -33,7 +38,7 @@ describe("AddAccount", () => {
     ).parentElement;
     if (importBtn) {
       fireEvent.click(importBtn);
-      expect(useNavigateMock).toHaveBeenCalled();
+      expect(create).toHaveBeenCalled();
     }
   });
 
@@ -44,7 +49,7 @@ describe("AddAccount", () => {
     ).parentElement;
     if (importBtn) {
       fireEvent.click(importBtn);
-      expect(useNavigateMock).toHaveBeenCalled();
+      expect(create).toHaveBeenCalled();
     }
   });
 });

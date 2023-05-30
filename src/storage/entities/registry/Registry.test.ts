@@ -115,7 +115,7 @@ describe("Registry", () => {
       _BaseEntity.get = get;
 
       expect(Registry.changeContactName("test", "test")).rejects.toThrowError(
-        "failed_to_change_contact_name"
+        "failed_to_update_contact"
       );
     });
 
@@ -176,7 +176,7 @@ describe("Registry", () => {
         getContact: vi.fn().mockReturnValue({
           name: "",
         }),
-        addRecent: vi.fn(),
+        addRecentAddress: vi.fn(),
         data: { contacts: { test: { address: "test" } } },
       });
       const set = vi.fn();
@@ -210,7 +210,7 @@ describe("Registry", () => {
         getContact: vi.fn().mockReturnValue({
           name: "",
         }),
-        getRecent: vi.fn().mockReturnValue([]),
+        getRecentAddresses: vi.fn().mockReturnValue([]),
         data: { contacts: { test: { address: "test" } } },
       });
       _BaseEntity.get = get;
