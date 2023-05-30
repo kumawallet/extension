@@ -2,6 +2,9 @@ import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import { SelectableChain } from "./SelectableChain";
 import { render } from "@testing-library/react";
 import { Chain } from "@src/storage/entities/Chains";
+import { POLKADOT } from "@src/constants/chains";
+
+const OPTION_CHAINS_MOCKS: Chain[] = [POLKADOT];
 
 describe("SelectableChain", () => {
   beforeAll(() => {
@@ -17,6 +20,7 @@ describe("SelectableChain", () => {
       <SelectableChain
         canSelectChain={true}
         selectedChain={selectedEVMChainMock}
+        optionChains={OPTION_CHAINS_MOCKS}
       />
     );
 
@@ -25,7 +29,11 @@ describe("SelectableChain", () => {
 
   it("should render null", () => {
     const { baseElement } = render(
-      <SelectableChain canSelectChain={true} selectedChain={{} as Chain} />
+      <SelectableChain
+        canSelectChain={true}
+        selectedChain={{} as Chain}
+        optionChains={OPTION_CHAINS_MOCKS}
+      />
     );
 
     expect(baseElement.children[0].children.length).toBe(0);
