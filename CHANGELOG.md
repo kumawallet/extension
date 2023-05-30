@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/05/12**
+- [#11](https://github.com/blockcoders/kuma-wallet/pull/11) Milestone 2
+
+## 0.1.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/05/12**
+- [#8](https://github.com/blockcoders/kuma-wallet/pull/8) Milestone 2
+
 ## 0.0.1
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/03/12**
 - [#6](https://github.com/blockcoders/kuma-wallet/pull/6) fix m1 tests

@@ -273,7 +273,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                 const selfAddress = selectedAccount?.value?.address;
                 if (from === selfAddress || to === selfAddress) {
                   const balance = await contract.balanceOf(accountAddress);
-
                   dispatch({
                     type: "update-one-asset",
                     payload: {

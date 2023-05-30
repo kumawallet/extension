@@ -124,8 +124,6 @@ export const Routes = () => {
     setHomeRoute(<Balance />);
   };
 
-  console.log("location.search", location.search);
-
   if (location.search.includes("from")) {
     return (
       <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
@@ -154,8 +152,6 @@ export const Routes = () => {
       </MemoryRouter>
     );
   }
-
-  // get initial route from query ?route=
 
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
