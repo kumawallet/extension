@@ -49,9 +49,7 @@ import {
   SIGN_MESSAGE,
 } from "./paths";
 
-// import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
-// import { isProduction } from "@src/utils/env";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 
 const getInitialEntry = (query: string) => {
@@ -63,7 +61,12 @@ const getInitialEntry = (query: string) => {
     return CALL_CONTRACT;
   }
 
-  return "";
+  if (query.includes("route")) {
+    const route = query.split("route=")[1];
+    return route;
+  }
+
+  return "/";
 };
 
 export const Routes = () => {
@@ -121,7 +124,9 @@ export const Routes = () => {
     setHomeRoute(<Balance />);
   };
 
-  if (location.search) {
+  console.log("location.search", location.search);
+
+  if (location.search.includes("from")) {
     return (
       <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
         <RRoutes>
@@ -150,8 +155,10 @@ export const Routes = () => {
     );
   }
 
+  // get initial route from query ?route=
+
   return (
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
         <Route path="/" element={homeRoute} />
         <Route path={ADD_ACCOUNT} element={<AddAccount />} />
