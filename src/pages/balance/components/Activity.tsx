@@ -146,8 +146,8 @@ export const Activity = () => {
       <input
         data-testid="search-input"
         id="search"
-        placeholder={t("search") || "Search"}
-        className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+        placeholder={t("search") as string}
+        className="input-primary"
         onChange={(e) => {
           setSearch(e.target.value);
         }}
@@ -187,17 +187,6 @@ export const Activity = () => {
                   <p className="text-xs">{`${formatDate(
                     lastUpdated as number
                   )} - `}</p>
-                  {/* <p>
-                    
-                    <a
-                      className="text-custom-green-bg hover:text-white text-sm"
-                      href={getLink(network, hash)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {tCommon("view_in_scanner")}
-                    </a>
-                  </p> */}
                   <p
                     className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
                       chipColor[status as RecordStatus]

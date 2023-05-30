@@ -58,7 +58,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             onPaste={(e) => e.preventDefault()}
             type={passwordType}
             value={password}
-            className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+            className="input-primary"
             onChange={({ target }) => setPassword(target.value)}
             onKeyDown={({ key }) => key === "Enter" && signIn()}
           />

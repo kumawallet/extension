@@ -262,7 +262,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 </label>
                 <select
                   id="accountType"
-                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  className="input-primary"
                   {...register("accountType")}
                 >
                   <option value={AccountType.EVM}>{t("form.evm_type")}</option>
@@ -288,7 +288,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   data-testid="privateKeyOrSeed"
                   id="privateKeyOrSeed"
                   type={"password"}
-                  className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  className="input-primary"
                   {...register("privateKeyOrSeed")}
                 />
                 <InputErrorMessage message={errors.privateKeyOrSeed?.message} />
@@ -306,7 +306,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   id="name"
                   placeholder={t("form.account_name_placeholder") as string}
                   max={32}
-                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                  className="input-primary"
                   {...register("name")}
                   onKeyDown={({ key }) =>
                     key === "Enter" && !generateSeed && submit()
@@ -330,7 +330,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       min={8}
                       onPaste={(e) => e.preventDefault()}
                       type={passwordType}
-                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="input-primary"
                       {...register("password")}
                     />
 
@@ -365,7 +365,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       id="confirmPassword"
                       onPaste={(e) => e.preventDefault()}
                       type={confirmPasswordType}
-                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="input-primary"
                       {...register("confirmPassword")}
                       onKeyDown={({ key }) => key === "Enter" && submit()}
                     />

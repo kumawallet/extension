@@ -249,10 +249,7 @@ export const ManageNetworks = () => {
             {t("network_name")}
           </label>
           <div className="mt-4">
-            <input
-              className="relative border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-              {...register("name")}
-            />
+            <input className="relative input-primary" {...register("name")} />
             <InputErrorMessage message={errors.name?.message} />
           </div>
         </>
@@ -288,7 +285,7 @@ export const ManageNetworks = () => {
             }}
           >
             <div className="relative mt-1">
-              <Listbox.Button className="text-start relative border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white">
+              <Listbox.Button className="text-start relative input-primary">
                 <span className="text-start">{supportedAccounts.name}</span>
               </Listbox.Button>
               <Transition
@@ -343,7 +340,7 @@ export const ManageNetworks = () => {
               <div className="mt-4">
                 <input
                   type="number"
-                  className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  className="relative mt-4 input-primary"
                   readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                   {...register("addressPrefix")}
                 />
@@ -381,7 +378,7 @@ export const ManageNetworks = () => {
                       {t("currency_name")}
                     </div>
                     <input
-                      className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="mt-4 input-primary"
                       readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                       {...register("nativeCurrency.name")}
                     />
@@ -395,7 +392,7 @@ export const ManageNetworks = () => {
                         {t("currency_symbol")}
                       </div>
                       <input
-                        className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                        className="mt-4 input-primary"
                         readOnly={
                           !isCustom(selectedNetwork.name) && !isCreating
                         }
@@ -411,7 +408,7 @@ export const ManageNetworks = () => {
                       </div>
                       <input
                         type="number"
-                        className="mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                        className="mt-4 input-primary"
                         readOnly={
                           !isCustom(selectedNetwork.name) && !isCreating
                         }
@@ -436,7 +433,7 @@ export const ManageNetworks = () => {
                 <div className="mt-5">
                   <input
                     placeholder={t("rpc_evm_placeholder") || ""}
-                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="relative mt-4 input-primary"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.evm")}
                   />
@@ -447,7 +444,7 @@ export const ManageNetworks = () => {
                 <div className="mt-5">
                   <input
                     placeholder={t("rpc_wasm_placeholder") || ""}
-                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="relative mt-4 input-primary"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("rpc.wasm")}
                   />
@@ -465,7 +462,7 @@ export const ManageNetworks = () => {
                 <div className="mt-5">
                   <input
                     placeholder={t("explorer_evm_placeholder") || ""}
-                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="relative mt-4 input-primary"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.evm.url")}
                   />
@@ -475,7 +472,7 @@ export const ManageNetworks = () => {
                 <div className="mt-5">
                   <input
                     placeholder={t("explorer_wasm_placeholder") || ""}
-                    className="relative mt-4 border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="relative mt-4 input-primary"
                     readOnly={!isCustom(selectedNetwork.name) && !isCreating}
                     {...register("explorer.wasm.url")}
                   />

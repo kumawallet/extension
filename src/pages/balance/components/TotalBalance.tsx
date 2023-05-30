@@ -61,7 +61,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           </p>
         ) : (
           <input
-            className="text-center border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            className="input-primary"
             type="text"
             value={accountName}
             onChange={(e) => setAccountName(e.target.value)}

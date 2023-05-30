@@ -49,9 +49,9 @@ import {
   SIGN_MESSAGE,
 } from "./paths";
 
-import { Decrypt } from "@src/components/decrypt";
+// import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
-import { isProduction } from "@src/utils/env";
+// import { isProduction } from "@src/utils/env";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 
 const getInitialEntry = (query: string) => {
@@ -241,7 +241,7 @@ export const Routes = () => {
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
 
-        {!isProduction && <Route path="/decrypt" element={<Decrypt />} />}
+        {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>
     </MemoryRouter>
   );

@@ -2,12 +2,15 @@ import { useState, useEffect, useMemo } from "react";
 import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "@src/components/common/PageWrapper";
 import Contact from "@src/storage/entities/registry/Contact";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
-import { InputErrorMessage, Loading } from "@src/components/common";
+import {
+  InputErrorMessage,
+  Loading,
+  PageWrapper,
+} from "@src/components/common";
 import { BsTrash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { object, string } from "yup";
@@ -173,7 +176,7 @@ export const Contacts = () => {
               placeholder="Insert contact name"
               max={32}
               min={1}
-              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
               {...register("name")}
             />
             <InputErrorMessage message={errors.name?.message} />
@@ -187,7 +190,7 @@ export const Contacts = () => {
               data-testid="address"
               id="address"
               placeholder="Insert address"
-              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
               {...register("address")}
             />
             <InputErrorMessage message={errors.address?.message} />
@@ -215,8 +218,8 @@ export const Contacts = () => {
         <>
           <input
             id="search"
-            placeholder={t("search") || "Search"}
-            className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            placeholder={t("search") as string}
+            className="input-primary"
             onChange={(e) => {
               setSearch(e.target.value);
             }}

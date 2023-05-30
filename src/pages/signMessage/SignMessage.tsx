@@ -98,7 +98,7 @@ export const SignMessage: FC<SignMessageProps> = ({
             </label>
             <input
               id="account"
-              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
               readOnly
               aria-disabled
               value={selectedAccount?.value?.address || ""}
@@ -110,7 +110,7 @@ export const SignMessage: FC<SignMessageProps> = ({
             </label>
             <textarea
               id="message"
-              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
+              className="input-primary resize-none"
               readOnly
               aria-disabled
               value={message || ""}

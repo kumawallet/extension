@@ -108,7 +108,7 @@ export const ManageAssets = () => {
               data-testid="address"
               id="address"
               {...register("address")}
-              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
             />
             <InputErrorMessage message={errors.address?.message} />
           </div>
@@ -121,7 +121,7 @@ export const ManageAssets = () => {
               data-testid="symbol"
               id="symbol"
               {...register("symbol")}
-              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
             />
             <InputErrorMessage message={errors.symbol?.message} />
           </div>
@@ -138,7 +138,7 @@ export const ManageAssets = () => {
               disabled={type === "WASM"}
               id="decimals"
               {...register("decimals")}
-              className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white disabled:opacity-60"
+              className="input-primary disabled:opacity-60"
             />
             <InputErrorMessage message={errors.decimals?.message} />
           </div>
