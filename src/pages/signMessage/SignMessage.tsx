@@ -32,6 +32,7 @@ export const SignMessage: FC<SignMessageProps> = ({
   const { message } = params as { message: string };
 
   const { t } = useTranslation("sign_message");
+  const { t: tCommon } = useTranslation("common");
 
   const {
     state: { api, type },
@@ -118,7 +119,7 @@ export const SignMessage: FC<SignMessageProps> = ({
           </div>
         </div>
         <div className="flex gap-2 justify-end">
-          <LoadingButton onClick={onClose}>{t("cancel")}</LoadingButton>
+          <LoadingButton onClick={onClose}>{tCommon("cancel")}</LoadingButton>
           <LoadingButton onClick={sign}>{t("sign")}</LoadingButton>
         </div>
       </div>

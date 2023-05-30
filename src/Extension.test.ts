@@ -930,7 +930,7 @@ describe("Extension", () => {
     const _Registry = (await import("./storage/entities/registry/Registry"))
       .default;
     const addRecent = vi.fn();
-    _Registry.addRecent = addRecent;
+    _Registry.addRecentAddress = addRecent;
 
     await Extension.addActivity("0x1234", {} as Record);
     expect(addRecent).toHaveBeenCalled();

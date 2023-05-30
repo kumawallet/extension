@@ -50,7 +50,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       return true;
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon(error as string));
+      showErrorToast(tCommon("failed_to_create_account"));
       return false;
     }
   };
@@ -79,7 +79,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       return true;
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon(error as string));
+      showErrorToast(tCommon("failed_to_import_account"));
       return false;
     }
   };
@@ -87,13 +87,13 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const deriveAccount = async ({ name, accountType }: AccountFormType) => {
     try {
       const isSessionActive = await Extension.isSessionActive();
-      if (!isSessionActive) throw new Error("failed_to_derive_account");
+      if (!isSessionActive) throw new Error("login_required");
       if (!accountType) throw new Error("account_type_required");
       await Extension.deriveAccount(name, accountType);
       return true;
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon(error as string));
+      showErrorToast(tCommon("failed_to_derive_account"));
       return false;
     }
   };
@@ -109,7 +109,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       return true;
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon(error as string));
+      showErrorToast(tCommon("failed_to_restore_password"));
       return false;
     }
   };

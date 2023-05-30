@@ -200,7 +200,7 @@ export default class Extension {
   }
 
   static async getNetwork(): Promise<Network> {
-    return Network.get();
+    return Network.get<Network>();
   }
 
   static async getGeneralSettings(): Promise<Setting[]> {
@@ -256,15 +256,12 @@ export default class Extension {
           (account) => new Contact(account.value.name, account.value.address)
         ),
       contacts: registry.getAllContacts(),
-      recent: registry.getRecent(chain.name),
+      recent: registry.getRecentAddresses(chain.name),
     };
   }
 
   static async saveContact(contact: Contact) {
-    const registry = await Registry.get<Registry>();
-    if (!registry) throw new Error("failed_to_get_registry");
-    registry.addContact(contact);
-    await Registry.set<Registry>(registry);
+    await Registry.addContact(contact);
   }
 
   static async removeContact(address: string) {
@@ -301,7 +298,7 @@ export default class Extension {
     await Activity.addRecord(txHash, record);
     const { address, network } = record;
     const register = new Register(address, Date.now());
-    await Registry.addRecent(network, register);
+    await Registry.addRecentAddress(network, register);
   }
 
   static async updateActivity(

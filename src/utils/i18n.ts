@@ -1,7 +1,7 @@
 import LanguageDetector from "i18next-browser-languagedetector";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { en, es, jp } from "../i18n";
+import { en, es, jp, it } from "../i18n";
 
 const DEFAULT_LANGUAGE = "en";
 
@@ -15,6 +15,7 @@ i18n
       en,
       es,
       jp,
+      it
     },
     lng: storedLanguage,
     fallbackLng: DEFAULT_LANGUAGE,

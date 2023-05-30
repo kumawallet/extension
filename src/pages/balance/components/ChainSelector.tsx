@@ -11,6 +11,7 @@ import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
 import { Chain } from "@src/storage/entities/Chains";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
+import { captureError } from "@src/utils/error-handling";
 
 export const ChainSelector = () => {
   const navigate = useNavigate();
@@ -35,10 +36,14 @@ export const ChainSelector = () => {
   }, []);
 
   const getSettings = async () => {
-    const showTestnets = (
-      await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
-    )?.value as boolean;
-    setShowTestnets(showTestnets);
+    try {
+      const showTestnets = (
+        await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
+      )?.value as boolean;
+      setShowTestnets(showTestnets);
+    } catch (error) {
+      captureError(error);
+    }
   };
 
   const selecteNetwork = async (chain: Chain, close: () => void) => {
