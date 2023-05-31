@@ -22,6 +22,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { captureError } from "@src/utils/error-handling";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -180,7 +181,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       result && setIsSuccessful(true);
       callback && callback();
     } catch (e) {
-      console.error(e);
+      captureError(e);
     } finally {
       endLoading();
     }
