@@ -67,7 +67,7 @@ export const Settings = () => {
             leaveTo="transform opacity-0 scale-95"
           >
             <Menu.Items className="right-0 absolute origin-bottom-right max-w-lg  bottom-12 w-full h-[calc(100vh-99px)] bg-[#29323C] ring-0 outline-0 rounded-xl z-50">
-              <div className="h-full flex flex-col overflow-auto">
+              <div className="h-full flex flex-col overflow-auto settings-container">
                 <div className="text-start px-4 pt-8 flex-1">
                   <div>
                     <div className="flex items-center justify-between pb-6">

@@ -39,7 +39,7 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-.scroll-accounts-list::-webkit-scrollbar {
+.scroll-accounts-list::-webkit-scrollbar, .settings-container::-webkit-scrollbar {
   display: none;
 }
 
