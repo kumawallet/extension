@@ -12,6 +12,7 @@ import notificationIcon from "/icon-128.png";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { TxToProcess } from "@src/types";
 import { BN } from "@polkadot/util";
+import { captureError } from "@src/utils/error-handling";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
@@ -306,7 +307,7 @@ const processEVMTx = async ({
   } catch (error) {
     sendNotification(`tx failed`, txHash);
     await Extension.updateActivity(txHash, RecordStatus.FAIL, String(error));
-    console.error(error);
+    captureError(error);
   }
 };
 
