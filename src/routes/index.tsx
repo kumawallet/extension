@@ -21,6 +21,7 @@ import {
   General,
   ManageNetworks,
   Security,
+  AboutUs
 } from "@src/pages/settings";
 import Extension from "@src/Extension";
 import {
@@ -39,6 +40,7 @@ import {
   RECEIVE,
   RESTORE_PASSWORD,
   SEND,
+  SETTINGS_ABOUT_US,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
@@ -243,6 +245,7 @@ export const Routes = () => {
         <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
+        <Route path={SETTINGS_ABOUT_US} element={<AboutUs />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>
