@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { ethers } from "ethers";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
@@ -73,7 +73,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const {
     state: { selectedAccount },
   } = useAccountContext();
-  const [searchParams] = useSearchParams();
 
   const PASSWORD_RULES = t("form.password_requirements");
   const passwordIsRequired = signUp || resetPassword;
@@ -181,6 +180,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       });
 
       result && setIsSuccessful(true);
+      history.pushState({}, "", "index.html");
       callback && callback();
     } catch (e) {
       captureError(e);
