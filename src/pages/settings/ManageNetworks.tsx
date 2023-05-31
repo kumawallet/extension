@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number, array } from "yup";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { getAccountType } from "../../../utils/account-utils";
+import { getAccountType } from "../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
 import { Listbox, Transition } from "@headlessui/react";

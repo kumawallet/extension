@@ -6,7 +6,6 @@ import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
 import {
   SETTINGS_GENERAL,
-  //SETTINGS_ADVANCED,
   SETTINGS_CONTACTS,
   SETTINGS_SECURITY,
   SIGNIN,
@@ -21,10 +20,6 @@ const OPTIONS = [
     text: "general",
     href: SETTINGS_GENERAL,
   },
-  //{
-  //  text: "advanced",
-  //  href: SETTINGS_ADVANCED,
-  //},
   {
     text: "contacts",
     href: SETTINGS_CONTACTS,

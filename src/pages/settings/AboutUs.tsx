@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 
-export const BugReport = () => {
+export const AboutUs = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("settings");
 
@@ -16,9 +16,8 @@ export const BugReport = () => {
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className="font-medium text-2xl">{t("bug_report")}</p>
+        <p className="font-medium text-2xl">{t("about_us")}</p>
       </div>
-      
     </PageWrapper>
   );
 };
