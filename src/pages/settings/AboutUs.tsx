@@ -13,6 +13,18 @@ import {
 
 const links = [
   {
+    title: "Kuma Wallet",
+    url: aboutUsLinks.kuma,
+    icon: (
+      <img
+        src={"/icon-34.png"}
+        alt={"kuma"}
+        width={30}
+        height={30}
+      />
+    )
+  },
+  {
     title: "Discord",
     url: aboutUsLinks.discord,
     icon: <BsDiscord size={30} color="#7289da" />,

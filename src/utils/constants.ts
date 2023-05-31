@@ -13,6 +13,7 @@ export const LANGUAGES = [
 ];
 
 export enum aboutUsLinks {
+  kuma = "https://kumawallet.io/",
   discord = "#",
   github = "https://github.com/blockcoders/kuma-wallet",
   twitter = "https://twitter.com/getkuma",
