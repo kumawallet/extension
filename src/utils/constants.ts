@@ -11,3 +11,11 @@ export const LANGUAGES = [
   { lang: "jp", name: "日本語", englishName: "Japanese", flag: "🇯🇵" },
   { lang: "it", name: "Italiano", englishName: "Italian", flag: "🇮🇹" },
 ];
+
+export enum aboutUsLinks {
+  discord = "#",
+  github = "https://github.com/blockcoders/kuma-wallet",
+  twitter = "https://twitter.com/getkuma",
+  telegram = "#",
+  blockcoders = "https://blockcoders.io/",
+}
