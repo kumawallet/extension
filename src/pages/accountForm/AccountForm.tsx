@@ -1,6 +1,6 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { mnemonicGenerate, mnemonicValidate } from "@polkadot/util-crypto";
@@ -22,6 +22,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { ADD_ACCOUNT, BALANCE } from "@src/routes/paths";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -71,6 +72,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
   const {
     state: { selectedAccount },
   } = useAccountContext();
+  const [searchParams] = useSearchParams();
 
   const PASSWORD_RULES = t("form.password_requirements");
   const passwordIsRequired = signUp || resetPassword;
@@ -204,7 +206,9 @@ export const AccountForm: FC<AddAccountFormProps> = ({
           <FiChevronLeft
             size={26}
             className="cursor-pointer"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              navigate(signUp ? ADD_ACCOUNT : BALANCE);
+            }}
           />
         )}
         <p className="text-xl">{title}</p>
