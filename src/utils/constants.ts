@@ -20,3 +20,8 @@ export enum aboutUsLinks {
   telegram = "#",
   blockcoders = "https://blockcoders.io/",
 }
+
+export enum issuesLinks {
+  github = "https://github.com/blockcoders/kuma-wallet",
+  discord = "#",
+}

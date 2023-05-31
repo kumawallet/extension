@@ -230,5 +230,14 @@
     "password": "パスワード",
     "confirm": "確認",
     "re_enter_password_text": "確認ためにもう一度パスワードを入力してください"
+  },
+  "bug_report": {
+    "title": "バグ報告",
+    "collaborate": "協力する",
+    "collaborate_description": "Kuma Wallet はオープンソース プロジェクトです。 私たちと協力したい場合は、GitHub リポジトリにアクセスしてください。 プル リクエストを送信する方法については、README.md ファイルの指示に従ってください。",
+    "collaborate_link": "GitHub リポジトリ",
+    "report_an_issue": "問題を報告する",
+    "report_an_issue_description": "問題を報告する場合は、Discord チャンネルにアクセスして、バグ報告の方法に従ってください。",
+    "report_an_issue_link": "Discord チャンネル"
   }
 }
