@@ -27,6 +27,7 @@ import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
+import { captureError } from "@src/utils/error-handling";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -39,6 +40,7 @@ interface WasmFormProps {
 
 export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
+  const { t: tCommon } = useTranslation("common");
 
   const {
     state: { selectedAccount },
@@ -216,7 +218,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         "estimated total": amounToShow,
       });
     } catch (error) {
-      showErrorToast(error);
+      captureError(error);
+      showErrorToast(tCommon("failed_to_get_fees"));
       setFee(defaultFees);
     }
   };
@@ -274,6 +277,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
+      captureError(error);
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);

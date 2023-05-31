@@ -17,6 +17,7 @@ import { Fees } from "./Fees";
 import { confirmTx, evmTx, EVMFee } from "@src/types";
 import { BigNumber0 } from "@src/constants/assets";
 import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
+import { captureError } from "@src/utils/error-handling";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -24,6 +25,7 @@ interface EvmFormProps {
 
 export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
+  const { t: tCommon } = useTranslation("common");
 
   const {
     state: { api, selectedChain },
@@ -222,7 +224,8 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
-        showErrorToast(error);
+        captureError(error);
+        showErrorToast(tCommon("failed_to_get_fees"));
       } finally {
         setIsLoadingFee(false);
       }
@@ -266,6 +269,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
+      captureError(error);
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);

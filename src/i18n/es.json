@@ -26,6 +26,7 @@
     "failed_to_update_contact": "Error al actualizar el contacto",
     "failed_to_remove_contact": "Error al eliminar el contacto",
     "failed_to_get_addresses": "Error al obtener las direcciones",
+    "failed_to_get_fees": "Error al obtener las tarifas",    
     "invalid_recovery_phrase": "Frase de recuperación inválida",
     "invalid_credentials": "Credenciales inválidas",
     "invalid_address": "Dirección inválida",

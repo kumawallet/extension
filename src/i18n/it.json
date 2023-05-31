@@ -26,6 +26,7 @@
     "failed_to_update_contact": "Impossibile aggiornare il contatto",
     "failed_to_remove_contact": "Impossibile rimuovere il contatto",
     "failed_to_get_addresses": "Impossibile ottenere gli indirizzi",
+    "failed_to_get_fees": "Impossibile ottenere le tasse",
     "invalid_recovery_phrase": "Frase di recupero non valida",
     "invalid_credentials": "Credenziali non valide",
     "invalid_address": "Indirizzo non valido",

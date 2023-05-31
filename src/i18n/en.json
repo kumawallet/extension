@@ -26,6 +26,7 @@
     "failed_to_update_contact": "Failed to update contact",
     "failed_to_remove_contact": "Failed to remove contact",
     "failed_to_get_addresses": "Failed to get addresses",
+    "failed_to_get_fees": "Failed to get fees",
     "invalid_recovery_phrase": "Invalid recovery phrase",
     "invalid_credentials": "Invalid password",
     "invalid_address": "Invalid address",

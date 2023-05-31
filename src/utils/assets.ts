@@ -87,6 +87,10 @@ export const formatBN = (bn: string, decimals: number) => {
     _number = "0";
   }
 
+  if (_number.startsWith(".")) {
+    _number = `0${_number}`;
+  }
+
   return _number;
 };
 

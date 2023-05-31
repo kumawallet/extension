@@ -26,6 +26,7 @@
     "failed_to_update_contact": "連絡先を更新できません",
     "failed_to_remove_contact": "連絡先を削除できません",
     "failed_to_get_addresses": "アドレスは取得できません",
+    "failed_to_get_fees": "手数料は取得できません",
     "invalid_recovery_phrase": "無効なリカバリーフレーズ",
     "invalid_credentials": "パスワードが無効です",
     "invalid_address": "無効なアドレス",
