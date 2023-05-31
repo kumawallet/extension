@@ -3,15 +3,27 @@ import { BsChevronRight } from "react-icons/bs";
 import { PageWrapper, SelectLanguage } from "@src/components/common";
 import { OptionButton } from "./OptionButton";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
+import { getWebAPI } from "@src/utils/env";
+import { useNavigate } from "react-router-dom";
+
+const WebAPI = getWebAPI();
 
 export const AddAccount = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation("add_account");
 
-  const openTab = (route: string) => {
-    const url = chrome.runtime.getURL(
-      `src/entries/newtab/index.html?route=${route}`
-    );
-    chrome.tabs.create({ url });
+  const openTab = async (route: string) => {
+    const tab = await WebAPI.tabs.getCurrent();
+
+    if (!tab) {
+      const url = WebAPI.runtime.getURL(
+        `src/entries/newtab/index.html?route=${route}`
+      );
+      WebAPI.tabs.create({ url });
+      return;
+    }
+
+    navigate(route);
   };
 
   return (
