@@ -9,8 +9,9 @@ import {
   //SETTINGS_ADVANCED,
   SETTINGS_CONTACTS,
   SETTINGS_SECURITY,
-  //SETTINGS_BUG,
   SIGNIN,
+  SETTINGS_BUG,
+  SETTINGS_ABOUT_US,
 } from "@src/routes/paths";
 import { ICON_SIZE } from "@src/constants/icons";
 
@@ -31,10 +32,14 @@ const OPTIONS = [
     text: "security",
     href: SETTINGS_SECURITY,
   },
-  //{
-  //  text: "bug_report",
-  //  href: SETTINGS_BUG,
-  //},
+  {
+    text: "bug_report",
+    href: SETTINGS_BUG,
+  },
+  {
+    text: "about_us",
+    href: SETTINGS_ABOUT_US,
+  },
 ];
 
 export const Settings = () => {
@@ -89,6 +94,9 @@ export const Settings = () => {
                 <BsBoxArrowInRight size={ICON_SIZE} />
               </div>
             </div>
+            <p className="text-center text-sm text-gray-400">
+              {Extension.version}
+            </p>
           </div>
         </Menu.Items>
       </Transition>

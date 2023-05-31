@@ -24,8 +24,14 @@ import { RecordStatus } from "./storage/entities/activity/types";
 import Assets from "./storage/entities/Assets";
 import TrustedSites from "./storage/entities/TrustedSites";
 import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./utils/constants";
+import { version } from "./utils/env";
 
 export default class Extension {
+
+  static get version() {
+    return version;
+  }
+
   private static validatePasswordFormat(password: string) {
     if (!password) throw new Error("password_required");
     if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");

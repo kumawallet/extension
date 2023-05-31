@@ -14,5 +14,6 @@ export const SETTINGS_CONTACTS = "/settings-contacts";
 export const SETTINGS_GENERAL = "/settings-general";
 export const SETTINGS_MANAGE_NETWORKS = "/settings-manage-networks";
 export const SETTINGS_SECURITY = "/settings-security";
+export const SETTINGS_ABOUT_US = "/settings-about-us";
 export const SIGN_MESSAGE = "/sign-message";
 export const SIGNIN = "/sign-in";
