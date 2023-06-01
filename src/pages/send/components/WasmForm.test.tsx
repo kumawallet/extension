@@ -53,6 +53,14 @@ describe("WasmForm", () => {
                   signAsync: () => "",
                 }),
               },
+              xcmPallet: {
+                limitedReserveTransferAssets: () => ({
+                  paymentInfo: () => ({
+                    partialFee: new BN("1000000"),
+                  }),
+                  signAsync: () => "",
+                }),
+              },
             },
           },
           selectedChain: selectedWASMChainMock,
@@ -253,6 +261,70 @@ describe("WasmForm", () => {
             };
           case "destinationAccount":
             return "0x123";
+          default:
+            return "";
+        }
+      },
+    });
+
+    const pKeyring = (await import("@polkadot/keyring")) as any;
+    pKeyring.Keyring = class {
+      constructor() {
+        return {
+          addFromMnemonic: () => ({
+            address: "0x123",
+          }),
+        };
+      }
+    };
+
+    const { getByText } = renderComponent();
+    const button = getByText(en.send.continue) as HTMLButtonElement;
+    await waitFor(() => {
+      expect(button.disabled).toEqual(false);
+    });
+    act(() => {
+      fireEvent.click(button);
+    });
+    expect(confirmTx).toHaveBeenCalled();
+  });
+
+  it("should call confirmTx with xcm", async () => {
+    const rhf = (await import("react-hook-form")) as any;
+    rhf.useFormContext = () => ({
+      handleSubmit: (cb: () => void) => {
+        cb();
+      },
+      formState: {
+        errors: {},
+      },
+      getValues: (value: string) => {
+        switch (value) {
+          case "isXcm":
+            return true;
+
+          default:
+            return "";
+        }
+      },
+      watch: (field: string) => {
+        switch (field) {
+          case "amount":
+            return "0.00005";
+          case "asset":
+            return {
+              id: "1",
+              name: "DOT",
+              symbol: "DOT",
+              decimals: 18,
+              balance: "1000000000000000000",
+            };
+          case "destinationAccount":
+            return "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc";
+          case "to":
+            return {
+              name: "Moonbeam",
+            };
           default:
             return "";
         }
