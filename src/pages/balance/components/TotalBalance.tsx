@@ -23,7 +23,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [accountName, setAccountName] = useState("");
-  const [showBalance, setShowBalance] = useState(false);
+  const [showBalance, setShowBalance] = useState(true);
 
   const {
     state: { selectedAccount },
