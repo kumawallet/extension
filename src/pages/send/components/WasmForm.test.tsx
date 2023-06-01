@@ -240,7 +240,6 @@ describe("WasmForm", () => {
           case "asset":
             return {
               id: "10",
-              address: "0x123",
               name: "Ethereum",
               symbol: "ETH",
               decimals: 18,
