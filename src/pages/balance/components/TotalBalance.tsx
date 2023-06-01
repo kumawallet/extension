@@ -1,11 +1,16 @@
 import { FC, useEffect, useState } from "react";
-import { BsArrowUpRight, BsArrowDownLeft } from "react-icons/bs";
+import {
+  BsArrowUpRight,
+  BsArrowDownLeft,
+  BsFillEyeSlashFill,
+  BsEyeFill,
+} from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
 import { useAccountContext, useAssetContext } from "@src/providers";
-import Extension from "@src/Extension";
+import { set } from "react-hook-form";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -13,26 +18,21 @@ interface TotalBalanceProps {
 }
 
 export const TotalBalance: FC<TotalBalanceProps> = () => {
+  const { t } = useTranslation("balance");
+  const navigate = useNavigate();
+
   const [isEditing, setIsEditing] = useState(false);
   const [accountName, setAccountName] = useState("");
-  const { t } = useTranslation("balance");
+  const [showBalance, setShowBalance] = useState(false);
 
   const {
     state: { selectedAccount },
     updateAccountName,
   } = useAccountContext();
 
-  useEffect(() => {
-    if (selectedAccount?.value?.name) {
-      setAccountName(selectedAccount.value.name);
-    }
-  }, [selectedAccount]);
-
   const {
     state: { assets },
   } = useAssetContext();
-
-  const navigate = useNavigate();
 
   const totalBalance = assets.reduce(
     (total, item) => total + (item.amount || 0),
@@ -48,6 +48,14 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
     updateAccountName(selectedAccount.key, accountName);
   };
+
+  const toggleBalance = () => setShowBalance(!showBalance);
+
+  useEffect(() => {
+    if (selectedAccount?.value?.name) {
+      setAccountName(selectedAccount.value.name);
+    }
+  }, [selectedAccount]);
 
   return (
     <div className="mx-auto">
@@ -71,10 +79,17 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         )}
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
-        <p className="text-2xl">$</p>
-        <p className="text-5xl" data-testid="balance">
-          {formatAmountWithDecimals(totalBalance, 5)}
-        </p>
+        <div className="flex gap-2 items-center">
+          <p className="text-2xl">$</p>
+          <p className="text-5xl" data-testid="balance">
+            {showBalance ? formatAmountWithDecimals(totalBalance, 5) : "***"}
+          </p>
+        </div>
+        {!showBalance ? (
+          <BsEyeFill size={23} onClick={toggleBalance} />
+        ) : (
+          <BsFillEyeSlashFill size={23} onClick={toggleBalance} />
+        )}
       </div>
       <div className="flex gap-3 justify-center">
         <button

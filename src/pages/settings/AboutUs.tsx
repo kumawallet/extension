@@ -4,25 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { aboutUsLinks } from "../../utils/constants";
-import {
-  BsDiscord,
-  BsGithub,
-  BsTwitter,
-  BsTelegram,
-} from "react-icons/bs";
+import { BsDiscord, BsGithub, BsTwitter, BsTelegram } from "react-icons/bs";
 
 const links = [
   {
     title: "Kuma Wallet",
     url: aboutUsLinks.kuma,
-    icon: (
-      <img
-        src={"/icon-34.png"}
-        alt={"kuma"}
-        width={30}
-        height={30}
-      />
-    )
+    icon: <img src={"/logo.svg"} alt={"kuma"} width={26} height={26} />,
   },
   {
     title: "Discord",
@@ -32,7 +20,7 @@ const links = [
   {
     title: "Github",
     url: aboutUsLinks.github,
-    icon: <BsGithub size={30} color="#000"/>,
+    icon: <BsGithub size={30} color="#fff" />,
   },
   {
     title: "Twitter",
