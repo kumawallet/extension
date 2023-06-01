@@ -10,7 +10,6 @@ import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
 import { useAccountContext, useAssetContext } from "@src/providers";
-import { set } from "react-hook-form";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -62,6 +61,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       <div className="flex items-center justify-center mb-4">
         {!isEditing ? (
           <p
+            data-testid="account-name"
             className="text-center text-2xl cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
@@ -69,6 +69,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           </p>
         ) : (
           <input
+            data-testid="account-name-input"
             className="input-primary"
             type="text"
             value={accountName}
@@ -86,9 +87,17 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           </p>
         </div>
         {!showBalance ? (
-          <BsEyeFill size={23} onClick={toggleBalance} />
+          <BsEyeFill
+            data-testid="show-balance"
+            size={23}
+            onClick={toggleBalance}
+          />
         ) : (
-          <BsFillEyeSlashFill size={23} onClick={toggleBalance} />
+          <BsFillEyeSlashFill
+            data-testid="hide-balance"
+            size={23}
+            onClick={toggleBalance}
+          />
         )}
       </div>
       <div className="flex gap-3 justify-center">
