@@ -46,6 +46,12 @@ describe("WasmForm", () => {
                     partialFee: new BN("1000000"),
                   },
                 }),
+                transfer: () => ({
+                  paymentInfo: () => ({
+                    partialFee: new BN("1000000"),
+                  }),
+                  signAsync: () => "",
+                }),
               },
             },
           },
@@ -243,7 +249,7 @@ describe("WasmForm", () => {
               name: "Ethereum",
               symbol: "ETH",
               decimals: 18,
-              balance: new BN("1000000000000000000"),
+              balance: "1000000000000000000",
             };
           case "destinationAccount":
             return "0x123";
