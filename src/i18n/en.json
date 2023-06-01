@@ -230,5 +230,14 @@
     "password": "Password",
     "confirm": "Confirm",
     "re_enter_password_text": "Please re-enter your password to confirm this action."
+  },
+  "bug_report": {
+    "title": "Bug report",
+    "collaborate": "Collaborate with us",
+    "collaborate_description": "Kuma Wallet is an open source project. If you want to collaborate with us, please visit our GitHub repository. You can follow the instructions on how to submit a pull request at the README.md file.",
+    "collaborate_link": "Github repository",
+    "report_an_issue": "Report an issue",
+    "report_an_issue_description": "If you want to report an issue, please visit our Discord channel and follow the instructions on how to submit a bug report.",
+    "report_an_issue_link": "Support channel"
   }
 }
