@@ -6,6 +6,7 @@ import { Asset } from "@src/providers/assetProvider/types";
 import { AssetIcon } from "@src/components/common/AssetIcon";
 import { useFormContext } from "react-hook-form";
 import { XCM_ASSETS_MAPPING } from "@src/constants/xcm";
+import { useLocation } from "react-router-dom";
 
 interface SelectableAssetProps {
   onChangeAsset: (asset: Asset) => void;
@@ -14,6 +15,8 @@ interface SelectableAssetProps {
 export const SelectableAsset: FC<SelectableAssetProps> = ({
   onChangeAsset,
 }) => {
+  const { state } = useLocation();
+
   const {
     state: { assets },
   } = useAssetContext();
@@ -36,6 +39,8 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
   useEffect(() => {
     const from = getValues("from");
     const isXcm = to.name !== getValues("from").name;
+    let _assets = assets;
+
     if (isXcm) {
       const xcmAssets = XCM_ASSETS_MAPPING[from.name]?.[to.name] || [];
 
@@ -43,17 +48,22 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
         xcmAssets.includes(symbol)
       );
 
-      const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
+      filteredAssets.length > 0 && (_assets = filteredAssets);
+    }
 
-      setSelectedAsset(_assets[0]);
-      onChangeAsset(_assets[0]);
-    } else {
-      if (assets.length > 0) {
-        setSelectedAsset(assets[0]);
-        onChangeAsset(assets[0]);
+    if (state?.assetSymbol) {
+      const asset = _assets.find(({ symbol }) => symbol === state.assetSymbol);
+
+      if (asset) {
+        setSelectedAsset(asset);
+        onChangeAsset(asset);
+        return;
       }
     }
-  }, [assets, to]);
+
+    setSelectedAsset(_assets[0]);
+    onChangeAsset(_assets[0]);
+  }, [assets, to, state]);
 
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>

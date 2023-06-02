@@ -105,12 +105,18 @@ export const Assets = () => {
             </div>
           </div>
 
-          <a
-            href="#"
-            className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
-          >
-            <BsArrowUpRight size={23} onClick={() => navigate(SEND)} />
-          </a>
+          <div className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full cursor-pointer">
+            <BsArrowUpRight
+              size={23}
+              onClick={() =>
+                navigate(SEND, {
+                  state: {
+                    assetSymbol: asset.symbol,
+                  },
+                })
+              }
+            />
+          </div>
         </div>
       ))}
 
