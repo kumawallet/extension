@@ -61,7 +61,12 @@ export const AboutUs = () => {
         <p className="font-medium text-2xl">{t("about_us")}</p>
       </div>
       {links.map((link, index) => (
-        <a key={index} href={link.url} target="_blank" rel="noreferrer">
+        <a
+          key={index}
+          href={link.url as unknown as string}
+          target="_blank"
+          rel="noreferrer"
+        >
           <div className="py-4 mb-4 shadow-lg flex rounded-lg justify-center items-center gap-2 transition-all hover:bg-[#469999] hover:bg-opacity-20 hover:scale-105 border border-opacity-5 border-[#ddd4]">
             {link.icon}
             <span className="text-2xl">{link.title}</span>
