@@ -12,16 +12,18 @@ export const LANGUAGES = [
   { lang: "it", name: "Italiano", englishName: "Italian", flag: "🇮🇹" },
 ];
 
+const env = import.meta.env;
+
 export enum aboutUsLinks {
-  kuma = "https://kumawallet.io/",
-  discord = "#",
-  github = "https://github.com/blockcoders/kuma-wallet",
-  twitter = "https://twitter.com/getkuma",
-  telegram = "#",
-  blockcoders = "https://blockcoders.io/",
+  kuma = env.VITE_ABOUT_KUMA || "#",
+  discord = env.VITE_ABOUT_DISCORD || "#",
+  github = env.VITE_ABOUT_GITHUB || "#",
+  twitter = env.VITE_ABOUT_TWITTER || "#",
+  telegram = env.VITE_ABOUT_TELEGRAM || "#",
+  blockcoders = env.VITE_ABOUT_BLOCKCODERS || "#",
 }
 
 export enum issuesLinks {
-  github = "https://github.com/blockcoders/kuma-wallet",
-  discord = "#",
+  github = env.VITE_ISSUES_GITHUB || "#",
+  discord = env.VITE_ISSUES_DISCORD || "#",
 }
