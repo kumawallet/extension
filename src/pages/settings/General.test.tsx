@@ -20,6 +20,7 @@ const getGeneralSettings = vi.fn().mockReturnValue([
   },
   {
     name: SettingKey.SHOW_TESTNETS,
+    value: false,
   },
   {
     name: SettingKey.MANAGE_NETWORKS,
