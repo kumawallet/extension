@@ -16,7 +16,7 @@ import { Keyring } from "@polkadot/api";
 import Extension from "@src/Extension";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { getWebAPI } from "@src/utils/env";
-import { BigNumber, Contract, ethers } from "ethers";
+import { BigNumber, Contract, ethers, utils } from "ethers";
 
 const WebAPI = getWebAPI();
 
@@ -24,7 +24,8 @@ interface Params {
   address: string;
   abi: string;
   method: string;
-  params: any;
+  params: string | any;
+  value?: string | any;
 }
 
 interface CallContractProps {
@@ -56,6 +57,7 @@ export const CallContract: FC<CallContractProps> = ({
     address,
     method,
     params: contractParams,
+    value,
   } = params || ({} as Params);
   const { t } = useTranslation("send");
 
@@ -98,6 +100,12 @@ export const CallContract: FC<CallContractProps> = ({
           Object.keys(contractParams).forEach((key) => {
             _params.push(contractParams[key]);
           });
+
+        if (value) {
+          _params.push({
+            value: typeof value === "string" ? new BN(value) : value,
+          });
+        }
 
         const { gasRequired, output } = await contract.query[method](
           selectedAccount.value.address,
@@ -156,10 +164,15 @@ export const CallContract: FC<CallContractProps> = ({
             _params.push(contractParams[key]);
           });
 
+        if (value) {
+          _params.push({
+            value: typeof value === "string" ? utils.parseEther(value) : value,
+          });
+        }
+
         const result = await contract.callStatic[method](..._params);
 
-        setTx(result);
-        if (result === true) {
+        if (result === true || Array.isArray(result)) {
           const feeData = await api.getFeeData();
           const gasLimit = await contract.estimateGas[method](..._params);
 
@@ -191,7 +204,8 @@ export const CallContract: FC<CallContractProps> = ({
 
       if (
         _error.includes("Invalid decoded address") ||
-        _error.includes("bad address")
+        _error.includes("bad address") ||
+        _error.includes("invalid address")
       ) {
         return showErrorToast(t("invalid_contract_address"));
       }
@@ -277,6 +291,12 @@ export const CallContract: FC<CallContractProps> = ({
           Object.keys(contractParams).forEach((key) => {
             _params.push(contractParams[key]);
           });
+
+        if (value) {
+          _params.push({
+            value: typeof value === "string" ? utils.parseEther(value) : value,
+          });
+        }
 
         const txResult = await (tx as Contract)[method](..._params);
 
