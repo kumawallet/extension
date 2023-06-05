@@ -185,12 +185,37 @@ const signMessage = async (message: string) => {
   }
 }
 ```
-
 When attempting to sign a message in Kuma Wallet, a pop-up will appear requesting the user's confirmation. The first step in the confirmation process involves verifying that the site is secure.
 
 ![trust-site](./images/trust-site.png)
 
 ![sign-message](./images/sign-message.png)
+
+```javascript
+// Call a contract method
+const res = await window.kuma.call({
+  method: "call_contract",
+  params: {
+    address: "0xe14863f40D42386B4eA97a55506926db0CE97403", // Contract address
+    abi, // Contract ABI (json or string)
+    method: "payMeMoney", // Contract method
+    params: {}, // (Optional) Contract method params
+    value: ethers.utils.parseEther("0.1"), // (Optional) Amount of Tokens to send (if contract method is payable)
+  },
+});
+```
+
+When attempting to call a contract method in Kuma Wallet, a pop-up will appear requesting the user's confirmation.
+
+**Note**: If the contract method is payable, the user will be prompted to confirm the amount to send.
+
+"value" can be:
+
+* **string** (e.g. "0.1" Native Token)
+* **ethers.utils.parseEther("0.1")** (where "0.1" is the amount of Native Tokens to send on EVM chains)
+* **new BN("100000000000000000")** (where "100000000000000000" is the amount of Native Tokens to send on Wasm chains)
+
+![call-contract](./images/contract-call.png)
 
 ## XCM - Supported transactions
 
