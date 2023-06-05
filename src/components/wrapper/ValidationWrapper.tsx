@@ -68,15 +68,20 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
     });
   };
 
+  const load = async () => {
+    starLoading();
+    const isSessionActive = await Extension.isSessionActive();
+    setIsSessionActive(isSessionActive);
+
+    await getTrustedSites();
+
+    endLoading();
+  };
+
   useEffect(() => {
     (async () => {
       if (selectedAccount?.value?.address && api) {
-        const isSessionActive = await Extension.isSessionActive();
-        setIsSessionActive(isSessionActive);
-
-        await getTrustedSites();
-
-        endLoading();
+        load();
       }
     })();
   }, [api, selectedAccount]);
@@ -86,7 +91,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
   }
 
   if (!isSessionActive) {
-    return <SignIn />;
+    return <SignIn afterSignIn={load} />;
   }
 
   if (!isTrustedSite()) {

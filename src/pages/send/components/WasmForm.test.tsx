@@ -226,7 +226,9 @@ describe("WasmForm", () => {
     act(() => {
       fireEvent.click(button);
     });
-    expect(confirmTx).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(confirmTx).toHaveBeenCalled();
+    });
   });
 
   it("should call confirmTx with created asset", async () => {
@@ -286,7 +288,9 @@ describe("WasmForm", () => {
     act(() => {
       fireEvent.click(button);
     });
-    expect(confirmTx).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(confirmTx).toHaveBeenCalled();
+    });
   });
 
   it("should call confirmTx with xcm", async () => {
@@ -350,6 +354,9 @@ describe("WasmForm", () => {
     act(() => {
       fireEvent.click(button);
     });
-    expect(confirmTx).toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(confirmTx).toHaveBeenCalled();
+    });
   });
 });

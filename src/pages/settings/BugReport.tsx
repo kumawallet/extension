@@ -23,7 +23,7 @@ export const BugReport = () => {
         <p className="text-xl font-medium mb-4">{t("collaborate")}</p>
         <p className="text-gray-500 mb-2">{t("collaborate_description")}</p>
         <a
-          href={issuesLinks.github}
+          href={issuesLinks.github as unknown as string}
           className="text-blue-500 hover:underline"
           target="_blank"
           rel="noreferrer"
@@ -35,7 +35,7 @@ export const BugReport = () => {
         <p className="text-xl font-medium mb-4">{t("report_an_issue")}</p>
         <p className="text-gray-500 mb-2">{t("report_an_issue_description")}</p>
         <a
-          href={issuesLinks.discord}
+          href={issuesLinks.discord as unknown as string}
           className="text-blue-500 hover:underline"
           target="_blank"
           rel="noreferrer"

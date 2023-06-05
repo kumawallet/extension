@@ -21,7 +21,7 @@ import {
   General,
   ManageNetworks,
   Security,
-  AboutUs
+  AboutUs,
 } from "@src/pages/settings";
 import Extension from "@src/Extension";
 import {
@@ -126,7 +126,7 @@ export const Routes = () => {
     setHomeRoute(<Balance />);
   };
 
-  if (location.search.includes("from")) {
+  if (location.search.includes("origin=kuma")) {
     return (
       <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
         <RRoutes>

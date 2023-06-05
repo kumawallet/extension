@@ -187,16 +187,43 @@ Al intentar firmar un mensaje en Kuma Wallet, aparecerá una ventana emergente q
 
 ![sign-message](./images/sign-message.png)
 
+```javascript
+// Llamar a un metodo de un contrato
+const res = await window.kuma.call({
+  method: "call_contract",
+  params: {
+    address: "0xe14863f40D42386B4eA97a55506926db0CE97403", // Direccion del contrato
+    abi, // ABI del contrato (json o string)
+    method: "payMeMoney", // Metodo del contrato
+    params: {}, // (Opcional) Parametros del metodo del contrato
+    value: ethers.utils.parseEther("0.1"), // (Opcional) Cantidad de Tokens a enviar (si el metodo es pagable)
+  },
+});
+```
+
+Al intentar llamar a un metodo de un contrato en Kuma Wallet, aparecerá una ventana emergente que solicitará la confirmación del usuario.
+
+**Nota**: Si el método del contrato es pagable, se le pedirá al usuario que confirme la cantidad a enviar.
+
+"value" puede ser:
+
+* **string** (ej. "0.1" Token Nativo)
+* **ethers.utils.parseEther("0.1")** (donde "0.1" es la cantidad de Tokens Nativos a enviar en blockchains EVM)
+* **new BN("100000000000000000")** (donde "100000000000000000" es la cantidad de Tokens Nativos a enviar en blockchains Wasm)
+
+![call-contract](./images/contract-call.png)
+
 ## XCM - Transacciones Soportadas
 
-| Transacciones | Astar     | Moonbeam | Polkadot | Shiden  | Moonriver | Kusama  |
-|---------------|-----------|----------|----------|---------|-----------|---------|
-| Astar         | Nativa    | XCM (E)  | XCM (W)  |---------|-----------|---------|
-| Moonbeam      | XCM (W)   | Nativa   | XCM (W)  |---------|-----------|---------|
-| Polkadot      | XCM (W)   | XCM (E)  | Nativa   |---------|-----------|---------|
-| Shiden        |-----------|----------|----------| Nativa  | XCM (E)   | XCM (W) |
-| Moonriver     |-----------|----------|----------| XCM (W) | Nativa    | XCM (W) |
-| Kusama        |-----------|----------|----------| XCM (W) | XCM (E)   | Nativa  |
+| Transacciones | Astar     | Moonbeam | Polkadot | Acala   | Shiden  | Moonriver | Kusama  |
+|---------------|-----------|----------|----------|---------|---------|-----------|---------|
+| Astar         | Nativa    | XCM (E)  | XCM (W)  | XCM (W) |---------|-----------|---------|
+| Moonbeam      | XCM (W)   | Nativa   | XCM (W)  | XCM (W) |---------|-----------|---------|
+| Polkadot      | XCM (W)   | XCM (E)  | Nativa   | XCM (W) |---------|-----------|---------|
+| Acala         | XCM (W)   | XCM (E)  | XCM (W)  | Nativa  |---------|-----------|---------|
+| Shiden        |-----------|----------|----------|---------| Nativa  | XCM (E)   | XCM (W) |
+| Moonriver     |-----------|----------|----------|---------| XCM (W) | Nativa    | XCM (W) |
+| Kusama        |-----------|----------|----------|---------| XCM (W) | XCM (E)   | Nativa  |
 
 **Nativa**: En este caso, se admite el movimiento de activos entre la misma cadena, pero no requiere ningún mensaje XCM.
 
