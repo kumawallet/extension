@@ -194,15 +194,15 @@ When attempting to sign a message in Kuma Wallet, a pop-up will appear requestin
 
 ## XCM - Supported transactions
 
-| Transactions | Astar     | Moonbeam | Polkadot | Shiden  | Moonriver | Kusama  | Acala   |
-|--------------|-----------|----------|----------|---------|-----------|---------|---------|
-| Astar        | Native    | XCM (E)  | XCM (W)  |---------|-----------|---------| XCM (W) |
-| Moonbeam     | XCM (W)   | Native   | XCM (W)  |---------|-----------|---------| XCM (W) |
-| Polkadot     | XCM (W)   | XCM (E)  | Native   |---------|-----------|---------| XCM (W) |
-| Shiden       |-----------|----------|----------| Native  | XCM (E)   | XCM (W) |---------|
-| Moonriver    |-----------|----------|----------| XCM (W) | Native    | XCM (W) |---------|
-| Kusama       |-----------|----------|----------| XCM (W) | XCM (E)   | Native  |---------|
-| Acala        | XCM (W)   | XCM (E)  | XCM (W)  |---------|-----------|---------| Native  |
+| Transactions | Astar     | Moonbeam | Polkadot | Acala   | Shiden  | Moonriver | Kusama  |
+|--------------|-----------|----------|----------|---------|---------|-----------|---------|
+| Astar        | Native    | XCM (E)  | XCM (W)  | XCM (W) |---------|-----------|---------|
+| Moonbeam     | XCM (W)   | Native   | XCM (W)  | XCM (W) |---------|-----------|---------|
+| Polkadot     | XCM (W)   | XCM (E)  | Native   | XCM (W) |---------|-----------|---------|
+| Acala        | XCM (W)   | XCM (E)  | XCM (W)  | Native  |---------|-----------|---------|
+| Shiden       |-----------|----------|----------|---------| Native  | XCM (E)   | XCM (W) |
+| Moonriver    |-----------|----------|----------|---------| XCM (W) | Native    | XCM (W) |
+| Kusama       |-----------|----------|----------|---------| XCM (W) | XCM (E)   | Native  |
 
 **Native**: In this case moving assets between the same chain is supported but it does not require any XCM message.
 
