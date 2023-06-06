@@ -14,12 +14,13 @@ import Extension from "@src/Extension";
 import { BsEye, BsTrash } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useThemeContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 
 export const Security = () => {
   const { t } = useTranslation("security");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
   const { getSelectedAccount } = useAccountContext();
   const {
     isLoading: isLoadingReset,
@@ -178,10 +179,10 @@ export const Security = () => {
               )
               .map((site, index) => (
                 <div
-                  className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2"
+                  className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2`}
                   key={index}
                 >
-                  <p className="text-custom-green-bg px-2 break-all w-[75%]">
+                  <p className={`text-${color}-primary px-2 break-all w-[75%]`}>
                     {site}
                   </p>
                   <div className="w-[20%] flex justify-end">
@@ -256,7 +257,9 @@ export const Security = () => {
                           {account?.value.name}
                         </Dialog.Title>
                         <div className="flex flex-col mt-4">
-                          <p className="text-sm text-white text-center break-all rounded-lg border p-2 bg-custom-gray-bg border-custom-green-bg">
+                          <p
+                            className={`text-sm text-white text-center break-all rounded-lg border p-2 bg-custom-gray-bg border-${color}-primary`}
+                          >
                             {account?.value.address}
                           </p>
                           <div className="relative my-8">
@@ -288,7 +291,7 @@ export const Security = () => {
                             <button
                               type="button"
                               onClick={closeModal}
-                              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-green-bg hover:bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                              className={`inline-flex justify-between items-center cursor-pointer rounded-md border border-${color}-primary hover:bg-${color}-primary px-4 py-2 text-sm font-medium`}
                             >
                               {tCommon("close")}
                             </button>

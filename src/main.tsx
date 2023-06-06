@@ -4,6 +4,7 @@ import {
   AuthProvider,
   NetworkProvider,
   TxProvider,
+  ThemeProvider,
 } from "./providers";
 import { Routes } from "./routes";
 import { ToastContainer } from "react-toastify";
@@ -22,14 +23,16 @@ export const Main = () => {
     <Sentry.ErrorBoundary fallback={<Error />}>
       <AuthProvider>
         <NetworkProvider>
-          <AccountProvider>
-            <AssetProvider>
-              <TxProvider>
-                <Routes />
-              </TxProvider>
-            </AssetProvider>
-            <ToastContainer theme="dark" />
-          </AccountProvider>
+          <ThemeProvider>
+            <AccountProvider>
+              <AssetProvider>
+                <TxProvider>
+                  <Routes />
+                </TxProvider>
+              </AssetProvider>
+              <ToastContainer theme="dark" />
+            </AccountProvider>
+          </ThemeProvider>
         </NetworkProvider>
       </AuthProvider>
     </Sentry.ErrorBoundary>

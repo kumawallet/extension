@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useThemeContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { Fees } from "./Fees";
@@ -23,6 +23,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
     state: { selectedAccount },
   } = useAccountContext();
   const { t } = useTranslation("send");
+  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const { getValues, watch } = useFormContext();
@@ -168,7 +169,7 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
         </div>
       </div>
       <LoadingButton
-        classname="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md"
+        classname={`font-medium text-base bg-${color}-primary w-full py-2 md:py-4 rounded-md`}
         onClick={onConfirm}
         isLoading={isLoading}
         isDisabled={isLoading}

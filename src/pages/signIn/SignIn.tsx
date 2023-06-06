@@ -8,6 +8,7 @@ import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { captureError } from "@src/utils/error-handling";
+import { useThemeContext } from "@src/providers";
 
 interface SignInProps {
   afterSignIn?: () => void;
@@ -16,6 +17,7 @@ interface SignInProps {
 export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   const { t } = useTranslation("sign_in");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
 
   const navigate = useNavigate();
   const { showErrorToast } = useToast();
@@ -77,7 +79,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
         <button
           aria-disabled={!isValid}
           disabled={!isValid}
-          className="mb-4 border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto disabled:bg-gray-600"
+          className={`mb-4 border bg-${color}-primary text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-${color}-primary focus:outline-none focus:shadow-outline w-fit mx-auto disabled:bg-gray-600`}
           onClick={signIn}
         >
           {t("signin_button_text")}

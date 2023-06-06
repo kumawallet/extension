@@ -4,9 +4,11 @@ import logo from "/logo.svg";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { ADD_ACCOUNT } from "@src/routes/paths";
 import { FullScreenFAB, SelectLanguage } from "@src/components/common";
+import { useThemeContext } from "@src/providers";
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
+  const { color } = useThemeContext();
 
   const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ export const Welcome = () => {
           {t("description")}
         </p>
         <button
-          className="font-medium text-base bg-custom-green-bg w-full py-2 md:py-4 rounded-md mx-auto"
+          className={`font-medium text-base bg-${color}-primary w-full py-2 md:py-4 rounded-md mx-auto`}
           onClick={goToAccounts}
         >
           {t("button_text")}

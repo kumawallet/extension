@@ -3,7 +3,11 @@ import { Menu, Transition } from "@headlessui/react";
 import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { transformAddress } from "@src/utils/account-utils";
 import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
@@ -11,6 +15,7 @@ import { SiEthereum, SiWebassembly } from "react-icons/si";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
+  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const {
@@ -70,13 +75,13 @@ export const AccountList = () => {
             <div className="flex justify-between mb-6 mt-3">
               <button
                 onClick={() => navigate(IMPORT_ACCOUNT)}
-                className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
+                className={`border border-${color}-primary text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-${color}-fill focus:outline-none focus:shadow-outline w-[40%]`}
               >
                 {t("accounts.import")}
               </button>
               <button
                 onClick={() => navigate(DERIVE_ACCOUNT)}
-                className="border border-custom-green-bg text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-[40%]"
+                className={`border border-${color}-primary text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-${color}-fill focus:outline-none focus:shadow-outline w-[40%]`}
               >
                 {t("accounts.create")}
               </button>

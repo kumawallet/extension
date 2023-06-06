@@ -11,6 +11,7 @@ import {
   useAccountContext,
   useAssetContext,
   useNetworkContext,
+  useThemeContext,
 } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import Extension from "@src/Extension";
@@ -41,6 +42,7 @@ interface WasmFormProps {
 export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
 
   const {
     state: { selectedAccount },
@@ -315,7 +317,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       )}
 
       <LoadingButton
-        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

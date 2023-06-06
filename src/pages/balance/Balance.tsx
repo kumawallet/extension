@@ -4,6 +4,7 @@ import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
 import { useLocation } from "react-router-dom";
+import { useThemeContext } from "@src/providers";
 
 export interface Asset {
   name: string;
@@ -16,6 +17,7 @@ export interface Asset {
 export const Balance = () => {
   const { t } = useTranslation("balance");
   const { state } = useLocation();
+  const { color } = useThemeContext();
 
   const TABS = useMemo(() => {
     return [
@@ -38,16 +40,16 @@ export const Balance = () => {
           <TotalBalance />
 
           <Tab.Group defaultIndex={state?.tab === "activity" ? 1 : 0}>
-            <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">
-              {TABS.map((tab, index) => (
+            <Tab.List
+              className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-5`}
+            >
+              {TABS.map((tab) => (
                 <Tab
                   key={tab.name}
                   className={({ selected }) =>
                     `px-4 py-1 focus:outline-none relative ${
                       selected
-                        ? index === 0
-                          ? "text-custom-green-bg active-tab"
-                          : "text-[#FFC300] active-tab"
+                        ? `text-${color}-secondary active-tab`
                         : "text-white"
                     }`
                   }

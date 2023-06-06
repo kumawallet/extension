@@ -7,7 +7,11 @@ import {
 } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import {
+  useAssetContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { Contract, ethers, Wallet, BigNumber } from "ethers";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -26,6 +30,7 @@ interface EvmFormProps {
 export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
 
   const {
     state: { api, selectedChain },
@@ -288,7 +293,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <LoadingButton
-        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

@@ -1,7 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { getAccountType } from "@src/utils/account-utils";
@@ -16,6 +20,7 @@ import { captureError } from "@src/utils/error-handling";
 export const ChainSelector = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
+  const { color } = useThemeContext();
   const {
     state: { chains, selectedChain },
     setSelectNetwork,
@@ -38,7 +43,10 @@ export const ChainSelector = () => {
   const getSettings = async () => {
     try {
       const showTestnets = (
-        await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
+        await Extension.getSetting(
+          SettingType.GENERAL,
+          SettingKey.SHOW_TESTNETS
+        )
       )?.value as boolean;
       setShowTestnets(showTestnets);
     } catch (error) {
@@ -150,7 +158,7 @@ export const ChainSelector = () => {
                       <Menu.Item key={index.toString()}>
                         {({ close }) => (
                           <div
-                            className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                            className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
                             onClick={() => {
                               selecteNetwork(chain, close);
                             }}
@@ -162,11 +170,10 @@ export const ChainSelector = () => {
                               alt={chain.name}
                               className="object-cover rounded-full"
                             />
-                            {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
                             <div className="flex gap-3 items-center">
                               <p className="text-xl">{chain.name}</p>
                               {chain.name === selectedChain?.name && (
-                                <p className="text-[#56DF53]">
+                                <p className={`text-${color}-primary`}>
                                   {t("chain_selector.connected")}
                                 </p>
                               )}

@@ -5,7 +5,11 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS, SEND } from "@src/routes/paths";
 import { BsArrowUpRight } from "react-icons/bs";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import {
+  useAssetContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { Loading, AssetIcon } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
@@ -13,6 +17,7 @@ import { formatUSDAmount } from "@src/utils/assets";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
+  const { color } = useThemeContext();
   const navigate = useNavigate();
   const {
     state: { type, api },
@@ -65,7 +70,7 @@ export const Assets = () => {
               checked={showAllAssets}
               onChange={() => setShowAllAssets(!showAllAssets)}
               className={`${
-                showAllAssets ? "bg-custom-green-bg" : "bg-custom-gray-bg"
+                showAllAssets ? `bg-${color}-primary` : "bg-custom-gray-bg"
               } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
             >
               <span className="sr-only">{t("show_all_assets")}</span>
@@ -105,7 +110,9 @@ export const Assets = () => {
             </div>
           </div>
 
-          <div className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full cursor-pointer">
+          <div
+            className={`bg-none outline-none p-2 flex justify-center items-center hover:bg-${color}-primary rounded-full cursor-pointer`}
+          >
             <BsArrowUpRight
               size={23}
               onClick={() =>
@@ -123,7 +130,7 @@ export const Assets = () => {
       {showManageAssets && (
         <div className="flex justify-center mt-2">
           <button
-            className="flex gap-1 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-custom-green-bg hover:bg-opacity-30"
+            className={`flex gap-1 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-${color}-primary hover:bg-opacity-30`}
             onClick={() => navigate(MANAGE_ASSETS)}
           >
             <ImCoinDollar />

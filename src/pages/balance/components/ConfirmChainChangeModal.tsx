@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import { Chain } from "@src/storage/entities/Chains";
+import { useThemeContext } from "@src/providers";
 
 interface ConfirmChainChangeModalProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
+
   const changeIsToEVM = chainToChange?.supportedAccounts[0].includes("EVM");
 
   const chainType = chainToChange?.supportedAccounts[0].toLocaleLowerCase();
@@ -88,7 +91,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   <p className="text-sm">
                     {needToCreateAccount
                       ? t("chain_selector.create_or_import_warning", {
-                          supported_type: `$tCommon(${chainType}_type)`,
+                          supported_type: tCommon(`${chainType}_type`),
                         })
                       : t("chain_selector.network_change_warning")}
                   </p>
@@ -105,7 +108,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   {!needToCreateAccount ? (
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                      className={`inline-flex justify-center rounded-md border border-transparent bg-${color}-fill px-4 py-2 text-sm font-medium`}
                       onClick={onConfirm}
                     >
                       {t("chain_selector.change")}
@@ -114,7 +117,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                     <>
                       <button
                         type="button"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                        className={`inline-flex justify-center rounded-md border border-transparent bg-${color}-fill px-4 py-2 text-sm font-medium`}
                         onClick={() => navigate(CREATE_ACCOUNT)}
                       >
                         {t("chain_selector.create_account")}

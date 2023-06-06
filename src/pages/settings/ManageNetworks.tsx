@@ -11,7 +11,11 @@ import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number, array } from "yup";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { getAccountType } from "../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
@@ -77,6 +81,7 @@ const SUPPORTED_CHAINS_TYPE = [
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
   const {
     state: { selectedChain },
     refreshNetworks,
@@ -498,7 +503,7 @@ export const ManageNetworks = () => {
                 {tCommon("cancel")}
               </button>
               <button
-                className="mt-5 ml-4 inline-flex justify-center border border-custom-green-bg text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-custom-green-bg focus:outline-none focus:shadow-outline text-sm"
+                className={`mt-5 ml-4 inline-flex justify-center border border-${color}-primary text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-${color}-primary focus:outline-none focus:shadow-outline text-sm`}
                 onClick={_onSubmit}
               >
                 {tCommon("save")}

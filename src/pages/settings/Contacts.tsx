@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { isHex } from "@polkadot/util";
 import { captureError } from "@src/utils/error-handling";
+import { useThemeContext } from "@src/providers";
 
 interface AccountForm {
   name: string;
@@ -27,6 +28,7 @@ interface AccountForm {
 export const Contacts = () => {
   const { t } = useTranslation("contacts");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const schema = object({
@@ -210,7 +212,7 @@ export const Contacts = () => {
             <button
               data-testid="save"
               type="button"
-              className="mt-5 ml-4 inline-flex justify-center border border-custom-green-bg text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-custom-green-bg focus:outline-none focus:shadow-outline text-sm"
+              className={`mt-5 ml-4 inline-flex justify-center border border-${color}-fill text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-${color}-primary focus:outline-none focus:shadow-outline text-sm`}
               onClick={saveContact}
             >
               {tCommon("save")}
@@ -238,14 +240,16 @@ export const Contacts = () => {
             )}
             {groupedContacts.map(([letter, contacts]) => (
               <section key={letter}>
-                <h3 className="text-lg font-medium my-2 text-custom-green-bg">
+                <h3
+                  className={`text-lg font-medium my-2 text-${color}-primary`}
+                >
                   {letter}
                 </h3>
                 {(contacts as Contact[]).map((contact, index) => (
                   <div
                     data-testid="contact"
                     key={index}
-                    className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
+                    className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
                   >
                     <div className="overflow-hidden text-ellipsis w-[75%] break-all">
                       <p className="text-lg font-medium">{contact?.name}</p>
