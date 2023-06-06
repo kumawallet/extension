@@ -1,63 +1,39 @@
 {
   "common": {
-    "loading": "Loading...",
-    "seed_required": "Seed is required",
-    "password_required": "Password is required",
-    "failed_to_create_accounts": "Failed to create accounts",
-    "private_key_or_seed_required": "Private Key or Seed is required",
-    "failed_to_import_account": "Cannot import accounts without seed or private key",
-    "failed_to_sign_in": "Failed to Sign In",
-    "failed_to_derive_account": "Failed to derive account",
-    "failed_to_set_network": "Failed to change network",
-    "failed_to_get_settings": "Failed to get settings",
-    "account_type_not_supported": "Account type not supported",
-    "failed_to_derive_from_empty_keyring": "Failed to derive from empty keyring",
-    "account_key_required": "Account key required",
-    "account_type_required": "Account type required",
-    "account_not_found": "Account not found",
-    "recovery_phrase_required": "Recovery phrase required",
-    "backup_not_found": "Backup not found",
-    "invalid_recovery_phrase": "Invalid recovery phrase",
-    "failed_to_restore_password": "Failed to restore password",
-    "login_required": "Login required",
-    "invalid_credentials": "Invalid password",
-    "failed_to_save_backup": "Failed to save backup",
-    "failed_to_restore_backup": "Failed to restore backup",
-    "failed_to_cache_password": "Failed to cache password",
-    "already_signed_up": "Already signed up",
-    "failed_to_update_account": "Failed to update account",
-    "failed_to_remove_account": "Failed to remove account",
-    "failed_to_add_account": "Failed to add account",
-    "account_already_exists": "Account already exists",
-    "failed_to_get_account": "Failed to get account",
-    "failed_to_save_keyring": "Failed to save keyring",
-    "failed_to_remove_keyring": "Failed to remove keyring",
-    "network_not_found": "Network not found",
-    "accounts_not_found": "Accounts not found",
-    "failed_to_show_private_key": "Failed to show private key",
-    "failed_to_add_contact": "Failed to add contact",
-    "failed_to_get_contact": "Failed to get contact",
-    "failed_to_change_contact_name": "Failed to change contact name",
-    "contact_not_found": "Contact not found",
-    "failed_to_remove_contact": "Failed to remove contact",
-    "failed_to_add_recent": "Failed to add recent",
-    "failed_to_get_recent": "Failed to get recent",
-    "no_contacts_found": "No contacts found",
-    "name_required": "Name is required",
-    "address_required": "Address is required",
-    "view_in_scanner": "Explore",
-    "add": "Add",
-    "manage": "Manage",
-    "cancel": "Cancel",
+    "evm_type": "Ethereum like account (EVM)",
+    "wasm_type": "Polkadot like account (Wasm)",
     "save": "Save",
+    "cancel": "Cancel",
     "delete": "Delete",
     "connect": "Connect",
     "show": "Show",
-    "hide": "Hide",
-    "open": "Open",
     "close": "Close",
     "copied": "Copied",
-    "invalid_address": "Invalid address"
+    "password_required": "Password is required",
+    "account_type_required": "Account type required",
+    "login_required": "Login required",
+    "failed_to_create_account": "Failed to create account",
+    "failed_to_import_account": "Failed to import account",
+    "failed_to_derive_account": "Failed to add account",
+    "failed_to_update_account": "Failed to update account",
+    "failed_to_remove_account": "Failed to remove account",
+    "failed_to_get_settings": "Failed to get settings",
+    "failed_to_update_setting": "Failed to update setting",
+    "failed_to_restore_password": "Failed to restore password",
+    "failed_to_cache_password": "Failed to login",
+    "failed_to_add_contact": "Failed to add contact",
+    "failed_to_get_contact": "Failed to get contact",
+    "failed_to_update_contact": "Failed to update contact",
+    "failed_to_remove_contact": "Failed to remove contact",
+    "failed_to_get_addresses": "Failed to get addresses",
+    "failed_to_get_fees": "Failed to get fees",
+    "invalid_recovery_phrase": "Invalid recovery phrase",
+    "invalid_credentials": "Invalid password",
+    "invalid_address": "Invalid address",
+    "accounts_not_found": "Accounts not found",
+    "network_not_found": "Network not found",
+    "contact_not_found": "Contact not found",
+    "no_contacts_found": "No contacts found"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -76,9 +52,6 @@
     "forgot_password": "Forgot password?"
   },
   "account_form": {
-    "common": {
-      "loading": "Loading..."
-    },
     "import": {
       "title": "Import Account",
       "button_text": "Import",
@@ -96,24 +69,20 @@
     },
     "form": {
       "continue_button_text": "Continue",
-      "seed": "Seed",
-      "seed_message": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
+      "recovery_phrase_warning": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
       "account_type": "Account type",
-      "show_seed": "Show seed",
-      "evm_type": "Ethereum like account (EVM)",
-      "wasm_type": "Polkadot like account (WASM)",
       "private_key": "Private key",
       "private_key_validation": "Invalid Private Key",
       "seed_phrase": "Seed Phrase",
-      "seed_phrasey_validation": "Invalid Seed Phrase",
+      "seed_phrase_validation": "Invalid Seed Phrase",
       "recovery_phrase": "Recovery Phrase",
       "account_name": "Account Name (optional)",
       "account_name_placeholder": "Max 32 characters",
       "password": "Password",
-      "password_hint": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
+      "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
       "confirm_password": "Confirm password",
-      "confirm_password_hint": "Passwords don't match.",
-      "required": "required",
+      "confirm_password_requirements": "Passwords don't match.",
+      "required": "Required",
       "confirm_recovery_phrase": "Confirm recovery phrase",
       "confirm_recovery_phrase_description": "Please confirm your recovery phrase by selecting the words in the correct order.",
       "next": "Next"
@@ -123,17 +92,14 @@
     "chain_selector": {
       "connected": "connected",
       "change_to": "Change to",
-      "create_or_import_warning": "This network only support {{type_supported}} and you don't have {{type_supported}}, please create or import {{type_supported}}.",
+      "create_or_import_warning": "This network only support {{supported_type}} accounts, please create or import a supported account.",
       "network_change_warning": "The selected account will be changed because the network to which you want to change does not support the current account type. Are you sure you want to change the network?",
       "create_account": "Create",
       "import_account": "Import",
-      "cancel": "Cancel",
       "change": "Change",
       "mainnets": "Mainnets",
       "testnets": "Testnets",
-      "custom": "Custom",
-      "evm_type": "Ethereum like account (EVM)",
-      "wasm_type": "Polkadot like account (WASM)"
+      "custom": "Custom"
     },
     "accounts": {
       "accounts": "Accounts",
@@ -154,6 +120,7 @@
     "contacts": "Contacts",
     "security": "Security",
     "bug_report": "Bug report",
+    "about_us": "About us",
     "sign_out": "Sign out"
   },
   "general_settings": {
@@ -195,18 +162,17 @@
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
-    "search": "Search by transaction hash, address or reference"
+    "search": "Search by transaction hash or address"
   },
   "receive": {
-    "title": "Share your address",
-    "copied": "Copied!"
+    "title": "Share your address"
   },
   "confirm_trusted_site": {
     "title": "Action Required",
     "new_site_warning": "This site wants to connect to your Kuma Wallet. Please review the site's information and make sure you trust it before connecting.",
     "do_you_trust_this_site": "Do you trust this site?",
     "site_will_be_trusted": "By confirming this site will be trusted in the future.",
-    "manage_trusted_sites": "If you want to manage the trusted sites go to the extension settings."
+    "manage_trusted_sites": "If you want to manage the trusted sites go to Settings > Security."
   },
   "security": {
     "title": "Security",
@@ -216,7 +182,6 @@
     "credentials": "Credentials",
     "restore_password": "Restore password",
     "show_account_keys": "Show account keys",
-    "show": "Show",
     "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account.",
     "reset_wallet": "Reset Kuma Wallet",
     "reset_wallet_warning": "Warning: This action will delete all your accounts and data from the extension. All your assets are safe as they are NOT stored on the extension. You will need to restore your accounts using the seed phrase.",
@@ -239,7 +204,13 @@
     "confirm": "Confirm",
     "tx_send": "Transaction sent",
     "insufficient_balance": "Insufficient balance",
-    "continue": "Continue"
+    "continue": "Continue",
+    "invalid_address": "Invalid address",
+    "invalid_contract_address": "Invalid contract address",
+    "invalid_method": "Invalid method",
+    "invalid_params": "Invalid params",
+    "invalid_abi": "Invalid ABI",
+    "contract_error": "An error occurred with the contract"
   },
   "manage_assets": {
     "title": "Manage Assets",
@@ -250,9 +221,23 @@
   },
   "sign_message": {
     "title": "Sign message",
-    "cancel": "Cancel",
     "sign": "Sign",
     "account": "Account",
     "message": "Message"
+  },
+  "re_enter_password": {
+    "title": "Re-enter password",
+    "password": "Password",
+    "confirm": "Confirm",
+    "re_enter_password_text": "Please re-enter your password to confirm this action."
+  },
+  "bug_report": {
+    "title": "Bug report",
+    "collaborate": "Collaborate with us",
+    "collaborate_description": "Kuma Wallet is an open source project. If you want to collaborate with us, please visit our GitHub repository. You can follow the instructions on how to submit a pull request at the README.md file.",
+    "collaborate_link": "Github repository",
+    "report_an_issue": "Report an issue",
+    "report_an_issue_description": "If you want to report an issue, please visit our Discord channel and follow the instructions on how to submit a bug report.",
+    "report_an_issue_link": "Support channel"
   }
 }

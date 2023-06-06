@@ -15,9 +15,10 @@ import { useNetworkContext } from "../networkProvider/NetworkProvider";
 import { transformAddress } from "@src/utils/account-utils";
 import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "@src/constants/chains";
 import Account from "@src/storage/entities/Account";
-import { AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { useAuthContext } from "../authProvider/AuthProvider";
 import { Action, AccountContext, InitialState } from "./types";
+import { captureError } from "@src/utils/error-handling";
 
 const initialState: InitialState = {
   accounts: [],
@@ -27,7 +28,7 @@ const initialState: InitialState = {
 
 const AccountContext = createContext({} as AccountContext);
 
-const reducer = (state: InitialState, action: Action): InitialState => {
+export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "set-accounts": {
       const { accounts } = action.payload;
@@ -56,6 +57,34 @@ const reducer = (state: InitialState, action: Action): InitialState => {
           value: {
             ...state.selectedAccount.value,
             address,
+          },
+        },
+      };
+    }
+    case "update-account-name": {
+      const { name } = action.payload;
+      const {
+        selectedAccount: { key },
+      } = state;
+      return {
+        ...state,
+        accounts: state.accounts.map((account) => {
+          if (account.key === key) {
+            return {
+              ...account,
+              value: {
+                ...account.value,
+                name,
+              },
+            };
+          }
+          return account;
+        }),
+        selectedAccount: {
+          ...state.selectedAccount,
+          value: {
+            ...state.selectedAccount.value,
+            name,
           },
         },
       };
@@ -94,8 +123,24 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       });
       return accounts;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
       return [];
+    }
+  };
+
+  const updateAccountName = async (accountKey: AccountKey, name: string) => {
+    try {
+      await Extension.changeAccountName(accountKey, name);
+      dispatch({
+        type: "update-account-name",
+        payload: {
+          name,
+        },
+      });
+    } catch (error) {
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_account"));
     }
   };
 
@@ -133,6 +178,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return selectedAccount;
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -157,6 +203,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(tCommon(error as string));
     }
   };
@@ -195,6 +242,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         deriveAccount,
         importAccount,
         createAccount,
+        updateAccountName,
       }}
     >
       {children}

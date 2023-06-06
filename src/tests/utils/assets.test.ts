@@ -6,6 +6,7 @@ import {
   formatUSDAmount,
   getAssetUSDPrice,
   getNatitveAssetBalance,
+  getWasmAssets,
 } from "@src/utils/assets";
 import { ethers } from "ethers";
 
@@ -109,6 +110,143 @@ describe("assets", () => {
 
       const result = await getAssetUSDPrice("eth");
       expect(result).toEqual(0);
+    });
+  });
+
+  describe("getWasmAssets", () => {
+    it("get assets", async () => {
+      const ASSETS_MOCK = [
+        [
+          {
+            args: [
+              {
+                id: 100,
+              },
+            ],
+          },
+          {
+            toJSON: () => ({
+              name: "0x476c696d6d6572",
+              symbol: "0x474c4d52",
+              decimals: 18,
+            }),
+          },
+        ],
+      ];
+
+      const apiMock = {
+        query: {
+          assets: {
+            metadata: {
+              entries: () => ASSETS_MOCK,
+            },
+            account: (
+              assetId: unknown,
+              address: unknown,
+              cb: (data: unknown) => void
+            ) => {
+              cb({
+                toJSON: () => ({
+                  balance: 10,
+                }),
+              });
+            },
+          },
+        },
+      } as unknown;
+      const CHAIN_NAME = "Astar";
+      const ADDRESS = "Yk1P3zKpYzkx5Ppvfs9PmE1KoqdfVshvzE2f7GTeT6uEmg5";
+      const dispatchMock = vi.fn();
+
+      const result = await getWasmAssets(
+        apiMock as ApiPromise,
+        CHAIN_NAME,
+        ADDRESS,
+        dispatchMock
+      );
+
+      expect(result.assets[0]).toContain({
+        id: "100",
+        name: "Glimmer",
+        symbol: "GLMR",
+        decimals: 18,
+        balance: BN0,
+        aditionalData: null,
+      });
+    });
+
+    it("get assets Astar case", async () => {
+      const ASSETS_MOCK = [
+        [
+          {
+            args: [
+              {
+                toString: () => "100",
+                toJSON: () => ({
+                  nativeAssetId: {
+                    token: "ACA",
+                  },
+                  foreignAssetId: 2,
+                  stableAssetId: 1,
+                }),
+              },
+            ],
+          },
+          {
+            toJSON: () => ({
+              name: "0x476c696d6d6572",
+              symbol: "0x474c4d52",
+              decimals: 18,
+            }),
+          },
+        ],
+      ];
+
+      const apiMock = {
+        query: {
+          assetRegistry: {
+            assetMetadatas: {
+              entries: () => ASSETS_MOCK,
+            },
+          },
+          tokens: {
+            accounts: (
+              address: unknown,
+              assetId: unknown,
+              cb: (data: unknown) => void
+            ) => {
+              cb({
+                toJSON: () => ({
+                  free: 10,
+                }),
+              });
+            },
+          },
+        },
+      } as unknown;
+      const CHAIN_NAME = "Acala";
+      const ADDRESS = "23gJg1hLk1NPjNR9TLGGHGZ8ZEZ6wR2JsgzgjXUxxj5Le5WZ";
+      const dispatchMock = vi.fn();
+
+      const result = await getWasmAssets(
+        apiMock as ApiPromise,
+        CHAIN_NAME,
+        ADDRESS,
+        dispatchMock
+      );
+
+      expect(result.assets[0]).toMatchObject({
+        id: "100",
+        name: "Glimmer",
+        symbol: "GLMR",
+        decimals: 18,
+        balance: BN0,
+        aditionalData: {
+          tokenId: {
+            StableAssetPoolToken: 1,
+          },
+        },
+      });
     });
   });
 });

@@ -1,5 +1,9 @@
 import { FC } from "react";
-import { LoadingButton, PageWrapper } from "@src/components/common";
+import {
+  LoadingButton,
+  PageWrapper,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import Extension from "@src/Extension";
@@ -8,6 +12,7 @@ import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { getWebAPI } from "@src/utils/env";
 import { useToast } from "@src/hooks";
+import { captureError } from "@src/utils/error-handling";
 
 const WebAPI = getWebAPI();
 
@@ -27,6 +32,7 @@ export const SignMessage: FC<SignMessageProps> = ({
   const { message } = params as { message: string };
 
   const { t } = useTranslation("sign_message");
+  const { t: tCommon } = useTranslation("common");
 
   const {
     state: { api, type },
@@ -41,7 +47,7 @@ export const SignMessage: FC<SignMessageProps> = ({
     try {
       let signedMessage = "";
       if (type.toLowerCase() === "wasm") {
-        const mnemonic = await Extension.showSeed();
+        const mnemonic = await Extension.showKey();
         const keyring = new Keyring({ type: "sr25519" });
 
         const signer = keyring.addFromMnemonic(mnemonic as string);
@@ -50,7 +56,7 @@ export const SignMessage: FC<SignMessageProps> = ({
       }
 
       if (type.toLowerCase() === "evm") {
-        const pk = await Extension.showPrivateKey();
+        const pk = await Extension.showKey();
 
         const signer = new ethers.Wallet(
           pk as string,
@@ -73,12 +79,15 @@ export const SignMessage: FC<SignMessageProps> = ({
         },
       });
     } catch (error) {
+      captureError(error);
       showErrorToast(error);
     }
   };
 
   return (
     <PageWrapper contentClassName="h-full">
+      <ReEnterPassword />
+
       <div className="flex flex-col mx-auto h-full py-3">
         <div className="flex-1">
           <div className="flex gap-3 items-center mb-7">
@@ -90,7 +99,7 @@ export const SignMessage: FC<SignMessageProps> = ({
             </label>
             <input
               id="account"
-              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+              className="input-primary"
               readOnly
               aria-disabled
               value={selectedAccount?.value?.address || ""}
@@ -102,7 +111,7 @@ export const SignMessage: FC<SignMessageProps> = ({
             </label>
             <textarea
               id="message"
-              className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white resize-none"
+              className="input-primary resize-none"
               readOnly
               aria-disabled
               value={message || ""}
@@ -110,7 +119,7 @@ export const SignMessage: FC<SignMessageProps> = ({
           </div>
         </div>
         <div className="flex gap-2 justify-end">
-          <LoadingButton onClick={onClose}>{t("cancel")}</LoadingButton>
+          <LoadingButton onClick={onClose}>{tCommon("cancel")}</LoadingButton>
           <LoadingButton onClick={sign}>{t("sign")}</LoadingButton>
         </div>
       </div>

@@ -7,7 +7,7 @@ const accountMock = {
   value: {
     name: "derived evm",
     address: "0x12345",
-    keyring: "EVM-12345" as AccountKey,
+    keyring: "EVM" as AccountType,
   },
 };
 
@@ -66,7 +66,7 @@ describe("Account", () => {
           return {
             update: vi.fn(),
             remove: () => remove(),
-            allreadyExists: () => false,
+            alreadyExists: () => false,
             add: () => add(),
           };
         }
@@ -117,11 +117,11 @@ describe("Account", () => {
     it("should add account", async () => {
       const BaseEntity = await import("./BaseEntity");
       BaseEntity.default.get = vi.fn().mockReturnValue({
-        allreadyExists: () => false,
+        alreadyExists: () => false,
         add: () => add(),
       });
 
-      await Accounts.add(accountMock);
+      await Accounts.save(accountMock);
       expect(add).toHaveBeenCalled();
     });
 
@@ -130,7 +130,7 @@ describe("Account", () => {
       BaseEntity.default.get = vi.fn().mockReturnValue(undefined);
 
       try {
-        await Accounts.add(accountMock);
+        await Accounts.save(accountMock);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: failed_to_add_account");
@@ -140,11 +140,11 @@ describe("Account", () => {
     it("should return  failed_to_add_account error", async () => {
       const BaseEntity = await import("./BaseEntity");
       BaseEntity.default.get = vi.fn().mockReturnValue({
-        allreadyExists: () => true,
+        alreadyExists: () => true,
       });
 
       try {
-        await Accounts.add(accountMock);
+        await Accounts.save(accountMock);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: account_already_exists");
@@ -198,7 +198,7 @@ describe("Account", () => {
   it("should update", () => {
     const newValue: AccountValue = {
       address: "0x789",
-      keyring: "EVM-0x789",
+      keyring: "EVM" as AccountType,
       name: "imported-evm",
     };
 
@@ -212,9 +212,9 @@ describe("Account", () => {
     });
   });
 
-  it("should return false allreadyExists", () => {
+  it("should return false alreadyExists", () => {
     const accounts = new Accounts();
-    const response = accounts.allreadyExists(accountMock.key);
+    const response = accounts.alreadyExists(accountMock.key);
     expect(response).toBe(false);
   });
 

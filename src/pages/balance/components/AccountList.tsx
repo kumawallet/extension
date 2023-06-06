@@ -62,7 +62,7 @@ export const AccountList = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="right-0 absolute origin-top-right top-12 w-full max-w-lg bg-[#29323C] rounded-xl ring-0 outline-0 max-h-[90vh] overflow-auto z-50">
+        <Menu.Items className="right-0 absolute origin-top-right top-12 w-full max-w-lg bg-[#29323C] rounded-xl ring-0 outline-0 max-h-[90vh] overflow-auto z-50 scroll-accounts-list">
           <div className="text-start py-2 pt-2 px-4">
             <p className="py-4 text-2xl font-medium">
               {t("accounts.accounts")}

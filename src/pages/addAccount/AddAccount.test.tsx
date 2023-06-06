@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { vi } from "vitest";
 import i18n from "@src/utils/i18n";
 import { AddAccount } from "./AddAccount";
 import en from "@src/i18n/en.json";
 
-const useNavigateMock = vi.fn();
+const create = vi.fn();
 
 const renderComponent = () => {
   return render(
@@ -17,8 +17,20 @@ const renderComponent = () => {
 
 describe("AddAccount", () => {
   beforeAll(() => {
+    vi.mock("@src/utils/env", () => ({
+      getWebAPI: () => ({
+        tabs: {
+          getCurrent: () => Promise.resolve(undefined),
+          create: () => create(),
+        },
+        runtime: {
+          getURL: vi.fn(),
+        },
+      }),
+    }));
+
     vi.mock("react-router-dom", () => ({
-      useNavigate: () => () => useNavigateMock(),
+      useNavigate: () => vi.fn(),
     }));
   });
   it("should render", () => {
@@ -26,25 +38,14 @@ describe("AddAccount", () => {
     expect(screen.getByText(en.add_account.title)).toBeTruthy();
   });
 
-  it("should redirect to import account view", () => {
+  it("should open new tab", async () => {
     renderComponent();
     const importBtn = screen.getByText(
       en.add_account.import_wallet
     ).parentElement;
     if (importBtn) {
       fireEvent.click(importBtn);
-      expect(useNavigateMock).toHaveBeenCalled();
-    }
-  });
-
-  it("should redirect to create account view", () => {
-    renderComponent();
-    const importBtn = screen.getByText(
-      en.add_account.create_wallet
-    ).parentElement;
-    if (importBtn) {
-      fireEvent.click(importBtn);
-      expect(useNavigateMock).toHaveBeenCalled();
+      await waitFor(() => expect(create).toHaveBeenCalled());
     }
   });
 });

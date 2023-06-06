@@ -11,16 +11,22 @@ import { parseIncomingQuery } from "@src/utils/utils";
 const sendMessage = vi.fn();
 
 const renderComponent = () => {
-  const query = `?params=${JSON.stringify({
-    message: "message",
-    origin: "http://vitest.local",
-  })}`;
+  const query = `?params={${btoa(
+    JSON.stringify({
+      message: "message",
+      origin: "http://vitest.local",
+    })
+  )}}`;
 
   const { params, ...metadata } = parseIncomingQuery(query);
 
   return render(
     <I18nextProvider i18n={i18n}>
-      <SignMessage params={params} metadata={metadata} onClose={vi.fn()} />
+      <SignMessage
+        params={params as unknown as { message: string }}
+        metadata={metadata}
+        onClose={vi.fn()}
+      />
     </I18nextProvider>
   );
 };
@@ -60,6 +66,10 @@ describe("SignMessage", () => {
         },
       }),
     }));
+
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => vi.fn(),
+    }));
   });
 
   it("should sign evm message", async () => {
@@ -67,9 +77,9 @@ describe("SignMessage", () => {
     Extension.getTrustedSites = vi
       .fn()
       .mockReturnValue(["http://vitest.local"]);
-    Extension.showSeed = () => "test seed";
-    Extension.showPrivateKey = () => "test private key";
+    Extension.showKey = () => "test key";
     Extension.addTrustedSite = vi.fn();
+    Extension.isAuthorized = vi.fn().mockReturnValue(true);
 
     const providers = (await import("@src/providers")) as Record<string, any>;
 

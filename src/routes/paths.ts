@@ -1,5 +1,6 @@
 export const ADD_ACCOUNT = "/add-account";
 export const BALANCE = "/balance";
+export const CALL_CONTRACT = "/call-contract";
 export const CREATE_ACCOUNT = "/create-account";
 export const DERIVE_ACCOUNT = "/derive-account";
 export const IMPORT_ACCOUNT = "/import-account";
@@ -13,5 +14,6 @@ export const SETTINGS_CONTACTS = "/settings-contacts";
 export const SETTINGS_GENERAL = "/settings-general";
 export const SETTINGS_MANAGE_NETWORKS = "/settings-manage-networks";
 export const SETTINGS_SECURITY = "/settings-security";
-export const SIGNIN = "/sign-in";
+export const SETTINGS_ABOUT_US = "/settings-about-us";
 export const SIGN_MESSAGE = "/sign-message";
+export const SIGNIN = "/sign-in";

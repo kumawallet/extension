@@ -4,21 +4,15 @@ import { AccountKey, AccountType, AccountValue } from "@src/accounts/types";
 import Account from "./Account";
 
 export default class SelectedAccount extends BaseEntity {
-  key: AccountKey;
-  value: AccountValue;
-  type: AccountType;
 
-  constructor() {
+  private constructor(public key: AccountKey, public value: AccountValue, public type: AccountType) {
     super();
-    this.key = "EVM-0x000000000";
-    this.value = {} as AccountValue;
-    this.type = AccountType.EVM;
   }
 
-  fromAccount(account: Account) {
-    this.key = account.key;
-    this.value = account.value;
-    this.type = this.key.split("-")[0] as AccountType;
+  public static fromAccount(account: Account): SelectedAccount {
+    const { key, value } = account;
+    const type = key.split("-")[0] as AccountType;
+    return new SelectedAccount(key, value, type);
   }
 
   static async getDefaultValue<SelectedAccount>(): Promise<SelectedAccount> {
@@ -26,8 +20,7 @@ export default class SelectedAccount extends BaseEntity {
     if (!accounts) throw new Error("accounts_not_found");
     const account = accounts.first();
     if (!account) return undefined as SelectedAccount;
-    const selected = new SelectedAccount();
-    selected.fromAccount(account);
+    const selected = await SelectedAccount.fromAccount(account);
     await SelectedAccount.set<SelectedAccount>(selected as SelectedAccount);
     return selected as SelectedAccount;
   }

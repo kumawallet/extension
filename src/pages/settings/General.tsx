@@ -16,6 +16,7 @@ import { Loading } from "@src/components/common";
 import { BsGear } from "react-icons/bs";
 import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 import { Switch } from "@headlessui/react";
+import { captureError } from "@src/utils/error-handling";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -46,7 +47,8 @@ export const General = () => {
       setShowTestnets(showTestnetsSetting);
     } catch (error) {
       setSettings([]);
-      showErrorToast(tCommon(error as string));
+      captureError(error);
+      showErrorToast(tCommon("failed_to_get_settings"));
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +73,8 @@ export const General = () => {
       i18n.changeLanguage(language || "en");
       i18nCommon.changeLanguage(language || "en");
     } catch (error) {
-      showErrorToast(tCommon(error as string));
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_setting"));
     }
   };
 
@@ -90,7 +93,8 @@ export const General = () => {
         );
       }
     } catch (error) {
-      showErrorToast(tCommon(error as string));
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_setting"));
     }
   };
 
@@ -119,7 +123,7 @@ export const General = () => {
                     data-testid="language-select"
                     className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                     onChange={(e) => saveLanguage(e.target.value)}
-                    value={selectedLanguage || ""}
+                    value={selectedLanguage}
                   >
                     {setting.isLanguageArray() &&
                       (setting.value as Language[]).map((option, index) => (
@@ -159,7 +163,7 @@ export const General = () => {
                       <div className="flex items-center">
                         <Switch
                           data-testid="show-testnets-switch"
-                          checked={showTestnets || false}
+                          checked={showTestnets}
                           onChange={changeShowTestnets}
                           className={`${
                             showTestnets

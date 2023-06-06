@@ -16,6 +16,7 @@ interface AccountContext {
   deriveAccount: (account: AccountFormType) => Promise<boolean>;
   importAccount: (account: AccountFormType) => Promise<boolean>;
   createAccount: (account: AccountFormType) => Promise<boolean>;
+  updateAccountName: (accountKey: AccountKey, name: string) => Promise<void>;
 }
 
 type Action =
@@ -35,5 +36,11 @@ type Action =
       type: "change-selected-address-format";
       payload: {
         address: string;
+      };
+    }
+  | {
+      type: "update-account-name";
+      payload: {
+        name: string;
       };
     };

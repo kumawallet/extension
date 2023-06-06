@@ -8,4 +8,5 @@ export * from "./ChainSelector";
 export * from "./ConfirmChainChangeModal";
 export * from "./Footer";
 export * from "./Header";
+export * from "./NetworkIcon";
 export * from "./TotalBalance";

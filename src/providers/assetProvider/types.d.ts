@@ -6,6 +6,19 @@ export interface Asset {
   address?: string;
   amount?: number;
   name?: string;
+  aditionalData?:
+    | {
+        tokenId: {
+          Token: string;
+        };
+      }
+    | {
+        tokenId: { ForeignAsset: string };
+      }
+    | {
+        tokenId: { StableAssetPoolToken: string };
+      }
+    | null = null;
 }
 
 export interface InitialState {

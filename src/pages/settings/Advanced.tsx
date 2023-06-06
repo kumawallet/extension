@@ -8,6 +8,7 @@ import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Loading } from "@src/components/common";
+import { captureError } from "@src/utils/error-handling";
 
 export const Advanced = () => {
   const { t } = useTranslation("advanced_settings");
@@ -28,7 +29,8 @@ export const Advanced = () => {
       setSettings(settings);
     } catch (error) {
       setSettings([]);
-      showErrorToast(tCommon(error as string));
+      captureError(error);
+      showErrorToast(tCommon("failed_to_get_settings"));
     } finally {
       setIsLoading(false);
     }

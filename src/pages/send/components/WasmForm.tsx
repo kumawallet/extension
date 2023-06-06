@@ -1,5 +1,9 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import { LoadingButton, Loading } from "@src/components/common";
+import {
+  LoadingButton,
+  Loading,
+  ReEnterPassword,
+} from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -21,6 +25,9 @@ import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
 import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
+import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
+import { captureError } from "@src/utils/error-handling";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -33,6 +40,7 @@ interface WasmFormProps {
 
 export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
+  const { t: tCommon } = useTranslation("common");
 
   const {
     state: { selectedAccount },
@@ -49,6 +57,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const {
     handleSubmit,
     watch,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
@@ -67,48 +76,32 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
   const asset = watch("asset");
+  const to = watch("to");
   const isNativeAsset = asset?.id === "-1";
   const destinationAccount = watch("destinationAccount");
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
 
-  useEffect(() => {
-    (async () => {
-      const seed = await Extension.showSeed();
-      const keyring = new Keyring({ type: "sr25519" });
-      const sender = keyring.addFromMnemonic(seed as string);
-      setSender(sender);
-    })();
-  }, []);
+  const loadSender = async () => {
+    const seed = await Extension.showKey();
+    const keyring = new Keyring({ type: "sr25519" });
+    const sender = keyring.addFromMnemonic(seed as string);
+    setSender(sender);
+  };
 
   const onSubmit = handleSubmit(async () => {
+    const signedTx = await (extrinsic as polkadotExtrinsic)?.signAsync(
+      sender as KeyringPair,
+      {
+        tip: Number(aditional.tip) * currencyUnits || "0",
+      }
+    );
+
     confirmTx({
       type: AccountType.WASM,
-      tx: extrinsic as polkadotExtrinsic,
-      aditional: {
-        tip: Number(aditional.tip) * currencyUnits || "0",
-      },
-      sender: sender as KeyringPair,
+      tx: signedTx as polkadotExtrinsic,
       fee,
     });
   });
-
-  useEffect(() => {
-    if (destinationIsInvalid) {
-      setFee(defaultFees);
-      return;
-    }
-
-    if (!destinationAccount || amount <= 0) return;
-
-    setIsLoadingFee(true);
-
-    const loadFees = setTimeout(async () => {
-      await getFeeData();
-      setIsLoadingFee(false);
-    }, 1000);
-
-    return () => clearTimeout(loadFees);
-  }, [amount, destinationAccount, destinationIsInvalid, asset?.id]);
 
   const getFeeData = async () => {
     if (!destinationAccount) return;
@@ -124,17 +117,62 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       let extrinsic: SubmittableExtrinsic<"promise"> | unknown;
       let estimatedFee = new BN("0");
 
-      if (asset?.address) {
+      const isXcm = getValues("isXcm");
+
+      if (isXcm) {
+        const { method, pallet, extrinsicValues } = XCM_MAPPING[
+          selectedChain.name
+        ][to.name]({
+          address: destinationAccount,
+          amount: bnAmount,
+          assetSymbol: asset.symbol,
+        }) as MapResponseXCM;
+
+        extrinsic = _api.tx[pallet][method](
+          ...Object.keys(extrinsicValues)
+            .filter(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "dest"
+                    | "beneficiary"
+                    | "assets"
+                    | "feeAssetItem"
+                    | "currencyId"
+                    | "amount"
+                    | "destWeightLimit"
+                ] !== null
+            )
+            .map(
+              (key) =>
+                extrinsicValues[
+                  key as
+                    | "dest"
+                    | "beneficiary"
+                    | "assets"
+                    | "feeAssetItem"
+                    | "currencyId"
+                    | "amount"
+                    | "destWeightLimit"
+                ]
+            )
+        );
+
+        const { partialFee } = await (
+          extrinsic as SubmittableExtrinsic<"promise">
+        ).paymentInfo(sender as KeyringPair);
+
+        estimatedFee = partialFee;
+      } else if (asset?.address) {
         // extrinsic from contract assets
-        const refTime = new BN("1000000000000");
-        const proofSize = new BN("1000000000000");
+
         const contract = new ContractPromise(api, metadata, asset.address);
         const { gasRequired } = await contract.query.transfer(
           selectedAccount.value.address,
           {
             gasLimit: api.registry.createType("WeightV2", {
-              refTime,
-              proofSize,
+              refTime: REF_TIME,
+              proofSize: PROOF_SIZE,
             }),
           },
           destinationAccount,
@@ -180,10 +218,35 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         "estimated total": amounToShow,
       });
     } catch (error) {
-      showErrorToast(error);
+      captureError(error);
+      showErrorToast(tCommon("failed_to_get_fees"));
       setFee(defaultFees);
     }
   };
+
+  useEffect(() => {
+    if (Extension.isAuthorized()) {
+      loadSender();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (destinationIsInvalid) {
+      setFee(defaultFees);
+      return;
+    }
+
+    if (!destinationAccount || amount <= 0) return;
+
+    setIsLoadingFee(true);
+
+    const loadFees = setTimeout(async () => {
+      await getFeeData();
+      setIsLoadingFee(false);
+    }, 1000);
+
+    return () => clearTimeout(loadFees);
+  }, [amount, destinationAccount, destinationIsInvalid, asset?.id, to?.name]);
 
   const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
 
@@ -214,16 +277,18 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
+      captureError(error);
       return false;
     }
-  }, [fee, asset, amount]);
+  }, [fee, asset, amount, isNativeAsset]);
 
   return (
     <>
       <CommonFormFields />
+      <ReEnterPassword cb={loadSender} />
 
       <div className="mb-3">
-        <p>{t("tip")}</p>
+        <p className="text-xs">{t("tip")}</p>
         <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
           <NumericFormat
             className="bg-transparent w-8/12 outline-0"

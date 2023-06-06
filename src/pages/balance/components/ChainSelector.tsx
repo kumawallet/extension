@@ -11,6 +11,7 @@ import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
 import { Chain } from "@src/storage/entities/Chains";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
+import { captureError } from "@src/utils/error-handling";
 
 export const ChainSelector = () => {
   const navigate = useNavigate();
@@ -35,10 +36,14 @@ export const ChainSelector = () => {
   }, []);
 
   const getSettings = async () => {
-    const showTestnets = (
-      await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
-    )?.value as boolean;
-    setShowTestnets(showTestnets);
+    try {
+      const showTestnets = (
+        await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
+      )?.value as boolean;
+      setShowTestnets(showTestnets);
+    } catch (error) {
+      captureError(error);
+    }
   };
 
   const selecteNetwork = async (chain: Chain, close: () => void) => {
@@ -105,7 +110,7 @@ export const ChainSelector = () => {
       <Menu>
         <Menu.Button
           data-testid="chain-button"
-          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
         >
           <img
             src={`/images/${selectedChain.logo}.png`}
@@ -113,7 +118,7 @@ export const ChainSelector = () => {
             height={24}
             className="object-cover rounded-full"
           />
-          <p>{selectedChain?.name}</p>
+          <p className="overflow-hidden text-ellipsis">{selectedChain?.name}</p>
           <BsChevronDown />
         </Menu.Button>
         <Transition

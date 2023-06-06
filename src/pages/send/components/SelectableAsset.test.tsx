@@ -33,6 +33,17 @@ describe("SelectableAsset", () => {
         },
       }),
     }));
+
+    vi.mock("react-hook-form", () => ({
+      useFormContext: () => ({
+        getValues: () => ({
+          name: "Moonbeam",
+        }),
+        watch: vi.fn().mockReturnValue({
+          name: "Moonbeam",
+        }),
+      }),
+    }));
   });
 
   it("should render", () => {
@@ -75,6 +86,6 @@ describe("SelectableAsset", () => {
       });
     });
 
-    expect(onChangeAsset).toBeCalledTimes(2);
+    expect(onChangeAsset).toBeCalledTimes(5);
   });
 });

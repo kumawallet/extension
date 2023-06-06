@@ -1,6 +1,5 @@
 import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
-import { BN } from "bn.js";
 import { I18nextProvider } from "react-i18next";
 import { EvmForm } from "./EvmForm";
 import i18n from "@src/utils/i18n";
@@ -28,11 +27,11 @@ describe("EvmForm", () => {
       useNetworkContext: () => ({
         state: {
           api: {
-            getGasPrice: vi.fn().mockReturnValue(new BN("1000000000")),
-            estimateGas: vi.fn().mockReturnValue(new BN("21000")),
+            getGasPrice: vi.fn().mockReturnValue(BigNumber.from("1000000000")),
+            estimateGas: vi.fn().mockReturnValue(BigNumber.from("21000")),
             getFeeData: vi.fn().mockReturnValue({
-              maxFeePerGas: new BN("1000000000"),
-              maxPriorityFeePerGas: new BN("1000000000"),
+              maxFeePerGas: BigNumber.from("1000000000"),
+              maxPriorityFeePerGas: BigNumber.from("1000000000"),
             }),
           },
           selectedChain: selectedEVMChainMock,
@@ -46,7 +45,7 @@ describe("EvmForm", () => {
               name: "Ethereum",
               symbol: "ETH",
               decimals: 18,
-              balance: new BN("1000000000000000000"),
+              balance: BigNumber.from("1000000000000000000"),
             },
           ],
         },
@@ -55,6 +54,19 @@ describe("EvmForm", () => {
 
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({
+        getValues: (value: string) => {
+          if (value === "isXcm") {
+            return false;
+          }
+
+          if (value === "to") {
+            return {
+              address: "0x123",
+            };
+          }
+
+          return null;
+        },
         handleSubmit: (cb: () => void) => {
           cb();
         },
@@ -83,22 +95,88 @@ describe("EvmForm", () => {
 
     vi.mock("@src/Extension", () => ({
       default: {
-        showPrivateKey: vi.fn().mockResolvedValue("privatekey"),
+        showKey: vi.fn().mockResolvedValue("privatekey"),
+        isAuthorized: vi.fn().mockReturnValue(true),
       },
     }));
 
-    vi.mock("ethers");
+    vi.mock("ethers", async () => {
+      const ethers = (await vi.importActual("ethers")) as any;
+
+      return {
+        ...ethers,
+        ethers: {
+          ...ethers.ethers,
+          Wallet: class Wallet {},
+          Contract: class Contract {
+            estimateGas = {
+              transfer: vi.fn().mockReturnValue(BigNumber.from("21000")),
+            };
+          },
+        },
+      };
+    });
+
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => () => vi.fn(),
+    }));
   });
 
-  it("should call confirmTx", async () => {
-    const ethres = (await import("ethers")) as Record<string, any>;
+  it("should call confirmTx with native asset", async () => {
+    const { getByText } = renderComponent();
 
-    ethres.BigNumber.from = (value: string) => new BN(value);
-    ethres.ethers.Wallet = vi.fn();
-    ethres.ethers.Contract = vi.fn().mockReturnValue({
-      estimateGas: vi.fn().mockReturnValue({
-        transfer: vi.fn().mockReturnValue(new BN("500000")),
-      }),
+    const button = getByText(en.send.continue) as HTMLButtonElement;
+
+    await waitFor(() => {
+      expect(button.disabled).toEqual(false);
+    });
+
+    act(() => {
+      fireEvent.click(button);
+    });
+    expect(confirmTx).toHaveBeenCalled();
+  });
+
+  it("should call confirmTx with erc20 asset", async () => {
+    const rhf = (await import("react-hook-form")) as any;
+    rhf.useFormContext = () => ({
+      getValues: (value: string) => {
+        if (value === "isXcm") {
+          return false;
+        }
+
+        if (value === "to") {
+          return {
+            address: "0x123",
+          };
+        }
+
+        return null;
+      },
+      handleSubmit: (cb: () => void) => {
+        cb();
+      },
+      formState: {
+        errors: {},
+      },
+      watch: (field: string) => {
+        switch (field) {
+          case "amount":
+            return "0.1";
+          case "asset":
+            return {
+              id: "1",
+              name: "Tether USD",
+              symbol: "USDT",
+              decimals: 18,
+              balance: BigNumber.from("1000000000000000000"),
+            };
+          case "destinationAccount":
+            return "0x123";
+          default:
+            return "";
+        }
+      },
     });
 
     const { getByText } = renderComponent();
@@ -106,7 +184,7 @@ describe("EvmForm", () => {
     const button = getByText(en.send.continue) as HTMLButtonElement;
 
     await waitFor(() => {
-      expect(button.disabled).toBeFalsy();
+      expect(button.disabled).toEqual(false);
     });
 
     act(() => {

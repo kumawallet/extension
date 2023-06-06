@@ -15,12 +15,15 @@ import {
   InputErrorMessage,
   LoadingButton,
   PageWrapper,
+  ReEnterPassword,
   SucessMessage,
 } from "@src/components/common";
 import { FiChevronLeft } from "react-icons/fi";
 import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { ADD_ACCOUNT, BALANCE } from "@src/routes/paths";
+import { captureError } from "@src/utils/error-handling";
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -71,12 +74,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     state: { selectedAccount },
   } = useAccountContext();
 
-  const PASSWORD_RULES = t("form.password_hint");
+  const PASSWORD_RULES = t("form.password_requirements");
   const passwordIsRequired = signUp || resetPassword;
 
   const { isLoading, endLoading, starLoading } = useLoading();
   const [isSuccessful, setIsSuccessful] = useState(false);
-  const [showSeed, setShowSeed] = useState(false);
+  const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
   const [seed] = useState(() => (generateSeed ? mnemonicGenerate(24) : ""));
   const { Icon, copyToClipboard } = useCopyToClipboard(seed);
 
@@ -121,7 +124,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             ),
             otherwise: string().test(
               "wasm validation",
-              t("form.seed_phrasey_validation") as string,
+              t("form.seed_phrase_validation") as string,
               (val) => {
                 return mnemonicValidate(val || "");
               }
@@ -143,7 +146,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       ? string()
           .oneOf(
             [ref("password"), null],
-            t("form.confirm_password_hint") as string
+            t("form.confirm_password_requirements") as string
           )
           .required(t("form.required") as string)
       : string().notRequired(),
@@ -177,9 +180,10 @@ export const AccountForm: FC<AddAccountFormProps> = ({
       });
 
       result && setIsSuccessful(true);
+      history.pushState({}, "", "index.html");
       callback && callback();
     } catch (e) {
-      console.error(e);
+      captureError(e);
     } finally {
       endLoading();
     }
@@ -196,12 +200,16 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   return (
     <PageWrapper>
+      {!signUp && <ReEnterPassword />}
+
       <div className="flex gap-3 items-center">
         {backButton && (
           <FiChevronLeft
             size={26}
             className="cursor-pointer"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              navigate(signUp ? ADD_ACCOUNT : BALANCE);
+            }}
           />
         )}
         <p className="text-xl">{title}</p>
@@ -231,10 +239,10 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   >
                     <Icon messagePosition="right" />
                   </button>
-                  {!showSeed && (
+                  {!showRecoveryPhrase && (
                     <div
-                      className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-50"
-                      onClick={() => setShowSeed(true)}
+                      className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center cursor-pointer z-10"
+                      onClick={() => setShowRecoveryPhrase(true)}
                     >
                       <button className="flex flex-col items-center">
                         <p>{tCommon("show")}</p>
@@ -244,8 +252,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   )}
                 </div>
                 <p className="text-gray-400 p-2 px-1">
-                  {" "}
-                  {t("form.seed_message")}
+                  {t("form.recovery_phrase_warning")}
                 </p>
               </div>
             )}
@@ -259,12 +266,12 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                 </label>
                 <select
                   id="accountType"
-                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  className="input-primary"
                   {...register("accountType")}
                 >
-                  <option value={AccountType.EVM}>{t("form.evm_type")}</option>
+                  <option value={AccountType.EVM}>{tCommon("evm_type")}</option>
                   <option value={AccountType.WASM}>
-                    {t("form.wasm_type")}
+                    {tCommon("wasm_type")}
                   </option>
                 </select>
               </div>
@@ -285,7 +292,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   data-testid="privateKeyOrSeed"
                   id="privateKeyOrSeed"
                   type={"password"}
-                  className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                  className="input-primary"
                   {...register("privateKeyOrSeed")}
                 />
                 <InputErrorMessage message={errors.privateKeyOrSeed?.message} />
@@ -303,7 +310,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   id="name"
                   placeholder={t("form.account_name_placeholder") as string}
                   max={32}
-                  className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                  className="input-primary"
                   {...register("name")}
                   onKeyDown={({ key }) =>
                     key === "Enter" && !generateSeed && submit()
@@ -327,7 +334,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       min={8}
                       onPaste={(e) => e.preventDefault()}
                       type={passwordType}
-                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pr-8 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="input-primary"
                       {...register("password")}
                     />
 
@@ -362,7 +369,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       id="confirmPassword"
                       onPaste={(e) => e.preventDefault()}
                       type={confirmPasswordType}
-                      className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="input-primary"
                       {...register("confirmPassword")}
                       onKeyDown={({ key }) => key === "Enter" && submit()}
                     />
@@ -406,7 +413,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             onClick={submit}
             isLoading={isLoading}
             isDisabled={
-              (generateSeed && !showSeed) ||
+              (generateSeed && !showRecoveryPhrase) ||
               (showInsertSeedStep && !seedConfirmationIsValid)
             }
           >

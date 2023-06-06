@@ -4,6 +4,8 @@ import { useAssetContext } from "@src/providers";
 import { FiChevronDown } from "react-icons/fi";
 import { Asset } from "@src/providers/assetProvider/types";
 import { AssetIcon } from "@src/components/common/AssetIcon";
+import { useFormContext } from "react-hook-form";
+import { XCM_ASSETS_MAPPING } from "@src/constants/xcm";
 
 interface SelectableAssetProps {
   onChangeAsset: (asset: Asset) => void;
@@ -16,7 +18,11 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
     state: { assets },
   } = useAssetContext();
 
+  const { watch, getValues } = useFormContext();
+
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+
+  const to = watch("to");
 
   const _onChangeAsset = (asset: Asset) => {
     setSelectedAsset(asset);
@@ -28,11 +34,26 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
   );
 
   useEffect(() => {
-    if (assets.length > 0) {
-      setSelectedAsset(assets[0]);
-      onChangeAsset(assets[0]);
+    const from = getValues("from");
+    const isXcm = to.name !== getValues("from").name;
+    if (isXcm) {
+      const xcmAssets = XCM_ASSETS_MAPPING[from.name]?.[to.name] || [];
+
+      const filteredAssets = assets.filter(({ symbol }) =>
+        xcmAssets.includes(symbol)
+      );
+
+      const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
+
+      setSelectedAsset(_assets[0]);
+      onChangeAsset(_assets[0]);
+    } else {
+      if (assets.length > 0) {
+        setSelectedAsset(assets[0]);
+        onChangeAsset(assets[0]);
+      }
     }
-  }, [assets]);
+  }, [assets, to]);
 
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>

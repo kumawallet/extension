@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { ADD_ACCOUNT } from "@src/routes/paths";
-import { FullScreenFAB } from "@src/components/common";
+import { FullScreenFAB, SelectLanguage } from "@src/components/common";
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
@@ -18,6 +18,7 @@ export const Welcome = () => {
   return (
     <>
       <PageWrapper>
+        <SelectLanguage />
         <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
         <p className="font-medium text-2xl md:text-3xl mb-2 text-center">
           {t("welcome_message")}

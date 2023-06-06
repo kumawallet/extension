@@ -1,14 +1,14 @@
-import Keyring from "../storage/entities/Keyring";
-import Vault from "../storage/entities/Vault";
-import { ethers } from "ethers";
-import { ACCOUNT_PATH } from "../utils/constants";
-import PolkadotKeyring from "@polkadot/ui-keyring";
 import Auth from "../storage/Auth";
-import { getAccountType } from "../utils/account-utils";
-import BackUp from "@src/storage/entities/BackUp";
-import Account from "@src/storage/entities/Account";
-import Accounts from "@src/storage/entities/Accounts";
+import Vault from "../storage/entities/Vault";
+import BackUp from "../storage/entities/BackUp";
+import Account from "../storage/entities/Account";
+import Accounts from "../storage/entities/Accounts";
+import HDKeyring from "../storage/entities/keyrings/hd/HDKeyring";
+import { SupportedKeyring } from "../storage/entities/keyrings/types";
 import { AccountType, AccountKey } from "./types";
+import { getAccountType } from "../utils/account-utils";
+import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
+import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
 
 export default class AccountManager {
   private static formatAddress(address: string, type: AccountType): AccountKey {
@@ -21,127 +21,79 @@ export default class AccountManager {
     }
     return `${type}-${address}`;
   }
-  private static async getImportedEVMAddress(privateKey: string) {
-    const wallet = new ethers.Wallet(privateKey);
-    const { address } = wallet || {};
-    const seed = wallet.mnemonic?.phrase || "";
-    return { address, privateKey, seed };
-  }
-  private static async getImportedWASMAddress(seed: string) {
-    const wallet = PolkadotKeyring.addUri(seed, Auth.password);
-    const { address } = wallet.json || {};
-    const privateKey = wallet.pair.meta.privateKey?.toString() || "";
-    return { address, seed, privateKey };
-  }
-  private static async addAccount(
-    address: string,
-    type: AccountType,
-    name: string,
-    keyring: Keyring
-  ): Promise<Account> {
-    const key = AccountManager.formatAddress(address, type);
+
+  static async getValidName(name: string) {
     if (name === "") {
       const n = await Accounts.count();
       name = `Account ${n + 1}`;
     }
-    const value = { name, address, keyring: keyring.key };
+    return name;
+  }
+
+  static async createAccount(
+    name: string,
+    address: string,
+    type: AccountType,
+    keyring: SupportedKeyring
+  ): Promise<Account> {
+    const key = AccountManager.formatAddress(address, type);
+    const _name = await AccountManager.getValidName(name);
+    const value = { name: _name, address, keyring: keyring.type };
     const account = new Account(key, value);
-    await Accounts.add(account);
-    await Keyring.save(keyring);
+    await Accounts.save(account);
+    await Vault.saveKeyring(keyring);
     return account;
   }
-  static async addEVMAccount(
+
+  static async addAccount(
+    type: AccountType,
     seed: string,
     name: string,
-    path?: string,
-    keyring?: Keyring
+    keyring?: HDKeyring
   ): Promise<Account> {
-    const type = AccountType.EVM;
-    const { address, privateKey } =
-      ethers.Wallet.fromMnemonic(seed, path || ACCOUNT_PATH) || {};
-    const key = AccountManager.formatAddress(address, type);
-    const _keyring = keyring || new Keyring(key, type, seed, privateKey);
-    return AccountManager.addAccount(address, type, name, _keyring);
+    const _keyring =
+      keyring || ((await Vault.getKeyring(type, seed)) as HDKeyring);
+    const address = _keyring.deriveKeyPair();
+    return AccountManager.createAccount(name, address, type, _keyring);
   }
-  static async addWASMAccount(
-    seed: string,
+
+  static async importAccount(
     name: string,
-    keyring?: Keyring
+    privateKeyOrSeed: string,
+    type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM
   ): Promise<Account> {
-    const type = AccountType.WASM;
-    const wallet = PolkadotKeyring.addUri(seed, Auth.password);
-    const { address } = wallet.json || {};
-    const key = AccountManager.formatAddress(address, type);
-    const _keyring = keyring || new Keyring(key, type, seed, "");
-    return AccountManager.addAccount(address, type, name, _keyring);
+    const keyring = (await Vault.getKeyring(type)) as
+      | ImportedEVMKeyring
+      | ImportedWASMKeyring;
+    const { address, keyPair } = await keyring.getImportedData(
+      privateKeyOrSeed
+    );
+    keyring.addKeyPair(address, keyPair);
+    return AccountManager.createAccount(name, address, type, keyring);
   }
-  static async importAccount({
-    name,
-    privateKeyOrSeed,
-    accountType,
-  }: {
-    name: string;
-    privateKeyOrSeed: string;
-    accountType: AccountType;
-  }): Promise<Account> {
-    const _type = getAccountType(accountType);
-    let type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
-    let importedData;
-    switch (_type) {
-      case AccountType.EVM:
-        importedData = await AccountManager.getImportedEVMAddress(
-          privateKeyOrSeed
-        );
-        type = AccountType.IMPORTED_EVM;
-        break;
-      case AccountType.WASM:
-        importedData = await AccountManager.getImportedWASMAddress(
-          privateKeyOrSeed
-        );
-        type = AccountType.IMPORTED_WASM;
-        break;
-      default:
-        throw new Error("account_type_not_supported");
-    }
-    const { address, privateKey, seed } = importedData;
-    const key = AccountManager.formatAddress(address, type);
-    const keyring = new Keyring(key, type, seed, privateKey);
-    return AccountManager.addAccount(address, type, name, keyring);
-  }
-  static async derive(
-    name: string,
-    vault: Vault,
-    type: AccountType
-  ): Promise<Account> {
-    const _type = getAccountType(type);
-    const keyring = await vault.getKeyringsByType(_type as AccountType);
+
+  static async derive(name: string, type: AccountType): Promise<Account> {
+    const keyring = (await Vault.getKeyring(type)) as HDKeyring;
     if (!keyring) throw new Error("failed_to_derive_from_empty_keyring");
-    keyring.increaseAccountQuantity();
-    let path;
-    switch (_type) {
-      case AccountType.EVM:
-        path = keyring.path.slice(0, -1) + keyring.accountQuantity;
-        return AccountManager.addEVMAccount(keyring.seed, name, path, keyring);
-      case AccountType.WASM:
-        path = `${keyring.path}/${keyring.accountQuantity}`;
-        return AccountManager.addWASMAccount(path, name, keyring);
-      default:
-        throw new Error("account_type_not_supported");
-    }
+    return AccountManager.addAccount(type, keyring.mnemonic, name, keyring);
   }
+
   static async getAccount(key: AccountKey): Promise<Account | undefined> {
     if (!key) throw new Error("account_key_required");
     return Accounts.getAccount(key);
   }
+
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("account_not_found");
     account.value.name = newName;
     return Accounts.update(account);
   }
+
   static async remove(key: AccountKey): Promise<void> {
     await Accounts.removeAccount(key);
   }
+
   static async getAll(
     type: AccountType[] | null = null
   ): Promise<Accounts | undefined> {
@@ -162,6 +114,7 @@ export default class AccountManager {
     }
     return accounts;
   }
+
   static async areAccountsInitialized(accounts: Accounts): Promise<boolean> {
     const accountsList = await accounts.getAll();
     return (
@@ -171,30 +124,21 @@ export default class AccountManager {
       ).length > 0
     );
   }
-  static async saveBackup(recoveryPhrase: string): Promise<void> {
-    if (!recoveryPhrase) throw new Error("recovery_phrase_required");
-    const encrypted = await Auth.getInstance().encryptBackup(recoveryPhrase);
+
+  static async saveBackup(privateKeyOrSeed: string): Promise<void> {
+    if (!privateKeyOrSeed) throw new Error("recovery_phrase_required");
+    const encrypted = await Auth.getInstance().encryptBackup(privateKeyOrSeed);
     const backup = new BackUp(encrypted);
     await BackUp.set(backup);
   }
+
   static async restorePassword(
     privateKeyOrSeed: string,
     password: string
   ): Promise<void> {
     const backup = await BackUp.get<BackUp>();
     if (!backup || !backup.data) throw new Error("backup_not_found");
-    const decryptedBackup = await Auth.decryptBackup(
-      backup.data,
-      privateKeyOrSeed
-    );
-    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
-    Auth.password = decryptedBackup as string;
-    Auth.isUnlocked = true;
-    const vault = await Vault.get<Vault>();
-    if (!vault) throw new Error("failed_to_restore_password");
-    Auth.password = password;
-    Auth.isUnlocked = true;
-    await Vault.set(vault);
+    await Auth.restorePassword(backup.data, password, privateKeyOrSeed);
     await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }

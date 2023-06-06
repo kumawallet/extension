@@ -3,10 +3,14 @@ import { Combobox } from "@headlessui/react";
 import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { transformAddress } from "@src/utils/account-utils";
-import { isHex } from "@polkadot/util";
+import Contact from "@src/storage/entities/registry/Contact";
+import { captureError } from "@src/utils/error-handling";
+import { useToast } from "@src/hooks";
+import { useTranslation } from "react-i18next";
 
 export const Destination = () => {
+  const { showErrorToast } = useToast();
+  const { t } = useTranslation("common");
   const {
     state: { selectedChain },
   } = useNetworkContext();
@@ -14,73 +18,54 @@ export const Destination = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
 
   const [destinationAddress, setDestinationAddress] = useState("");
 
   const [accountToSelect, setAccountToSelect] = useState<any>([]);
   const [isOpenOptions, setisOpenOptions] = useState(false);
 
+  const isXcm = watch("isXcm");
+
   useEffect(() => {
     if (selectedAccount.key && selectedChain?.name) {
       (async () => {
-        const { contacts, ownAccounts, recent } =
-          await Extension.getRegistryAddresses();
-
-        const _ownAccounts = ownAccounts
-          .map((acc) =>
-            !isHex(acc.address)
-              ? {
-                  name: acc.name,
-                  address: transformAddress(
-                    acc.address,
-                    selectedChain?.addressPrefix
-                  ),
-                }
-              : acc
-          )
-          .filter((acc) => acc.address !== selectedAccount.value.address);
-
-        const _contacts = contacts.map((acc) =>
-          !isHex(acc.address)
-            ? {
-                name: acc.name,
-                address: transformAddress(
-                  acc.address,
-                  selectedChain?.addressPrefix
-                ),
-              }
-            : acc
-        );
-
-        const _recent = recent.map((acc) =>
-          !isHex(acc.address)
-            ? {
-                address: transformAddress(
-                  acc.address,
-                  selectedChain?.addressPrefix
-                ),
-              }
-            : acc
-        );
-
-        setAccountToSelect([
-          {
-            label: "recent",
-            values: _recent,
-          },
-          {
-            label: "contacts",
-            values: _contacts,
-          },
-          {
-            label: "own accounts",
-            values: _ownAccounts,
-          },
-        ]);
+        try {
+          const { contacts, ownAccounts, recent } =
+            await Extension.getRegistryAddresses();
+  
+          let _ownAccounts: Contact[] = [];
+  
+          if (!isXcm) {
+            _ownAccounts = ownAccounts.filter(
+              (acc) => acc.name !== selectedAccount.value.name
+            );
+          } else {
+            _ownAccounts = ownAccounts;
+          }
+  
+          setAccountToSelect([
+            {
+              label: "recent",
+              values: recent,
+            },
+            {
+              label: "contacts",
+              values: contacts,
+            },
+            {
+              label: "own accounts",
+              values: _ownAccounts,
+            },
+          ]);
+          
+        } catch (error) {
+          captureError(error);
+          showErrorToast(t("failed_to_get_addresses"));
+        }
       })();
     }
-  }, [selectedAccount?.key, selectedChain?.name]);
+  }, [selectedAccount?.key, selectedChain?.name, isXcm]);
 
   const onChangeAccount = (account: string) => {
     setDestinationAddress(account);

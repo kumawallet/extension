@@ -1,4 +1,4 @@
-import { AccountKey } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "./Account";
 
 describe("Account", () => {
@@ -7,7 +7,7 @@ describe("Account", () => {
     const value = {
       name: "derived evm",
       address: "0x12345",
-      keyring: "EVM-123" as AccountKey,
+      keyring: "EVM" as AccountType,
     };
 
     const account = new Account(key, value);

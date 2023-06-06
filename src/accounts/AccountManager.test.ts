@@ -1,7 +1,6 @@
 import { vi } from "vitest";
 import AccountManager from "./AccountManager";
 import { AccountValue } from "./types";
-import Keyring from "../storage/entities/Keyring";
 import { AccountKey, AccountType } from "@src/accounts/types";
 import {
   accountsMocks,
@@ -9,14 +8,8 @@ import {
   selectedWASMAccountMock,
 } from "@src/tests/mocks/account-mocks";
 import Accounts from "@src/storage/entities/Accounts";
-import Vault from "@src/storage/entities/Vault";
-
-const evmWalletResponseMock = {
-  address: "0x12345",
-  mnemonic: {
-    phrase: "1 2 3 4 5",
-  },
-};
+import { SupportedKeyring } from "@src/storage/entities/keyrings/types";
+import HDKeyring from "@src/storage/entities/keyrings/hd/HDKeyring";
 
 const wasmWalletResponseMock = {
   json: {
@@ -63,6 +56,9 @@ describe("AccountManager", () => {
       return {
         ethers: {
           Wallet: WalletMock,
+          utils: {
+            isValidMnemonic: () => false,
+          },
         },
       };
     });
@@ -86,6 +82,9 @@ describe("AccountManager", () => {
         static set() {
           return {};
         }
+        static async saveKeyring() {
+          return null;
+        }
         async getKeyringsByType() {
           return {
             path: "",
@@ -104,6 +103,7 @@ describe("AccountManager", () => {
         getInstance: () => ({
           encryptBackup: () => "",
         }),
+        restorePassword: vi.fn(),
       },
     }));
     vi.mock("@src/storage/entities/BackUp", () => {
@@ -126,6 +126,7 @@ describe("AccountManager", () => {
       default: {
         count: () => 0,
         add: vi.fn(),
+        save: vi.fn(),
         getAccount: vi.fn().mockImplementation(() => selectedEVMAccountMock),
         update: vi.fn().mockImplementation((account) => account),
         getAll: vi.fn().mockImplementation(() => accountsMocks),
@@ -161,37 +162,21 @@ describe("AccountManager", () => {
     });
   });
 
-  describe("getImportedEVMAddress", () => {
-    it("should return address, seed and privateKey", async () => {
-      const privateKey = "1234x";
-
-      const result = await AccountManager["getImportedEVMAddress"](privateKey);
-
-      expect(result).toHaveProperty("address", evmWalletResponseMock.address);
-      expect(result).toHaveProperty("privateKey", privateKey);
-      expect(result).toHaveProperty(
-        "seed",
-        evmWalletResponseMock.mnemonic.phrase
-      );
-    });
+  it("should get valid name", async () => {
+    const result = await AccountManager["getValidName"]("");
+    expect(result).toEqual("Account 1");
   });
 
-  describe("getImportedWASMAddress", () => {
-    it("should return address, seed and privateKey", async () => {
-      const seed = "1 2 3 4 5";
-
-      const result = await AccountManager["getImportedWASMAddress"](seed);
-
-      expect(result).toHaveProperty(
-        "address",
-        wasmWalletResponseMock.json.address
-      );
-      expect(result).toHaveProperty(
-        "privateKey",
-        wasmWalletResponseMock.pair.meta.privateKey.toString()
-      );
-      expect(result).toHaveProperty("seed", seed);
-    });
+  it("should create account", async () => {
+    const result = await AccountManager.createAccount(
+      selectedEVMAccountMock.value.name,
+      selectedEVMAccountMock.value.address,
+      AccountType.EVM,
+      {
+        type: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
+      } as unknown as SupportedKeyring
+    );
+    expect(result).toEqual(selectedEVMAccountMock);
   });
 
   describe("addAccount", () => {
@@ -199,186 +184,106 @@ describe("AccountManager", () => {
       const newAccountForm = {
         address: "0x1234",
         type: AccountType.EVM,
+        seed: "",
         name: "",
         keyring: {
           key: `${AccountType.EVM}-0x1234`,
+          deriveKeyPair: () => "0x12345",
         },
       };
 
-      const result = await AccountManager["addAccount"](
-        newAccountForm.address,
+      const result = await AccountManager.addAccount(
         newAccountForm.type,
+        newAccountForm.seed,
         newAccountForm.name,
-        newAccountForm.keyring as Keyring
-      );
-
-      expect(result).toHaveProperty(
-        "key",
-        `${AccountType.EVM}-${newAccountForm.address}`
+        newAccountForm.keyring as unknown as HDKeyring
       );
 
       expect(result.value).toEqual({
         name: "Account 1",
-        address: newAccountForm.address,
-        keyring: `${AccountType.EVM}-${newAccountForm.address}`,
-      });
-      expect(result).toHaveProperty("type", AccountType.EVM);
-    });
-  });
-
-  describe("addEVMAccount", () => {
-    it("should return new account", async () => {
-      const evmForm = {
-        seed: "12345",
-        name: "new evm account",
-        path: "0/0/0",
-        keyring: {
-          key: `${AccountType.EVM}-0x12345`,
-        },
-      };
-      const result = await AccountManager["addEVMAccount"](
-        evmForm.seed,
-        evmForm.name,
-        evmForm.path,
-        evmForm.keyring as Keyring
-      );
-      expect(result).toHaveProperty("key", `${AccountType.EVM}-0x12345`);
-      expect(result.value).toEqual({
-        name: evmForm.name,
         address: "0x12345",
-        keyring: `${AccountType.EVM}-0x12345`,
+        keyring: undefined,
       });
-      expect(result).toHaveProperty("type", AccountType.EVM);
-    });
-  });
-
-  describe("addWasmAccount", () => {
-    it("should return new account", async () => {
-      const wasmForm = {
-        seed: "12345",
-        name: "new wasm account",
-        keyring: {
-          key: `${AccountType.WASM}-12345`,
-        },
-      };
-      const result = await AccountManager["addWASMAccount"](
-        wasmForm.seed,
-        wasmForm.name,
-        wasmForm.keyring as Keyring
-      );
-      expect(result).toHaveProperty("key", `${AccountType.WASM}-12345`);
-      expect(result.value).toEqual({
-        name: wasmForm.name,
-        address: wasmForm.seed,
-        keyring: `${AccountType.WASM}-12345`,
-      });
-      expect(result).toHaveProperty("type", AccountType.WASM);
     });
   });
 
   describe("importAccount", () => {
     it("should add imported evm account", async () => {
+      const Vault = (await import("@src/storage/entities/Vault")).default;
+      const getKeyring = vi.fn().mockReturnValue({
+        getImportedData: () => ({
+          address: "0x123",
+          keyPair: {
+            key: "",
+          },
+        }),
+        addKeyPair: vi.fn(),
+      });
+      Vault.getKeyring = getKeyring;
+
       const importEVMForm = {
         name: "imported-evm",
         privateKeyOrSeed: "0x12345",
-        accountType: AccountType.EVM,
+        accountType: AccountType.IMPORTED_EVM,
       };
 
-      const result = await AccountManager["importAccount"](importEVMForm);
-      expect(result).toHaveProperty(
-        "key",
-        `${AccountType.IMPORTED_EVM}-0x12345`
+      const result = await AccountManager.importAccount(
+        importEVMForm.name,
+        importEVMForm.privateKeyOrSeed,
+        AccountType.IMPORTED_EVM
       );
+
       expect(result.value).toEqual({
         name: importEVMForm.name,
-        address: "0x12345",
+        address: "0x123",
         keyring: undefined,
       });
-      expect(result).toHaveProperty("type", AccountType.IMPORTED_EVM);
-    });
-
-    it("should add imported wasm account", async () => {
-      const importEVMForm = {
-        name: "imported-wasm",
-        privateKeyOrSeed: "0x12345",
-        accountType: AccountType.WASM,
-      };
-
-      const result = await AccountManager["importAccount"](importEVMForm);
-      expect(result).toHaveProperty(
-        "key",
-        `${AccountType.IMPORTED_WASM}-12345`
-      );
-      expect(result.value).toEqual({
-        name: importEVMForm.name,
-        address: "12345",
-        keyring: undefined,
-      });
-      expect(result).toHaveProperty("type", AccountType.IMPORTED_WASM);
     });
   });
 
   describe("derive", () => {
-    it("should derive wasm account", async () => {
-      const mockVault = new Vault();
+    it("should return derived account", async () => {
+      const Vault = (await import("@src/storage/entities/Vault")).default;
+      Vault.getKeyring = vi.fn().mockReturnValue({
+        deriveKeyPair: () => "EVM-1234",
+      });
 
-      const deriveForm = {
-        name: "derive-evm",
-        vault: mockVault,
-        type: AccountType.WASM,
-      };
-      const result = await AccountManager["derive"](
-        deriveForm.name,
-        deriveForm.vault,
-        deriveForm.type
-      );
+      const result = await AccountManager.derive("Account", AccountType.EVM);
       expect(result).toMatchObject({
-        key: `${AccountType.WASM}-12345`,
+        key: `${AccountType.EVM}-1234`,
+        type: AccountType.EVM,
         value: {
-          name: deriveForm.name,
-          address: "12345",
+          name: "Account",
+          address: "EVM-1234",
           keyring: undefined,
         },
-        type: AccountType.WASM,
       });
     });
+    it("should throw error", async () => {
+      const Vault = (await import("@src/storage/entities/Vault")).default;
+      Vault.getKeyring = vi.fn().mockReturnValue(null);
 
-    it("should derive evm account", async () => {
-      const mockVault = new Vault();
-
-      const deriveForm = {
-        name: "derive-evm",
-        vault: mockVault,
-        type: AccountType.EVM,
-      };
-      const result = await AccountManager["derive"](
-        deriveForm.name,
-        deriveForm.vault,
-        deriveForm.type
-      );
-      expect(result).toMatchObject({
-        key: `${AccountType.EVM}-0x12345`,
-        value: {
-          name: deriveForm.name,
-          address: "0x12345",
-          keyring: undefined,
-        },
-        type: AccountType.EVM,
-      });
+      try {
+        await AccountManager.derive("Accoun", AccountType.EVM);
+      } catch (error) {
+        expect(String(error)).toEqual(
+          "Error: failed_to_derive_from_empty_keyring"
+        );
+      }
     });
   });
 
   describe("getAccount", () => {
     it("should return account by key", async () => {
-      const result = await AccountManager["getAccount"](
+      const result = await AccountManager.getAccount(
         selectedEVMAccountMock.key as AccountKey
       );
       expect(result).toMatchObject(selectedEVMAccountMock);
     });
 
-    it("shoud show error", async () => {
+    it("should show error", async () => {
       try {
-        await AccountManager["getAccount"]("" as AccountKey);
+        await AccountManager.getAccount("" as AccountKey);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: account_key_required");
@@ -450,28 +355,63 @@ describe("AccountManager", () => {
     });
   });
 
+  describe("saveBackup", () => {
+    it("should save backup", async () => {
+      const ethers = await import("ethers");
+      ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
+
+      const result = await AccountManager.saveBackup(
+        "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match"
+      );
+      expect(result).toBeUndefined();
+    });
+
+    it("should throw recovery_phrase_required error", async () => {
+      try {
+        await AccountManager.saveBackup("");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: recovery_phrase_required");
+      }
+    });
+
+    it("should throw invalid_recovery_phrase error", async () => {
+      try {
+        await AccountManager.saveBackup("invalid recovery phrase");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: invalid_recovery_phrase");
+      }
+    });
+  });
+
   describe("restorePassword", () => {
     it("should restore password", async () => {
-      const get = vi.fn().mockImplementation(() => ({
-        data: "encrypted_data",
-      }));
+      const Backup = (await import("@src/storage/entities/BackUp")).default;
+      Backup.get = vi.fn().mockReturnValue({
+        data: {},
+      });
 
-      const Backup = await import("@src/storage/entities/BackUp");
-      Backup.default.get = get;
+      const ethers = await import("ethers");
+      ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
 
-      const decryptBackup = vi
-        .fn()
-        .mockImplementation(async () => "decrypted_password" as unknown);
+      const result = await AccountManager.restorePassword(
+        "recovery phrase",
+        "Test.123"
+      );
 
-      const Auth = await import("../storage/Auth");
-      Auth.default.decryptBackup = decryptBackup;
-      Auth.default.password = "";
-      Auth.default.isUnlocked = false;
+      expect(result).toBeUndefined();
+    });
+    it("should throw backup_not_found error", async () => {
+      const Backup = (await import("@src/storage/entities/BackUp")).default;
+      Backup.get = vi.fn().mockImplementation(() => null);
 
-      await AccountManager["restorePassword"]("0x12345", "12345");
-
-      expect(get).toHaveBeenCalledOnce();
-      expect(decryptBackup).toHaveBeenCalledOnce();
+      try {
+        await AccountManager.restorePassword(
+          "invalid recovery phrase",
+          "Test.123"
+        );
+      } catch (error) {
+        expect(String(error)).toEqual("Error: backup_not_found");
+      }
     });
   });
 });

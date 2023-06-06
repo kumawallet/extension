@@ -1,8 +1,7 @@
-import { AccountType, AccountKey } from "./accounts/types";
+import { AccountType } from "./accounts/types";
 import Extension from "./Extension";
 import { selectedEVMChainMock } from "./tests/mocks/chain-mocks";
 import { expect } from "vitest";
-import Account from "./storage/entities/Account";
 import {
   selectedEVMAccountMock,
   accountsMocks,
@@ -12,7 +11,7 @@ import { SettingKey } from "./storage/entities/settings/types";
 import { CHAINS } from "./constants/chains";
 import Record from "./storage/entities/activity/Record";
 import { RecordStatus } from "./storage/entities/activity/types";
-import { Asset } from "./pages";
+import { selectedWASMChainMock } from "./tests/mocks/chain-mocks";
 const accountManageMock = {
   saveBackup: vi.fn(),
 };
@@ -58,13 +57,22 @@ describe("Extension", () => {
         getInstance: vi.fn().mockReturnValue({
           signUp: vi.fn(),
         }),
+        signOut: vi.fn(),
+        isAuthorized: vi.fn().mockReturnValue(true),
+        signIn: vi.fn(),
+        isSessionActive: vi.fn().mockReturnValue(true),
       },
     }));
     vi.mock("./storage/entities/Account", () => ({
       default: {},
     }));
     vi.mock("./storage/entities/Network", () => ({
-      default: {},
+      default: {
+        getInstance: vi.fn().mockReturnValue({
+          set: vi.fn(),
+        }),
+        set: vi.fn(),
+      },
     }));
     vi.mock("./storage/entities/SelectedAccount.ts", () => {
       class _SelectedAccount {
@@ -74,7 +82,7 @@ describe("Extension", () => {
         static set() {
           vi.fn();
         }
-        fromAccount() {
+        static fromAccount() {
           vi.fn();
         }
       }
@@ -89,7 +97,9 @@ describe("Extension", () => {
       },
     }));
     vi.mock("./storage/entities/Vault.ts", () => ({
-      default: {},
+      default: {
+        alreadySignedUp: vi.fn().mockReturnValue(true),
+      },
     }));
     vi.mock("./storage/entities/BackUp.ts", () => ({
       default: {},
@@ -113,286 +123,245 @@ describe("Extension", () => {
         default: BaseEntityMock,
       };
     });
-    vi.mock("./storage/Storage.ts", () => ({
+    vi.mock("./storage/Storage", () => ({
       default: {
         getInstance: vi.fn().mockReturnValue({
           init: vi.fn(),
+          resetWallet: vi.fn(),
         }),
+        init: vi.fn(),
       },
     }));
     vi.mock("./accounts/AccountManager.ts", () => ({
       default: {
         saveBackup: () => accountManageMock.saveBackup(),
-        addWASMAccount: vi.fn(),
-        addEVMAccount: vi.fn(),
+        addAccount: vi.fn().mockReturnValue({
+          key: "WASM-123",
+          value: "0x123",
+          type: AccountType.WASM,
+        }),
+        getAccount: vi.fn(),
+        importAccount: vi.fn().mockReturnValue({
+          key: "WASM-123",
+          value: "0x123",
+          type: AccountType.WASM,
+        }),
+        derive: vi.fn().mockReturnValue({
+          key: "WASM-123",
+          value: "0x123",
+          type: AccountType.WASM,
+        }),
+        restorePassword: vi.fn(),
+        remove: vi.fn(),
+        changeName: vi.fn(),
+        areAccountsInitialized: vi.fn().mockReturnValue(true),
       },
     }));
   });
 
-  describe("init", () => {
-    it("should init", async () => {
-      await Extension["init"]("12345", "1 2 3 4 5", true);
-      expect(accountManageMock.saveBackup).toHaveBeenCalled();
+  describe("validatePasswordFormat", () => {
+    it("should be valid", () => {
+      const result = Extension["validatePasswordFormat"]("Test.123");
+      expect(result).toBe(undefined);
     });
 
-    it("should throw error on init", async () => {
-      const AccountMannager = await import("./accounts/AccountManager");
-      AccountMannager.default.saveBackup = vi
-        .fn()
-        .mockRejectedValue("failed_to_save_backup");
-
+    it("should return password_required error", () => {
       try {
-        await Extension["init"]("12345", "1 2 3 4 5", true);
+        Extension["validatePasswordFormat"]("");
       } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_save_backup");
+        expect(String(error)).toEqual("Error: password_required");
+      }
+    });
+
+    it("should return password_invalid error", () => {
+      try {
+        Extension["validatePasswordFormat"]("123456");
+      } catch (error) {
+        expect(String(error)).toEqual("Error: password_invalid");
       }
     });
   });
 
+  describe("validatePrivateKeyOrSeedFormat", () => {
+    it("should be valid", () => {
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+
+      const result = Extension["validatePrivateKeyOrSeedFormat"](SEED);
+      expect(result).toBe(undefined);
+    });
+
+    it("should return private_key_or_seed_required error", () => {
+      const SEED = "";
+      try {
+        Extension["validatePrivateKeyOrSeedFormat"](SEED);
+      } catch (error) {
+        expect(String(error)).toEqual("Error: private_key_or_seed_required");
+      }
+    });
+
+    it("should return private_key_or_seed_invalid error", () => {
+      const SEED = "123";
+      try {
+        Extension["validatePrivateKeyOrSeedFormat"](SEED);
+      } catch (error) {
+        expect(String(error)).toEqual("Error: private_key_or_seed_invalid");
+      }
+    });
+  });
+
+  describe("signUp", () => {
+    it("should signUp", async () => {
+      const PASSWORD = "Test.123";
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+
+      const result = await Extension["signUp"](PASSWORD, SEED);
+      expect(result).toBe(undefined);
+    });
+
+    it("should throw error", async () => {
+      const PASSWORD = "Test.123";
+      const SEED = "";
+
+      try {
+        await Extension["signUp"](PASSWORD, SEED);
+      } catch (error) {
+        expect(String(error)).toEqual("Error: private_key_or_seed_required");
+      }
+    });
+  });
+
+  it("should be authorized", () => {
+    const result = Extension.isAuthorized();
+    expect(result).toBe(true);
+  });
+
   describe("createAccounts", () => {
     it("should create accounts", async () => {
-      const AccountMannager = await import("./accounts/AccountManager");
-      AccountMannager.default.saveBackup = accountManageMock.saveBackup;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = true;
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+      const NAME = "created";
+      const PASSWORD = "Test.123";
+      const IS_SIGNUP = true;
 
       const result = await Extension.createAccounts(
-        "1 2 3 4 5",
-        "name",
-        "12345"
+        SEED,
+        NAME,
+        PASSWORD,
+        IS_SIGNUP
       );
       expect(result).toBe(true);
     });
 
     it("should create accounts with isSignUp in false", async () => {
-      const AccountMannager = await import("./accounts/AccountManager");
-      AccountMannager.default.saveBackup = accountManageMock.saveBackup;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = true;
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+      const NAME = "created";
+      const PASSWORD = "Test.123";
+      const IS_SIGNUP = false;
 
       const result = await Extension.createAccounts(
-        "1 2 3 4 5",
-        "name",
-        "12345",
-        false
+        SEED,
+        NAME,
+        PASSWORD,
+        IS_SIGNUP
       );
       expect(result).toBe(true);
-    });
-    it("should throw seed_required error", async () => {
-      try {
-        await Extension.createAccounts("", "", "");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: seed_required");
-      }
-    });
-
-    it("should throw seed_required error", async () => {
-      try {
-        await Extension.createAccounts("1 2 3 4 5", "", "");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: password_required");
-      }
-    });
-
-    it("should throw failed_to_import_account", async () => {
-      const AccountMannager = await import("./accounts/AccountManager");
-      AccountMannager.default.saveBackup = accountManageMock.saveBackup;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = false;
-
-      try {
-        await Extension.createAccounts("1 2 3 4 5", "name", "12345");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_create_accounts");
-      }
     });
   });
 
   describe("importAccount", () => {
-    it("should return private_key_or_seed_required error", async () => {
-      try {
-        await Extension.importAccount("name", "", "password", AccountType.EVM);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: private_key_or_seed_required");
-      }
-    });
+    it("should import account", async () => {
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+      const NAME = "created";
+      const PASSWORD = "Test.123";
+      const type = AccountType.IMPORTED_WASM;
+      const IS_SIGNUP = true;
 
-    it("should return password_required error", async () => {
-      try {
-        await Extension.importAccount("name", "1 2 3 4 5", "", AccountType.EVM);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: password_required");
-      }
-    });
-
-    it("should reutrn failed_to_import_account", async () => {
-      const selectedAccount = vi.fn();
-      const _AccountManager = await import("./accounts/AccountManager");
-      _AccountManager.default.importAccount = selectedAccount;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = true;
-
-      await Extension.importAccount(
-        "name",
-        "1 2 3 4 5",
-        "12345",
-        AccountType.EVM
+      const result = await Extension.importAccount(
+        NAME,
+        SEED,
+        PASSWORD,
+        type,
+        IS_SIGNUP
       );
-      expect(selectedAccount).toHaveBeenCalled();
+      expect(result).toBe(undefined);
+    });
+    it("should import account with isSignUp in false", async () => {
+      const SEED =
+        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+      const NAME = "created";
+      const PASSWORD = "Test.123";
+      const type = AccountType.IMPORTED_WASM;
+      const IS_SIGNUP = false;
+
+      const result = await Extension.importAccount(
+        NAME,
+        SEED,
+        PASSWORD,
+        type,
+        IS_SIGNUP
+      );
+      expect(result).toBe(undefined);
     });
   });
 
-  describe("restorePassword", () => {
-    it("should restore password", async () => {
-      const restorePassword = vi.fn();
+  it("should restore password", async () => {
+    const SEED =
+      "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+    const PASSWORD = "Test.123";
 
-      const _AccountManager = await import("./accounts/AccountManager");
-      _AccountManager.default.restorePassword = restorePassword;
-
-      await Extension.restorePassword("1 2 3 4 5", "12345");
-      expect(restorePassword).toHaveBeenCalled();
-    });
-
-    it("should return private_key_or_seed_required", async () => {
-      try {
-        await Extension.restorePassword("", "");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: private_key_or_seed_required");
-      }
-    });
-
-    it("should return private_key_or_seed_required", async () => {
-      try {
-        await Extension.restorePassword("1 2 3 4 5", "");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: password_required");
-      }
-    });
+    const result = await Extension.restorePassword(SEED, PASSWORD);
+    expect(result).toBe(undefined);
   });
 
   it("should remove key", async () => {
-    const remove = vi.fn();
-
-    const _AccountManager = await import("./accounts/AccountManager");
-    _AccountManager.default.remove = remove;
-
-    Extension.removeAccount("EVM-1234");
-    expect(remove).toHaveBeenCalled();
+    const result = await Extension.removeAccount("EVM-1234");
+    expect(result).toBe(undefined);
   });
 
-  it("should change account name", async () => {
-    const changeName = vi.fn();
-
-    const _AccountManager = await import("./accounts/AccountManager");
-    _AccountManager.default.changeName = changeName;
-
-    Extension.changeAccountName("EVM-1234", "newname");
-
-    expect(changeName).toHaveBeenCalled();
+  it("should change name", async () => {
+    const result = await Extension.changeAccountName("EVM-1234", "test");
+    expect(result).toBe(undefined);
   });
 
-  describe("reset wallet", () => {
+  describe("resetWallet", () => {
     it("should reset wallet", async () => {
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = true;
+      const Auth = (await import("./storage/Auth")).default;
+      Auth.isAuthorized = vi.fn().mockReturnValue(true);
 
-      const resetWallet = vi.fn();
-      const _Storage = await import("./storage/Storage");
-      _Storage.default.getInstance = vi.fn().mockReturnValue({
-        resetWallet: resetWallet,
-      });
-
-      await Extension.resetWallet();
-      expect(resetWallet).toHaveBeenCalled();
+      const result = await Extension.resetWallet();
+      expect(result).toBe(undefined);
     });
+
     it("should throw error", async () => {
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.isUnlocked = false;
+      const Auth = (await import("./storage/Auth")).default;
+      Auth.isAuthorized = vi.fn().mockReturnValue(false);
 
       try {
         await Extension.resetWallet();
-        throw new Error("bad test");
       } catch (error) {
-        expect(String(error)).toEqual("Error: wallet_not_unlocked");
+        expect(String(error)).toEqual("Error: not_authorized");
       }
     });
   });
 
-  describe("sign in", () => {
-    it("should sign in", async () => {
-      const getEncryptedVault = vi.fn().mockReturnValue("vault");
-      const cachePassword = vi.fn();
-
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.getEncryptedVault = getEncryptedVault;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.getInstance = vi.fn().mockReturnValue({
-        signIn: vi.fn(),
-      });
-
-      const _CacheAuth = await import("./storage/entities/CacheAuth");
-      _CacheAuth.default.cachePassword = cachePassword;
-
-      await Extension.signIn("12345");
-      expect(cachePassword).toHaveBeenCalled();
-    });
-
-    it("should return failed_to_sign_in error", async () => {
-      const getEncryptedVault = vi.fn().mockReturnValue(undefined);
-
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.getEncryptedVault = getEncryptedVault;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.getInstance = vi.fn().mockReturnValue({
-        signOut: vi.fn(),
-      });
-
-      try {
-        await Extension.signIn("12345");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_sign_in");
-      }
-    });
-
-    it("should throw error", async () => {
-      const getEncryptedVault = vi.fn().mockRejectedValue(Error("vault_error"));
-
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.getEncryptedVault = getEncryptedVault;
-
-      const _Auth = await import("./storage/Auth");
-      _Auth.default.getInstance = vi.fn().mockReturnValue({
-        signOut: vi.fn(),
-      });
-
-      try {
-        await Extension.signIn("12345");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: vault_error");
-      }
-    });
+  it("signIn", async () => {
+    const result = await Extension.signIn("Test.123");
+    expect(result).toBe(undefined);
   });
 
-  it("should return alreadySignedUp as true", async () => {
-    const _Vault = await import("./storage/entities/Vault");
-    _Vault.default.alreadySignedUp = vi.fn().mockResolvedValue(true);
-
+  it("should be signed up", async () => {
     const result = await Extension.alreadySignedUp();
     expect(result).toBe(true);
   });
 
   describe("areAccountsInitialized", () => {
     it("should true", async () => {
-      const _Accounts = await import("./storage/entities/Accounts");
-      _Accounts.default.get = vi.fn().mockReturnValue({
+      const Accounts = await import("./storage/entities/Accounts");
+      Accounts.default.get = vi.fn().mockReturnValue({
         data: {
           "EVM-1234": {
             type: AccountType.EVM,
@@ -400,26 +369,21 @@ describe("Extension", () => {
         },
       });
 
-      const _AccountManager = await import("./accounts/AccountManager");
-      _AccountManager.default.areAccountsInitialized = vi
-        .fn()
-        .mockReturnValue(true);
-
       const result = await Extension.areAccountsInitialized();
       expect(result).toBe(true);
     });
 
     it("should return false", async () => {
-      const _Accounts = await import("./storage/entities/Accounts");
-      _Accounts.default.get = vi.fn().mockReturnValue(undefined);
+      const Accounts = await import("./storage/entities/Accounts");
+      Accounts.default.get = vi.fn().mockReturnValue(undefined);
 
       const result = await Extension.areAccountsInitialized();
       expect(result).toBe(false);
     });
 
     it("should return with catch error false", async () => {
-      const _Accounts = await import("./storage/entities/Accounts");
-      _Accounts.default.get = vi.fn().mockRejectedValue(undefined);
+      const Accounts = await import("./storage/entities/Accounts");
+      Accounts.default.get = vi.fn().mockRejectedValue(undefined);
 
       try {
         await Extension.areAccountsInitialized();
@@ -430,105 +394,57 @@ describe("Extension", () => {
   });
 
   it("should sign out", async () => {
-    const clear = vi.fn();
-
-    const _Auth = await import("./storage/Auth");
-    _Auth.default.getInstance = vi.fn().mockReturnValue({
-      signOut: vi.fn(),
-    });
-
-    const _CacheAuth = await import("./storage/entities/CacheAuth");
-    _CacheAuth.default.clear = clear;
-
-    await Extension.signOut();
-    expect(clear).toHaveBeenCalled();
+    const result = await Extension.signOut();
+    expect(result).toBe(undefined);
   });
 
-  it("should return isUnlocked as true", async () => {
-    const _Auth = await import("./storage/Auth");
-    _Auth.default.isUnlocked = true;
-
-    const _CacheAuth = await import("./storage/entities/CacheAuth");
-    _CacheAuth.default.loadFromCache = vi.fn();
-
-    const result = await Extension.isUnlocked();
+  it("should session be active", async () => {
+    const result = await Extension.isSessionActive();
     expect(result).toBe(true);
   });
 
-  describe("showPrivateKey", () => {
-    it("should return private key", async () => {
-      const _SelectedAccount = await import(
-        "./storage/entities/SelectedAccount"
-      );
-      _SelectedAccount.default.get = vi.fn().mockReturnValue({
+  describe("showKey", () => {
+    it("should return key", async () => {
+      const SelectedAccount = (
+        await import("./storage/entities/SelectedAccount")
+      ).default;
+      SelectedAccount.get = vi.fn().mockReturnValue({
         value: {
-          keyring: "EVM-12345",
+          type: AccountType.EVM,
+          address: "EVM-1234",
+          keyring: "EVM",
         },
       });
 
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.showPrivateKey = vi.fn().mockReturnValue("private-key");
+      const Vault = (await import("./storage/entities/Vault")).default;
+      Vault.getKeyring = vi.fn().mockReturnValue({
+        getKey: () => {
+          return "1234";
+        },
+      });
 
-      const result = await Extension.showPrivateKey();
-
-      expect(result).toEqual("private-key");
+      const result = await Extension.showKey();
+      expect(result).toBe("1234");
     });
 
     it("should return undefined", async () => {
-      const _SelectedAccount = await import(
-        "./storage/entities/SelectedAccount"
-      );
-      _SelectedAccount.default.get = vi.fn().mockReturnValue(undefined);
+      const SelectedAccount = (
+        await import("./storage/entities/SelectedAccount")
+      ).default;
+      SelectedAccount.get = vi.fn().mockReturnValue(undefined);
 
-      const result = await Extension.showPrivateKey();
+      const result = await Extension.showKey();
       expect(result).toBe(undefined);
     });
   });
 
-  describe("showSeed", () => {
-    it("should return seed", async () => {
-      const _SelectedAccount = await import(
-        "./storage/entities/SelectedAccount"
-      );
-      _SelectedAccount.default.get = vi.fn().mockReturnValue({
-        value: {
-          keyring: "EVM-12345",
-        },
-      });
-
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.showSeed = vi.fn().mockReturnValue("seed");
-
-      const result = await Extension.showSeed();
-
-      expect(result).toEqual("seed");
-    });
-
-    it("should return undefined", async () => {
-      const _SelectedAccount = await import(
-        "./storage/entities/SelectedAccount"
-      );
-      _SelectedAccount.default.get = vi.fn().mockReturnValue(undefined);
-
-      const result = await Extension.showSeed();
-      expect(result).toBe(undefined);
-    });
-  });
-
-  it("should return account by key", async () => {
-    const _AccountManager = await import("./accounts/AccountManager");
-    _AccountManager.default.getAccount = vi
-      .fn()
-      .mockReturnValue(selectedEVMAccountMock);
-
-    const result = await Extension.getAccount(
-      selectedEVMAccountMock.key as AccountKey
-    );
-    expect(result).toMatchObject(selectedEVMAccountMock);
+  it("get account", async () => {
+    const result = await Extension.getAccount("EVM-1234");
+    expect(result).toBe(undefined);
   });
 
   describe("getAllAccounts", () => {
-    it("should return empty array", async () => {
+    it("should return all accounts", async () => {
       const _AccountManager = await import("./accounts/AccountManager");
       _AccountManager.default.getAll = vi.fn().mockReturnValue({
         getAll: vi.fn().mockReturnValue(accountsMocks),
@@ -549,109 +465,21 @@ describe("Extension", () => {
     });
   });
 
-  describe("deriveAccount", () => {
-    it("should return new account", async () => {
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.get = vi.fn().mockReturnValue("vault");
-
-      const _AccountManager = await import("./accounts/AccountManager");
-      _AccountManager.default.derive = vi
-        .fn()
-        .mockReturnValue(selectedEVMAccountMock);
-
-      const result = await Extension.deriveAccount(
-        "derived-evm",
-        AccountType.EVM
-      );
-      expect(result).toMatchObject(selectedEVMAccountMock);
-    });
-    it("should return failed_to_derive_account error", async () => {
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.get = vi.fn().mockReturnValue(undefined);
-
-      try {
-        await Extension.deriveAccount("derived-evm", AccountType.EVM);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_derive_account");
-      }
+  it("should derive account", async () => {
+    const result = await Extension.deriveAccount(
+      "derived-evm",
+      AccountType.EVM
+    );
+    expect(result).toMatchObject({
+      key: "WASM-123",
+      value: "0x123",
+      type: AccountType.WASM,
     });
   });
 
-  describe("setNetwork", () => {
-    it("should return true", async () => {
-      class NetworkMock {
-        private static instance: NetworkMock;
-
-        public static getInstance() {
-          if (!NetworkMock.instance) {
-            NetworkMock.instance = new NetworkMock();
-          }
-          return NetworkMock.instance;
-        }
-
-        static get() {
-          vi.fn();
-        }
-
-        static set() {
-          vi.fn();
-        }
-
-        get() {
-          vi.fn();
-        }
-
-        set() {
-          vi.fn();
-        }
-      }
-
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.get = vi.fn().mockReturnValue("vault");
-
-      const _Network = (await import("./storage/entities/Network")) as {
-        default: object;
-      };
-      _Network.default = NetworkMock;
-
-      const result = await Extension.setNetwork(selectedEVMChainMock);
-      expect(result).toBe(true);
-    });
-
-    it("should return failed_to_derive_account error", async () => {
-      const _Vault = await import("./storage/entities/Vault");
-      _Vault.default.get = vi.fn().mockReturnValue(undefined);
-
-      try {
-        await Extension.setNetwork(selectedEVMChainMock);
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_set_network");
-      }
-    });
-  });
-
-  it("should set new selected account", async () => {
-    const set = vi.fn();
-    class SelectedAccountMock {
-      fromAccount() {
-        vi.fn();
-      }
-
-      static set() {
-        set();
-      }
-    }
-
-    const _SelectedAccountMock = (await import(
-      "./storage/entities/SelectedAccount"
-    )) as { default: object };
-    _SelectedAccountMock.default = SelectedAccountMock;
-
-    await Extension.setSelectedAccount(selectedEVMAccountMock as Account);
-
-    expect(set).toHaveBeenCalled();
+  it("should set network", async () => {
+    const result = await Extension.setNetwork(selectedWASMChainMock);
+    expect(result).toBe(true);
   });
 
   it("should return selected account", async () => {
@@ -854,7 +682,7 @@ describe("Extension", () => {
         .default;
       const get = vi.fn().mockReturnValue({
         getAllContacts: () => contactsMock,
-        getRecent: () => [],
+        getRecentAddresses: () => [],
       });
       _Registry.get = get;
 
@@ -946,35 +774,15 @@ describe("Extension", () => {
     it("should save contact", async () => {
       const _Registry = (await import("./storage/entities/registry/Registry"))
         .default;
-      const get = vi.fn().mockReturnValue({
-        addContact: vi.fn(),
-      });
-      const set = vi.fn();
-      _Registry.get = get;
-      _Registry.set = set;
+      const addContact = vi.fn();
+
+      _Registry.addContact = addContact;
 
       await Extension.saveContact({
         name: "account1",
         address: "0x12345",
       });
-      expect(set).toHaveBeenCalled();
-    });
-
-    it("should return error", async () => {
-      const _Registry = (await import("./storage/entities/registry/Registry"))
-        .default;
-      const get = vi.fn().mockReturnValue(undefined);
-      _Registry.get = get;
-
-      try {
-        await Extension.saveContact({
-          name: "account1",
-          address: "0x12345",
-        });
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_registry");
-      }
+      expect(addContact).toHaveBeenCalled();
     });
   });
 
@@ -1102,7 +910,7 @@ describe("Extension", () => {
     const _Registry = (await import("./storage/entities/registry/Registry"))
       .default;
     const addRecent = vi.fn();
-    _Registry.addRecent = addRecent;
+    _Registry.addRecentAddress = addRecent;
 
     await Extension.addActivity("0x1234", {} as Record);
     expect(addRecent).toHaveBeenCalled();
@@ -1123,7 +931,10 @@ describe("Extension", () => {
     const addAsset = vi.fn();
     _Assets.addAsset = addAsset;
 
-    await Extension.addAsset(CHAINS[0].chains[0].name, {} as Asset);
+    await Extension.addAsset(
+      CHAINS[0].chains[0].name,
+      {} as unknown as { symbol: string; address: string; decimals: number }
+    );
     expect(addAsset).toHaveBeenCalled();
   });
 

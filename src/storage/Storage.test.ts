@@ -4,6 +4,9 @@ import { vi } from "vitest";
 const initChainsMock = vi.fn().mockImplementation(() => null);
 const clearMock = vi.fn().mockImplementation(() => null);
 
+const fakePassword = "Asdasd123123!";
+const fakeKey = "fakeKey";
+
 describe("Storage", () => {
   beforeAll(() => {
     (global.navigator as unknown) = {
@@ -31,6 +34,14 @@ describe("Storage", () => {
     vi.mock("./entities/CacheAuth", () => ({
       default: {
         init: vi.fn(),
+      },
+    }));
+
+    vi.mock("./Auth", () => ({
+      default: {
+        getInstance: vi.fn().mockImplementation(() => ({
+          setAuth: vi.fn(),
+        })),
       },
     }));
 
@@ -77,6 +88,12 @@ describe("Storage", () => {
       },
     }));
 
+    vi.mock("../accounts/AccountManager", () => ({
+      default: {
+        saveBackup: vi.fn(),
+      },
+    }));
+
     vi.mock("./entities/Chains", () => ({
       default: {
         init: () => initChainsMock(),
@@ -86,28 +103,13 @@ describe("Storage", () => {
 
   it("should instance", () => {
     const storageInstance = Storage.getInstance();
-    const browser = storageInstance.browser;
     const storage = storageInstance.storage;
-    expect(browser).toHaveProperty("storage");
     expect(storage).toHaveProperty("clear");
-  });
-
-  it("should return salt", async () => {
-    global.navigator = {
-      ...global.navigator,
-      appName: "1",
-      platform: "2",
-      userAgent: "3",
-      language: "4",
-    };
-
-    const salt = await Storage.getInstance().getSalt();
-    expect(salt).toEqual("1-2-3-4-7");
   });
 
   describe("init", () => {
     it("should init", async () => {
-      await Storage.getInstance().init();
+      await Storage.init(fakePassword, fakeKey);
       expect(initChainsMock).toHaveBeenCalled();
     });
 
@@ -116,7 +118,7 @@ describe("Storage", () => {
       Vault.default.alreadySignedUp = vi.fn().mockResolvedValue(() => false);
 
       try {
-        await Storage.getInstance().init();
+        await Storage.init(fakePassword, fakeKey);
         throw new Error("bad test");
       } catch (error) {
         expect(String(error)).toEqual("Error: already_signed_up");

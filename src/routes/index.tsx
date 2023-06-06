@@ -12,6 +12,7 @@ import {
   SignIn,
   SignMessage,
   Welcome,
+  CallContract,
 } from "@src/pages";
 import {
   Advanced,
@@ -20,6 +21,7 @@ import {
   General,
   ManageNetworks,
   Security,
+  AboutUs,
 } from "@src/pages/settings";
 import Extension from "@src/Extension";
 import {
@@ -30,6 +32,7 @@ import {
 import {
   ADD_ACCOUNT,
   BALANCE,
+  CALL_CONTRACT,
   CREATE_ACCOUNT,
   DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
@@ -37,6 +40,7 @@ import {
   RECEIVE,
   RESTORE_PASSWORD,
   SEND,
+  SETTINGS_ABOUT_US,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
@@ -47,10 +51,25 @@ import {
   SIGN_MESSAGE,
 } from "./paths";
 
-import { Decrypt } from "@src/components/decrypt";
 import { Loading } from "@src/components/common/Loading";
-import { isProduction } from "@src/utils/env";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
+
+const getInitialEntry = (query: string) => {
+  if (query.includes("sign_message")) {
+    return SIGN_MESSAGE;
+  }
+
+  if (query.includes("call_contract")) {
+    return CALL_CONTRACT;
+  }
+
+  if (query.includes("route")) {
+    const route = query.split("route=")[1];
+    return route;
+  }
+
+  return "/";
+};
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
@@ -98,34 +117,46 @@ export const Routes = () => {
       setHomeRoute(<AddAccount />);
       return;
     }
-    const isUnlocked = await Extension.isUnlocked();
+    const isSessionActive = await Extension.isSessionActive();
 
-    if (!isUnlocked) {
+    if (!isSessionActive) {
       setHomeRoute(<SignIn />);
       return;
     }
     setHomeRoute(<Balance />);
   };
 
-  if (location.search) {
+  if (location.search.includes("origin=kuma")) {
     return (
-      <MemoryRouter initialEntries={[SIGN_MESSAGE]}>
+      <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
         <RRoutes>
-          <Route
-            path={SIGN_MESSAGE}
-            element={
-              <ValidationWrapper query={location.search}>
-                <SignMessage />
-              </ValidationWrapper>
-            }
-          />
+          {location.search.includes("sign_message") && (
+            <Route
+              path={SIGN_MESSAGE}
+              element={
+                <ValidationWrapper query={location.search}>
+                  <SignMessage />
+                </ValidationWrapper>
+              }
+            />
+          )}
+          {location.search.includes("call_contract") && (
+            <Route
+              path={CALL_CONTRACT}
+              element={
+                <ValidationWrapper query={location.search}>
+                  <CallContract />
+                </ValidationWrapper>
+              }
+            />
+          )}
         </RRoutes>
       </MemoryRouter>
     );
   }
 
   return (
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
         <Route path="/" element={homeRoute} />
         <Route path={ADD_ACCOUNT} element={<AddAccount />} />
@@ -214,8 +245,9 @@ export const Routes = () => {
         <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
+        <Route path={SETTINGS_ABOUT_US} element={<AboutUs />} />
 
-        {!isProduction && <Route path="/decrypt" element={<Decrypt />} />}
+        {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>
     </MemoryRouter>
   );

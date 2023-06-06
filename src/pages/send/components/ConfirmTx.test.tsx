@@ -46,6 +46,10 @@ describe("ConfirmTx", () => {
               return "100";
             case "destinationAccount":
               return "0x123";
+            case "to":
+              return {
+                name: "Ethereum",
+              };
             case "from":
               return {
                 name: "Ethereum",
