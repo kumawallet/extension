@@ -49,7 +49,7 @@ export const Balance = () => {
                   className={({ selected }) =>
                     `px-4 py-1 focus:outline-none relative ${
                       selected
-                        ? `text-${color}-secondary active-tab`
+                        ? `text-${color}-secondary active-tab after:bg-${color}-fill`
                         : "text-white"
                     }`
                   }

@@ -27,7 +27,6 @@ import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./utils/constants";
 import { version } from "./utils/env";
 
 export default class Extension {
-
   static get version() {
     return version;
   }
@@ -131,6 +130,7 @@ export default class Extension {
     }
     await Storage.getInstance().resetWallet();
     localStorage.removeItem("welcome");
+    localStorage.removeItem("color");
   }
 
   static async signIn(password: string) {

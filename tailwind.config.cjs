@@ -5,15 +5,6 @@ module.exports = {
       pattern: /-chain-/,
       variants: ["after", "before", "hover", "selection"],
     },
-    // {
-    //   pattern: /bg-chain-/,
-    // },
-    // {
-    //   pattern: /border-chain-/,
-    // },
-    // {
-    //   pattern: /fill-chain-/,
-    // },
   ],
   theme: {
     extend: {
@@ -44,16 +35,16 @@ module.exports = {
             fill: "#54cbc8",
           },
           acala: {
-            primary: "#e91a53",
+            primary: "#645AFF",
             secondary: "#fff",
-            fill: "#e91a53",
+            fill: "#645AFF",
           },
           astar: {
-            primary: "#007cf0",
+            primary: "#1b6dc1d9",
             secondary: "#fff",
-            fill: "#007cf0",
+            fill: "#1b6dc1d9",
           },
-          binance: {
+          "binance-smart-chain-mainnet": {
             primary: "#f3ba2f",
             secondary: "#fff",
             fill: "#f3ba2f",
@@ -79,9 +70,9 @@ module.exports = {
             fill: "#000",
           },
           moonbeam: {
-            primary: "#54cbc8",
+            primary: "#53cbc9",
             secondary: "#fff",
-            fill: "#54cbc8",
+            fill: "#53cbc9",
           },
           moonriver: {
             primary: "#e7af08",
@@ -93,7 +84,7 @@ module.exports = {
             secondary: "#fff",
             fill: "#d3046f",
           },
-          polygon: {
+          "polygon-mainnet": {
             primary: "#7c43da",
             secondary: "#fff",
             fill: "#7c43da",
@@ -104,9 +95,9 @@ module.exports = {
             fill: "#ec442d",
           },
           shiden: {
-            primary: "#5630c3",
+            primary: "#5923B2",
             secondary: "#fff",
-            fill: "#5630c3",
+            fill: "#5923B2",
           },
         },
       },
