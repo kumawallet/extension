@@ -120,6 +120,7 @@ export const getWasmAssets = async (
 
     switch (chainName) {
       case "Acala":
+      case "Mandala":
         assetPallet = api.query.assetRegistry.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
         break;
@@ -153,8 +154,8 @@ export const getWasmAssets = async (
       const decimals = Number(jsonAsset?.decimals || 0);
 
       let aditionalData: Asset["aditionalData"] = null;
-
-      if (chainName === "Acala") {
+      console.log("chainName", chainName.toLowerCase());
+      if (["acala", "mandala"].includes(chainName.toLowerCase())) {
         const token = metadata.args[0].toJSON() as {
           nativeAssetId?: { token: string };
           foreignAssetId?: string;
@@ -207,8 +208,8 @@ export const getWasmAssets = async (
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
-
-        if (chainName === "Acala") {
+        console.log(chainName)
+        if (["acala", "mandala"].includes(chainName.toLowerCase())) {
           params.push(address, asset.aditionalData?.tokenId);
         } else {
           params.push(asset.id, address);

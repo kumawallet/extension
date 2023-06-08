@@ -99,7 +99,8 @@
       "change": "Cambiar",
       "mainnets": "Redes principales",
       "testnets": "Redes de prueba",
-      "custom": "Personalizadas"
+      "custom": "Personalizadas",
+      "search": "Buscar por nombre"
     },
     "accounts": {
       "accounts": "Cuentas",

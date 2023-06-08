@@ -359,6 +359,132 @@ export const GOERLI = {
   supportedAccounts: [EVM],
 };
 
+export const BNB_TESTNET = {
+  name: "Binance Smart Chain Testnet",
+  rpc: {
+    evm: "https://data-seed-prebsc-1-s1.binance.org:8545",
+  },
+  addressPrefix: 5,
+  nativeCurrency: {
+    name: "Binance Chain Native Token",
+    symbol: "tBNB",
+    decimals: 18,
+  },
+  explorer: {
+    evm: {
+      name: "bscscan",
+      url: "https://testnet.bscscan.com/",
+    },
+  },
+  logo: "binance",
+  supportedAccounts: [EVM],
+};
+
+export const MUMBAI_TESTNET = {
+  name: "Polygon Testnet Mumbai",
+  rpc: {
+    evm: "https://rpc-mumbai.maticvigil.com/",
+  },
+  addressPrefix: 5,
+  nativeCurrency: {
+    name: "Matic",
+    symbol: "MATIC",
+    decimals: 18,
+  },
+  explorer: {
+    evm: {
+      name: "polygonscan",
+      url: "https://mumbai.polygonscan.com/",
+    },
+  },
+  logo: "polygon",
+  supportedAccounts: [EVM],
+};
+
+export const SEPOLIA = {
+  name: "Sepolia",
+  rpc: {
+    evm: "https://rpc.sepolia.org",
+  },
+  addressPrefix: 5,
+  nativeCurrency: {
+    name: "Sepolia Ether",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  explorer: {
+    evm: {
+      name: "subscan",
+      url: "https://sepolia.subscan.io/",
+    },
+  },
+  logo: "ethereum",
+  supportedAccounts: [EVM],
+};
+
+export const MANDALA = {
+  name: "Mandala",
+  rpc: {
+    wasm: "wss://mandala-rpc.aca-staging.network/ws",
+  },
+  addressPrefix: 42,
+  nativeCurrency: {
+    name: "Acala Token",
+    symbol: "mACA",
+    decimals: 12,
+  },
+  explorer: {
+    wasm: {
+      name: "subscan",
+      url: "https://acala-testnet.subscan.io/",
+    },
+  },
+  logo: "acala",
+  supportedAccounts: [WASM],
+};
+
+export const ROCOCO = {
+  name: "Rococo",
+  rpc: {
+    wasm: "wss://rococo-rpc.polkadot.io",
+  },
+  addressPrefix: 42,
+  nativeCurrency: {
+    name: "Rococo",
+    symbol: "ROC",
+    decimals: 12,
+  },
+  explorer: {
+    wasm: {
+      name: "subscan",
+      url: "https://rococo.subscan.io/",
+    },
+  },
+  logo: "rococo",
+  supportedAccounts: [WASM],
+};
+
+export const WESTEND = {
+  name: "Westend",
+  rpc: {
+    wasm: "wss://westend-rpc.polkadot.io",
+  },
+  addressPrefix: 42,
+  nativeCurrency: {
+    name: "WND",
+    symbol: "WND",
+    decimals: 12,
+  },
+  explorer: {
+    wasm: {
+      name: "polkascan",
+      url: "https://westend.subscan.io/",
+    },
+  },
+  logo: "kusama",
+  supportedAccounts: [WASM],
+};
+
 export const MAINNETS: Chain[] = [
   POLKADOT,
   KUSAMA,
@@ -372,7 +498,17 @@ export const MAINNETS: Chain[] = [
   BINANCE,
 ];
 
-export const TESTNETS: Chain[] = [MOONBASE_ALPHA, SHIBUYA, GOERLI];
+export const TESTNETS: Chain[] = [
+  MOONBASE_ALPHA,
+  SHIBUYA,
+  GOERLI,
+  BNB_TESTNET,
+  MUMBAI_TESTNET,
+  SEPOLIA,
+  MANDALA,
+  ROCOCO,
+  WESTEND,
+];
 
 export const CHAINS = [
   {
