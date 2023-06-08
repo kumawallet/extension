@@ -154,7 +154,6 @@ export const getWasmAssets = async (
       const decimals = Number(jsonAsset?.decimals || 0);
 
       let aditionalData: Asset["aditionalData"] = null;
-      console.log("chainName", chainName.toLowerCase());
       if (["acala", "mandala"].includes(chainName.toLowerCase())) {
         const token = metadata.args[0].toJSON() as {
           nativeAssetId?: { token: string };
@@ -208,7 +207,6 @@ export const getWasmAssets = async (
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
-        console.log(chainName)
         if (["acala", "mandala"].includes(chainName.toLowerCase())) {
           params.push(address, asset.aditionalData?.tokenId);
         } else {
