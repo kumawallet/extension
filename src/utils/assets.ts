@@ -22,10 +22,11 @@ export const getNatitveAssetBalance = async (
     if (!api) return _amount;
 
     if ("query" in api) {
-      const { data } =
-        ((await api.query.system?.account(accountAddress)) as unknown as {
-          data: { free: BN };
-        }) || {};
+      const { data } = (await api.query.system?.account(
+        accountAddress
+      )) as unknown as {
+        data: { free: BN };
+      };
 
       return data.free;
     }
@@ -59,11 +60,11 @@ export const getAssetUSDPrice = async (query: string) => {
 };
 
 export const formatAmountWithDecimals = (
-  amount: number,
+  amount = 0,
   decimals = 0,
   assetDecimals = 0
 ) => {
-  return Number((amount / 10 ** assetDecimals || 0).toFixed(decimals));
+  return Number((amount / 10 ** assetDecimals).toFixed(decimals));
 };
 
 export const formatBN = (bn: string, decimals: number) => {
