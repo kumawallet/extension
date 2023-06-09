@@ -18,6 +18,7 @@ import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { captureError } from "@src/utils/error-handling";
 
 export const ChainSelector = () => {
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const { color } = useThemeContext();
@@ -138,8 +139,17 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-99px)] max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
             <div className="px-6 py-2 pt-2 text-start">
+              <div className="flex flex-col gap-1 py-2">
+                <input
+                  type="text"
+                  placeholder={t("chain_selector.search") || "Search"}
+                  value={search}
+                  onChange={({ target }) => setSearch(target.value)}
+                  className="input-primary"
+                />
+              </div>
               <div className="flex flex-col gap-1">
                 {Object.keys(filteredChains).map((spec) => (
                   <div key={spec}>

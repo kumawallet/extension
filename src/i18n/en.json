@@ -99,7 +99,8 @@
       "change": "Change",
       "mainnets": "Mainnets",
       "testnets": "Testnets",
-      "custom": "Custom"
+      "custom": "Custom",
+      "search": "Search by name"
     },
     "accounts": {
       "accounts": "Accounts",

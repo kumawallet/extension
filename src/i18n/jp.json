@@ -99,7 +99,8 @@
       "change": "変更",
       "mainnets": "メインネット",
       "testnets": "テストネット",
-      "custom": "カスタム"
+      "custom": "カスタム",
+      "search": "検索"
     },
     "accounts": {
       "accounts": "アカウント",

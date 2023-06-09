@@ -80,9 +80,19 @@ describe("assets", () => {
     expect(result).toEqual(0.1);
   });
 
+  it("should return 0", async () => {
+    const result = await formatAmountWithDecimals(0);
+    expect(result).toEqual(0);
+  });
+
   it("should format bn", () => {
     const result = formatBN("100", 5);
     expect(result).toEqual("0.001");
+  });
+
+  it("should format bn, returning 0", () => {
+    const result = formatBN("100", 0);
+    expect(result).toEqual("0");
   });
 
   it("should format usd amount", () => {
