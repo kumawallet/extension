@@ -60,13 +60,8 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
     }, [seed]);
 
     useEffect(() => {
-      if (droppedWords.length === words.length) {
-        const confirmedSeed: string = seedWords
-          .map(({ word }) => word)
-          .join(" ");
-        const confirmed: boolean = confirmedSeed === seed;
-        confirm(confirmed);
-      }
+      const confirmedSeed: string = seedWords.map(({ word }) => word).join(" ");
+      confirm(confirmedSeed === seed);
     }, [droppedWords, seedWords, seed, confirm]);
 
     function isDropped(word: string) {
