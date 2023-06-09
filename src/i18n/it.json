@@ -99,7 +99,8 @@
       "change": "Cambiare",
       "mainnets": "Mainnets",
       "testnets": "Testnets",
-      "custom": "Personalizzato"
+      "custom": "Personalizzato",
+      "search": "Cercare per nome"
     },
     "accounts": {
       "accounts": "Accounts",

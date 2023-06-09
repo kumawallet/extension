@@ -1,3 +1,4 @@
+import { formatAmountWithDecimals } from "@src/utils/assets";
 import { formatDate, makeQuerys, parseIncomingQuery } from "@src/utils/utils";
 
 describe("utils", () => {

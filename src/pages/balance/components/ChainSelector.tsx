@@ -14,6 +14,7 @@ import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { captureError } from "@src/utils/error-handling";
 
 export const ChainSelector = () => {
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const {
@@ -38,7 +39,10 @@ export const ChainSelector = () => {
   const getSettings = async () => {
     try {
       const showTestnets = (
-        await Extension.getSetting(SettingType.GENERAL, SettingKey.SHOW_TESTNETS)
+        await Extension.getSetting(
+          SettingType.GENERAL,
+          SettingKey.SHOW_TESTNETS
+        )
       )?.value as boolean;
       setShowTestnets(showTestnets);
     } catch (error) {
@@ -130,8 +134,17 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="left-0 absolute origin-top-left max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-99px)] max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
             <div className="px-6 py-2 pt-2 text-start">
+              <div className="flex flex-col gap-1 py-2">
+                <input
+                  type="text"
+                  placeholder={t("chain_selector.search") || "Search"}
+                  value={search}
+                  onChange={({ target }) => setSearch(target.value)}
+                  className="input-primary"
+                />
+              </div>
               <div className="flex flex-col gap-1">
                 {Object.keys(filteredChains).map((spec) => (
                   <div key={spec}>
@@ -144,37 +157,39 @@ export const ChainSelector = () => {
                         <div className="h-[1px] w-full bg-[#343A40]" />
                       </div>
                     )}
-                    {filteredChains[
-                      spec as "mainnets" | "testnets" | "custom"
-                    ].map((chain, index) => (
-                      <Menu.Item key={index.toString()}>
-                        {({ close }) => (
-                          <div
-                            className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
-                            onClick={() => {
-                              selecteNetwork(chain, close);
-                            }}
-                          >
-                            <img
-                              src={`/images/${chain.logo}.png`}
-                              width={30}
-                              height={30}
-                              alt={chain.name}
-                              className="object-cover rounded-full"
-                            />
-                            {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
-                            <div className="flex gap-3 items-center">
-                              <p className="text-xl">{chain.name}</p>
-                              {chain.name === selectedChain?.name && (
-                                <p className="text-[#56DF53]">
-                                  {t("chain_selector.connected")}
-                                </p>
-                              )}
+                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
+                      .filter(({ name }) =>
+                        name.toLowerCase().includes(search.toLowerCase())
+                      )
+                      .map((chain, index) => (
+                        <Menu.Item key={index.toString()}>
+                          {({ close }) => (
+                            <div
+                              className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                              onClick={() => {
+                                selecteNetwork(chain, close);
+                              }}
+                            >
+                              <img
+                                src={`/images/${chain.logo}.png`}
+                                width={30}
+                                height={30}
+                                alt={chain.name}
+                                className="object-cover rounded-full"
+                              />
+                              {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
+                              <div className="flex gap-3 items-center">
+                                <p className="text-xl">{chain.name}</p>
+                                {chain.name === selectedChain?.name && (
+                                  <p className="text-[#56DF53]">
+                                    {t("chain_selector.connected")}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </Menu.Item>
-                    ))}
+                          )}
+                        </Menu.Item>
+                      ))}
                   </div>
                 ))}
               </div>

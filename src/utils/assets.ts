@@ -22,10 +22,11 @@ export const getNatitveAssetBalance = async (
     if (!api) return _amount;
 
     if ("query" in api) {
-      const { data } =
-        ((await api.query.system?.account(accountAddress)) as unknown as {
-          data: { free: BN };
-        }) || {};
+      const { data } = (await api.query.system?.account(
+        accountAddress
+      )) as unknown as {
+        data: { free: BN };
+      };
 
       return data.free;
     }
@@ -59,11 +60,11 @@ export const getAssetUSDPrice = async (query: string) => {
 };
 
 export const formatAmountWithDecimals = (
-  amount: number,
+  amount = 0,
   decimals = 0,
   assetDecimals = 0
 ) => {
-  return Number((amount / 10 ** assetDecimals || 0).toFixed(decimals));
+  return Number((amount / 10 ** assetDecimals).toFixed(decimals));
 };
 
 export const formatBN = (bn: string, decimals: number) => {
@@ -120,6 +121,7 @@ export const getWasmAssets = async (
 
     switch (chainName) {
       case "Acala":
+      case "Mandala":
         assetPallet = api.query.assetRegistry.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
         break;
@@ -153,8 +155,7 @@ export const getWasmAssets = async (
       const decimals = Number(jsonAsset?.decimals || 0);
 
       let aditionalData: Asset["aditionalData"] = null;
-
-      if (chainName === "Acala") {
+      if (["acala", "mandala"].includes(chainName.toLowerCase())) {
         const token = metadata.args[0].toJSON() as {
           nativeAssetId?: { token: string };
           foreignAssetId?: string;
@@ -207,8 +208,7 @@ export const getWasmAssets = async (
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
-
-        if (chainName === "Acala") {
+        if (["acala", "mandala"].includes(chainName.toLowerCase())) {
           params.push(address, asset.aditionalData?.tokenId);
         } else {
           params.push(asset.id, address);
