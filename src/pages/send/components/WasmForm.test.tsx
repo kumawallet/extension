@@ -91,6 +91,9 @@ describe("WasmForm", () => {
           selectedAccount: selectedWASMAccountMock,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("react-hook-form", () => ({

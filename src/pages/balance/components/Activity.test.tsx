@@ -36,6 +36,9 @@ describe("Actvity", () => {
           selectedAccount: selectedEVMAccountMock,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("@src/Extension");

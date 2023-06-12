@@ -32,6 +32,9 @@ describe("TotalBalance", () => {
         },
         updateAccountName: () => updateAccountName(),
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("react-router-dom", () => ({

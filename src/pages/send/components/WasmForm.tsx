@@ -27,8 +27,9 @@ import metadata from "@src/constants/metadata.json";
 import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
-import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
 import { captureError } from "@src/utils/error-handling";
+import { XCM_MAPPING } from "@src/xcm/extrinsics";
+import { MapResponseXCM } from "@src/xcm/interfaces";
 
 const defaultFees = {
   "estimated fee": new BN("0"),

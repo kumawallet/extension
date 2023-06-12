@@ -50,6 +50,9 @@ describe("Assets", () => {
           isLoadingAssets: false,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
   });
   it("should render assets", () => {

@@ -10,6 +10,12 @@ const renderComponent = () => {
 
 describe("SelectableAsset", () => {
   beforeAll(() => {
+    vi.mock("react-router-dom", () => ({
+      useLocation: () => ({
+        state: null,
+      }),
+    }));
+
     vi.mock("@src/providers", () => ({
       useAssetContext: vi.fn().mockReturnValue({
         state: {
@@ -31,6 +37,9 @@ describe("SelectableAsset", () => {
         state: {
           selectedChain: selectedEVMChainMock,
         },
+      }),
+      useThemeContext: () => ({
+        color: "red",
       }),
     }));
 

@@ -24,6 +24,9 @@ describe("AccountSelected", () => {
           },
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
   });
 

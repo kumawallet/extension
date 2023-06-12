@@ -91,6 +91,9 @@ describe("AccountForm", () => {
           selectedAccount: {},
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
   });
 

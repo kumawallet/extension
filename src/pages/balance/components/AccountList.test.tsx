@@ -68,6 +68,9 @@ describe("AccountList", () => {
           },
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("@src/hooks", () => ({

@@ -5,7 +5,7 @@ import { FiChevronDown } from "react-icons/fi";
 import { Asset } from "@src/providers/assetProvider/types";
 import { AssetIcon } from "@src/components/common/AssetIcon";
 import { useFormContext } from "react-hook-form";
-import { XCM_ASSETS_MAPPING } from "@src/constants/xcm";
+import { XCM_ASSETS_MAPPING } from "@src/xcm/assets";
 import { useLocation } from "react-router-dom";
 
 interface SelectableAssetProps {

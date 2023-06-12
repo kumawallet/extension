@@ -20,8 +20,9 @@ import erc20abi from "@src/constants/erc20.abi.json";
 import { Fees } from "./Fees";
 import { confirmTx, evmTx, EVMFee } from "@src/types";
 import { BigNumber0 } from "@src/constants/assets";
-import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
 import { captureError } from "@src/utils/error-handling";
+import { XCM_MAPPING } from "@src/xcm/extrinsics";
+import { MapResponseEVM } from "@src/xcm/interfaces";
 
 interface EvmFormProps {
   confirmTx: confirmTx;

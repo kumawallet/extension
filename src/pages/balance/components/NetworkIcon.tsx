@@ -1,7 +1,5 @@
-import { FC, useEffect, useState } from "react";
-import { useNetworkContext } from "@src/providers";
-import Extension from "@src/Extension";
-import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
+import { FC } from "react";
+
 import { Chain } from "@src/storage/entities/Chains";
 
 interface NetworkIconProps {
