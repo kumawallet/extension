@@ -35,14 +35,16 @@ module.exports = {
             fill: "#54cbc8",
           },
           acala: {
-            primary: "#645AFF",
+            primary: "#8077ff",
             secondary: "#fff",
-            fill: "#645AFF",
+            fill: "#8077ff",
+            text: "#fff",
           },
           astar: {
             primary: "#1b6dc1d9",
             secondary: "#fff",
             fill: "#1b6dc1d9",
+            text: "#fff",
           },
           "binance-smart-chain-mainnet": {
             primary: "#f3ba2f",
@@ -83,6 +85,7 @@ module.exports = {
             primary: "#d3046f",
             secondary: "#fff",
             fill: "#d3046f",
+            text: "#d3046f",
           },
           "polygon-mainnet": {
             primary: "#7c43da",
@@ -95,9 +98,9 @@ module.exports = {
             fill: "#ec442d",
           },
           shiden: {
-            primary: "#5923B2",
+            primary: "#7b50c1",
             secondary: "#fff",
-            fill: "#5923B2",
+            fill: "#7b50c1",
           },
         },
       },

@@ -9,11 +9,8 @@ import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
-import {
-  useAccountContext,
-  useAssetContext,
-  useThemeContext,
-} from "@src/providers";
+import { useAccountContext, useAssetContext } from "@src/providers";
+import { Button } from "@src/components/common";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -23,7 +20,6 @@ interface TotalBalanceProps {
 export const TotalBalance: FC<TotalBalanceProps> = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
-  const { color } = useThemeContext();
 
   const [isEditing, setIsEditing] = useState(false);
   const [accountName, setAccountName] = useState("");
@@ -106,20 +102,18 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         )}
       </div>
       <div className="flex gap-3 justify-center">
-        <button
-          onClick={() => navigate(SEND)}
-          className={`flex gap-1 items-center text-${color}-primary font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40`}
-        >
-          <BsArrowUpRight />
-          <p>{t("send")}</p>
-        </button>
-        <button
-          onClick={() => navigate(RECEIVE)}
-          className={`flex gap-1 items-center text-${color}-primary font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40`}
-        >
-          <BsArrowDownLeft />
-          <p>{t("receive")}</p>
-        </button>
+        <Button onClick={() => navigate(SEND)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <BsArrowUpRight />
+            <p>{t("send")}</p>
+          </span>
+        </Button>
+        <Button onClick={() => navigate(RECEIVE)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <BsArrowDownLeft />
+            <p>{t("receive")}</p>
+          </span>
+        </Button>
       </div>
     </div>
   );

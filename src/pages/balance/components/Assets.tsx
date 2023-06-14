@@ -10,7 +10,7 @@ import {
   useNetworkContext,
   useThemeContext,
 } from "@src/providers";
-import { Loading, AssetIcon } from "@src/components/common";
+import { Loading, AssetIcon, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
 import { formatUSDAmount } from "@src/utils/assets";
@@ -129,13 +129,12 @@ export const Assets = () => {
 
       {showManageAssets && (
         <div className="flex justify-center mt-2">
-          <button
-            className={`flex gap-1 items-center text-gray-200 rounded-xl px-2 py-1 hover:bg-${color}-primary hover:bg-opacity-30`}
-            onClick={() => navigate(MANAGE_ASSETS)}
-          >
-            <ImCoinDollar />
-            <span>{t("manage_assets")}</span>
-          </button>
+          <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
+            <span className="flex gap-1 items-center">
+              <ImCoinDollar />
+              <span>{t("manage_assets")}</span>
+            </span>
+          </Button>
         </div>
       )}
     </div>

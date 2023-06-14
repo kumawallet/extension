@@ -3,12 +3,10 @@ import { useNavigate } from "react-router-dom";
 import logo from "/logo.svg";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { ADD_ACCOUNT } from "@src/routes/paths";
-import { FullScreenFAB, SelectLanguage } from "@src/components/common";
-import { useThemeContext } from "@src/providers";
+import { Button, FullScreenFAB, SelectLanguage } from "@src/components/common";
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
-  const { color } = useThemeContext();
 
   const navigate = useNavigate();
 
@@ -28,12 +26,12 @@ export const Welcome = () => {
         <p className="font-light text-xs md:text-sm mb-12 text-center">
           {t("description")}
         </p>
-        <button
-          className={`font-medium text-base bg-${color}-primary w-full py-2 md:py-4 rounded-md mx-auto`}
+        <Button
+          classname="font-medium text-base  w-full py-2 md:py-4 mx-auto"
           onClick={goToAccounts}
         >
           {t("button_text")}
-        </button>
+        </Button>
       </PageWrapper>
       <footer className="fixed bottom-0 left-0 right-0 py-4 px-3 flex justify-end gap-4 max-w-3xl w-full mx-auto">
         <FullScreenFAB />

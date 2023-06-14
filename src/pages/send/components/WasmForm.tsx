@@ -1,9 +1,5 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import {
-  LoadingButton,
-  Loading,
-  ReEnterPassword,
-} from "@src/components/common";
+import { Button, Loading, ReEnterPassword } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -317,7 +313,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         </p>
       )}
 
-      <LoadingButton
+      <Button
         classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
@@ -326,7 +322,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         }}
       >
         {t("continue")}
-      </LoadingButton>
+      </Button>
     </>
   );
 };

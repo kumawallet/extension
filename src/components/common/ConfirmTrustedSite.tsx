@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { PageWrapper } from "./PageWrapper";
-import { useThemeContext } from "@src/providers";
+import { Button } from "./Button";
 
 interface ConfirmTrustedSiteProps {
   confirm: () => void;
@@ -16,7 +16,6 @@ export const ConfirmTrustedSite: FC<ConfirmTrustedSiteProps> = ({
 }) => {
   const { t } = useTranslation("confirm_trusted_site");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
 
   return (
     <PageWrapper contentClassName="h-full">
@@ -39,21 +38,13 @@ export const ConfirmTrustedSite: FC<ConfirmTrustedSiteProps> = ({
             <p className="mt-4">{t("manage_trusted_sites")}</p>
           </div>
         </div>
-        <div className="flex gap-2 justify-end">
-          <button
-            type="button"
-            className={`mt-5 inline-flex justify-center border border-custom-gray-bg text-${color}-secondary rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm`}
-            onClick={cancel}
-          >
+        <div className="flex gap-4 justify-end mt-5 items-center">
+          <Button variant="text" classname="text-sm" onClick={cancel}>
             {tCommon("cancel")}
-          </button>
-          <button
-            type="button"
-            className={`mt-5 ml-4 inline-flex justify-center border border-${color}-primary text-${color}-secondary rounded-lg py-2 px-4 transition duration-500 ease select-none bg-${color}-fill focus:outline-none focus:shadow-outline text-sm`}
-            onClick={confirm}
-          >
+          </Button>
+          <Button classname="text-sm" onClick={confirm}>
             {tCommon("connect")}
-          </button>
+          </Button>
         </div>
       </div>
     </PageWrapper>

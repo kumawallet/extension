@@ -12,10 +12,11 @@ import Account from "@src/storage/entities/Account";
 import { transformAddress } from "@src/utils/account-utils";
 import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import { SiEthereum, SiWebassembly } from "react-icons/si";
+import { Button } from "@src/components/common";
+// import { Logo } from "@src/components/common/Logo";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const {
@@ -54,7 +55,8 @@ export const AccountList = () => {
   return (
     <Menu>
       <Menu.Button data-testid="account-button">
-        <div className="flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer">
+        <div className="flex justify-center items-center rounded-full transition-all bg-[#212529] bg-opacity-30 hover:bg-opacity-50 p-1 cursor-pointer">
+          {/* <Logo className="w-7 h-7" fillColor={`fill-${color}-primary`} /> */}
           <img className="w-5 h-5" src={logo} />
         </div>
       </Menu.Button>
@@ -73,18 +75,20 @@ export const AccountList = () => {
               {t("accounts.accounts")}
             </p>
             <div className="flex justify-between mb-6 mt-3">
-              <button
+              <Button
+                classname="w-[40%]"
                 onClick={() => navigate(IMPORT_ACCOUNT)}
-                className={`border border-${color}-primary text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-${color}-fill focus:outline-none focus:shadow-outline w-[40%]`}
+                variant="outlined"
               >
                 {t("accounts.import")}
-              </button>
-              <button
+              </Button>
+              <Button
+                classname="w-[40%]"
                 onClick={() => navigate(DERIVE_ACCOUNT)}
-                className={`border border-${color}-primary text-white rounded-xl py-2 transition duration-500 ease select-none hover:bg-${color}-fill focus:outline-none focus:shadow-outline w-[40%]`}
+                variant="outlined"
               >
                 {t("accounts.create")}
-              </button>
+              </Button>
             </div>
             <div className="flex flex-col gap-5">
               <Menu.Item>

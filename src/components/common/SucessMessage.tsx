@@ -2,6 +2,7 @@ import { FC } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { PageWrapper } from "./PageWrapper";
 import { useThemeContext } from "@src/providers";
+import { Button } from "./Button";
 
 interface SucessMessageProps {
   title: string;
@@ -26,12 +27,7 @@ export const SucessMessage: FC<SucessMessageProps> = ({
           <FaCheckCircle size={30} />
         </div>
 
-        <button
-          className={`border bg-${color}-primary text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-${color}-primary focus:outline-none focus:shadow-outline w-fit mx-auto`}
-          onClick={onClick}
-        >
-          {buttonText}
-        </button>
+        <Button onClick={onClick}>{buttonText}</Button>
       </div>
     </PageWrapper>
   );

@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { PageWrapper } from "@src/components/common/PageWrapper";
+import { PageWrapper } from "@src/components/common";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
@@ -19,18 +18,7 @@ export const Balance = () => {
   const { state } = useLocation();
   const { color } = useThemeContext();
 
-  const TABS = useMemo(() => {
-    return [
-      {
-        name: t("assets"),
-        component: <Assets />,
-      },
-      {
-        name: t("activity"),
-        component: <Activity />,
-      },
-    ];
-  }, []);
+  const TABS = [t("assets"), t("activity")];
 
   return (
     <>
@@ -45,7 +33,7 @@ export const Balance = () => {
             >
               {TABS.map((tab) => (
                 <Tab
-                  key={tab.name}
+                  key={tab}
                   className={({ selected }) =>
                     `px-4 py-1 focus:outline-none relative ${
                       selected
@@ -54,7 +42,7 @@ export const Balance = () => {
                     }`
                   }
                 >
-                  {tab.name}
+                  {tab}
                 </Tab>
               ))}
             </Tab.List>

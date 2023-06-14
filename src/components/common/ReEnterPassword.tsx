@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-import { LoadingButton } from "./LoadingButton";
+import { Button } from "./Button";
 import { useLoading, useToast } from "@src/hooks";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import Extension from "@src/Extension";
@@ -108,13 +108,13 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
                   </div>
                 </div>
                 <div className="mt-4 flex justify-end">
-                  <LoadingButton
+                  <Button
                     onClick={signIn}
                     isLoading={isLoading}
                     isDisabled={isLoading}
                   >
                     {t("confirm")}
-                  </LoadingButton>
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

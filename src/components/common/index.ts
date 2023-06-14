@@ -5,7 +5,7 @@ export * from "./Error";
 export * from "./FullScreenFAB";
 export * from "./InputErroMessage";
 export * from "./Loading";
-export * from "./LoadingButton";
+export * from "./Button";
 export * from "./PageWrapper";
 export * from "./ReEnterPassword";
 export * from "./SelectLanguage";

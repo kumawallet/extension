@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { LoadingButton } from "@src/components/common";
+import { Button } from "@src/components/common";
 import { cropAccount } from "@src/utils/account-utils";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -168,14 +168,14 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, isLoading, tx }) => {
           <Fees fee={tx?.fee || {}} />
         </div>
       </div>
-      <LoadingButton
+      <Button
         classname={`font-medium text-base bg-${color}-primary w-full py-2 md:py-4 rounded-md`}
         onClick={onConfirm}
         isLoading={isLoading}
         isDisabled={isLoading}
       >
         {t("confirm")}
-      </LoadingButton>
+      </Button>
     </div>
   );
 };

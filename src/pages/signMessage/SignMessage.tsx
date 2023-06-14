@@ -1,9 +1,5 @@
 import { FC } from "react";
-import {
-  LoadingButton,
-  PageWrapper,
-  ReEnterPassword,
-} from "@src/components/common";
+import { Button, PageWrapper, ReEnterPassword } from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import Extension from "@src/Extension";
@@ -119,8 +115,8 @@ export const SignMessage: FC<SignMessageProps> = ({
           </div>
         </div>
         <div className="flex gap-2 justify-end">
-          <LoadingButton onClick={onClose}>{tCommon("cancel")}</LoadingButton>
-          <LoadingButton onClick={sign}>{t("sign")}</LoadingButton>
+          <Button onClick={onClose}>{tCommon("cancel")}</Button>
+          <Button onClick={sign}>{t("sign")}</Button>
         </div>
       </div>
     </PageWrapper>

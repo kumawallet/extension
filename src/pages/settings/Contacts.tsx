@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import {
+  Button,
   InputErrorMessage,
   Loading,
   PageWrapper,
@@ -158,14 +159,13 @@ export const Contacts = () => {
         <p className="font-medium text-2xl">{t("title")}</p>
         {!isCreateContact && (
           <div className="flex-1 flex justify-end">
-            <button
+            <Button
               data-testid="new-contact"
-              type="button"
-              className="inline-flex justify-between items-center rounded-lg border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm"
-              onClick={() => toggleCreateContact()}
+              classname=" text-sm"
+              onClick={toggleCreateContact}
             >
-              <span>{t("new_contact")} </span>
-            </button>
+              {t("new_contact")}
+            </Button>
           </div>
         )}
       </div>
@@ -201,22 +201,21 @@ export const Contacts = () => {
             <InputErrorMessage message={errors.address?.message} />
           </div>
 
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className="mt-5 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
-              onClick={() => toggleCreateContact()}
+          <div className="flex gap-4 justify-end mt-5">
+            <Button
+              variant="text"
+              classname="text-sm"
+              onClick={toggleCreateContact}
             >
               {tCommon("cancel")}
-            </button>
-            <button
+            </Button>
+            <Button
               data-testid="save"
-              type="button"
-              className={`mt-5 ml-4 inline-flex justify-center border border-${color}-fill text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-${color}-primary focus:outline-none focus:shadow-outline text-sm`}
+              classname={`text-sm`}
               onClick={saveContact}
             >
               {tCommon("save")}
-            </button>
+            </Button>
           </div>
         </>
       ) : (

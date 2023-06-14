@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import {
   PageWrapper,
   Loading,
-  LoadingButton,
+  Button,
   ReEnterPassword,
 } from "@src/components/common";
 import { useToast, useLoading } from "@src/hooks";
@@ -203,26 +203,21 @@ export const Security = () => {
         <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("credentials")}</p>
           <div className="p-2">
-            <button
-              type="button"
-              className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+            <Button
+              classname="text-sm font-medium"
               onClick={() => navigate(RESTORE_PASSWORD)}
             >
               {t("restore_password")}
-            </button>
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("show_account_keys")}</p>
           <div className="p-2">
             <div className="relative inset-0 flex items-center justify-center">
-              <button
-                type="button"
-                onClick={openModal}
-                className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-              >
+              <Button onClick={openModal} classname="text-sm font-medium">
                 {tCommon("show")}
-              </button>
+              </Button>
             </div>
             {isOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isOpen} as={Fragment}>
@@ -288,13 +283,13 @@ export const Security = () => {
                             {t("account_keys_description")}
                           </p>
                           <div className="mt-4 flex justify-end">
-                            <button
-                              type="button"
+                            <Button
+                              variant="text"
                               onClick={closeModal}
-                              className={`inline-flex justify-between items-center cursor-pointer rounded-md border border-${color}-primary hover:bg-${color}-primary px-4 py-2 text-sm font-medium`}
+                              classname="text-sm font-medium"
                             >
                               {tCommon("close")}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </Dialog.Panel>
@@ -358,13 +353,13 @@ export const Security = () => {
                             {t("reset_wallet_warning")}
                           </p>
                           <div className="mt-4 flex justify-end">
-                            <LoadingButton
+                            <Button
                               isLoading={isLoadingReset}
                               onClick={resetWallet}
                               classname="inline-flex justify-between items-center cursor-pointer rounded-md border border-custom-red-bg hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
                             >
                               {t("reset")}
-                            </LoadingButton>
+                            </Button>
                           </div>
                         </div>
                       </Dialog.Panel>
