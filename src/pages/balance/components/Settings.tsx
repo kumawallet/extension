@@ -54,7 +54,7 @@ export const Settings = () => {
         <>
           <Menu.Button>
             <div className="flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer">
-              <BsGear color="#469999" />
+              <BsGear className="fill-custom-green-bg" />
             </div>
           </Menu.Button>
           <Transition

@@ -60,6 +60,7 @@ Se agregarán más puentes en el futuro para soportar más cadenas.
 
 **Redes predeterminadas**
 - Astar 
+- Acala
 - Shiden  
 - Moonriver 
 - Moonbeam 
@@ -81,12 +82,20 @@ Se agregarán más puentes en el futuro para soportar más cadenas.
 - MATIC
 - DEV
 - GoerliETH
+- ACA
 
 **Redes de prueba predeterminadas**
+
 - Shibuya
 - Moonbase Alpha
 - Goerli
-
+- Binances Smart Chain Testnet
+- Polygon Testnet Mumbai
+- Sepolia
+- Mandala
+- Rococo
+- Westend
+  
 ## Construcción local
 
 ```bash
