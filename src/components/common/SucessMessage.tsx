@@ -27,7 +27,14 @@ export const SucessMessage: FC<SucessMessageProps> = ({
           <FaCheckCircle size={30} />
         </div>
 
-        <Button onClick={onClick}>{buttonText}</Button>
+        <div className="flex">
+          <Button
+            classname="font-medium text-base max-w-md w-full py-2 md:py-4 mx-auto"
+            onClick={onClick}
+          >
+            {buttonText}
+          </Button>
+        </div>
       </div>
     </PageWrapper>
   );

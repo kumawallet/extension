@@ -74,9 +74,17 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             )}
           </button>
         </div>
-        <Button aria-disabled={!isValid} isDisabled={!isValid} onClick={signIn}>
-          {t("signin_button_text")}
-        </Button>
+
+        <div className="flex">
+          <Button
+            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto"
+            aria-disabled={!isValid}
+            isDisabled={!isValid}
+            onClick={signIn}
+          >
+            {t("signin_button_text")}
+          </Button>
+        </div>
         <p
           className="text-center mb-6"
           onClick={() => navigate(RESTORE_PASSWORD)}

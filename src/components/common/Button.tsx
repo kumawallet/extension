@@ -20,7 +20,7 @@ interface ButtonProps {
 
 const DEFAULT_SPINNER_CLASSNAME = "mx-auto animate-spin fill-white";
 const BASE_CLASSNAME =
-  "min-w-fit min-h-[35px] rounded-lg px-4 py-2 m-2 transition duration-500 ease select-none disabled:opacity-30 disabled:bg-gray-600";
+  "min-w-fit min-h-[35px] w-fit rounded-lg px-4 py-2 m-2 transition duration-500 ease select-none disabled:opacity-30 disabled:bg-gray-600";
 
 const getVariantStyles = (
   variant: ButtonProps["variant"],

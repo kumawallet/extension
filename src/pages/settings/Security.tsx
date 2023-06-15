@@ -70,6 +70,8 @@ export const Security = () => {
     startLoadingReset();
     try {
       await Extension.resetWallet();
+      localStorage.removeItem("welcome");
+      localStorage.removeItem("color");
       window.location.reload();
     } catch (error) {
       showErrorToast(tCommon(error as string));
@@ -221,7 +223,13 @@ export const Security = () => {
             </div>
             {isOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isOpen} as={Fragment}>
-              <Dialog as="div" className="relative z-10" onClose={closeModal}>
+              <Dialog
+                as="div"
+                className="relative z-10"
+                onClose={() => null}
+
+                // onClose={closeModal}
+              >
                 <Transition.Child
                   as={Fragment}
                   enter="ease-out duration-300"
@@ -317,7 +325,8 @@ export const Security = () => {
               <Dialog
                 as="div"
                 className="relative z-10"
-                onClose={!isLoadingReset ? closeResetModal : () => null}
+                onClose={() => null}
+                // onClose={!isLoadingReset ? closeResetModal : () => null}
               >
                 <Transition.Child
                   as={Fragment}

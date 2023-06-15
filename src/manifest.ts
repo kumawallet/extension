@@ -33,7 +33,6 @@ const POPUP = "src/entries/popup/index.html";
 const manifestV3: chrome.runtime.ManifestV3 = {
   ...commonManifest,
   manifest_version: 3,
-  // options_page: "src/entries/options/index.html",
   background: {
     service_worker: BACKGROUND,
     type: "module",
@@ -53,7 +52,6 @@ const manifestV3: chrome.runtime.ManifestV3 = {
       matches: ["<all_urls>"],
     },
   ],
-  // devtools_page: "src/devtools/index.html",
   content_security_policy: {
     extension_pages: SECURITY,
   },
@@ -62,7 +60,6 @@ const manifestV3: chrome.runtime.ManifestV3 = {
 const manifestV2: chrome.runtime.ManifestV2 = {
   ...commonManifest,
   manifest_version: 2,
-
   browser_action: {
     default_popup: POPUP,
     default_title: "Open the popup",

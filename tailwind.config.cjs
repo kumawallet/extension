@@ -52,9 +52,9 @@ module.exports = {
             fill: "#f3ba2f",
           },
           default: {
-            primary: "#469999",
+            primary: "#7a49d8",
             secondary: "#fff",
-            fill: "#469999",
+            fill: "#7a49d8",
           },
           ethereum: {
             primary: "#6975b0",

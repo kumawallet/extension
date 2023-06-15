@@ -1,6 +1,5 @@
 import { Fragment, useMemo } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,12 +11,13 @@ import Account from "@src/storage/entities/Account";
 import { transformAddress } from "@src/utils/account-utils";
 import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import { SiEthereum, SiWebassembly } from "react-icons/si";
-import { Button } from "@src/components/common";
-// import { Logo } from "@src/components/common/Logo";
+import { Button, Logo } from "@src/components/common";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
+
+  const { color } = useThemeContext();
 
   const {
     state: { selectedChain },
@@ -56,8 +56,7 @@ export const AccountList = () => {
     <Menu>
       <Menu.Button data-testid="account-button">
         <div className="flex justify-center items-center rounded-full transition-all bg-[#212529] bg-opacity-30 hover:bg-opacity-50 p-1 cursor-pointer">
-          {/* <Logo className="w-7 h-7" fillColor={`fill-${color}-primary`} /> */}
-          <img className="w-5 h-5" src={logo} />
+          <Logo className="w-7 h-7" fillClassName={`fill-${color}-primary`} />
         </div>
       </Menu.Button>
       <Transition

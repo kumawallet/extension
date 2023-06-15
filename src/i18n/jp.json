@@ -33,7 +33,8 @@
     "accounts_not_found": "アカウントが見つかりません",
     "network_not_found": "ネットワークが見つかりません",
     "contact_not_found": "連絡先は見つかりません",
-    "no_contacts_found": "連絡先が存在しません"
+    "no_contacts_found": "連絡先が存在しません",
+    "error": "エラーが発生しました"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
