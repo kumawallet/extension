@@ -43,7 +43,7 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
 
   return (
     <Transition appear show={showDialog} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => null}>
+      <Dialog as="div" className="relative z-50" onClose={() => null}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -67,7 +67,7 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-custom-gray-bg p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-custom-gray-bg p-6 text-left align-middle shadow-xl transition-all z-50">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 "
