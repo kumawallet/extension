@@ -8,7 +8,7 @@ Kuma Wallet
 </p>
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kumawallet/extension/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kumawallet/extension/tree/main)
-[![Coverage Status](https://coveralls.io/repos/github/kumawallet/extension/badge.svg?branch=main)](https://coveralls.io/github/kumawallet/extension?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/blockcoders/extension/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/extension?branch=main)
 [![CodeQL](https://github.com/kumawallet/extension/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/kumawallet/extension/actions/workflows/codeql-analysis.yml)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
