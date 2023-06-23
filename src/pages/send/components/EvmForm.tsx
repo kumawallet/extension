@@ -105,6 +105,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             address: destinationAccount,
             amount: bnAmount,
             assetSymbol: asset.symbol,
+            xcmPalletVersion: "",
           }) as MapResponseEVM;
 
           const contract = new ethers.Contract(

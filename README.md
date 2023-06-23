@@ -61,6 +61,7 @@ More bridges will be added in the future to support more chains.
 
 **Default Networks**
 - Astar 
+- Acala
 - Shiden  
 - Moonriver 
 - Moonbeam 
@@ -69,6 +70,7 @@ More bridges will be added in the future to support more chains.
 - Binance Smart Chain 
 - Ethereum
 - Polygon
+- Astar
 
 **Default Tokens**
 - ASTR
@@ -82,12 +84,19 @@ More bridges will be added in the future to support more chains.
 - MATIC
 - DEV
 - GoerliETH
+- ACA
 
 **Default Testnets**
 
 - Shibuya
 - Moonbase Alpha
 - Goerli
+- Binances Smart Chain Testnet
+- Polygon Testnet Mumbai
+- Sepolia
+- Mandala
+- Rococo
+- Westend
 
 ## Building locally
 
@@ -242,7 +251,7 @@ When attempting to call a contract method in Kuma Wallet, a pop-up will appear r
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
 
 ## Localization
-Kuma currently only supports English, Spanish and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/blockcoders/kuma-wallet/tree/main/src/i18n) folder.
+Kuma currently only supports English, Spanish, Italian and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/blockcoders/kuma-wallet/tree/main/src/i18n) folder.
 
 ## Credits
 
