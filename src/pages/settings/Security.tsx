@@ -226,9 +226,7 @@ export const Security = () => {
               <Dialog
                 as="div"
                 className="relative z-10"
-                onClose={() => null}
-
-                // onClose={closeModal}
+                onClose={() => (!isOpen ? closeModal() : false)}
               >
                 <Transition.Child
                   as={Fragment}
@@ -325,8 +323,9 @@ export const Security = () => {
               <Dialog
                 as="div"
                 className="relative z-10"
-                onClose={() => null}
-                // onClose={!isLoadingReset ? closeResetModal : () => null}
+                onClose={
+                  !isLoadingReset && !isResetOpen ? closeResetModal : () => null
+                }
               >
                 <Transition.Child
                   as={Fragment}

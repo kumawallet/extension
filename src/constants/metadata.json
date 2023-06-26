@@ -7,7 +7,7 @@
   "contract": {
     "name": "erc20",
     "version": "0.1.0",
-    "authors": ["Blockcoders <https://blockcoders.io/>"]
+    "authors": ["Blockcoders <https://kumawallet.io/>"]
   },
   "V3": {
     "spec": {

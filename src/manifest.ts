@@ -5,7 +5,7 @@ const commonManifest = {
   name: pkg.displayName,
   content_scripts: [
     {
-      matches: ["http://*/*", "https://*/*", "<all_urls>"],
+      matches: ["file://*/*", "http://*/*", "https://*/*"],
       run_at: "document_end",
       js: ["src/entries/content/index.js"],
     },
@@ -18,7 +18,6 @@ const commonManifest = {
     "storage",
     "activeTab",
     "scripting",
-    "nativeMessaging",
     "tabs",
     "notifications",
   ] as chrome.runtime.ManifestPermissions[],

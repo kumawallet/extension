@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/06/23**
+- [#14](https://github.com/blockcoders/kuma-wallet/pull/14) New branding
+- [#13](https://github.com/blockcoders/kuma-wallet/pull/13) Adding testnets 
+
 ## 0.2.0
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/05/07**
 - [#12](https://github.com/blockcoders/kuma-wallet/pull/12) Milestone 3

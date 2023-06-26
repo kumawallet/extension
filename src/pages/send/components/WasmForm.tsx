@@ -119,12 +119,19 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const isXcm = getValues("isXcm");
 
       if (isXcm) {
+        const query = (api as ApiPromise).query;
+
+        const xcmPallet = query.polkadotXcm || query.xcmPallet;
+
+        const xcmPalletVersion = await xcmPallet.palletVersion();
+
         const { method, pallet, extrinsicValues } = XCM_MAPPING[
           selectedChain.name
         ][to.name]({
           address: destinationAccount,
           amount: bnAmount,
           assetSymbol: asset.symbol,
+          xcmPalletVersion: xcmPalletVersion.toString(),
         }) as MapResponseXCM;
 
         extrinsic = _api.tx[pallet][method](

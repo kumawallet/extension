@@ -162,36 +162,39 @@ export const ChainSelector = () => {
                         <div className="h-[1px] w-full bg-[#343A40]" />
                       </div>
                     )}
-                    {filteredChains[
-                      spec as "mainnets" | "testnets" | "custom"
-                    ].map((chain, index) => (
-                      <Menu.Item key={index.toString()}>
-                        {({ close }) => (
-                          <div
-                            className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
-                            onClick={() => {
-                              selecteNetwork(chain, close);
-                            }}
-                          >
-                            <img
-                              src={`/images/${chain.logo}.png`}
-                              width={30}
-                              height={30}
-                              alt={chain.name}
-                              className="object-cover rounded-full"
-                            />
-                            <div className="flex gap-3 items-center">
-                              <p className="text-xl">{chain.name}</p>
-                              {chain.name === selectedChain?.name && (
-                                <p className={`text-${color}-primary`}>
-                                  {t("chain_selector.connected")}
-                                </p>
-                              )}
+                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
+                      .filter(({ name }) =>
+                        name.toLowerCase().includes(search.toLowerCase())
+                      )
+                      .map((chain, index) => (
+                        <Menu.Item key={index.toString()}>
+                          {({ close }) => (
+                            <div
+                              className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                              onClick={() => {
+                                selecteNetwork(chain, close);
+                              }}
+                            >
+                              <img
+                                src={`/images/${chain.logo}.png`}
+                                width={30}
+                                height={30}
+                                alt={chain.name}
+                                className="object-cover rounded-full"
+                              />
+                              {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
+                              <div className="flex gap-3 items-center">
+                                <p className="text-xl">{chain.name}</p>
+                                {chain.name === selectedChain?.name && (
+                                  <p className="text-[#56DF53]">
+                                    {t("chain_selector.connected")}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </Menu.Item>
-                    ))}
+                          )}
+                        </Menu.Item>
+                      ))}
                   </div>
                 ))}
               </div>

@@ -160,7 +160,10 @@ export default class Extension {
   static async showKey(): Promise<string | undefined> {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
     if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
-    const { keyring: type, address } = selectedAccount.value;
+    const { keyring: type } = selectedAccount.value;
+
+    const address = selectedAccount.key.split("-")[1];
+
     const keyring = await Vault.getKeyring(type);
     return keyring.getKey(address);
   }

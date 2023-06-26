@@ -28,6 +28,13 @@ describe("WasmForm", () => {
       useNetworkContext: () => ({
         state: {
           api: {
+            query: {
+              polkadotXcm: {
+                palletVersion: () => ({
+                  toString: () => "0",
+                }),
+              },
+            },
             registry: {
               createType: () => new BN("1000000"),
             },

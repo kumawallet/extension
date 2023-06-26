@@ -414,6 +414,7 @@ describe("Extension", () => {
           address: "EVM-1234",
           keyring: "EVM",
         },
+        key: "EVM-1234",
       });
 
       const Vault = (await import("./storage/entities/Vault")).default;

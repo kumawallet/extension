@@ -4,12 +4,12 @@ Kuma Wallet
 > Kuma is a work in progress. The documentation may not reflect the current implementation. **Expect a stable release and proper documentation for Q3 2023**.
 
 <p align="center">
-  <img src="./images/logo.svg" />
+  <img width="630" src="./images/logo.svg" />
 </p>
 
-[![CircleCI](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main.svg?style=svg)](https://circleci.com/gh/blockcoders/kuma-wallet/tree/main)
-[![Coverage Status](https://coveralls.io/repos/github/blockcoders/kuma-wallet/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/kuma-wallet?branch=main)
-[![CodeQL](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/blockcoders/kuma-wallet/actions/workflows/codeql-analysis.yml)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/kumawallet/extension/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kumawallet/extension/tree/main)
+[![Coverage Status](https://coveralls.io/repos/github/blockcoders/extension/badge.svg?branch=main)](https://coveralls.io/github/blockcoders/extension?branch=main)
+[![CodeQL](https://github.com/kumawallet/extension/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/kumawallet/extension/actions/workflows/codeql-analysis.yml)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -61,6 +61,7 @@ More bridges will be added in the future to support more chains.
 
 **Default Networks**
 - Astar 
+- Acala
 - Shiden  
 - Moonriver 
 - Moonbeam 
@@ -69,6 +70,7 @@ More bridges will be added in the future to support more chains.
 - Binance Smart Chain 
 - Ethereum
 - Polygon
+- Astar
 
 **Default Tokens**
 - ASTR
@@ -82,12 +84,19 @@ More bridges will be added in the future to support more chains.
 - MATIC
 - DEV
 - GoerliETH
+- ACA
 
 **Default Testnets**
 
 - Shibuya
 - Moonbase Alpha
 - Goerli
+- Binances Smart Chain Testnet
+- Polygon Testnet Mumbai
+- Sepolia
+- Mandala
+- Rococo
+- Westend
 
 ## Building locally
 
@@ -242,7 +251,7 @@ When attempting to call a contract method in Kuma Wallet, a pop-up will appear r
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
 
 ## Localization
-Kuma currently only supports English, Spanish and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/blockcoders/kuma-wallet/tree/main/src/i18n) folder.
+Kuma currently only supports English, Spanish, Italian and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/kumawallet/extension/tree/main/src/i18n) folder.
 
 ## Credits
 
