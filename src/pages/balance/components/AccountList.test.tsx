@@ -26,6 +26,9 @@ describe("AccountList", () => {
           JsonRpcProvider: vi.fn().mockResolvedValue({ getBalance: () => 0 }),
         },
       },
+      BigNumber: {
+        from: vi.fn().mockReturnValue(0),
+      },
     }));
     vi.mock("@polkadot/api", () => ({
       ApiPromise: {
