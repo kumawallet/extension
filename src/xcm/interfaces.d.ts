@@ -4,6 +4,7 @@ export interface ExtrinsicValues {
   address: string;
   amount: BN | BigNumberish | string;
   assetSymbol?: string;
+  xcmPalletVersion: string;
 }
 
 export interface MapResponseXCM {

@@ -8,10 +8,15 @@ type fungibleAsset = BN | BigNumberish | string;
 type parents = 0 | 1;
 type interior = "Here" | unknown;
 
+export const XCM_DEFAULT_VERSIONS: { [key: string]: Version } = {
+  "0": "V1",
+  "1": "V2",
+};
+
 export const getDest = ({
   parents = 0,
   parachainId = null,
-  version = "V1",
+  version = "V2",
 }: {
   parents?: number;
   parachainId?: number | null;
@@ -34,7 +39,7 @@ export const getDest = ({
 };
 
 export const getAssets = ({
-  version = "V1",
+  version = "V2",
   fungible = BN0,
   interior = "Here",
   parents = 0,
@@ -86,7 +91,7 @@ export const transformAddress = (address: string) => {
 
 export const getBeneficiary = ({
   address = "",
-  version = "V1",
+  version = "V2",
   account = "AccountId32",
   parents = 0,
 }: {

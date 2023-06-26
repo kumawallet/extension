@@ -3,120 +3,142 @@ import {
   POLKADOT_PARACHAINS,
   RELAY_CHAINS,
 } from "@src/constants/chains";
-import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
+import {
+  XCM,
+  XCM_DEFAULT_VERSIONS,
+  getBeneficiary,
+  transformAddress,
+} from "../utils";
 import { Map } from "../interfaces";
 
 export const ACALA_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.POLKADOT]: ({ address, amount }) => ({
+  [RELAY_CHAINS.POLKADOT]: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
-    method: XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS,
+    method: XCM.pallets.X_TOKENS.methods.TRANSFER,
     extrinsicValues: {
-      dest: getDest({
-        parents: 1,
-      }),
-      beneficiary: getBeneficiary({
+      currencyId: {
+        Token: "DOT",
+      },
+      amount,
+      dest: getBeneficiary({
         address,
-      }),
-      assets: getAssets({
-        fungible: amount,
         parents: 1,
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
-      feeAssetItem: 0,
+      destWeightLimit: "Unlimited",
     },
   }),
 
-  [PARACHAINS.MOONBEAM]: ({ address, amount, assetSymbol }) => {
-    let assets = null;
+  [PARACHAINS.ASTAR]: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+    let currencyId = null;
+    const destWeightLimit = "Unlimited";
+
     switch (assetSymbol?.toLowerCase()) {
-      case "astr": {
-        assets = getAssets({
-          fungible: amount,
-        });
+      case "aca": {
+        currencyId = {
+          Token: "ACA",
+        };
         break;
       }
-      case "glmr": {
-        assets = getAssets({
-          fungible: amount,
-          interior: {
-            X2: [
-              {
-                Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
-              },
-              {
-                PalletInstance: 10,
-              },
-            ],
-          },
-        });
+
+      case "astr": {
+        currencyId = {
+          ForeignAsset: 2,
+        };
         break;
       }
       default:
         throw new Error("Invalid asset symbol");
     }
+
+    const { accountId } = transformAddress(address);
+
     return {
-      pallet: XCM.pallets.POLKADOT_XCM.NAME,
-      method: XCM.pallets.POLKADOT_XCM.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
+      pallet: XCM.pallets.X_TOKENS.NAME,
+      method: XCM.pallets.X_TOKENS.methods.TRANSFER,
       extrinsicValues: {
-        dest: getDest({
-          parents: 1,
-          parachainId: POLKADOT_PARACHAINS.MOONBEAM.id,
-        }),
-        beneficiary: getBeneficiary({
-          address,
-          account: "AccountKey20",
-        }),
-        assets,
-        feeAssetItem: 0,
-        weightLimit: "Unlimited",
+        currencyId,
+        amount,
+        dest: {
+          [XCM_DEFAULT_VERSIONS[xcmPalletVersion]]: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.ASTAR.id,
+                },
+                {
+                  AccountId32: {
+                    network: "Any",
+                    id: accountId,
+                  },
+                },
+              ],
+            },
+          },
+        },
+        destWeightLimit,
       },
     };
   },
 
-  [PARACHAINS.ACALA]: ({ address, amount, assetSymbol }) => {
-    let assets = null;
-    let method = null;
+  [PARACHAINS.MOONBEAM]: ({
+    address,
+    amount,
+    assetSymbol,
+    xcmPalletVersion,
+  }) => {
+    let currencyId = null;
+    let destWeightLimit: string | { Limited: number } = "Unlimited";
 
     switch (assetSymbol?.toLowerCase()) {
-      case "astr": {
-        method = XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS;
-        assets = getAssets({
-          fungible: amount,
-        });
+      case "aca": {
+        currencyId = {
+          Token: "ACA",
+        };
+        destWeightLimit = {
+          Limited: 1_000_000_000,
+        };
         break;
       }
-      case "aca": {
-        method = XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS;
-        assets = getAssets({
-          fungible: amount,
-          interior: {
-            X2: [
-              {
-                Parachain: POLKADOT_PARACHAINS.ACALA.id,
-              },
-              {
-                GeneralKey: "0x0000",
-              },
-            ],
-          },
-        });
+
+      case "glmr": {
+        currencyId = {
+          ForeignAsset: 0,
+        };
         break;
       }
       default:
         throw new Error("Invalid asset symbol");
     }
+
+    const { accountId } = transformAddress(address);
+
     return {
-      pallet: XCM.pallets.POLKADOT_XCM.NAME,
-      method,
+      pallet: XCM.pallets.X_TOKENS.NAME,
+      method: XCM.pallets.X_TOKENS.methods.TRANSFER,
       extrinsicValues: {
-        dest: getDest({
-          parents: 1,
-          parachainId: POLKADOT_PARACHAINS.ACALA.id,
-        }),
-        beneficiary: getBeneficiary({
-          address,
-        }),
-        assets,
-        feeAssetItem: 0,
+        currencyId,
+        amount,
+        dest: {
+          [XCM_DEFAULT_VERSIONS[xcmPalletVersion]]: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
+                },
+                {
+                  AccountKey20: {
+                    network: "Any",
+                    key: accountId,
+                  },
+                },
+              ],
+            },
+          },
+        } as unknown,
+        destWeightLimit,
       },
     };
   },

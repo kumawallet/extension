@@ -3,39 +3,55 @@ import {
   POLKADOT_PARACHAINS,
   RELAY_CHAINS,
 } from "@src/constants/chains";
-import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
+import {
+  XCM,
+  XCM_DEFAULT_VERSIONS,
+  getAssets,
+  getBeneficiary,
+  getDest,
+} from "../utils";
 import { Map } from "../interfaces";
 
 export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.POLKADOT]: ({ address, amount }) => ({
+  [RELAY_CHAINS.POLKADOT]: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
     method: XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS,
     extrinsicValues: {
       dest: getDest({
         parents: 1,
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       beneficiary: getBeneficiary({
         address,
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       assets: getAssets({
         fungible: amount,
         parents: 1,
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       feeAssetItem: 0,
     },
   }),
 
-  [PARACHAINS.MOONBEAM]: ({ address, amount, assetSymbol }) => {
+  [PARACHAINS.MOONBEAM]: ({
+    address,
+    amount,
+    assetSymbol,
+    xcmPalletVersion,
+  }) => {
     let assets = null;
     switch (assetSymbol?.toLowerCase()) {
       case "astr": {
         assets = getAssets({
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
           fungible: amount,
         });
         break;
       }
       case "glmr": {
         assets = getAssets({
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
           fungible: amount,
           interior: {
             X2: [
@@ -60,10 +76,12 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
         dest: getDest({
           parents: 1,
           parachainId: POLKADOT_PARACHAINS.MOONBEAM.id,
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
         }),
         beneficiary: getBeneficiary({
           address,
           account: "AccountKey20",
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
         }),
         assets,
         feeAssetItem: 0,
@@ -72,7 +90,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.ACALA]: ({ address, amount, assetSymbol }) => {
+  [PARACHAINS.ACALA]: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let assets = null;
     let method = null;
 
@@ -80,6 +98,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
       case "astr": {
         method = XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS;
         assets = getAssets({
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
           fungible: amount,
         });
         break;
@@ -87,6 +106,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
       case "aca": {
         method = XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS;
         assets = getAssets({
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
           fungible: amount,
           interior: {
             X2: [
@@ -111,9 +131,11 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
         dest: getDest({
           parents: 1,
           parachainId: POLKADOT_PARACHAINS.ACALA.id,
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
         }),
         beneficiary: getBeneficiary({
           address,
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
         }),
         assets,
         feeAssetItem: 0,
