@@ -12,6 +12,7 @@ import {
   formatAmountWithDecimals,
   getAssetUSDPrice,
   getNatitveAssetBalance,
+  getSubtrateNativeBalance,
   getWasmAssets,
 } from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
@@ -68,15 +69,28 @@ export const reducer = (state: InitialState, action: Action) => {
     }
     case "update-one-asset": {
       const {
-        asset: { newValue, updatedBy, updatedByValue },
+        asset: {
+          balance,
+          frozen = "0",
+          reserved = "0",
+          transferable = "0",
+          updatedBy,
+          updatedByValue,
+        },
       } = action.payload;
       const assets = [...state.assets];
 
       const index = assets.findIndex(
         (asset) => asset[updatedBy] === updatedByValue
       );
-      if (index > -1 && !newValue.eq(assets[index].balance)) {
-        assets[index].balance = newValue;
+      if (index > -1 && !balance.eq(assets[index].balance)) {
+        assets[index] = {
+          ...assets[index],
+          balance,
+          frozen,
+          reserved,
+          transferable,
+        };
         return {
           ...state,
           assets,
@@ -113,11 +127,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
+
       assets = [
         {
           id: "-1",
           ...selectedChain?.nativeCurrency,
-          balance: _nativeBalance,
+          ..._nativeBalance,
         },
         ..._assets.map((asset) => ({
           ...asset,
@@ -147,23 +162,36 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,
     account: AccountEntity
   ) => {
-    const nativeAsset = await getNatitveAssetBalance(
-      api,
-      account.value.address
-    );
+    const amounts = await getNatitveAssetBalance(api, account.value.address);
 
     // suscribers for native asset balance update
     if (type === "WASM") {
       const unsub = await (api as ApiPromise).query.system.account(
-        selectedAccount.value.address,
-        ({ data }: { data: { free: string } }) => {
+        account.value.address,
+        ({
+          data,
+        }: {
+          data: {
+            free: string;
+            reserved: string;
+            miscFrozen?: string;
+            frozen?: string;
+            feeFrozen?: string;
+          };
+        }) => {
+          const { transferable, reserved, balance, frozen } =
+            getSubtrateNativeBalance(data);
+
           dispatch({
             type: "update-one-asset",
             payload: {
               asset: {
                 updatedBy: "id",
                 updatedByValue: "-1",
-                newValue: new BN(String(data?.free) || 0),
+                balance,
+                transferable,
+                reserved,
+                frozen,
               },
             },
           });
@@ -183,7 +211,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               asset: {
                 updatedBy: "id",
                 updatedByValue: "-1",
-                newValue: balance,
+                balance,
               },
             },
           });
@@ -191,7 +219,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       });
     }
 
-    return nativeAsset;
+    return amounts;
   };
 
   const getOtherAssets = async () => {
@@ -217,14 +245,14 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api as ApiPromise,
       selectedChain.name,
       selectedAccount.value.address,
-      (assetId: string, newValue: BN) => {
+      (assetId: string, balance: BN) => {
         dispatch({
           type: "update-one-asset",
           payload: {
             asset: {
               updatedBy: "id",
               updatedByValue: assetId,
-              newValue: newValue,
+              balance,
             },
           },
         });
@@ -279,7 +307,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                       asset: {
                         updatedBy: "id",
                         updatedByValue: assets[index].id,
-                        newValue: balance,
+                        balance,
                       },
                     },
                   });
@@ -394,7 +422,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               asset: {
                 updatedBy: "address",
                 updatedByValue: asset.address as string,
-                newValue: balance,
+                balance,
               },
             },
           });

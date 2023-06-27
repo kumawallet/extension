@@ -15,31 +15,40 @@ import { AnyTuple } from "@polkadot/types-codec/types";
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
   accountAddress: string
-): Promise<BN | BigNumberish> => {
+) => {
+  const _amounts = {
+    balance: BN0,
+  };
   try {
-    const _amount = BN0;
-
-    if (!api) return _amount;
+    if (!api) return _amounts;
 
     if ("query" in api) {
       const { data } = (await api.query.system?.account(
         accountAddress
       )) as unknown as {
-        data: { free: BN };
+        data: {
+          free: string;
+          reserved: string;
+          miscFrozen?: string;
+          frozen?: string;
+          feeFrozen?: string;
+        };
       };
 
-      return data.free;
+      return getSubtrateNativeBalance(data);
     }
 
     if ("getBalance" in api) {
       const amount = await api.getBalance(accountAddress);
-      return amount;
+      return {
+        balance: amount,
+      };
     }
 
-    return _amount;
+    return _amounts;
   } catch (error) {
     captureError(error);
-    return BN0;
+    return _amounts;
   }
 };
 
@@ -262,5 +271,29 @@ export const getWasmAssets = async (
   return {
     assets,
     unsubs,
+  };
+};
+
+export const getSubtrateNativeBalance = (data: {
+  free: string;
+  reserved: string;
+  miscFrozen?: string;
+  frozen?: string;
+  feeFrozen?: string;
+}) => {
+  const free = new BN(String(data?.free || 0));
+  const reserved = new BN(String(data?.reserved || 0));
+  const miscFrozen = new BN(String(data?.miscFrozen || data?.frozen || 0));
+  const feeFrozen = new BN(String(data?.feeFrozen || 0));
+
+  const frozen = miscFrozen.add(feeFrozen);
+
+  const transferable = free.sub(frozen).sub(reserved);
+
+  return {
+    balance: free,
+    transferable,
+    reserved,
+    frozen,
   };
 };
