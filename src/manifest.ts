@@ -5,7 +5,7 @@ const commonManifest = {
   name: pkg.displayName,
   content_scripts: [
     {
-      matches: ["http://*/*", "https://*/*", "<all_urls>"],
+      matches: ["file://*/*", "http://*/*", "https://*/*"],
       run_at: "document_end",
       js: ["src/entries/content/index.js"],
     },
@@ -18,7 +18,6 @@ const commonManifest = {
     "storage",
     "activeTab",
     "scripting",
-    "nativeMessaging",
     "tabs",
     "notifications",
   ] as chrome.runtime.ManifestPermissions[],
@@ -33,7 +32,6 @@ const POPUP = "src/entries/popup/index.html";
 const manifestV3: chrome.runtime.ManifestV3 = {
   ...commonManifest,
   manifest_version: 3,
-  // options_page: "src/entries/options/index.html",
   background: {
     service_worker: BACKGROUND,
     type: "module",
@@ -53,7 +51,6 @@ const manifestV3: chrome.runtime.ManifestV3 = {
       matches: ["<all_urls>"],
     },
   ],
-  // devtools_page: "src/devtools/index.html",
   content_security_policy: {
     extension_pages: SECURITY,
   },
