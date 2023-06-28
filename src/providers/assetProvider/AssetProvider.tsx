@@ -23,7 +23,7 @@ import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import { BN0, PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
 import { IAsset } from "@src/types";
@@ -70,10 +70,10 @@ export const reducer = (state: InitialState, action: Action) => {
     case "update-one-asset": {
       const {
         asset: {
-          balance,
-          frozen = "0",
-          reserved = "0",
-          transferable = "0",
+          balance = BN0,
+          frozen = BN0,
+          reserved = BN0,
+          transferable = BN0,
           updatedBy,
           updatedByValue,
         },
@@ -83,7 +83,7 @@ export const reducer = (state: InitialState, action: Action) => {
       const index = assets.findIndex(
         (asset) => asset[updatedBy] === updatedByValue
       );
-      if (index > -1 && !balance.eq(assets[index].balance)) {
+      if (index > -1 && !balance?.eq(assets[index].balance)) {
         assets[index] = {
           ...assets[index],
           balance,
@@ -162,12 +162,14 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,
     account: AccountEntity
   ) => {
-    const amounts = await getNatitveAssetBalance(api, account.value.address);
+    const address = account.value.address;
+
+    const amounts = await getNatitveAssetBalance(api, address);
 
     // suscribers for native asset balance update
     if (type === "WASM") {
       const unsub = await (api as ApiPromise).query.system.account(
-        account.value.address,
+        address,
         ({
           data,
         }: {
@@ -245,14 +247,25 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api as ApiPromise,
       selectedChain.name,
       selectedAccount.value.address,
-      (assetId: string, balance: BN) => {
+      (
+        assetId: string,
+        amounts: {
+          balance: BN;
+          frozen: BN;
+          reserved: BN;
+          transferable: BN;
+        }
+      ) => {
         dispatch({
           type: "update-one-asset",
           payload: {
             asset: {
               updatedBy: "id",
               updatedByValue: assetId,
-              balance,
+              balance: amounts.balance,
+              frozen: amounts.frozen,
+              reserved: amounts.reserved,
+              transferable: amounts.transferable,
             },
           },
         });

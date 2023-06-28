@@ -11,6 +11,7 @@ import { selectedWASMChainMock } from "@src/tests/mocks/chain-mocks";
 import { AccountType } from "@src/accounts/types";
 import { stringToU8a } from "@polkadot/util";
 import { render, waitFor } from "@testing-library/react";
+import { BN0 } from "@src/constants/assets";
 
 const testIds = {
   loadAssetsBtn: "load-assets-btn",
@@ -312,6 +313,9 @@ describe("AssetProvider", () => {
               symbol: "USD",
               decimals: 2,
               amount: 100,
+              frozen: BN0,
+              reserved: BN0,
+              transferable: BN0,
             },
           ],
           isLoadingAssets: false,
@@ -322,7 +326,10 @@ describe("AssetProvider", () => {
             asset: {
               updatedBy: "id",
               updatedByValue: "1",
-              newValue: new BN("200"),
+              balance: new BN("200"),
+              frozen: BN0,
+              reserved: BN0,
+              transferable: BN0,
             },
           },
         }
@@ -333,6 +340,9 @@ describe("AssetProvider", () => {
             id: "1",
             name: "Asset 1",
             balance: new BN("200"),
+            frozen: BN0,
+            reserved: BN0,
+            transferable: BN0,
             symbol: "USD",
             decimals: 2,
             amount: 100,

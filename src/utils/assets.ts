@@ -116,7 +116,15 @@ export const getWasmAssets = async (
   api: ApiPromise,
   chainName: string,
   address: string,
-  dispatch: (assetId: string, newValue: BN) => void
+  dispatch: (
+    assetId: string,
+    amounts: {
+      balance: BN;
+      frozen: BN;
+      reserved: BN;
+      transferable: BN;
+    }
+  ) => void
 ) => {
   const assets: Asset[] = [];
   const unsubs: unknown[] = [];
@@ -209,6 +217,9 @@ export const getWasmAssets = async (
         name,
         symbol,
         balance,
+        frozen: BN0,
+        reserved: BN0,
+        transferable: balance,
         decimals,
         aditionalData,
       });
@@ -229,12 +240,17 @@ export const getWasmAssets = async (
             toJSON: () => {
               balance: number | string;
               free: number;
+              isFrozen?: boolean;
+              reserved?: number;
+              frozen?: number;
             };
           }) => {
             const result = data.toJSON();
             let balance = BN0;
+            let frozen = BN0;
+            let reserved = BN0;
 
-            if (result?.balance) {
+            if (result?.balance && !result.isFrozen) {
               if (typeof result?.balance === "number") {
                 balance = new BN(String(result?.balance));
               }
@@ -244,6 +260,19 @@ export const getWasmAssets = async (
                 (result.balance as string).startsWith("0x")
               ) {
                 balance = hexToBn(result.balance);
+              }
+            }
+
+            if (result?.balance && result.isFrozen) {
+              if (typeof result?.balance === "number") {
+                frozen = new BN(String(result?.balance));
+              }
+
+              if (
+                typeof result.balance === "string" &&
+                (result.balance as string).startsWith("0x")
+              ) {
+                frozen = hexToBn(result.balance);
               }
             }
 
@@ -258,7 +287,34 @@ export const getWasmAssets = async (
               }
             }
 
-            dispatch(asset.id, balance);
+            if (result?.reserved) {
+              if (
+                typeof result?.reserved === "string" &&
+                String(result.reserved)?.startsWith("0x")
+              ) {
+                reserved = hexToBn(result.reserved);
+              } else {
+                reserved = new BN(String(result?.reserved));
+              }
+            }
+
+            if (result?.frozen) {
+              if (
+                typeof result?.frozen === "string" &&
+                String(result.frozen)?.startsWith("0x")
+              ) {
+                frozen = hexToBn(result.frozen);
+              } else {
+                frozen = new BN(String(result?.frozen));
+              }
+            }
+
+            dispatch(asset.id, {
+              balance,
+              frozen,
+              reserved,
+              transferable: balance.sub(frozen).sub(reserved),
+            });
           }
         );
 

@@ -1,4 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
+import { BN } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
 import {
   formatAmountWithDecimals,
@@ -37,7 +38,12 @@ describe("assets", () => {
       } as unknown;
 
       const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
-      expect(result).toEqual(10);
+      expect(result).toEqual({
+        balance: new BN(10),
+        frozen: new BN(0),
+        reserved: new BN(0),
+        transferable: new BN(10),
+      });
     });
 
     it("should use ethereum api", async () => {
@@ -49,18 +55,24 @@ describe("assets", () => {
         api as ethers.providers.JsonRpcProvider,
         "0x123"
       );
-      expect(result).toEqual(2);
+      expect(result).toEqual({
+        balance: 2,
+      });
     });
 
     it("should return same amount", async () => {
       const api = {} as unknown;
       const result = await getNatitveAssetBalance(api as null, "0x123");
-      expect(result).toEqual(BN0);
+      expect(result).toEqual({
+        balance: new BN(0),
+      });
     });
 
     it("should return same amount", async () => {
       const result = await getNatitveAssetBalance(null, "0x123");
-      expect(result).toEqual(BN0);
+      expect(result).toEqual({
+        balance: BN0,
+      });
     });
 
     it("should throw error", async () => {
@@ -71,7 +83,9 @@ describe("assets", () => {
       } as unknown;
 
       const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
-      expect(result).toEqual(BN0);
+      expect(result).toEqual({
+        balance: new BN(0),
+      });
     });
   });
 
