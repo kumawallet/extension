@@ -35,3 +35,32 @@ export const defaultAssetConfig = {
     },
   ],
 };
+
+export const COINGECKO_ASSET_MAP: { [key: string]: string } = {
+  xcatom: "cosmos",
+  bnc: "bifrost-native-coin",
+  glmr: "moonbeam",
+  dot: "polkadot",
+  aca: "acala",
+  ldot: "liquid-staking-dot",
+  hdx: "hydradx",
+  ausd: "acala-dollar",
+  usdt: "tether",
+  ibtc: "interbtc",
+  intr: "Interlay",
+  pha: "pha",
+  unq: "unq",
+  vdot: "voucher-dot",
+
+  astr: "astar",
+
+  xcdot: "polkadot",
+  xchdx: "hydradx",
+  xcausd: "acala-dollar",
+  xcibtc: "interbtc",
+  xcusdt: "tether",
+  xcpha: "pha",
+  xcbnc: "bifrost-native-coin",
+  xcastr: "astar",
+  xcaca: "acala",
+};

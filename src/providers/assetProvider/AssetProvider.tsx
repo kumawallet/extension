@@ -23,7 +23,12 @@ import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-import { BN0, PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import {
+  BN0,
+  COINGECKO_ASSET_MAP,
+  PROOF_SIZE,
+  REF_TIME,
+} from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
 import { IAsset } from "@src/types";
@@ -146,8 +151,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           assets,
         },
       });
-
-      return assets;
     } catch (error) {
       captureError(error);
       dispatch({
@@ -156,6 +159,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       getAssetsUSDPrice(assets);
     }
+    return assets;
   };
 
   const getNativeAsset = async (
@@ -374,7 +378,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const addresToQuery = [];
       for (const [index, asset] of copyAssets.entries()) {
-        if (asset.id === "-1" && asset.name && !asset.balance.isZero?.()) {
+        if (asset.name && !asset.balance.isZero?.()) {
           addresToQuery.push({
             index,
             asset,
@@ -386,7 +390,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         addresToQuery.map(async ({ asset, index }) => {
           const query = asset.id === "-1" ? selectedChain.name : asset.name;
 
-          const price = await getAssetUSDPrice(query as string).catch(() => 0);
+          const network = COINGECKO_ASSET_MAP[query.toLowerCase()] || query;
+
+          const price = await getAssetUSDPrice(network).catch(() => 0);
 
           const _balance = Number(
             formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)

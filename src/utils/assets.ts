@@ -126,7 +126,7 @@ export const getWasmAssets = async (
     }
   ) => void
 ) => {
-  const assets: Asset[] = [];
+  let assets: Asset[] = [];
   const unsubs: unknown[] = [];
   try {
     let assetPallet = null;
@@ -156,7 +156,7 @@ export const getWasmAssets = async (
 
     const entries = await assetPallet?.entries();
 
-    entries?.forEach(([metadata, asset]) => {
+    for (const [, [metadata, asset]] of entries.entries()) {
       const jsonAsset = asset.toJSON() as {
         name: string;
         symbol: string;
@@ -223,7 +223,24 @@ export const getWasmAssets = async (
         decimals,
         aditionalData,
       });
-    });
+    }
+
+    assets = await Promise.all(
+      assets.map(async (asset) => {
+        const params = [];
+        if (["acala", "mandala"].includes(chainName.toLowerCase())) {
+          params.push(address, asset.aditionalData?.tokenId);
+        } else {
+          params.push(asset.id, address);
+        }
+
+        const data = await balanceMethod?.(...params);
+
+        const _data = getSubtrateNonNativeBalance(data);
+
+        return { ...asset, ..._data };
+      })
+    );
 
     await Promise.all(
       assets.map(async (asset) => {
@@ -245,76 +262,8 @@ export const getWasmAssets = async (
               frozen?: number;
             };
           }) => {
-            const result = data.toJSON();
-            let balance = BN0;
-            let frozen = BN0;
-            let reserved = BN0;
-
-            if (result?.balance && !result.isFrozen) {
-              if (typeof result?.balance === "number") {
-                balance = new BN(String(result?.balance));
-              }
-
-              if (
-                typeof result.balance === "string" &&
-                (result.balance as string).startsWith("0x")
-              ) {
-                balance = hexToBn(result.balance);
-              }
-            }
-
-            if (result?.balance && result.isFrozen) {
-              if (typeof result?.balance === "number") {
-                frozen = new BN(String(result?.balance));
-              }
-
-              if (
-                typeof result.balance === "string" &&
-                (result.balance as string).startsWith("0x")
-              ) {
-                frozen = hexToBn(result.balance);
-              }
-            }
-
-            if (result?.free) {
-              if (
-                typeof result?.free === "string" &&
-                String(result.free)?.startsWith("0x")
-              ) {
-                balance = hexToBn(result.free);
-              } else {
-                balance = new BN(String(result?.free));
-              }
-            }
-
-            if (result?.reserved) {
-              if (
-                typeof result?.reserved === "string" &&
-                String(result.reserved)?.startsWith("0x")
-              ) {
-                reserved = hexToBn(result.reserved);
-              } else {
-                reserved = new BN(String(result?.reserved));
-              }
-            }
-
-            if (result?.frozen) {
-              if (
-                typeof result?.frozen === "string" &&
-                String(result.frozen)?.startsWith("0x")
-              ) {
-                frozen = hexToBn(result.frozen);
-              } else {
-                frozen = new BN(String(result?.frozen));
-              }
-            }
-
-            dispatch(asset.id, {
-              balance,
-              frozen,
-              reserved,
-              transferable: balance.sub(frozen).sub(reserved),
-            });
+            const _data = getSubtrateNonNativeBalance(data);
+            dispatch(asset.id, _data);
           }
         );
 
@@ -351,5 +300,86 @@ export const getSubtrateNativeBalance = (data: {
     transferable,
     reserved,
     frozen,
+  };
+};
+
+export const getSubtrateNonNativeBalance = (data: {
+  toJSON: () => {
+    balance: number | string;
+    free: number;
+    isFrozen?: boolean;
+    reserved?: number;
+    frozen?: number;
+  };
+}) => {
+  const result = data.toJSON();
+  let balance = BN0;
+  let frozen = BN0;
+  let reserved = BN0;
+
+  if (result?.balance && !result.isFrozen) {
+    if (typeof result?.balance === "number") {
+      balance = new BN(String(result?.balance));
+    }
+
+    if (
+      typeof result.balance === "string" &&
+      (result.balance as string).startsWith("0x")
+    ) {
+      balance = hexToBn(result.balance);
+    }
+  }
+
+  if (result?.balance && result.isFrozen) {
+    if (typeof result?.balance === "number") {
+      frozen = new BN(String(result?.balance));
+    }
+
+    if (
+      typeof result.balance === "string" &&
+      (result.balance as string).startsWith("0x")
+    ) {
+      frozen = hexToBn(result.balance);
+    }
+  }
+
+  if (result?.free) {
+    if (
+      typeof result?.free === "string" &&
+      String(result.free)?.startsWith("0x")
+    ) {
+      balance = hexToBn(result.free);
+    } else {
+      balance = new BN(String(result?.free));
+    }
+  }
+
+  if (result?.reserved) {
+    if (
+      typeof result?.reserved === "string" &&
+      String(result.reserved)?.startsWith("0x")
+    ) {
+      reserved = hexToBn(result.reserved);
+    } else {
+      reserved = new BN(String(result?.reserved));
+    }
+  }
+
+  if (result?.frozen) {
+    if (
+      typeof result?.frozen === "string" &&
+      String(result.frozen)?.startsWith("0x")
+    ) {
+      frozen = hexToBn(result.frozen);
+    } else {
+      frozen = new BN(String(result?.frozen));
+    }
+  }
+
+  return {
+    balance,
+    frozen,
+    reserved,
+    transferable: balance.sub(frozen).sub(reserved),
   };
 };
