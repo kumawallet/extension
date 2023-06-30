@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.4
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/06/29**
+- [#16](https://github.com/blockcoders/kuma-wallet/pull/16) Fix manifest
+
+## 0.2.3
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/06/26**
+- [#15](https://github.com/blockcoders/kuma-wallet/pull/15) Fix manifest
+
 ## 0.2.2
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/06/23**
 - [#14](https://github.com/blockcoders/kuma-wallet/pull/14) New branding
