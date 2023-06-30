@@ -89,8 +89,13 @@ export const reducer = (state: InitialState, action: Action) => {
         (asset) => asset[updatedBy] === updatedByValue
       );
       if (index > -1 && !balance?.eq(assets[index].balance)) {
+        const _balance = Number(
+          formatAmountWithDecimals(Number(balance), 6, assets[index].decimals)
+        );
+
         assets[index] = {
           ...assets[index],
+          amount: Number(((assets[index].price || 0) * _balance).toFixed(2)),
           balance,
           frozen,
           reserved,
@@ -152,6 +157,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
+      // console.log(error);
       captureError(error);
       dispatch({
         type: "end-loading",
@@ -241,7 +247,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return [...assetsFromPallet, ...assets];
     } else {
-      const assets = loadAssetsFromStorage();
+      const assets = await loadAssetsFromStorage();
       return assets;
     }
   };
@@ -280,87 +286,91 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       unsubs?.length > 0 &&
       setUnsubscribers((state) => [...state, ...unsubs]);
 
-    return assets;
+    return assets || [];
   };
 
   const loadAssetsFromStorage = async () => {
-    const assetsFromStorage = await Extension.getAssetsByChain(
-      selectedChain.name
-    );
-    const assets: IAsset[] = [];
-
-    if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
-      const accountAddress = selectedAccount.value.address;
-
-      await Promise.all(
-        assetsFromStorage.map(async (asset, index) => {
-          assets[index] = {
-            address: asset.address,
-            balance: "",
-            id: String(index),
-            decimals: asset.decimals,
-            symbol: asset.symbol,
-          };
-
-          try {
-            if (type === "EVM") {
-              const contract = new ethers.Contract(
-                asset.address,
-                erc20Abi,
-                api
-              );
-              const balance = await contract.balanceOf(accountAddress);
-              assets[index].balance = balance;
-
-              contract.removeAllListeners("Transfer");
-
-              contract.on("Transfer", async (from, to) => {
-                const selfAddress = selectedAccount?.value?.address;
-                if (from === selfAddress || to === selfAddress) {
-                  const balance = await contract.balanceOf(accountAddress);
-                  dispatch({
-                    type: "update-one-asset",
-                    payload: {
-                      asset: {
-                        updatedBy: "id",
-                        updatedByValue: assets[index].id,
-                        balance,
-                      },
-                    },
-                  });
-                }
-              });
-            } else {
-              const gasLimit = api.registry.createType("WeightV2", {
-                refTime: REF_TIME,
-                proofSize: PROOF_SIZE,
-              });
-
-              const contract = new ContractPromise(
-                api,
-                metadata,
-                asset.address
-              );
-
-              const { output } = await contract.query.balanceOf(
-                accountAddress,
-                {
-                  gasLimit,
-                },
-                accountAddress
-              );
-              assets[index].balance = new BN(output?.toString() || "0");
-              assets[index].contract = contract;
-            }
-          } catch (error) {
-            captureError(error);
-            assets[index].balance = new BN("0");
-          }
-        })
+    try {
+      const assetsFromStorage = await Extension.getAssetsByChain(
+        selectedChain.name
       );
-    }
+      const assets: IAsset[] = [];
 
-    return assets;
+      if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
+        const accountAddress = selectedAccount.value.address;
+
+        await Promise.all(
+          assetsFromStorage.map(async (asset, index) => {
+            assets[index] = {
+              address: asset.address,
+              balance: "",
+              id: String(index),
+              decimals: asset.decimals,
+              symbol: asset.symbol,
+            };
+
+            try {
+              if (type === "EVM") {
+                const contract = new ethers.Contract(
+                  asset.address,
+                  erc20Abi,
+                  api
+                );
+                const balance = await contract.balanceOf(accountAddress);
+                assets[index].balance = balance;
+
+                contract.removeAllListeners("Transfer");
+
+                contract.on("Transfer", async (from, to) => {
+                  const selfAddress = selectedAccount?.value?.address;
+                  if (from === selfAddress || to === selfAddress) {
+                    const balance = await contract.balanceOf(accountAddress);
+                    dispatch({
+                      type: "update-one-asset",
+                      payload: {
+                        asset: {
+                          updatedBy: "id",
+                          updatedByValue: assets[index].id,
+                          balance,
+                        },
+                      },
+                    });
+                  }
+                });
+              } else {
+                const gasLimit = api.registry.createType("WeightV2", {
+                  refTime: REF_TIME,
+                  proofSize: PROOF_SIZE,
+                });
+
+                const contract = new ContractPromise(
+                  api,
+                  metadata,
+                  asset.address
+                );
+
+                const { output } = await contract.query.balanceOf(
+                  accountAddress,
+                  {
+                    gasLimit,
+                  },
+                  accountAddress
+                );
+                assets[index].balance = new BN(output?.toString() || "0");
+                assets[index].contract = contract;
+              }
+            } catch (error) {
+              captureError(error);
+              assets[index].balance = new BN("0");
+            }
+          })
+        );
+      }
+
+      return assets;
+    } catch (error) {
+      return [];
+    }
   };
 
   const removeListeners = () => {
@@ -378,7 +388,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const addresToQuery = [];
       for (const [index, asset] of copyAssets.entries()) {
-        if (asset.name && !asset.balance.isZero?.()) {
+        if (asset.symbol) {
           addresToQuery.push({
             index,
             asset,
@@ -388,7 +398,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       await Promise.all(
         addresToQuery.map(async ({ asset, index }) => {
-          const query = asset.id === "-1" ? selectedChain.name : asset.name;
+          const query = asset.symbol;
 
           const network = COINGECKO_ASSET_MAP[query.toLowerCase()] || query;
 
@@ -398,6 +408,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
             formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
           );
 
+          copyAssets[index].price = price;
           copyAssets[index].amount = Number((price * _balance).toFixed(2));
 
           return;

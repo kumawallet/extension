@@ -179,14 +179,6 @@ export const getWasmAssets = async (
           stableAssetId?: string;
         };
 
-        if (
-          !token?.nativeAssetId &&
-          !token?.foreignAssetId &&
-          !token?.stableAssetId
-        ) {
-          return;
-        }
-
         if (token?.nativeAssetId) {
           aditionalData = {
             tokenId: {
@@ -194,7 +186,6 @@ export const getWasmAssets = async (
             },
           };
         }
-
         if (token?.foreignAssetId) {
           aditionalData = {
             tokenId: {
@@ -202,7 +193,6 @@ export const getWasmAssets = async (
             },
           };
         }
-
         if (token?.stableAssetId) {
           aditionalData = {
             tokenId: {
@@ -212,17 +202,18 @@ export const getWasmAssets = async (
         }
       }
 
-      assets.push({
-        id,
-        name,
-        symbol,
-        balance,
-        frozen: BN0,
-        reserved: BN0,
-        transferable: balance,
-        decimals,
-        aditionalData,
-      });
+      aditionalData &&
+        assets.push({
+          id,
+          name,
+          symbol,
+          balance,
+          frozen: BN0,
+          reserved: BN0,
+          transferable: balance,
+          decimals,
+          aditionalData,
+        });
     }
 
     assets = await Promise.all(
@@ -234,7 +225,15 @@ export const getWasmAssets = async (
           params.push(asset.id, address);
         }
 
-        const data = await balanceMethod?.(...params);
+        const data = (await balanceMethod?.(...params)) as unknown as {
+          toJSON: () => {
+            balance: number | string;
+            free: number;
+            isFrozen?: boolean;
+            reserved?: number;
+            frozen?: number;
+          };
+        };
 
         const _data = getSubtrateNonNativeBalance(data);
 
@@ -270,22 +269,39 @@ export const getWasmAssets = async (
         unsubs.push(unsub);
       })
     );
+    return {
+      assets,
+      unsubs,
+    };
   } catch (error) {
     captureError(error);
+    return {
+      assets,
+      unsubs,
+    };
   }
-  return {
-    assets,
-    unsubs,
-  };
 };
 
-export const getSubtrateNativeBalance = (data: {
-  free: string;
-  reserved: string;
-  miscFrozen?: string;
-  frozen?: string;
-  feeFrozen?: string;
-}) => {
+export const getSubtrateNativeBalance = (
+  data:
+    | {
+        free: string;
+        reserved: string;
+        miscFrozen?: string;
+        frozen?: string;
+        feeFrozen?: string;
+      }
+    | undefined
+) => {
+  if (!data) {
+    return {
+      balance: BN0,
+      frozen: BN0,
+      reserved: BN0,
+      transferable: BN0,
+    };
+  }
+
   const free = new BN(String(data?.free || 0));
   const reserved = new BN(String(data?.reserved || 0));
   const miscFrozen = new BN(String(data?.miscFrozen || data?.frozen || 0));
@@ -303,15 +319,28 @@ export const getSubtrateNativeBalance = (data: {
   };
 };
 
-export const getSubtrateNonNativeBalance = (data: {
-  toJSON: () => {
-    balance: number | string;
-    free: number;
-    isFrozen?: boolean;
-    reserved?: number;
-    frozen?: number;
-  };
-}) => {
+export const getSubtrateNonNativeBalance = (
+  data:
+    | {
+        toJSON: () => {
+          balance: number | string;
+          free: number;
+          isFrozen?: boolean;
+          reserved?: number;
+          frozen?: number;
+        };
+      }
+    | undefined
+) => {
+  if (!data) {
+    return {
+      balance: BN0,
+      frozen: BN0,
+      reserved: BN0,
+      transferable: BN0,
+    };
+  }
+
   const result = data.toJSON();
   let balance = BN0;
   let frozen = BN0;

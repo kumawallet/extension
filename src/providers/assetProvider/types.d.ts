@@ -9,6 +9,7 @@ export interface Asset {
   address?: string;
   amount?: number;
   name?: string;
+  price?: number;
   aditionalData?:
     | {
         tokenId: {
