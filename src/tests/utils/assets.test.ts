@@ -164,16 +164,12 @@ describe("assets", () => {
             metadata: {
               entries: () => ASSETS_MOCK,
             },
-            account: (
-              assetId: unknown,
-              address: unknown,
-              cb: (data: unknown) => void
-            ) => {
-              cb({
+            account: (assetId: unknown, address: unknown) => {
+              return {
                 toJSON: () => ({
-                  balance: 10,
+                  free: new BN(10),
                 }),
-              });
+              };
             },
           },
         },
@@ -189,12 +185,15 @@ describe("assets", () => {
         dispatchMock
       );
 
-      expect(result.assets[0]).toContain({
+      expect(result.assets[0]).toEqual({
         id: "100",
         name: "Glimmer",
         symbol: "GLMR",
         decimals: 18,
-        balance: BN0,
+        balance: new BN(10),
+        transferable: new BN(10),
+        frozen: new BN(0),
+        reserved: new BN(0),
         aditionalData: null,
       });
     });
@@ -234,16 +233,12 @@ describe("assets", () => {
             },
           },
           tokens: {
-            accounts: (
-              address: unknown,
-              assetId: unknown,
-              cb: (data: unknown) => void
-            ) => {
-              cb({
+            accounts: (address: unknown, assetId: unknown) => {
+              return {
                 toJSON: () => ({
-                  free: 10,
+                  free: new BN(10),
                 }),
-              });
+              };
             },
           },
         },
@@ -264,7 +259,7 @@ describe("assets", () => {
         name: "Glimmer",
         symbol: "GLMR",
         decimals: 18,
-        balance: BN0,
+        balance: new BN(10),
         aditionalData: {
           tokenId: {
             StableAssetPoolToken: 1,

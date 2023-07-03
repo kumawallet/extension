@@ -354,7 +354,7 @@ describe("AssetProvider", () => {
             transferable: BN0,
             symbol: "USD",
             decimals: 2,
-            amount: 100,
+            amount: 0,
           },
         ],
         isLoadingAssets: false,

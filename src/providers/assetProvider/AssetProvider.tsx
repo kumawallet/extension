@@ -157,7 +157,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
       });
     } catch (error) {
-      // console.log(error);
       captureError(error);
       dispatch({
         type: "end-loading",

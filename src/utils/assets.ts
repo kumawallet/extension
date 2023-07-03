@@ -200,9 +200,20 @@ export const getWasmAssets = async (
             },
           };
         }
-      }
 
-      aditionalData &&
+        aditionalData &&
+          assets.push({
+            id,
+            name,
+            symbol,
+            balance,
+            frozen: BN0,
+            reserved: BN0,
+            transferable: balance,
+            decimals,
+            aditionalData,
+          });
+      } else {
         assets.push({
           id,
           name,
@@ -214,6 +225,7 @@ export const getWasmAssets = async (
           decimals,
           aditionalData,
         });
+      }
     }
 
     assets = await Promise.all(
