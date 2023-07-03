@@ -280,12 +280,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       if (isNativeAsset) {
         return bnAmount.gt(BN0) && estimatedTotal.lte(assetToCompare);
       } else {
-        const BNBalance = new BN(asset?.balance);
-
         return (
-          bnAmount.lte(BNBalance) &&
+          bnAmount.lte(assetToCompare) &&
           estimatedTotal.gt(BN0) &&
-          estimatedTotal.lte(assetToCompare)
+          estimatedTotal.lte(nativeBalance)
         );
       }
     } catch (error) {
