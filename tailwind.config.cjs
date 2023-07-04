@@ -15,7 +15,7 @@ module.exports = {
           hover: "",
         },
         "custom-green": {
-          bg: "#9163e8",
+          bg: "#986bff",
           hover: "",
         },
         "custom-gray": {

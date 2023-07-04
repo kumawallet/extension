@@ -12,6 +12,7 @@ import {
   formatAmountWithDecimals,
   getAssetUSDPrice,
   getNatitveAssetBalance,
+  getSubtrateNativeBalance,
   getWasmAssets,
 } from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
@@ -22,7 +23,12 @@ import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
-import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
+import {
+  BN0,
+  COINGECKO_ASSET_MAP,
+  PROOF_SIZE,
+  REF_TIME,
+} from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState } from "./types";
 import randomcolor from "randomcolor";
 import { IAsset } from "@src/types";
@@ -68,15 +74,33 @@ export const reducer = (state: InitialState, action: Action) => {
     }
     case "update-one-asset": {
       const {
-        asset: { newValue, updatedBy, updatedByValue },
+        asset: {
+          balance = BN0,
+          frozen = BN0,
+          reserved = BN0,
+          transferable = BN0,
+          updatedBy,
+          updatedByValue,
+        },
       } = action.payload;
       const assets = [...state.assets];
 
       const index = assets.findIndex(
         (asset) => asset[updatedBy] === updatedByValue
       );
-      if (index > -1 && !newValue.eq(assets[index].balance)) {
-        assets[index].balance = newValue;
+      if (index > -1 && !balance?.eq(assets[index].balance)) {
+        const _balance = Number(
+          formatAmountWithDecimals(Number(balance), 6, assets[index].decimals)
+        );
+
+        assets[index] = {
+          ...assets[index],
+          amount: Number(((assets[index].price || 0) * _balance).toFixed(2)),
+          balance,
+          frozen,
+          reserved,
+          transferable,
+        };
         return {
           ...state,
           assets,
@@ -113,11 +137,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
       const _assets = await getOtherAssets();
+
       assets = [
         {
           id: "-1",
           ...selectedChain?.nativeCurrency,
-          balance: _nativeBalance,
+          ..._nativeBalance,
         },
         ..._assets.map((asset) => ({
           ...asset,
@@ -131,8 +156,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           assets,
         },
       });
-
-      return assets;
     } catch (error) {
       captureError(error);
       dispatch({
@@ -141,29 +164,45 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       getAssetsUSDPrice(assets);
     }
+    return assets;
   };
 
   const getNativeAsset = async (
     api: ApiPromise | ethers.providers.JsonRpcProvider | null,
     account: AccountEntity
   ) => {
-    const nativeAsset = await getNatitveAssetBalance(
-      api,
-      account.value.address
-    );
+    const address = account.value.address;
+
+    const amounts = await getNatitveAssetBalance(api, address);
 
     // suscribers for native asset balance update
     if (type === "WASM") {
       const unsub = await (api as ApiPromise).query.system.account(
-        selectedAccount.value.address,
-        ({ data }: { data: { free: string } }) => {
+        address,
+        ({
+          data,
+        }: {
+          data: {
+            free: string;
+            reserved: string;
+            miscFrozen?: string;
+            frozen?: string;
+            feeFrozen?: string;
+          };
+        }) => {
+          const { transferable, reserved, balance, frozen } =
+            getSubtrateNativeBalance(data);
+
           dispatch({
             type: "update-one-asset",
             payload: {
               asset: {
                 updatedBy: "id",
                 updatedByValue: "-1",
-                newValue: new BN(String(data?.free) || 0),
+                balance,
+                transferable,
+                reserved,
+                frozen,
               },
             },
           });
@@ -183,7 +222,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               asset: {
                 updatedBy: "id",
                 updatedByValue: "-1",
-                newValue: balance,
+                balance,
               },
             },
           });
@@ -191,7 +230,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       });
     }
 
-    return nativeAsset;
+    return amounts;
   };
 
   const getOtherAssets = async () => {
@@ -207,7 +246,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       return [...assetsFromPallet, ...assets];
     } else {
-      const assets = loadAssetsFromStorage();
+      const assets = await loadAssetsFromStorage();
       return assets;
     }
   };
@@ -217,14 +256,25 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api as ApiPromise,
       selectedChain.name,
       selectedAccount.value.address,
-      (assetId: string, newValue: BN) => {
+      (
+        assetId: string,
+        amounts: {
+          balance: BN;
+          frozen: BN;
+          reserved: BN;
+          transferable: BN;
+        }
+      ) => {
         dispatch({
           type: "update-one-asset",
           payload: {
             asset: {
               updatedBy: "id",
               updatedByValue: assetId,
-              newValue: newValue,
+              balance: amounts.balance,
+              frozen: amounts.frozen,
+              reserved: amounts.reserved,
+              transferable: amounts.transferable,
             },
           },
         });
@@ -235,87 +285,91 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       unsubs?.length > 0 &&
       setUnsubscribers((state) => [...state, ...unsubs]);
 
-    return assets;
+    return assets || [];
   };
 
   const loadAssetsFromStorage = async () => {
-    const assetsFromStorage = await Extension.getAssetsByChain(
-      selectedChain.name
-    );
-    const assets: IAsset[] = [];
-
-    if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
-      const accountAddress = selectedAccount.value.address;
-
-      await Promise.all(
-        assetsFromStorage.map(async (asset, index) => {
-          assets[index] = {
-            address: asset.address,
-            balance: "",
-            id: String(index),
-            decimals: asset.decimals,
-            symbol: asset.symbol,
-          };
-
-          try {
-            if (type === "EVM") {
-              const contract = new ethers.Contract(
-                asset.address,
-                erc20Abi,
-                api
-              );
-              const balance = await contract.balanceOf(accountAddress);
-              assets[index].balance = balance;
-
-              contract.removeAllListeners("Transfer");
-
-              contract.on("Transfer", async (from, to) => {
-                const selfAddress = selectedAccount?.value?.address;
-                if (from === selfAddress || to === selfAddress) {
-                  const balance = await contract.balanceOf(accountAddress);
-                  dispatch({
-                    type: "update-one-asset",
-                    payload: {
-                      asset: {
-                        updatedBy: "id",
-                        updatedByValue: assets[index].id,
-                        newValue: balance,
-                      },
-                    },
-                  });
-                }
-              });
-            } else {
-              const gasLimit = api.registry.createType("WeightV2", {
-                refTime: REF_TIME,
-                proofSize: PROOF_SIZE,
-              });
-
-              const contract = new ContractPromise(
-                api,
-                metadata,
-                asset.address
-              );
-
-              const { output } = await contract.query.balanceOf(
-                accountAddress,
-                {
-                  gasLimit,
-                },
-                accountAddress
-              );
-              assets[index].balance = new BN(output?.toString() || "0");
-              assets[index].contract = contract;
-            }
-          } catch (error) {
-            captureError(error);
-            assets[index].balance = new BN("0");
-          }
-        })
+    try {
+      const assetsFromStorage = await Extension.getAssetsByChain(
+        selectedChain.name
       );
-    }
+      const assets: IAsset[] = [];
 
-    return assets;
+      if (assetsFromStorage.length > 0 && selectedAccount?.value?.address) {
+        const accountAddress = selectedAccount.value.address;
+
+        await Promise.all(
+          assetsFromStorage.map(async (asset, index) => {
+            assets[index] = {
+              address: asset.address,
+              balance: "",
+              id: String(index),
+              decimals: asset.decimals,
+              symbol: asset.symbol,
+            };
+
+            try {
+              if (type === "EVM") {
+                const contract = new ethers.Contract(
+                  asset.address,
+                  erc20Abi,
+                  api
+                );
+                const balance = await contract.balanceOf(accountAddress);
+                assets[index].balance = balance;
+
+                contract.removeAllListeners("Transfer");
+
+                contract.on("Transfer", async (from, to) => {
+                  const selfAddress = selectedAccount?.value?.address;
+                  if (from === selfAddress || to === selfAddress) {
+                    const balance = await contract.balanceOf(accountAddress);
+                    dispatch({
+                      type: "update-one-asset",
+                      payload: {
+                        asset: {
+                          updatedBy: "id",
+                          updatedByValue: assets[index].id,
+                          balance,
+                        },
+                      },
+                    });
+                  }
+                });
+              } else {
+                const gasLimit = api.registry.createType("WeightV2", {
+                  refTime: REF_TIME,
+                  proofSize: PROOF_SIZE,
+                });
+
+                const contract = new ContractPromise(
+                  api,
+                  metadata,
+                  asset.address
+                );
+
+                const { output } = await contract.query.balanceOf(
+                  accountAddress,
+                  {
+                    gasLimit,
+                  },
+                  accountAddress
+                );
+                assets[index].balance = new BN(output?.toString() || "0");
+                assets[index].contract = contract;
+              }
+            } catch (error) {
+              captureError(error);
+              assets[index].balance = new BN("0");
+            }
+          })
+        );
+      }
+
+      return assets;
+    } catch (error) {
+      return [];
+    }
   };
 
   const removeListeners = () => {
@@ -333,7 +387,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const addresToQuery = [];
       for (const [index, asset] of copyAssets.entries()) {
-        if (asset.id === "-1" && asset.name && !asset.balance.isZero?.()) {
+        if (asset.symbol) {
           addresToQuery.push({
             index,
             asset,
@@ -343,14 +397,17 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
       await Promise.all(
         addresToQuery.map(async ({ asset, index }) => {
-          const query = asset.id === "-1" ? selectedChain.name : asset.name;
+          const query = asset.symbol;
 
-          const price = await getAssetUSDPrice(query as string).catch(() => 0);
+          const network = COINGECKO_ASSET_MAP[query.toLowerCase()] || query;
+
+          const price = await getAssetUSDPrice(network).catch(() => 0);
 
           const _balance = Number(
             formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
           );
 
+          copyAssets[index].price = price;
           copyAssets[index].amount = Number((price * _balance).toFixed(2));
 
           return;
@@ -394,7 +451,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
               asset: {
                 updatedBy: "address",
                 updatedByValue: asset.address as string,
-                newValue: balance,
+                balance,
               },
             },
           });

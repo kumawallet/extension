@@ -1,15 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import { formatAmountWithDecimals } from "@src/utils/assets";
 import { ImCoinDollar } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { MANAGE_ASSETS, SEND } from "@src/routes/paths";
-import { BsArrowUpRight } from "react-icons/bs";
+import { MANAGE_ASSETS } from "@src/routes/paths";
 import { useAssetContext, useNetworkContext } from "@src/providers";
-import { Loading, AssetIcon } from "@src/components/common";
+import { Loading } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
-import { formatUSDAmount } from "@src/utils/assets";
+import { Asset } from "./Asset";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -82,36 +80,7 @@ export const Assets = () => {
       {isLoadingAssets && <Loading />}
 
       {filteredAsset.map((asset, index) => (
-        <div
-          key={index.toString()}
-          className="bg-[#343A40] px-2 py-2 rounded-2xl flex items-center justify-between font-inter"
-        >
-          <div className="flex gap-2 items-center">
-            <AssetIcon asset={asset} width={32} />
-            <div className="flex flex-col">
-              <div className="flex gap-1 items-center">
-                <p className="font-bold text-xl">
-                  {formatAmountWithDecimals(
-                    Number(asset.balance),
-                    6,
-                    asset.decimals
-                  )}
-                </p>
-                <p className="tx-sm">{asset.symbol}</p>
-              </div>
-              <div className="text-xs text-gray-400">
-                {formatUSDAmount(asset.amount || 0)}
-              </div>
-            </div>
-          </div>
-
-          <a
-            href="#"
-            className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
-          >
-            <BsArrowUpRight size={23} onClick={() => navigate(SEND)} />
-          </a>
-        </div>
+        <Asset asset={asset} key={index} />
       ))}
 
       {showManageAssets && (

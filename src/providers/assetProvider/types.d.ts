@@ -2,10 +2,14 @@ export interface Asset {
   symbol: string;
   decimals: number;
   id: string;
-  balance: BN | ethers.BigNumberish;
+  balance: BN;
+  transferable: BN;
+  reserved: BN;
+  frozen: BN;
   address?: string;
   amount?: number;
   name?: string;
+  price?: number;
   aditionalData?:
     | {
         tokenId: {
@@ -56,7 +60,10 @@ export type Action =
         asset: {
           updatedBy: "id" | "address" | "name";
           updatedByValue: string;
-          newValue: BN;
+          balance: BN;
+          transferable?: BN;
+          reserved?: BN;
+          frozen?: BN;
         };
       };
     };
