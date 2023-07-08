@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.2.5
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/07/08**
+- [#17](https://github.com/blockcoders/kuma-wallet/pull/17) Transferable balances substrate
+
 ## 0.2.4
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/06/29**
 - [#16](https://github.com/blockcoders/kuma-wallet/pull/16) Fix manifest
