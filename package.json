@@ -1,7 +1,7 @@
 {
   "name": "kuma-wallet",
   "displayName": "Kuma Wallet",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Kuma a cross-chain wallet that offers seamless management and transfer of assets between EVM and WASM chains.",
   "author": "Blockcoders Engineering <hello@blockcoders.io>",
   "license": "MIT",
