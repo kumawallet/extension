@@ -32,33 +32,30 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
 
   useEffect(() => {
     const from = getValues("from");
-    const isXcm = to.name !== getValues("from").name;
+    const isXcm = to.name !== from.name;
     if (isXcm) {
       const xcmAssets = XCM_ASSETS_MAPPING[from.name]?.[to.name] || [];
-
       const filteredAssets = assets.filter(
         ({ symbol }, index, self) =>
           xcmAssets.includes(symbol) &&
           self.findIndex((s) => s.symbol === symbol) === index
       );
-
       const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
-
       setSelectedAsset(_assets[0]);
       onChangeAsset(_assets[0]);
-      setAssetsToSelect(
-        _assets.filter(({ id, balance }) => id === _assets[0].id || balance > 0)
-      );
+      setAssetsToSelect(_assets);
     } else {
       if (assets.length > 0) {
         setSelectedAsset(assets[0]);
         onChangeAsset(assets[0]);
-        setAssetsToSelect(
-          assets.filter(({ id, balance }) => id === assets[0].id || balance > 0)
-        );
+        setAssetsToSelect(assets);
       }
     }
   }, [assets, to]);
+
+  const _selectableAssets = assetsToSelect.filter(
+    ({ id, balance }) => id === assetsToSelect[0].id || balance > 0
+  );
 
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>
@@ -82,7 +79,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
           </span>
         </Listbox.Button>
         <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-40">
-          {assetsToSelect.map((asset, index) => (
+          {_selectableAssets.map((asset, index) => (
             <Listbox.Option
               key={index.toString()}
               value={asset}
