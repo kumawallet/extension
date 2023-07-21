@@ -10,18 +10,17 @@ export const ShowBalance = () => {
   const { watch } = useFormContext();
 
   const asset = watch("asset");
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.nativeCurrency.decimals;
 
   const showTransferable =
     asset?.transferable && !asset?.transferable?.eq(asset?.balance);
 
+  const showAmount = asset?.balance && String(asset?.balance) !== "0";
+
   return (
     <div className="text-start flex-col text-sm rounded-lg  flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white gap-1 mb-3">
       <p>
-        Total:{" "}
-        {!asset?.balance?.isZero()
-          ? formatBN(String(asset?.balance), decimals)
-          : 0}
+        Total: {showAmount ? formatBN(String(asset?.balance), decimals) : 0}
       </p>
       {showTransferable && (
         <p>Available: {formatBN(String(asset?.transferable), decimals)}</p>

@@ -21,6 +21,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
   const { watch, getValues } = useFormContext();
 
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [assetsToSelect, setAssetsToSelect] = useState<Asset[]>([]);
 
   const to = watch("to");
 
@@ -29,28 +30,27 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
     onChangeAsset?.(asset);
   };
 
-  const assetsToSelect = assets.filter(({ id, balance }) =>
-    id === "-1" ? true : balance > 0
-  );
-
   useEffect(() => {
     const from = getValues("from");
-    const isXcm = to.name !== getValues("from").name;
+    const isXcm = to.name !== from.name;
     if (isXcm) {
       const xcmAssets = XCM_ASSETS_MAPPING[from.name]?.[to.name] || [];
 
-      const filteredAssets = assets.filter(({ symbol }) =>
-        xcmAssets.includes(symbol)
+      const filteredAssets = assets.filter(
+        ({ symbol }, index, self) =>
+          xcmAssets.includes(symbol) &&
+          self.findIndex((s) => s.symbol === symbol) === index
       );
 
       const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
-
       setSelectedAsset(_assets[0]);
       onChangeAsset(_assets[0]);
+      setAssetsToSelect(_assets);
     } else {
       if (assets.length > 0) {
         setSelectedAsset(assets[0]);
         onChangeAsset(assets[0]);
+        setAssetsToSelect(assets);
       }
     }
   }, [assets, to]);
