@@ -642,7 +642,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
         case "aca": {
           method = XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS;
           assets = getAssets({
-            version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+            version: "V3",
             fungible: amount,
             interior: {
               X2: [
@@ -650,7 +650,10 @@ export const XCM_MAPPING: IXCM_MAPPING = {
                   Parachain: POLKADOT_PARACHAINS.ACALA.id,
                 },
                 {
-                  GeneralKey: "0x0000",
+                  GeneralKey: {
+                    data: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    length: 2,
+                  },
                 },
               ],
             },
@@ -667,11 +670,11 @@ export const XCM_MAPPING: IXCM_MAPPING = {
           dest: getDest({
             parents: 1,
             parachainId: POLKADOT_PARACHAINS.ACALA.id,
-            version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+            version: "V3",
           }),
           beneficiary: getBeneficiary({
             address,
-            version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+            version: "V3",
           }),
           assets,
           feeAssetItem: 0,

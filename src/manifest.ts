@@ -17,7 +17,6 @@ const commonManifest = {
   permissions: [
     "storage",
     "activeTab",
-    "scripting",
     "tabs",
     "notifications",
   ] as chrome.runtime.ManifestPermissions[],

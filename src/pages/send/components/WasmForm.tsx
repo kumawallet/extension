@@ -26,6 +26,7 @@ import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { captureError } from "@src/utils/error-handling";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseXCM } from "@src/xcm/interfaces";
+import { formatBN } from "@src/utils/assets";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -271,13 +272,15 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const BN0 = new BN("0");
       const nativeBalance = assets[0].balance;
 
-      if (isNativeAsset) {
-        return bnAmount.gt(BN0) && estimatedTotal.lte(nativeBalance);
-      } else {
-        const BNBalance = new BN(asset?.balance);
+      const assetToCompare = !asset.transferable?.isZero()
+        ? asset.transferable
+        : nativeBalance;
 
+      if (isNativeAsset) {
+        return bnAmount.gt(BN0) && estimatedTotal.lte(assetToCompare);
+      } else {
         return (
-          bnAmount.lte(BNBalance) &&
+          bnAmount.lte(assetToCompare) &&
           estimatedTotal.gt(BN0) &&
           estimatedTotal.lte(nativeBalance)
         );
@@ -290,8 +293,14 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
   return (
     <>
-      <CommonFormFields />
       <ReEnterPassword cb={loadSender} />
+      <CommonFormFields />
+      {asset?.transferable && !asset?.transferable?.eq(asset?.balance) && (
+        <div className="text-start flex-col text-sm rounded-lg  flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white gap-1 mb-3">
+          <p>Total: {formatBN(String(asset?.balance), decimals)}</p>
+          <p>Available: {formatBN(String(asset?.transferable), decimals)}</p>
+        </div>
+      )}
 
       <div className="mb-3">
         <p className="text-xs">{t("tip")}</p>

@@ -121,7 +121,8 @@ describe("WasmForm", () => {
                 name: "DOT",
                 symbol: "DOT",
                 decimals: 18,
-                balance: new BN("1000000000000000000"),
+                balance: new BN("10000000000000000000"),
+                transferable: new BN("1000000000000000000"),
               };
             case "destinationAccount":
               return "0x123";
@@ -208,6 +209,7 @@ describe("WasmForm", () => {
               symbol: "ETH",
               decimals: 18,
               balance: new BN("1000000000000000000"),
+              transferable: new BN("1000000000000000000"),
             };
           case "destinationAccount":
             return "0x123";
@@ -275,6 +277,7 @@ describe("WasmForm", () => {
               symbol: "ETH",
               decimals: 18,
               balance: "1000000000000000000",
+              transferable: new BN("1000000000000000000"),
             };
           case "destinationAccount":
             return "0x123";
@@ -342,6 +345,7 @@ describe("WasmForm", () => {
               symbol: "DOT",
               decimals: 18,
               balance: "1000000000000000000",
+              transferable: new BN("1000000000000000000"),
             };
           case "destinationAccount":
             return "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc";
