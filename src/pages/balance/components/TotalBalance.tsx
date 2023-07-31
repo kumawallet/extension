@@ -84,7 +84,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         <div className="flex gap-2 items-center">
           <p className="text-2xl">$</p>
           <p className="text-5xl" data-testid="balance">
-            {showBalance ? formatAmountWithDecimals(totalBalance, 5) : "***"}
+            {showBalance ? (formatAmountWithDecimals(totalBalance, 5) || "0") : "***"}
           </p>
         </div>
         {!showBalance ? (

@@ -8,9 +8,8 @@ import {
 } from "react";
 import { useNetworkContext } from "../networkProvider";
 
-const initialState = {
-  color: "chain-default",
-};
+
+const DEFAULT_COLOR = "chain-default"
 
 const ThemeContext = createContext(
   {} as {
@@ -24,7 +23,7 @@ export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
   } = useNetworkContext();
 
   const [color, setColor] = useState(
-    () => localStorage.getItem("color") || initialState.color
+    () => localStorage.getItem("color") || DEFAULT_COLOR
   );
 
   useEffect(() => {
@@ -33,9 +32,13 @@ export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
         (chain) => chain.name === selectedChain.name
       );
 
-      const color = !isCustom
+      const isTestnet = chains?.testnets?.find(
+        (chain) => chain.name === selectedChain.name
+      )
+
+      const color = !isCustom && !isTestnet
         ? `chain-${selectedChain.name.toLowerCase().replace(/ /g, "-")}`
-        : initialState.color;
+        : DEFAULT_COLOR;
       setColor(color);
       localStorage.setItem("color", color);
     }

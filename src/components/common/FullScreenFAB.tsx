@@ -1,10 +1,15 @@
+import { getWebAPI } from "@src/utils/env";
+import { isInPopup } from "@src/utils/utils";
 import { BsFullscreen } from "react-icons/bs";
 
 export const FullScreenFAB = () => {
   const openTab = () => {
-    const url = chrome.runtime.getURL("src/entries/newtab/index.html");
-    chrome.tabs.create({ url });
+    const API = getWebAPI()
+    const url = API.runtime.getURL("src/entries/newtab/index.html");
+    API.tabs.create({ url });
   };
+
+  if (!isInPopup()) return null
 
   return (
     <button

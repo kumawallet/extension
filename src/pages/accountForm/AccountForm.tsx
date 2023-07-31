@@ -413,6 +413,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             onClick={submit}
             isLoading={isLoading}
             isDisabled={
+              isLoading ||
               (generateSeed && !showRecoveryPhrase) ||
               (showInsertSeedStep && !seedConfirmationIsValid)
             }

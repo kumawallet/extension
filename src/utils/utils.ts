@@ -1,3 +1,5 @@
+import { getWebAPI } from "./env";
+
 export const formatDate = (date: number) => {
   const d = new Date(date);
   const year = d.getFullYear();
@@ -48,3 +50,10 @@ export const makeQuerys = (params: Record<string, string>) => {
       .join("&")
   );
 };
+
+export const isInPopup = function() {
+  const API = getWebAPI()
+
+  return (typeof API != undefined && API.extension) ?
+  API.extension.getViews({ type: "popup" }).length > 0 : null;
+}

@@ -1,5 +1,4 @@
-import { FC } from "react";
-import { memo } from "react";
+import { FC, memo } from "react";
 import { useDrag } from "react-dnd";
 
 export interface WordProps {
@@ -21,7 +20,7 @@ export const Word: FC<WordProps> = memo(function Word({
     }),
     [word]
   );
-  let bg = "bg-default-primary";
+  let bg = "bg-chain-default-primary";
   if (isDropped) {
     bg = "bg-custom-gray-bg";
   }

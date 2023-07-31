@@ -42,9 +42,11 @@ export const Welcome = () => {
           </Button>
         </div>
       </PageWrapper>
+
       <footer className="fixed bottom-0 left-0 right-0 py-4 px-3 flex justify-end gap-4 max-w-3xl w-full mx-auto">
         <FullScreenFAB />
       </footer>
+
     </>
   );
 };

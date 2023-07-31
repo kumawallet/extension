@@ -73,16 +73,16 @@ export const AccountList = () => {
             <p className="py-4 text-2xl font-medium">
               {t("accounts.accounts")}
             </p>
-            <div className="flex justify-between mb-6 mt-3">
+            <div className="flex justify-evenly mb-6 mt-3">
               <Button
-                classname="w-[40%]"
+                classname="!w-[40%]"
                 onClick={() => navigate(IMPORT_ACCOUNT)}
                 variant="outlined"
               >
                 {t("accounts.import")}
               </Button>
               <Button
-                classname="w-[40%]"
+                classname="!w-[40%]"
                 onClick={() => navigate(DERIVE_ACCOUNT)}
                 variant="outlined"
               >
