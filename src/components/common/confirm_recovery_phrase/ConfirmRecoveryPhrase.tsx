@@ -105,7 +105,7 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
           ))}
         </div>
 
-        <p className="text-center text-xl font-bold font-inter my-4">
+        <p className="text-center font-bold font-inter my-4">
           {t("form.confirm_recovery_phrase_description")}
         </p>
 
