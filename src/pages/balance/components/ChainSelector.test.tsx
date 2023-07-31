@@ -92,7 +92,6 @@ describe("ChainSelector", () => {
     });
     const account = getByText(CHAINS[0].chains[0].name);
 
-    (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
     act(() => {
       fireEvent.click(account.parentElement as HTMLElement);
     });

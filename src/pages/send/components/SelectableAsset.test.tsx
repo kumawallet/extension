@@ -48,18 +48,20 @@ describe("SelectableAsset", () => {
         getValues: () => ({
           name: "Moonbeam",
         }),
-        watch: vi.fn().mockReturnValue({
+        watch: () => ({
           name: "Moonbeam",
         }),
       }),
     }));
   });
 
-  it("should render", () => {
+  it("should render", async () => {
     const { getByTestId } = renderComponent();
 
-    const selectedAsset = getByTestId("selected-asset");
-    expect(selectedAsset.innerHTML).contain("ETH");
+    await waitFor(() => {
+      const selectedAsset = getByTestId("selected-asset");
+      expect(selectedAsset.innerHTML).contain("ETH");
+    });
   });
 
   it("should render all assets", async () => {
@@ -72,9 +74,7 @@ describe("SelectableAsset", () => {
     });
 
     await waitFor(() => {
-      const address = getByText("USDT");
-
-      expect(address).toBeDefined();
+      expect(getByText("USDT")).toBeDefined();
     });
   });
 

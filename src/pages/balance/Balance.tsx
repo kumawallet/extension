@@ -1,9 +1,10 @@
-import { PageWrapper } from "@src/components/common";
+import { useEffect, useState } from "react";
+import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
 import { useLocation } from "react-router-dom";
-import { useThemeContext } from "@src/providers";
+import { useNetworkContext, useThemeContext } from "@src/providers";
 
 export interface Asset {
   name: string;
@@ -17,8 +18,17 @@ export const Balance = () => {
   const { t } = useTranslation("balance");
   const { state } = useLocation();
   const { color } = useThemeContext();
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const TABS = [t("assets"), t("activity")];
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [selectedChain?.name]);
 
   return (
     <>
@@ -27,7 +37,11 @@ export const Balance = () => {
         <div className="flex flex-col">
           <TotalBalance />
 
-          <Tab.Group defaultIndex={state?.tab === "activity" ? 1 : 0}>
+          <Tab.Group
+            selectedIndex={selectedIndex}
+            onChange={setSelectedIndex}
+            defaultIndex={state?.tab === "activity" ? 1 : 0}
+          >
             <Tab.List
               className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-5`}
             >

@@ -29,9 +29,9 @@ export const SelectableChain: FC<SelectableChainProps> = ({
       }}
       defaultValue={selectedChain}
     >
-      <div className="relative mt-1">
+      <div className="relative mt-1 grid">
         <Listbox.Button
-          className="min-w-[150px] flex justify-center bg-[#212529] rounded-xl py-3 px-6 items-center gap-2 cursor-default"
+          className="min-w-[120px] flex justify-center bg-[#212529] rounded-xl py-3 px-2 md:px-6 items-center gap-2 cursor-default"
           read-only={Boolean(canSelectChain).toString()}
           style={{
             boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
@@ -43,7 +43,9 @@ export const SelectableChain: FC<SelectableChainProps> = ({
             height={29}
             className="object-contain rounded-full"
           />
-          <span>{chain.name}</span>
+          <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+            {chain.name}
+          </span>
         </Listbox.Button>
         {canSelectChain && (optionChains?.length || 0) > 0 && (
           <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">

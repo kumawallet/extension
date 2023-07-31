@@ -19,6 +19,7 @@ import { BigNumber0 } from "@src/constants/assets";
 import { captureError } from "@src/utils/error-handling";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
+import { ShowBalance } from "./ShowBalance";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -279,8 +280,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
   return (
     <>
-      <CommonFormFields />
       <ReEnterPassword cb={loadSender} />
+      <CommonFormFields />
+      <ShowBalance />
 
       {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
 

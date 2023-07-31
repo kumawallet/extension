@@ -20,10 +20,10 @@ import {
 } from "@src/components/common";
 import { FiChevronLeft } from "react-icons/fi";
 import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { ADD_ACCOUNT, BALANCE } from "@src/routes/paths";
 import { captureError } from "@src/utils/error-handling";
+import { DndProvider } from "react-dnd-multi-backend";
+import { HTML5toTouch } from "rdndmb-html5-to-touch"; // or any other pipeline
 
 export type AccountFormType = AccountForm & { seed?: string };
 
@@ -398,7 +398,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             <label htmlFor="name" className="block text-sm font-medium mb-1">
               {t("form.confirm_recovery_phrase")}
             </label>
-            <DndProvider backend={HTML5Backend}>
+            <DndProvider options={HTML5toTouch}>
               <ConfirmRecoveryPhrase
                 seed={seed}
                 confirm={(confirm: boolean) =>
