@@ -10,7 +10,7 @@ type interior = "Here" | unknown;
 
 export const XCM_DEFAULT_VERSIONS: { [key: string]: Version } = {
   "0": "V1",
-  "1": "V2",
+  "1": "V3",
 };
 
 export const getDest = ({

@@ -3,26 +3,32 @@ import {
   PARACHAINS,
   RELAY_CHAINS,
 } from "@src/constants/chains";
-import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
+import {
+  XCM,
+  XCM_DEFAULT_VERSIONS,
+  getAssets,
+  getBeneficiary,
+  getDest,
+} from "../utils";
 import { Map, Version } from "../interfaces";
 
 export const SHIDEN_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.KUSAMA]: ({ address, amount }) => ({
+  [RELAY_CHAINS.KUSAMA]: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
     method: XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS,
     extrinsicValues: {
       dest: getDest({
         parents: 1,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       beneficiary: getBeneficiary({
         address,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       assets: getAssets({
         fungible: amount,
         parents: 1,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
       feeAssetItem: 0,
     },

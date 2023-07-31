@@ -1,5 +1,11 @@
 import { KUSAMA_PARACHAINS } from "@src/constants/chains";
-import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
+import {
+  XCM,
+  XCM_DEFAULT_VERSIONS,
+  getAssets,
+  getBeneficiary,
+  getDest,
+} from "../utils";
 import { Map } from "../interfaces";
 
 export const KUSAMA_EXTRINSICS: { [key: string]: Map } = {
@@ -25,21 +31,21 @@ export const KUSAMA_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  [KUSAMA_PARACHAINS.SHIDEN.name]: ({ address, amount }) => ({
+  [KUSAMA_PARACHAINS.SHIDEN.name]: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {
       dest: getDest({
         parachainId: KUSAMA_PARACHAINS.SHIDEN.id,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       beneficiary: getBeneficiary({
         address,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       assets: getAssets({
         fungible: amount,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       feeAssetItem: 0,
     },

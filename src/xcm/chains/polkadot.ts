@@ -54,9 +54,7 @@ export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
         version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       feeAssetItem: 0,
-      weightLimit: {
-        Limited: 1_000_000_000,
-      },
+      weightLimit: "Unlimited",
     },
   }),
   [POLKADOT_PARACHAINS.ACALA.name]: ({
@@ -69,15 +67,15 @@ export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
     extrinsicValues: {
       dest: getDest({
         parachainId: POLKADOT_PARACHAINS.ACALA.id,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       beneficiary: getBeneficiary({
         address,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       assets: getAssets({
         fungible: amount,
-        version: "V3",
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }) as unknown,
       feeAssetItem: 0,
       weightLimit: "Unlimited",

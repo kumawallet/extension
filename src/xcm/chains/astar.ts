@@ -114,7 +114,10 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
                 Parachain: POLKADOT_PARACHAINS.ACALA.id,
               },
               {
-                GeneralKey: "0x0000",
+                GeneralKey: {
+                  data: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  length: 2,
+                },
               },
             ],
           },
