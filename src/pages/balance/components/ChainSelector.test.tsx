@@ -84,26 +84,16 @@ describe("ChainSelector", () => {
     act(() => {
       fireEvent.click(button);
     });
-    await waitFor(
-      () => {
-        expect(getByText(CHAINS[0].chains[0].name)).toBeDefined();
-      },
-      {
-        timeout: 10000,
-      }
-    );
+    await waitFor(() => {
+      expect(getByText(CHAINS[0].chains[0].name)).toBeDefined();
+    });
     const account = getByText(CHAINS[0].chains[0].name);
 
     act(() => {
       fireEvent.click(account.parentElement as HTMLElement);
     });
-    await waitFor(
-      () => {
-        expect(setSelectNetwork).toHaveBeenCalled();
-      },
-      {
-        timeout: 10000,
-      }
-    );
+    await waitFor(() => {
+      expect(setSelectNetwork).toHaveBeenCalled();
+    });
   });
 });
