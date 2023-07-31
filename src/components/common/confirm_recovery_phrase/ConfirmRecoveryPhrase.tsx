@@ -91,11 +91,6 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
 
     return (
       <div className="mt-4">
-        <div className="flex justify-center items-center mb-4">
-          <p className="text-center">
-            {t("form.confirm_recovery_phrase_description")}
-          </p>
-        </div>
         <div className="grid grid-cols-3 gap-2">
           {seedWords.map(({ word, accept }, index) => (
             <SeedWord
@@ -109,6 +104,10 @@ export const ConfirmRecoveryPhrase: FC<ConfirmRecoveryPhraseProps> = memo(
             />
           ))}
         </div>
+
+        <p className="text-center text-xl font-bold font-inter my-4">
+          {t("form.confirm_recovery_phrase_description")}
+        </p>
 
         <div className="flex justify-center flex-wrap items-center mt-5 p-2 gap-2">
           {words.map((word, index) => (

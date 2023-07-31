@@ -84,7 +84,7 @@
       "confirm_password_requirements": "パスワードが一致しません",
       "required": "必須",
       "confirm_recovery_phrase": "リカバリーフレーズを確認",
-      "confirm_recovery_phrase_description": "リカバリーフレーズを正しい順序で選択して確認してください。",
+      "confirm_recovery_phrase_description": "回復フレーズを正しい順序でドラッグして確認する。",
       "next": "次へ"
     }
   },
