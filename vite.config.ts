@@ -48,6 +48,7 @@ export default defineConfig({
         "**/src/constants/**",
         "**/src/routes/**",
         "**/src/components/common/**",
+        "**/src/xcm/**",
       ],
     },
   },

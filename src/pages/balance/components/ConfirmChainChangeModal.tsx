@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import { Chain } from "@src/storage/entities/Chains";
+import { useThemeContext } from "@src/providers";
+import { Button } from "@src/components/common";
 
 interface ConfirmChainChangeModalProps {
   isOpen: boolean;
@@ -27,6 +29,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const { t: tCommon } = useTranslation("common");
+
   const changeIsToEVM = chainToChange?.supportedAccounts[0].includes("EVM");
 
   const chainType = chainToChange?.supportedAccounts[0].toLocaleLowerCase();
@@ -64,7 +67,7 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                 >
                   {t("chain_selector.change_to")} {chainToChange?.name || ""}
                   <span className="capitalize text-gray-300 text-xs block">
-                    ( {t(`chain_selector.${chainType}_type`) || ""} )
+                    ( {tCommon(`${chainType?.toLowerCase()}_type`)} )
                   </span>
                 </Dialog.Title>
 
@@ -88,38 +91,37 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   <p className="text-sm">
                     {needToCreateAccount
                       ? t("chain_selector.create_or_import_warning", {
-                          supported_type: `$tCommon(${chainType}_type)`,
+                          supported_type: tCommon(
+                            `${chainType?.toLowerCase()}_type`
+                          ),
                         })
                       : t("chain_selector.network_change_warning")}
                   </p>
                 </div>
 
-                <div className="mt-4 flex justify-end gap-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium  outline-0"
+                <div className="mt-4 flex justify-end gap-4 items-center">
+                  <Button
+                    variant="text"
+                    classname={`text-sm font-medium`}
                     onClick={onClose}
                   >
                     {tCommon("cancel")}
-                  </button>
+                  </Button>
                   {!needToCreateAccount ? (
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
+                    <Button
+                      variant="text"
+                      classname={`text-sm font-medium`}
                       onClick={onConfirm}
                     >
                       {t("chain_selector.change")}
-                    </button>
+                    </Button>
                   ) : (
-                    <>
-                      <button
-                        type="button"
-                        className="inline-flex justify-center rounded-md border border-transparent bg-custom-green-bg px-4 py-2 text-sm font-medium"
-                        onClick={() => navigate(CREATE_ACCOUNT)}
-                      >
-                        {t("chain_selector.create_account")}
-                      </button>
-                    </>
+                    <Button
+                      classname={`text-sm font-medium`}
+                      onClick={() => navigate(CREATE_ACCOUNT)}
+                    >
+                      {t("chain_selector.create_account")}
+                    </Button>
                   )}
                 </div>
               </Dialog.Panel>

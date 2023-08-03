@@ -5,7 +5,8 @@ import { FiChevronDown } from "react-icons/fi";
 import { Asset } from "@src/providers/assetProvider/types";
 import { AssetIcon } from "@src/components/common/AssetIcon";
 import { useFormContext } from "react-hook-form";
-import { XCM_ASSETS_MAPPING } from "@src/constants/xcm";
+import { XCM_ASSETS_MAPPING } from "@src/xcm/assets";
+import { useLocation } from "react-router-dom";
 
 interface SelectableAssetProps {
   onChangeAsset: (asset: Asset) => void;
@@ -14,6 +15,8 @@ interface SelectableAssetProps {
 export const SelectableAsset: FC<SelectableAssetProps> = ({
   onChangeAsset,
 }) => {
+  const { state } = useLocation();
+
   const {
     state: { assets },
   } = useAssetContext();
@@ -53,7 +56,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
         setAssetsToSelect(assets);
       }
     }
-  }, [assets, to]);
+  }, [assets, to, state]);
 
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>

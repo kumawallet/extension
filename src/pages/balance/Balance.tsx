@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance } from "./components";
 import { useLocation } from "react-router-dom";
-import { useNetworkContext } from "@src/providers";
+import { useNetworkContext, useThemeContext } from "@src/providers";
 
 export interface Asset {
   name: string;
@@ -17,24 +17,18 @@ export interface Asset {
 export const Balance = () => {
   const { t } = useTranslation("balance");
   const { state } = useLocation();
+  const { color } = useThemeContext();
   const {
     state: { selectedChain },
   } = useNetworkContext();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const TABS = useMemo(() => {
-    return [
-      {
-        name: t("assets"),
-        component: <Assets />,
-      },
-      {
-        name: t("activity"),
-        component: <Activity />,
-      },
-    ];
-  }, []);
+  const TABS = [t("assets"), t("activity")];
+
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [selectedChain?.name]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -52,21 +46,20 @@ export const Balance = () => {
             onChange={setSelectedIndex}
             defaultIndex={state?.tab === "activity" ? 1 : 0}
           >
-            <Tab.List className="flex space-x-1 p-1 border-b-[1px] border-b-[#343A40] mt-5">
-              {TABS.map((tab, index) => (
+            <Tab.List
+              className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-5`}
+            >
+              {TABS.map((tab) => (
                 <Tab
-                  key={tab.name}
+                  key={tab}
                   className={({ selected }) =>
-                    `px-4 py-1 focus:outline-none relative ${
-                      selected
-                        ? index === 0
-                          ? "text-custom-green-bg active-tab"
-                          : "text-[#FFC300] active-tab"
-                        : "text-white"
+                    `px-4 py-1 focus:outline-none relative ${selected
+                      ? `text-${color}-secondary active-tab after:bg-${color}-fill`
+                      : "text-white"
                     }`
                   }
                 >
-                  {tab.name}
+                  {tab}
                 </Tab>
               ))}
             </Tab.List>

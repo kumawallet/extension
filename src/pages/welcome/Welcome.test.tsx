@@ -20,6 +20,17 @@ describe("Welcome", () => {
     vi.mock("react-router-dom", () => ({
       useNavigate: () => () => useNavigateMock(),
     }));
+
+    vi.mock("@src/utils/env", () => ({
+      getWebAPI: () => ({
+        runtime: {
+          getURL: () => ""
+        },
+        tabs: {
+          create: () => ""
+        }
+      })
+    }))
   });
 
   it("should render", () => {

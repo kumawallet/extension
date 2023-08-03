@@ -11,6 +11,7 @@ import {
   useNetworkContext,
   useTxContext,
   useAccountContext,
+  useThemeContext,
 } from "@src/providers";
 import Chains from "@src/storage/entities/Chains";
 import { FaChevronRight } from "react-icons/fa";
@@ -24,6 +25,7 @@ const chipColor = {
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
+  const { color } = useThemeContext();
 
   const {
     state: { type, chains },
@@ -47,9 +49,8 @@ export const Activity = () => {
 
   useEffect(() => {
     if (selectedAccount) {
-      getContacts();
+      Promise.all([getNetworks(), getContacts()]);
     }
-    getNetworks();
   }, [selectedAccount.key]);
 
   const getNetworks = async () => {
@@ -175,7 +176,7 @@ export const Activity = () => {
             >
               <div className="flex items-center justify-between gap-3">
                 <a
-                  className="text-custom-green-bg hover:bg-custom-green-bg hover:bg-opacity-30 rounded-full p-1"
+                  className={`text-${color}-primary hover:bg-${color}-primary hover:bg-opacity-30 rounded-full p-1`}
                   href={getLink(network, hash)}
                   target="_blank"
                   rel="noreferrer"
@@ -188,9 +189,8 @@ export const Activity = () => {
                     lastUpdated as number
                   )}`}</p>
                   <p
-                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
-                      chipColor[status as RecordStatus]
-                    }`}
+                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${chipColor[status as RecordStatus]
+                      }`}
                   >
                     {status}
                   </p>

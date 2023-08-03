@@ -34,7 +34,7 @@ jobs:
         run: npm run test:cov
         
       - name: Run Build
-       run: |-
+        run: |-
           npm run build:chrome
           zip -r chrome-extension-${{ github.event.pull_request.head.sha }}.zip dist/chrome
 

@@ -1,4 +1,4 @@
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useThemeContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 
@@ -6,6 +6,8 @@ export const AccountSelected = () => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const { color } = useThemeContext();
 
   const account = cropAccount(selectedAccount?.value?.address);
 
@@ -21,7 +23,14 @@ export const AccountSelected = () => {
         data-testid="account-button"
       >
         <Icon />
-        <p className="text-custom-green-bg">{account}</p>
+        <p
+          className={`text-${color}-primary`}
+          style={{
+            color,
+          }}
+        >
+          {account}
+        </p>
       </button>
     </>
   );

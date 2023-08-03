@@ -14,6 +14,7 @@ import {
 } from "@src/routes/paths";
 import { ICON_SIZE } from "@src/constants/icons";
 import { RxCross2 } from "react-icons/rx";
+import { useThemeContext } from "@src/providers";
 
 const OPTIONS = [
   {
@@ -40,6 +41,7 @@ const OPTIONS = [
 
 export const Settings = () => {
   const { t } = useTranslation("settings");
+  const { color } = useThemeContext();
 
   const navigate = useNavigate();
 
@@ -53,8 +55,10 @@ export const Settings = () => {
       {({ close }) => (
         <>
           <Menu.Button>
-            <div className="flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer">
-              <BsGear className="fill-custom-green-bg" />
+            <div
+              className={`flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer text-${color}-primary`}
+            >
+              <BsGear />
             </div>
           </Menu.Button>
           <Transition
@@ -83,7 +87,7 @@ export const Settings = () => {
                         <div
                           key={opt.text}
                           onClick={() => navigate(opt.href)}
-                          className="flex justify-between items-center hover:bg-custom-green-bg hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer"
+                          className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
                         >
                           <p className="text-xl">{t(opt.text)}</p>
                           <BsChevronRight />

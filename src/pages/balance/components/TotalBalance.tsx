@@ -10,6 +10,7 @@ import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
 import { useAccountContext, useAssetContext } from "@src/providers";
+import { Button } from "@src/components/common";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -83,7 +84,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         <div className="flex gap-2 items-center">
           <p className="text-2xl">$</p>
           <p className="text-5xl" data-testid="balance">
-            {showBalance ? formatAmountWithDecimals(totalBalance, 5) : "***"}
+            {showBalance ? (formatAmountWithDecimals(totalBalance, 5) || "0") : "***"}
           </p>
         </div>
         {!showBalance ? (
@@ -101,20 +102,18 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         )}
       </div>
       <div className="flex gap-3 justify-center">
-        <button
-          onClick={() => navigate(SEND)}
-          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40"
-        >
-          <BsArrowUpRight />
-          <p>{t("send")}</p>
-        </button>
-        <button
-          onClick={() => navigate(RECEIVE)}
-          className="flex gap-1 items-center text-custom-green-bg font-bold text-lg px-3 py-1 rounded-2xl hover:bg-custom-gray-bg hover:bg-opacity-40"
-        >
-          <BsArrowDownLeft />
-          <p>{t("receive")}</p>
-        </button>
+        <Button onClick={() => navigate(SEND)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <BsArrowUpRight />
+            <p>{t("send")}</p>
+          </span>
+        </Button>
+        <Button onClick={() => navigate(RECEIVE)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <BsArrowDownLeft />
+            <p>{t("receive")}</p>
+          </span>
+        </Button>
       </div>
     </div>
   );

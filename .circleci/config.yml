@@ -14,6 +14,8 @@ jobs:
         type: string
     docker:
       - image: cimg/node:<< parameters.node-version >>
+        environment:
+          NODE_OPTIONS: --max-old-space-size=2048
     resource_class: medium
     steps:
       - checkout

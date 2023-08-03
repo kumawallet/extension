@@ -1,13 +1,13 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import { AccountType } from "@src/accounts/types";
-import {
-  Loading,
-  LoadingButton,
-  ReEnterPassword,
-} from "@src/components/common";
+import { Loading, Button, ReEnterPassword } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import {
+  useAssetContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { Contract, ethers, Wallet, BigNumber } from "ethers";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -16,8 +16,9 @@ import erc20abi from "@src/constants/erc20.abi.json";
 import { Fees } from "./Fees";
 import { confirmTx, evmTx, EVMFee } from "@src/types";
 import { BigNumber0 } from "@src/constants/assets";
-import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
 import { captureError } from "@src/utils/error-handling";
+import { XCM_MAPPING } from "@src/xcm/extrinsics";
+import { MapResponseEVM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
 
 interface EvmFormProps {
@@ -27,6 +28,7 @@ interface EvmFormProps {
 export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
 
   const {
     state: { api, selectedChain },
@@ -120,11 +122,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             ...Object.keys(extrinsicValues).map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "currency_address"
-                    | "amount"
-                    | "destination"
-                    | "weight"
+                key as
+                | "currency_address"
+                | "amount"
+                | "destination"
+                | "weight"
                 ]
             )
           ).catch(() => {
@@ -290,8 +292,8 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         </p>
       )}
 
-      <LoadingButton
-        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
+      <Button
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{
@@ -299,7 +301,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         }}
       >
         {t("continue")}
-      </LoadingButton>
+      </Button>
     </>
   );
 };

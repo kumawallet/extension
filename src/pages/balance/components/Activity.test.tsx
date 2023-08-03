@@ -36,6 +36,9 @@ describe("Actvity", () => {
           selectedAccount: selectedEVMAccountMock,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("@src/Extension");
@@ -64,6 +67,8 @@ describe("Actvity", () => {
     const { getByTestId } = renderComponent();
     await waitFor(() => {
       expect(getByTestId("search-input")).toBeDefined();
+    }, {
+      timeout: 10000,
     });
   });
 

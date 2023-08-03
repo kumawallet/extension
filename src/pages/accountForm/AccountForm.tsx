@@ -13,7 +13,7 @@ import { AccountType } from "@src/accounts/types";
 import { getAccountType } from "@src/utils/account-utils";
 import {
   InputErrorMessage,
-  LoadingButton,
+  Button,
   PageWrapper,
   ReEnterPassword,
   SucessMessage,
@@ -409,16 +409,17 @@ export const AccountForm: FC<AddAccountFormProps> = ({
           </div>
         )}
         <div className="flex justify-end" data-testid="submitbtn">
-          <LoadingButton
+          <Button
             onClick={submit}
             isLoading={isLoading}
             isDisabled={
+              isLoading ||
               (generateSeed && !showRecoveryPhrase) ||
               (showInsertSeedStep && !seedConfirmationIsValid)
             }
           >
             {generateSeed && !showInsertSeedStep ? t("form.next") : buttonText}
-          </LoadingButton>
+          </Button>
         </div>
       </div>
     </PageWrapper>

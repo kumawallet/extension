@@ -17,7 +17,8 @@ import { FiChevronLeft } from "react-icons/fi";
 import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
 import { BigNumber, Contract } from "ethers";
 import { getWebAPI } from "@src/utils/env";
-import { MapResponseEVM, XCM_MAPPING } from "@src/constants/xcm";
+import { XCM_MAPPING } from "@src/xcm/extrinsics";
+import { MapResponseEVM } from "@src/xcm/interfaces";
 
 const WebAPI = getWebAPI();
 

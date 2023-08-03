@@ -28,6 +28,9 @@ describe("ManageAssets", () => {
           type: AccountType.EVM,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("react-router-dom", () => ({

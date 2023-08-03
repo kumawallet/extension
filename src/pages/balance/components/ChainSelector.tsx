@@ -1,7 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
 import { getAccountType } from "@src/utils/account-utils";
@@ -17,6 +21,7 @@ export const ChainSelector = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
+  const { color } = useThemeContext();
   const {
     state: { chains, selectedChain },
     setSelectNetwork,

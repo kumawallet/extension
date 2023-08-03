@@ -1,5 +1,5 @@
 import {
-  LoadingButton,
+  Button,
   PageWrapper,
   ReEnterPassword,
 } from "@src/components/common";
@@ -410,20 +410,20 @@ export const CallContract: FC<CallContractProps> = ({
         )}
 
         <div className="flex gap-2 justify-end">
-          <LoadingButton
+          <Button
             isDisabled={isLoading}
             isLoading={isLoading}
             onClick={onClose}
           >
             {t("cancel")}
-          </LoadingButton>
-          <LoadingButton
+          </Button>
+          <Button
             isDisabled={isLoading || !canSign}
             isLoading={isLoading}
             onClick={send}
           >
             {t("sign")}
-          </LoadingButton>
+          </Button>
         </div>
       </div>
     </PageWrapper>

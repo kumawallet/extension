@@ -1,9 +1,5 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import {
-  LoadingButton,
-  Loading,
-  ReEnterPassword,
-} from "@src/components/common";
+import { Button, Loading, ReEnterPassword } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -11,6 +7,7 @@ import {
   useAccountContext,
   useAssetContext,
   useNetworkContext,
+  useThemeContext,
 } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import Extension from "@src/Extension";
@@ -26,8 +23,9 @@ import metadata from "@src/constants/metadata.json";
 import { Fees } from "./Fees";
 import { confirmTx, polkadotExtrinsic } from "@src/types";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
-import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
 import { captureError } from "@src/utils/error-handling";
+import { XCM_MAPPING } from "@src/xcm/extrinsics";
+import { MapResponseXCM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
 
 const defaultFees = {
@@ -42,6 +40,7 @@ interface WasmFormProps {
 export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
 
   const {
     state: { selectedAccount },
@@ -141,27 +140,27 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
             .filter(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "dest"
-                    | "beneficiary"
-                    | "assets"
-                    | "feeAssetItem"
-                    | "currencyId"
-                    | "amount"
-                    | "destWeightLimit"
+                key as
+                | "dest"
+                | "beneficiary"
+                | "assets"
+                | "feeAssetItem"
+                | "currencyId"
+                | "amount"
+                | "destWeightLimit"
                 ] !== null
             )
             .map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "dest"
-                    | "beneficiary"
-                    | "assets"
-                    | "feeAssetItem"
-                    | "currencyId"
-                    | "amount"
-                    | "destWeightLimit"
+                key as
+                | "dest"
+                | "beneficiary"
+                | "assets"
+                | "feeAssetItem"
+                | "currencyId"
+                | "amount"
+                | "destWeightLimit"
                 ]
             )
         );
@@ -325,8 +324,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         </p>
       )}
 
-      <LoadingButton
-        classname="font-medium text-base bg-[#212529] hover:bg-custom-green-bg transition-all w-full py-2 md:py-4 rounded-md mt-7"
+      <Button
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{
@@ -334,7 +333,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         }}
       >
         {t("continue")}
-      </LoadingButton>
+      </Button>
     </>
   );
 };

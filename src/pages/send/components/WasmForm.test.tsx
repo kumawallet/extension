@@ -98,6 +98,9 @@ describe("WasmForm", () => {
           selectedAccount: selectedWASMAccountMock,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     vi.mock("react-hook-form", () => ({
@@ -229,19 +232,18 @@ describe("WasmForm", () => {
 
     const { getByText } = renderComponent();
     const button = getByText(en.send.continue) as HTMLButtonElement;
-    await waitFor(
-      () => {
-        expect(button.disabled).toEqual(false);
-      },
-      {
-        timeout: 10000,
-      }
-    );
+    await waitFor(() => {
+      expect(button.disabled).toEqual(false);
+    }, {
+      timeout: 10000
+    });
     act(() => {
       fireEvent.click(button);
     });
     await waitFor(() => {
       expect(confirmTx).toHaveBeenCalled();
+    }, {
+      timeout: 10000
     });
   });
 
@@ -297,19 +299,18 @@ describe("WasmForm", () => {
 
     const { getByText } = renderComponent();
     const button = getByText(en.send.continue) as HTMLButtonElement;
-    await waitFor(
-      () => {
-        expect(button.disabled).toEqual(false);
-      },
-      {
-        timeout: 10000,
-      }
-    );
+    await waitFor(() => {
+      expect(button.disabled).toEqual(false);
+    }, {
+      timeout: 10000
+    });
     act(() => {
       fireEvent.click(button);
     });
     await waitFor(() => {
       expect(confirmTx).toHaveBeenCalled();
+    }, {
+      timeout: 10000
     });
   });
 
@@ -369,20 +370,19 @@ describe("WasmForm", () => {
 
     const { getByText } = renderComponent();
     const button = getByText(en.send.continue) as HTMLButtonElement;
-    await waitFor(
-      () => {
-        expect(button.disabled).toEqual(false);
-      },
-      {
-        timeout: 10000,
-      }
-    );
+    await waitFor(() => {
+      expect(button.disabled).toEqual(false);
+    }, {
+      timeout: 10000
+    });
     act(() => {
       fireEvent.click(button);
     });
 
     await waitFor(() => {
       expect(confirmTx).toHaveBeenCalled();
+    }, {
+      timeout: 10000
     });
   });
 });

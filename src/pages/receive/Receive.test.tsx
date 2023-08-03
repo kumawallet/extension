@@ -26,6 +26,9 @@ describe("Receive", () => {
           selectedAccount: selectedEVMAccountMock,
         },
       }),
+      useThemeContext: () => ({
+        color: "red",
+      }),
     }));
 
     // mock useCopyToClipboard

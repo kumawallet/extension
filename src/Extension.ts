@@ -129,7 +129,6 @@ export default class Extension {
       throw new Error("not_authorized");
     }
     await Storage.getInstance().resetWallet();
-    localStorage.removeItem("welcome");
   }
 
   static async signIn(password: string) {

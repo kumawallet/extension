@@ -1,12 +1,6 @@
 import { en } from "@src/i18n";
 import i18n from "@src/utils/i18n";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { SignIn } from "./SignIn";
 
@@ -24,6 +18,11 @@ describe("SignIn", () => {
   beforeEach(() => {
     renderComponent();
 
+    vi.mock("@src/providers", () => ({
+      useThemeContext: () => ({
+        color: "red",
+      }),
+    }));
     vi.mock("react-router-dom", () => ({
       useNavigate: () => () => navigate(),
     }));

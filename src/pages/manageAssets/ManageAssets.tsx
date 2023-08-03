@@ -1,9 +1,5 @@
 import { useMemo, useEffect } from "react";
-import {
-  InputErrorMessage,
-  LoadingButton,
-  PageWrapper,
-} from "@src/components/common";
+import { InputErrorMessage, Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
@@ -143,9 +139,9 @@ export const ManageAssets = () => {
             <InputErrorMessage message={errors.decimals?.message} />
           </div>
           <div className="flex justify-end" data-testid="submitbtn">
-            <LoadingButton onClick={onSubmit} isLoading={isSubmitting}>
+            <Button onClick={onSubmit} isLoading={isSubmitting}>
               {t("add")}
-            </LoadingButton>
+            </Button>
           </div>
         </div>
       </PageWrapper>

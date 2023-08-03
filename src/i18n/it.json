@@ -33,7 +33,8 @@
     "accounts_not_found": "Accounts non trovati",
     "network_not_found": "Rete non trovata",
     "contact_not_found": "Contatto non trovato",
-    "no_contacts_found": "Nessun contatto trovato"
+    "no_contacts_found": "Nessun contatto trovato",
+    "error": ""
   },
   "welcome": {
     "welcome_message": "Benvenuto a Kuma Wallet",

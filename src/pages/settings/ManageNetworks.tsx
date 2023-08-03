@@ -5,13 +5,17 @@ import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { Fragment, useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
-import { InputErrorMessage, Loading } from "@src/components/common";
+import { Button, InputErrorMessage, Loading } from "@src/components/common";
 import Extension from "@src/Extension";
 import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number, array } from "yup";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useNetworkContext,
+  useThemeContext,
+} from "@src/providers";
 import { getAccountType } from "../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
@@ -77,6 +81,7 @@ const SUPPORTED_CHAINS_TYPE = [
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
+  const { color } = useThemeContext();
   const {
     state: { selectedChain },
     refreshNetworks,
@@ -231,14 +236,10 @@ export const ManageNetworks = () => {
         />
         <p className="font-medium text-2xl">{t("title")}</p>
         {!isCreating && (
-          <div className="flex-1 flex justify-end">
-            <button
-              type="button"
-              className="mt-5 inline-flex justify-between items-center rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-              onClick={showCreateForm}
-            >
+          <div className="flex-1 flex justify-end mt-5">
+            <Button classname="text-sm font-medium" onClick={showCreateForm}>
               <span>{t("new_network")}</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -482,27 +483,22 @@ export const ManageNetworks = () => {
           )}
 
           {(isCustom(selectedNetwork.name) || isCreating) && (
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-5">
               {!isCreating && (
-                <button
-                  className="mt-5 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
-                  onClick={() => deleteNetwork()}
+                <Button
+                  variant="text"
+                  classname="text-sm"
+                  onClick={deleteNetwork}
                 >
                   {tCommon("delete")}
-                </button>
+                </Button>
               )}
-              <button
-                className="mt-5 ml-4 inline-flex justify-center border border-custom-gray-bg text-white rounded-lg py-2 px-4 hover:bg-gray-400 hover:bg-opacity-30 transition duration-500 ease select-none focus:outline-none focus:shadow-outline text-sm"
-                onClick={() => cancel()}
-              >
+              <Button variant="text" classname="text-sm" onClick={cancel}>
                 {tCommon("cancel")}
-              </button>
-              <button
-                className="mt-5 ml-4 inline-flex justify-center border border-custom-green-bg text-white rounded-lg py-2 px-4 transition duration-500 ease select-none bg-custom-green-bg focus:outline-none focus:shadow-outline text-sm"
-                onClick={_onSubmit}
-              >
+              </Button>
+              <Button classname="text-sm" onClick={_onSubmit}>
                 {tCommon("save")}
-              </button>
+              </Button>
             </div>
           )}
         </>

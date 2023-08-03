@@ -1,6 +1,5 @@
 import { FC, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper } from "@src/components/common/PageWrapper";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
@@ -8,6 +7,7 @@ import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { captureError } from "@src/utils/error-handling";
+import { Button, PageWrapper } from "@src/components/common";
 
 interface SignInProps {
   afterSignIn?: () => void;
@@ -74,14 +74,17 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             )}
           </button>
         </div>
-        <button
-          aria-disabled={!isValid}
-          disabled={!isValid}
-          className="mb-4 border bg-custom-green-bg text-white rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:bg-custom-green-bg focus:outline-none focus:shadow-outline w-fit mx-auto disabled:bg-gray-600"
-          onClick={signIn}
-        >
-          {t("signin_button_text")}
-        </button>
+
+        <div className="flex">
+          <Button
+            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto"
+            aria-disabled={!isValid}
+            isDisabled={!isValid}
+            onClick={signIn}
+          >
+            {t("signin_button_text")}
+          </Button>
+        </div>
         <p
           className="text-center mb-6"
           onClick={() => navigate(RESTORE_PASSWORD)}

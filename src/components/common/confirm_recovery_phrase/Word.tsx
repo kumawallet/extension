@@ -1,5 +1,4 @@
-import { FC } from "react";
-import { memo } from "react";
+import { FC, memo } from "react";
 import { useDrag } from "react-dnd";
 
 export interface WordProps {
@@ -21,7 +20,7 @@ export const Word: FC<WordProps> = memo(function Word({
     }),
     [word]
   );
-  let bg = "bg-custom-green-bg";
+  let bg = "bg-chain-default-primary";
   if (isDropped) {
     bg = "bg-custom-gray-bg";
   }
@@ -29,7 +28,7 @@ export const Word: FC<WordProps> = memo(function Word({
   return (
     <div
       ref={drag}
-      className={`${bg} p-2 border border-custom-green-bg rounded-md text-center cursor-pointer`}
+      className={`${bg} p-2 border border-default-primary rounded-md text-center cursor-pointer`}
       style={{ opacity }}
       data-testid="box"
     >
