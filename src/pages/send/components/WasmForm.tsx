@@ -28,7 +28,7 @@ import { confirmTx, polkadotExtrinsic } from "@src/types";
 import { PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { MapResponseXCM, XCM_MAPPING } from "@src/constants/xcm";
 import { captureError } from "@src/utils/error-handling";
-import { formatBN } from "@src/utils/assets";
+import { ShowBalance } from "./ShowBalance";
 
 const defaultFees = {
   "estimated fee": new BN("0"),
@@ -296,12 +296,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     <>
       <ReEnterPassword cb={loadSender} />
       <CommonFormFields />
-      {asset?.transferable && !asset?.transferable?.eq(asset?.balance) && (
-        <div className="text-start flex-col text-sm rounded-lg  flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white gap-1 mb-3">
-          <p>Total: {formatBN(String(asset?.balance), decimals)}</p>
-          <p>Available: {formatBN(String(asset?.transferable), decimals)}</p>
-        </div>
-      )}
+      <ShowBalance />
 
       <div className="mb-3">
         <p className="text-xs">{t("tip")}</p>

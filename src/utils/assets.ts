@@ -76,7 +76,7 @@ export const formatAmountWithDecimals = (
   return Number((amount / 10 ** assetDecimals).toFixed(decimals));
 };
 
-export const formatBN = (bn: string, decimals: number) => {
+export const formatBN = (bn: string, decimals = 1) => {
   let _number = bn;
 
   if (!decimals) return "0";
@@ -94,7 +94,7 @@ export const formatBN = (bn: string, decimals: number) => {
   }
 
   if (_number.endsWith(".")) {
-    _number = "0";
+    _number = _number.slice(0, _number.length - 1);
   }
 
   if (_number.startsWith(".")) {

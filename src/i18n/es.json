@@ -84,7 +84,7 @@
       "confirm_password_requirements": "Las contraseñas no coinciden.",
       "required": "Requerido",
       "confirm_recovery_phrase": "Confirmar frase de recuperación",
-      "confirm_recovery_phrase_description": "Por favor confirma tu frase de recuperación seleccionando las palabras en el orden correcto.",
+      "confirm_recovery_phrase_description": "Por favor confirma tu frase de recuperación arrastrando las palabras en el orden correcto.",
       "next": "Siguiente"
     }
   },
