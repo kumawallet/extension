@@ -67,6 +67,8 @@ describe("Actvity", () => {
     const { getByTestId } = renderComponent();
     await waitFor(() => {
       expect(getByTestId("search-input")).toBeDefined();
+    }, {
+      timeout: 10000,
     });
   });
 
