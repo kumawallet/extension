@@ -122,11 +122,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             ...Object.keys(extrinsicValues).map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "currency_address"
-                    | "amount"
-                    | "destination"
-                    | "weight"
+                key as
+                | "currency_address"
+                | "amount"
+                | "destination"
+                | "weight"
                 ]
             )
           ).catch(() => {

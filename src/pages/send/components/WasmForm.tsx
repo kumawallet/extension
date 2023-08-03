@@ -140,27 +140,27 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
             .filter(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "dest"
-                    | "beneficiary"
-                    | "assets"
-                    | "feeAssetItem"
-                    | "currencyId"
-                    | "amount"
-                    | "destWeightLimit"
+                key as
+                | "dest"
+                | "beneficiary"
+                | "assets"
+                | "feeAssetItem"
+                | "currencyId"
+                | "amount"
+                | "destWeightLimit"
                 ] !== null
             )
             .map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "dest"
-                    | "beneficiary"
-                    | "assets"
-                    | "feeAssetItem"
-                    | "currencyId"
-                    | "amount"
-                    | "destWeightLimit"
+                key as
+                | "dest"
+                | "beneficiary"
+                | "assets"
+                | "feeAssetItem"
+                | "currencyId"
+                | "amount"
+                | "destWeightLimit"
                 ]
             )
         );
