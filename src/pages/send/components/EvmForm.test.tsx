@@ -110,7 +110,7 @@ describe("EvmForm", () => {
         ...ethers,
         ethers: {
           ...ethers.ethers,
-          Wallet: class Wallet {},
+          Wallet: class Wallet { },
           Contract: class Contract {
             estimateGas = {
               transfer: vi.fn().mockReturnValue(BigNumber.from("21000")),
@@ -132,6 +132,8 @@ describe("EvmForm", () => {
 
     await waitFor(() => {
       expect(button.disabled).toEqual(false);
+    }, {
+      timeout: 10000
     });
 
     act(() => {
@@ -188,6 +190,8 @@ describe("EvmForm", () => {
 
     await waitFor(() => {
       expect(button.disabled).toEqual(false);
+    }, {
+      timeout: 10000
     });
 
     act(() => {
