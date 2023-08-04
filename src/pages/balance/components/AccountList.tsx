@@ -56,7 +56,7 @@ export const AccountList = () => {
     <Menu>
       <Menu.Button data-testid="account-button">
         <div className="flex justify-center items-center rounded-full transition-all bg-[#212529] bg-opacity-30 hover:bg-opacity-50 p-1 cursor-pointer">
-          <Logo className="w-7 h-7" fillClassName={`fill-${color}-primary`} />
+          <Logo className="w-7 h-7" fillClassName={`fill-${color}-primary`} lineClassName={`fill-${color}-secondary`} />
         </div>
       </Menu.Button>
       <Transition
@@ -96,10 +96,9 @@ export const AccountList = () => {
                     {filteredAccounts.map((account) => (
                       <div
                         key={account?.key}
-                        className={`${
-                          selectedAccount?.key === account?.key &&
+                        className={`${selectedAccount?.key === account?.key &&
                           "bg-gray-400 bg-opacity-30"
-                        }  bg-opacity-30 flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition`}
+                          }  bg-opacity-30 flex rounded-lg py-2 px-4 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition`}
                         onClick={() => {
                           changeSelectedAccount(account as Account);
                           close();

@@ -110,7 +110,7 @@ export const getBeneficiary = ({
       interior: {
         X1: {
           [account]: {
-            network: "Any",
+            network: version === "V3" ? null : "Any",
             [accountKey]: accountId,
           },
         },
