@@ -4,7 +4,7 @@ import { BsChevronDown } from "react-icons/bs";
 import {
   useAccountContext,
   useNetworkContext,
-  useThemeContext,
+
 } from "@src/providers";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
@@ -21,7 +21,6 @@ export const ChainSelector = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
-  const { color } = useThemeContext();
   const {
     state: { chains, selectedChain },
     setSelectNetwork,
@@ -155,13 +154,13 @@ export const ChainSelector = () => {
                   <div key={spec}>
                     {filteredChains[spec as "mainnets" | "testnets" | "custom"]
                       .length > 0 && (
-                      <div className="flex items-center gap-3 whitespace-nowrap">
-                        <p className="text-[#808385] text-lg">
-                          {t(`chain_selector.${spec}`)}
-                        </p>
-                        <div className="h-[1px] w-full bg-[#343A40]" />
-                      </div>
-                    )}
+                        <div className="flex items-center gap-3 whitespace-nowrap">
+                          <p className="text-[#808385] text-lg">
+                            {t(`chain_selector.${spec}`)}
+                          </p>
+                          <div className="h-[1px] w-full bg-[#343A40]" />
+                        </div>
+                      )}
                     {filteredChains[spec as "mainnets" | "testnets" | "custom"]
                       .filter(({ name }) =>
                         name.toLowerCase().includes(search.toLowerCase())
