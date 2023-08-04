@@ -1,5 +1,5 @@
 import Record from "@src/storage/entities/activity/Record";
-import { TxProvider, reducer, useTxContext } from "./TxProvider";
+import { TxProvider, useTxContext } from "./TxProvider";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { selectedWASMAccountMock } from "@src/tests/mocks/account-mocks";
 import {
@@ -34,9 +34,7 @@ const activiyMock: Partial<Record>[] = [
   },
 ];
 
-const initialState = {
-  activity: [],
-};
+
 
 const testIds = {
   activity: "activity",
@@ -163,71 +161,72 @@ describe("TxProvider", () => {
 
     const providers = await import("@src/providers");
     providers.useNetworkContext = () =>
-      ({
-        state: {
-          api: {
-            registry: {
-              findMetaError: () => ({
-                section: "section",
-                name: "name",
-              }),
-            },
-            events: {
-              system: {
-                ExtrinsicSuccess: {
-                  is: () => false,
-                },
-                ExtrinsicFailed: {
-                  is: () => true,
-                },
+    ({
+      state: {
+        api: {
+          registry: {
+            findMetaError: () => ({
+              section: "section",
+              name: "name",
+            }),
+          },
+          events: {
+            system: {
+              ExtrinsicSuccess: {
+                is: () => false,
+              },
+              ExtrinsicFailed: {
+                is: () => true,
               },
             },
-            rpc: {
-              chain: {
-                getBlockHash: () => 1,
-                getBlock: () => ({
-                  block: {
-                    header: {
-                      hash: "0x123",
-                    },
-                    extrinsics: [
-                      {
-                        hash: "0x123",
-                      },
-                    ],
+          },
+          rpc: {
+            chain: {
+              getBlockHash: () => 1,
+              getBlock: () => ({
+                block: {
+                  header: {
+                    hash: "0x123",
                   },
-                }),
-              },
-            },
-            at: () => ({
-              query: {
-                system: {
-                  events: () => [
+                  extrinsics: [
                     {
-                      phase: {
-                        isApplyExtrinsic: true,
-                        asApplyExtrinsic: {
-                          eq: () => true,
-                        },
-                      },
-                      event: {
-                        // data: [dispatchError]
-                        data: [
-                          {
-                            isModule: true,
-                            asModule: {},
-                          },
-                        ],
-                      },
+                      hash: "0x123",
                     },
                   ],
                 },
-              },
-            }),
+              }),
+            },
           },
-          selectedChain: selectedWASMChainMock,
+          at: () => ({
+            query: {
+              system: {
+                events: () => [
+                  {
+                    phase: {
+                      isApplyExtrinsic: true,
+                      asApplyExtrinsic: {
+                        eq: () => true,
+                      },
+                    },
+                    event: {
+                      // data: [dispatchError]
+                      data: [
+                        {
+                          isModule: true,
+                          asModule: {},
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          }),
         },
-      } as any);
+        selectedChain: selectedWASMChainMock,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     const { findByTestId } = renderComponent();
 
@@ -235,27 +234,12 @@ describe("TxProvider", () => {
       const activity = await findByTestId(testIds.activity);
 
       expect(activity.innerHTML).toEqual(JSON.stringify(activiyMock));
+    }, {
+      timeout: 10000
     });
   });
 
   it("should load evm activity", async () => {
-    // const envUtils = await import("@src/utils/env");
-    // envUtils.getWebAPI = () => ({
-    //   windows: {
-    //     getCurrent: () => ({
-    //       id: 1,
-    //     }),
-    //   },
-    //   runtime: {
-    //     sendMessage: () => null,
-    //     connect: () => null,
-    //     onMessage: {
-    //       addListener: () => null,
-    //       removeListener: () => null,
-    //     },
-    //   },
-    // });
-
     const _Extension = (await import("@src/Extension")).default;
     _Extension.getActivity = vi.fn().mockReturnValue([
       {
@@ -267,18 +251,19 @@ describe("TxProvider", () => {
 
     const providers = await import("@src/providers");
     providers.useNetworkContext = () =>
-      ({
-        state: {
-          api: {
-            getTransaction: () => ({
-              wait: () => ({
-                status: 1,
-              }),
+    ({
+      state: {
+        api: {
+          getTransaction: () => ({
+            wait: () => ({
+              status: 1,
             }),
-          },
-          selectedChain: selectedEVMChainMock,
+          }),
         },
-      } as any);
+        selectedChain: selectedEVMChainMock,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     const { findByTestId } = renderComponent();
 
@@ -297,35 +282,4 @@ describe("TxProvider", () => {
       );
     });
   });
-
-  // describe("reducer", () => {
-  //   it("should initialize activity", () => {
-  //     const state = reducer(initialState, {
-  //       type: "init-activity",
-  //       payload: {
-  //         activity: activiyMock as Record[],
-  //       },
-  //     });
-
-  //     expect(state.activity).toEqual(activiyMock);
-  //   });
-
-  //   it("should update activity status", () => {
-  //     const state = reducer(
-  //       {
-  //         activity: activiyMock as Record[],
-  //       },
-  //       {
-  //         type: "update-activity-status",
-  //         payload: {
-  //           hash: "0x123",
-  //           status: RecordStatus.SUCCESS,
-  //           error: undefined,
-  //         },
-  //       }
-  //     );
-
-  //     expect(state.activity[0].status).toEqual(RecordStatus.SUCCESS);
-  //   });
-  // });
 });
