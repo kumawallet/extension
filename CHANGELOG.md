@@ -1,8 +1,17 @@
 # Changelog
 
+# 0.3.0
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/04**
+- [#31](https://github.com/blockcoders/kuma-wallet/pull/31) update missing deps
+- [#30](https://github.com/blockcoders/kuma-wallet/pull/30) M4 release
+
+# 0.2.7
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/01**
+- [#28](https://github.com/blockcoders/kuma-wallet/pull/28) M3 fixes
+
 # 0.2.6
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/07/10**
-Fix links and envs variables
+- Fix links and envs variables
 
 # 0.2.5
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/07/08**
