@@ -164,7 +164,7 @@ describe("assets", () => {
             metadata: {
               entries: () => ASSETS_MOCK,
             },
-            account: (assetId: unknown, address: unknown) => {
+            account: () => {
               return {
                 toJSON: () => ({
                   free: new BN(10),
@@ -233,7 +233,7 @@ describe("assets", () => {
             },
           },
           tokens: {
-            accounts: (address: unknown, assetId: unknown) => {
+            accounts: () => {
               return {
                 toJSON: () => ({
                   free: new BN(10),
