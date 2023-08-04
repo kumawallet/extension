@@ -21,7 +21,9 @@ export default class CacheAuth extends BaseEntity {
   static fromData<CacheAuth>(data: { [key: string]: unknown }): CacheAuth {
     const entity = CacheAuth.getInstance();
     Object.keys(data).forEach((key) => {
-      (entity as any)[key] = data[key];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      (entity as { [key: string]: unknown })[key] = data[key];
     });
     return entity as CacheAuth;
   }

@@ -51,9 +51,10 @@ export const makeQuerys = (params: Record<string, string>) => {
   );
 };
 
-export const isInPopup = function() {
-  const API = getWebAPI()
+export const isInPopup = function () {
+  const API = getWebAPI();
 
-  return (typeof API != undefined && API.extension) ?
-  API.extension.getViews({ type: "popup" }).length > 0 : null;
-}
+  return API != undefined && API.extension
+    ? API.extension.getViews({ type: "popup" }).length > 0
+    : null;
+};

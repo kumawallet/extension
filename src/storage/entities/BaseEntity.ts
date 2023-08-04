@@ -9,10 +9,10 @@ export default class BaseEntity {
     return undefined as T;
   }
 
-  static fromData<T>(data: { [key: string]: any }): T {
+  static fromData<T>(data: { [key: string]: string }): T {
     const entity = new this() as T;
     Object.keys(data).forEach((key) => {
-      (entity as any)[key] = data[key];
+      (entity as { [key: string]: string })[key] = data[key];
     });
     return entity;
   }

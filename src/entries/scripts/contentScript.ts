@@ -3,7 +3,9 @@ interface KumaProps {
   params: object;
 }
 
-(window as any).kuma = {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+window.kuma = {
   call: ({ method, params }: KumaProps) => {
     const origin = window.location.origin;
     return new Promise((res) => {
