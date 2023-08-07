@@ -46,14 +46,20 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
       );
 
       const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
-      setSelectedAsset(_assets[0]);
-      onChangeAsset(_assets[0]);
+
+      const defaultAsset = _assets.find(({ symbol }) => symbol === state?.symbol);
+
       setAssetsToSelect(_assets);
+      setSelectedAsset(defaultAsset || _assets[0]);
+      onChangeAsset(defaultAsset || _assets[0]);
     } else {
       if (assets.length > 0) {
-        setSelectedAsset(assets[0]);
-        onChangeAsset(assets[0]);
         setAssetsToSelect(assets);
+
+        const defaultAsset = assets.find(({ symbol }) => symbol === state?.symbol);
+
+        setSelectedAsset(defaultAsset || assets[0]);
+        onChangeAsset(defaultAsset || assets[0]);
       }
     }
   }, [assets, to, state]);

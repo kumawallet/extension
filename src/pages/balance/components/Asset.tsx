@@ -34,12 +34,15 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
         </div>
       </div>
 
-      <a
-        href="#"
-        className="bg-none outline-none p-2 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
+      <div
+        className="bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
       >
-        <BsArrowUpRight size={23} onClick={() => navigate(SEND)} />
-      </a>
+        <BsArrowUpRight size={23} onClick={() => navigate(SEND, {
+          state: {
+            symbol: asset.symbol,
+          }
+        })} />
+      </div>
     </div>
   );
 };

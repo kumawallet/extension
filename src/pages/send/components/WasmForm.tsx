@@ -272,13 +272,13 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const BN0 = new BN("0");
       const nativeBalance = assets[0].balance;
 
-      const assetToCompare = !asset.transferable?.isZero()
-        ? asset.transferable
-        : nativeBalance;
+      const assetToCompare = asset.transferable;
 
       if (isNativeAsset) {
         return bnAmount.gt(BN0) && estimatedTotal.lte(assetToCompare);
       } else {
+
+
         return (
           bnAmount.lte(assetToCompare) &&
           estimatedTotal.gt(BN0) &&
