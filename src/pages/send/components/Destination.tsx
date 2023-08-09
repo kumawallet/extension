@@ -45,7 +45,7 @@ export const Destination = () => {
   const to = watch("to");
 
   useEffect(() => {
-    if (selectedAccount.key && selectedChain?.name) {
+    if (selectedAccount.key && selectedChain?.name && to.name) {
       (async () => {
         try {
           const { contacts, ownAccounts, recent } =
@@ -86,6 +86,8 @@ export const Destination = () => {
       })();
     }
   }, [selectedAccount?.key, selectedChain?.name, isXcm, type, to?.name]);
+
+
 
   const onChangeAccount = (account: string) => {
     setDestinationAddress(account);
