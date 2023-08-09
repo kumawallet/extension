@@ -9,6 +9,7 @@ import { SelectableChain } from "./SelectableChain";
 import { useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
+import { Chain } from "@src/storage/entities/Chains";
 
 export const CommonFormFields = () => {
   const { t } = useTranslation("send");
@@ -26,7 +27,7 @@ export const CommonFormFields = () => {
 
   const to = watch("to");
 
-  const [destinationChains, setDestinationChains] = useState<any[]>([]);
+  const [destinationChains, setDestinationChains] = useState<Chain[]>([]);
 
   const getDestinationChains = async () => {
     let chains = [selectedChain];

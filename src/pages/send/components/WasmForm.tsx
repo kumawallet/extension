@@ -248,7 +248,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     setIsLoadingFee(true);
 
     const loadFees = setTimeout(async () => {
-      await getFeeData();
+      await getFeeData().catch();
       setIsLoadingFee(false);
     }, 1000);
 
@@ -325,7 +325,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{
