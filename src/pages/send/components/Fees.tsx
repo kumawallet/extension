@@ -10,7 +10,7 @@ export const Fees = ({ fee }: any) => {
   } = useNetworkContext();
   const { watch } = useFormContext();
 
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.nativeCurrency?.decimals || 1;
   const amount = watch("amount");
   const asset = watch("asset");
   const isNativeAsset = asset?.id === "-1";

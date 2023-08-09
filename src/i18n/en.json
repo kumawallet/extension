@@ -34,7 +34,8 @@
     "network_not_found": "Network not found",
     "contact_not_found": "Contact not found",
     "no_contacts_found": "No contacts found",
-    "error": "Si è verificato un errore"
+    "error": "An error has occurred",
+    "rpc_error": "Network error"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",

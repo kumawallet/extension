@@ -8,7 +8,7 @@ export const ShowBalance = () => {
   const asset = watch("asset");
 
 
-  const decimals = asset.decimals
+  const decimals = asset?.decimals
 
   const showTransferable =
     asset?.transferable && !asset?.transferable?.eq(asset?.balance);
