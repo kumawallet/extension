@@ -55,7 +55,7 @@ export const CommonFormFields = () => {
         <div className="flex gap-2 justify-center items-end mb-4">
           <div className="px-2">
             <p className="mb-2 font-inter font-light">From:</p>
-            <SelectableChain selectedChain={getValues("from")} />
+            <SelectableChain selectedChain={getValues("from") || {}} />
           </div>
           <TbChevronRight size={26} className="mb-2" />
           <div className="px-2">
@@ -84,7 +84,7 @@ export const CommonFormFields = () => {
                 allowLeadingZeros={false}
                 value={getValues("amount")}
                 onValueChange={({ value }) => {
-                  setValue("amount", value);
+                  setValue("amount", value || "0");
                 }}
                 allowedDecimalSeparators={["%"]}
               />

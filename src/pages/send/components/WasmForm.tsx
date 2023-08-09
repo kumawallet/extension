@@ -72,7 +72,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   });
 
   const _api = api as ApiPromise;
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.nativeCurrency?.decimals || 1;
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
   const asset = watch("asset");
@@ -104,11 +104,11 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   });
 
   const getFeeData = async () => {
-    if (!destinationAccount) return;
+    if (!destinationAccount && asset?.id) return;
     try {
       const _amount = isNativeAsset
         ? amount * currencyUnits
-        : amount * 10 ** asset.decimals;
+        : amount * 10 ** asset?.decimals || 0;
 
       const bnAmount = new BN(
         String(_amount.toLocaleString("fullwide", { useGrouping: false }))
@@ -226,7 +226,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       });
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon("failed_to_get_fees"));
+      showErrorToast(String(error).includes("disconnected") ? tCommon("rpc_error") : tCommon("failed_to_get_fees"));
       setFee(defaultFees);
     }
   };
@@ -243,7 +243,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       return;
     }
 
-    if (!destinationAccount || amount <= 0) return;
+    if (!destinationAccount || Number(amount) <= 0 || !asset?.id) return;
 
     setIsLoadingFee(true);
 
@@ -255,7 +255,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     return () => clearTimeout(loadFees);
   }, [amount, destinationAccount, destinationIsInvalid, asset?.id, to?.name]);
 
-  const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee;
+  const canContinue = Number(amount) > 0 && destinationAccount && !isLoadingFee && asset?.id;
 
   const isEnoughToPay = useMemo(() => {
     if (!amount || !currencyUnits) return false;

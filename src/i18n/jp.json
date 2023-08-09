@@ -34,7 +34,8 @@
     "network_not_found": "ネットワークが見つかりません",
     "contact_not_found": "連絡先は見つかりません",
     "no_contacts_found": "連絡先が存在しません",
-    "error": "エラーが発生しました"
+    "error": "エラーが発生しました",
+    "rpc_error": "ネットワークエラー"
   },
   "welcome": {
     "welcome_message": "Kuma Walletへようこそ",
