@@ -2,8 +2,11 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   safelist: [
     {
-      pattern: /-chain-/,
-      variants: ["after", "before", "hover", "selection"],
+      pattern: /^bg-chain-.*-(primary|secondary|fill|text)$/,
+      variants: ["hover", "after"],
+    },
+    {
+      pattern: /(text|border|fill|text|border)-chain/,
     },
   ],
   theme: {
@@ -38,13 +41,11 @@ module.exports = {
             primary: "#8077ff",
             secondary: "#fff",
             fill: "#8077ff",
-            text: "#fff",
           },
           astar: {
             primary: "#1b6dc1d9",
             secondary: "#fff",
             fill: "#1b6dc1d9",
-            text: "#fff",
           },
           "binance-smart-chain-mainnet": {
             primary: "#f3ba2f",
@@ -85,7 +86,6 @@ module.exports = {
             primary: "#d3046f",
             secondary: "#fff",
             fill: "#d3046f",
-            text: "#d3046f",
           },
           "polygon-mainnet": {
             primary: "#7c43da",
