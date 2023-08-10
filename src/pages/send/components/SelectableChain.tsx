@@ -48,7 +48,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
           </span>
         </Listbox.Button>
         {canSelectChain && (optionChains?.length || 0) > 0 && (
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+          <Listbox.Options className="absolute mt-1 max-h-60 w-max overflow-auto rounded-md bg-[#212529] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
             {optionChains?.map((chain) => (
               <Listbox.Option
                 key={chain.name}

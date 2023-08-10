@@ -57,7 +57,7 @@ export const Destination = () => {
             (acc) => acc.name !== selectedAccount.value.name
           ) : ownAccounts
 
-          const filterByType = (to as Chain).supportedAccounts.includes(type as AccountType) ? type as AccountType : (to as Chain).supportedAccounts[0] as AccountType;
+          const filterByType = (to as Chain).supportedAccounts[0] === (type as AccountType) ? type as AccountType : (to as Chain).supportedAccounts[0] as AccountType;
 
           setAccountToSelect([
             {
