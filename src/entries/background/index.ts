@@ -271,8 +271,9 @@ const processEVMTx = async ({
     )) as ethers.providers.JsonRpcProvider;
     const txReceipt = await api.getTransaction(txHash);
     const date = Date.now();
+
     const activity: Partial<IRecord> = {
-      address: originAddress,
+      address: destinationAddress,
       type: RecordType.TRANSFER,
       reference: AccountType.EVM,
       hash: txHash,

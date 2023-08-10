@@ -293,7 +293,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-2`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{
