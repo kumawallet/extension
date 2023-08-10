@@ -1,5 +1,17 @@
 # Changelog
 
+# 0.3.4
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/09**
+- [#35](https://github.com/blockcoders/kuma-wallet/pull/35) Improve destination chain
+
+# 0.3.3
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/09**
+- [#34](https://github.com/blockcoders/kuma-wallet/pull/34) fix validation before calculate fee
+
+# 0.3.2
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/07**
+- [#33](https://github.com/blockcoders/kuma-wallet/pull/33) fix non native asset transferable amount + send selected asset
+
 # 0.3.1
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/05**
 - [#32](https://github.com/blockcoders/kuma-wallet/pull/32) M3 fixes

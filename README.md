@@ -1,10 +1,8 @@
 Kuma Wallet
 ===========
 
-> Kuma is a work in progress. The documentation may not reflect the current implementation. **Expect a stable release and proper documentation for Q3 2023**.
-
 <p align="center">
-  <img width="630" src="./images/logo.svg" />
+  <img width="340" src="./images/logo.svg" />
 </p>
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kumawallet/extension/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kumawallet/extension/tree/main)
@@ -246,9 +244,19 @@ When attempting to call a contract method in Kuma Wallet, a pop-up will appear r
 
 **Note**: XCM allow assets to be transferred between chains meaning, for example, that some DOT can be moved from the relay-chain to some parachain or even between parachains. But, it does NOT support moving tokens to a different relay-chain/parachains ecosystem. In other words, DOT cannot be sent to Kusama using XCM.
 
+## Change Log
+
+See [Changelog](CHANGELOG.md) for more information.
+
 ## Contributing
 
 We welcome contributions from the community. If you would like to contribute, please read our [contributing guidelines](./CONTRIBUTING.md).
+
+## Collaborators
+
+- [**Jose Ramirez**](https://github.com/0xslipk)
+- [**Fernando Sirni**](https://github.com/fersirni)
+- [**Ruben Gutierrez**](https://github.com/RubenGutierrezC)
 
 ## Localization
 Kuma currently only supports English, Spanish, Italian and Japanese as the default languages. We have the languages strings in [\i18n](https://github.com/kumawallet/extension/tree/main/src/i18n) folder.
@@ -258,3 +266,7 @@ Kuma currently only supports English, Spanish, Italian and Japanese as the defau
 We want to thanks the [Web3 Foundation](https://web3.foundation/) for their support and the [Polkadot](https://polkadot.network/) team for their help and guidance. We also want to thank the [Astar](https://astar.network/) team for their support on Beta testing and the Polkadot community for their feedback and support.
 
 This project was a really great learning experience for us and we hope to continue to contribute to the Polkadot ecosystem. Our core developers team has been working on this project for more than 6 months and we are really proud of the result. We hope you will enjoy using Kuma Wallet as much as we enjoyed building it. 
+
+## License
+
+Licensed under the MIT - see the [LICENSE](LICENSE) file for details.

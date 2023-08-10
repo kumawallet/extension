@@ -1,10 +1,8 @@
 Kuma Wallet
 ===========
 
-> Kuma es un trabajo en progreso. Es posible que la documentación no refleje la implementación actual. **Espere una versión estable y la documentación adecuada para el tercer trimestre de 2023**.
-
 <p align="center">
-  <img width="630" src="./images/logo.svg" />
+  <img width="340" src="./images/logo.svg" />
 </p>
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kumawallet/extension/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kumawallet/extension/tree/main)
@@ -242,12 +240,26 @@ Al intentar llamar a un metodo de un contrato en Kuma Wallet, aparecerá una ven
 
 **Nota**: XCM permite que los activos se transfieran entre cadenas, lo que significa, por ejemplo, que algunos DOT se pueden mover de la cadena 'relay' a alguna parachain o incluso entre parachains. Pero NO admite mover tokens a un ecosistema diferente (otro conjunto de cadena 'relay' / parachains). En otras palabras, no se puede enviar DOT a Kusama usando XCM.
 
+## Registro de cambios
+
+Consulte [Changelog](CHANGELOG.md) para más información.
+
 ## Contribuyendo
 
 Damos la bienvenida a las contribuciones de la comunidad. Si desea contribuir, lea nuestras [directrices de contribución] (./CONTRIBUTING.md).
+
+## Colaboradores
+
+- [**Jose Ramirez**](https://github.com/0xslipk)
+- [**Fernando Sirni**](https://github.com/fersirni)
+- [**Ruben Gutierrez**](https://github.com/RubenGutierrezC)
 
 ## Créditos
 
 Queremos agradecer a la Fundación Web3 por su apoyo y al equipo de Polkadot por su ayuda y orientación. También queremos agradecer al equipo de Astar por su apoyo en las pruebas Beta y a la comunidad de Polkadot por sus comentarios y apoyo.
 Este proyecto fue una gran experiencia de aprendizaje para nosotros y esperamos seguir contribuyendo al ecosistema de Polkadot.
 Nuestro equipo principal de desarrolladores ha estado trabajando en este proyecto durante más de 6 meses y estamos muy orgullosos del resultado. Esperamos que disfrute usando Kuma Wallet tanto como nosotros disfrutamos construyéndolo.
+
+## Licencia
+
+Con licencia de MIT - consulte el archivo [LICENSE](LICENSE) para obtener más información.
