@@ -2,8 +2,11 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   safelist: [
     {
-      pattern: /-chain-/,
-      variants: ["after", "before", "hover", "selection"],
+      pattern: /bg-chain-/,
+      variants: ["after", "hover"],
+    },
+    {
+      pattern: /(text|border|fill|text|border)-chain/,
     },
   ],
   theme: {
