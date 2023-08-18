@@ -5,6 +5,7 @@ import { SEND } from "@src/routes/paths";
 import { formatAmountWithDecimals, formatUSDAmount } from "@src/utils/assets";
 import { BsArrowUpRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { useThemeContext } from "@src/providers";
 
 interface AssetProps {
   asset: IAsset;
@@ -12,6 +13,7 @@ interface AssetProps {
 
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
+  const { color } = useThemeContext()
 
   return (
     <div className="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between">
@@ -35,7 +37,7 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
       </div>
 
       <div
-        className="bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-custom-green-bg rounded-full"
+        className={`bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-${color}-fill rounded-full`}
       >
         <BsArrowUpRight size={23} onClick={() => navigate(SEND, {
           state: {

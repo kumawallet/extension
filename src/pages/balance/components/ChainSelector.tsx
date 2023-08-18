@@ -4,6 +4,7 @@ import { BsChevronDown } from "react-icons/bs";
 import {
   useAccountContext,
   useNetworkContext,
+  useThemeContext,
 
 } from "@src/providers";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
@@ -30,6 +31,7 @@ export const ChainSelector = () => {
     getAllAccounts,
     setSelectedAccount,
   } = useAccountContext();
+  const { color } = useThemeContext()
 
   const [chainToChange, setChainToChange] = useState<Chain | null>(null);
   const [openModal, setopenModal] = useState(false);
@@ -173,7 +175,7 @@ export const ChainSelector = () => {
                         <Menu.Item key={index.toString()}>
                           {({ close }) => (
                             <div
-                              className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                              className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
                               onClick={() => {
                                 selecteNetwork(chain, close);
                               }}
