@@ -14,7 +14,6 @@ import { object, string, number, array } from "yup";
 import {
   useAccountContext,
   useNetworkContext,
-  useThemeContext,
 } from "@src/providers";
 import { getAccountType } from "../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
@@ -81,7 +80,6 @@ const SUPPORTED_CHAINS_TYPE = [
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
   const {
     state: { selectedChain },
     refreshNetworks,
@@ -236,7 +234,7 @@ export const ManageNetworks = () => {
         />
         <p className="font-medium text-2xl">{t("title")}</p>
         {!isCreating && (
-          <div className="flex-1 flex justify-end mt-5">
+          <div className="flex-1 flex justify-end">
             <Button classname="text-sm font-medium" onClick={showCreateForm}>
               <span>{t("new_network")}</span>
             </Button>
@@ -305,9 +303,8 @@ export const ManageNetworks = () => {
                       {({ selected }) => (
                         <>
                           <span
-                            className={`block truncate ${
-                              selected ? "font-medium" : "font-normal"
-                            }`}
+                            className={`block truncate ${selected ? "font-medium" : "font-normal"
+                              }`}
                           >
                             {person.name}
                           </span>
@@ -442,15 +439,15 @@ export const ManageNetworks = () => {
               )}
               {(selectedNetwork.rpc.wasm ||
                 selectedNetwork.rpc.wasm === "") && (
-                <div className="mt-5">
-                  <input
-                    placeholder={t("rpc_wasm_placeholder") || ""}
-                    className="relative mt-4 input-primary"
-                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    {...register("rpc.wasm")}
-                  />
-                </div>
-              )}
+                  <div className="mt-5">
+                    <input
+                      placeholder={t("rpc_wasm_placeholder") || ""}
+                      className="relative mt-4 input-primary"
+                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
+                      {...register("rpc.wasm")}
+                    />
+                  </div>
+                )}
             </>
           )}
 

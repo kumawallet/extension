@@ -130,14 +130,14 @@
   "general_settings": {
     "title": "General",
     "languages": "Idiomas",
-    "manage_networks": "Adminsitrar redes",
+    "manage_networks": "Administrar redes",
     "show_testnets": "Mostrar redes de prueba"
   },
   "advanced_settings": {
     "title": "Avanzado"
   },
   "manage_networks": {
-    "title": "Adminsitrar redes",
+    "title": "Administrar redes",
     "new_network": "Nueva red",
     "network_name": "Nombre de la red",
     "address_prefix": "Prefijo de la dirección",

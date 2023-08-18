@@ -240,6 +240,20 @@ Al intentar llamar a un metodo de un contrato en Kuma Wallet, aparecerá una ven
 
 **Nota**: XCM permite que los activos se transfieran entre cadenas, lo que significa, por ejemplo, que algunos DOT se pueden mover de la cadena 'relay' a alguna parachain o incluso entre parachains. Pero NO admite mover tokens a un ecosistema diferente (otro conjunto de cadena 'relay' / parachains). En otras palabras, no se puede enviar DOT a Kusama usando XCM.
 
+## Agregar nueva cadena
+Para agregar una nueva cadena, go to **Configuracion > General > Adminsitrar redes > Nueva Red**, rellena los datos de la cadena, pulsa el botón de guardar y deberías ver la nueva red en la lista de cadenas.
+
+![add-network-1](./images/add-network-1.png)
+
+![add-network-2](./images/add-network-2.png)
+
+![add-network-3](./images/add-network-3.png)
+
+![add-network-4](./images/add-network-4.png)
+
+![add-network-5](./images/add-network-5.png)
+
+
 ## Registro de cambios
 
 Consulte [Changelog](CHANGELOG.md) para más información.
