@@ -10,6 +10,7 @@ import { useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
 import { Chain } from "@src/storage/entities/Chains";
+import { XCMAlertMessage } from "./XCMAlertMessage";
 
 export const CommonFormFields = () => {
   const { t } = useTranslation("send");
@@ -77,7 +78,10 @@ export const CommonFormFields = () => {
             />
           </div>
           <div>
-            <p>{t("amount")}</p>
+            <div className="flex gap-1 items-center">
+              <p>{t("amount")}</p>
+              <XCMAlertMessage />
+            </div>
             <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
               <NumericFormat
                 className="bg-transparent w-7/12 outline-0 text-xl font-inter font-bold outline-none"
