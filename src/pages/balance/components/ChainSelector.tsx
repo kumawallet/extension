@@ -110,6 +110,10 @@ export const ChainSelector = () => {
     }, 500);
   };
 
+  const isCustomChain = (chain: Chain) => {
+    return filteredChains.custom.some((c) => c.name === chain.name);
+  }
+
   const filteredChains = {
     ...chains,
     testnets: showTestnets ? chains.testnets : [],
@@ -176,13 +180,24 @@ export const ChainSelector = () => {
                                 selecteNetwork(chain, close);
                               }}
                             >
-                              <img
-                                src={`/images/${chain.logo}.png`}
-                                width={30}
-                                height={30}
-                                alt={chain.name}
-                                className="object-cover rounded-full"
-                              />
+                              {
+                                isCustomChain(chain) ? (
+                                  <div
+                                    className="w-[30px] h-[30px] rounded-full flex justify-center items-center p-1 bg-gray-400"
+                                  >
+                                    <p className="text-black font-bold font-inter">{chain.name.substring(0, 2)}</p>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={`/images/${chain.logo}.png`}
+                                    width={30}
+                                    height={30}
+                                    alt={chain.name}
+                                    className="object-cover rounded-full"
+                                  />
+
+                                )
+                              }
                               {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
                               <div className="flex gap-3 items-center">
                                 <p className="text-xl">{chain.name}</p>

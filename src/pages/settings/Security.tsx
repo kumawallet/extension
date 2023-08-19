@@ -274,7 +274,7 @@ export const Security = () => {
                               onCopy={(e) => e.preventDefault()}
                             />
                             {hideKeys && (
-                              <div className="absolute left-0 top-0 w-full h-full bg-transparent backdrop-blur-sm rounded-lg flex justify-center items-center">
+                              <div className="absolute left-0 top-0 w-full h-full  backdrop-blur-sm bg-black rounded-lg flex justify-center items-center">
                                 <button
                                   className="flex flex-col items-center"
                                   onClick={() => setHideKeys(false)}
@@ -360,7 +360,15 @@ export const Security = () => {
                           <p className="text-sm font-medium text-custom-red-bg">
                             {t("reset_wallet_warning")}
                           </p>
-                          <div className="mt-4 flex justify-end">
+                          <div className="mt-4 flex justify-end gap-2">
+                            <Button
+                              variant="text"
+                              onClick={closeResetModal}
+                              classname="text-sm font-medium"
+                            >
+                              {tCommon("close")}
+                            </Button>
+
                             <Button
                               isLoading={isLoadingReset}
                               onClick={resetWallet}

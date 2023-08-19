@@ -488,7 +488,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [rpc, selectedAccount, type, api]);
 
   useEffect(() => {
-    let interval: NodeJS.Timer;
+    let interval: NodeJS.Timeout;
     if (state.assets.length > 0) {
       interval = setInterval(() => {
         getAssetsUSDPrice(state.assets);

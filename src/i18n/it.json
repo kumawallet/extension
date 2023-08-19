@@ -213,7 +213,8 @@
     "invalid_method": "Metodo non valido",
     "invalid_params": "Parametri non validi",
     "invalid_abi": "ABI non valido",
-    "contract_error": "Si è verificato un errore con il contratto"
+    "contract_error": "Si è verificato un errore con il contratto",
+    "xcm_alert_message": "Assicuratevi di trasferire abbastanza gettoni per pagare la tassa con questo gettone sull'altra catena."
   },
   "manage_assets": {
     "title": "Gestire gli assets",

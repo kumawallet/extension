@@ -244,6 +244,19 @@ When attempting to call a contract method in Kuma Wallet, a pop-up will appear r
 
 **Note**: XCM allow assets to be transferred between chains meaning, for example, that some DOT can be moved from the relay-chain to some parachain or even between parachains. But, it does NOT support moving tokens to a different relay-chain/parachains ecosystem. In other words, DOT cannot be sent to Kusama using XCM.
 
+## Add New Network
+To add a new network, go to **Settings > General > Manage networks > New network**, then fill in the chain data, press the save button, and you should see the new network in the chain list.
+
+![add-network-1](./images/add-network-1.png)
+
+![add-network-2](./images/add-network-2.png)
+
+![add-network-3](./images/add-network-3.png)
+
+![add-network-4](./images/add-network-4.png)
+
+![add-network-5](./images/add-network-5.png)
+
 ## Change Log
 
 See [Changelog](CHANGELOG.md) for more information.

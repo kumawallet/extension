@@ -213,7 +213,8 @@
     "invalid_method": "無効なメソッド",
     "invalid_params": "無効なパラメータ",
     "invalid_abi": "無効なABI",
-    "contract_error": "コントラクトエラー"
+    "contract_error": "コントラクトエラー",
+    "xcm_alert_message": "このトークンで料金を支払うのに十分なトークンを他のチェーンに送金してください。"
   },
   "manage_assets": {
     "title": "アセット管理",
