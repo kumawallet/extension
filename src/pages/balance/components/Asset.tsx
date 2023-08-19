@@ -13,6 +13,7 @@ interface AssetProps {
 
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
+
   const { color } = useThemeContext()
 
   return (

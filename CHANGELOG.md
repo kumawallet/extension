@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.3.5
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/09**
+- [#36](https://github.com/blockcoders/kuma-wallet/pull/36) Reduce bundle
+
 # 0.3.4
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/09**
 - [#35](https://github.com/blockcoders/kuma-wallet/pull/35) Improve destination chain
