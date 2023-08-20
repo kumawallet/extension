@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.3.6
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/20**
+- [#37](https://github.com/blockcoders/kuma-wallet/pull/37) M4 evaluation fixes
+
 # 0.3.5
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/09**
 - [#36](https://github.com/blockcoders/kuma-wallet/pull/36) Reduce bundle
