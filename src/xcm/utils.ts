@@ -126,6 +126,7 @@ export const XCM = {
       methods: {
         RESERVE_TRANSFER_ASSETS: "reserveTransferAssets",
         LIMITED_RESERVE_TRANSFER_ASSETS: "limitedReserveTransferAssets",
+        LIMITED_TELEPORT_ASSETS: "limitedTeleportAssets",
       },
     },
     POLKADOT_XCM: {
@@ -134,6 +135,7 @@ export const XCM = {
         RESERVE_WITHDRAW_ASSETS: "reserveWithdrawAssets",
         RESERVE_TRANSFER_ASSETS: "reserveTransferAssets",
         LIMITED_RESERVE_TRANSFER_ASSETS: "limitedReserveTransferAssets",
+        LIMITED_TELEPORT_ASSETS: "limitedTeleportAssets",
       },
     },
     X_TOKENS: {

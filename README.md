@@ -257,6 +257,12 @@ To add a new network, go to **Settings > General > Manage networks > New network
 
 ![add-network-5](./images/add-network-5.png)
 
+## Test XCM Transfer
+You can transfer ROC from Rococo to AssetHub. Go to Settings > General and activate the "Show testnets" option, then change to Rococo, and you're able to transfer to AssetHub:
+
+![xcm-transfer](./images/test-xcm.png)
+
+
 ## Change Log
 
 See [Changelog](CHANGELOG.md) for more information.

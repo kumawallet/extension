@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
 import { Chain } from "@src/storage/entities/Chains";
-import { useThemeContext } from "@src/providers";
 import { Button } from "@src/components/common";
 
 interface ConfirmChainChangeModalProps {
@@ -91,10 +90,10 @@ export const ConfirmChainChangeModal: FC<ConfirmChainChangeModalProps> = ({
                   <p className="text-sm">
                     {needToCreateAccount
                       ? t("chain_selector.create_or_import_warning", {
-                          supported_type: tCommon(
-                            `${chainType?.toLowerCase()}_type`
-                          ),
-                        })
+                        supported_type: tCommon(
+                          `${chainType?.toLowerCase()}_type`
+                        ),
+                      })
                       : t("chain_selector.network_change_warning")}
                   </p>
                 </div>

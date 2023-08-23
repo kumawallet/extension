@@ -253,6 +253,10 @@ Para agregar una nueva cadena, go to **Configuracion > General > Adminsitrar red
 
 ![add-network-5](./images/add-network-5.png)
 
+## Probar Transferencias XCM
+Puedes transferir ROC de Rococo a AssetHub. Ve a Ajustes > General y activa la opción "Mostrar redes de prueba", luego cambia a Rococo y ya podrás transferir a AssetHub:
+
+![xcm-transfer](./images/test-xcm.png)
 
 ## Registro de cambios
 
