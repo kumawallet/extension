@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.3.7
+Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/20**
+- [#38](https://github.com/blockcoders/kuma-wallet/pull/38) Add assethub for rococo xcm
+
 # 0.3.6
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/08/20**
 - [#37](https://github.com/blockcoders/kuma-wallet/pull/37) M4 evaluation fixes
