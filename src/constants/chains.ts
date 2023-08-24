@@ -17,6 +17,14 @@ export const enum PARACHAINS {
   ACALA = "Acala",
 }
 
+export const enum RELAY_CHAIN_TESTNETS {
+  ROCOCO = "Rococo",
+}
+
+export const enum PARACHAINS_TESTNETS {
+  ROCOCO_ASSET_HUB = "Asset Hub (Rococo)",
+}
+
 export const POLKADOT_PARACHAINS = {
   ACALA: {
     name: PARACHAINS.ACALA,
@@ -40,6 +48,13 @@ export const KUSAMA_PARACHAINS = {
   MOONRIVER: {
     name: PARACHAINS.MOONRIVER,
     id: 2023,
+  },
+};
+
+export const ROCOCO_PARACHAINS = {
+  ASSET_HUB: {
+    name: PARACHAINS_TESTNETS.ROCOCO_ASSET_HUB,
+    id: 1000,
   },
 };
 
@@ -462,6 +477,29 @@ export const ROCOCO = {
   },
   logo: "rococo",
   supportedAccounts: [WASM],
+  xcm: [PARACHAINS_TESTNETS.ROCOCO_ASSET_HUB],
+};
+
+export const ROCOCO_ASSET_HUB = {
+  name: "Asset Hub (Rococo)",
+  rpc: {
+    wasm: "wss://rococo-asset-hub-rpc.polkadot.io",
+  },
+  addressPrefix: 2,
+  nativeCurrency: {
+    name: "Rococo",
+    symbol: "ROC",
+    decimals: 12,
+  },
+  explorer: {
+    wasm: {
+      name: "subscan",
+      url: "https://assethub-rococo.subscan.io/",
+    },
+  },
+  logo: "assethub",
+  supportedAccounts: [WASM],
+  xcm: [RELAY_CHAIN_TESTNETS.ROCOCO],
 };
 
 export const WESTEND = {
@@ -507,6 +545,7 @@ export const TESTNETS: Chain[] = [
   SEPOLIA,
   MANDALA,
   ROCOCO,
+  ROCOCO_ASSET_HUB,
   WESTEND,
 ];
 
