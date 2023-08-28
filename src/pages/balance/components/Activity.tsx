@@ -49,9 +49,8 @@ export const Activity = () => {
 
   useEffect(() => {
     if (selectedAccount) {
-      getContacts();
+      Promise.all([getNetworks(), getContacts()]);
     }
-    getNetworks();
   }, [selectedAccount.key]);
 
   const getNetworks = async () => {
@@ -190,9 +189,8 @@ export const Activity = () => {
                     lastUpdated as number
                   )}`}</p>
                   <p
-                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${
-                      chipColor[status as RecordStatus]
-                    }`}
+                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${chipColor[status as RecordStatus]
+                      }`}
                   >
                     {status}
                   </p>

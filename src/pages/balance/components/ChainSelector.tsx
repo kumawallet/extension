@@ -21,7 +21,6 @@ export const ChainSelector = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { t } = useTranslation("balance");
-  const { color } = useThemeContext();
   const {
     state: { chains, selectedChain },
     setSelectNetwork,
@@ -31,6 +30,7 @@ export const ChainSelector = () => {
     getAllAccounts,
     setSelectedAccount,
   } = useAccountContext();
+  const { color } = useThemeContext()
 
   const [chainToChange, setChainToChange] = useState<Chain | null>(null);
   const [openModal, setopenModal] = useState(false);
@@ -109,6 +109,10 @@ export const ChainSelector = () => {
     }, 500);
   };
 
+  const isCustomChain = (chain: Chain) => {
+    return filteredChains.custom.some((c) => c.name === chain.name);
+  }
+
   const filteredChains = {
     ...chains,
     testnets: showTestnets ? chains.testnets : [],
@@ -155,13 +159,13 @@ export const ChainSelector = () => {
                   <div key={spec}>
                     {filteredChains[spec as "mainnets" | "testnets" | "custom"]
                       .length > 0 && (
-                      <div className="flex items-center gap-3 whitespace-nowrap">
-                        <p className="text-[#808385] text-lg">
-                          {t(`chain_selector.${spec}`)}
-                        </p>
-                        <div className="h-[1px] w-full bg-[#343A40]" />
-                      </div>
-                    )}
+                        <div className="flex items-center gap-3 whitespace-nowrap">
+                          <p className="text-[#808385] text-lg">
+                            {t(`chain_selector.${spec}`)}
+                          </p>
+                          <div className="h-[1px] w-full bg-[#343A40]" />
+                        </div>
+                      )}
                     {filteredChains[spec as "mainnets" | "testnets" | "custom"]
                       .filter(({ name }) =>
                         name.toLowerCase().includes(search.toLowerCase())
@@ -170,18 +174,29 @@ export const ChainSelector = () => {
                         <Menu.Item key={index.toString()}>
                           {({ close }) => (
                             <div
-                              className="flex gap-2 cursor-pointer items-center hover:bg-custom-green-bg hover:bg-opacity-40 py-2 px-4 rounded-xl"
+                              className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
                               onClick={() => {
                                 selecteNetwork(chain, close);
                               }}
                             >
-                              <img
-                                src={`/images/${chain.logo}.png`}
-                                width={30}
-                                height={30}
-                                alt={chain.name}
-                                className="object-cover rounded-full"
-                              />
+                              {
+                                isCustomChain(chain) ? (
+                                  <div
+                                    className="w-[30px] h-[30px] rounded-full flex justify-center items-center p-1 bg-gray-400"
+                                  >
+                                    <p className="text-black font-bold font-inter">{chain.name.substring(0, 2)}</p>
+                                  </div>
+                                ) : (
+                                  <img
+                                    src={`/images/${chain.logo}.png`}
+                                    width={30}
+                                    height={30}
+                                    alt={chain.name}
+                                    className="object-cover rounded-full"
+                                  />
+
+                                )
+                              }
                               {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
                               <div className="flex gap-3 items-center">
                                 <p className="text-xl">{chain.name}</p>

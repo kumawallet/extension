@@ -3,7 +3,7 @@ import { getWebAPI } from "./env";
 export const formatDate = (date: number) => {
   const d = new Date(date);
   const year = d.getFullYear();
-  const month = d.toLocaleString("default", { month: "short" });
+  const month = d.toLocaleString("en-US", { month: "short" });
   const day = d.getDate();
   const hours = d.getHours().toString().padStart(2, "0");
   const minutes = d.getMinutes().toString().padStart(2, "0");
@@ -51,9 +51,10 @@ export const makeQuerys = (params: Record<string, string>) => {
   );
 };
 
-export const isInPopup = function() {
-  const API = getWebAPI()
+export const isInPopup = function () {
+  const API = getWebAPI();
 
-  return (typeof API != undefined && API.extension) ?
-  API.extension.getViews({ type: "popup" }).length > 0 : null;
-}
+  return API != undefined && API.extension
+    ? API.extension.getViews({ type: "popup" }).length > 0
+    : null;
+};

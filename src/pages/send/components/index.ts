@@ -6,3 +6,4 @@ export * from "./SelectableAsset";
 export * from "./SelectableChain";
 export * from "./WasmForm";
 export * from "./ShowBalance";
+export * from "./XCMAlertMessage";

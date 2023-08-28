@@ -34,7 +34,8 @@
     "network_not_found": "Network not found",
     "contact_not_found": "Contact not found",
     "no_contacts_found": "No contacts found",
-    "error": "Si è verificato un errore"
+    "error": "An error has occurred",
+    "rpc_error": "Network error"
   },
   "welcome": {
     "welcome_message": "Welcome to Kuma Wallet",
@@ -212,7 +213,8 @@
     "invalid_method": "Invalid method",
     "invalid_params": "Invalid params",
     "invalid_abi": "Invalid ABI",
-    "contract_error": "An error occurred with the contract"
+    "contract_error": "An error occurred with the contract",
+    "xcm_alert_message": "Make sure to transfer enough tokens to pay the fee with this token on the other chain."
   },
   "manage_assets": {
     "title": "Manage Assets",

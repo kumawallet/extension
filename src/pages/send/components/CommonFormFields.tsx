@@ -9,6 +9,8 @@ import { SelectableChain } from "./SelectableChain";
 import { useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
 import Extension from "@src/Extension";
+import { Chain } from "@src/storage/entities/Chains";
+import { XCMAlertMessage } from "./XCMAlertMessage";
 
 export const CommonFormFields = () => {
   const { t } = useTranslation("send");
@@ -26,7 +28,7 @@ export const CommonFormFields = () => {
 
   const to = watch("to");
 
-  const [destinationChains, setDestinationChains] = useState<any[]>([]);
+  const [destinationChains, setDestinationChains] = useState<Chain[]>([]);
 
   const getDestinationChains = async () => {
     let chains = [selectedChain];
@@ -55,7 +57,7 @@ export const CommonFormFields = () => {
         <div className="flex gap-2 justify-center items-end mb-4">
           <div className="px-2">
             <p className="mb-2 font-inter font-light">From:</p>
-            <SelectableChain selectedChain={getValues("from")} />
+            <SelectableChain selectedChain={getValues("from") || {}} />
           </div>
           <TbChevronRight size={26} className="mb-2" />
           <div className="px-2">
@@ -76,7 +78,10 @@ export const CommonFormFields = () => {
             />
           </div>
           <div>
-            <p>{t("amount")}</p>
+            <div className="flex gap-1 items-center">
+              <p>{t("amount")}</p>
+              <XCMAlertMessage />
+            </div>
             <div className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 flex w-full p-2.5 bg-[#343A40] border-gray-600 placeholder-gray-400 text-white">
               <NumericFormat
                 className="bg-transparent w-7/12 outline-0 text-xl font-inter font-bold outline-none"
@@ -84,7 +89,7 @@ export const CommonFormFields = () => {
                 allowLeadingZeros={false}
                 value={getValues("amount")}
                 onValueChange={({ value }) => {
-                  setValue("amount", value);
+                  setValue("amount", value || "0");
                 }}
                 allowedDecimalSeparators={["%"]}
               />

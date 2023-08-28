@@ -10,7 +10,7 @@ export const Fees = ({ fee }: any) => {
   } = useNetworkContext();
   const { watch } = useFormContext();
 
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.nativeCurrency?.decimals || 1;
   const amount = watch("amount");
   const asset = watch("asset");
   const isNativeAsset = asset?.id === "-1";
@@ -23,7 +23,7 @@ export const Fees = ({ fee }: any) => {
       {type === "EVM" && (
         <div className="flex justify-between gap-2">
           <p>{t("gas_limit")}</p>
-          <p className="font-bold">{String(fee["gas limit"])} gwei</p>
+          <p className="font-bold font-inter">{String(fee["gas limit"])} gwei</p>
         </div>
       )}
 
@@ -36,7 +36,7 @@ export const Fees = ({ fee }: any) => {
         <p>{t("estimated_total")}</p>
         {isNativeAsset ? (
           <>
-            <p className="font-bold">
+            <p className="font-bold font-inter">
               {`${formatBN(
                 String(fee["estimated total"]),
                 decimals
@@ -45,7 +45,7 @@ export const Fees = ({ fee }: any) => {
           </>
         ) : (
           <>
-            <p className="font-bold">{`${amount} ${asset?.symbol} + ${formatBN(
+            <p className="font-bold font-inter">{`${amount} ${asset?.symbol} + ${formatBN(
               String(fee["estimated total"]),
               decimals
             )} ${nativeSymbol}`}</p>

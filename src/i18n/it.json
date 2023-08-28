@@ -34,7 +34,8 @@
     "network_not_found": "Rete non trovata",
     "contact_not_found": "Contatto non trovato",
     "no_contacts_found": "Nessun contatto trovato",
-    "error": ""
+    "error": "Si è verificato un errore",
+    "rpc_error": "Errore di rete"
   },
   "welcome": {
     "welcome_message": "Benvenuto a Kuma Wallet",
@@ -212,7 +213,8 @@
     "invalid_method": "Metodo non valido",
     "invalid_params": "Parametri non validi",
     "invalid_abi": "ABI non valido",
-    "contract_error": "Si è verificato un errore con il contratto"
+    "contract_error": "Si è verificato un errore con il contratto",
+    "xcm_alert_message": "Assicuratevi di trasferire abbastanza gettoni per pagare la tassa con questo gettone sull'altra catena."
   },
   "manage_assets": {
     "title": "Gestire gli assets",

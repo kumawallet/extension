@@ -125,7 +125,7 @@ export const Send = () => {
         let _tx;
         const _amount = isNativeAsset
           ? amount * currencyUnits
-          : amount * 10 ** (asset.decimals as number);
+          : amount * 10 ** (asset?.decimals || 0 as number);
 
         const bnAmount = BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
@@ -146,11 +146,11 @@ export const Send = () => {
             ...Object.keys(extrinsicValues).map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "currency_address"
-                    | "amount"
-                    | "destination"
-                    | "weight"
+                key as
+                | "currency_address"
+                | "amount"
+                | "destination"
+                | "weight"
                 ]
             ),
             {

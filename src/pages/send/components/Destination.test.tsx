@@ -19,6 +19,7 @@ describe("Destination", () => {
       useNetworkContext: () => ({
         state: {
           selectedChain: selectedEVMChainMock,
+          type: "EVM"
         },
       }),
       useAccountContext: () => ({
@@ -34,18 +35,18 @@ describe("Destination", () => {
           contacts: [
             {
               name: "test",
-              address: "0x1234",
+              address: "0xbE1b7B9e75b96449a9286e3dE0fa0e6E89428968",
             },
           ],
           ownAccounts: [
             {
               name: "test",
-              address: "0x1235",
+              address: "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac",
             },
           ],
           recent: [
             {
-              address: "0x1236",
+              address: "0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc",
             },
           ],
         }),
@@ -57,7 +58,17 @@ describe("Destination", () => {
         register: vi.fn().mockReturnValue({
           onChange: vi.fn(),
         }),
-        watch: vi.fn().mockReturnValue(true),
+        watch: vi.fn().mockImplementation((val: string) => {
+
+          if (val === "isXcm") return false
+
+          if (val === "to") return {
+            name: "Ethereum",
+            supportedAccounts: ["EVM"],
+          }
+
+        }),
+
       }),
     }));
   });
@@ -71,7 +82,7 @@ describe("Destination", () => {
       fireEvent.click(input);
     });
     await waitFor(() => {
-      expect(getAllByText("0x1234").length).toBe(1);
+      expect(getAllByText("0xbE1b7B9e75b96449a9286e3dE0fa0e6E89428968").length).toBe(1);
     });
   });
 
@@ -85,17 +96,17 @@ describe("Destination", () => {
     });
 
     await waitFor(() => {
-      const address = getAllByText("0x1234");
+      const address = getAllByText("0xbE1b7B9e75b96449a9286e3dE0fa0e6E89428968");
 
       expect(address.length).toBe(1);
     });
 
     act(() => {
-      fireEvent.change(input, { target: { value: "0x123" } });
+      fireEvent.change(input, { target: { value: "0xbE1b7B9e75b96449a9286e3dE0fa0e6E89428968" } });
     });
 
     await waitFor(() => {
-      const address = getAllByText("0x1234");
+      const address = getAllByText("0xbE1b7B9e75b96449a9286e3dE0fa0e6E89428968");
 
       expect(address.length).toBe(1);
     });

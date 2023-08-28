@@ -22,7 +22,7 @@ export interface Asset {
     | {
         tokenId: { StableAssetPoolToken: string };
       }
-    | null = null;
+    | null;
 }
 
 export interface InitialState {

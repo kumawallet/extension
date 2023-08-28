@@ -34,7 +34,9 @@
     "network_not_found": "Red no encontrada",
     "contact_not_found": "Contacto no encontrado",
     "no_contacts_found": "No se encontraron contactos",
-    "error": "Ha ocurrido un error"
+    "error": "Ha ocurrido un error",
+    "rpc_error": "Error de red"
+
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -128,14 +130,14 @@
   "general_settings": {
     "title": "General",
     "languages": "Idiomas",
-    "manage_networks": "Adminsitrar redes",
+    "manage_networks": "Administrar redes",
     "show_testnets": "Mostrar redes de prueba"
   },
   "advanced_settings": {
     "title": "Avanzado"
   },
   "manage_networks": {
-    "title": "Adminsitrar redes",
+    "title": "Administrar redes",
     "new_network": "Nueva red",
     "network_name": "Nombre de la red",
     "address_prefix": "Prefijo de la dirección",
@@ -212,7 +214,8 @@
     "invalid_method": "Método inválido",
     "invalid_params": "Parámetros inválidos",
     "invalid_abi": "ABI inválido",
-    "contract_error": "Ocurrio un error con el contrato"
+    "contract_error": "Ocurrio un error con el contrato",
+    "xcm_alert_message": "Asegúrate de transferir suficientes tokens para pagar la cuota con este token en la otra cadena"
   },
   "manage_assets": {
     "title": "Gestionar activos",

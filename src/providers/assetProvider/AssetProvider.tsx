@@ -90,7 +90,7 @@ export const reducer = (state: InitialState, action: Action) => {
       );
       if (index > -1 && !balance?.eq(assets[index].balance)) {
         const _balance = Number(
-          formatAmountWithDecimals(Number(balance), 6, assets[index].decimals)
+          formatAmountWithDecimals(Number(balance), 6, assets[index]?.decimals)
         );
 
         assets[index] = {
@@ -404,7 +404,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           const price = await getAssetUSDPrice(network).catch(() => 0);
 
           const _balance = Number(
-            formatAmountWithDecimals(Number(asset.balance), 6, asset.decimals)
+            formatAmountWithDecimals(Number(asset.balance), 6, asset?.decimals)
           );
 
           copyAssets[index].price = price;
@@ -488,7 +488,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   }, [rpc, selectedAccount, type, api]);
 
   useEffect(() => {
-    let interval: NodeJS.Timer;
+    let interval: NodeJS.Timeout;
     if (state.assets.length > 0) {
       interval = setInterval(() => {
         getAssetsUSDPrice(state.assets);

@@ -1,16 +1,14 @@
-import { useNetworkContext } from "@src/providers";
 import { formatBN } from "@src/utils/assets";
 import { useFormContext } from "react-hook-form";
 
 export const ShowBalance = () => {
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
 
   const { watch } = useFormContext();
 
   const asset = watch("asset");
-  const decimals = selectedChain?.nativeCurrency.decimals;
+
+
+  const decimals = asset?.decimals
 
   const showTransferable =
     asset?.transferable && !asset?.transferable?.eq(asset?.balance);

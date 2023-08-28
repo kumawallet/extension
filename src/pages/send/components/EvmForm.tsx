@@ -122,11 +122,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             ...Object.keys(extrinsicValues).map(
               (key) =>
                 extrinsicValues[
-                  key as
-                    | "currency_address"
-                    | "amount"
-                    | "destination"
-                    | "weight"
+                key as
+                | "currency_address"
+                | "amount"
+                | "destination"
+                | "weight"
                 ]
             )
           ).catch(() => {
@@ -293,7 +293,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

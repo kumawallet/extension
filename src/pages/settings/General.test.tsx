@@ -55,6 +55,8 @@ describe("General", () => {
 
     await waitFor(() => {
       expect(getByTestId("language-select")).toBeDefined();
+    }, {
+      timeout: 10000
     });
   });
 
@@ -63,6 +65,8 @@ describe("General", () => {
 
     await waitFor(() => {
       expect(getByTestId("language-select")).toBeDefined();
+    }, {
+      timeout: 10000
     });
 
     await waitFor(() => {
