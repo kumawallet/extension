@@ -80,7 +80,6 @@ const SUPPORTED_CHAINS_TYPE = [
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
   const {
     state: { selectedChain },
     refreshNetworks,
