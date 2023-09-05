@@ -160,7 +160,8 @@
     "insert_name": "Insert contact name",
     "insert_address": "Insert address",
     "search": "Search contacts by name or address",
-    "new_contact": "New contact"
+    "new_contact": "New contact",
+    "required": "Required"
   },
   "activity": {
     "title": "Activity",
@@ -193,9 +194,11 @@
   "send": {
     "title": "Send token",
     "from": "From",
-    "to:": "To",
+    "to": "To",
     "destination_account": "Destination account",
     "amount": "Amount",
+    "total": "Total",
+    "available": "Available",
     "gas_limit": "Gas limit",
     "estimated_fee": "Estimated fee",
     "estimated_total": "Estimated total",
