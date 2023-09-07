@@ -71,7 +71,7 @@
     },
     "form": {
       "continue_button_text": "Continuare",
-      "recovery_phrase_warning": "Questa è la chiave del tuo account e l'unico modo per riottenere l'accesso nel caso in cui avessi dimenticato la password. Assicurati di salvarla in un posto sicuro poiché non potrai più vederla." ,      
+      "recovery_phrase_warning": "Questa è la chiave del tuo account e l'unico modo per riottenere l'accesso nel caso in cui avessi dimenticato la password. Assicurati di salvarla in un posto sicuro poiché non potrai più vederla.",
       "account_type": "Tipo di account",
       "private_key": "Chiave privata",
       "private_key_validation": "Chiave privata non valida",
@@ -160,7 +160,8 @@
     "insert_name": "Inserire il nome",
     "insert_address": "Inserire l'indirizzo",
     "search": "Cercare per nome o indirizzo",
-    "new_contact": "Nuovo contatto"
+    "new_contact": "Nuovo contatto",
+    "required": "Richiesto"
   },
   "activity": {
     "title": "Attività",
@@ -193,9 +194,11 @@
   "send": {
     "title": "Invia token",
     "from": "Da",
-    "to:": "A",
+    "to": "A",
     "destination_account": "Account di destinazione",
     "amount": "Quantità",
+    "total": "Totale",
+    "available": "Disponibile",
     "gas_limit": "Limite di gas",
     "estimated_fee": "Tassa stimata",
     "estimated_total": "Totale stimato",
