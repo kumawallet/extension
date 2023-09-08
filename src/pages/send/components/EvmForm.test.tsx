@@ -64,7 +64,7 @@ describe("EvmForm", () => {
 
           if (value === "to") {
             return {
-              address: "0x123",
+              address: "0xa0a58b72969DF1904Bf2315f2D041AD639737429",
             };
           }
 
@@ -88,7 +88,7 @@ describe("EvmForm", () => {
                 decimals: 18,
               };
             case "destinationAccount":
-              return "0x123";
+              return "0xa0a58b72969DF1904Bf2315f2D041AD639737429";
             default:
               return "";
           }
@@ -113,7 +113,9 @@ describe("EvmForm", () => {
           Wallet: class Wallet { },
           Contract: class Contract {
             estimateGas = {
-              transfer: vi.fn().mockReturnValue(BigNumber.from("21000")),
+              transfer: vi.fn().mockReturnValue(
+                Promise.resolve(BigNumber.from("21000"))
+              ),
             };
           },
         },
@@ -152,7 +154,7 @@ describe("EvmForm", () => {
 
         if (value === "to") {
           return {
-            address: "0x123",
+            address: "0xa0a58b72969DF1904Bf2315f2D041AD639737429",
           };
         }
 
@@ -177,7 +179,7 @@ describe("EvmForm", () => {
               balance: BigNumber.from("1000000000000000000"),
             };
           case "destinationAccount":
-            return "0x123";
+            return "0xa0a58b72969DF1904Bf2315f2D041AD639737429";
           default:
             return "";
         }
@@ -199,4 +201,8 @@ describe("EvmForm", () => {
     });
     expect(confirmTx).toHaveBeenCalled();
   });
+
+  it("should return error calculating gas fee", async () => {
+
+  })
 });

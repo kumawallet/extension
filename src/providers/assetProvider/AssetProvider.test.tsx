@@ -210,6 +210,7 @@ describe("AssetProvider", () => {
         type: "loading-assets",
       });
       expect(state).toEqual({
+        network: "",
         assets: [],
         isLoadingAssets: true,
       });
@@ -220,6 +221,7 @@ describe("AssetProvider", () => {
         type: "end-loading",
       });
       expect(state).toEqual({
+        network: "",
         assets: [],
         isLoadingAssets: false,
       });
@@ -229,6 +231,7 @@ describe("AssetProvider", () => {
       const state = reducer(initialState, {
         type: "set-assets",
         payload: {
+          network: "testnet",
           assets: [
             {
               id: "1",
@@ -245,6 +248,7 @@ describe("AssetProvider", () => {
         },
       });
       expect(state).toEqual({
+        network: "testnet",
         assets: [
           {
             id: "1",
@@ -265,6 +269,8 @@ describe("AssetProvider", () => {
     it("should update assets", () => {
       const state = reducer(
         {
+          network: "testnet",
+
           assets: [
             {
               id: "1",
@@ -283,6 +289,7 @@ describe("AssetProvider", () => {
         {
           type: "update-assets",
           payload: {
+            network: "testnet",
             assets: [
               {
                 id: "1",
@@ -297,6 +304,7 @@ describe("AssetProvider", () => {
         }
       );
       expect(state).toEqual({
+        network: "testnet",
         assets: [
           {
             id: "1",
@@ -314,6 +322,8 @@ describe("AssetProvider", () => {
     it("should update one assets", () => {
       const state = reducer(
         {
+          network: "testnet",
+
           assets: [
             {
               id: "1",
@@ -344,6 +354,7 @@ describe("AssetProvider", () => {
         }
       );
       expect(state).toEqual({
+        network: "testnet",
         assets: [
           {
             id: "1",
@@ -364,6 +375,7 @@ describe("AssetProvider", () => {
     it("shoudn't update one assets", () => {
       const state = reducer(
         {
+          network: "testnet",
           assets: [
             {
               id: "1",
@@ -394,6 +406,7 @@ describe("AssetProvider", () => {
         }
       );
       expect(state).toEqual({
+        network: "testnet",
         assets: [
           {
             id: "1",

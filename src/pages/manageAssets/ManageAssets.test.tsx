@@ -26,11 +26,17 @@ describe("ManageAssets", () => {
         state: {
           selectedChain: CHAINS[0].chains[3],
           type: AccountType.EVM,
+          api: null
         },
       }),
       useThemeContext: () => ({
         color: "red",
       }),
+      useAccountContext: () => ({
+        state: {
+          selectedAccount: {}
+        }
+      })
     }));
 
     vi.mock("react-router-dom", () => ({

@@ -88,8 +88,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
   useEffect(() => {
     const isXcm = getValues("isXcm");
-
-
     if (destinationIsInvalid || !isValidAddress(destinationAccount, isXcm ? undefined : "evm") || amount <= 0) return;
     (async () => {
       setIsLoadingFee(true);
