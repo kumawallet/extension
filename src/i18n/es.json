@@ -26,7 +26,7 @@
     "failed_to_update_contact": "Error al actualizar el contacto",
     "failed_to_remove_contact": "Error al eliminar el contacto",
     "failed_to_get_addresses": "Error al obtener las direcciones",
-    "failed_to_get_fees": "Error al obtener las tarifas",    
+    "failed_to_get_fees": "Error al obtener las tarifas",
     "invalid_recovery_phrase": "Frase de recuperación inválida",
     "invalid_credentials": "Credenciales inválidas",
     "invalid_address": "Dirección inválida",
@@ -36,7 +36,6 @@
     "no_contacts_found": "No se encontraron contactos",
     "error": "Ha ocurrido un error",
     "rpc_error": "Error de red"
-
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma Wallet",
@@ -161,7 +160,8 @@
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
     "search": "Buscar contactos por nombre o dirección",
-    "new_contact": "Nuevo contacto"
+    "new_contact": "Nuevo contacto",
+    "required": "Requerido"
   },
   "activity": {
     "title": "Actividad",
@@ -194,9 +194,11 @@
   "send": {
     "title": "Enviar token",
     "from": "Desde",
-    "to:": "Para",
+    "to": "Para",
     "destination_account": "Cuenta destino",
     "amount": "Monto",
+    "total": "Total",
+    "available": "Disponible",
     "gas_limit": "Limite de gas",
     "estimated_fee": "Tasa estimada",
     "estimated_total": "Total estimado",

@@ -1,0 +1,250 @@
+{
+  "common": {
+    "evm_type": "Ethereum Hesabı (EVM)",
+    "wasm_type": "Polkadot Hesabı (Wasm)",
+    "save": "Kaydet",
+    "cancel": "İptal Et",
+    "delete": "Sil",
+    "connect": "Bağlan",
+    "show": "Göster",
+    "close": "Kapat",
+    "copied": "Kopyalandı",
+    "password_required": "Şifre zorunludur",
+    "account_type_required": "Hesap türü zorunludur",
+    "login_required": "Giriş zorunludur",
+    "failed_to_create_account": "Hesap oluşturma başarısız",
+    "failed_to_import_account": "Hesap içeri aktarma başarısız",
+    "failed_to_derive_account": "Hesap ekleme başarısız",
+    "failed_to_update_account": "Hesap güncelleme başarısız",
+    "failed_to_remove_account": "Hesap kaldırma başarısız",
+    "failed_to_get_settings": "Ayarlar alınamadı",
+    "failed_to_update_setting": "Ayarlar güncellenemedi",
+    "failed_to_restore_password": "Şifre kurtarılamadı",
+    "failed_to_cache_password": "Giriş başarısız",
+    "failed_to_add_contact": "Kişi ekleme başarısız",
+    "failed_to_get_contact": "Kişi gösterme başarısız",
+    "failed_to_update_contact": "Kişi güncelleme başarısız",
+    "failed_to_remove_contact": "Kişi kaldırma başarısız",
+    "failed_to_get_addresses": "Adresler gösterilemiyor",
+    "failed_to_get_fees": "Ücret hesaplaması yapılamadı",
+    "invalid_recovery_phrase": "Geçersiz kurtarma ifadesi",
+    "invalid_credentials": "Geçersiz şifre",
+    "invalid_address": "Geçersiz adres",
+    "accounts_not_found": "Hesaplar bulunamadı",
+    "network_not_found": "Ağ bulunamadı",
+    "contact_not_found": "Kişi bulunamadı",
+    "no_contacts_found": "Kişiler bulunamadı",
+    "error": "Bir hata oluştu",
+    "rpc_error": "Ağ hatası"
+  },
+  "welcome": {
+    "welcome_message": "Kuma Wallet'e Hoş geldiniz",
+    "description": "Tüm hesaplarınız tek bir yerde",
+    "button_text": "Başlayalım"
+  },
+  "add_account": {
+    "title": "Hesap Ekle",
+    "import_wallet": "Cüzdanı içe aktar",
+    "create_wallet": "Cüzdan oluştur"
+  },
+  "sign_in": {
+    "welcome": "Tekrar hoş geldin",
+    "password_placeholder": "Şifrenizi giriniz",
+    "signin_button_text": "Giriş yap",
+    "forgot_password": "Şifreni mi unuttun?"
+  },
+  "account_form": {
+    "import": {
+      "title": "Cüzdanı içe aktar",
+      "button_text": "İçe aktar",
+      "submit_message": "Cüzdan içe aktarıldı"
+    },
+    "create_or_derivate": {
+      "title": "Cüzdan oluştur",
+      "button_text": "Oluştur",
+      "submit_message": "Cüzdan oluşturuldu"
+    },
+    "restore": {
+      "title": "Şifre Sıfırlama",
+      "button_text": "Kurtar",
+      "submit_message": "Şifre geri yüklendi"
+    },
+    "form": {
+      "continue_button_text": "Devam et",
+      "recovery_phrase_warning": "Bu, hesabınızın anahtarıdır ve şifrenizi unutursanız erişimi geri kazanmanın tek yoludur. Onu tekrar göremeyeceğinizden, emin olmak için güvenli bir yere kaydedin.",
+      "account_type": "Hesap türü",
+      "private_key": "Private key",
+      "private_key_validation": "Geçersiz Private Key",
+      "seed_phrase": "Anahtar İfadesi",
+      "seed_phrase_validation": "Geçersiz Anahtar İfadesi",
+      "recovery_phrase": "Kurtarma İfadesi",
+      "account_name": "Hesap Adı (opsiyonel)",
+      "account_name_placeholder": "En fazla 32 karakter",
+      "password": "Şifre",
+      "password_requirements": "Şifrenin en az sekiz karakter, en az bir rakam, hem küçük hem de büyük harfler ve özel karakterler içermesi gerekmektedir.",
+      "confirm_password": "Şifreni doğrula",
+      "confirm_password_requirements": "Şifreler eşleşmiyor.",
+      "required": "Bu değer zorunludur",
+      "confirm_recovery_phrase": "Kurtarma ifadesini doğrula",
+      "confirm_recovery_phrase_description": "Lütfen kurtarma cümlenizi doğru sırayla sürükleyerek onaylayın.",
+      "next": "İleri"
+    }
+  },
+  "balance": {
+    "chain_selector": {
+      "connected": "bağlandı",
+      "change_to": "Şununla değiştir",
+      "create_or_import_warning": "Bu ağ sadece {{supported_type}} cüzdanlarına destek vermektedir, lütfen desteklenen bir cüzdan oluşturun veya içe aktarın.",
+      "network_change_warning": "Seçilen cüzdan değiştirilecek çünkü değiştirmek istediğiniz ağ mevcut cüzdan türünü desteklemiyor. Ağı değiştirmek istediğinizden emin misiniz?",
+      "create_account": "Oluştur",
+      "import_account": "İçe aktar",
+      "change": "Değiştir",
+      "mainnets": "Ana Ağlar",
+      "testnets": "Test Ağları",
+      "custom": "Özel",
+      "search": "İsim ile ara"
+    },
+    "accounts": {
+      "accounts": "Hesaplar",
+      "import": "İçe Aktar",
+      "create": "Oluştur"
+    },
+    "send": "Gönder",
+    "receive": "Al",
+    "assets": "Varlıklar",
+    "activity": "Etkinlik",
+    "show_all_assets": "Tüm varlıkları göster",
+    "manage_assets": "Varlıkları yönet"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "general": "Genel",
+    "advanced": "Gelişmiş",
+    "contacts": "Kişiler",
+    "security": "Güvenlik",
+    "bug_report": "Hata bildir",
+    "about_us": "Hakkımızda",
+    "sign_out": "Çıkış yap"
+  },
+  "general_settings": {
+    "title": "Genel",
+    "languages": "Diller",
+    "manage_networks": "Ağları yönet",
+    "show_testnets": "Test ağlarını göster"
+  },
+  "advanced_settings": {
+    "title": "Gelişmiş"
+  },
+  "manage_networks": {
+    "title": "Ağları yönet",
+    "new_network": "Yeni Ağ",
+    "network_name": "Ağ adı",
+    "address_prefix": "Adres ön eki",
+    "native_currency": "Para birimi",
+    "account_type_support": "Hesap türü desteği",
+    "currency_name": "Para birimi adı",
+    "currency_symbol": "Sembolü",
+    "currency_decimals": "Decimal değeri",
+    "rpc_urls": "RPC Adresleri",
+    "rpc_evm_placeholder": "örn. https://mainnet.infura.io/v3/your-api-key",
+    "rpc_wasm_placeholder": "örn. wss://rpc.polkadot.io",
+    "explorer": "Blok Gezgini",
+    "explorer_evm_placeholder": "örn. https://etherscan.io/tx/",
+    "explorer_wasm_placeholder": "örn. https://polkascan.io/pre/kusama/transaction/"
+  },
+  "contacts": {
+    "title": "Kişiler",
+    "name": "Ad",
+    "address": "Adres",
+    "save_contact": "Kişiyi kaydet",
+    "insert_name": "Kişi adını girin",
+    "insert_address": "Adres girin",
+    "search": "Adres veya isimle kişi ara",
+    "new_contact": "Kişi oluştur",
+    "required": "Bu değer zorunludur"
+  },
+  "activity": {
+    "title": "Etkinlik",
+    "empty": "Henüz bir etkinlik yok",
+    "search": "Adres veya transaction hash ile etkinlik ara"
+  },
+  "receive": {
+    "title": "Adresini paylaş"
+  },
+  "confirm_trusted_site": {
+    "title": "İşlem Gerekiyor",
+    "new_site_warning": "Bu site, Kuma Cüzdanınıza bağlanmayı istiyor. Lütfen site bilgilerini gözden geçirin ve güvendiğinizden emin olun, ardından bağlantı kurabilirsiniz..",
+    "do_you_trust_this_site": "Bu siteye güveniyor musun?",
+    "site_will_be_trusted": "Onaylarsanız bu site ileride güvenilir olarak sayılacak.",
+    "manage_trusted_sites": "Eğer güvenilir siteleri yönetmek istiyorsanız Ayarlar > Güvenlik yolunu izleyin."
+  },
+  "security": {
+    "title": "Güvenlik",
+    "trusted_sites": "Güvenilir siteler",
+    "no_trusted_sites": "Güvenilir site yok",
+    "search": "URL ile site ara",
+    "credentials": "Hesap bilgileri",
+    "restore_password": "Şifre sıfırla",
+    "show_account_keys": "Kurtarma ifadelerini göster",
+    "account_keys_description": "Uyarı: Lütfen bu şifreyi gizli tutun. Özel anahtarlarınızı paylaşmak, hesabınızdaki varlıkların çalınmasına neden olabilir.",
+    "reset_wallet": "Kuma Wallet'i Sıfırla",
+    "reset_wallet_warning": "Uyarı: Bu işlem, tüm hesaplarınızı ve verilerinizi uzantıdan silecektir. Varlıklarınız tümüyle uzantıda SAKLANMADIĞI için güvendedir. Hesaplarınızı kurtarmak için seed ifadesini kullanmanız gerekecektir.",
+    "reset": "Sıfırla"
+  },
+  "send": {
+    "title": "Token gönder",
+    "from": "Gönderilen",
+    "to": "Alınan",
+    "destination_account": "Hedef adresi",
+    "amount": "Miktar",
+    "total": "Bakiye",
+    "available": "Kullanılabilir",
+    "gas_limit": "Gas sınırı",
+    "estimated_fee": "Hesaplanan gaz ücreti",
+    "estimated_total": "Hesaplanan toplam ücret",
+    "tip": "Bahşiş (opsiyonel)",
+    "transfer": "Transfer",
+    "chains": "Zinciler",
+    "assets": "Varlıklar",
+    "details": "Detaylar",
+    "confirm": "Onayla",
+    "tx_send": "Transaction gönderildi",
+    "insufficient_balance": "Yetersiz bakiye",
+    "continue": "Devam et",
+    "invalid_address": "Geçersiz adres",
+    "invalid_contract_address": "Geçersiz kontrat adresi",
+    "invalid_method": "Geçersiz metot",
+    "invalid_params": "Geçersiz parametre",
+    "invalid_abi": "Geçersiz ABI",
+    "contract_error": "Kontrat ile bir hata oluştu.",
+    "xcm_alert_message": "Lütfen diğer zincirde bu token ile ücreti ödemek için yeterli miktarda token transfer ettiğinizden emin olun."
+  },
+  "manage_assets": {
+    "title": "Varlıkları Yönet",
+    "address": "Adres",
+    "symbol": "Sembol",
+    "decimals": "Decimal Değeri",
+    "add": "Ekle"
+  },
+  "sign_message": {
+    "title": "Mesajı imzala",
+    "sign": "İmzala",
+    "account": "Hesap",
+    "message": "Mesaj"
+  },
+  "re_enter_password": {
+    "title": "Tekrar şifre girin",
+    "password": "Şifre",
+    "confirm": "Doğrula",
+    "re_enter_password_text": "Lütfen bu işlemi doğrulamak için şifrenizi tekrar girin."
+  },
+  "bug_report": {
+    "title": "Hata  bildir",
+    "collaborate": "Bize katkı yapın",
+    "collaborate_description": "Kuma Wallet açık kaynak bir projedir. Eğer bize katkı yapmak isterseniz, lütfen GitHub depomuzu ziyaret edin. README.md dosyasındaki talimatları takip ederek bir Pull Request'in nasıl gönderileceği konusunda bilgi alabilirsiniz.",
+    "collaborate_link": "Github Reposu",
+    "report_an_issue": "Bir hata bildir",
+    "report_an_issue_description": "Bir sorun bildirmek isterseniz, lütfen Discord kanalımızı ziyaret edin ve hata raporu nasıl gönderileceği konusundaki talimatları takip edin.",
+    "report_an_issue_link": "Destek kanalı"
+  }
+}
