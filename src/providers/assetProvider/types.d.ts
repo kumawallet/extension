@@ -1,4 +1,5 @@
 import AccountEntity from "@src/storage/entities/Account";
+import { Chain } from "@src/storage/entities/Chains";
 import { API } from "@src/types";
 export interface Asset {
   symbol: string;
@@ -36,7 +37,7 @@ export interface InitialState {
 export interface LoadAssetParams {
   api: API;
   selectedAccount: AccountEntity;
-  selectedChain: any;
+  selectedChain: Chain;
 }
 
 export interface AssetContext {
