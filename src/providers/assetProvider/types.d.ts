@@ -6,13 +6,14 @@ export interface Asset {
   decimals: number;
   id: string;
   balance: BN;
-  transferable: BN;
-  reserved: BN;
-  frozen: BN;
+  transferable?: BN;
+  reserved?: BN;
+  frozen?: BN;
   address?: string;
   amount?: number;
   name?: string;
   price?: number;
+  color?: string;
   aditionalData?:
     | {
         tokenId: {

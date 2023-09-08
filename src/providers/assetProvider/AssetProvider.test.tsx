@@ -12,6 +12,8 @@ import { AccountType } from "@src/accounts/types";
 import { stringToU8a } from "@polkadot/util";
 import { render, waitFor } from "@testing-library/react";
 import { BN0 } from "@src/constants/assets";
+import { NetworkProvider, useNetworkContext } from "@src/providers/networkProvider";
+import { AccountProvider, useAccountContext } from "@src/providers/accountProvider";
 
 const testIds = {
   loadAssetsBtn: "load-assets-btn",
@@ -24,9 +26,16 @@ const TestComponent = () => {
     loadAssets,
   } = useAssetContext();
 
+  const { state: { api, selectedChain } } = useNetworkContext()
+  const { state: { selectedAccount } } = useAccountContext()
+
   return (
     <>
-      <button data-testid={testIds.loadAssetsBtn} onClick={loadAssets}>
+      <button data-testid={testIds.loadAssetsBtn} onClick={() => loadAssets({
+        api,
+        selectedChain,
+        selectedAccount
+      })}>
         load assets
       </button>
       <div data-testid={testIds.assets}>{JSON.stringify(assets)}</div>
@@ -36,9 +45,13 @@ const TestComponent = () => {
 
 const renderComponent = () => {
   return render(
-    <AssetProvider>
-      <TestComponent />
-    </AssetProvider>
+    <NetworkProvider>
+      <AccountProvider>
+        <AssetProvider>
+          <TestComponent />
+        </AssetProvider>
+      </AccountProvider>
+    </NetworkProvider>
   );
 };
 
@@ -49,7 +62,7 @@ describe("AssetProvider", () => {
       const react = (await vi.importActual("react")) as typeof React;
       return {
         ...react,
-        useReducer: vi.fn().mockImplementation((reducer, initialState) => {
+        useReducer: vi.fn().mockImplementation(() => {
           return [
             {
               assets: [
@@ -81,6 +94,16 @@ describe("AssetProvider", () => {
         ]),
       },
     }));
+
+    vi.mock("@src/storage/entities/BaseEntity", () => {
+      class BaseEntityMock {
+        constructor() { }
+      }
+
+      return {
+        default: BaseEntityMock,
+      };
+    });
 
     vi.mock("@polkadot/api-contract", () => {
       class ContractPromise {

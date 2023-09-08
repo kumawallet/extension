@@ -167,7 +167,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           ...asset,
           // TODO: save this colors in storage
           color: randomcolor(),
-        })),
+        })) as Asset[],
       ];
       dispatch({
         type: "set-assets",
