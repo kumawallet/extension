@@ -20,6 +20,7 @@ import { captureError } from "@src/utils/error-handling";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
+import { isValidAddress } from "@src/utils/account-utils";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -84,8 +85,12 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     }
   }, []);
 
+
   useEffect(() => {
-    if (destinationIsInvalid || !destinationAccount || amount <= 0) return;
+    const isXcm = getValues("isXcm");
+
+
+    if (destinationIsInvalid || !isValidAddress(destinationAccount, isXcm ? undefined : "evm") || amount <= 0) return;
     (async () => {
       setIsLoadingFee(true);
 
@@ -98,7 +103,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           _amount.toLocaleString("fullwide", { useGrouping: false })
         );
 
-        const isXcm = getValues("isXcm");
         const to = getValues("to");
 
         if (isXcm) {
@@ -204,7 +208,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           const gasLimit = await contract.estimateGas.transfer(
             destinationAccount,
             bnAmount
-          );
+          ).catch(() => BigNumber.from("21000"));
 
           const _gasLimit = gasLimit;
           const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
@@ -228,6 +232,13 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
+        setFee({
+          "gas limit": BigNumber0,
+          "max fee per gas": BigNumber0,
+          "max priority fee per gas": BigNumber0,
+          "estimated fee": BigNumber0,
+          "estimated total": BigNumber0,
+        })
         captureError(error);
         showErrorToast(tCommon("failed_to_get_fees"));
       } finally {
