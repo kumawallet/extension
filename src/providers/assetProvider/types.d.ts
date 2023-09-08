@@ -1,3 +1,5 @@
+import AccountEntity from "@src/storage/entities/Account";
+import { API } from "@src/types";
 export interface Asset {
   symbol: string;
   decimals: number;
@@ -26,13 +28,20 @@ export interface Asset {
 }
 
 export interface InitialState {
+  network: string;
   assets: Asset[];
   isLoadingAssets: boolean;
 }
 
+export interface LoadAssetParams {
+  api: API;
+  selectedAccount: AccountEntity;
+  selectedChain: any;
+}
+
 export interface AssetContext {
   state: InitialState;
-  loadAssets: () => void;
+  loadAssets: (props: LoadAssetParams) => void;
 }
 
 export type Action =
@@ -45,12 +54,14 @@ export type Action =
   | {
       type: "set-assets";
       payload: {
+        network: string;
         assets: Asset[];
       };
     }
   | {
       type: "update-assets";
       payload: {
+        network: string;
         assets: Assset[];
       };
     }

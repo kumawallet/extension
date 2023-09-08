@@ -15,7 +15,7 @@
     "build:chrome": "BROWSER_TARGET=CHROME vite build",
     "build:firefox": "BROWSER_TARGET=FIREFOX vite build",
     "build": "NODE_ENV=production tsc --noEmit && npm run build:chrome && npm run build:firefox",
-    "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME nodemon",
+    "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME vite build --watch",
     "dev:firefox": "NODE_ENV=develop BROWSER_TARGET=FIREFOX nodemon",
     "test": "vitest --reporter=verbose",
     "test:cov": "vitest  --reporter=verbose run --coverage",
