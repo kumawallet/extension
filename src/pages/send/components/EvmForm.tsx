@@ -97,6 +97,8 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           ? Number(amount) * currencyUnits
           : Number(amount) * 10 ** asset.decimals;
 
+        if (isNaN(_amount)) return;
+
         const bnAmount = ethers.BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
         );
@@ -230,6 +232,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
+        console.log('fee', {
+          error
+        })
         setFee({
           "gas limit": BigNumber0,
           "max fee per gas": BigNumber0,
@@ -264,6 +269,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         ? Number(amount) * currencyUnits
         : Number(amount) * 10 ** asset.decimals;
 
+
+      if (isNaN(_amount)) return false;
+
       const bnAmount = BigNumber.from(
         _amount.toLocaleString("fullwide", { useGrouping: false })
       );
@@ -282,6 +290,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
+      console.log('isEnoughToPay', {
+        error
+      })
       captureError(error);
       return false;
     }
