@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
-import { SEND, RECEIVE } from "@src/routes/paths";
+import { SEND, RECEIVE, EARNING } from "@src/routes/paths";
 import { useAccountContext, useAssetContext } from "@src/providers";
 import { Button } from "@src/components/common";
 
@@ -115,6 +115,16 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           </span>
         </Button>
       </div>
+
+      <div className="flex gap-3 justify-center">
+        <Button onClick={() => navigate(EARNING)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <BsArrowDownLeft />
+            <p>{t("earning")}</p>
+          </span>
+        </Button>
+      </div>
+
     </div>
   );
 };

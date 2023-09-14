@@ -7,6 +7,7 @@ export * from "./FullScreenFAB";
 export * from "./InputErroMessage";
 export * from "./Loading";
 export * from "./Logo";
+export * from "./PageTitle";
 export * from "./PageWrapper";
 export * from "./ReEnterPassword";
 export * from "./SelectLanguage";

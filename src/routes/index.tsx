@@ -13,6 +13,7 @@ import {
   SignMessage,
   Welcome,
   CallContract,
+  Earning,
 } from "@src/pages";
 import {
   Advanced,
@@ -35,6 +36,7 @@ import {
   CALL_CONTRACT,
   CREATE_ACCOUNT,
   DERIVE_ACCOUNT,
+  EARNING,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
   RECEIVE,
@@ -165,6 +167,7 @@ export const Routes = () => {
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
+        <Route path={EARNING} element={<Earning />} />
 
         <Route
           path={IMPORT_ACCOUNT}

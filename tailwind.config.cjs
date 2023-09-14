@@ -6,7 +6,11 @@ module.exports = {
       variants: ["hover", "after"],
     },
     {
-      pattern: /(text|border|fill|text|border)-chain/,
+      pattern: /(text|fill|text|border)-chain/,
+    },
+    {
+      pattern: /(outline)-chain-.*-(primary)/,
+      variants: ["focus", "hover"],
     },
   ],
   theme: {
