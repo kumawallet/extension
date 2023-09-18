@@ -4,26 +4,24 @@ import { Frecuency, SelectableAsset } from './components';
 import { HiMiniArrowsRightLeft } from "react-icons/hi2"
 import { NumericFormat } from 'react-number-format';
 import { useThemeContext } from '@src/providers';
+import { useEarning } from './hooks';
 
-const MOCK_ASSETS = [
-  {
-    label: "ETH",
-    image: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
-  },
-  {
-    label: "BTC",
-    image: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579",
-  },
-  {
-    label: "USDT",
-    image: "https://assets.coingecko.com/coins/images/325/small/Tether-logo.png?1598003707",
-  }
-]
 
 export const Earning = () => {
   const { t } = useTranslation("earning");
   const { color } = useThemeContext()
 
+  const {
+    assetsToBuy,
+    assetsToSell,
+    selectedAssetToBuy,
+    selectedAssetToSell,
+    setSelectedAssetToBuy,
+    setSelectedAssetToSell,
+    amount,
+    setAmount,
+    createSwap
+  } = useEarning()
 
   return (
     <PageWrapper contentClassName="bg-[#29323C] h-full flex flex-col"
@@ -37,18 +35,18 @@ export const Earning = () => {
         <div className='flex-1'>
           <div className='flex justify-center items-center gap-3'>
             <SelectableAsset
-              value={MOCK_ASSETS[0]}
-              options={MOCK_ASSETS}
-              onChange={(value) => console.log(value)}
-              defaulValue={MOCK_ASSETS[0]}
+              value={selectedAssetToSell}
+              options={assetsToSell}
+              onChange={(value) => setSelectedAssetToSell(value)}
+              defaulValue={selectedAssetToSell}
               label={t("sell") as string}
             />
             <HiMiniArrowsRightLeft className="mt-7" size={20} />
             <SelectableAsset
-              value={MOCK_ASSETS[0]}
-              options={MOCK_ASSETS}
-              onChange={(value) => console.log(value)}
-              defaulValue={MOCK_ASSETS[0]}
+              value={selectedAssetToBuy}
+              options={assetsToBuy}
+              onChange={(value) => setSelectedAssetToBuy(value)}
+              defaulValue={selectedAssetToBuy}
               label={t("receive") as string}
             />
           </div>
@@ -65,19 +63,19 @@ export const Earning = () => {
                   className={`input-secondary py-3 rounded-2xl pr-12 outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary rounded-r-none`}
                   allowNegative={false}
                   allowLeadingZeros={false}
-                  // value={getValues("amount")}
-                  // onValueChange={({ value }) => {
-                  //   setValue("amount", value || "0");
-                  // }}
+                  value={amount}
+                  onValueChange={({ value }) => {
+                    setAmount(value);
+                  }}
                   allowedDecimalSeparators={["%"]}
                 />
                 <button className='absolute right-3 -translate-y-1/2 top-1/2 text-bold text-[#D1D5DB] hover:bg-gray-400 hover:bg-opacity-40 p-1 rounded-2xl'>{t("max")}</button>
               </div>
               <SelectableAsset
-                value={MOCK_ASSETS[0]}
-                options={MOCK_ASSETS}
-                onChange={(value) => console.log(value)}
-                defaulValue={MOCK_ASSETS[0]}
+                value={selectedAssetToSell}
+                options={assetsToSell}
+                onChange={(value) => setSelectedAssetToSell(value)}
+                defaulValue={selectedAssetToSell}
                 containerClassName='flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]'
                 buttonClassName='rounded-l-none'
               />
@@ -93,7 +91,10 @@ export const Earning = () => {
       </div>
 
       <div className='py-2'>
-        <Button classname={`font-medium text-base capitalize py-2 bg-[#212529] hover:bg-${color}-primary m-0 !w-full`}>
+        <Button
+          classname={`font-medium text-base capitalize py-2 bg-[#212529] hover:bg-${color}-primary m-0 !w-full`}
+          onClick={createSwap}
+        >
           {t("proceed")}
         </Button>
       </div>
