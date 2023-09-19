@@ -29,12 +29,13 @@ import {
   PROOF_SIZE,
   REF_TIME,
 } from "@src/constants/assets";
-import { Action, Asset, AssetContext, InitialState } from "./types";
+import { Action, Asset, AssetContext, InitialState, LoadAssetParams } from "./types";
 import randomcolor from "randomcolor";
-import { IAsset } from "@src/types";
+import { API, IAsset } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 
 export const initialState: InitialState = {
+  network: "",
   assets: [],
   isLoadingAssets: false,
 };
@@ -46,6 +47,7 @@ export const reducer = (state: InitialState, action: Action) => {
     case "loading-assets": {
       return {
         ...state,
+        network: "",
         assets: [],
         isLoadingAssets: true,
       };
@@ -57,16 +59,25 @@ export const reducer = (state: InitialState, action: Action) => {
       };
     }
     case "set-assets": {
-      const { assets } = action.payload;
+      const { assets, network } = action.payload;
+
+      if (state.network !== "") return {
+        ...state,
+        isLoadingAssets: false,
+      };
 
       return {
         ...state,
+        network,
         assets,
         isLoadingAssets: false,
       };
     }
     case "update-assets": {
-      const { assets } = action.payload;
+      const { assets, network } = action.payload;
+
+      if (network !== state.network) return state
+
       return {
         ...state,
         assets,
@@ -128,7 +139,11 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [unsubscribers, setUnsubscribers] = useState<any[]>([]);
 
-  const loadAssets = async () => {
+  const loadAssets = async ({
+    api,
+    selectedAccount,
+    selectedChain,
+  }: LoadAssetParams) => {
     dispatch({
       type: "loading-assets",
     });
@@ -136,7 +151,11 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     let assets: Asset[] = [];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
-      const _assets = await getOtherAssets();
+      const _assets = await getOtherAssets({
+        api,
+        selectedAccount,
+        selectedChain,
+      });
 
       assets = [
         {
@@ -148,11 +167,12 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           ...asset,
           // TODO: save this colors in storage
           color: randomcolor(),
-        })),
+        })) as Asset[],
       ];
       dispatch({
         type: "set-assets",
         payload: {
+          network: selectedChain?.name,
           assets,
         },
       });
@@ -162,13 +182,13 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "end-loading",
       });
     } finally {
-      getAssetsUSDPrice(assets);
+      getAssetsUSDPrice(assets, selectedChain?.name);
     }
     return assets;
   };
 
   const getNativeAsset = async (
-    api: ApiPromise | ethers.providers.JsonRpcProvider | null,
+    api: API,
     account: AccountEntity
   ) => {
     const address = account.value.address;
@@ -233,13 +253,13 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     return amounts;
   };
 
-  const getOtherAssets = async () => {
+  const getOtherAssets = async (props: LoadAssetParams) => {
     if (!type) return [];
 
     if (type === "WASM") {
       const [assets, assetsFromPallet] = await Promise.all([
         loadAssetsFromStorage(),
-        loadPolkadotAssets(),
+        loadPolkadotAssets(props),
       ]);
 
       assets.length > 0 && listWasmContracts(assets);
@@ -251,11 +271,11 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const loadPolkadotAssets = async () => {
+  const loadPolkadotAssets = async ({ api, selectedAccount, selectedChain }: LoadAssetParams) => {
     const { assets, unsubs } = await getWasmAssets(
-      api as ApiPromise,
-      selectedChain.name,
-      selectedAccount.value.address,
+      api,
+      selectedChain?.name,
+      selectedAccount?.value?.address,
       (
         assetId: string,
         amounts: {
@@ -381,9 +401,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const getAssetsUSDPrice = async (assets?: Asset[]) => {
+  const getAssetsUSDPrice = async (assets: Asset[], network: string) => {
     try {
-      const copyAssets = [...(assets || state.assets)];
+      const copyAssets = [...assets];
 
       const addresToQuery = [];
       for (const [index, asset] of copyAssets.entries()) {
@@ -417,6 +437,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       dispatch({
         type: "update-assets",
         payload: {
+          network,
           assets: copyAssets,
         },
       });
@@ -475,28 +496,21 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (
-      rpc &&
       selectedAccount?.value?.address &&
-      selectedChain &&
       type &&
-      api
+      api &&
+      selectedChain?.name
     ) {
       if (selectedAccount?.type?.includes(type)) {
-        loadAssets();
+        loadAssets({
+          api,
+          selectedAccount,
+          selectedChain
+        });
       }
     }
-  }, [rpc, selectedAccount, type, api]);
+  }, [selectedAccount, type, api, selectedChain?.name]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (state.assets.length > 0) {
-      interval = setInterval(() => {
-        getAssetsUSDPrice(state.assets);
-      }, 60000);
-    }
-
-    return () => clearInterval(interval);
-  }, [state.assets]);
 
   return (
     <AssetContext.Provider

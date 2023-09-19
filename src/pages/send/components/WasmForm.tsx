@@ -110,6 +110,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         ? amount * currencyUnits
         : amount * 10 ** asset?.decimals || 0;
 
+      if (isNaN(_amount)) return;
+
       const bnAmount = new BN(
         String(_amount.toLocaleString("fullwide", { useGrouping: false }))
       );
@@ -264,6 +266,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const _amount = isNativeAsset
         ? amount * currencyUnits
         : amount * 10 ** asset.decimals;
+
+      if (isNaN(_amount)) return;
 
       const bnAmount = new BN(
         _amount.toLocaleString("fullwide", { useGrouping: false })
