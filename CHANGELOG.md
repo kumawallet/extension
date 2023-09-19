@@ -2,6 +2,7 @@
 
 # 0.3.8
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/09/19**
+- [#42](https://github.com/blockcoders/kuma-wallet/pull/42) Fix tests
 - [#41](https://github.com/blockcoders/kuma-wallet/pull/41) A Turkish language file has been added
 - [#39](https://github.com/blockcoders/kuma-wallet/pull/39) EVM transfer error and Incorrect asset amounts
 
