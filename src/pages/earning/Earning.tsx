@@ -1,6 +1,6 @@
-import { Button, PageTitle, PageWrapper } from '@src/components/common'
+import { Button, PageTitle, PageWrapper, ReEnterPassword } from '@src/components/common'
 import { useTranslation } from 'react-i18next';
-import { Frecuency, SelectableAsset } from './components';
+import { ActiveSwaps, Frecuency, SelectableAsset } from './components';
 import { HiMiniArrowsRightLeft } from "react-icons/hi2"
 import { NumericFormat } from 'react-number-format';
 import { useThemeContext } from '@src/providers';
@@ -20,18 +20,37 @@ export const Earning = () => {
     setSelectedAssetToSell,
     amount,
     setAmount,
-    createSwap
+
+    frecuency,
+    setFrecuency,
+    isLoading,
+    activeSwaps,
+    deleteSwap,
+    isLoadingActiveSwaps,
+    selectedAssetIsInActiveSwaps,
+    selectedTokenBalance,
+    handleSwap
   } = useEarning()
 
   return (
     <PageWrapper contentClassName="bg-[#29323C] h-full flex flex-col"
       innerContentClassName='flex flex-col'
     >
+      <ReEnterPassword />
+
+
       <div className='flex flex-col flex-1'>
         <PageTitle
           title={t("title")}
           canNavigateBack
         />
+
+        <ActiveSwaps
+          activeSwaps={activeSwaps}
+          deleteSwap={deleteSwap}
+          isLoading={isLoadingActiveSwaps}
+        />
+
         <div className='flex-1'>
           <div className='flex justify-center items-center gap-3'>
             <SelectableAsset
@@ -54,7 +73,7 @@ export const Earning = () => {
           <div className="mt-10">
             <div className='flex justify-between mb-1'>
               <p className="font-inter font-bold text-lg">{t("investment_amount")}</p>
-              <p className="font-inter font-bold text-lg text-[#9CA3AF]">{t("balance")}: 0</p>
+              <p className="font-inter font-bold text-lg text-[#9CA3AF]">{t("balance")}: {selectedTokenBalance}</p>
             </div>
 
             <div className='flex'>
@@ -85,17 +104,21 @@ export const Earning = () => {
           </div>
 
           <div className='mt-10'>
-            <Frecuency />
+            <Frecuency
+              frecuency={frecuency}
+              setFrecuency={setFrecuency}
+            />
           </div>
         </div>
       </div>
 
       <div className='py-2'>
         <Button
+          isLoading={isLoading}
           classname={`font-medium text-base capitalize py-2 bg-[#212529] hover:bg-${color}-primary m-0 !w-full`}
-          onClick={createSwap}
+          onClick={handleSwap}
         >
-          {t("proceed")}
+          {selectedAssetIsInActiveSwaps ? t("update") : t("proceed")}
         </Button>
       </div>
 

@@ -43,6 +43,7 @@
     "@polkadot/util-crypto": "12.4.2",
     "@sentry/react": "^7.64.0",
     "@superfluid-finance/sdk-core": "^0.6.9",
+    "date-fns": "^2.30.0",
     "ethers": "^5.7.2",
     "graphql": "^16.8.0",
     "i18next": "^22.5.1",

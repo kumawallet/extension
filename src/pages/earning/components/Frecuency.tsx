@@ -1,6 +1,6 @@
 import { Listbox, Switch, Transition } from "@headlessui/react";
 import { useThemeContext } from "@src/providers";
-import { Fragment, useState } from "react";
+import { FC, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 import { BiChevronDown } from "react-icons/bi"
@@ -49,16 +49,24 @@ const HOURS = [
   24
 ]
 
-export const Frecuency = () => {
+interface FrecuencyProps {
+  frecuency: {
+    frecuency: string,
+    howManyDays: string,
+    selectedDayManually: boolean,
+    hour: number
+  }
+  setFrecuency: (frecuency: any) => void
+}
+
+export const Frecuency: FC<FrecuencyProps> = ({
+  setFrecuency,
+  frecuency
+}) => {
   const { t } = useTranslation("swap");
   const { color } = useThemeContext();
 
-  const [frecuency, setFrecuency] = useState({
-    frecuency: FRECUENCIES[0].value,
-    howManyDays: "",
-    selectedDayManually: false,
-    hour: HOURS[9],
-  });
+
 
   const selectedDayManually = (day: string, isManually: boolean) => setFrecuency({ ...frecuency, howManyDays: day, selectedDayManually: isManually })
 
