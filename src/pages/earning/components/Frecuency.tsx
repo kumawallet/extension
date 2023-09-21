@@ -7,15 +7,15 @@ import { BiChevronDown } from "react-icons/bi"
 
 const FRECUENCIES = [
   {
-    label: "Daily",
+    label: "daily",
     value: "daily",
   },
   {
-    label: "Weekly",
+    label: "weekly",
     value: "weekly",
   },
   {
-    label: "Monthly",
+    label: "monthly",
     value: "monthly",
   },
 ];
@@ -63,7 +63,7 @@ export const Frecuency: FC<FrecuencyProps> = ({
   setFrecuency,
   frecuency
 }) => {
-  const { t } = useTranslation("swap");
+  const { t } = useTranslation("earning");
   const { color } = useThemeContext();
 
 
@@ -73,7 +73,7 @@ export const Frecuency: FC<FrecuencyProps> = ({
 
   return (
     <>
-      <p className="font-inter font-bold text-lg mb-1">
+      <p className="font-inter font-bold md:text-lg mb-1">
         {t("choose_frecuency")}
       </p>
       <div className="flex flex-wrap gap-5">
@@ -105,7 +105,7 @@ export const Frecuency: FC<FrecuencyProps> = ({
         })}
       </div>
 
-      <p className="font-inter font-bold text-lg mb-1 mt-4">
+      <p className="font-inter font-bold md:text-lg mb-1 mt-4">
         {t("how_many_days")}
       </p>
       <div
@@ -128,13 +128,13 @@ export const Frecuency: FC<FrecuencyProps> = ({
               key={day}
               onClick={() => selectedDayManually(day, true)}
               className={`${frecuency.selectedDayManually && frecuency.howManyDays === day ? `bg-${color}-fill text-${color}-secondary` : "bg-[#212529]"} hover:bg-${color}-fill hover:text-${color}-secondary rounded-xl py-2 px-3 text-[#A3A3A3] text-lg`}
-            >{day}</button>
+            >{t(day)}</button>
           ))
         }
       </div>
 
-      <p className="font-inter font-bold text-lg mb-1 mt-4">
-        {t("especify_hour")}
+      <p className="font-inter font-bold md:text-lg mb-1 mt-4">
+        {t("especify_hour")}:
       </p>
 
       <div className="">

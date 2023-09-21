@@ -38,22 +38,22 @@ export const SelectableAsset = <T extends { image?: string; label?: string | JSX
 
   return (
     <div className={`flex flex-col flex-1 ${containerClassName}`}>
-      {label && <p className="mb-[2px] font-inter font-bold text-lg">{label}</p>}
+      {label && <p className="mb-[2px] font-inter font-bold md:text-lg">{label}</p>}
       <Listbox
         value={value}
         onChange={onChange}
         defaultValue={defaulValue}
       >
-        <div className="relative grid">
+        <div className="relative h-full">
           <Listbox.Button
-            className={`min-w-[120px] flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
+            className={`min-w-[120px] h-full w-full flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
             aria-readonly={isReadOnly}
           >
             <div className="flex gap-1 items-center">
               {
                 value.image && <OptImage image={value.image} />
               }
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis text-xl">
+              <span className="whitespace-nowrap overflow-hidden text-ellipsis md:text-xl">
                 {value.label}
               </span>
             </div>
@@ -73,7 +73,7 @@ export const SelectableAsset = <T extends { image?: string; label?: string | JSX
                     opt.image && <OptImage image={opt.image} />
                   }
 
-                  <span className="text-xl">{opt.label}</span>
+                  <span className="md:text-xl">{opt.label}</span>
                 </Listbox.Option>
               ))}
             </Listbox.Options>

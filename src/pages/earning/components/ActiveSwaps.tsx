@@ -4,6 +4,7 @@ import { SuperToken } from '@superfluid-finance/sdk-core'
 import { format } from 'date-fns'
 import { utils } from 'ethers'
 import { FC, Fragment, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AiFillDelete } from 'react-icons/ai'
 import { BsArrowUpCircle, BsPencil } from 'react-icons/bs'
 
@@ -19,6 +20,8 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
   deleteSwap,
   isLoading
 }) => {
+  const { t } = useTranslation("earning")
+
   const [isOpen, setIsOpen] = useState(false)
 
   function closeModal() {
@@ -39,7 +42,7 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
           onClick={openModal}
           className="rounded-md bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
         >
-          {activeSwaps.length} Active swaps
+          {activeSwaps.length} {t("active_swaps")}
         </button>
       </div>
 
@@ -73,7 +76,7 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                     as="h3"
                     className="text-lg font-medium leading-6 mb-1"
                   >
-                    Active swaps
+                    {t("active_swaps")}
                   </Dialog.Title>
                   {
                     isLoading ? <Loading /> : (
@@ -101,7 +104,7 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                                       </button>
                                     </div>
 
-                                    <p>start date: {format(swap.timestamp, 'dd/MM/yy')}</p>
+                                    <p>{t("start_date")}: {format(swap.timestamp, 'dd/MM/yy')}</p>
 
                                   </Disclosure.Panel>
                                 </>

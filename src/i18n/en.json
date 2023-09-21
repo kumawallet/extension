@@ -243,5 +243,23 @@
     "report_an_issue": "Report an issue",
     "report_an_issue_description": "If you want to report an issue, please visit our Discord channel and follow the instructions on how to submit a bug report.",
     "report_an_issue_link": "Support channel"
+  },
+  "earning": {
+    "title": "Earning",
+    "active_swaps": "Active Swaps",
+    "start_date": "Start Date",
+    "sell": "Sell",
+    "receive": "Receive",
+    "balance": "balance",
+    "investment_amount": "Investment Amount",
+    "max": "max",
+    "update": "Update",
+    "proceed": "Proceed",
+    "choose_frecuency": "Choose frecuency",
+    "how_many_days": "How many days?",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "especify_hour": "Especify hour"
   }
 }

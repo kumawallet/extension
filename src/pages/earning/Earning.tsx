@@ -40,16 +40,23 @@ export const Earning = () => {
 
 
       <div className='flex flex-col flex-1'>
-        <PageTitle
-          title={t("title")}
-          canNavigateBack
-        />
 
-        <ActiveSwaps
-          activeSwaps={activeSwaps}
-          deleteSwap={deleteSwap}
-          isLoading={isLoadingActiveSwaps}
-        />
+        <div className='flex justify-between items-center mb-7'>
+          <PageTitle
+            title={t("title")}
+            canNavigateBack
+            containerClassName='!w-fit !mb-0'
+          />
+
+          <ActiveSwaps
+            activeSwaps={activeSwaps}
+            deleteSwap={deleteSwap}
+            isLoading={isLoadingActiveSwaps}
+          />
+
+        </div>
+
+
 
         <div className='flex-1'>
           <div className='flex justify-center items-center gap-3'>
@@ -72,8 +79,8 @@ export const Earning = () => {
 
           <div className="mt-10">
             <div className='flex justify-between mb-1'>
-              <p className="font-inter font-bold text-lg">{t("investment_amount")}</p>
-              <p className="font-inter font-bold text-lg text-[#9CA3AF]">{t("balance")}: {selectedTokenBalance}</p>
+              <p className="font-inter font-bold md:text-lg">{t("investment_amount")}</p>
+              <p className="font-inter font-bold md:text-lg text-[#9CA3AF]">{t("balance")}: {selectedTokenBalance}</p>
             </div>
 
             <div className='flex'>
@@ -115,7 +122,7 @@ export const Earning = () => {
       <div className='py-2'>
         <Button
           isLoading={isLoading}
-          classname={`font-medium text-base capitalize py-2 bg-[#212529] hover:bg-${color}-primary m-0 !w-full`}
+          classname={`font-medium text-base capitalize py-2 bg-[#212529] hover:bg-${color}-primary m-0 !w-full !px0`}
           onClick={handleSwap}
         >
           {selectedAssetIsInActiveSwaps ? t("update") : t("proceed")}
