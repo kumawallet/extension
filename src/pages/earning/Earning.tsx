@@ -1,3 +1,5 @@
+
+
 import { Button, PageTitle, PageWrapper, ReEnterPassword } from '@src/components/common'
 import { useTranslation } from 'react-i18next';
 import { ActiveSwaps, Frecuency, SelectableAsset } from './components';
@@ -29,7 +31,8 @@ export const Earning = () => {
     isLoadingActiveSwaps,
     selectedAssetIsInActiveSwaps,
     selectedTokenBalance,
-    handleSwap
+    handleSwap,
+    selectAssetFromActiveSwaps
   } = useEarning()
 
   return (
@@ -52,6 +55,7 @@ export const Earning = () => {
             activeSwaps={activeSwaps}
             deleteSwap={deleteSwap}
             isLoading={isLoadingActiveSwaps}
+            selectAssetFromActiveSwaps={selectAssetFromActiveSwaps}
           />
 
         </div>

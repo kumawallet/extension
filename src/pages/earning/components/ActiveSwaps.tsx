@@ -12,13 +12,15 @@ import { BsArrowUpCircle, BsPencil } from 'react-icons/bs'
 interface ActiveSwapsProps {
   activeSwaps: any[]
   deleteSwap: (token: SuperToken, tokenName: string) => void
-  isLoading?: boolean
+  isLoading?: boolean;
+  selectAssetFromActiveSwaps: (token: any) => void
 }
 
 export const ActiveSwaps: FC<ActiveSwapsProps> = ({
   activeSwaps,
   deleteSwap,
-  isLoading
+  isLoading,
+  selectAssetFromActiveSwaps
 }) => {
   const { t } = useTranslation("earning")
 
@@ -96,7 +98,10 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                                   </Disclosure.Button>
                                   <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm">
                                     <div className='flex justify-end gap-3 items-center'>
-                                      <button className='text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2'>
+                                      <button className='text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2' onClick={() => {
+                                        selectAssetFromActiveSwaps(swap)
+                                        closeModal()
+                                      }}>
                                         <BsPencil className='h-5 w-5' />
                                       </button>
                                       <button className='text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2' onClick={() => deleteSwap(swap.st, swap.asset)}>

@@ -3,7 +3,7 @@ import { useLoading, useToast } from "@src/hooks";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { Framework, SuperToken } from "@superfluid-finance/sdk-core";
 import { useEffect, useState } from "react";
-import { EarningAssets } from "../utils/assets-per-chain";
+import { ASSETS_INFO, EarningAssets } from "../utils/assets-per-chain";
 import Extension from "@src/Extension";
 import { utils } from "ethers";
 import { use } from "i18next";
@@ -98,57 +98,36 @@ export const useEarning = () => {
 
       setPairAssets(assetPairs);
 
-      setAssetsToSell(assets.map((asset) => ({ label: asset })));
-      setSelectedAssetToSell({ label: firstAsset });
+      const image = ASSETS_INFO[firstAsset].image;
+
+      setAssetsToSell(
+        assets.map((asset) => ({
+          label: asset,
+          image: ASSETS_INFO[asset].image,
+        }))
+      );
+      setSelectedAssetToSell({
+        label: firstAsset,
+        image,
+      });
 
       const assetsToBuy = assetPairs[firstAsset];
-      setAssetsToBuy(assetsToBuy.map((asset) => ({ label: asset })));
-      setSelectedAssetToBuy({ label: assetsToBuy[0] });
+      setAssetsToBuy(
+        assetsToBuy.map((asset) => ({
+          label: asset,
+          image: ASSETS_INFO[asset].image,
+        }))
+      );
+      setSelectedAssetToBuy({
+        label: assetsToBuy[0],
+        image: ASSETS_INFO[assetsToBuy[0]].image,
+      });
 
       loadActiveSwaps(assets);
     } catch (error) {
       showErrorToast(error);
     }
   };
-
-  // const createSwap = async () => {
-  //   if (!amount) return;
-  //   starLoading();
-  //   try {
-  //     const bnAmount = utils.parseEther(amount);
-  //     const frecuencyInSeconds = getFrecuencyToSeconds(frecuency.frecuency);
-
-  //     const sf = await Framework.create({
-  //       chainId: EarningAssets[selectedChain?.name].chainId,
-  //       provider,
-  //     });
-
-  //     const token = await sf.loadSuperToken(selectedAssetToSell.label);
-
-  //     const privateKey = await Extension.showKey();
-
-  //     const signer = sf.createSigner({
-  //       privateKey,
-  //       provider,
-  //     });
-
-  //     const flowOperation = (await token).createFlow({
-  //       sender: await signer.getAddress(),
-  //       receiver: EarningAssets[selectedChain?.name].contractAddress,
-  //       flowRate: bnAmount.div(frecuencyInSeconds).toString(),
-  //     });
-
-  //     const txnResponse = await flowOperation.exec(signer);
-  //     await txnResponse.wait();
-
-  //     showSuccessToast("Swap created successfully");
-
-  //     loadActiveSwaps([...activeSwaps, selectedAssetToSell.label]);
-  //   } catch (error) {
-  //     showErrorToast(error);
-  //   }
-  //   endLoading();
-  // };
 
   const loadActiveSwaps = async (assetNames: string[]) => {
     starLoadingActiveSwaps();
@@ -283,6 +262,28 @@ export const useEarning = () => {
     endLoading();
   };
 
+  const selectAssetFromActiveSwaps = (swap: any) => {
+    if (!swap) return;
+
+    setSelectedAssetToSell({
+      label: swap.asset,
+      image: ASSETS_INFO[swap.asset].image,
+    });
+
+    const assetsToBuy = paisAssets[swap.asset];
+    setAssetsToBuy(
+      assetsToBuy.map((asset: string) => ({
+        label: asset,
+        image: ASSETS_INFO[asset].image,
+      }))
+    );
+
+    setSelectedAssetToBuy({
+      label: assetsToBuy[0],
+      image: ASSETS_INFO[assetsToBuy[0]].image,
+    });
+  };
+
   useEffect(() => {
     if (!SUPPORTED_CHAINS.includes(selectedChain?.name)) return;
 
@@ -296,8 +297,16 @@ export const useEarning = () => {
 
     if (!assetToBuy) return;
 
-    setAssetsToBuy(assetToBuy.map((asset: string) => ({ label: asset })));
-    setSelectedAssetToBuy({ label: assetToBuy[0] });
+    setAssetsToBuy(
+      assetToBuy.map((asset: string) => ({
+        label: asset,
+        image: ASSETS_INFO[asset].image,
+      }))
+    );
+    setSelectedAssetToBuy({
+      label: assetToBuy[0],
+      image: ASSETS_INFO[assetToBuy[0]].image,
+    });
   }, [selectedAssetToSell, paisAssets]);
 
   useEffect(() => {
@@ -349,5 +358,6 @@ export const useEarning = () => {
     selectedAssetIsInActiveSwaps,
     selectedTokenBalance,
     handleSwap,
+    selectAssetFromActiveSwaps,
   };
 };
