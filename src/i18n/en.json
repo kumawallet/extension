@@ -260,6 +260,8 @@
     "daily": "Daily",
     "weekly": "Weekly",
     "monthly": "Monthly",
-    "especify_hour": "Especify hour"
+    "especify_hour": "Especify hour",
+    "total_amount_swapped": "Total amount swapped",
+    "flow_rate": "Flow rate"
   }
 }

@@ -1,12 +1,11 @@
+import { FC, Fragment, useState } from 'react'
 import { Dialog, Disclosure, Transition } from '@headlessui/react'
 import { Loading } from '@src/components/common'
 import { SuperToken } from '@superfluid-finance/sdk-core'
-import { format } from 'date-fns'
 import { utils } from 'ethers'
-import { FC, Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AiFillDelete } from 'react-icons/ai'
-import { BsArrowUpCircle, BsPencil } from 'react-icons/bs'
+import { BsArrowUpCircle, } from 'react-icons/bs'
+import { ActiveSwapInfo } from './ActiveSwapInfo'
 
 
 interface ActiveSwapsProps {
@@ -32,6 +31,11 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
 
   function openModal() {
     setIsOpen(true)
+  }
+
+  const handleDeletSwap = async (token: SuperToken, tokenName: string) => {
+    await deleteSwap(token, tokenName)
+    closeModal()
   }
 
 
@@ -90,27 +94,18 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                                 <>
                                   <Disclosure.Button className="flex w-full justify-between rounded-lg bg-black bg-opacity-20 px-4 py-2 text-left text-sm font-medium focus:outline-none">
                                     <span>{swap.asset}</span>
-                                    <span>{utils.formatEther(swap.flowRate as string).toString()}/s</span>
                                     <BsArrowUpCircle
                                       className={`${!open ? 'rotate-180 transform' : ''
                                         } h-5 w-5`}
                                     />
                                   </Disclosure.Button>
                                   <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm">
-                                    <div className='flex justify-end gap-3 items-center'>
-                                      <button className='text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2' onClick={() => {
-                                        selectAssetFromActiveSwaps(swap)
-                                        closeModal()
-                                      }}>
-                                        <BsPencil className='h-5 w-5' />
-                                      </button>
-                                      <button className='text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2' onClick={() => deleteSwap(swap.st, swap.asset)}>
-                                        <AiFillDelete className="h-5 w-5" />
-                                      </button>
-                                    </div>
-
-                                    <p>{t("start_date")}: {format(swap.timestamp, 'dd/MM/yy')}</p>
-
+                                    <ActiveSwapInfo
+                                      swap={swap}
+                                      selectAssetFromActiveSwaps={selectAssetFromActiveSwaps}
+                                      closeModal={closeModal}
+                                      deleteSwap={handleDeletSwap}
+                                    />
                                   </Disclosure.Panel>
                                 </>
                               )}

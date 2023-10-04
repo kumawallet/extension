@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { ASSETS_INFO, EarningAssets } from "../utils/assets-per-chain";
 import Extension from "@src/Extension";
 import { utils } from "ethers";
-import { use } from "i18next";
 
 const SUPPORTED_CHAINS = [MUMBAI_TESTNET.name];
 
@@ -189,6 +188,8 @@ export const useEarning = () => {
 
       const txnResponse = await deleteFlowOperation.exec(signer);
       await txnResponse.wait();
+
+      showSuccessToast("Swap deleted successfully");
 
       const newActiveSwaps = activeSwaps.filter(
         (swap) => swap.asset !== tokenName
