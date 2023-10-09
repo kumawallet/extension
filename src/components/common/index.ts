@@ -11,3 +11,4 @@ export * from "./PageWrapper";
 export * from "./ReEnterPassword";
 export * from "./SelectLanguage";
 export * from "./SucessMessage";
+export * from "./PageTitle";

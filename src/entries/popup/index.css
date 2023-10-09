@@ -1,5 +1,7 @@
 body {
+  height: 100% !important;
+  min-height: 100% !important;
+
   width: 357px !important;
   min-width: 357px !important;
-  height: 600px !important;
 }

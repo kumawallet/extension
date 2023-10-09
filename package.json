@@ -15,7 +15,7 @@
     "build:chrome": "BROWSER_TARGET=CHROME vite build",
     "build:firefox": "BROWSER_TARGET=FIREFOX vite build",
     "build": "NODE_ENV=production tsc --noEmit && npm run build:chrome && npm run build:firefox",
-    "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME nodemon",
+    "dev": "NODE_ENV=develop BROWSER_TARGET=CHROME vite build --watch",
     "dev:firefox": "NODE_ENV=develop BROWSER_TARGET=FIREFOX nodemon",
     "test": "vitest --reporter=verbose",
     "test:cov": "vitest  --reporter=verbose run --coverage",
@@ -33,6 +33,7 @@
   "homepage": "https://github.com/kumawallet/extension/blob/main/README.md",
   "bugs": "https://github.com/kumawallet/extension/issues",
   "dependencies": {
+    "@galacticcouncil/sdk": "^0.7.2",
     "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^2.9.11",
     "@metamask/browser-passworder": "^4.1.0",

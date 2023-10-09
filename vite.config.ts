@@ -65,6 +65,7 @@ export default defineConfig({
   plugins: [react(), makeManifest(), copyContentStyle()],
   publicDir,
   build: {
+    target: "esnext",
     chunkSizeWarningLimit: 1000,
     outDir,
     // sourcemap: process.env.__DEV__ === "true",

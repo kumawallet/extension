@@ -523,6 +523,27 @@ export const WESTEND = {
   supportedAccounts: [WASM],
 };
 
+export const HYDRA_DX_ROCOCO = {
+  name: "HydraDX",
+  rpc: {
+    wasm: "wss://hydradx-rococo-rpc.play.hydration.cloud",
+  },
+  addressPrefix: 63,
+  nativeCurrency: {
+    name: "HDX",
+    symbol: "HDX",
+    decimals: 12,
+  },
+  explorer: {
+    wasm: {
+      name: "subscan",
+      url: "https://hydra-poc-3.subscan.io/",
+    },
+  },
+  logo: "hydradx",
+  supportedAccounts: [WASM],
+};
+
 export const MAINNETS: Chain[] = [
   POLKADOT,
   KUSAMA,
@@ -547,6 +568,7 @@ export const TESTNETS: Chain[] = [
   ROCOCO,
   ROCOCO_ASSET_HUB,
   WESTEND,
+  HYDRA_DX_ROCOCO,
 ];
 
 export const CHAINS = [
