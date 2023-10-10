@@ -109,6 +109,15 @@ export const formatBN = (bn: string, decimals = 1, fixed?: null | number) => {
   return _number;
 };
 
+export const transformAmountStringToBN = (amount: string, decimals: number) => {
+  try {
+    const amountBN = new BN(amount.replace(".", "") + "".padEnd(decimals, "0"));
+    return amountBN;
+  } catch (error) {
+    return new BN("0");
+  }
+};
+
 export const formatUSDAmount = (amount: number) => {
   return amount.toLocaleString("en-US", {
     style: "currency",

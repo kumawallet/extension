@@ -9,7 +9,12 @@ import { useAccountContext, useNetworkContext } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import { decodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
-import { formatBN } from "@src/utils/assets";
+import { transformAmountStringToBN } from "@src/utils/assets";
+import { useLoading, useToast } from "@src/hooks";
+import Extension from "@src/Extension";
+import { Keyring } from "@polkadot/api";
+import { useNavigate } from "react-router-dom";
+import { BALANCE } from "@src/routes/paths";
 
 interface Asset {
   image?: string;
@@ -27,6 +32,8 @@ export interface TxInfoState {
 }
 
 export const useSwap = () => {
+  const navigate = useNavigate();
+
   const {
     state: { api },
   } = useNetworkContext();
@@ -34,6 +41,9 @@ export const useSwap = () => {
   const {
     state: { selectedAccount },
   } = useAccountContext();
+
+  const { isLoading, starLoading, endLoading } = useLoading();
+  const { showErrorToast, showSuccessToast } = useToast();
 
   const [assets, setAssets] = useState<Asset[]>([]);
 
@@ -57,12 +67,12 @@ export const useSwap = () => {
     bridgeName: "HydraDX",
     bridgeFee: "0",
     gasFee: "0",
-    destinationAddress: "",
+    destinationAddress: selectedAccount.value.address,
   });
 
   const [amounts, setAmounts] = useState({
-    sell: new BN("0"),
-    buy: new BN("0"),
+    sell: "0",
+    buy: "0",
   });
 
   const [tradeRouter, setTradeRouter] = useState<TradeRouter | null>(null);
@@ -134,19 +144,6 @@ export const useSwap = () => {
     });
   };
 
-  const isValidWASMAddress = useMemo(() => {
-    const { address, isNotOwnAddress } = recipient;
-
-    if (!isNotOwnAddress || !address.trim()) return true;
-
-    try {
-      decodeAddress(address);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }, [recipient]);
-
   const handleRecipientChange = (label: string, value: unknown) => {
     setRecipient((prevState) => ({
       ...prevState,
@@ -155,13 +152,18 @@ export const useSwap = () => {
   };
 
   const handleAmounts = async (label: "sell" | "buy", value: string) => {
+    setAmounts((prevState) => ({
+      ...prevState,
+      [label]: value,
+    }));
+
     const firstAssetId = label === "sell" ? assetToSell.id : assetToBuy.id;
     const secondAssetId = label === "sell" ? assetToBuy.id : assetToSell.id;
 
     const _sellResult = await tradeRouter?.getBestSell(
       firstAssetId!,
       secondAssetId!,
-      new BN(value).toString()
+      value
     );
 
     const { amountOut, tradeFee } = _sellResult?.toHuman() || {
@@ -171,11 +173,7 @@ export const useSwap = () => {
 
     setAmounts((prevState) => ({
       ...prevState,
-      [label]: new BN(value),
-      [label === "sell" ? "buy" : "sell"]: formatBN(
-        amountOut,
-        label === "sell" ? assetToBuy.decimals : assetToSell.decimals
-      ),
+      [label === "sell" ? "buy" : "sell"]: amountOut,
     }));
 
     setTxInfo((prevState) => ({
@@ -200,6 +198,58 @@ export const useSwap = () => {
     }
   };
 
+  const swap = async () => {
+    starLoading();
+    try {
+      const extrinsic = await (api as ApiPromise).tx.omnipool.sell(
+        assetToSell.id,
+        assetToBuy.id,
+        transformAmountStringToBN(
+          amounts.sell,
+          assetToSell.decimals
+        ).toString(),
+        transformAmountStringToBN(amounts.buy, assetToBuy.decimals).toString()
+      );
+
+      const seed = await Extension.showKey();
+      const keyring = new Keyring({ type: "sr25519" });
+      const sender = keyring.addFromMnemonic(seed as string);
+
+      await extrinsic.signAndSend(sender);
+
+      showSuccessToast("Swap successful");
+      navigate(BALANCE);
+    } catch (error) {
+      showErrorToast(error);
+    }
+
+    endLoading();
+  };
+
+  const isValidWASMAddress = useMemo(() => {
+    const { address, isNotOwnAddress } = recipient;
+
+    if (!isNotOwnAddress || !address.trim()) return true;
+
+    try {
+      decodeAddress(address);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }, [recipient]);
+
+  const balanceIsSufficient = useMemo(() => {
+    const balance = new BN(assetToSell.balance);
+
+    const amount = transformAmountStringToBN(
+      amounts.sell,
+      assetToSell.decimals
+    );
+
+    return balance.gte(amount);
+  }, [assetToSell?.balance, amounts?.sell]);
+
   useEffect(() => {
     if (!api) return;
 
@@ -219,5 +269,8 @@ export const useSwap = () => {
     amounts,
     handleAmounts,
     handleAssetChange,
+    swap,
+    isLoading,
+    balanceIsSufficient,
   };
 };

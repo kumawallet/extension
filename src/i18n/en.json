@@ -259,6 +259,7 @@
     "bridge_name": "Bridge name",
     "bridge_fee": "Bridge fee",
     "gas_fee": "Gas fee",
-    "destination_address": "Destination address"
+    "destination_address": "Destination address",
+    "insufficient_balance": "Insufficient balance"
   }
 }

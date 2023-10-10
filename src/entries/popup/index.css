@@ -1,6 +1,6 @@
 body {
-  height: 100% !important;
-  min-height: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
 
   width: 357px !important;
   min-width: 357px !important;
