@@ -524,7 +524,7 @@ export const WESTEND = {
 };
 
 export const HYDRA_DX_ROCOCO = {
-  name: "HydraDX",
+  name: "HydraDX (Rococo)",
   rpc: {
     wasm: "wss://hydradx-rococo-rpc.play.hydration.cloud",
   },

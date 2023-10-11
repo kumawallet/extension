@@ -11,6 +11,7 @@ import {
   StorageEntryPromiseOverloads,
 } from "@polkadot/api/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
+import { HYDRA_DX_ROCOCO } from "@src/constants/chains";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -111,7 +112,17 @@ export const formatBN = (bn: string, decimals = 1, fixed?: null | number) => {
 
 export const transformAmountStringToBN = (amount: string, decimals: number) => {
   try {
-    const amountBN = new BN(amount.replace(".", "") + "".padEnd(decimals, "0"));
+    const amountWithoutDot = amount.replace(".", "");
+
+    const isMissingUnits = amountWithoutDot.length < decimals;
+
+    const missingUnits = decimals - amountWithoutDot.length;
+
+    const amountWithMissingUnits = `${amountWithoutDot}${"0".repeat(
+      isMissingUnits ? missingUnits + 1 : 0
+    )}`;
+
+    const amountBN = new BN(amountWithMissingUnits);
     return amountBN;
   } catch (error) {
     return new BN("0");
@@ -155,6 +166,10 @@ export const getWasmAssets = async (
       case "Mandala":
         assetPallet = api.query.assetRegistry.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
+        break;
+      case HYDRA_DX_ROCOCO.name:
+        assetPallet = api.query.assetRegistry.assetMetadataMap;
+        balanceMethod = api.query.tokens?.accounts;
         break;
       default:
         assetPallet = api.query.assets?.metadata;
@@ -247,6 +262,8 @@ export const getWasmAssets = async (
         const params = [];
         if (["acala", "mandala"].includes(chainName.toLowerCase())) {
           params.push(address, asset.aditionalData?.tokenId);
+        } else if (chainName === HYDRA_DX_ROCOCO.name) {
+          params.push(address, asset.id);
         } else {
           params.push(asset.id, address);
         }
@@ -272,6 +289,8 @@ export const getWasmAssets = async (
         const params = [];
         if (["acala", "mandala"].includes(chainName.toLowerCase())) {
           params.push(address, asset.aditionalData?.tokenId);
+        } else if (chainName === HYDRA_DX_ROCOCO.name) {
+          params.push(address, asset.id);
         } else {
           params.push(asset.id, address);
         }

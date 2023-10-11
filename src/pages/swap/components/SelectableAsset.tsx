@@ -1,5 +1,6 @@
 import { Listbox } from "@headlessui/react";
 import { useThemeContext } from "@src/providers";
+import { BsCoin } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md"
 
 interface SelectableAssetProps<T extends { image?: string; label?: string | JSX.Element }> {
@@ -15,11 +16,15 @@ interface SelectableAssetProps<T extends { image?: string; label?: string | JSX.
 
 const OptImage = ({ image }: { image: string }) => {
   return (
-    <img
-      src={image}
-      width={29}
-      height={29}
-      className="object-contain rounded-full"
+    // <img
+    //   src={image}
+    //   width={29}
+    //   height={29}
+    //   className="object-contain rounded-full"
+    // />
+    <BsCoin
+      size={27}
+      className="text-[#212529] rounded-full bg-[#f8f9fa] p-[2px]"
     />
   )
 }
@@ -49,7 +54,7 @@ export const SelectableAsset = <T extends { image?: string; label?: string | JSX
             className={`min-w-[120px] h-full w-full flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
             aria-readonly={isReadOnly}
           >
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-2 items-center">
               {
                 value.image && <OptImage image={value.image} />
               }

@@ -37,6 +37,7 @@ export const Swap = () => {
     swap,
     isLoading,
     balanceIsSufficient,
+    setMaxAmout
   } = useSwap();
 
   return (
@@ -74,7 +75,7 @@ export const Swap = () => {
                 )}
                 hasMaxOption
                 label={t("you_send") as string}
-                onMax={() => console.log("max")}
+                onMax={setMaxAmout}
                 onValueChange={(val) => handleAmounts("sell", val)}
                 selectableAsset={
                   <SelectableAsset

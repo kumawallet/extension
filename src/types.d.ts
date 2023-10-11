@@ -62,7 +62,7 @@ export interface SendForm {
 }
 
 export interface TxToProcess {
-  amount: number;
+  amount: number | string;
   originAddress: string;
   destinationAddress: string;
   rpc: string;

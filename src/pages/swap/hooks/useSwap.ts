@@ -9,12 +9,16 @@ import { useAccountContext, useNetworkContext } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import { decodeAddress } from "@polkadot/util-crypto";
 import { BN } from "@polkadot/util";
-import { transformAmountStringToBN } from "@src/utils/assets";
+import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { useLoading, useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { Keyring } from "@polkadot/api";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
+import { captureError } from "@src/utils/error-handling";
+import { TxToProcess } from "@src/types";
+import { AccountType } from "@src/accounts/types";
+import { getWebAPI } from "@src/utils/env";
 
 interface Asset {
   image?: string;
@@ -31,11 +35,13 @@ export interface TxInfoState {
   destinationAddress: string;
 }
 
+const WebAPI = getWebAPI();
+
 export const useSwap = () => {
   const navigate = useNavigate();
 
   const {
-    state: { api },
+    state: { api, rpc, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -78,70 +84,77 @@ export const useSwap = () => {
   const [tradeRouter, setTradeRouter] = useState<TradeRouter | null>(null);
 
   const init = async (api: ApiPromise) => {
-    const poolService = new PoolService(api);
-    const balanceClient = new BalanceClient(api);
-    const tradeRouter = new TradeRouter(poolService, {
-      includeOnly: [PoolType.Omni],
-    });
+    starLoading();
+    try {
+      const poolService = new PoolService(api);
+      const balanceClient = new BalanceClient(api);
+      const tradeRouter = new TradeRouter(poolService, {
+        includeOnly: [PoolType.Omni],
+      });
 
-    setTradeRouter(tradeRouter);
+      setTradeRouter(tradeRouter);
 
-    const result = await tradeRouter.getAllAssets();
+      const result = await tradeRouter.getAllAssets();
 
-    const assetsWithBalance = await Promise.all(
-      result.map(async (asset) => {
-        const a =
-          asset.id === "0"
-            ? await balanceClient.getAccountBalance(
-                selectedAccount.value.address,
-                asset.id
-              )
-            : await balanceClient.getTokenAccountBalance(
-                selectedAccount.value.address,
-                asset.id
-              );
-        const b = await balanceClient.getAssetMetadata(asset.id);
-        return {
-          ...asset,
-          balance: "amount" in a ? a.amount.toString() : a.toString() || "0",
-          decimals: b.decimals,
-        };
-      })
-    );
+      const assetsWithBalance = await Promise.all(
+        result.map(async (asset) => {
+          const a =
+            asset.id === "0"
+              ? await balanceClient.getAccountBalance(
+                  selectedAccount.value.address,
+                  asset.id
+                )
+              : await balanceClient.getTokenAccountBalance(
+                  selectedAccount.value.address,
+                  asset.id
+                );
+          const b = await balanceClient.getAssetMetadata(asset.id);
+          return {
+            ...asset,
+            balance: "amount" in a ? a.amount.toString() : a.toString() || "0",
+            decimals: b.decimals,
+          };
+        })
+      );
 
-    setAssets(
-      assetsWithBalance.map((asset) => ({
-        label: asset.symbol,
-        id: asset.id,
-        image: asset.symbol,
-        balance: asset.balance,
-        decimals: asset.decimals,
-      }))
-    );
+      setAssets(
+        assetsWithBalance.map((asset) => ({
+          label: asset.symbol,
+          id: asset.id,
+          image: asset.symbol,
+          balance: asset.balance,
+          decimals: asset.decimals,
+        }))
+      );
 
-    const assetToSell = assetsWithBalance.find((asset) => asset.id === "0")!;
-    // const assetToSell = assetsWithBalance[0];
+      const assetToSell = assetsWithBalance.find((asset) => asset.id === "0")!;
+      // const assetToSell = assetsWithBalance[0];
 
-    setAssetToSell({
-      label: assetToSell.symbol,
-      id: assetToSell.id,
-      image: assetToSell.symbol,
-      balance: assetToSell.balance,
-      decimals: assetToSell.decimals,
-    });
+      setAssetToSell({
+        label: assetToSell.symbol,
+        id: assetToSell.id,
+        image: assetToSell.symbol,
+        balance: assetToSell.balance,
+        decimals: assetToSell.decimals,
+      });
 
-    const assetToBuy = assetsWithBalance.find(
-      (asset) => asset.symbol.toLowerCase() === "astr"
-    )!;
-    // const assetToBuy = assetsWithBalance[1];
+      const assetToBuy = assetsWithBalance.find(
+        (asset) => asset.symbol.toLowerCase() === "astr"
+      )!;
+      // const assetToBuy = assetsWithBalance[1];
 
-    setAssetToBuy({
-      label: assetToBuy.symbol,
-      id: assetToBuy.id,
-      image: assetToBuy.symbol,
-      balance: assetToBuy.balance,
-      decimals: assetToBuy.decimals,
-    });
+      setAssetToBuy({
+        label: assetToBuy.symbol,
+        id: assetToBuy.id,
+        image: assetToBuy.symbol,
+        balance: assetToBuy.balance,
+        decimals: assetToBuy.decimals,
+      });
+    } catch (error) {
+      showErrorToast("Error fetching assets");
+      captureError(error);
+    }
+    endLoading();
   };
 
   const handleRecipientChange = (label: string, value: unknown) => {
@@ -198,10 +211,24 @@ export const useSwap = () => {
     }
   };
 
+  const setMaxAmout = () => {
+    const balance = new BN(assetToSell.balance);
+    const amount = balance.toString();
+
+    const formatedAmount = formatBN(amount, assetToSell.decimals);
+
+    setAmounts((prevState) => ({
+      ...prevState,
+      sell: formatedAmount,
+    }));
+
+    handleAmounts("sell", formatedAmount);
+  };
+
   const swap = async () => {
     starLoading();
     try {
-      const extrinsic = await (api as ApiPromise).tx.omnipool.sell(
+      const extrinsic = (api as ApiPromise).tx.omnipool.sell(
         assetToSell.id,
         assetToBuy.id,
         transformAmountStringToBN(
@@ -215,7 +242,37 @@ export const useSwap = () => {
       const keyring = new Keyring({ type: "sr25519" });
       const sender = keyring.addFromMnemonic(seed as string);
 
-      await extrinsic.signAndSend(sender);
+      const signedTx = await extrinsic.signAsync(sender);
+
+      const txToSend: Partial<TxToProcess> = {
+        amount: amounts.sell,
+        originAddress: selectedAccount.value.address,
+        destinationAddress: selectedAccount.value.address,
+        rpc: rpc as string,
+        asset: {
+          symbol: assetToSell.label,
+          id: assetToSell.id as string,
+          decimals: assetToSell.decimals,
+          balance: assetToSell.balance,
+        },
+        destinationNetwork: selectedChain.name,
+        networkInfo: selectedChain,
+        originNetwork: selectedChain,
+        tx: {
+          txHash: signedTx.toHex(),
+          type: AccountType.WASM,
+        },
+      };
+
+      const { id } = await WebAPI.windows.getCurrent();
+
+      await WebAPI.runtime.sendMessage({
+        from: "popup",
+        origin: "kuma",
+        method: "process_tx",
+        popupId: id,
+        tx: txToSend,
+      });
 
       showSuccessToast("Swap successful");
       navigate(BALANCE);
@@ -272,5 +329,6 @@ export const useSwap = () => {
     swap,
     isLoading,
     balanceIsSufficient,
+    setMaxAmout,
   };
 };
