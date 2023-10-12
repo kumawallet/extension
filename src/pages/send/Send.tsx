@@ -6,10 +6,7 @@ import { useAccountContext, useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { number, object, string } from "yup";
 import { useLoading, useToast } from "@src/hooks";
-import { decodeAddress, encodeAddress } from "@polkadot/keyring";
 import { useNavigate } from "react-router-dom";
-import { isHex } from "@polkadot/util";
-import { isAddress } from "ethers/lib/utils";
 import { AccountType } from "@src/accounts/types";
 import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { BALANCE } from "@src/routes/paths";
@@ -19,6 +16,7 @@ import { BigNumber, Contract } from "ethers";
 import { getWebAPI } from "@src/utils/env";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
+import { isValidAddress } from "@src/utils/account-utils";
 
 const WebAPI = getWebAPI();
 
@@ -52,21 +50,7 @@ export const Send = () => {
         .test(
           "valid address",
           tCommon("invalid_address") as string,
-          (address) => {
-            try {
-              if (!address) return false;
-
-              if (isHex(address)) {
-                return isAddress(address);
-              } else {
-                encodeAddress(decodeAddress(address));
-              }
-
-              return true;
-            } catch (error) {
-              return false;
-            }
-          }
+          (address) => isValidAddress(address)
         )
         .required(t("required") as string),
       amount: number().required(t("required") as string),

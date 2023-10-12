@@ -27,7 +27,7 @@ const initialState: InitialState = {
 
 const NetworkContext = createContext({} as NetworkContext);
 
-export const getProvider = (rpc: string, type: string) => {
+export const getProvider = async (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc as string);
 
@@ -52,6 +52,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     case "select-network": {
       const { selectedChain, rpc, type, api } = action.payload;
 
+      if (selectedChain?.name === state.selectedChain?.name) return state
+
       return {
         ...state,
         selectedChain,
@@ -61,11 +63,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       };
     }
     case "set-api": {
-      const { api, rpc, type } = action.payload;
+      const { api, type, rpc } = action.payload;
+
+      if (rpc !== state.rpc) return state
 
       return {
         ...state,
-        rpc: rpc || state.rpc,
         api: api,
         type: type || state.type,
       };
@@ -136,6 +139,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         );
       }
 
+      if (state.api && "disconnect" in state.api) await (state.api as ApiPromise).disconnect()
+
       dispatch({
         type: "select-network",
         payload: {
@@ -169,6 +174,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+
   //  only for chain with multi support (WASM and EVM)
   const setNewRpc = async (type: string) => {
     try {
@@ -185,6 +191,9 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const rpcAlreadyInUse = newRpc === state.rpc;
       if (rpcAlreadyInUse || !newRpc) return;
+
+      if (state.api && "disconnect" in state.api) (state.api as ApiPromise).disconnect()
+
 
       dispatch({
         type: "set-api",
@@ -212,12 +221,15 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     if (state.rpc && state.type && !state.api) {
       (async () => {
+
         const api = await getProvider(state.rpc as string, state.type);
+
         dispatch({
           type: "set-api",
           payload: {
             api,
             type: state.type,
+            rpc: state.rpc as string,
           },
         });
       })();

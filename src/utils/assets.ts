@@ -139,7 +139,7 @@ export const getWasmAssets = async (
     switch (chainName) {
       case "Acala":
       case "Mandala":
-        assetPallet = api.query.assetRegistry.assetMetadatas;
+        assetPallet = api.query.assetRegistry?.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
         break;
       default:
