@@ -1,4 +1,4 @@
-import { Language, SettingValue } from "./types";
+import { Language, SettingValue, Currency } from "./types";
 
 export default class Setting {
     value: SettingValue;
@@ -37,5 +37,12 @@ export default class Setting {
         const lang = this.value as Language[];
         return lang.length > 0 && lang[0].lang !== undefined;
       }
+    }
+
+    isCurrencyArray() {
+        if (this.isObject()) {
+            const currencies = this.value as Currency[];
+            return currencies.length > 0 && currencies[0].symbol !== undefined;
+        }
     }
   }

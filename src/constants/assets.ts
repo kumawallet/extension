@@ -45,15 +45,15 @@ export const COINGECKO_ASSET_MAP: { [key: string]: string } = {
   ldot: "liquid-staking-dot",
   hdx: "hydradx",
   ausd: "acala-dollar",
+  matic:"matic-network",
+  eth:"ethereum",
   usdt: "tether",
   ibtc: "interbtc",
   intr: "Interlay",
   pha: "pha",
   unq: "unq",
   vdot: "voucher-dot",
-
   astr: "astar",
-
   xcdot: "polkadot",
   xchdx: "hydradx",
   xcausd: "acala-dollar",

@@ -130,7 +130,8 @@
     "title": "Generale",
     "languages": "Lingue",
     "manage_networks": "Gestire le reti",
-    "show_testnets": "Mostrare le testnets"
+    "show_testnets": "Mostrare le testnets",
+    "currencies": "Valute"
   },
   "advanced_settings": {
     "title": "Avanzate"

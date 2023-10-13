@@ -8,6 +8,7 @@ import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
+  Currency,
   Language,
   SettingKey,
   SettingType,
@@ -27,6 +28,7 @@ export const General = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState([] as Setting[]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("");
   const [showTestnets, setShowTestnets] = useState(false);
   const { showErrorToast } = useToast();
 
@@ -41,12 +43,15 @@ export const General = () => {
       setSettings(settings);
       const laguagesSetting = getSettingByName(settings, SettingKey.LANGUAGES)
         ?.value as Language[];
+      const currenciesSetting = getSettingByName(settings,SettingKey.CURRENCY)?.value as Currency[];
+
       const showTestnetsSetting = getSettingByName(
         settings,
         SettingKey.SHOW_TESTNETS
       )?.value as boolean;
       setSelectedLanguage(getSelectedLanguage(laguagesSetting));
       setShowTestnets(showTestnetsSetting);
+      setSelectedCurrency(getSelectedCurrency(currenciesSetting));
     } catch (error) {
       setSettings([]);
       captureError(error);
@@ -68,6 +73,13 @@ export const General = () => {
     return selectedLanguage?.lang || "en";
   };
 
+  const getSelectedCurrency = (currencies: Currency[]) => {
+    const selectedCurrency = currencies.find(
+        (currency) => currency.symbol === localStorage.getItem("currency")
+    );
+    return selectedCurrency?.symbol || "usd";
+  }
+
   const saveLanguage = async (language: string) => {
     try {
       await localStorage.setItem("language", language || "en");
@@ -79,6 +91,16 @@ export const General = () => {
       showErrorToast(tCommon("failed_to_update_setting"));
     }
   };
+
+  const saveCurrency = async (currency: string) => {
+    try {
+      localStorage.setItem("currency", currency || "usd");
+      setSelectedCurrency(currency);
+    } catch (error) {
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_setting"));
+    }
+  }
 
   const changeShowTestnets = async () => {
     try {
@@ -135,6 +157,25 @@ export const General = () => {
                       ))}
                   </select>
                 </div>
+              );
+            case SettingKey.CURRENCY:
+              return (
+                  <div key={index} className="flex flex-col gap-2">
+                    <p className="text-lg font-medium">{t("currencies")}</p>
+                    <select
+                    data-testid="currency-select"
+                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    onChange={(e)=> saveCurrency(e.target.value)}
+                    value={selectedCurrency}
+                    >
+                      {setting.isCurrencyArray() &&
+                          (setting.value as Currency[]).map((option,index)=> (
+                              <option key={index} value={option.symbol}>
+                                {`${option.name}`}
+                              </option>
+                          ))}
+                    </select>
+                  </div>
               );
             case SettingKey.MANAGE_NETWORKS:
               return (

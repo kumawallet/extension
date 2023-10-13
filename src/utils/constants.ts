@@ -13,6 +13,13 @@ export const LANGUAGES = [
     {lang: "tr", name: "Türkçe", englishName: "Turkish", flag: "🇹🇷"},
 ];
 
+export const CURRENCIES = [
+    {symbol:"usd",name:"US Dollar ($)",logo:"$"},
+    {symbol:"eur",name:"Euro (€)",logo:"€"},
+    {symbol:"jpy",name:"Japanese Yen (¥)",logo:"¥"},
+    {symbol:"try",name:"Turkish Lira (₺)",logo:"₺"},
+];
+
 const env = import.meta.env;
 
 export enum aboutUsLinks {

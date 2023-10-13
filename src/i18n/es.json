@@ -130,7 +130,8 @@
     "title": "General",
     "languages": "Idiomas",
     "manage_networks": "Administrar redes",
-    "show_testnets": "Mostrar redes de prueba"
+    "show_testnets": "Mostrar redes de prueba",
+    "currencies": "Monedas"
   },
   "advanced_settings": {
     "title": "Avanzado"

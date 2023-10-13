@@ -130,7 +130,8 @@
     "title": "Genel",
     "languages": "Diller",
     "manage_networks": "Ağları yönet",
-    "show_testnets": "Test ağlarını göster"
+    "show_testnets": "Test ağlarını göster",
+    "currencies": "Para Birimi Dönüşümü"
   },
   "advanced_settings": {
     "title": "Gelişmiş"

@@ -130,7 +130,8 @@
     "title": "一般",
     "languages": "言語",
     "manage_networks": "ネットワーク管理",
-    "show_testnets": "テストネットを表示"
+    "show_testnets": "テストネットを表示",
+    "currencies": "通貨"
   },
   "advanced_settings": {
     "title": "高度な設定"
