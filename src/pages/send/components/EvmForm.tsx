@@ -4,6 +4,7 @@ import { Loading, Button, ReEnterPassword } from "@src/components/common";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import {
+  useAccountContext,
   useAssetContext,
   useNetworkContext,
   useThemeContext,
@@ -45,6 +46,8 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     getValues,
     formState: { errors },
   } = useFormContext();
+
+  const { state: { selectedAccount } } = useAccountContext()
 
   const { showErrorToast } = useToast();
 
@@ -105,6 +108,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
         const to = getValues("to");
 
+
         if (isXcm) {
           const { method, abi, contractAddress, extrinsicValues } = XCM_MAPPING[
             selectedChain.name
@@ -161,9 +165,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         } else if (isNativeAsset) {
           let tx: evmTx = {
+            from: selectedAccount.value.address,
             to: destinationAccount,
             value: bnAmount,
           };
+
 
           const [feeData, gasLimit] = await Promise.all([
             _api.getFeeData(),
@@ -232,9 +238,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           setEvmTx(contract);
         }
       } catch (error) {
-        console.log('fee', {
-          error
-        })
         setFee({
           "gas limit": BigNumber0,
           "max fee per gas": BigNumber0,
