@@ -43,7 +43,7 @@ export const defaultAssetConfig = {
     },
     {
       address: "0x13A0c5930C028511Dc02665E7285134B6d11A5f4",
-      symbol: "tETH",
+      symbol: "gETH",
       decimals: 18,
     },
     {
