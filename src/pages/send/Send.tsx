@@ -17,6 +17,7 @@ import { getWebAPI } from "@src/utils/env";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
 import { isValidAddress } from "@src/utils/account-utils";
+import { captureError } from "@src/utils/error-handling";
 
 const WebAPI = getWebAPI();
 
@@ -183,7 +184,10 @@ export const Send = () => {
         },
       });
     } catch (error) {
-      showErrorToast(error);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _error: any = error;
+      showErrorToast(_error?.error?.message || _error?.message || _error);
+      captureError(_error)
     }
     endLoading();
   };
