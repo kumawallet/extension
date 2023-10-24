@@ -18,3 +18,4 @@ export const SETTINGS_SECURITY = "/settings-security";
 export const SIGN_MESSAGE = "/sign-message";
 export const SIGNIN = "/sign-in";
 export const EARNING = "/earning";
+export const EARNING_DETAIL = "/earning-detail";

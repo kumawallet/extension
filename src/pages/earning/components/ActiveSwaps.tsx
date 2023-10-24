@@ -2,10 +2,10 @@ import { FC, Fragment, useState } from 'react'
 import { Dialog, Disclosure, Transition } from '@headlessui/react'
 import { Loading } from '@src/components/common'
 import { SuperToken } from '@superfluid-finance/sdk-core'
-import { utils } from 'ethers'
 import { useTranslation } from 'react-i18next'
 import { BsArrowUpCircle, } from 'react-icons/bs'
 import { ActiveSwapInfo } from './ActiveSwapInfo'
+import { useNavigate } from 'react-router-dom'
 
 
 interface ActiveSwapsProps {
@@ -22,6 +22,7 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
   selectAssetFromActiveSwaps
 }) => {
   const { t } = useTranslation("earning")
+  const navigate = useNavigate()
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -92,7 +93,11 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                             <Disclosure key={index.toString()}>
                               {({ open }) => (
                                 <>
-                                  <Disclosure.Button className="flex w-full justify-between rounded-lg bg-black bg-opacity-20 px-4 py-2 text-left text-sm font-medium focus:outline-none">
+                                  <Disclosure.Button className="flex w-full justify-between rounded-lg bg-black bg-opacity-20 px-4 py-2 text-left text-sm font-medium focus:outline-none"
+                                    onClick={() => navigate(`/earning-detail`, {
+                                      state: { asset: swap.asset, timestamp: swap.timestamp, flowRate: swap.flowRate }
+                                    })}
+                                  >
                                     <span>{swap.asset}</span>
                                     <BsArrowUpCircle
                                       className={`${!open ? 'rotate-180 transform' : ''
@@ -100,12 +105,12 @@ export const ActiveSwaps: FC<ActiveSwapsProps> = ({
                                     />
                                   </Disclosure.Button>
                                   <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm">
-                                    <ActiveSwapInfo
+                                    {/* <ActiveSwapInfo
                                       swap={swap}
                                       selectAssetFromActiveSwaps={selectAssetFromActiveSwaps}
                                       closeModal={closeModal}
                                       deleteSwap={handleDeletSwap}
-                                    />
+                                    /> */}
                                   </Disclosure.Panel>
                                 </>
                               )}

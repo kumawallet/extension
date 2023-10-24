@@ -60,6 +60,7 @@
     "react-qr-code": "^2.0.12",
     "react-router-dom": "^6.15.0",
     "react-toastify": "^8.2.0",
+    "recharts": "^2.9.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
