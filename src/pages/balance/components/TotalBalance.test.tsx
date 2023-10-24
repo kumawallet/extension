@@ -3,6 +3,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
+import {CHAINS} from "@src/constants/chains";
+import {AccountType} from "@src/accounts/types";
 
 const renderComponent = () => {
   return render(
@@ -24,6 +26,14 @@ describe("TotalBalance", () => {
               amount: 100,
             },
           ],
+        },
+        loadAssets: vi.fn(),
+      }),
+      useNetworkContext: () => ({
+        state: {
+          selectedChain: CHAINS[0].chains[3],
+          type: AccountType.EVM,
+          api: null
         },
       }),
       useAccountContext: () => ({
