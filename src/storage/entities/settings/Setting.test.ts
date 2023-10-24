@@ -36,4 +36,8 @@ describe("Setting", () => {
     const setting = new Setting("test", [{ lang: "test" }] as SettingValue);
     expect(setting.isLanguageArray()).toBeTruthy();
   });
+  it("should return currency array", () => {
+    const setting = new Setting("test", [{ symbol: "test" }] as SettingValue);
+    expect(setting.isCurrencyArray()).toBeTruthy();
+  });
 });

@@ -19,13 +19,24 @@ const getGeneralSettings = vi.fn().mockReturnValue([
     ],
   },
   {
+    name:SettingKey.CURRENCY,
+    isCurrencyArray : () => true,
+    value: [
+      {
+        symbol: "usd",
+        name:"US Dollar ($)",
+      },
+      {},
+    ],
+  },
+  {
     name: SettingKey.SHOW_TESTNETS,
     value: false,
   },
   {
     name: SettingKey.MANAGE_NETWORKS,
   },
-] as Setting[]);
+] as unknown as Setting[]);
 const updateSetting = vi.fn();
 const navigate = vi.fn();
 
@@ -52,7 +63,6 @@ describe("General", () => {
     Extension.updateSetting = updateSetting;
 
     const { getByTestId } = renderComponent();
-
     await waitFor(() => {
       expect(getByTestId("language-select")).toBeDefined();
     }, {

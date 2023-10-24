@@ -1,5 +1,6 @@
 import BaseEntity from "../BaseEntity";
 import LanguageSetting from "./LanguageSetting";
+import CurrencySetting from "./CurrencySetting";
 import Setting from "./Setting";
 import { SettingKey, SettingType, SettingValue } from "./types";
 
@@ -25,6 +26,8 @@ export default class Settings extends BaseEntity {
       SettingKey.LANGUAGES,
       LanguageSetting.getSupportedLanguages()
     );
+    settings.addToGeneral(SettingKey.CURRENCY,
+        CurrencySetting.getCurrencies());
     // this setting does not have a value (the true is just a placeholder)
     settings.addToGeneral(SettingKey.MANAGE_NETWORKS, true);
     settings.addToGeneral(SettingKey.SHOW_TESTNETS, false);

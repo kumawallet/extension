@@ -11,6 +11,7 @@ import {
   StorageEntryPromiseOverloads,
 } from "@polkadot/api/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
+import { CURRENCIES } from "@utils/constants";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -54,14 +55,15 @@ export const getNatitveAssetBalance = async (
 
 export const getAssetUSDPrice = async (query: string) => {
   const _query = query.toLowerCase();
+  const currency = localStorage.getItem("currency") || "usd";
   try {
     const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=${currency}`
     );
 
     const json = await data.json();
 
-    return json?.[_query]?.["usd"] || 0;
+    return json?.[_query]?.[currency] || 0;
   } catch (error) {
     captureError(error);
     return 0;
@@ -105,12 +107,20 @@ export const formatBN = (bn: string, decimals = 1) => {
 };
 
 export const formatUSDAmount = (amount: number) => {
+  const currencyInfo = getCurrencyInfo();
+  const currencySymbol = currencyInfo.symbol
   return amount.toLocaleString("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: currencySymbol,
     maximumFractionDigits: 6,
   });
 };
+
+export const getCurrencyInfo = () => {
+  const selectedCurrency = localStorage.getItem("currency") || "usd";
+  const currencyInfo = CURRENCIES.find(currency => currency.symbol === selectedCurrency);
+  return currencyInfo ? currencyInfo : CURRENCIES[0];
+}
 
 export const getWasmAssets = async (
   api: ApiPromise,

@@ -6,10 +6,10 @@ import {
   BsEyeFill,
 } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
-import { formatAmountWithDecimals } from "@src/utils/assets";
+import { formatAmountWithDecimals,getCurrencyInfo } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { SEND, RECEIVE } from "@src/routes/paths";
-import { useAccountContext, useAssetContext } from "@src/providers";
+import {useAccountContext, useAssetContext, useNetworkContext} from "@src/providers";
 import { Button } from "@src/components/common";
 
 interface TotalBalanceProps {
@@ -24,6 +24,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [accountName, setAccountName] = useState("");
   const [showBalance, setShowBalance] = useState(true);
+  const [currencyLogo, setCurrencyLogo] = useState("$");
 
   const {
     state: { selectedAccount },
@@ -32,12 +33,17 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const {
     state: { assets },
+    loadAssets,
   } = useAssetContext();
+  const {
+    state: { api, selectedChain },
+  } = useNetworkContext();
 
-  const totalBalance = assets.reduce(
-    (total, item) => total + (item.amount || 0),
-    0
-  );
+  const updateAllAssets = async () => {
+    loadAssets({api, selectedAccount, selectedChain});
+  }
+
+  const totalBalance = assets.reduce((total, item) => total + (item.amount || 0), 0);
 
   const update = async () => {
     setIsEditing(false);
@@ -55,6 +61,9 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
     if (selectedAccount?.value?.name) {
       setAccountName(selectedAccount.value.name);
     }
+
+    setCurrencyLogo(getCurrencyInfo().logo);
+    updateAllAssets();
   }, [selectedAccount]);
 
   return (
@@ -82,7 +91,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
         <div className="flex gap-2 items-center">
-          <p className="text-2xl">$</p>
+          <p className="text-2xl">{currencyLogo}</p>
           <p className="text-5xl" data-testid="balance">
             {showBalance ? (formatAmountWithDecimals(totalBalance, 5) || "0") : "***"}
           </p>

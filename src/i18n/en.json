@@ -130,7 +130,8 @@
     "title": "General",
     "languages": "Languages",
     "manage_networks": "Manage networks",
-    "show_testnets": "Show testnets"
+    "show_testnets": "Show testnets",
+    "currencies": "Currencies"
   },
   "advanced_settings": {
     "title": "Advanced"
