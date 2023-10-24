@@ -1,5 +1,8 @@
 # Changelog
 
+# 0.3.10
+- [#44](https://github.com/blockcoders/kuma-wallet/pull/44) Balances can now be displayed in the desired currency.
+
 # 0.3.9
 Published by **[blockcoders](https://github.com/blockcoders)** on **2023/10/24**
 - [#45](https://github.com/blockcoders/kuma-wallet/pull/45) Zeta chain integration
