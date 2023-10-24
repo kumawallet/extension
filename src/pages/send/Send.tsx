@@ -186,7 +186,7 @@ export const Send = () => {
     } catch (error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const _error: any = error;
-      showErrorToast(_error?.error?.message || _error?.message || _error);
+      showErrorToast(_error?.body || _error?.error?.message || _error.message || _error);
       captureError(_error)
     }
     endLoading();
