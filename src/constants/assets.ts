@@ -1,6 +1,6 @@
 import { BN } from "bn.js";
 import { BigNumber } from "ethers";
-import { PARACHAINS } from "./chains";
+import { PARACHAINS, ZETA_CHAIN_TESTNET } from "./chains";
 
 export const REF_TIME = new BN("1000000000000");
 export const PROOF_SIZE = new BN("1000000000000");
@@ -31,6 +31,29 @@ export const defaultAssetConfig = {
     {
       address: "0xFFFfffFF0Ca324C842330521525E7De111F38972",
       symbol: "xcSDN",
+      decimals: 18,
+    },
+  ],
+
+  [ZETA_CHAIN_TESTNET.name]: [
+    {
+      address: "0xd97B1de3619ed2c6BEb3860147E30cA8A7dC9891",
+      symbol: "tBNB",
+      decimals: 18,
+    },
+    {
+      address: "0x13A0c5930C028511Dc02665E7285134B6d11A5f4",
+      symbol: "gETH",
+      decimals: 18,
+    },
+    {
+      address: "0x48f80608B672DC30DC7e3dbBd0343c5F02C738Eb",
+      symbol: "tMATIC",
+      decimals: 18,
+    },
+    {
+      address: "0x65a45c57636f9BcCeD4fe193A602008578BcA90b",
+      symbol: "tBTC",
       decimals: 18,
     },
   ],

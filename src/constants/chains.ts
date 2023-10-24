@@ -523,6 +523,26 @@ export const WESTEND = {
   supportedAccounts: [WASM],
 };
 
+export const ZETA_CHAIN_TESTNET: Chain = {
+  name: "Zeta Chain Testnet",
+  rpc: {
+    evm: "https://zetachain-athens-evm.blockpi.network/v1/rpc/public",
+  },
+  nativeCurrency: {
+    name: "aZETA",
+    symbol: "aZETA",
+    decimals: 18,
+  },
+  logo: "zeta",
+  explorer: {
+    evm: {
+      name: "",
+      url: "https://zetachain-athens-3.blockscout.com/",
+    },
+  },
+  supportedAccounts: [EVM],
+};
+
 export const MAINNETS: Chain[] = [
   POLKADOT,
   KUSAMA,
@@ -547,6 +567,7 @@ export const TESTNETS: Chain[] = [
   ROCOCO,
   ROCOCO_ASSET_HUB,
   WESTEND,
+  ZETA_CHAIN_TESTNET,
 ];
 
 export const CHAINS = [
