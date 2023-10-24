@@ -50,6 +50,15 @@ describe("EvmForm", () => {
           ],
         },
       }),
+      useAccountContext: () => ({
+        state: {
+          selectedAccount: {
+            value: {
+              address: "0xa0a58b72969DF1904Bf2315f2D041AD639737429",
+            }
+          },
+        }
+      }),
       useThemeContext: () => ({
         color: "red",
       }),
