@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ASSETS_INFO, EarningAssets } from "../utils/assets-per-chain";
 import Extension from "@src/Extension";
 import { utils } from "ethers";
+import { useLocation } from "react-router-dom";
 
 const SUPPORTED_CHAINS = [MUMBAI_TESTNET.name];
 
@@ -48,6 +49,8 @@ const getFrecuencyToSeconds = (frecuency: string) => {
 };
 
 export const useEarning = () => {
+  const { state } = useLocation();
+
   const {
     state: { selectedChain, api: provider },
   } = useNetworkContext();
@@ -93,7 +96,9 @@ export const useEarning = () => {
 
       const { assets, assetPairs } = getChainAssets;
 
-      const firstAsset = assets[0];
+      const firstAsset = state?.token
+        ? assets.find((asset) => asset === state?.token) || assets[0]
+        : assets[0];
 
       setPairAssets(assetPairs);
 
@@ -263,15 +268,15 @@ export const useEarning = () => {
     endLoading();
   };
 
-  const selectAssetFromActiveSwaps = (swap: any) => {
-    if (!swap) return;
+  const selectAssetFromActiveSwaps = (tokenName: string) => {
+    if (!tokenName) return;
 
     setSelectedAssetToSell({
-      label: swap.asset,
-      image: ASSETS_INFO[swap.asset].image,
+      label: tokenName,
+      image: ASSETS_INFO[tokenName].image,
     });
 
-    const assetsToBuy = paisAssets[swap.asset];
+    const assetsToBuy = paisAssets[tokenName];
     setAssetsToBuy(
       assetsToBuy.map((asset: string) => ({
         label: asset,

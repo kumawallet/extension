@@ -136,13 +136,6 @@ export const ActiveSwapInfo: FC<ActiveSwapInfoProps> = ({
 
 
 
-    console.log({
-      _token1,
-      _token2,
-      poolContract
-    })
-
-
     const currentTimestampBigNumber = BigNumber.from(
       new Date().valueOf() // Milliseconds elapsed since UTC epoch, disregards timezone.
     );
@@ -208,7 +201,6 @@ export const ActiveSwapInfo: FC<ActiveSwapInfoProps> = ({
         provider: api,
       });
 
-      console.log('token2Name', token2Name)
 
       const token2 = await sf.loadSuperToken(token2Name);
 
@@ -251,9 +243,6 @@ export const ActiveSwapInfo: FC<ActiveSwapInfoProps> = ({
 
   const pair = EarningAssets[selectedChain.name].assetPairs[swap.asset]?.[0]
 
-  console.log({
-    pair
-  })
 
   return (
     <>

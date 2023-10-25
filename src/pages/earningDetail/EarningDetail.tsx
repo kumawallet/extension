@@ -1,16 +1,18 @@
-import { PageTitle, PageWrapper } from "@src/components/common";
+import { Loading, PageTitle, PageWrapper } from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ASSETS_INFO, EarningAssets } from "../earning/utils/assets-per-chain";
 import { Framework, SuperToken } from "@superfluid-finance/sdk-core";
-import { useToast } from "@src/hooks";
-import { BigNumber, Contract, utils } from "ethers";
+import { useLoading, useToast } from "@src/hooks";
+import { BigNumber, Contract, utils, ethers } from "ethers";
 import { BsPencil } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { format } from "date-fns";
 import { PriceChart } from "./components";
+import Extension from "@src/Extension";
+import { EARNING } from "@src/routes/paths";
 
 const ANIMATION_MINIMUM_STEP_TIME = 10;
 const REFRESH_INTERVAL = 3000; // 300 * 100 = 30000 ms = 30 s
@@ -74,6 +76,7 @@ const poolABI = [
 
 export const EarningDetail = () => {
   const { state } = useLocation();
+  const navigate = useNavigate()
 
   const { t } = useTranslation("earning");
   const {
@@ -83,7 +86,8 @@ export const EarningDetail = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const { showErrorToast } = useToast();
+  const { isLoading, endLoading, starLoading } = useLoading(true);
+  const { showErrorToast, showSuccessToast } = useToast();
 
   const [token1, setToken1] = useState<SuperToken | null>(null);
   const [token2, setToken2] = useState<SuperToken | null>(null);
@@ -114,6 +118,7 @@ export const EarningDetail = () => {
   const [twapFlowRate1, setTwapFlowRate1] = useState<BigNumber>(
     BigNumber.from(0)
   );
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
 
   const poolContract = new Contract(poolAddress, poolABI, api);
 
@@ -132,8 +137,8 @@ export const EarningDetail = () => {
       receiver: poolAddress,
     });
 
-    const currentTimestampBigNumber = BigNumber.from(
-      new Date().valueOf() // Milliseconds elapsed since UTC epoch, disregards timezone.
+    const currentTimestampBigNumber = ethers.BigNumber.from(
+      new Date().valueOf().toString() // Milliseconds elapsed since UTC epoch, disregards timezone.
     );
     const currentTimestamp = currentTimestampBigNumber.div(1000).toString();
 
@@ -142,16 +147,18 @@ export const EarningDetail = () => {
       .add((REFRESH_INTERVAL * ANIMATION_MINIMUM_STEP_TIME) / 1000)
       .toString();
 
-    const [presentLockedBalances, futureLockedBalances] = await Promise.all([
-      poolContract.getUserBalancesAtTime(
-        selectedAccount.value.address,
-        currentTimestamp
-      ),
-      poolContract.getUserBalancesAtTime(
-        selectedAccount.value.address,
-        futureTimestamp
-      ),
-    ]);
+    const [presentLockedBalances, futureLockedBalances, reserves] =
+      await Promise.all([
+        poolContract.getUserBalancesAtTime(
+          selectedAccount.value.address,
+          currentTimestamp
+        ),
+        poolContract.getUserBalancesAtTime(
+          selectedAccount.value.address,
+          futureTimestamp
+        ),
+        poolContract.getReservesAtTime(currentTimestamp),
+      ]);
 
     const _presentLockedBalances = {
       balance0: presentLockedBalances[0],
@@ -161,6 +168,11 @@ export const EarningDetail = () => {
     const _futureLockedBalances = {
       balance0: futureLockedBalances[0],
       balance1: futureLockedBalances[1],
+    };
+
+    const _reserves = {
+      reserve0: reserves[0],
+      reserve1: reserves[1],
     };
 
     const initialBalance0 = BigNumber.from(_token1.flowRate).mul(
@@ -202,7 +214,59 @@ export const EarningDetail = () => {
 
     setTwapFlowRate0(calcTwapFlowRate0);
     setTwapFlowRate1(calcTwapFlowRate1);
+
+    if (BigNumber.from(_token1.flowRate).gt(0)) {
+      setCurrentPrice(
+        _reserves.reserve1.mul(1000).div(_reserves.reserve0).toNumber() / 1000
+      );
+      // setAveragePrice(
+      //     decodedPresentLockedBalances.balance1.mul(1000).div(initialBalance0).toNumber() / 1000
+      // );
+    } else if (BigNumber.from(_token2.flowRate).gt(0)) {
+      setCurrentPrice(
+        _reserves.reserve0.mul(1000).div(_reserves.reserve1).toNumber() / 1000
+      );
+      // setAveragePrice(
+      //     decodedPresentLockedBalances.balance0.mul(1000).div(initialBalance1).toNumber() / 1000
+      // );
+    }
   };
+
+  const deleteSwap = async () => {
+    starLoading()
+    try {
+      if (!token1) return;
+
+      const deleteFlowOperation = token1?.deleteFlow({
+        sender: selectedAccount.value.address,
+        receiver: EarningAssets[selectedChain?.name].contractAddress,
+      });
+
+
+      const privateKey = await Extension.showKey();
+
+      const sf = await Framework.create({
+        chainId: EarningAssets[selectedChain?.name].chainId,
+        provider: api,
+      });
+
+      const signer = sf.createSigner({
+        privateKey,
+        provider: api,
+      });
+
+
+
+      const txnResponse = await deleteFlowOperation.exec(signer);
+      await txnResponse.wait();
+
+      showSuccessToast("Swap deleted successfully");
+      navigate(EARNING)
+    } catch (error) {
+      showErrorToast(error);
+    }
+    endLoading()
+  }
 
   useEffect(() => {
     if (!state?.asset) return;
@@ -229,6 +293,7 @@ export const EarningDetail = () => {
 
         setToken1Name(token1Name);
         setToken2Name(token2Name);
+        endLoading();
       } catch (error) {
         showErrorToast("error_loading_tokens");
       }
@@ -274,70 +339,83 @@ export const EarningDetail = () => {
         />
       </div>
 
-      <div className="flex justify-between items-center gap-3 ">
-        <div>
-          <p className="text-xl font-poppins">{`${token1Name} / ${token2Name}`}</p>
-        </div>
-
-        <div>
-          <button
-            className="text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2"
-            onClick={() => {
-              console.log("edit");
-            }}
-          >
-            <BsPencil className="h-5 w-5" />
-          </button>
-          <button
-            className="text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2"
-            onClick={() => console.log("delete")}
-          >
-            <AiFillDelete className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-
-      <PriceChart />
-
-      <div className="mb-3">
-        <p className="font-inter text-lg">{t("total_amount_swapped")}:</p>
-
-        <div className="flex gap-2 items-center mb-2 md:text-xl font-inter tracking-wider">
-          <img
-            src={ASSETS_INFO[token1Name as "fDAIx" | "fUSDCx"]?.image}
-            alt=""
-            width={20}
-            height={20}
-            className="object-contain rounded-full"
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <>
+          <div className="flex justify-between items-center gap-3 ">
+            <p className="text-xl font-poppins">{`${token1Name} / ${token2Name}`}</p>
+            <div>
+              <button
+                className="text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2"
+                onClick={() => {
+                  navigate(EARNING, {
+                    state: {
+                      token: token1Name,
+                    }
+                  })
+                }}
+              >
+                <BsPencil className="h-5 w-5" />
+              </button>
+              <button
+                className="text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2"
+                onClick={deleteSwap}
+              >
+                <AiFillDelete className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+          <PriceChart
+            token1Name={token1Name}
+            token2Name={token2Name}
+            startDate={state.timestamp}
+            token1={token1 as SuperToken}
+            token2={token2 as SuperToken}
+            currentPrice={currentPrice}
           />
-          <p>-{utils.formatEther(currentBalance0).toString()}</p>
-        </div>
 
-        <div className="flex gap-2 items-center md:text-xl font-inter tracking-wider">
-          <img
-            src={ASSETS_INFO[token2Name as "fDAIx" | "fUSDCx"]?.image}
-            alt=""
-            width={20}
-            height={20}
-            className="object-contain rounded-full"
-          />
-          <p>+{utils.formatEther(currentTwapBalance1).toString()}</p>
-        </div>
-      </div>
+          <div className="mb-3">
+            <p className="font-inter text-lg">{t("total_amount_swapped")}:</p>
 
-      <div className="flex flex-col gap-2 bg-[#303943] rounded-xl p-4">
-        <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
-          <p>{t("start_date")}:</p>
-          <p>{format(state.timestamp, "dd/MM/yy")}</p>
-        </div>
+            <div className="flex gap-2 items-center mb-2 md:text-xl font-inter tracking-wider">
+              <img
+                src={ASSETS_INFO[token1Name as "fDAIx" | "fUSDCx"]?.image}
+                alt=""
+                width={20}
+                height={20}
+                className="object-contain rounded-full"
+              />
+              <p>-{utils.formatEther(currentBalance0).toString()}</p>
+            </div>
 
-        <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
-          <p>
-            {token1Name} {t("flow_rate")}:
-          </p>
-          <p>{utils.formatEther(state.flowRate as string).toString()}</p>
-        </div>
-      </div>
+            <div className="flex gap-2 items-center md:text-xl font-inter tracking-wider">
+              <img
+                src={ASSETS_INFO[token2Name as "fDAIx" | "fUSDCx"]?.image}
+                alt=""
+                width={20}
+                height={20}
+                className="object-contain rounded-full"
+              />
+              <p>+{utils.formatEther(currentTwapBalance1).toString()}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 bg-[#303943] rounded-xl p-4">
+            <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
+              <p>{t("start_date")}:</p>
+              <p>{format(state.timestamp, "dd/MM/yy")}</p>
+            </div>
+
+            <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
+              <p>
+                {token1Name} {t("flow_rate")}:
+              </p>
+              <p>{utils.formatEther(state.flowRate as string).toString()}</p>
+            </div>
+          </div>
+        </>
+      )}
     </PageWrapper>
   );
 };
