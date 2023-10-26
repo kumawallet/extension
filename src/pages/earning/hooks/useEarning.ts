@@ -1,12 +1,14 @@
 import { MUMBAI_TESTNET } from "@src/constants/chains";
 import { useLoading, useToast } from "@src/hooks";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { Framework, SuperToken } from "@superfluid-finance/sdk-core";
+import { Framework } from "@superfluid-finance/sdk-core";
 import { useEffect, useState } from "react";
 import { ASSETS_INFO, EarningAssets } from "../utils/assets-per-chain";
 import Extension from "@src/Extension";
-import { utils } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { useLocation } from "react-router-dom";
+import { useDialog } from "@src/hooks/common/useDialog";
+import { cfaABI } from "@src/pages/earningDetail";
 
 const SUPPORTED_CHAINS = [MUMBAI_TESTNET.name];
 
@@ -66,6 +68,7 @@ export const useEarning = () => {
     starLoading: starLoadingActiveSwaps,
     endLoading: endLoadingActiveSwaps,
   } = useLoading();
+  const { isOpen, openDialog, closeDialog } = useDialog();
 
   const [assetsToSell, setAssetsToSell] = useState<Asset[]>([]);
   const [assetsToBuy, setAssetsToBuy] = useState<Asset[]>([]);
@@ -80,6 +83,8 @@ export const useEarning = () => {
   const [amount, setAmount] = useState<string>("");
   const [activeSwaps, setActiveSwaps] = useState<any[]>([]);
   const [selectedTokenBalance, setSelectedTokenBalance] = useState<string>("0");
+
+  const [estimatedFee, setEstimatedFee] = useState<string>("0");
 
   const [frecuency, setFrecuency] = useState({
     frecuency: FRECUENCIES[0].value,
@@ -171,47 +176,85 @@ export const useEarning = () => {
     endLoadingActiveSwaps();
   };
 
-  const deleteSwap = async (token: SuperToken, tokenName: string) => {
-    starLoadingActiveSwaps();
-    try {
-      const deleteFlowOperation = await token.deleteFlow({
-        sender: selectedAccount.value.address,
-        receiver: EarningAssets[selectedChain?.name].contractAddress,
-      });
+  const selectedAssetIsInActiveSwaps = activeSwaps.some(
+    (swap) => swap.asset === selectedAssetToSell.label
+  );
 
-      const privateKey = await Extension.showKey();
+  const handleSwap = async () => {
+    if (!amount) return;
+
+    starLoading();
+
+    openDialog();
+
+    try {
+      // estimated fee
+
+      const pk = await Extension.showKey();
+
+      const wallet = new ethers.Wallet(
+        pk as string,
+        provider as ethers.providers.JsonRpcProvider
+      );
+
+      const bnAmount = utils.parseEther(amount);
+      const frecuencyInSeconds = getFrecuencyToSeconds(frecuency.frecuency);
+
+      const flowRate = bnAmount.div(frecuencyInSeconds);
+
+      const contract = new ethers.Contract(
+        "0xcfa132e353cb4e398080b9700609bb008eceb125",
+        cfaABI,
+        wallet
+      );
 
       const sf = await Framework.create({
         chainId: EarningAssets[selectedChain?.name].chainId,
         provider,
       });
 
-      const signer = sf.createSigner({
-        privateKey,
-        provider,
-      });
+      const token = await sf.loadSuperToken(selectedAssetToSell.label);
+      let fee = BigNumber.from("0");
 
-      const txnResponse = await deleteFlowOperation.exec(signer);
-      await txnResponse.wait();
+      if (!selectedAssetIsInActiveSwaps) {
+        fee = await contract.estimateGas.createFlow(
+          token.address,
+          selectedAccount.value.address,
+          "0x0794c89b0767d480965574Af38052aab32496E00",
+          flowRate,
+          "0x000000"
+        );
+      } else {
+        fee = await contract.estimateGas.updateFlow(
+          token.address,
+          selectedAccount.value.address,
+          "0x0794c89b0767d480965574Af38052aab32496E00",
+          flowRate,
+          "0x000000"
+        );
+      }
 
-      showSuccessToast("Swap deleted successfully");
+      const feeData = await provider.getFeeData();
 
-      const newActiveSwaps = activeSwaps.filter(
-        (swap) => swap.asset !== tokenName
-      );
+      const _gasLimit = fee;
+      const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+      const _maxPriorityFeePerGas =
+        feeData.maxPriorityFeePerGas as ethers.BigNumber;
 
-      setActiveSwaps(newActiveSwaps);
+      const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+      const estimatedTotal = avg.mul(_gasLimit);
+
+      const estimatedFee = utils.formatEther(estimatedTotal.toString());
+
+      setEstimatedFee(estimatedFee);
     } catch (error) {
+      console.log(error);
       showErrorToast(error);
     }
-    endLoadingActiveSwaps();
+    endLoading();
   };
 
-  const selectedAssetIsInActiveSwaps = activeSwaps.some(
-    (swap) => swap.asset === selectedAssetToSell.label
-  );
-
-  const handleSwap = async () => {
+  const confirmHandleSwap = async () => {
     if (!amount) return;
     starLoading();
     try {
@@ -262,6 +305,7 @@ export const useEarning = () => {
         showSuccessToast("Swap updated successfully");
         loadActiveSwaps([...activeSwaps.map((swap) => swap.asset)]);
       }
+      closeDialog();
     } catch (error) {
       showErrorToast(error);
     }
@@ -359,11 +403,14 @@ export const useEarning = () => {
     setFrecuency,
     isLoading,
     activeSwaps,
-    deleteSwap,
     isLoadingActiveSwaps,
     selectedAssetIsInActiveSwaps,
     selectedTokenBalance,
     handleSwap,
+    confirmHandleSwap,
     selectAssetFromActiveSwaps,
+    isOpen,
+    closeDialog,
+    estimatedFee,
   };
 };

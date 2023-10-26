@@ -10,7 +10,7 @@ import { BigNumber, Contract, utils, ethers } from "ethers";
 import { BsPencil } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { format } from "date-fns";
-import { PriceChart } from "./components";
+import { ConfirmDialog, PriceChart } from "./components";
 import Extension from "@src/Extension";
 import { EARNING } from "@src/routes/paths";
 
@@ -74,6 +74,8 @@ const poolABI = [
   },
 ];
 
+export const cfaABI = [{ "inputs": [{ "internalType": "contract ISuperfluid", "name": "host", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [], "name": "CFA_FWD_INVALID_FLOW_RATE", "type": "error" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }, { "internalType": "bytes", "name": "userData", "type": "bytes" }], "name": "createFlow", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "bytes", "name": "userData", "type": "bytes" }], "name": "deleteFlow", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "account", "type": "address" }], "name": "getAccountFlowInfo", "outputs": [{ "internalType": "uint256", "name": "lastUpdated", "type": "uint256" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }, { "internalType": "uint256", "name": "deposit", "type": "uint256" }, { "internalType": "uint256", "name": "owedDeposit", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "account", "type": "address" }], "name": "getAccountFlowrate", "outputs": [{ "internalType": "int96", "name": "flowrate", "type": "int96" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }], "name": "getBufferAmountByFlowrate", "outputs": [{ "internalType": "uint256", "name": "bufferAmount", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }], "name": "getFlowInfo", "outputs": [{ "internalType": "uint256", "name": "lastUpdated", "type": "uint256" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }, { "internalType": "uint256", "name": "deposit", "type": "uint256" }, { "internalType": "uint256", "name": "owedDeposit", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "flowOperator", "type": "address" }], "name": "getFlowOperatorPermissions", "outputs": [{ "internalType": "uint8", "name": "permissions", "type": "uint8" }, { "internalType": "int96", "name": "flowrateAllowance", "type": "int96" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }], "name": "getFlowrate", "outputs": [{ "internalType": "int96", "name": "flowrate", "type": "int96" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "flowOperator", "type": "address" }], "name": "grantPermissions", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "flowOperator", "type": "address" }], "name": "revokePermissions", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }], "name": "setFlowrate", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }], "name": "setFlowrateFrom", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "int96", "name": "flowrate", "type": "int96" }, { "internalType": "bytes", "name": "userData", "type": "bytes" }], "name": "updateFlow", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [{ "internalType": "contract ISuperToken", "name": "token", "type": "address" }, { "internalType": "address", "name": "flowOperator", "type": "address" }, { "internalType": "uint8", "name": "permissions", "type": "uint8" }, { "internalType": "int96", "name": "flowrateAllowance", "type": "int96" }], "name": "updateFlowOperatorPermissions", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }];
+
 export const EarningDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate()
@@ -89,6 +91,8 @@ export const EarningDetail = () => {
   const { isLoading, endLoading, starLoading } = useLoading(true);
   const { showErrorToast, showSuccessToast } = useToast();
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   const [token1, setToken1] = useState<SuperToken | null>(null);
   const [token2, setToken2] = useState<SuperToken | null>(null);
   const [time, setTime] = useState(REFRESH_INTERVAL);
@@ -97,6 +101,7 @@ export const EarningDetail = () => {
 
   const [flowRate0, setFlowRate0] = useState<BigNumber>(BigNumber.from(0));
   const [flowRate1, setFlowRate1] = useState<BigNumber>(BigNumber.from(0));
+  const [deleteSwapFee, setDeleteSwapFee] = useState<string>("0");
 
   const [currentBalance0, setCurrentBalance0] = useState<BigNumber>(
     BigNumber.from(0)
@@ -121,6 +126,7 @@ export const EarningDetail = () => {
   const [currentPrice, setCurrentPrice] = useState<number>(0);
 
   const poolContract = new Contract(poolAddress, poolABI, api);
+
 
   const refreshFlowRate = async () => {
     if (!token1 || !token2 || !poolContract) return;
@@ -236,7 +242,41 @@ export const EarningDetail = () => {
     starLoading()
     try {
       if (!token1) return;
+      setIsDialogOpen(true)
 
+      const pk = await Extension.showKey();
+
+      const wallet = new ethers.Wallet(
+        pk as string,
+        api as ethers.providers.JsonRpcProvider
+      );
+
+      const contract = new ethers.Contract("0xcfa132e353cb4e398080b9700609bb008eceb125", cfaABI, wallet)
+
+      const fee = await contract.estimateGas.deleteFlow(token1.address, selectedAccount.value.address, "0x0794c89b0767d480965574Af38052aab32496E00", "0x000000")
+      const feeData = await api.getFeeData();
+
+      const _gasLimit = fee;
+      const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
+      const _maxPriorityFeePerGas =
+        feeData.maxPriorityFeePerGas as ethers.BigNumber;
+
+      const avg = _maxFeePerGas.add(_maxPriorityFeePerGas).div(2);
+      const estimatedTotal = avg.mul(_gasLimit);
+
+      const estimatedFee = utils.formatEther(estimatedTotal.toString())
+      setDeleteSwapFee(estimatedFee)
+
+    } catch (error) {
+      showErrorToast(error);
+    }
+    endLoading()
+  }
+
+  const confirmDeleteSwap = async () => {
+    if (!token1) return;
+    starLoading()
+    try {
       const deleteFlowOperation = token1?.deleteFlow({
         sender: selectedAccount.value.address,
         receiver: EarningAssets[selectedChain?.name].contractAddress,
@@ -262,8 +302,9 @@ export const EarningDetail = () => {
 
       showSuccessToast("Swap deleted successfully");
       navigate(EARNING)
+
     } catch (error) {
-      showErrorToast(error);
+      showErrorToast(error)
     }
     endLoading()
   }
@@ -331,6 +372,17 @@ export const EarningDetail = () => {
       contentClassName="bg-[#29323C] h-full flex flex-col"
       innerContentClassName="flex flex-col"
     >
+
+      <ConfirmDialog
+        closeModal={() => setIsDialogOpen(false)}
+        isOpen={isDialogOpen}
+        isLoading={isLoading}
+        fee={deleteSwapFee}
+        description={t("delete_swap_description")}
+        onAccept={confirmDeleteSwap}
+      />
+
+
       <div className="flex justify-between items-center mb-7">
         <PageTitle
           title={t("title")}
@@ -339,83 +391,82 @@ export const EarningDetail = () => {
         />
       </div>
 
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="flex justify-between items-center gap-3 ">
-            <p className="text-xl font-poppins">{`${token1Name} / ${token2Name}`}</p>
-            <div>
-              <button
-                className="text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2"
-                onClick={() => {
-                  navigate(EARNING, {
-                    state: {
-                      token: token1Name,
-                    }
-                  })
-                }}
-              >
-                <BsPencil className="h-5 w-5" />
-              </button>
-              <button
-                className="text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2"
-                onClick={deleteSwap}
-              >
-                <AiFillDelete className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-          <PriceChart
-            token1Name={token1Name}
-            token2Name={token2Name}
-            startDate={state.timestamp}
-            token1={token1 as SuperToken}
-            token2={token2 as SuperToken}
-            currentPrice={currentPrice}
+
+
+
+      <div className="flex justify-between items-center gap-3 ">
+        <p className="text-xl font-poppins">{`${token1Name} / ${token2Name}`}</p>
+        <div>
+          <button
+            className="text-blue-600 hover:bg-gray-400 hover:bg-opacity-20 rounded-full p-2"
+            onClick={() => {
+              navigate(EARNING, {
+                state: {
+                  token: token1Name,
+                }
+              })
+            }}
+          >
+            <BsPencil className="h-5 w-5" />
+          </button>
+          <button
+            className="text-red-500 hover:bg-gray-400 hover:bg-opacity-20  rounded-full p-2"
+            onClick={deleteSwap}
+          >
+            <AiFillDelete className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      <PriceChart
+        token1Name={token1Name}
+        token2Name={token2Name}
+        startDate={state.timestamp}
+        token1={token1 as SuperToken}
+        token2={token2 as SuperToken}
+        currentPrice={currentPrice}
+      />
+
+      <div className="mb-3">
+        <p className="font-inter text-lg">{t("total_amount_swapped")}:</p>
+
+        <div className="flex gap-2 items-center mb-2 md:text-xl font-inter tracking-wider">
+          <img
+            src={ASSETS_INFO[token1Name as "fDAIx" | "fUSDCx"]?.image}
+            alt=""
+            width={20}
+            height={20}
+            className="object-contain rounded-full"
           />
+          <p>-{utils.formatEther(currentBalance0).toString()}</p>
+        </div>
 
-          <div className="mb-3">
-            <p className="font-inter text-lg">{t("total_amount_swapped")}:</p>
+        <div className="flex gap-2 items-center md:text-xl font-inter tracking-wider">
+          <img
+            src={ASSETS_INFO[token2Name as "fDAIx" | "fUSDCx"]?.image}
+            alt=""
+            width={20}
+            height={20}
+            className="object-contain rounded-full"
+          />
+          <p>+{utils.formatEther(currentTwapBalance1).toString()}</p>
+        </div>
+      </div>
 
-            <div className="flex gap-2 items-center mb-2 md:text-xl font-inter tracking-wider">
-              <img
-                src={ASSETS_INFO[token1Name as "fDAIx" | "fUSDCx"]?.image}
-                alt=""
-                width={20}
-                height={20}
-                className="object-contain rounded-full"
-              />
-              <p>-{utils.formatEther(currentBalance0).toString()}</p>
-            </div>
+      <div className="flex flex-col gap-2 bg-[#303943] rounded-xl p-4">
+        <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
+          <p>{t("start_date")}:</p>
+          <p>{format(state.timestamp, "dd/MM/yy")}</p>
+        </div>
 
-            <div className="flex gap-2 items-center md:text-xl font-inter tracking-wider">
-              <img
-                src={ASSETS_INFO[token2Name as "fDAIx" | "fUSDCx"]?.image}
-                alt=""
-                width={20}
-                height={20}
-                className="object-contain rounded-full"
-              />
-              <p>+{utils.formatEther(currentTwapBalance1).toString()}</p>
-            </div>
-          </div>
+        <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
+          <p>
+            {token1Name} {t("flow_rate")}:
+          </p>
+          <p>{utils.formatEther(state.flowRate as string).toString()}</p>
+        </div>
+      </div>
 
-          <div className="flex flex-col gap-2 bg-[#303943] rounded-xl p-4">
-            <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
-              <p>{t("start_date")}:</p>
-              <p>{format(state.timestamp, "dd/MM/yy")}</p>
-            </div>
 
-            <div className="flex justify-between items-center font-inter text-[#A3A3A3]">
-              <p>
-                {token1Name} {t("flow_rate")}:
-              </p>
-              <p>{utils.formatEther(state.flowRate as string).toString()}</p>
-            </div>
-          </div>
-        </>
-      )}
     </PageWrapper>
   );
 };

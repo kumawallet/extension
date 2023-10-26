@@ -1,6 +1,6 @@
 
 
-import { Button, PageTitle, PageWrapper, ReEnterPassword } from '@src/components/common'
+import { Button, ConfirmDialog, PageTitle, PageWrapper, ReEnterPassword } from '@src/components/common'
 import { useTranslation } from 'react-i18next';
 import { ActiveSwaps, Frecuency, SelectableAsset } from './components';
 import { HiMiniArrowsRightLeft } from "react-icons/hi2"
@@ -27,12 +27,16 @@ export const Earning = () => {
     setFrecuency,
     isLoading,
     activeSwaps,
-    deleteSwap,
     isLoadingActiveSwaps,
     selectedAssetIsInActiveSwaps,
     selectedTokenBalance,
     handleSwap,
-    selectAssetFromActiveSwaps
+
+    selectAssetFromActiveSwaps,
+    closeDialog,
+    estimatedFee,
+    isOpen,
+    confirmHandleSwap
   } = useEarning()
 
   return (
@@ -40,6 +44,16 @@ export const Earning = () => {
       innerContentClassName='flex flex-col'
     >
       <ReEnterPassword />
+
+      <ConfirmDialog
+        closeModal={closeDialog}
+        description=''
+        fee={estimatedFee}
+        isLoading={isLoading}
+        isOpen={isOpen}
+        onAccept={confirmHandleSwap}
+
+      />
 
 
       <div className='flex flex-col flex-1'>
@@ -53,11 +67,10 @@ export const Earning = () => {
 
           <ActiveSwaps
             activeSwaps={activeSwaps}
-            deleteSwap={deleteSwap}
+            deleteSwap={() => { }}
             isLoading={isLoadingActiveSwaps}
             selectAssetFromActiveSwaps={selectAssetFromActiveSwaps}
           />
-
         </div>
 
 

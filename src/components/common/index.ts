@@ -1,5 +1,6 @@
 export * from "./AssetIcon";
 export * from "./Button";
+export * from "./ConfirmDialog";
 export * from "./ConfirmTrustedSite";
 export * from "./DecryptFAB";
 export * from "./Error";
