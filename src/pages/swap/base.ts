@@ -10,6 +10,7 @@ export interface SwapAsset {
   decimals: number;
   network: string;
   name: string;
+  address?: string;
 }
 
 export interface ActiveSwaps {
@@ -65,6 +66,19 @@ export abstract class Swapper {
       estimatedTotal: string;
     };
     destination: string;
+  }>;
+
+  abstract confirmTx(props: {
+    assetToTransfer: {
+      id: string;
+      decimals: number;
+      address: string;
+    };
+    amount: string;
+    destinationAccount: string;
+  }): Promise<{
+    txHash: string;
+    type: string;
   }>;
 
   abstract mustConfirmTx(): boolean;

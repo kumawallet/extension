@@ -13,7 +13,7 @@ import {
   POLYGON,
   SHIDEN,
 } from "@src/constants/chains";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { Keyring } from "@polkadot/keyring";
 import {
   GraphQLClient,
@@ -21,7 +21,9 @@ import {
   Variables,
   gql,
 } from "graphql-request";
-import { ActiveSwaps, InitProps, Swapper } from "./base";
+import { ActiveSwaps, InitProps, SwapAsset, Swapper } from "./base";
+import { transformAmountStringToBN } from "@src/utils/assets";
+import { AccountType } from "@src/accounts/types";
 
 interface StealthExToken {
   id: string;
@@ -155,6 +157,7 @@ const StealthEx_MAP_NATIVE_TOKENS: {
 export class StealthEX implements Swapper {
   private api: ApiPromise | ethers.providers.JsonRpcProvider | null = null;
   private gqlClient: GraphQLClient;
+  private chainName: string | undefined;
 
   public swap_info: string = "stealthex_swap_message";
 
@@ -166,6 +169,7 @@ export class StealthEX implements Swapper {
 
   async init({ chainName, nativeCurrency, api }: InitProps) {
     this.api = api;
+    this.chainName = chainName;
 
     const tokens = await this.getTokens();
 
@@ -188,7 +192,7 @@ export class StealthEX implements Swapper {
             decimals: 0,
             network: token.network,
             symbol: token?.symbol.toUpperCase() || "",
-          } as Asset)
+          } as SwapAsset)
       );
 
     const nativeAssets = nativeTokens.map((ntoken) => {
@@ -205,7 +209,7 @@ export class StealthEX implements Swapper {
         balance: "0",
         decimals: 0,
         network: token?.network || "",
-      } as Asset;
+      } as SwapAsset;
     });
 
     return {
@@ -359,7 +363,10 @@ export class StealthEX implements Swapper {
 
       const amount = new BN(amountFrom);
 
-      const extrinsic = this.api.tx.balances.transfer(destination, amount);
+      const extrinsic = this.api.tx.balances.transferKeepAlive(
+        destination,
+        amount
+      );
 
       const { partialFee } = await extrinsic.paymentInfo(sender);
 
@@ -381,6 +388,109 @@ export class StealthEX implements Swapper {
     return {
       fee,
       destination,
+    };
+  }
+
+  async confirmTx({
+    amount,
+    assetToTransfer,
+    destinationAccount,
+  }: {
+    assetToTransfer: {
+      id: string;
+      decimals: number;
+      address: string;
+    };
+    amount: string;
+    destinationAccount: string;
+  }) {
+    let txHash = "";
+    let type = "";
+
+    const isNativeAsset = assetToTransfer?.id === "-1";
+
+    if (this.api instanceof ApiPromise) {
+      const seed = await Extension.showKey();
+      const keyring = new Keyring({ type: "sr25519" });
+      const sender = keyring.addFromMnemonic(seed as string);
+
+      type = AccountType.WASM;
+
+      if (isNativeAsset) {
+        const extrinsic = this.api.tx.balances.transferKeepAlive(
+          destinationAccount,
+          new BN(amount)
+        );
+
+        txHash = (await extrinsic.signAsync(sender)).toHex();
+      } else {
+        const extrinsic = this.api.tx.assets.transfer(
+          assetToTransfer.id,
+          destinationAccount,
+          new BN(amount)
+        );
+
+        txHash = (await extrinsic.signAsync(sender)).toHex();
+      }
+    } else if (this.api instanceof ethers.providers.JsonRpcProvider) {
+      const pk = await Extension.showKey();
+      const wallet = new ethers.Wallet(pk as string, this.api);
+
+      type = AccountType.EVM;
+
+      const tx = {
+        from: wallet.address,
+        to: destinationAccount,
+        value: transformAmountStringToBN(
+          amount,
+          assetToTransfer.decimals
+        ).toString(),
+      };
+
+      if (isNativeAsset) {
+        const [feeData, gasLimit] = await Promise.all([
+          this.api.getFeeData(),
+          this.api.estimateGas(tx),
+        ]);
+
+        const transaction = await wallet.sendTransaction({
+          ...tx,
+          gasLimit,
+          maxFeePerGas: feeData.maxFeePerGas as BigNumber,
+          maxPriorityFeePerGas: feeData.maxPriorityFeePerGas as BigNumber,
+        });
+
+        txHash = transaction.hash;
+      } else {
+        const contract = new ethers.Contract(
+          assetToTransfer.address,
+          [
+            "function transfer(address to, uint256 value) public returns (bool)",
+          ],
+          wallet
+        );
+        const feeData = await this.api.getFeeData();
+        const gasLimit = await contract.estimateGas
+          .transfer(destinationAccount, tx.value)
+          .catch(() => BigNumber.from("21000"));
+
+        const transaction = await contract.transfer(
+          destinationAccount,
+          transformAmountStringToBN(amount, assetToTransfer.decimals),
+          {
+            gasLimit,
+            maxFeePerGas: feeData.maxFeePerGas as BigNumber,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas as BigNumber,
+          }
+        );
+
+        txHash = transaction.hash;
+      }
+    }
+
+    return {
+      txHash,
+      type,
     };
   }
 

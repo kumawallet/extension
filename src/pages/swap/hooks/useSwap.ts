@@ -9,20 +9,14 @@ import { BN } from "@polkadot/util";
 import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { useLoading, useToast } from "@src/hooks";
 import { captureError } from "@src/utils/error-handling";
-// import { getWebAPI } from "@src/utils/env";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import { StealthEX } from "../stealthEX";
-import { ActiveSwaps, Swapper } from "../base";
-
-interface Asset {
-  image?: string;
-  label: string;
-  id?: string;
-  balance: string;
-  decimals: number;
-  symbol: string;
-}
+import { ActiveSwaps, SwapAsset, Swapper } from "../base";
+import { getWebAPI } from "@src/utils/env";
+import { useNavigate } from "react-router-dom";
+import { BALANCE } from "@src/routes/paths";
+import { useTranslation } from "react-i18next";
 
 export interface TxInfoState {
   bridgeName: string;
@@ -31,11 +25,14 @@ export interface TxInfoState {
   destinationAddress: string;
 }
 
-// const WebAPI = getWebAPI();
+const WebAPI = getWebAPI();
 
 export const useSwap = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const {
-    state: { api, selectedChain },
+    state: { api, selectedChain, rpc },
   } = useNetworkContext();
 
   const {
@@ -65,30 +62,30 @@ export const useSwap = () => {
 
   const { showErrorToast, showSuccessToast } = useToast();
 
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [assets, setAssets] = useState<SwapAsset[]>([]);
 
-  const [assetToSell, setAssetToSell] = useState<Asset>({
+  const [assetToSell, setAssetToSell] = useState<Partial<SwapAsset>>({
     label: "",
     balance: new BN("0").toString(),
     decimals: 0,
     symbol: "",
   });
-  const [assetsToSell, setAssetsToSell] = useState<Asset[]>([]);
+  const [assetsToSell, setAssetsToSell] = useState<SwapAsset[]>([]);
 
-  const [assetToBuy, setAssetToBuy] = useState<Asset>({
+  const [assetToBuy, setAssetToBuy] = useState<Partial<SwapAsset>>({
     label: "",
     balance: new BN("0").toString(),
     decimals: 0,
     symbol: "",
   });
-  const [assetsToBuy, setAssetsToBuy] = useState<Asset[]>([]);
+  const [assetsToBuy, setAssetsToBuy] = useState<SwapAsset[]>([]);
 
   const [recipient, setRecipient] = useState({
     isNotOwnAddress: false,
     address: "",
   });
 
-  const [txInfo, setTxInfo] = useState<TxInfoState>({
+  const [txInfo] = useState<TxInfoState>({
     bridgeName: "SteatlhEX",
     bridgeFee: "0",
     gasFee: "0",
@@ -131,11 +128,7 @@ export const useSwap = () => {
 
   const [activeSwaps, setActiveSwaps] = useState<ActiveSwaps[]>([]);
 
-  // const [tradeRouter, setTradeRouter] = useState<null>(null);
-
   const [swapper, setSwapper] = useState<Swapper | null>(null);
-
-  // const showRecipientAddress = stealthEX.showRecipentAddressFormat();
 
   const [mustConfirmTx, setMustConfirmTx] = useState(false);
 
@@ -186,8 +179,8 @@ export const useSwap = () => {
       label === "sell" ? starLoadingBuyAsset() : starLoadingSellAsset();
 
       const { estimatedAmount, minAmount } = await swapper!.getEstimatedAmount({
-        from: assetToSell.symbol?.toLowerCase(),
-        to: assetToBuy.symbol?.toLowerCase(),
+        from: (assetToSell.symbol || "")?.toLowerCase(),
+        to: (assetToBuy.symbol || "")?.toLowerCase(),
         amount: value,
       });
 
@@ -204,13 +197,13 @@ export const useSwap = () => {
     }
   };
 
-  const handleAssetChange = (label: "sell" | "buy", asset: Asset) => {
+  const handleAssetChange = (label: "sell" | "buy", asset: SwapAsset) => {
     if (label === "sell") {
       setAssetToSell(asset);
 
       if (assetToBuy.symbol === asset.symbol) {
         setAssetToBuy(
-          assetsToBuy.find((a) => a.symbol !== asset.symbol) as Asset
+          assetsToBuy.find((a) => a.symbol !== asset.symbol) as SwapAsset
         );
       }
     } else {
@@ -218,7 +211,7 @@ export const useSwap = () => {
 
       if (assetToSell.symbol === asset.symbol) {
         setAssetToSell(
-          assetsToSell.find((a) => a.symbol !== asset.symbol) as Asset
+          assetsToSell.find((a) => a.symbol !== asset.symbol) as SwapAsset
         );
       }
     }
@@ -226,8 +219,8 @@ export const useSwap = () => {
 
   const setMaxAmout = () => {
     try {
-      const amount = assetToSell.balance.toString();
-      const formatedAmount = formatBN(amount, assetToSell.decimals);
+      const amount = assetToSell.balance?.toString();
+      const formatedAmount = formatBN(amount || "", assetToSell.decimals);
 
       setAmounts((prevState) => ({
         ...prevState,
@@ -244,8 +237,8 @@ export const useSwap = () => {
     starLoading();
     try {
       const { destination, fee } = await swapper!.createSwap({
-        currencyFrom: assetToSell.symbol,
-        currencyTo: assetToBuy.symbol,
+        currencyFrom: assetToSell.symbol as string,
+        currencyTo: assetToBuy.symbol as string,
         amountFrom: amounts.sell,
         addressTo: recipient.address,
       });
@@ -266,11 +259,11 @@ export const useSwap = () => {
           image: `/images/${selectedChain.logo}.png`,
         },
         assetFrom: {
-          symbol: assetToSell.label.toLocaleUpperCase(),
+          symbol: (assetToSell.label || "").toLocaleUpperCase(),
           image: assetToSell.image || "",
         },
         assetTo: {
-          symbol: assetToSell.label.toLocaleUpperCase(),
+          symbol: (assetToSell.label || "").toLocaleUpperCase(),
           image: assetToSell.image || "",
         },
         estimatedFee: fee.estimatedFee.toString(),
@@ -324,7 +317,68 @@ export const useSwap = () => {
   };
 
   const onConfirmTx = async () => {
+    if (!swapper) return;
     console.log("onConfirmTx");
+    starLoading();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const txToSend: any = {
+        amount: amounts.sell,
+        originAddress: selectedAccount.value.address,
+        destinationAddress: recipient.address,
+        rpc: rpc as string,
+        asset: assetToSell,
+        destinationNetwork: selectedChain?.name,
+        networkInfo: selectedChain,
+        originNetwork: selectedChain,
+      };
+
+      const isConfirmNeeded = swapper.mustConfirmTx();
+
+      if (isConfirmNeeded) {
+        const assetToTransfer = _assets.find(
+          (asset) => asset.symbol === assetToSell.label
+        )!;
+
+        const { txHash, type } = await swapper.confirmTx({
+          assetToTransfer: {
+            id: assetToTransfer.id,
+            address: assetToTransfer.address || "",
+            decimals: assetToTransfer.decimals,
+          },
+          amount: amounts.sell,
+          destinationAccount: recipient.address,
+        });
+
+        const { id } = await WebAPI.windows.getCurrent();
+
+        txToSend.txHash = txHash;
+        txToSend.type = type;
+
+        await WebAPI.runtime.sendMessage({
+          from: "popup",
+          origin: "kuma",
+          method: "process_tx",
+          popupId: id,
+          tx: txToSend,
+        });
+
+        showSuccessToast(t("tx_send"));
+        navigate(BALANCE, {
+          state: {
+            tab: "activity",
+          },
+        });
+      }
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _error: any = error;
+      showErrorToast(
+        _error?.body || _error?.error?.message || _error.message || error
+      );
+      captureError(error);
+    }
+    endLoading();
   };
 
   const isValidWASMAddress = useMemo(() => {
@@ -347,7 +401,7 @@ export const useSwap = () => {
       const assetBalance = new BN(assetToSell.balance.toString());
       const amountBalance = transformAmountStringToBN(
         amounts.sell,
-        assetToSell.decimals
+        assetToSell.decimals || 0
       );
 
       isSufficient = assetBalance.gte(amountBalance);

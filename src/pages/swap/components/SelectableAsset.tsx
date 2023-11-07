@@ -3,8 +3,9 @@ import { useThemeContext } from "@src/providers";
 import { useState } from "react";
 import { BsCoin } from "react-icons/bs";
 import { BsChevronExpand } from "react-icons/bs"
+import { SwapAsset } from "../base";
 
-interface SelectableAssetProps<T extends { image?: string; label?: string | JSX.Element }> {
+interface SelectableAssetProps<T extends SwapAsset> {
   label?: string;
   onChange: (asset: T) => void;
   defaulValue: T;
@@ -36,7 +37,7 @@ const OptImage = ({ image }: { image: string }) => {
   )
 }
 
-export const SelectableAsset = <T extends { image?: string; label?: string | JSX.Element },>({
+export const SelectableAsset = <T extends SwapAsset,>({
   label,
   onChange,
   defaulValue,
@@ -78,7 +79,7 @@ export const SelectableAsset = <T extends { image?: string; label?: string | JSX
 
           <Combobox.Input
             className={`!pl-10 min-w-[120px] h-full w-full flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
-            displayValue={(asset) => asset?.label?.toUpperCase() || ""}
+            displayValue={(asset: SwapAsset) => asset?.label?.toUpperCase() || ""}
             onChange={(e) => setQuery(e.target.value)}
           />
           <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">

@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { Tab } from "@headlessui/react";
 import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
+import { SwapAsset } from "./base";
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
@@ -128,18 +129,18 @@ export const Swap = () => {
                   <div className="flex-1">
                     <div className="flex justify-center items-center gap-3">
                       <SelectableAsset
-                        value={assetToSell}
+                        value={assetToSell as SwapAsset}
                         options={assetsToSell}
                         onChange={(asset) => handleAssetChange("sell", asset)}
-                        defaulValue={assetToSell}
+                        defaulValue={assetToSell as SwapAsset}
                         label={t("transfer_from") as string}
                       />
                       <HiMiniArrowsRightLeft className="mt-7" size={20} />
                       <SelectableAsset
-                        value={assetToBuy}
+                        value={assetToBuy as SwapAsset}
                         options={assetsToBuy}
                         onChange={(asset) => handleAssetChange("buy", asset)}
-                        defaulValue={assetToBuy}
+                        defaulValue={assetToBuy as SwapAsset}
                         label={t("transfer_to") as string}
                       />
                     </div>
@@ -151,7 +152,7 @@ export const Swap = () => {
                           isLoading={isLoadingSellAsset}
                           amount={amounts.sell}
                           balance={formatBN(
-                            assetToSell.balance.toString() || "0",
+                            assetToSell.balance?.toString() || "0",
                             assetToSell.decimals,
                             4
                           )}
@@ -164,12 +165,12 @@ export const Swap = () => {
                           showBalance
                           selectableAsset={
                             <SelectableAsset
-                              value={assetToSell}
+                              value={assetToSell as SwapAsset}
                               options={assetsToSell}
                               onChange={(asset) =>
                                 handleAssetChange("sell", asset)
                               }
-                              defaulValue={assetToSell}
+                              defaulValue={assetToSell as SwapAsset}
                               containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                               buttonClassName="rounded-l-none"
                             />
@@ -186,7 +187,7 @@ export const Swap = () => {
                         isLoading={isLoadingBuyAsset}
                         amount={amounts.buy}
                         balance={formatBN(
-                          assetToBuy.balance.toString() || "0",
+                          assetToBuy.balance?.toString() || "0",
                           assetToBuy.decimals,
                           4
                         )}
@@ -197,12 +198,12 @@ export const Swap = () => {
                         showBalance={false}
                         selectableAsset={
                           <SelectableAsset
-                            value={assetToBuy}
+                            value={assetToBuy as SwapAsset}
                             options={assetsToBuy}
                             onChange={(asset) =>
                               handleAssetChange("buy", asset)
                             }
-                            defaulValue={assetToBuy}
+                            defaulValue={assetToBuy as SwapAsset}
                             containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                             buttonClassName="rounded-l-none"
                           />
@@ -214,7 +215,7 @@ export const Swap = () => {
                     <RecipientAddress
                       recipentAddressFormat={
                         showRecipientAddress
-                          ? assetToBuy.label.toUpperCase()
+                          ? assetToBuy.label?.toUpperCase()
                           : ""
                       }
                       isOptional={false}

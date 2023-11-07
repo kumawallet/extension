@@ -267,6 +267,7 @@
     "bridge_fee": "Bridge fee",
     "gas_fee": "Gas fee",
     "destination_address": "Destination address",
-    "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address."
+    "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",
+    "tx_send":"Transaction sent"
   }
 }
