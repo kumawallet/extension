@@ -22,6 +22,7 @@ import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
 import { isValidAddress } from "@src/utils/account-utils";
+import { formatBN } from "@src/utils/assets";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -47,16 +48,18 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     formState: { errors },
   } = useFormContext();
 
-  const { state: { selectedAccount } } = useAccountContext()
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
   const { showErrorToast } = useToast();
 
   const [fee, setFee] = useState<EVMFee>({
-    "gas limit": BigNumber0,
+    gasLimit: BigNumber0,
     "max fee per gas": BigNumber0,
     "max priority fee per gas": BigNumber0,
-    "estimated fee": BigNumber0,
-    "estimated total": BigNumber0,
+    estimatedFee: BigNumber0,
+    estimatedTotal: BigNumber0,
   });
   const [isLoadingFee, setIsLoadingFee] = useState(false);
   const [wallet, setWallet] = useState<ethers.Wallet | null>(null);
@@ -88,10 +91,14 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
     }
   }, []);
 
-
   useEffect(() => {
     const isXcm = getValues("isXcm");
-    if (destinationIsInvalid || !isValidAddress(destinationAccount, isXcm ? undefined : "evm") || amount <= 0) return;
+    if (
+      destinationIsInvalid ||
+      !isValidAddress(destinationAccount, isXcm ? undefined : "evm") ||
+      amount <= 0
+    )
+      return;
     (async () => {
       setIsLoadingFee(true);
 
@@ -107,7 +114,6 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         );
 
         const to = getValues("to");
-
 
         if (isXcm) {
           const { method, abi, contractAddress, extrinsicValues } = XCM_MAPPING[
@@ -154,12 +160,12 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           }
 
           setFee({
-            "gas limit": _gasLimit,
+            gasLimit: _gasLimit,
             "max fee per gas": feeData.maxFeePerGas as BigNumber,
             "max priority fee per gas":
               feeData.maxPriorityFeePerGas as BigNumber,
-            "estimated fee": avg,
-            "estimated total": estimatedTotal,
+            estimatedFee: avg,
+            estimatedTotal: estimatedTotal,
           });
 
           setEvmTx(contract);
@@ -170,11 +176,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
             value: bnAmount,
           };
 
-
           const [feeData, gasLimit] = await Promise.all([
             _api.getFeeData(),
             _api.estimateGas(tx),
           ]);
+
 
           const _gasLimit = gasLimit;
           const _maxFeePerGas = feeData.maxFeePerGas as BigNumber;
@@ -195,11 +201,11 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           const estimatedTotal = avg.mul(_gasLimit).add(bnAmount);
 
           setFee({
-            "gas limit": _gasLimit,
+            gasLimit: _gasLimit,
             "max fee per gas": _maxFeePerGas,
             "max priority fee per gas": _maxPriorityFeePerGas,
-            "estimated fee": avg,
-            "estimated total": estimatedTotal,
+            estimatedFee: avg,
+            estimatedTotal: estimatedTotal,
           });
 
           setEvmTx(tx);
@@ -211,10 +217,9 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           );
 
           const feeData = await _api.getFeeData();
-          const gasLimit = await contract.estimateGas.transfer(
-            destinationAccount,
-            bnAmount
-          ).catch(() => BigNumber.from("21000"));
+          const gasLimit = await contract.estimateGas
+            .transfer(destinationAccount, bnAmount)
+            .catch(() => BigNumber.from("21000"));
 
           const _gasLimit = gasLimit;
           const _maxFeePerGas = feeData.maxFeePerGas as ethers.BigNumber;
@@ -227,24 +232,24 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
           const estimatedTotal = avg.mul(_gasLimit);
 
           setFee({
-            "gas limit": _gasLimit,
+            gasLimit: _gasLimit,
             "max fee per gas": feeData.maxFeePerGas as BigNumber,
             "max priority fee per gas":
               feeData.maxPriorityFeePerGas as BigNumber,
-            "estimated fee": avg,
-            "estimated total": estimatedTotal,
+            estimatedFee: avg,
+            estimatedTotal: estimatedTotal,
           });
 
           setEvmTx(contract);
         }
       } catch (error) {
         setFee({
-          "gas limit": BigNumber0,
+          gasLimit: BigNumber0,
           "max fee per gas": BigNumber0,
           "max priority fee per gas": BigNumber0,
-          "estimated fee": BigNumber0,
-          "estimated total": BigNumber0,
-        })
+          estimatedFee: BigNumber0,
+          estimatedTotal: BigNumber0,
+        });
         captureError(error);
         showErrorToast(tCommon("failed_to_get_fees"));
       } finally {
@@ -272,13 +277,12 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         ? Number(amount) * currencyUnits
         : Number(amount) * 10 ** asset.decimals;
 
-
       if (isNaN(_amount)) return false;
 
       const bnAmount = BigNumber.from(
         _amount.toLocaleString("fullwide", { useGrouping: false })
       );
-      const estimatedTotal = fee["estimated total"];
+      const estimatedTotal = fee.estimatedTotal;
       const nativeBalance = assets[0].balance;
 
       if (isNativeAsset) {
@@ -293,13 +297,14 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
         );
       }
     } catch (error) {
-      console.log('isEnoughToPay', {
-        error
-      })
       captureError(error);
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);
+
+
+  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.nativeCurrency.symbol}}`
+
 
   return (
     <>
@@ -307,7 +312,15 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       <CommonFormFields />
       <ShowBalance />
 
-      {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
+      {isLoadingFee ? (
+        <Loading />
+      ) : (
+        <Fees
+          gasLimit={fee.gasLimit.toString()}
+          estimatedFee={`${formatBN(fee.estimatedFee.toString(), asset.decimals, 10)} ${asset.symbol || ""}`}
+          estimatedTotal={estimatedTotal}
+        />
+      )}
 
       {canContinue && !isEnoughToPay && (
         <p className="text-sm mt-2 text-red-500 text-center">
@@ -316,7 +329,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-2`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

@@ -335,7 +335,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
                   erc20Abi,
                   api
                 );
+
                 const balance = await contract.balanceOf(accountAddress);
+
                 assets[index].balance = balance;
 
                 contract.removeAllListeners("Transfer");

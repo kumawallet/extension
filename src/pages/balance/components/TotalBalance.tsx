@@ -6,11 +6,12 @@ import {
   BsEyeFill,
 } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
-import { formatAmountWithDecimals,getCurrencyInfo } from "@src/utils/assets";
+import { formatAmountWithDecimals, getCurrencyInfo } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
-import { SEND, RECEIVE } from "@src/routes/paths";
-import {useAccountContext, useAssetContext, useNetworkContext} from "@src/providers";
+import { SEND, RECEIVE, SWAP } from "@src/routes/paths";
+import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
 import { Button } from "@src/components/common";
+import { RiTokenSwapLine } from "react-icons/ri";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -40,7 +41,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   } = useNetworkContext();
 
   const updateAllAssets = async () => {
-    loadAssets({api, selectedAccount, selectedChain});
+    loadAssets({ api, selectedAccount, selectedChain });
   }
 
   const totalBalance = assets.reduce((total, item) => total + (item.amount || 0), 0);
@@ -121,6 +122,14 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           <span className="flex items-center gap-1 text-lg font-bold">
             <BsArrowDownLeft />
             <p>{t("receive")}</p>
+          </span>
+        </Button>
+      </div>
+      <div className="flex gap-3 justify-center">
+        <Button onClick={() => navigate(SWAP)} variant="text">
+          <span className="flex items-center gap-1 text-lg font-bold">
+            <RiTokenSwapLine />
+            <p>{t("swap")}</p>
           </span>
         </Button>
       </div>

@@ -106,7 +106,7 @@ export const ASTAR = {
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ACALA],
 };
 
-const MOONBEAM = {
+export const MOONBEAM = {
   name: "Moonbeam",
   rpc: {
     evm: "https://rpc.api.moonbeam.network",
@@ -128,7 +128,7 @@ const MOONBEAM = {
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR, PARACHAINS.ACALA],
 };
 
-const ACALA = {
+export const ACALA = {
   name: "Acala",
   rpc: {
     wasm: "wss://acala-rpc-0.aca-api.network",
@@ -150,7 +150,7 @@ const ACALA = {
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ASTAR],
 };
 
-const KUSAMA = {
+export const KUSAMA = {
   name: "Kusama",
   rpc: { wasm: "wss://kusama-rpc.polkadot.io" },
   addressPrefix: 2,
@@ -170,7 +170,7 @@ const KUSAMA = {
   xcm: [PARACHAINS.SHIDEN, PARACHAINS.MOONRIVER],
 };
 
-const ETHEREUM = {
+export const ETHEREUM = {
   name: "Ethereum",
   rpc: { evm: "https://eth.llamarpc.com" },
   addressPrefix: 1,
@@ -189,7 +189,7 @@ const ETHEREUM = {
   supportedAccounts: [EVM],
 };
 
-const POLYGON = {
+export const POLYGON = {
   name: "Polygon Mainnet",
   chain: "Polygon",
   icon: "polygon",
@@ -211,7 +211,7 @@ const POLYGON = {
   supportedAccounts: [EVM],
 };
 
-const BINANCE = {
+export const BINANCE = {
   name: "Binance Smart Chain Mainnet",
   chain: "BSC",
   rpc: {
@@ -232,7 +232,7 @@ const BINANCE = {
   supportedAccounts: [EVM],
 };
 
-const MOONRIVER = {
+export const MOONRIVER = {
   name: "Moonriver",
   rpc: {
     evm: "https://rpc.api.moonriver.moonbeam.network",
@@ -274,7 +274,7 @@ const MOONRIVER = {
   xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.SHIDEN],
 };
 
-const SHIDEN = {
+export const SHIDEN = {
   name: "Shiden",
   rpc: {
     evm: "https://evm.shiden.astar.network",

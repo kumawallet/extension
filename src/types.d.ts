@@ -13,19 +13,19 @@ export type polkadotExtrinsic =
 export type evmTx = utils.Deferrable<providers.TransactionRequest>;
 
 export type WasmFee = {
-  "estimated fee": BN;
-  "estimated total": BN;
+  estimatedFee: BN;
+  estimatedTotal: BN;
 };
 
 export type API = ApiPromise | ethers.providers.JsonRpcProvider | nul;
 
 export type EVMFee = {
-  "gas limit": BigNumber;
+  gasLimit: BigNumber;
   "max fee per gas": BigNumber;
   // "max base fee per gas": BigNumber;
   "max priority fee per gas": BigNumber;
-  "estimated fee": BigNumber;
-  "estimated total": BigNumber;
+  estimatedFee: BigNumber;
+  estimatedTotal: BigNumber;
 };
 
 export type Tx =
