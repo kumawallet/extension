@@ -24,6 +24,15 @@ import { useCallback, useState } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
 
+// waiting, confirming, exchanging, sending, finished, failed, refunded, verifying
+
+const chipColor: { [key: string]: string } = {
+  ['failed']: "bg-red-600",
+  ['refunded']: "bg-red-600",
+  ['finished']: "bg-green-600",
+  ['waiting']: "bg-yellow-600",
+};
+
 export const Swap = () => {
   const { t } = useTranslation("swap");
   const { color } = useThemeContext();
@@ -71,8 +80,9 @@ export const Swap = () => {
     assetToBuy,
   ]);
 
+
   return (
-    <PageWrapper contentClassName="bg-[#29323C] h-full">
+    <PageWrapper contentClassName="bg-[#29323C] h-full flex-1">
       <ReEnterPassword />
 
       {mustConfirmTx ? (
@@ -92,7 +102,7 @@ export const Swap = () => {
         />
       ) : (
         <>
-          <div className="flex gap-3 items-center mb-7">
+          <div className="flex gap-3 items-center mb-2">
             <FiChevronLeft
               size={26}
               className="cursor-pointer"
@@ -108,13 +118,13 @@ export const Swap = () => {
               onChange={setSelectedIndex}
             >
               <Tab.List
-                className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-5`}
+                className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-3`}
               >
                 {TABS.map((tab) => (
                   <Tab
                     key={tab}
                     className={({ selected }) =>
-                      `px-4 text-xl py-1 focus:outline-none relative w-full ${selected
+                      `px-4 text-base md:text-xl py-1 focus:outline-none relative w-full ${selected
                         ? `text-${color}-secondary active-tab after:bg-${color}-fill`
                         : "text-white"
                       }`
@@ -124,7 +134,7 @@ export const Swap = () => {
                   </Tab>
                 ))}
               </Tab.List>
-              <Tab.Panels className="mt-2 px-4">
+              <Tab.Panels className="mt-5 px-4">
                 <Tab.Panel key={0}>
                   <div className="flex-1">
                     <div className="flex justify-center items-center gap-3">
@@ -263,36 +273,38 @@ export const Swap = () => {
                           className="p-2 rounded-xl bg-[#727e8b17]"
                         >
                           <div className="flex justify-center gap-2">
-                            {swap.iconFrom && swap.iconTo && (
-                              <div className="flex items-center gap-1">
-                                <div className="flex flex-col gap-1 items-center">
-                                  <img
-                                    src={swap.iconFrom}
-                                    className="w-8 h-8"
-                                  />
-                                  <p>
-                                    {`${swap.amountFrom
-                                      } ${swap?.currencyFrom?.toUpperCase()}`}
-                                  </p>
-                                </div>
-                                <HiMiniArrowRight size={20} />
-                                <div className="flex flex-col gap-1 items-center">
-                                  <img src={swap.iconTo} className="w-8 h-8" />
-                                  <p>
-                                    {`${swap.amountTo
-                                      } ${swap?.currencyTo?.toUpperCase()}`}
-                                  </p>
-                                </div>
+                            <div className="flex items-center gap-1">
+                              <div className="flex flex-col gap-1 items-center">
+                                <img
+                                  src={swap.iconFrom || ""}
+                                  className="w-8 h-8"
+                                />
+                                <p>
+                                  {`${swap.amountFrom
+                                    } ${swap?.currencyFrom?.toUpperCase()}`}
+                                </p>
                               </div>
-                            )}
+                              <HiMiniArrowRight size={20} />
+                              <div className="flex flex-col gap-1 items-center">
+                                <img src={swap.iconTo || ""} className="w-8 h-8" />
+                                <p>
+                                  {`${swap.amountTo
+                                    } ${swap?.currencyTo?.toUpperCase()}`}
+                                </p>
+                              </div>
+                            </div>
+
                           </div>
 
                           <div className="mb-3 flex flex-col gap-1">
                             <p>id: {swap.id}</p>
-
-                            <p>status: {swap.status}</p>
+                            <p className="flex items-center gap-2">status:
+                              <span className={`rounded-xl p-1 ${chipColor[swap.status] || "bg-yellow-600"}`}>
+                                {swap.status}
+                              </span>
+                            </p>
                           </div>
-
+                          {/* 
                           <div className="flex flex-col gap-1 mb-5">
                             <p>
                               {t("you_send")}:{" "}
@@ -317,7 +329,7 @@ export const Swap = () => {
                             <p className="overflow-hidden text-ellipsis">
                               {t("to_address")}: {swap.addressTo}
                             </p>
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>

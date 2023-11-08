@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   BsArrowUpRight,
   BsArrowDownLeft,
@@ -12,6 +12,7 @@ import { SEND, RECEIVE, SWAP } from "@src/routes/paths";
 import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
 import { Button } from "@src/components/common";
 import { RiTokenSwapLine } from "react-icons/ri";
+import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -57,6 +58,15 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   };
 
   const toggleBalance = () => setShowBalance(!showBalance);
+
+
+  const isSwapAvailable = useMemo(() => {
+
+    if (!selectedChain?.name) return false;
+
+    return SUPPORTED_CHAINS_FOR_SWAP.includes(selectedChain?.name);
+
+  }, [selectedChain])
 
   useEffect(() => {
     if (selectedAccount?.value?.name) {
@@ -111,23 +121,21 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           />
         )}
       </div>
-      <div className="flex gap-3 justify-center">
-        <Button onClick={() => navigate(SEND)} variant="text">
-          <span className="flex items-center gap-1 text-lg font-bold">
+      <div className="flex gap-1 justify-center">
+        <Button onClick={() => navigate(SEND)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowUpRight />
             <p>{t("send")}</p>
           </span>
         </Button>
-        <Button onClick={() => navigate(RECEIVE)} variant="text">
-          <span className="flex items-center gap-1 text-lg font-bold">
+        <Button onClick={() => navigate(RECEIVE)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowDownLeft />
             <p>{t("receive")}</p>
           </span>
         </Button>
-      </div>
-      <div className="flex gap-3 justify-center">
-        <Button onClick={() => navigate(SWAP)} variant="text">
-          <span className="flex items-center gap-1 text-lg font-bold">
+        <Button isDisabled={!isSwapAvailable} onClick={() => navigate(SWAP)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <RiTokenSwapLine />
             <p>{t("swap")}</p>
           </span>

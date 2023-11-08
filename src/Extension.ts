@@ -25,6 +25,7 @@ import Assets from "./storage/entities/Assets";
 import TrustedSites from "./storage/entities/TrustedSites";
 import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./utils/constants";
 import { version } from "./utils/env";
+import Swap, { SwapData } from "./storage/entities/registry/Swap";
 
 export default class Extension {
   static get version() {
@@ -337,5 +338,13 @@ export default class Extension {
 
   static async removeTrustedSite(site: string) {
     return TrustedSites.removeSite(site);
+  }
+
+  static async getSwapsByProtocol(protocol: string) {
+    return Swap.getSwapsByProtocol(protocol);
+  }
+
+  static async addSwap(protocol: string, swap: SwapData) {
+    return Swap.addSwap(protocol, swap);
   }
 }

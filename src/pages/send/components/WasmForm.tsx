@@ -230,7 +230,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         estimatedTotal: amounToShow,
       });
     } catch (error) {
-      console.log(error)
       captureError(error);
       showErrorToast(String(error).includes("disconnected") ? tCommon("rpc_error") : tCommon("failed_to_get_fees"));
       setFee(defaultFees);

@@ -148,6 +148,8 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       type: "loading-assets",
     });
 
+    if (!api) return
+
     let assets: Asset[] = [];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);

@@ -22,7 +22,7 @@ import {
   gql,
 } from "graphql-request";
 import { ActiveSwaps, InitProps, SwapAsset, Swapper } from "./base";
-import { transformAmountStringToBN } from "@src/utils/assets";
+import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { AccountType } from "@src/accounts/types";
 
 interface StealthExToken {
@@ -157,7 +157,8 @@ const StealthEx_MAP_NATIVE_TOKENS: {
 export class StealthEX implements Swapper {
   private api: ApiPromise | ethers.providers.JsonRpcProvider | null = null;
   private gqlClient: GraphQLClient;
-  private chainName: string | undefined;
+  public protocol: string = "stealthex";
+  public bridgeFee: string = "0.4%";
 
   public swap_info: string = "stealthex_swap_message";
 
@@ -169,7 +170,6 @@ export class StealthEX implements Swapper {
 
   async init({ chainName, nativeCurrency, api }: InitProps) {
     this.api = api;
-    this.chainName = chainName;
 
     const tokens = await this.getTokens();
 
@@ -317,14 +317,16 @@ export class StealthEX implements Swapper {
     amountFrom,
     currencyFrom,
     currencyTo,
+    currencyDecimals,
   }: {
     addressTo: string;
     amountFrom: string;
     currencyFrom: string;
     currencyTo: string;
+    currencyDecimals: number;
   }) {
     const {
-      createSwap: { destination, error },
+      createSwap: { destination, error, id },
     } = (await this.sendPetition({
       document: gql`
         {
@@ -336,6 +338,7 @@ export class StealthEX implements Swapper {
           ) {
             destination
             error
+            id
           }
         }
       `,
@@ -343,6 +346,7 @@ export class StealthEX implements Swapper {
       createSwap: {
         destination: string;
         error: string;
+        id: string;
       };
     };
 
@@ -361,7 +365,7 @@ export class StealthEX implements Swapper {
       const keyring = new Keyring({ type: "sr25519" });
       const sender = keyring.addFromMnemonic(seed as string);
 
-      const amount = new BN(amountFrom);
+      const amount = transformAmountStringToBN(amountFrom, currencyDecimals);
 
       const extrinsic = this.api.tx.balances.transferKeepAlive(
         destination,
@@ -370,8 +374,12 @@ export class StealthEX implements Swapper {
 
       const { partialFee } = await extrinsic.paymentInfo(sender);
 
-      fee.estimatedFee = partialFee.toString();
-      fee.estimatedTotal = partialFee.add(amount).toString();
+      fee.estimatedFee = formatBN(partialFee.toString(), currencyDecimals, 10);
+      fee.estimatedTotal = formatBN(
+        partialFee.add(amount).toString(),
+        currencyDecimals,
+        10
+      );
     }
 
     if (this.api instanceof ethers.providers.JsonRpcProvider) {
@@ -388,6 +396,7 @@ export class StealthEX implements Swapper {
     return {
       fee,
       destination,
+      id,
     };
   }
 
@@ -416,10 +425,15 @@ export class StealthEX implements Swapper {
 
       type = AccountType.WASM;
 
+      const bnAmount = transformAmountStringToBN(
+        amount,
+        assetToTransfer.decimals
+      );
+
       if (isNativeAsset) {
         const extrinsic = this.api.tx.balances.transferKeepAlive(
           destinationAccount,
-          new BN(amount)
+          bnAmount
         );
 
         txHash = (await extrinsic.signAsync(sender)).toHex();
@@ -427,7 +441,7 @@ export class StealthEX implements Swapper {
         const extrinsic = this.api.tx.assets.transfer(
           assetToTransfer.id,
           destinationAccount,
-          new BN(amount)
+          bnAmount
         );
 
         txHash = (await extrinsic.signAsync(sender)).toHex();
@@ -495,42 +509,38 @@ export class StealthEX implements Swapper {
   }
 
   async getActiveSwaps(): Promise<ActiveSwaps[]> {
-    // const { data } = (await this.sendPetition({
-    //   path: "exchanges",
-    //   method: "get",
-    // })) as {
-    //   data: {
-    //     data: {
-    //       exchanges: {
-    //         address_from: string;
-    //         address_to: string;
-    //         amount_from: string;
-    //         amount_to: string;
-    //         currency_from: string;
-    //         currency_to: string;
-    //         id: string;
-    //         status: string;
-    //       }[];
-    //     };
-    //   };
-    // };
+    const swapsInStorage = await Extension.getSwapsByProtocol("stealthex");
 
-    // return (
-    //   data.data?.exchanges?.map((swap) => ({
-    //     addressFrom: swap.address_from,
-    //     addressTo: swap.address_to,
-    //     amountFrom: swap.amount_from,
-    //     amountTo: swap.amount_to,
-    //     currencyFrom: swap.currency_from,
-    //     currencyTo: swap.currency_to,
-    //     iconFrom: null,
-    //     iconTo: null,
-    //     id: swap.id,
-    //     status: swap.status,
-    //   })) || []
-    // );
+    const swapsIds = swapsInStorage
+      .filter((swap) => swap.id)
+      .map((swap) => swap.id);
 
-    return [];
+    const { getActiveSwaps } = (await this.sendPetition({
+      document: gql`
+        {
+          getActiveSwaps(swapsIds: ["${swapsIds.join('","')}"]) {
+            id
+            addressFrom
+            addressTo
+            amountFrom
+            amountTo
+            currencyFrom
+            currencyTo
+            iconFrom
+            iconTo
+            status
+          }
+        } 
+      `,
+    })) as {
+      getActiveSwaps: ActiveSwaps[];
+    };
+
+    return getActiveSwaps.reverse();
+  }
+
+  async saveSwapInStorage(swapId: string) {
+    await Extension.addSwap(this.protocol, { id: swapId });
   }
 
   canChangeSetAssetToSell() {

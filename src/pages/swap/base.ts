@@ -1,4 +1,16 @@
 import { ApiPromise } from "@polkadot/api";
+import {
+  ACALA,
+  ASTAR,
+  BINANCE,
+  ETHEREUM,
+  KUSAMA,
+  MOONBEAM,
+  MOONRIVER,
+  POLKADOT,
+  POLYGON,
+  SHIDEN,
+} from "@src/constants/chains";
 import { ethers } from "ethers";
 
 export interface SwapAsset {
@@ -34,6 +46,7 @@ export interface InitProps {
 
 export abstract class Swapper {
   swap_info: string | undefined;
+  protocol: string | undefined;
 
   abstract init(props: InitProps): Promise<{
     nativeAssets: SwapAsset[];
@@ -60,12 +73,14 @@ export abstract class Swapper {
     amountFrom: string;
     currencyFrom: string;
     currencyTo: string;
+    currencyDecimals: number;
   }): Promise<{
     fee: {
       estimatedFee: string;
       estimatedTotal: string;
     };
     destination: string;
+    id: string;
   }>;
 
   abstract confirmTx(props: {
@@ -82,4 +97,19 @@ export abstract class Swapper {
   }>;
 
   abstract mustConfirmTx(): boolean;
+
+  abstract saveSwapInStorage(swapId: string): void;
 }
+
+export const SUPPORTED_CHAINS_FOR_SWAP = [
+  POLKADOT.name,
+  ASTAR.name,
+  MOONBEAM.name,
+  ACALA.name,
+  KUSAMA.name,
+  ETHEREUM.name,
+  POLYGON.name,
+  BINANCE.name,
+  MOONRIVER.name,
+  SHIDEN.name,
+];

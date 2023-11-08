@@ -40,10 +40,10 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   return (
     <div className={containerClassName}>
       <div className="flex justify-between">
-        <p className="font-inter font-bold text-lg">{label}</p>
+        <p className="font-inter font-bold md:text-lg">{label}</p>
         {
           showBalance && (
-            <p className="font-inter font-bold text-lg text-[#9CA3AF]">
+            <p className="font-inter font-bold md:text-lg text-[#9CA3AF]">
               {t("balance")}: {balance}
             </p>
           )

@@ -21,15 +21,15 @@ import { useTranslation } from "react-i18next";
 export interface TxInfoState {
   bridgeName: string;
   bridgeFee: string;
-  gasFee: string;
-  destinationAddress: string;
+  gasFee: string | null;
+  destinationAddress: string | null;
 }
 
 const WebAPI = getWebAPI();
 
 export const useSwap = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation("swap");
 
   const {
     state: { api, selectedChain, rpc },
@@ -85,11 +85,11 @@ export const useSwap = () => {
     address: "",
   });
 
-  const [txInfo] = useState<TxInfoState>({
-    bridgeName: "SteatlhEX",
-    bridgeFee: "0",
-    gasFee: "0",
-    destinationAddress: "",
+  const [txInfo, setTxInfo] = useState<TxInfoState>({
+    bridgeName: "",
+    bridgeFee: "",
+    gasFee: null,
+    destinationAddress: null,
   });
 
   const [tx, setTx] = useState({
@@ -117,6 +117,7 @@ export const useSwap = () => {
       estimatedFee: "0",
       estimatedTotal: "0",
     },
+    swapId: "",
   });
 
   const [amounts, setAmounts] = useState({
@@ -140,6 +141,12 @@ export const useSwap = () => {
       const chainName = selectedChain?.name;
 
       const _swapper = new StealthEX();
+
+      setTxInfo((prevState) => ({
+        ...prevState,
+        bridgeName: _swapper.protocol,
+        bridgeFee: _swapper.bridgeFee,
+      }));
 
       const { nativeAssets, pairs } = await _swapper.init({
         nativeCurrency,
@@ -229,23 +236,32 @@ export const useSwap = () => {
 
       handleAmounts("sell", formatedAmount);
     } catch (error) {
-      console.log(error);
+      showErrorToast("error_setting_max_amount");
+      captureError(error);
     }
   };
 
   const swap = async () => {
     starLoading();
     try {
-      const { destination, fee } = await swapper!.createSwap({
+      const { destination, fee, id } = await swapper!.createSwap({
         currencyFrom: assetToSell.symbol as string,
+        currencyDecimals: assetToSell.decimals as number,
         currencyTo: assetToBuy.symbol as string,
         amountFrom: amounts.sell,
         addressTo: recipient.address,
       });
-      showSuccessToast("Swap successful");
-      loadActiveSwaps();
+
+      const isNeededToConfirmTx = swapper!.mustConfirmTx();
+
+      if (!isNeededToConfirmTx) {
+        showSuccessToast("Swap successful");
+        loadActiveSwaps();
+        return;
+      }
 
       const tx = {
+        swapId: id,
         addressFrom: selectedAccount.value.address,
         addressTo: destination,
         amountFrom: amounts.sell,
@@ -266,8 +282,6 @@ export const useSwap = () => {
           symbol: (assetToSell.label || "").toLocaleUpperCase(),
           image: assetToSell.image || "",
         },
-        estimatedFee: fee.estimatedFee.toString(),
-        estimatedTotal: fee.estimatedTotal.toString(),
         fee,
       };
 
@@ -276,13 +290,14 @@ export const useSwap = () => {
       setMustConfirmTx(swapper!.mustConfirmTx());
 
       // clean amounts
-      setMinSellAmount(null);
-      setAmounts((prevState) => ({
-        ...prevState,
-        sell: "0",
-        buy: "0",
-      }));
+      // setMinSellAmount(null);
+      // setAmounts((prevState) => ({
+      //   ...prevState,
+      //   sell: "0",
+      //   buy: "0",
+      // }));
     } catch (error) {
+      captureError(error);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       showErrorToast(error.response?.data?.message || error?.message || error);
@@ -299,38 +314,31 @@ export const useSwap = () => {
     starLoadingActiveSwaps();
     try {
       const activeSwaps = await swapper!.getActiveSwaps();
-      setActiveSwaps(
-        activeSwaps.map((swap) => ({
-          ...swap,
-          iconFrom:
-            assets.find((asset) => asset.label === swap.currencyFrom)?.image ||
-            "",
-          iconTo:
-            assets.find((asset) => asset.label === swap.currencyTo)?.image ||
-            "",
-        }))
-      );
+      setActiveSwaps(activeSwaps);
     } catch (error) {
-      console.log(error);
+      showErrorToast("error_fetching_active_swaps");
     }
     endLoadingActiveSwaps();
   };
 
   const onConfirmTx = async () => {
     if (!swapper) return;
-    console.log("onConfirmTx");
     starLoading();
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const txToSend: any = {
         amount: amounts.sell,
         originAddress: selectedAccount.value.address,
-        destinationAddress: recipient.address,
+        destinationAddress: tx.addressTo,
         rpc: rpc as string,
         asset: assetToSell,
         destinationNetwork: selectedChain?.name,
         networkInfo: selectedChain,
         originNetwork: selectedChain,
+        tx: {
+          type: "",
+          txHash: "",
+        },
       };
 
       const isConfirmNeeded = swapper.mustConfirmTx();
@@ -347,13 +355,15 @@ export const useSwap = () => {
             decimals: assetToTransfer.decimals,
           },
           amount: amounts.sell,
-          destinationAccount: recipient.address,
+          destinationAccount: tx.addressTo,
         });
 
         const { id } = await WebAPI.windows.getCurrent();
 
-        txToSend.txHash = txHash;
-        txToSend.type = type;
+        txToSend.tx = {
+          type,
+          txHash,
+        };
 
         await WebAPI.runtime.sendMessage({
           from: "popup",
@@ -364,6 +374,7 @@ export const useSwap = () => {
         });
 
         showSuccessToast(t("tx_send"));
+        await swapper.saveSwapInStorage(tx.swapId);
         navigate(BALANCE, {
           state: {
             tab: "activity",

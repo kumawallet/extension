@@ -133,7 +133,6 @@ export const transformAmountStringToBN = (amount: string, decimals: number) => {
     const amountBN = new BN(amountWithMissingUnits);
     return amountBN;
   } catch (error) {
-    console.log(error);
     return new BN("0");
   }
 };
