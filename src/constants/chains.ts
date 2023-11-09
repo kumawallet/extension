@@ -204,7 +204,7 @@ export const POLYGON = {
   explorer: {
     evm: {
       name: "polygonscan",
-      url: "https://polygonscan.com",
+      url: "https://polygonscan.com/",
     },
   },
   logo: "polygon",
@@ -226,7 +226,7 @@ export const BINANCE = {
   explorer: {
     evm: {
       name: "bscscan",
-      url: "https://bscscan.com",
+      url: "https://bscscan.com/",
     },
   },
   supportedAccounts: [EVM],

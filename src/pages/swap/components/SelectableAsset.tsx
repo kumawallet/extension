@@ -4,16 +4,18 @@ import { useState } from "react";
 import { BsCoin } from "react-icons/bs";
 import { BsChevronExpand } from "react-icons/bs"
 import { SwapAsset } from "../base";
+import { Loading } from "@src/components/common";
 
 interface SelectableAssetProps<T extends SwapAsset> {
+  buttonClassName?: string;
+  containerClassName?: string;
+  defaulValue: T;
+  isLoading?: boolean
+  isReadOnly?: boolean;
   label?: string;
   onChange: (asset: T) => void;
-  defaulValue: T;
-  value: T
-  isReadOnly?: boolean;
   options: T[];
-  containerClassName?: string;
-  buttonClassName?: string;
+  value: T
 }
 
 const OptImage = ({ image }: { image: string }) => {
@@ -38,14 +40,15 @@ const OptImage = ({ image }: { image: string }) => {
 }
 
 export const SelectableAsset = <T extends SwapAsset,>({
+  buttonClassName,
+  containerClassName,
+  defaulValue,
+  isLoading = false,
+  isReadOnly = false,
   label,
   onChange,
-  defaulValue,
-  value,
-  isReadOnly = false,
   options,
-  containerClassName,
-  buttonClassName
+  value,
 }: SelectableAssetProps<T>) => {
   const { color } = useThemeContext()
 
@@ -77,10 +80,18 @@ export const SelectableAsset = <T extends SwapAsset,>({
             }
           </Combobox.Label>
 
+
+          {isLoading && (
+            <div className="absolute top-1/2 -translate-y-1/2 left-5">
+              <Loading containerClass="py-0" />
+            </div>
+          )}
+
           <Combobox.Input
             className={`!pl-10 min-w-[120px] h-full w-full flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
             displayValue={(asset: SwapAsset) => asset?.label?.toUpperCase() || ""}
             onChange={(e) => setQuery(e.target.value)}
+            aria-disabled={isLoading}
           />
           <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
             <BsChevronExpand

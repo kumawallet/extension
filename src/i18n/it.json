@@ -247,5 +247,29 @@
     "report_an_issue": "Segnalare un problema",
     "report_an_issue_description": "Se vuoi segnalare un problema, visita il nostro canale Discord e segui le istruzioni su come inviare una segnalazione di un bug.",
     "report_an_issue_link": "Support channel"
+  },
+  "swap": {
+    "title": "Scambio",
+    "transfer_from": "",
+    "transfer_to": "",
+    "id": "",
+    "status": "",
+    "you_send": "",
+    "you_receive": "",
+    "to_address": "",
+    "you_get": "",
+    "exchange": "",
+    "my_exchanges": "",
+    "min_amount": "",
+    "insufficient_balance": "",
+    "recipent_address": "",
+    "bridge_name": "",
+    "bridge_fee": "",
+    "gas_fee": "",
+    "destination_address": "",
+    "stealthex_swap_message": "",
+    "tx_send":"",
+    "error_fetching_swaps": "",
+    "error_setting_max_amount": ""
   }
 }

@@ -247,5 +247,29 @@
     "report_an_issue": "Bir hata bildir",
     "report_an_issue_description": "Bir sorun bildirmek isterseniz, lütfen Discord kanalımızı ziyaret edin ve hata raporu nasıl gönderileceği konusundaki talimatları takip edin.",
     "report_an_issue_link": "Destek kanalı"
+  },
+  "swap": {
+    "title": "Takas",
+    "transfer_from": "Transferden",
+    "transfer_to": "Transfere",
+    "id": "Kimlik",
+    "status": "Durum",
+    "you_send": "Gönderilen",
+    "you_receive": "Alınan",
+    "to_address": "Alıcı adresine",
+    "you_get": "Alırsınız",
+    "exchange": "Değiş tokuş",
+    "my_exchanges": "Benim takaslarım",
+    "min_amount": "Transfer için minimum miktar",
+    "insufficient_balance": "Yetersiz bakiye",
+    "recipent_address": "Alıcı adresi",
+    "bridge_name": "Köprü adı",
+    "bridge_fee": "Köprü ücreti",
+    "gas_fee": "Gaz ücreti",
+    "destination_address": "Hedef adres",
+    "stealthex_swap_message": "Devam ettiğinizde, StealthEX tarafından sağlanan bir adrese transfer yapmanız gerekecek. İşlem otomatik olarak işlenir ve token'larınız alıcı adresinizde size ulaşır.",
+    "tx_send": "İşlem gönderildi",
+    "error_fetching_swaps": "Takasları alırken hata oluştu",
+    "error_setting_max_amount": "Maksimum miktar ayarlama hatası"    
   }
 }

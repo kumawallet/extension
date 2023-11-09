@@ -74,6 +74,14 @@ export abstract class Swapper {
     currencyFrom: string;
     currencyTo: string;
     currencyDecimals: number;
+    nativeAsset: {
+      symbol: string;
+      decimals: number;
+    };
+    assetToSell: {
+      symbol: string;
+      decimals: number;
+    };
   }): Promise<{
     fee: {
       estimatedFee: string;
@@ -95,6 +103,8 @@ export abstract class Swapper {
     txHash: string;
     type: string;
   }>;
+
+  abstract getPairs(asset: string): Promise<SwapAsset[]>;
 
   abstract mustConfirmTx(): boolean;
 

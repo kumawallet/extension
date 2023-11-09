@@ -59,6 +59,11 @@ export const useSwap = () => {
     starLoading: starLoadingSellAsset,
     endLoading: endLoadingSellAsset,
   } = useLoading();
+  const {
+    isLoading: isLoadingSellPairs,
+    starLoading: starLoadingSellPairs,
+    endLoading: endLoadingSellPairs,
+  } = useLoading();
 
   const { showErrorToast, showSuccessToast } = useToast();
 
@@ -154,13 +159,13 @@ export const useSwap = () => {
         api,
       });
 
-      setAssets([...pairs, ...nativeAssets]);
+      setAssets([...nativeAssets]);
 
       setAssetToSell(nativeAssets[0]);
       setAssetsToSell(nativeAssets);
 
-      setAssetToBuy(pairs[0]);
-      setAssetsToBuy(pairs);
+      // setAssetToBuy(pairs[0]);
+      // setAssetsToBuy(pairs);
       setSwapper(_swapper);
     } catch (error) {
       showErrorToast("Error fetching assets");
@@ -250,6 +255,11 @@ export const useSwap = () => {
         currencyTo: assetToBuy.symbol as string,
         amountFrom: amounts.sell,
         addressTo: recipient.address,
+        nativeAsset: selectedChain?.nativeCurrency,
+        assetToSell: {
+          symbol: assetToSell.label as string,
+          decimals: assetToSell.decimals as number,
+        },
       });
 
       const isNeededToConfirmTx = swapper!.mustConfirmTx();
@@ -316,7 +326,7 @@ export const useSwap = () => {
       const activeSwaps = await swapper!.getActiveSwaps();
       setActiveSwaps(activeSwaps);
     } catch (error) {
-      showErrorToast("error_fetching_active_swaps");
+      showErrorToast("error_fetching_swaps");
     }
     endLoadingActiveSwaps();
   };
@@ -437,23 +447,40 @@ export const useSwap = () => {
   }, [swapper]);
 
   useEffect(() => {
-    if (amounts.sell !== "0") {
-      handleAmounts("sell", amounts.sell);
-    }
+    (async () => {
+      if (amounts.sell !== "0") {
+        handleAmounts("sell", amounts.sell);
+      }
 
-    if (_assets.length > 0) {
-      const selectedAsset = _assets.find(
-        (asset) => asset.symbol === assetToSell.label
-      );
+      if (_assets.length > 0) {
+        const selectedAsset = _assets.find(
+          (asset) => asset.symbol === assetToSell.label
+        );
 
-      if (!selectedAsset) return;
+        if (!selectedAsset) return;
 
-      setAssetToSell((prevState) => ({
-        ...prevState,
-        balance: selectedAsset.balance,
-        decimals: selectedAsset.decimals,
-      }));
-    }
+        setAssetToSell((prevState) => ({
+          ...prevState,
+          balance: selectedAsset.balance,
+          decimals: selectedAsset.decimals,
+        }));
+
+        starLoadingSellPairs();
+        setAssetsToBuy([]);
+        setAssetToBuy({
+          label: "",
+          balance: new BN("0").toString(),
+          decimals: 0,
+          symbol: "",
+        });
+        const pairs = await swapper!.getPairs(assetToSell.symbol as string);
+        if (pairs.length > 0) {
+          setAssetsToBuy(pairs);
+          setAssetToBuy(pairs[0]);
+        }
+        endLoadingSellPairs();
+      }
+    })();
   }, [assetToSell?.label, _assets]);
 
   useEffect(() => {
@@ -494,6 +521,7 @@ export const useSwap = () => {
     isLoadingActiveSwaps,
     isLoadingBuyAsset,
     isLoadingSellAsset,
+    isLoadingSellPairs,
     isValidWASMAddress,
     minSellAmount,
     mustConfirmTx,

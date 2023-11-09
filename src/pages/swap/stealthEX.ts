@@ -159,8 +159,11 @@ export class StealthEX implements Swapper {
   private gqlClient: GraphQLClient;
   public protocol: string = "stealthex";
   public bridgeFee: string = "0.4%";
-
   public swap_info: string = "stealthex_swap_message";
+  private pairs: {
+    asset: string;
+    pairs: string[];
+  }[] = [];
 
   constructor() {
     this.gqlClient = new GraphQLClient(
@@ -176,24 +179,26 @@ export class StealthEX implements Swapper {
     const nativeTokens = StealthEx_MAP_NATIVE_TOKENS[chainName] || [];
 
     const pairTokens = await this.getPairTokensFromNativeCurrency(
-      nativeCurrency
+      nativeTokens.map((token) => token.stealthExName)
     );
 
-    const pairs = tokens
-      .filter((token) => pairTokens.includes(token.symbol))
-      .map(
-        (token, index) =>
-          ({
-            name: token.name,
-            label: token.symbol,
-            image: token.image,
-            id: token.id || index,
-            balance: "0",
-            decimals: 0,
-            network: token.network,
-            symbol: token?.symbol.toUpperCase() || "",
-          } as SwapAsset)
-      );
+    this.pairs = pairTokens;
+
+    // const pairs = tokens
+    //   .filter((token) => pairTokens[0].pairs.includes(token.symbol))
+    //   .map(
+    //     (token, index) =>
+    //       ({
+    //         name: token.name,
+    //         label: token.symbol,
+    //         image: token.image,
+    //         id: token.id || index,
+    //         balance: "0",
+    //         decimals: 0,
+    //         network: token.network,
+    //         symbol: token?.symbol.toUpperCase() || "",
+    //       } as SwapAsset)
+    //   );
 
     const nativeAssets = nativeTokens.map((ntoken) => {
       const token = tokens.find(
@@ -214,8 +219,32 @@ export class StealthEX implements Swapper {
 
     return {
       nativeAssets,
-      pairs,
+      pairs: [],
     };
+  }
+
+  async getPairs(asset: string): Promise<SwapAsset[]> {
+    const tokens = await this.getTokens();
+
+    const _pairs = this.pairs.find((pair) => pair.asset === asset)?.pairs || [];
+
+    const pairs = tokens
+      .filter((token) => _pairs.includes(token.symbol))
+      .map(
+        (token, index) =>
+          ({
+            name: token.name,
+            label: token.symbol,
+            image: token.image,
+            id: token.id || index,
+            balance: "0",
+            decimals: 0,
+            network: token.network,
+            symbol: token?.symbol.toUpperCase() || "",
+          } as SwapAsset)
+      );
+
+    return pairs;
   }
 
   sendPetition({
@@ -253,26 +282,37 @@ export class StealthEX implements Swapper {
     return tokens;
   }
 
-  async getPairTokensFromNativeCurrency(
-    nativeCurrency: string
-  ): Promise<string[]> {
+  async getPairTokensFromNativeCurrency(nativeCurrencies: string[]): Promise<
+    {
+      asset: string;
+      pairs: string[];
+    }[]
+  > {
     const {
-      getPairTokensFromNativeCurrency: { pairTokens },
+      getPairTokensFromNativeCurrency: { pairs },
     } = (await this.sendPetition({
       document: gql`
         query {
-          getPairTokensFromNativeCurrency(nativeCurrency: "${nativeCurrency}") {
-            pairTokens
+          getPairTokensFromNativeCurrency(nativeCurrencies: [${nativeCurrencies.map(
+            (nativeCurrency) => `"${nativeCurrency}"`
+          )}]) {
+            pairs {
+              asset
+              pairs
+            }
           }
         }
       `,
     })) as {
       getPairTokensFromNativeCurrency: {
-        pairTokens: string[];
+        pairs: {
+          asset: string;
+          pairs: string[];
+        }[];
       };
     };
 
-    return pairTokens;
+    return pairs;
   }
 
   async getEstimatedAmount({
@@ -318,12 +358,22 @@ export class StealthEX implements Swapper {
     currencyFrom,
     currencyTo,
     currencyDecimals,
+    assetToSell,
+    nativeAsset,
   }: {
     addressTo: string;
     amountFrom: string;
     currencyFrom: string;
     currencyTo: string;
     currencyDecimals: number;
+    nativeAsset: {
+      symbol: string;
+      decimals: number;
+    };
+    assetToSell: {
+      symbol: string;
+      decimals: number;
+    };
   }) {
     const {
       createSwap: { destination, error, id },
@@ -360,6 +410,8 @@ export class StealthEX implements Swapper {
       estimatedTotal: new BN(0).toString(),
     };
 
+    const isNativeAsset = assetToSell.symbol === nativeAsset.symbol;
+
     if (this.api instanceof ApiPromise) {
       const seed = await Extension.showKey();
       const keyring = new Keyring({ type: "sr25519" });
@@ -386,11 +438,31 @@ export class StealthEX implements Swapper {
       const gasPrice = await this.api.getGasPrice();
       const gasLimit = 21000;
 
-      fee.estimatedFee = gasPrice.mul(gasLimit).toString();
-      fee.estimatedTotal = new BN(fee.estimatedFee)
-        .add(new BN(amountFrom))
-        .toString();
+      const estimatedFee = gasPrice.mul(gasLimit);
+
       fee.gasLimit = gasLimit.toString();
+      fee.estimatedFee = `${formatBN(
+        estimatedFee.toString(),
+        nativeAsset.decimals,
+        8
+      )} ${nativeAsset.symbol}`;
+
+      const amount = transformAmountStringToBN(
+        amountFrom,
+        currencyDecimals
+      ) as unknown as BigNumber;
+
+      const estimatedTotal = isNativeAsset
+        ? `${formatBN(
+            gasPrice.mul(gasLimit).add(amount).toString(),
+            nativeAsset.decimals,
+            8
+          )} ${nativeAsset?.symbol}`
+        : `${amountFrom} ${
+            assetToSell?.symbol
+          } + ${fee.estimatedFee.toString()}`;
+
+      fee.estimatedTotal = estimatedTotal;
     }
 
     return {
@@ -490,7 +562,7 @@ export class StealthEX implements Swapper {
 
         const transaction = await contract.transfer(
           destinationAccount,
-          transformAmountStringToBN(amount, assetToTransfer.decimals),
+          tx.value,
           {
             gasLimit,
             maxFeePerGas: feeData.maxFeePerGas as BigNumber,
@@ -514,6 +586,8 @@ export class StealthEX implements Swapper {
     const swapsIds = swapsInStorage
       .filter((swap) => swap.id)
       .map((swap) => swap.id);
+
+    if (!swapsIds.length) return [];
 
     const { getActiveSwaps } = (await this.sendPetition({
       document: gql`
