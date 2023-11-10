@@ -38,7 +38,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
     loadAssets,
   } = useAssetContext();
   const {
-    state: { api, selectedChain },
+    state: { api, selectedChain, type },
   } = useNetworkContext();
 
   const updateAllAssets = async () => {
@@ -62,11 +62,11 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const isSwapAvailable = useMemo(() => {
 
-    if (!selectedChain?.name) return false;
+    if (!selectedChain?.name || !type) return false;
 
-    return SUPPORTED_CHAINS_FOR_SWAP.includes(selectedChain?.name);
+    return SUPPORTED_CHAINS_FOR_SWAP[type.toLowerCase() as 'wasm' | 'evm'].includes(selectedChain?.name);
 
-  }, [selectedChain])
+  }, [selectedChain, type])
 
   useEffect(() => {
     if (selectedAccount?.value?.name) {

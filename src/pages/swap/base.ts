@@ -111,15 +111,13 @@ export abstract class Swapper {
   abstract saveSwapInStorage(swapId: string): void;
 }
 
-export const SUPPORTED_CHAINS_FOR_SWAP = [
-  POLKADOT.name,
-  ASTAR.name,
-  MOONBEAM.name,
-  ACALA.name,
-  KUSAMA.name,
-  ETHEREUM.name,
-  POLYGON.name,
-  BINANCE.name,
-  MOONRIVER.name,
-  SHIDEN.name,
-];
+export const SUPPORTED_CHAINS_FOR_SWAP = {
+  wasm: [POLKADOT.name, ASTAR.name, ACALA.name, KUSAMA.name, SHIDEN.name],
+  evm: [
+    MOONBEAM.name,
+    MOONRIVER.name,
+    ETHEREUM.name,
+    POLYGON.name,
+    BINANCE.name,
+  ],
+};
