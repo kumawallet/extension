@@ -164,6 +164,7 @@ export class StealthEX implements Swapper {
     asset: string;
     pairs: string[];
   }[] = [];
+  private tokens: StealthExToken[] = [];
 
   constructor() {
     this.gqlClient = new GraphQLClient(
@@ -171,10 +172,10 @@ export class StealthEX implements Swapper {
     );
   }
 
-  async init({ chainName, nativeCurrency, api }: InitProps) {
+  async init({ chainName, api }: InitProps) {
     this.api = api;
 
-    const tokens = await this.getTokens();
+    this.tokens = await this.getTokens();
 
     const nativeTokens = StealthEx_MAP_NATIVE_TOKENS[chainName] || [];
 
@@ -201,7 +202,7 @@ export class StealthEX implements Swapper {
     //   );
 
     const nativeAssets = nativeTokens.map((ntoken) => {
-      const token = tokens.find(
+      const token = this.tokens.find(
         (token) => token.symbol === ntoken.stealthExName.toLocaleLowerCase()
       );
 
@@ -224,11 +225,11 @@ export class StealthEX implements Swapper {
   }
 
   async getPairs(asset: string): Promise<SwapAsset[]> {
-    const tokens = await this.getTokens();
+    // const tokens = await this.getTokens();
 
     const _pairs = this.pairs.find((pair) => pair.asset === asset)?.pairs || [];
 
-    const pairs = tokens
+    const pairs = this.tokens
       .filter((token) => _pairs.includes(token.symbol))
       .map(
         (token, index) =>

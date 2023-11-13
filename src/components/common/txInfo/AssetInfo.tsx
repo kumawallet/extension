@@ -8,15 +8,19 @@ interface AssetInfoProps {
   };
   amount: string;
   dataTestId: string;
+  isAproximate?: boolean;
+  className?: string;
 }
 
 export const AssetInfo: FC<AssetInfoProps> = ({
   asset,
   amount,
   dataTestId,
+  isAproximate,
+  className = ""
 }) => {
   return (
-    <div className="flex flex-col items-center" data-testid={dataTestId}>
+    <div className={`flex flex-col items-center ${className}`} data-testid={dataTestId}>
       <div className="flex gap-2 items-center">
         {asset.image ? (
           <>
@@ -25,7 +29,7 @@ export const AssetInfo: FC<AssetInfoProps> = ({
               width={30}
               className="object-cover rounded-full"
             />
-            <p className="font-inter uppercase">{asset?.symbol}</p>
+            {/* <p className="font-inter uppercase">{asset?.symbol}</p> */}
           </>
         ) : (
           <>
@@ -36,9 +40,9 @@ export const AssetInfo: FC<AssetInfoProps> = ({
           </>
         )}
       </div>
-      <p className="font-inter">
-        <span className=" font-bold text-[27px] mr-2">{amount}</span>
-        <span className="uppercase">{asset?.symbol}</span>
+      <p className="font-inter font-bold md:text-[27px] mt-2">
+        {isAproximate && "≅"} {amount}
+        <span className="uppercase text-xs md:text-base">{asset?.symbol}</span>
       </p>
     </div>
   );

@@ -2,7 +2,6 @@ import { FC } from "react";
 import { Button } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { useThemeContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { Fees } from "@src/pages/send/components/Fees";
@@ -17,21 +16,34 @@ interface TxInfoProps {
     name: string;
     image: string;
   };
+  chainBridge?: {
+    name: string;
+    image: string;
+  }
   chainTo: {
     name: string;
     image: string;
   };
+  addressBridge?: string;
   addressFrom: string;
   addressTo: string;
   amountFrom: string;
+  amountBridge?: string;
   amountTo: string;
   assetFrom: {
     symbol: string;
     image: string | null;
+    isAproximate?: boolean;
   };
+  assetBridge?: {
+    symbol: string;
+    image: string | null;
+    isAproximate?: boolean;
+  }
   assetTo: {
     symbol: string;
     image: string | null;
+    isAproximate?: boolean;
   };
   fee: {
     estimatedFee: string;
@@ -45,15 +57,17 @@ export const TxInfo: FC<TxInfoProps> = ({
   addressTo,
   amountFrom,
   amountTo,
+  assetBridge,
+  addressBridge,
   assetFrom,
   assetTo,
+  chainBridge,
   chainFrom,
   chainTo,
-  isLoading,
-  onConfirm,
   fee,
-  onBack
-
+  isLoading,
+  onBack,
+  onConfirm,
 }) => {
   const { t } = useTranslation("send");
   const { color } = useThemeContext();
@@ -72,35 +86,84 @@ export const TxInfo: FC<TxInfoProps> = ({
       <div className="mb-5">
         {<p className="mb-2">{t("chains")}:</p>}{" "}
         <div
-          className="flex justify-around items-center bg-[#212529] rounded-xl py-3 px-5 gap-1"
+          className="flex justify-around items-center bg-[#212529] rounded-xl py-3 md:px-5 gap-1"
           style={{
             boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
           }}
         >
           <ChainInfo
-            chain={chainFrom}
+            chain={{
+              name: chainBridge ? "" : chainFrom.name, // this is to maximize the space
+              image: chainFrom.image,
+            }}
             address={addressFrom}
             dataTestId="origin-chain"
+            className={chainBridge ? "flex-[25%]" : ""}
           />
+
+          {
+            chainBridge && addressBridge && (
+              <>
+                <div className="flex gap-1">
+                  <FaChevronLeft />
+                  <FaChevronRight />
+                </div>
+                <ChainInfo
+                  chain={{
+                    name: "",
+                    image: chainBridge.image,
+                  }}
+                  address={addressBridge}
+                  dataTestId="destination-chain"
+                  className={"flex-[25%]"}
+                />
+              </>
+            )
+          }
+
           <div className="flex gap-1">
             <FaChevronLeft />
             <FaChevronRight />
           </div>
           <ChainInfo
-            chain={chainTo}
+            chain={{
+              name: chainBridge ? "" : chainTo.name,
+              image: chainTo.image,
+            }}
             address={addressTo}
             dataTestId="destination-chain"
+            className={chainBridge ? "flex-[25%]" : ""}
+
           />
         </div>
       </div>
       <div className="mb-5">
         <p>{t("assets")}:</p>
-        <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 px-5">
+        <div className="flex justify-around items-center bg-[#343A40] rounded-xl py-3 md:px-5 gap-1 ">
           <AssetInfo
             asset={assetFrom}
             amount={amountFrom}
             dataTestId="origin-asset"
+            className={chainBridge ? "flex-[25%]" : ""}
+
           />
+          {
+            assetBridge && (
+              <>
+                <div className="flex gap-1">
+                  <FaChevronLeft />
+                  <FaChevronRight />
+                </div>
+                <AssetInfo
+                  asset={assetBridge}
+                  amount={amountFrom}
+                  dataTestId="destination-asset"
+                  className={chainBridge ? "flex-[25%]" : ""}
+
+                />
+              </>
+            )
+          }
           <div className="flex gap-1">
             <FaChevronLeft />
             <FaChevronRight />
@@ -108,7 +171,10 @@ export const TxInfo: FC<TxInfoProps> = ({
           <AssetInfo
             asset={assetTo}
             amount={amountTo}
+            isAproximate={assetTo.isAproximate}
             dataTestId="destination-asset"
+            className={chainBridge ? "flex-[25%]" : ""}
+
           />
         </div>
       </div>

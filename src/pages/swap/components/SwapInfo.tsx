@@ -20,12 +20,18 @@ export const SwapInfo: FC<SwapInfoProps> = ({
 
   const _bridgeName = useMemo(() => {
     if (bridgeName === "stealthex") {
-      return <img
-        className="bg-[#fde936] p-1"
-        src="/images/stealthex.svg"
-        alt="Stealthex"
-        width={90}
-      />;
+      return (
+
+        <a href="https://stealthex.io/" target="_blank" rel="noopener noreferrer">
+          <img
+            className="bg-[#fde936] p-1"
+            src="/images/stealthex.svg"
+            alt="Stealthex"
+            width={90}
+          />
+        </a>
+      )
+        ;
     }
 
     return <p>{bridgeName}</p>;

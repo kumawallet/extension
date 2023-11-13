@@ -25,6 +25,45 @@ export interface TxInfoState {
   destinationAddress: string | null;
 }
 
+interface Tx {
+  addressBridge: string;
+  addressFrom: string;
+  addressTo: string;
+  amountBridge: string;
+  amountFrom: string;
+  amountTo: string;
+  chainBridge: {
+    name: string;
+    image: string;
+  };
+  chainFrom: {
+    name: string;
+    image: string;
+  };
+  chainTo: {
+    name: string;
+    image: string;
+  };
+  assetBridge: {
+    symbol: string;
+    image: string;
+  };
+  assetFrom: {
+    symbol: string;
+    image: string;
+  };
+  assetTo: {
+    symbol: string;
+    image: string;
+    isAproximate: boolean;
+  };
+  fee: {
+    estimatedFee: string;
+    estimatedTotal: string;
+  };
+  swapId: string;
+}
+
 const WebAPI = getWebAPI();
 
 export const useSwap = () => {
@@ -97,17 +136,27 @@ export const useSwap = () => {
     destinationAddress: null,
   });
 
-  const [tx, setTx] = useState({
+  const [tx, setTx] = useState<Tx>({
+    addressBridge: "",
     addressFrom: "",
     addressTo: "",
+    amountBridge: "",
     amountFrom: "",
     amountTo: "",
+    chainBridge: {
+      name: "",
+      image: "",
+    },
     chainFrom: {
       name: "",
       image: "",
     },
     chainTo: {
       name: "",
+      image: "",
+    },
+    assetBridge: {
+      symbol: "",
       image: "",
     },
     assetFrom: {
@@ -117,6 +166,7 @@ export const useSwap = () => {
     assetTo: {
       symbol: "",
       image: "",
+      isAproximate: true,
     },
     fee: {
       estimatedFee: "0",
@@ -153,7 +203,7 @@ export const useSwap = () => {
         bridgeFee: _swapper.bridgeFee,
       }));
 
-      const { nativeAssets, pairs } = await _swapper.init({
+      const { nativeAssets } = await _swapper.init({
         nativeCurrency,
         chainName,
         api,
@@ -163,9 +213,6 @@ export const useSwap = () => {
 
       setAssetToSell(nativeAssets[0]);
       setAssetsToSell(nativeAssets);
-
-      // setAssetToBuy(pairs[0]);
-      // setAssetsToBuy(pairs);
       setSwapper(_swapper);
     } catch (error) {
       showErrorToast("Error fetching assets");
@@ -270,31 +317,41 @@ export const useSwap = () => {
         return;
       }
 
-      const tx = {
+      const tx: Tx = {
         swapId: id,
+        addressBridge: destination,
         addressFrom: selectedAccount.value.address,
-        addressTo: destination,
+        addressTo: recipient.address,
         amountFrom: amounts.sell,
         amountTo: amounts.sell,
+        amountBridge: amounts.sell,
         chainFrom: {
-          name: selectedChain?.name || "",
+          name: "",
+          image: `/images/${selectedChain.logo}.png`,
+        },
+        chainBridge: {
+          name: "",
           image: `/images/${selectedChain.logo}.png`,
         },
         chainTo: {
-          name: selectedChain?.name || "",
-          image: `/images/${selectedChain.logo}.png`,
+          name: "",
+          image: assetToBuy.image || "",
         },
         assetFrom: {
           symbol: (assetToSell.label || "").toLocaleUpperCase(),
           image: assetToSell.image || "",
         },
-        assetTo: {
+        assetBridge: {
           symbol: (assetToSell.label || "").toLocaleUpperCase(),
           image: assetToSell.image || "",
         },
+        assetTo: {
+          symbol: (assetToBuy.label || "").toLocaleUpperCase(),
+          image: assetToBuy.image || "",
+          isAproximate: true,
+        },
         fee,
       };
-
       setTx(tx);
 
       setMustConfirmTx(swapper!.mustConfirmTx());

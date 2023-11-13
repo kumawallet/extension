@@ -122,19 +122,19 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
         )}
       </div>
       <div className="flex gap-1 justify-center">
-        <Button onClick={() => navigate(SEND)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+        <Button onClick={() => navigate(SEND)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
           <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowUpRight />
             <p>{t("send")}</p>
           </span>
         </Button>
-        <Button onClick={() => navigate(RECEIVE)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+        <Button onClick={() => navigate(RECEIVE)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
           <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowDownLeft />
             <p>{t("receive")}</p>
           </span>
         </Button>
-        <Button isDisabled={!isSwapAvailable} onClick={() => navigate(SWAP)} variant="text" classname="w-1/2  md:w-1/3 px-1 m-0">
+        <Button isDisabled={!isSwapAvailable} onClick={() => navigate(SWAP)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
           <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <RiTokenSwapLine />
             <p>{t("swap")}</p>
