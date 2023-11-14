@@ -265,6 +265,8 @@
     "recipent_address": "Alıcı adresi",
     "bridge_name": "Köprü adı",
     "bridge_fee": "Köprü ücreti",
+    "swapper_name": "Swapper adı",
+    "swapper_fee": "Swapper ücreti",
     "gas_fee": "Gaz ücreti",
     "destination_address": "Hedef adres",
     "stealthex_swap_message": "Devam ettiğinizde, StealthEX tarafından sağlanan bir adrese transfer yapmanız gerekecek. İşlem otomatik olarak işlenir ve token'larınız alıcı adresinizde size ulaşır.",

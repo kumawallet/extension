@@ -265,6 +265,8 @@
     "recipent_address": "Dirección de destino",
     "bridge_name": "Nombre del puente",
     "bridge_fee": "Tasa del puente",
+    "swapper_name": "Nombre del intercambiador",
+    "swapper_fee": "Tasa del intercambiador",
     "gas_fee": "Limite de gas",
     "destination_address": "Dirección de destino",
     "stealthex_swap_message": "Después de proceder tendrá que transferir a una dirección proporcionada por StealthEX. La transacción se procesará automáticamente y recibirá sus tokens en la dirección del destinatario.",

@@ -47,6 +47,7 @@ export interface InitProps {
 export abstract class Swapper {
   swap_info: string | undefined;
   protocol: string | undefined;
+  type: string | undefined;
 
   abstract init(props: InitProps): Promise<{
     nativeAssets: SwapAsset[];
@@ -69,6 +70,7 @@ export abstract class Swapper {
   abstract getActiveSwaps(): Promise<ActiveSwaps[]>;
 
   abstract createSwap(props: {
+    addressFrom?: string;
     addressTo: string;
     amountFrom: string;
     currencyFrom: string;

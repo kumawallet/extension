@@ -19,6 +19,7 @@ import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
 
 export interface TxInfoState {
+  bridgeType: string;
   bridgeName: string;
   bridgeFee: string;
   gasFee: string | null;
@@ -130,6 +131,7 @@ export const useSwap = () => {
   });
 
   const [txInfo, setTxInfo] = useState<TxInfoState>({
+    bridgeType: "",
     bridgeName: "",
     bridgeFee: "",
     gasFee: null,
@@ -199,6 +201,7 @@ export const useSwap = () => {
 
       setTxInfo((prevState) => ({
         ...prevState,
+        bridgeType: _swapper.type,
         bridgeName: _swapper.protocol,
         bridgeFee: _swapper.bridgeFee,
       }));
@@ -301,6 +304,7 @@ export const useSwap = () => {
         currencyDecimals: assetToSell.decimals as number,
         currencyTo: assetToBuy.symbol as string,
         amountFrom: amounts.sell,
+        addressFrom: selectedAccount.value.address,
         addressTo: recipient.address,
         nativeAsset: selectedChain?.nativeCurrency,
         assetToSell: {

@@ -265,6 +265,8 @@
     "recipent_address": "受取人のアドレス",
     "bridge_name": "ブリッジ名",
     "bridge_fee": "ブリッジ手数料",
+    "swapper_name": "スワッパー名",
+    "swapper_fee": "スワッパー手数料",
     "gas_fee": "ガス手数料",
     "destination_address": "送信先アドレス",
     "stealthex_swap_message": "手続きを進めると、StealthEXで提供されたアドレスに送金する必要があります。取引は自動的に処理され、トークンは受取人のアドレスに届きます。",

@@ -265,6 +265,8 @@
     "recipent_address": "Recipent address",
     "bridge_name": "Bridge name",
     "bridge_fee": "Bridge fee",
+    "swapper_name": "Swapper name",
+    "swapper_fee": "Swapper fee",
     "gas_fee": "Gas fee",
     "destination_address": "Destination address",
     "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",

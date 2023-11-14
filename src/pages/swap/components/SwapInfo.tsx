@@ -12,6 +12,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   bridgeName,
   destinationAddress,
   gasFee,
+  bridgeType
 }) => {
   const { t } = useTranslation("swap");
   const {
@@ -39,15 +40,20 @@ export const SwapInfo: FC<SwapInfoProps> = ({
 
   return (
     <div className="bg-[#303943] p-3 rounded-xl flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <p>{t("bridge_name")}:</p>
-        {_bridgeName}
-      </div>
-
-      <div className="flex justify-between items-center">
-        <p>{t("bridge_fee")}:</p>
-        <p>{bridgeFee}</p>
-      </div>
+      {
+        bridgeType && (
+          <>
+            <div className="flex justify-between items-center">
+              <p>{t(`${bridgeType}_name`)}:</p>
+              {_bridgeName}
+            </div>
+            <div className="flex justify-between items-center">
+              <p>{t(`${bridgeType}_fee`)}:</p>
+              <p>{bridgeFee}</p>
+            </div>
+          </>
+        )
+      }
 
       {gasFee && (
         <div className="flex justify-between items-center">

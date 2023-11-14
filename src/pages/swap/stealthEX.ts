@@ -165,6 +165,7 @@ export class StealthEX implements Swapper {
     pairs: string[];
   }[] = [];
   private tokens: StealthExToken[] = [];
+  public type = "swapper";
 
   constructor() {
     this.gqlClient = new GraphQLClient(
@@ -184,22 +185,6 @@ export class StealthEX implements Swapper {
     );
 
     this.pairs = pairTokens;
-
-    // const pairs = tokens
-    //   .filter((token) => pairTokens[0].pairs.includes(token.symbol))
-    //   .map(
-    //     (token, index) =>
-    //       ({
-    //         name: token.name,
-    //         label: token.symbol,
-    //         image: token.image,
-    //         id: token.id || index,
-    //         balance: "0",
-    //         decimals: 0,
-    //         network: token.network,
-    //         symbol: token?.symbol.toUpperCase() || "",
-    //       } as SwapAsset)
-    //   );
 
     const nativeAssets = nativeTokens.map((ntoken) => {
       const token = this.tokens.find(
@@ -225,8 +210,6 @@ export class StealthEX implements Swapper {
   }
 
   async getPairs(asset: string): Promise<SwapAsset[]> {
-    // const tokens = await this.getTokens();
-
     const _pairs = this.pairs.find((pair) => pair.asset === asset)?.pairs || [];
 
     const pairs = this.tokens
@@ -326,7 +309,7 @@ export class StealthEX implements Swapper {
     amount: string;
   }) {
     const {
-      getEstimatedAmount: { estimatedAmount, minAmount },
+      getEstimatedAmount: { estimated, min },
     } = (await this.sendPetition({
       document: gql`
         {
@@ -335,26 +318,27 @@ export class StealthEX implements Swapper {
             from: "${from}"
             to: "${to}"
           ){
-            estimatedAmount
-            minAmount
+            estimated
+            min
           }
         }
       `,
     })) as {
       getEstimatedAmount: {
-        estimatedAmount: string;
-        minAmount: string;
+        estimated: number;
+        min: number;
       };
     };
 
     return {
-      estimatedAmount,
-      minAmount,
+      estimatedAmount: String(estimated),
+      minAmount: String(min),
     };
   }
 
   async createSwap({
     addressTo,
+    addressFrom,
     amountFrom,
     currencyFrom,
     currencyTo,
@@ -362,6 +346,7 @@ export class StealthEX implements Swapper {
     assetToSell,
     nativeAsset,
   }: {
+    addressFrom: string;
     addressTo: string;
     amountFrom: string;
     currencyFrom: string;
@@ -382,6 +367,7 @@ export class StealthEX implements Swapper {
       document: gql`
         {
           createSwap(
+            addressFrom: "${addressFrom}"
             addressTo: "${addressTo}"
             amountFrom: "${amountFrom}"
             currencyFrom: "${currencyFrom}"
