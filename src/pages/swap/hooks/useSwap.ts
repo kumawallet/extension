@@ -327,7 +327,7 @@ export const useSwap = () => {
         addressFrom: selectedAccount.value.address,
         addressTo: recipient.address,
         amountFrom: amounts.sell,
-        amountTo: amounts.sell,
+        amountTo: amounts.buy,
         amountBridge: amounts.sell,
         chainFrom: {
           name: "",
@@ -400,9 +400,14 @@ export const useSwap = () => {
       const txToSend: any = {
         amount: amounts.sell,
         originAddress: selectedAccount.value.address,
-        destinationAddress: tx.addressTo,
+        destinationAddress: tx.addressBridge,
         rpc: rpc as string,
-        asset: assetToSell,
+        asset: {
+          id: assetToSell.id,
+          symbol: assetToSell.label,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          color: (assetToSell as any).color || "",
+        },
         destinationNetwork: selectedChain?.name,
         networkInfo: selectedChain,
         originNetwork: selectedChain,
@@ -426,7 +431,7 @@ export const useSwap = () => {
             decimals: assetToTransfer.decimals,
           },
           amount: amounts.sell,
-          destinationAccount: tx.addressTo,
+          destinationAccount: tx.addressBridge,
         });
 
         const { id } = await WebAPI.windows.getCurrent();

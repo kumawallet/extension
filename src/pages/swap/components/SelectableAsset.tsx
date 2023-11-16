@@ -17,6 +17,7 @@ interface SelectableAssetProps<T extends SwapAsset> {
   onChange: (asset: T) => void;
   options: T[];
   value: T;
+  position: 'left' | 'right';
 }
 
 const OptImage = ({ image }: { image: string }) => {
@@ -48,6 +49,7 @@ export const SelectableAsset = <T extends SwapAsset>({
   label,
   onChange,
   options,
+  position,
   value,
 }: SelectableAssetProps<T>) => {
   const { color } = useThemeContext();
@@ -99,7 +101,7 @@ export const SelectableAsset = <T extends SwapAsset>({
             </Combobox.Button>
             {!isReadOnly && options?.length > 0 && open && (
               <Combobox.Options
-                className="absolute mt-1 top-10 max-h-60 w-full overflow-auto rounded-md bg-[#212529] py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                className={`absolute mt-1 top-10 ${position === "left" ? "left-o" : "right-0"} max-h-60 w-[140%] sm:w-full overflow-auto rounded-md bg-[#212529] py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50`}
                 style={{
                   height: 300,
                 }}

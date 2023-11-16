@@ -149,6 +149,7 @@ export const Swap = () => {
                         onChange={(asset) => handleAssetChange("sell", asset)}
                         defaulValue={assetToSell as SwapAsset}
                         label={t("transfer_from") as string}
+                        position="left"
                       />
                       <HiMiniArrowsRightLeft className="mt-7" size={20} />
                       <SelectableAsset
@@ -158,6 +159,7 @@ export const Swap = () => {
                         defaulValue={assetToBuy as SwapAsset}
                         label={t("transfer_to") as string}
                         isLoading={isLoadingSellPairs}
+                        position="right"
                       />
                     </div>
 
@@ -189,6 +191,7 @@ export const Swap = () => {
                               defaulValue={assetToSell as SwapAsset}
                               containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                               buttonClassName="rounded-l-none"
+                              position="right"
                             />
                           }
                         />
@@ -222,6 +225,7 @@ export const Swap = () => {
                             defaulValue={assetToBuy as SwapAsset}
                             containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                             buttonClassName="rounded-l-none"
+                            position="right"
                           />
                         }
                       />
