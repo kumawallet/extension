@@ -96,7 +96,11 @@ export const Send = () => {
       originAddress,
       destinationAddress,
       rpc: rpc as string,
-      asset,
+      asset: {
+        id: asset.id,
+        symbol: asset.symbol || "",
+        color: asset.color || "",
+      },
       destinationNetwork,
       networkInfo: selectedChain,
       originNetwork: selectedChain,

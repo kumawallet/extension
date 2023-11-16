@@ -262,6 +262,7 @@
     "my_exchanges": "My exchanges",
     "min_amount": "Min amount to transfer",
     "insufficient_balance": "Insufficient balance",
+    "min_amount_error": "Amount is less than minimum",
     "recipent_address": "Recipent address",
     "bridge_name": "Bridge name",
     "bridge_fee": "Bridge fee",

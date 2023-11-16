@@ -11,6 +11,7 @@ interface AssetAmountInputProps {
   hasMaxOption?: boolean;
   isDisabled?: boolean;
   isLoading?: boolean;
+  isReadOnly?: boolean;
   label: string;
   minSellAmount?: string | null;
   onMax?: () => void;
@@ -26,6 +27,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   hasMaxOption = false,
   isDisabled = false,
   isLoading = false,
+  isReadOnly = false,
   label,
   minSellAmount,
   onMax,
@@ -60,8 +62,9 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
             onValueChange={({ value }) => {
               onValueChange(value || "0");
             }}
-            disabled={isLoading || isDisabled}
+            disabled={isLoading || isDisabled || isReadOnly}
             allowedDecimalSeparators={["%"]}
+            readOnly={isReadOnly}
           />
 
           {hasMaxOption && (

@@ -64,14 +64,18 @@ export interface SendForm {
 }
 
 export interface TxToProcess {
-  amount: number;
+  amount: number | string;
   originAddress: string;
   destinationAddress: string;
   rpc: string;
   originNetwork: string;
   destinationNetwork: string;
   networkInfo: Chain;
-  asset: IAsset;
+  asset: {
+    id: string;
+    symbol: string;
+    color: string;
+  };
   rpc: string;
   tx: {
     txHash: string;
@@ -79,5 +83,9 @@ export interface TxToProcess {
       tip?: BN | string;
     };
     type: AccountType;
+  };
+  swap?: {
+    protocol: string;
+    id: string;
   };
 }

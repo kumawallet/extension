@@ -92,6 +92,8 @@ export const SelectableAsset = <T extends SwapAsset>({
               onChange={(e) => setQuery(e.target.value)}
               aria-disabled={isLoading}
               autoComplete="off"
+              aria-readonly={isLoading}
+              readOnly={isLoading}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <BsChevronExpand

@@ -17,6 +17,8 @@ import { getWebAPI } from "@src/utils/env";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
+import { TxToProcess } from "@src/types";
+import { AccountType } from "@src/accounts/types";
 
 export interface TxInfoState {
   bridgeType: string;
@@ -104,6 +106,11 @@ export const useSwap = () => {
     starLoading: starLoadingSellPairs,
     endLoading: endLoadingSellPairs,
   } = useLoading();
+  const {
+    isLoading: isCreatingSwap,
+    starLoading: starCreatingSwap,
+    endLoading: endCreatingSwap,
+  } = useLoading();
 
   const { showErrorToast, showSuccessToast } = useToast();
 
@@ -189,6 +196,8 @@ export const useSwap = () => {
   const [swapper, setSwapper] = useState<Swapper | null>(null);
 
   const [mustConfirmTx, setMustConfirmTx] = useState(false);
+
+  const [sellBalanceError, setSellBalanceError] = useState<string | null>(null);
 
   const init = async (api: ApiPromise | ethers.providers.JsonRpcProvider) => {
     starLoading();
@@ -297,7 +306,7 @@ export const useSwap = () => {
   };
 
   const swap = async () => {
-    starLoading();
+    starCreatingSwap();
     try {
       const { destination, fee, id } = await swapper!.createSwap({
         currencyFrom: assetToSell.symbol as string,
@@ -374,7 +383,7 @@ export const useSwap = () => {
       showErrorToast(error.response?.data?.message || error?.message || error);
     }
 
-    endLoading();
+    endCreatingSwap();
   };
 
   const onBack = () => {
@@ -397,24 +406,24 @@ export const useSwap = () => {
     starLoading();
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const txToSend: any = {
+      const txToSend: Partial<TxToProcess> = {
         amount: amounts.sell,
         originAddress: selectedAccount.value.address,
         destinationAddress: tx.addressBridge,
         rpc: rpc as string,
         asset: {
-          id: assetToSell.id,
-          symbol: assetToSell.label,
+          id: assetToSell?.id || "",
+          symbol: assetToSell?.label || "",
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           color: (assetToSell as any).color || "",
         },
         destinationNetwork: selectedChain?.name,
         networkInfo: selectedChain,
         originNetwork: selectedChain,
-        tx: {
-          type: "",
-          txHash: "",
-        },
+        // tx: {
+        //   type: "",
+        //   txHash: "",
+        // },
       };
 
       const isConfirmNeeded = swapper.mustConfirmTx();
@@ -437,8 +446,13 @@ export const useSwap = () => {
         const { id } = await WebAPI.windows.getCurrent();
 
         txToSend.tx = {
-          type,
+          type: type as AccountType,
           txHash,
+        };
+
+        txToSend.swap = {
+          protocol: swapper!.protocol,
+          id: tx.swapId,
         };
 
         await WebAPI.runtime.sendMessage({
@@ -450,7 +464,7 @@ export const useSwap = () => {
         });
 
         showSuccessToast(t("tx_send"));
-        await swapper.saveSwapInStorage(tx.swapId);
+        // await swapper.saveSwapInStorage(tx.swapId);
         navigate(BALANCE, {
           state: {
             tab: "activity",
@@ -492,13 +506,16 @@ export const useSwap = () => {
       );
 
       isSufficient = assetBalance.gte(amountBalance);
+      !isSufficient && setSellBalanceError("insufficient_balance");
     }
 
     if (isSufficient && minSellAmount) {
       isSufficient =
         Number(amounts.sell) < Number(minSellAmount) ? false : true;
+      !isSufficient && setSellBalanceError("min_amount_error");
     }
 
+    isSufficient && setSellBalanceError(null);
     return isSufficient;
   }, [assetToSell?.balance, amounts?.sell, minSellAmount]);
 
@@ -583,6 +600,7 @@ export const useSwap = () => {
     handleAmounts,
     handleAssetChange,
     handleRecipientChange,
+    isCreatingSwap,
     isLoading,
     isLoadingActiveSwaps,
     isLoadingBuyAsset,
@@ -594,6 +612,7 @@ export const useSwap = () => {
     onBack,
     onConfirmTx,
     recipient,
+    sellBalanceError,
     setAssetToBuy,
     setAssetToSell,
     setMaxAmout,

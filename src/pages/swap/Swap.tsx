@@ -53,6 +53,7 @@ export const Swap = () => {
     handleAmounts,
     handleAssetChange,
     handleRecipientChange,
+    isCreatingSwap,
     isLoading,
     isLoadingActiveSwaps,
     isLoadingBuyAsset,
@@ -64,6 +65,7 @@ export const Swap = () => {
     onBack,
     onConfirmTx,
     recipient,
+    sellBalanceError,
     setMaxAmout,
     showRecipientAddress,
     swap,
@@ -150,6 +152,8 @@ export const Swap = () => {
                         defaulValue={assetToSell as SwapAsset}
                         label={t("transfer_from") as string}
                         position="left"
+                        isLoading={isLoading}
+                        isReadOnly={isCreatingSwap}
                       />
                       <HiMiniArrowsRightLeft className="mt-7" size={20} />
                       <SelectableAsset
@@ -158,8 +162,9 @@ export const Swap = () => {
                         onChange={(asset) => handleAssetChange("buy", asset)}
                         defaulValue={assetToBuy as SwapAsset}
                         label={t("transfer_to") as string}
-                        isLoading={isLoadingSellPairs}
+                        isLoading={isLoading || isLoadingSellPairs}
                         position="right"
+                        isReadOnly={isCreatingSwap}
                       />
                     </div>
 
@@ -167,7 +172,7 @@ export const Swap = () => {
                       <div>
                         <AssetAmountInput
                           minSellAmount={minSellAmount}
-                          isLoading={isLoadingSellAsset}
+                          isLoading={isLoading || isLoadingSellAsset}
                           amount={amounts.sell}
                           balance={formatBN(
                             assetToSell.balance?.toString() || "0",
@@ -180,6 +185,7 @@ export const Swap = () => {
                           onValueChange={(val) =>
                             debouncedHandleAmount("sell", val)
                           }
+                          isReadOnly={isCreatingSwap}
                           showBalance
                           selectableAsset={
                             <SelectableAsset
@@ -188,22 +194,25 @@ export const Swap = () => {
                               onChange={(asset) =>
                                 handleAssetChange("sell", asset)
                               }
+                              isLoading={isLoading}
                               defaulValue={assetToSell as SwapAsset}
                               containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                               buttonClassName="rounded-l-none"
                               position="right"
+                              isReadOnly={isCreatingSwap}
+
                             />
                           }
                         />
                         {!balanceIsSufficient && (
                           <InputErrorMessage
-                            message={t("insufficient_balance") as string}
+                            message={sellBalanceError ? t(sellBalanceError) as string : ""}
                           />
                         )}
                       </div>
 
                       <AssetAmountInput
-                        isLoading={isLoadingBuyAsset}
+                        isLoading={isLoading || isLoadingBuyAsset}
                         amount={amounts.buy}
                         balance={formatBN(
                           assetToBuy.balance?.toString() || "0",
@@ -214,11 +223,13 @@ export const Swap = () => {
                         onValueChange={(asset) =>
                           debouncedHandleAmount("buy", asset)
                         }
+                        isReadOnly={isCreatingSwap}
                         showBalance={false}
                         selectableAsset={
                           <SelectableAsset
                             value={assetToBuy as SwapAsset}
                             options={assetsToBuy}
+                            isLoading={isLoading || isLoadingSellPairs}
                             onChange={(asset) =>
                               handleAssetChange("buy", asset)
                             }
@@ -226,6 +237,8 @@ export const Swap = () => {
                             containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
                             buttonClassName="rounded-l-none"
                             position="right"
+                            isReadOnly={isCreatingSwap}
+
                           />
                         }
                       />
@@ -264,7 +277,7 @@ export const Swap = () => {
                   <Button
                     isDisabled={!canSend}
                     isLoading={
-                      isLoading || isLoadingBuyAsset || isLoadingSellAsset
+                      isLoading || isLoadingBuyAsset || isLoadingSellAsset || isCreatingSwap
                     }
                     classname={`font-medium text-base capitalize w-full py-2 bg-[#212529] hover:bg-${color}-primary !mx-0`}
                     onClick={swap}

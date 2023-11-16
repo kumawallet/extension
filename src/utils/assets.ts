@@ -78,6 +78,16 @@ export const formatAmountWithDecimals = (
   return Number((amount / 10 ** assetDecimals).toFixed(decimals));
 };
 
+export const formatStringAmountWithDecimals = (amount = "", decimals = 0) => {
+  const [_amount, _decimals] = amount.split(".");
+
+  if (!_decimals) return amount;
+
+  const _newDecimals = (_decimals || "").substr(0, decimals);
+
+  return `${_amount}.${_newDecimals}`;
+};
+
 export const formatBN = (bn: string, decimals = 1, fixed?: null | number) => {
   let _number = bn;
 
