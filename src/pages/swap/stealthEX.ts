@@ -413,12 +413,16 @@ export class StealthEX implements Swapper {
 
       const { partialFee } = await extrinsic.paymentInfo(sender);
 
-      fee.estimatedFee = formatBN(partialFee.toString(), currencyDecimals, 10);
-      fee.estimatedTotal = formatBN(
+      fee.estimatedFee = `${formatBN(
+        partialFee.toString(),
+        currencyDecimals,
+        10
+      )} ${assetToSell.symbol}`;
+      fee.estimatedTotal = `${formatBN(
         partialFee.add(amount).toString(),
         currencyDecimals,
         10
-      );
+      )} ${assetToSell.symbol}`;
     }
 
     if (this.api instanceof ethers.providers.JsonRpcProvider) {

@@ -42,7 +42,7 @@ export const AssetInfo: FC<AssetInfoProps> = ({
         )}
       </div>
       <p className="font-inter font-bold md:text-[27px] mt-2">
-        {isAproximate && "≅"} {formatStringAmountWithDecimals(amount, 2)}
+        {isAproximate && "≅"} {formatStringAmountWithDecimals(amount, 3)}
         <span className="uppercase text-xs md:text-base ml-1">{asset?.symbol}</span>
       </p>
     </div>
