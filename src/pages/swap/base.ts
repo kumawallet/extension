@@ -46,7 +46,7 @@ export interface InitProps {
 
 export abstract class Swapper {
   swap_info: string | undefined;
-  protocol: string | undefined;
+  protocol: string = "";
   type: string | undefined;
 
   abstract init(props: InitProps): Promise<{

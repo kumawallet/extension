@@ -1,3 +1,4 @@
+import { formatStringAmountWithDecimals } from "@src/utils/assets";
 import { FC } from "react";
 import { RiCopperCoinLine } from "react-icons/ri";
 
@@ -41,8 +42,8 @@ export const AssetInfo: FC<AssetInfoProps> = ({
         )}
       </div>
       <p className="font-inter font-bold md:text-[27px] mt-2">
-        {isAproximate && "≅"} {amount}
-        <span className="uppercase text-xs md:text-base">{asset?.symbol}</span>
+        {isAproximate && "≅"} {formatStringAmountWithDecimals(amount, 3)}
+        <span className="uppercase text-xs md:text-base ml-1">{asset?.symbol}</span>
       </p>
     </div>
   );
