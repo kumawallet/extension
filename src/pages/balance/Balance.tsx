@@ -34,6 +34,7 @@ export const Balance = () => {
     setSelectedIndex(0);
   }, [selectedChain?.name]);
 
+
   return (
     <>
       <Header />

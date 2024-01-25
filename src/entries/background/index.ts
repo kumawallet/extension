@@ -146,6 +146,7 @@ const processWasmTx = async ({
   networkInfo,
   tx,
   rpc,
+  swap,
 }: TxToProcess) => {
   try {
     const { txHash, type } = tx;
@@ -239,6 +240,8 @@ const processWasmTx = async ({
             status = RecordStatus.FAIL;
           } else {
             status = RecordStatus.SUCCESS;
+
+            swap && (await Extension.addSwap(swap.protocol, { id: swap.id }));
           }
           const hash = txHash.toString();
           await Extension.updateActivity(hash, status, error);
@@ -262,6 +265,7 @@ const processEVMTx = async ({
   networkInfo,
   tx,
   rpc,
+  swap,
 }: TxToProcess) => {
   const { txHash } = tx;
   try {
@@ -301,6 +305,11 @@ const processEVMTx = async ({
     const result = await txReceipt.wait();
     const status =
       result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+
+    result.status === 1 &&
+      swap &&
+      (await Extension.addSwap(swap.protocol, { id: swap.id }));
+
     const error = "";
     await Extension.updateActivity(txHash, status, error);
     sendNotification(`tx ${status}`, txHash);

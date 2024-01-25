@@ -5,15 +5,16 @@ import { Fees } from "./Fees";
 import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 
 const evmFees = {
-  "gas limit": "21000",
-  "estimated fee": "0.000000000000000001",
-  "estimated total": "0.000000000000000001",
+  gasLimit: "21000",
+  estimatedFee: "0.000000000000000001",
+  estimatedTotal: "0.000000000000000001",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderComponent = (fee: any) => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <Fees fee={fee} />
+      <Fees {...fee} />
     </I18nextProvider>
   );
 };
@@ -55,7 +56,12 @@ describe("Fees", () => {
       },
     });
 
-    const { container } = renderComponent(evmFees);
+    const { container } = renderComponent({
+      ...evmFees,
+      estimatedTotal: "1 USDT + 0.001 ETH"
+    });
+
+
     expect(container.innerHTML).contain("1 USDT");
   });
 });

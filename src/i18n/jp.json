@@ -247,5 +247,31 @@
     "report_an_issue": "問題を報告する",
     "report_an_issue_description": "問題を報告する場合は、Discord チャンネルにアクセスして、バグ報告の方法に従ってください。",
     "report_an_issue_link": "Discord チャンネル"
+  },
+  "swap": {
+    "title": "スワップ",
+    "transfer_from": "から転送",
+    "transfer_to": "へ転送",
+    "id": "ID",
+    "status": "ステータス",
+    "you_send": "送信する",
+    "you_receive": "受信する",
+    "to_address": "宛先アドレス",
+    "you_get": "受け取る",
+    "exchange": "交換",
+    "my_exchanges": "私の取引",
+    "min_amount": "転送の最小金額",
+    "insufficient_balance": "残高不足",
+    "recipent_address": "受取人のアドレス",
+    "bridge_name": "ブリッジ名",
+    "bridge_fee": "ブリッジ手数料",
+    "swapper_name": "スワッパー名",
+    "swapper_fee": "スワッパー手数料",
+    "gas_fee": "ガス手数料",
+    "destination_address": "送信先アドレス",
+    "stealthex_swap_message": "手続きを進めると、StealthEXで提供されたアドレスに送金する必要があります。取引は自動的に処理され、トークンは受取人のアドレスに届きます。",
+    "tx_send": "トランザクション送信済み",
+    "error_fetching_swaps": "スワップの取得エラー",
+    "error_setting_max_amount": "最大金額の設定エラー"    
   }
 }

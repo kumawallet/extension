@@ -247,5 +247,31 @@
     "report_an_issue": "Reportar un error",
     "report_an_issue_description": "Si quieres reportar un error, por favor visita nuestro canal de Discord y sigue las instrucciones sobre cómo reportar un error.",
     "report_an_issue_link": "Canal de soporte"
+  },
+  "swap": {
+    "title": "Intercambio",
+    "transfer_from": "Transferir desde",
+    "transfer_to": "Transferir a",
+    "id": "ID",
+    "status": "Estatus",
+    "you_send": "Envias",
+    "you_receive": "Recibes",
+    "to_address": "A esta dirección",
+    "you_get": "Recibes",
+    "exchange": "Intercambio",
+    "my_exchanges": "Mis intercambios",
+    "min_amount": "Monto mínimo",
+    "insufficient_balance": "Balance insuficiente",
+    "recipent_address": "Dirección de destino",
+    "bridge_name": "Nombre del puente",
+    "bridge_fee": "Tasa del puente",
+    "swapper_name": "Nombre del intercambiador",
+    "swapper_fee": "Tasa del intercambiador",
+    "gas_fee": "Limite de gas",
+    "destination_address": "Dirección de destino",
+    "stealthex_swap_message": "Después de proceder tendrá que transferir a una dirección proporcionada por StealthEX. La transacción se procesará automáticamente y recibirá sus tokens en la dirección del destinatario.",
+    "tx_send": "Transacción enviada",
+    "error_fetching_swaps": "Error al obtener los intercambios",
+    "error_setting_max_amount": "Error al establecer el monto máximo"
   }
 }

@@ -17,6 +17,7 @@ import { getWebAPI } from "@src/utils/env";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
 import { isValidAddress } from "@src/utils/account-utils";
+import { formatBN } from "@src/utils/assets";
 import { captureError } from "@src/utils/error-handling";
 
 const WebAPI = getWebAPI();
@@ -36,7 +37,7 @@ export const Send = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const [tx, setTx] = useState<Tx | null>(null);
+  const [tx, setTx] = useState<Tx | null>();
 
   const schema = useMemo(() => {
     return object({
@@ -77,6 +78,9 @@ export const Send = () => {
   const decimals = selectedChain?.nativeCurrency.decimals || 1;
   const currencyUnits = 10 ** decimals;
 
+  const asset = getValues("asset") as IAsset;
+  const amount = getValues("amount");
+
   const sendTx = async () => {
     starLoading();
     const amount = getValues("amount");
@@ -92,7 +96,11 @@ export const Send = () => {
       originAddress,
       destinationAddress,
       rpc: rpc as string,
-      asset,
+      asset: {
+        id: asset.id,
+        symbol: asset.symbol || "",
+        color: asset.color || "",
+      },
       destinationNetwork,
       networkInfo: selectedChain,
       originNetwork: selectedChain,
@@ -110,7 +118,7 @@ export const Send = () => {
         let _tx;
         const _amount = isNativeAsset
           ? amount * currencyUnits
-          : amount * 10 ** (asset?.decimals || 0 as number);
+          : amount * 10 ** (asset?.decimals || (0 as number));
 
         const bnAmount = BigNumber.from(
           _amount.toLocaleString("fullwide", { useGrouping: false })
@@ -139,7 +147,7 @@ export const Send = () => {
                 ]
             ),
             {
-              gasLimit: tx?.fee["gas limit"],
+              gasLimit: tx?.fee.gasLimit,
               maxFeePerGas: tx?.fee["max fee per gas"],
               maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
               type: 2,
@@ -154,7 +162,7 @@ export const Send = () => {
             destinationAddress,
             bnAmount,
             {
-              gasLimit: tx?.fee["gas limit"],
+              gasLimit: tx?.fee.gasLimit,
               maxFeePerGas: tx?.fee["max fee per gas"],
               maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
             }
@@ -192,6 +200,19 @@ export const Send = () => {
     endLoading();
   };
 
+  const estimatedTotal =
+    asset?.id === "-1"
+      ? `${formatBN(
+        tx?.fee.estimatedTotal.toString() || "",
+        asset.decimals,
+        8
+      )} ${asset?.symbol}`
+      : `${amount} ${asset?.symbol} + ${formatBN(
+        tx?.fee.estimatedTotal.toString() || "",
+        asset.decimals,
+        8
+      )} ${selectedChain?.nativeCurrency.symbol}`;
+
   return (
     <PageWrapper contentClassName="bg-[#29323C] h-full">
       <FormProvider {...methods}>
@@ -214,7 +235,21 @@ export const Send = () => {
             )}
           </div>
         ) : (
-          <ConfirmTx tx={tx} onConfirm={sendTx} isLoading={isLoading} />
+          <ConfirmTx
+            fee={{
+              gasLimit:
+                tx.type === AccountType.EVM ? tx.fee.gasLimit.toString() : "",
+              estimatedFee: `${formatBN(
+                tx.fee.estimatedFee.toString(),
+                asset?.decimals,
+                10
+              )} ${selectedChain?.nativeCurrency.symbol || ""}`,
+              estimatedTotal: estimatedTotal,
+            }}
+            onConfirm={sendTx}
+            isLoading={isLoading}
+            onBack={() => setTx(null)}
+          />
         )}
       </FormProvider>
     </PageWrapper>

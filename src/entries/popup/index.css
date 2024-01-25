@@ -3,3 +3,10 @@ body {
   min-width: 357px !important;
   height: 600px !important;
 }
+
+#__root {
+  display: flex;
+  flex-direction: column;
+  height: auto !important;
+}
+

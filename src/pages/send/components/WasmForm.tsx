@@ -27,10 +27,11 @@ import { captureError } from "@src/utils/error-handling";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseXCM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
+import { formatBN } from "@src/utils/assets";
 
 const defaultFees = {
-  "estimated fee": new BN("0"),
-  "estimated total": new BN("0"),
+  estimatedFee: new BN("0"),
+  estimatedTotal: new BN("0"),
 };
 
 interface WasmFormProps {
@@ -201,8 +202,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
         estimatedFee = new BN(String(_proofSize)).add(new BN(String(_refTime)));
       } else {
+
+
         if (asset?.id === "-1") {
-          extrinsic = _api.tx.balances.transfer(destinationAccount, bnAmount);
+          extrinsic = _api.tx.balances.transferKeepAlive(destinationAccount, bnAmount);
         } else {
           extrinsic = _api.tx.assets.transfer(
             asset.id,
@@ -223,8 +226,8 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         asset?.id === "-1" ? bnAmount.add(estimatedFee) : estimatedFee;
 
       setFee({
-        "estimated fee": estimatedFee,
-        "estimated total": amounToShow,
+        estimatedFee: estimatedFee,
+        estimatedTotal: amounToShow,
       });
     } catch (error) {
       captureError(error);
@@ -272,7 +275,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       const bnAmount = new BN(
         _amount.toLocaleString("fullwide", { useGrouping: false })
       );
-      const estimatedTotal = fee["estimated total"];
+      const estimatedTotal = fee.estimatedTotal;
       const BN0 = new BN("0");
       const nativeBalance = assets[0].balance;
 
@@ -294,6 +297,9 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       return false;
     }
   }, [fee, asset, amount, isNativeAsset]);
+
+  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.nativeCurrency.symbol}}`
+
 
   return (
     <>
@@ -320,7 +326,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         </div>
       </div>
 
-      {isLoadingFee ? <Loading /> : <Fees fee={fee} />}
+      {isLoadingFee ? <Loading /> : <Fees
+        estimatedFee={`${formatBN(fee.estimatedFee.toString(), asset.decimals, 10)} ${asset.symbol || ""}`}
+        estimatedTotal={estimatedTotal}
+      />}
 
       {canContinue && !isEnoughToPay && (
         <p className="text-sm mt-2 text-red-500 text-center">
