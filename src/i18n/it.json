@@ -71,7 +71,7 @@
     },
     "form": {
       "continue_button_text": "Continuare",
-      "recovery_phrase_warning": "Questa è la chiave del tuo account e l'unico modo per riottenere l'accesso nel caso in cui avessi dimenticato la password. Assicurati di salvarla in un posto sicuro poiché non potrai più vederla." ,      
+      "recovery_phrase_warning": "Questa è la chiave del tuo account e l'unico modo per riottenere l'accesso nel caso in cui avessi dimenticato la password. Assicurati di salvarla in un posto sicuro poiché non potrai più vederla.",
       "account_type": "Tipo di account",
       "private_key": "Chiave privata",
       "private_key_validation": "Chiave privata non valida",
@@ -130,7 +130,8 @@
     "title": "Generale",
     "languages": "Lingue",
     "manage_networks": "Gestire le reti",
-    "show_testnets": "Mostrare le testnets"
+    "show_testnets": "Mostrare le testnets",
+    "currencies": "Valute"
   },
   "advanced_settings": {
     "title": "Avanzate"
@@ -160,7 +161,8 @@
     "insert_name": "Inserire il nome",
     "insert_address": "Inserire l'indirizzo",
     "search": "Cercare per nome o indirizzo",
-    "new_contact": "Nuovo contatto"
+    "new_contact": "Nuovo contatto",
+    "required": "Richiesto"
   },
   "activity": {
     "title": "Attività",
@@ -193,9 +195,11 @@
   "send": {
     "title": "Invia token",
     "from": "Da",
-    "to:": "A",
+    "to": "A",
     "destination_account": "Account di destinazione",
     "amount": "Quantità",
+    "total": "Totale",
+    "available": "Disponibile",
     "gas_limit": "Limite di gas",
     "estimated_fee": "Tassa stimata",
     "estimated_total": "Totale stimato",
@@ -243,5 +247,31 @@
     "report_an_issue": "Segnalare un problema",
     "report_an_issue_description": "Se vuoi segnalare un problema, visita il nostro canale Discord e segui le istruzioni su come inviare una segnalazione di un bug.",
     "report_an_issue_link": "Support channel"
+  },
+  "swap": {
+    "title": "Scambio",
+    "transfer_from": "Trasferisci da",
+    "transfer_to": "Trasferisci a",
+    "id": "ID",
+    "status": "Stato",
+    "you_send": "Invii",
+    "you_receive": "Ricevi",
+    "to_address": "All'indirizzo",
+    "you_get": "Ricevi",
+    "exchange": "Scambio",
+    "my_exchanges": "I miei scambi",
+    "min_amount": "Importo minimo da trasferire",
+    "insufficient_balance": "Saldo insufficiente",
+    "recipent_address": "Indirizzo del destinatario",
+    "bridge_name": "Nome del ponte",
+    "bridge_fee": "Commissione del ponte",
+    "swapper_name": "Nome dello scambiatore",
+    "swapper_fee": "Commissione dello scambiatore",
+    "gas_fee": "Commissione gas",
+    "destination_address": "Indirizzo di destinazione",
+    "stealthex_swap_message": "Dopo aver proceduto, dovrai trasferire a un indirizzo fornito da StealthEX. La transazione verrà elaborata automaticamente e riceverai i tuoi token all'indirizzo del destinatario.",
+    "tx_send": "Transazione inviata",
+    "error_fetching_swaps": "Errore durante il recupero degli scambi",
+    "error_setting_max_amount": "Errore impostando l'importo massimo"
   }
 }

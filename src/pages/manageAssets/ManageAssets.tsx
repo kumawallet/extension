@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import Extension from "@src/Extension";
 import { BALANCE } from "@src/routes/paths";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
 import { number, object, string } from "yup";
 import { isHex, u8aToHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
@@ -29,8 +29,9 @@ export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
   const { t: tCommon } = useTranslation("common");
   const {
-    state: { selectedChain, type },
+    state: { selectedChain, type, api },
   } = useNetworkContext();
+  const { state: { selectedAccount } } = useAccountContext()
   const { loadAssets } = useAssetContext();
 
   const navigate = useNavigate();
@@ -71,7 +72,11 @@ export const ManageAssets = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       await Extension.addAsset(selectedChain.name, data);
-      loadAssets();
+      loadAssets({
+        api,
+        selectedChain,
+        selectedAccount
+      });
       navigate(BALANCE);
     } catch (error) {
       showErrorToast(error);

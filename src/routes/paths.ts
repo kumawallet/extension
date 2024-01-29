@@ -17,3 +17,4 @@ export const SETTINGS_SECURITY = "/settings-security";
 export const SETTINGS_ABOUT_US = "/settings-about-us";
 export const SIGN_MESSAGE = "/sign-message";
 export const SIGNIN = "/sign-in";
+export const SWAP = "/swap";

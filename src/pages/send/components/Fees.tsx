@@ -1,20 +1,22 @@
+import { FC } from "react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
-import { formatBN } from "@src/utils/assets";
-import { useFormContext } from "react-hook-form";
 
-export const Fees = ({ fee }: any) => {
+interface FeesProps {
+  estimatedFee: string;
+  estimatedTotal: string;
+  gasLimit?: string;
+}
+
+export const Fees: FC<FeesProps> = ({
+  estimatedFee,
+  estimatedTotal,
+  gasLimit,
+}) => {
   const { t } = useTranslation("send");
   const {
-    state: { type, selectedChain },
+    state: { type },
   } = useNetworkContext();
-  const { watch } = useFormContext();
-
-  const decimals = selectedChain?.nativeCurrency?.decimals || 1;
-  const amount = watch("amount");
-  const asset = watch("asset");
-  const isNativeAsset = asset?.id === "-1";
-  const nativeSymbol = selectedChain?.nativeCurrency.symbol;
 
   if (!type) return null;
 
@@ -23,18 +25,19 @@ export const Fees = ({ fee }: any) => {
       {type === "EVM" && (
         <div className="flex justify-between gap-2">
           <p>{t("gas_limit")}</p>
-          <p className="font-bold font-inter">{String(fee["gas limit"])} gwei</p>
+          <p className="font-bold font-inter">{String(gasLimit)} gwei</p>
         </div>
       )}
 
       <div className="flex justify-between gap-2">
-        <p>{t("estimated_fee")}</p>
-        <p>{formatBN(String(fee["estimated fee"]), decimals)}</p>
+        <p>{t("estimated_fee")}:</p>
+        <p>{estimatedFee}</p>
       </div>
 
       <div className="flex justify-between gap-2">
-        <p>{t("estimated_total")}</p>
-        {isNativeAsset ? (
+        <p>{t("estimated_total")}:</p>
+        <p className="font-bold font-inter">{estimatedTotal}</p>
+        {/* {isNativeAsset ? (
           <>
             <p className="font-bold font-inter">
               {`${formatBN(
@@ -50,7 +53,7 @@ export const Fees = ({ fee }: any) => {
               decimals
             )} ${nativeSymbol}`}</p>
           </>
-        )}
+        )} */}
       </div>
     </div>
   );

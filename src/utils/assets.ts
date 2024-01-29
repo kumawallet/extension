@@ -11,6 +11,7 @@ import {
   StorageEntryPromiseOverloads,
 } from "@polkadot/api/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
+import { CURRENCIES } from "@utils/constants";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -54,14 +55,15 @@ export const getNatitveAssetBalance = async (
 
 export const getAssetUSDPrice = async (query: string) => {
   const _query = query.toLowerCase();
+  const currency = localStorage.getItem("currency") || "usd";
   try {
     const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=${currency}`
     );
 
     const json = await data.json();
 
-    return json?.[_query]?.["usd"] || 0;
+    return json?.[_query]?.[currency] || 0;
   } catch (error) {
     captureError(error);
     return 0;
@@ -76,7 +78,17 @@ export const formatAmountWithDecimals = (
   return Number((amount / 10 ** assetDecimals).toFixed(decimals));
 };
 
-export const formatBN = (bn: string, decimals = 1) => {
+export const formatStringAmountWithDecimals = (amount = "", decimals = 0) => {
+  const [_amount, _decimals] = amount.split(".");
+
+  if (!_decimals) return amount;
+
+  const _newDecimals = (_decimals || "").substr(0, decimals);
+
+  return `${_amount}.${_newDecimals}`;
+};
+
+export const formatBN = (bn: string, decimals = 1, fixed?: null | number) => {
   let _number = bn;
 
   if (!decimals) return "0";
@@ -101,15 +113,46 @@ export const formatBN = (bn: string, decimals = 1) => {
     _number = `0${_number}`;
   }
 
+  if (fixed && _number.includes(".")) {
+    const [integer, decimal] = _number.split(".");
+    _number = `${integer}.${decimal.slice(0, fixed)}`;
+  }
+
   return _number;
 };
 
 export const formatUSDAmount = (amount: number) => {
+  const currencyInfo = getCurrencyInfo();
+  const currencySymbol = currencyInfo.symbol;
   return amount.toLocaleString("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: currencySymbol,
     maximumFractionDigits: 6,
   });
+};
+
+export const transformAmountStringToBN = (amount: string, decimals: number) => {
+  try {
+    const [amountWithoutDot, dotAmount] = amount.split(".");
+    const _dotAmount = dotAmount || "";
+    const missingUnits = decimals - _dotAmount.length;
+    const amountWithMissingUnits = `${amountWithoutDot}${_dotAmount}${"0".repeat(
+      missingUnits
+    )}`;
+
+    const amountBN = new BN(amountWithMissingUnits);
+    return amountBN;
+  } catch (error) {
+    return new BN("0");
+  }
+};
+
+export const getCurrencyInfo = () => {
+  const selectedCurrency = localStorage.getItem("currency") || "usd";
+  const currencyInfo = CURRENCIES.find(
+    (currency) => currency.symbol === selectedCurrency
+  );
+  return currencyInfo ? currencyInfo : CURRENCIES[0];
 };
 
 export const getWasmAssets = async (
@@ -139,7 +182,7 @@ export const getWasmAssets = async (
     switch (chainName) {
       case "Acala":
       case "Mandala":
-        assetPallet = api.query.assetRegistry.assetMetadatas;
+        assetPallet = api.query.assetRegistry?.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
         break;
       default:

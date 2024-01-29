@@ -13,6 +13,7 @@ import {
   SignMessage,
   Welcome,
   CallContract,
+  Swap,
 } from "@src/pages";
 import {
   Advanced,
@@ -49,6 +50,7 @@ import {
   SETTINGS_SECURITY,
   SIGNIN,
   SIGN_MESSAGE,
+  SWAP,
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -165,6 +167,7 @@ export const Routes = () => {
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
+        <Route path={SWAP} element={<Swap />} />
 
         <Route
           path={IMPORT_ACCOUNT}

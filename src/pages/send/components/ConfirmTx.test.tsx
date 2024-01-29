@@ -11,7 +11,12 @@ const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
       <ConfirmTx
-        tx={{} as any}
+        onBack={() => vi.fn()}
+        fee={{
+          estimatedFee: "100",
+          estimatedTotal: "100",
+          gasLimit: "100",
+        }}
         onConfirm={() => onConfirm()}
         isLoading={false}
       />
@@ -66,6 +71,7 @@ describe("ConfirmTx", () => {
             case "asset":
               return {
                 name: "Ethereum",
+                symbol: "ETH"
               };
             default:
               return "";
@@ -81,14 +87,15 @@ describe("ConfirmTx", () => {
     const originChain = getByTestId("origin-chain");
     const destinationChain = getByTestId("destination-chain");
 
+
     expect(originChain.innerHTML).contain("Ethereum");
     expect(destinationChain.innerHTML).contain("Ethereum");
 
     const originAsset = getByTestId("origin-asset");
     const destinationAsset = getByTestId("destination-asset");
 
-    expect(originAsset.innerHTML).contain("Ethereum");
-    expect(destinationAsset.innerHTML).contain("Ethereum");
+    expect(originAsset.innerHTML).contain("ETH");
+    expect(destinationAsset.innerHTML).contain("ETH");
   });
 
   it("should call onConfirm when confirm button is clicked", () => {

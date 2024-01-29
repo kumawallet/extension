@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   BsArrowUpRight,
   BsArrowDownLeft,
@@ -6,11 +6,13 @@ import {
   BsEyeFill,
 } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
-import { formatAmountWithDecimals } from "@src/utils/assets";
+import { formatAmountWithDecimals, getCurrencyInfo } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
-import { SEND, RECEIVE } from "@src/routes/paths";
-import { useAccountContext, useAssetContext } from "@src/providers";
+import { SEND, RECEIVE, SWAP } from "@src/routes/paths";
+import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
 import { Button } from "@src/components/common";
+import { RiTokenSwapLine } from "react-icons/ri";
+import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -24,6 +26,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [accountName, setAccountName] = useState("");
   const [showBalance, setShowBalance] = useState(true);
+  const [currencyLogo, setCurrencyLogo] = useState("$");
 
   const {
     state: { selectedAccount },
@@ -32,12 +35,17 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const {
     state: { assets },
+    loadAssets,
   } = useAssetContext();
+  const {
+    state: { api, selectedChain, type },
+  } = useNetworkContext();
 
-  const totalBalance = assets.reduce(
-    (total, item) => total + (item.amount || 0),
-    0
-  );
+  const updateAllAssets = async () => {
+    loadAssets({ api, selectedAccount, selectedChain });
+  }
+
+  const totalBalance = assets.reduce((total, item) => total + (item.amount || 0), 0);
 
   const update = async () => {
     setIsEditing(false);
@@ -51,10 +59,22 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const toggleBalance = () => setShowBalance(!showBalance);
 
+
+  const isSwapAvailable = useMemo(() => {
+
+    if (!selectedChain?.name || !type) return false;
+
+    return SUPPORTED_CHAINS_FOR_SWAP[type.toLowerCase() as 'wasm' | 'evm'].includes(selectedChain?.name);
+
+  }, [selectedChain, type])
+
   useEffect(() => {
     if (selectedAccount?.value?.name) {
       setAccountName(selectedAccount.value.name);
     }
+
+    setCurrencyLogo(getCurrencyInfo().logo);
+    updateAllAssets();
   }, [selectedAccount]);
 
   return (
@@ -82,7 +102,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       </div>
       <div className="flex mb-4 gap-2 items-center justify-center">
         <div className="flex gap-2 items-center">
-          <p className="text-2xl">$</p>
+          <p className="text-2xl">{currencyLogo}</p>
           <p className="text-5xl" data-testid="balance">
             {showBalance ? (formatAmountWithDecimals(totalBalance, 5) || "0") : "***"}
           </p>
@@ -101,17 +121,23 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           />
         )}
       </div>
-      <div className="flex gap-3 justify-center">
-        <Button onClick={() => navigate(SEND)} variant="text">
-          <span className="flex items-center gap-1 text-lg font-bold">
+      <div className="flex gap-1 justify-center">
+        <Button onClick={() => navigate(SEND)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowUpRight />
             <p>{t("send")}</p>
           </span>
         </Button>
-        <Button onClick={() => navigate(RECEIVE)} variant="text">
-          <span className="flex items-center gap-1 text-lg font-bold">
+        <Button onClick={() => navigate(RECEIVE)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
             <BsArrowDownLeft />
             <p>{t("receive")}</p>
+          </span>
+        </Button>
+        <Button isDisabled={!isSwapAvailable} onClick={() => navigate(SWAP)} variant="text" classname="w-1/2  md:w-1/3 px-1 !m-0">
+          <span className="flex items-center gap-1 text-base md:text-lg font-bold">
+            <RiTokenSwapLine />
+            <p>{t("swap")}</p>
           </span>
         </Button>
       </div>

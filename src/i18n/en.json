@@ -130,7 +130,8 @@
     "title": "General",
     "languages": "Languages",
     "manage_networks": "Manage networks",
-    "show_testnets": "Show testnets"
+    "show_testnets": "Show testnets",
+    "currencies": "Currencies"
   },
   "advanced_settings": {
     "title": "Advanced"
@@ -160,7 +161,8 @@
     "insert_name": "Insert contact name",
     "insert_address": "Insert address",
     "search": "Search contacts by name or address",
-    "new_contact": "New contact"
+    "new_contact": "New contact",
+    "required": "Required"
   },
   "activity": {
     "title": "Activity",
@@ -193,9 +195,11 @@
   "send": {
     "title": "Send token",
     "from": "From",
-    "to:": "To",
+    "to": "To",
     "destination_account": "Destination account",
     "amount": "Amount",
+    "total": "Total",
+    "available": "Available",
     "gas_limit": "Gas limit",
     "estimated_fee": "Estimated fee",
     "estimated_total": "Estimated total",
@@ -243,5 +247,32 @@
     "report_an_issue": "Report an issue",
     "report_an_issue_description": "If you want to report an issue, please visit our Discord channel and follow the instructions on how to submit a bug report.",
     "report_an_issue_link": "Support channel"
+  },
+  "swap": {
+    "title": "Swap",
+    "transfer_from": "Transfer from",
+    "transfer_to": "Transfer to",
+    "id": "ID",
+    "status": "Status",
+    "you_send": "You send",
+    "you_receive": "You receive",
+    "to_address": "To address",
+    "you_get": "You get",
+    "exchange": "Exchange",
+    "my_exchanges": "My exchanges",
+    "min_amount": "Min amount to transfer",
+    "insufficient_balance": "Insufficient balance",
+    "min_amount_error": "Amount is less than minimum",
+    "recipent_address": "Recipent address",
+    "bridge_name": "Bridge name",
+    "bridge_fee": "Bridge fee",
+    "swapper_name": "Swapper name",
+    "swapper_fee": "Swapper fee",
+    "gas_fee": "Gas fee",
+    "destination_address": "Destination address",
+    "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",
+    "tx_send":"Transaction sent",
+    "error_fetching_swaps": "Error fetching swaps",
+    "error_setting_max_amount": "Error setting max amount"
   }
 }
