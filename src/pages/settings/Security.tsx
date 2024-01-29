@@ -70,7 +70,6 @@ export const Security = () => {
     startLoadingReset();
     try {
       await Extension.resetWallet();
-      localStorage.removeItem("welcome");
       localStorage.removeItem("color");
       window.location.reload();
     } catch (error) {

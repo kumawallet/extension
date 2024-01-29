@@ -1,5 +1,5 @@
+import type { FC, PropsWithChildren } from "react";
 import { useThemeContext } from "@src/providers";
-import { FC, PropsWithChildren } from "react";
 
 interface OpionButtonProps extends PropsWithChildren {
   onClick?: () => void;
@@ -11,9 +11,10 @@ export const OptionButton: FC<OpionButtonProps> = ({ children, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`flex justify-between items-center py-5 px-5 rounded-md bg-custom-gray-bg transition-all hover:bg-${color}-primary`}
+      className={`flex justify-center py-[14px] rounded-md bg-[#040404] transition-all hover:bg-${color}-primary z-10`}
+      style={{ boxShadow: "0px 8.73px 8.73px 0px rgba(0, 0, 0, 0.25)" }}
     >
-      {children}
+      <p className="font-medium text-sm">{children}</p>
     </button>
   );
 };

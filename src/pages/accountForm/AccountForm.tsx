@@ -20,7 +20,7 @@ import {
 } from "@src/components/common";
 import { FiChevronLeft } from "react-icons/fi";
 import { ConfirmRecoveryPhrase } from "@src/components/common/confirm_recovery_phrase/ConfirmRecoveryPhrase";
-import { ADD_ACCOUNT, BALANCE } from "@src/routes/paths";
+import { WELCOME, BALANCE } from "@src/routes/paths";
 import { captureError } from "@src/utils/error-handling";
 import { DndProvider } from "react-dnd-multi-backend";
 import { HTML5toTouch } from "rdndmb-html5-to-touch"; // or any other pipeline
@@ -53,6 +53,8 @@ export interface AccountForm {
   isSignUp?: boolean;
   resetPassword?: boolean;
 }
+
+
 
 export const AccountForm: FC<AddAccountFormProps> = ({
   title,
@@ -109,46 +111,46 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     privateKeyOrSeed:
       fields?.privateKeyOrSeed && fields?.accountType
         ? string().when("accountType", {
-            is: (value: string) => value && value === "EVM",
-            then: string().test(
-              "evm validation",
-              t("form.private_key_validation") as string,
-              (val) => {
-                try {
-                  new ethers.Wallet(val || "");
-                } catch (e) {
-                  return false;
-                }
-                return true;
+          is: (value: string) => value && value === "EVM",
+          then: string().test(
+            "evm validation",
+            t("form.private_key_validation") as string,
+            (val) => {
+              try {
+                new ethers.Wallet(val || "");
+              } catch (e) {
+                return false;
               }
-            ),
-            otherwise: string().test(
-              "wasm validation",
-              t("form.seed_phrase_validation") as string,
-              (val) => {
-                return mnemonicValidate(val || "");
-              }
-            ),
-          })
+              return true;
+            }
+          ),
+          otherwise: string().test(
+            "wasm validation",
+            t("form.seed_phrase_validation") as string,
+            (val) => {
+              return mnemonicValidate(val || "");
+            }
+          ),
+        })
         : fields?.privateKeyOrSeed && !fields?.accountType
-        ? string().required(t("form.required") as string)
-        : string().optional(),
+          ? string().required(t("form.required") as string)
+          : string().optional(),
     name: string().optional(),
     password: passwordIsRequired
       ? string()
-          .matches(
-            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
-            PASSWORD_RULES
-          )
-          .required(t("form.required") as string)
+        .matches(
+          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+          PASSWORD_RULES
+        )
+        .required(t("form.required") as string)
       : string().notRequired(),
     confirmPassword: passwordIsRequired
       ? string()
-          .oneOf(
-            [ref("password"), null],
-            t("form.confirm_password_requirements") as string
-          )
-          .required(t("form.required") as string)
+        .oneOf(
+          [ref("password")],
+          t("form.confirm_password_requirements") as string
+        )
+        .required(t("form.required") as string)
       : string().notRequired(),
   }).required();
 
@@ -200,7 +202,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
 
   return (
     <PageWrapper>
-      {!signUp && <ReEnterPassword />}
+      {!signUp && !resetPassword && <ReEnterPassword />}
 
       <div className="flex gap-3 items-center">
         {backButton && (
@@ -208,7 +210,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             size={26}
             className="cursor-pointer"
             onClick={() => {
-              navigate(signUp ? ADD_ACCOUNT : BALANCE);
+              navigate(signUp ? WELCOME : BALANCE);
             }}
           />
         )}

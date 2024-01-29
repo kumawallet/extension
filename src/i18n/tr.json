@@ -38,19 +38,17 @@
     "rpc_error": "Ağ hatası"
   },
   "welcome": {
-    "welcome_message": "Kuma Wallet'e Hoş geldiniz",
-    "description": "Tüm hesaplarınız tek bir yerde",
-    "button_text": "Başlayalım"
-  },
-  "add_account": {
-    "title": "Hesap Ekle",
+    "welcome_message": "Kuma'ya hoş geldiniz",
+    "description": "Sizi ayarlayalım!",
+    "button_text": "Başlayalım",
     "import_wallet": "Cüzdanı içe aktar",
     "create_wallet": "Cüzdan oluştur"
   },
   "sign_in": {
     "welcome": "Tekrar hoş geldin",
+    "description": "dostça kripto cüzdanınıza",
     "password_placeholder": "Şifrenizi giriniz",
-    "signin_button_text": "Giriş yap",
+    "signin_button_text": "Kilidi Aç",
     "forgot_password": "Şifreni mi unuttun?"
   },
   "account_form": {

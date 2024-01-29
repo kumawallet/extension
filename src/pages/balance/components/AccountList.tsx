@@ -11,7 +11,8 @@ import Account from "@src/storage/entities/Account";
 import { transformAddress } from "@src/utils/account-utils";
 import { DERIVE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import { SiEthereum, SiWebassembly } from "react-icons/si";
-import { Button, Logo } from "@src/components/common";
+import { Button } from "@src/components/common";
+import { GoChevronDown } from "react-icons/go";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
@@ -55,8 +56,9 @@ export const AccountList = () => {
   return (
     <Menu>
       <Menu.Button data-testid="account-button">
-        <div className="flex justify-center items-center rounded-full transition-all bg-[#212529] bg-opacity-30 hover:bg-opacity-50 p-1 cursor-pointer">
-          <Logo className="w-7 h-7" fillClassName={`fill-${color}-primary`} lineClassName={`fill-${color}-secondary`} />
+        <div className="flex items-center gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-full">
+          <p className={`text-${color}-primary text-base`}>{selectedAccount?.value?.name}</p>
+          <GoChevronDown size={18} />
         </div>
       </Menu.Button>
       <Transition

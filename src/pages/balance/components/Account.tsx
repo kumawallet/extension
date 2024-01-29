@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAccountContext } from "@src/providers";
 import { AccountList } from "./AccountList";
 import { useNetworkContext } from "@src/providers";
-import { AccountSelected } from "./AccountSelected";
+// import { AccountSelected } from "./AccountSelected";
 
 export const Account = () => {
   const {
@@ -33,7 +33,6 @@ export const Account = () => {
 
   return (
     <div className="flex gap-2 items-center">
-      <AccountSelected />
       <AccountList />
     </div>
   );

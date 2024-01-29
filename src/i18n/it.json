@@ -38,19 +38,17 @@
     "rpc_error": "Errore di rete"
   },
   "welcome": {
-    "welcome_message": "Benvenuto a Kuma Wallet",
-    "description": "Tutti i tuoi assets in un unico posto",
-    "button_text": "Iniziare"
-  },
-  "add_account": {
-    "title": "Aggiungere un account",
+    "welcome_message": "Benvenuto su Kuma",
+    "description": "Facciamo la configurazione!",
+    "button_text": "Iniziare",
     "import_wallet": "Importa wallet",
     "create_wallet": "Crea wallet"
   },
   "sign_in": {
     "welcome": "Bentornato",
+    "description": "nel tuo amichevole portafoglio criptato",
     "password_placeholder": "Scribe la tua password",
-    "signin_button_text": "Accedere",
+    "signin_button_text": "Sblocca",
     "forgot_password": "Hai dimenticato la password?"
   },
   "account_form": {

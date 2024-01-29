@@ -3,7 +3,7 @@ module.exports = {
   safelist: [
     {
       pattern: /^bg-chain-.*-(primary|secondary|fill|text)$/,
-      variants: ["hover", "after"],
+      variants: ["hover", "after", "hover:enabled"],
     },
     {
       pattern: /(text|border|fill|text|border)-chain/,

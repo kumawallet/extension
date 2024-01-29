@@ -3,8 +3,7 @@ import { toast } from "react-toastify";
 export const useToast = () => {
   const showErrorToast = (message: string | unknown) => {
     toast.error(String(message), {
-      position: toast.POSITION.TOP_CENTER,
-      // autoClose: false,
+      position: 'top-center',
       className: "toast",
       toastId: "TOAST_ERROR",
     });
@@ -12,8 +11,7 @@ export const useToast = () => {
 
   const showSuccessToast = (message: string) => {
     toast.success(String(message), {
-      position: toast.POSITION.TOP_CENTER,
-      // autoClose: false,
+      position: 'top-center',
       className: "toast",
       toastId: "TOAST_SUCCESS",
     });

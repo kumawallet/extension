@@ -10,3 +10,4 @@ export * from "./Footer";
 export * from "./Header";
 export * from "./NetworkIcon";
 export * from "./TotalBalance";
+export * from "./Actions";

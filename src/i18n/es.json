@@ -38,19 +38,17 @@
     "rpc_error": "Error de red"
   },
   "welcome": {
-    "welcome_message": "Bienvenido a Kuma Wallet",
-    "description": "Todas tus cuentas en un solo lugar",
-    "button_text": "Empezar"
-  },
-  "add_account": {
-    "title": "Añadir cuenta",
+    "welcome_message": "Bienvenido a Kuma",
+    "description": "¡Vamos a configurarte!",
+    "button_text": "Empezar",
     "import_wallet": "Importar billetera",
     "create_wallet": "Crear billetera"
   },
   "sign_in": {
     "welcome": "Bienvenido de nuevo",
+    "description": "a tu amigable billetera de criptomonedas",
     "password_placeholder": "Escribe tu contraseña",
-    "signin_button_text": "Iniciar sesión",
+    "signin_button_text": "Desbloquear",
     "forgot_password": "¿Olvidaste tu contraseña?"
   },
   "account_form": {

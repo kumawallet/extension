@@ -38,19 +38,17 @@
     "rpc_error": "ネットワークエラー"
   },
   "welcome": {
-    "welcome_message": "Kuma Walletへようこそ",
-    "description": "すべてのアカウントが一つの場所に",
-    "button_text": "開始"
-  },
-  "add_account": {
-    "title": "アカウントを追加",
+    "welcome_message": "Kumaへようこそ",
+    "description": "さあ、設定をしましょう！",
+    "button_text": "開始",
     "import_wallet": "ウォレットをインポート",
     "create_wallet": "ウォレットを作成"
   },
   "sign_in": {
     "welcome": "お帰りなさい",
+    "description": "あなたの友達の仮想通貨ウォレットへ",
     "password_placeholder": "パスワード（を入力してください）",
-    "signin_button_text": "サインイン",
+    "signin_button_text": "アンロック",
     "forgot_password": "パスワードを忘れた場合"
   },
   "account_form": {
