@@ -66,14 +66,14 @@ export const Balance = () => {
             defaultIndex={state?.tab === "activity" ? 1 : 0}
           >
             <Tab.List
-              className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-5`}
+              className="flex space-x-1 p-1 mt-5"
             >
               {TABS.map((tab) => (
                 <Tab
                   key={tab}
                   className={({ selected }) =>
                     `px-4 py-1 focus:outline-none relative ${selected
-                      ? `text-${color}-secondary active-tab after:bg-${color}-fill`
+                      ? `text-${color}-primary active-tab after:bg-${color}-fill`
                       : "text-white"
                     }`
                   }

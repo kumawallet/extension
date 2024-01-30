@@ -108,6 +108,8 @@
       "create": "Crear"
     },
     "send": "Enviar",
+    "swap": "Intercambiar",
+    "buy": "Comprar",
     "receive": "Recibir",
     "assets": "Activos",
     "activity": "Actividad",

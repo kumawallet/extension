@@ -42,7 +42,7 @@ export const Actions = () => {
 
       <Action
         Icon={<img src={BuyIcon} width={22} />}
-        title={t("swap")}
+        title={t("buy")}
         onClick={() => navigate("")}
         isDisabled={true}
       />

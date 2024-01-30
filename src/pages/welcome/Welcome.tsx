@@ -30,28 +30,31 @@ export const Welcome = () => {
 
   return (
     <PageWrapper
-      contentClassName="bg-[#1F1432] h-[100dvh] relative"
+      contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0"
     >
       <ColoredBackground />
       {/* <SelectLanguage /> */}
-      <Logo
-        className="mx-auto mt-14 w-[15.5rem]"
-        fillClassName="fill-chain-default-primary"
-        lineClassName="#070707"
-      />
-      <p className="font-semibold text-2xl -mt-5 mb-2 text-center">
-        {t("welcome_message")}
-      </p>
-      <p className="font-light text-sm mb-9 text-center">
-        {t("description")}
-      </p>
-      <div className="flex flex-col gap-5">
-        <OptionButton onClick={() => openTab(CREATE_ACCOUNT)}>
-          {t("create_wallet")}
-        </OptionButton>
-        <OptionButton onClick={() => openTab(IMPORT_ACCOUNT)}>
-          {t("import_wallet")}
-        </OptionButton>
+      <div className="py-6 px-4">
+        <Logo
+          className="mx-auto mt-14 w-[15.5rem]"
+          fillClassName="fill-chain-default-primary"
+          lineClassName="#070707"
+        />
+        <p className="font-semibold text-2xl -mt-5 mb-2 text-center">
+          {t("welcome_message")}
+        </p>
+        <p className="font-light text-sm mb-9 text-center">
+          {t("description")}
+        </p>
+        <div className="flex flex-col gap-5">
+          <OptionButton onClick={() => openTab(CREATE_ACCOUNT)}>
+            {t("create_wallet")}
+          </OptionButton>
+          <OptionButton onClick={() => openTab(IMPORT_ACCOUNT)}>
+            {t("import_wallet")}
+          </OptionButton>
+        </div>
+
       </div>
     </PageWrapper>
   );

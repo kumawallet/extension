@@ -50,10 +50,10 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   };
 
   return (
-    <PageWrapper contentClassName="bg-[#1F1432] h-[100dvh] relative">
+    <PageWrapper contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0">
       <ColoredBackground />
 
-      <div className="flex flex-col">
+      <div className="flex flex-col py-6 px-4">
         <Logo
           className="mx-auto mt-14 w-[15.5rem]"
           fillClassName="fill-chain-default-primary"
