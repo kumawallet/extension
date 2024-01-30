@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext, useThemeContext } from "@src/providers";
-import BG3 from '/assets/bg-3.svg'
 
 export interface Asset {
   name: string;
