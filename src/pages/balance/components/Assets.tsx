@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-import { ImCoinDollar } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
@@ -8,10 +7,11 @@ import {
   useNetworkContext,
   useThemeContext,
 } from "@src/providers";
-import { Loading,  Button } from "@src/components/common";
+import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { ApiPromise } from "@polkadot/api";
-import { Asset }  from "./Asset";
+import { Asset } from "./Asset";
+import { CgOptions } from "react-icons/cg";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -37,6 +37,14 @@ export const Assets = () => {
         return asset.balance > 0;
       });
     }
+
+    // order by balance, id === -1 should be first
+    _assets.sort((a, b) => {
+      if (a.id === "-1") return -1;
+      if (b.id === "-1") return 1;
+
+      return b.balance - a.balance;
+    });
 
     return _assets;
   }, [assets, showAllAssets]);
@@ -67,15 +75,13 @@ export const Assets = () => {
             <Switch
               checked={showAllAssets}
               onChange={() => setShowAllAssets(!showAllAssets)}
-              className={`${
-                showAllAssets ? `bg-${color}-primary` : "bg-custom-gray-bg"
-              } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
+              className={`${showAllAssets ? `bg-${color}-primary` : "bg-custom-gray-bg"
+                } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
             >
               <span className="sr-only">{t("show_all_assets")}</span>
               <span
-                className={`${
-                  showAllAssets ? "translate-x-6" : "translate-x-1"
-                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
+                className={`${showAllAssets ? "translate-x-6" : "translate-x-1"
+                  } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
               />
             </Switch>
           </div>
@@ -92,7 +98,7 @@ export const Assets = () => {
         <div className="flex justify-center mt-2">
           <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
             <span className="flex gap-1 items-center">
-              <ImCoinDollar />
+              <CgOptions />
               <span>{t("manage_assets")}</span>
             </span>
           </Button>

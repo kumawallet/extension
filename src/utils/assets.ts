@@ -12,6 +12,7 @@ import {
 } from "@polkadot/api/types";
 import { AnyTuple } from "@polkadot/types-codec/types";
 import { CURRENCIES } from "@utils/constants";
+import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
@@ -197,110 +198,37 @@ export const getWasmAssets = async (
         unsubs,
       };
 
-    const entries = await assetPallet?.entries();
+    const mappedAssets = SUBSTRATE_ASSETS_MAP[chainName] || [];
 
-    for (const [, [metadata, asset]] of entries.entries()) {
-      const jsonAsset = asset.toJSON() as {
-        name: string;
-        symbol: string;
-        decimals: number;
-      };
-
-      const id = (metadata.args[0] as unknown as { id: number })?.id
-        ? String((metadata.args[0] as unknown as { id: number })?.id)
-        : metadata.args[0].toString();
-      const name = hexToString(jsonAsset?.name || "");
-      const symbol = hexToString(jsonAsset?.symbol || "");
-      const balance = BN0;
-      const decimals = Number(jsonAsset?.decimals || 0);
-
-      let aditionalData: Asset["aditionalData"] = null;
-      if (["acala", "mandala"].includes(chainName.toLowerCase())) {
-        const token = metadata.args[0].toJSON() as {
-          nativeAssetId?: { token: string };
-          foreignAssetId?: string;
-          stableAssetId?: string;
-        };
-
-        if (token?.nativeAssetId) {
-          aditionalData = {
-            tokenId: {
-              Token: token?.nativeAssetId?.token,
-            },
-          };
-        }
-        if (token?.foreignAssetId) {
-          aditionalData = {
-            tokenId: {
-              ForeignAsset: token.foreignAssetId,
-            },
-          };
-        }
-        if (token?.stableAssetId) {
-          aditionalData = {
-            tokenId: {
-              StableAssetPoolToken: token.stableAssetId,
-            },
-          };
-        }
-
-        aditionalData &&
-          assets.push({
-            id,
-            name,
-            symbol,
-            balance,
-            frozen: BN0,
-            reserved: BN0,
-            transferable: balance,
-            decimals,
-            aditionalData,
-          });
-      } else {
-        assets.push({
-          id,
-          name,
-          symbol,
-          balance,
-          frozen: BN0,
-          reserved: BN0,
-          transferable: balance,
-          decimals,
-          aditionalData,
-        });
-      }
-    }
-
-    assets = await Promise.all(
-      assets.map(async (asset) => {
+    const assetBalances = await Promise.all(
+      mappedAssets.map((asset) => {
         const params = [];
         if (["acala", "mandala"].includes(chainName.toLowerCase())) {
-          params.push(address, asset.aditionalData?.tokenId);
+          params.push(address, asset.id);
         } else {
           params.push(asset.id, address);
         }
 
-        const data = (await balanceMethod?.(...params)) as unknown as {
-          toJSON: () => {
-            balance: number | string;
-            free: number;
-            isFrozen?: boolean;
-            reserved?: number;
-            frozen?: number;
-          };
-        };
-
-        const _data = getSubtrateNonNativeBalance(data);
-
-        return { ...asset, ..._data };
+        return balanceMethod?.(...params);
       })
     );
+
+    assetBalances.forEach((data, index) => {
+      const asset = mappedAssets[index];
+      const _data = getSubtrateNonNativeBalance(data);
+
+      assets.push({
+        ...asset,
+        id: typeof asset.id === "object" ? String(asset.id) : asset.id,
+        ..._data,
+      });
+    });
 
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
         if (["acala", "mandala"].includes(chainName.toLowerCase())) {
-          params.push(address, asset.aditionalData?.tokenId);
+          params.push(address, JSON.parse(asset.id));
         } else {
           params.push(asset.id, address);
         }
@@ -386,6 +314,7 @@ export const getSubtrateNonNativeBalance = (
         };
       }
     | undefined
+    | any
 ) => {
   if (!data) {
     return {

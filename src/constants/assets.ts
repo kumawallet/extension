@@ -18,12 +18,12 @@ export const defaultAssetConfig = {
   [PARACHAINS.MOONBEAM]: [
     {
       address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080",
-      symbol: "xcDOT",
+      symbol: "DOT",
       decimals: 10,
     },
     {
       address: "0xFfFFFfffA893AD19e540E172C10d78D4d479B5Cf",
-      symbol: "xcASTR",
+      symbol: "ASTR",
       decimals: 18,
     },
   ],
@@ -31,12 +31,12 @@ export const defaultAssetConfig = {
   [PARACHAINS.MOONRIVER]: [
     {
       address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080",
-      symbol: "xcKSM",
+      symbol: "KSM",
       decimals: 12,
     },
     {
       address: "0xFFFfffFF0Ca324C842330521525E7De111F38972",
-      symbol: "xcSDN",
+      symbol: "SDN",
       decimals: 18,
     },
   ],
@@ -141,6 +141,11 @@ export const defaultAssetConfig = {
       symbol: "WBTC",
       decimals: 8,
     },
+    // {
+    //   address: "0xa6FB1DF483b24EEAB569e19447E0e107003B9E15",
+    //   symbol: "ENB",
+    //   decimals: 18,
+    // },
   ],
 };
 

@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useNetworkContext } from "@src/providers";
-import { RiCopperCoinLine } from "react-icons/ri";
 import { IAsset } from "@src/types";
+import { ASSETS_ICONS } from "@src/constants/assets-icons";
 
 interface AssetIconProps {
   asset: IAsset | null;
@@ -15,16 +15,30 @@ export const AssetIcon: FC<AssetIconProps> = ({ asset, width }) => {
 
   if (!asset || !selectedChain) return null;
 
+  const assetSymbol = asset.symbol?.toUpperCase() || "";
+
+  const icon = ASSETS_ICONS[assetSymbol] || null
+
   return (
     <>
-      {asset.id === "-1" ? (
+      {icon ? (
         <img
-          src={`/images/${selectedChain.logo}.png`}
+          src={icon}
           width={width}
           className="object-cover rounded-full"
         />
       ) : (
-        <RiCopperCoinLine size={width} color={asset.color || "#fff"} />
+        <div style={{
+          width: width,
+          height: width,
+          borderRadius: "50%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "gray",
+        }}>
+          {asset.symbol?.charAt(0).toUpperCase()}
+        </div>
       )}
     </>
   );

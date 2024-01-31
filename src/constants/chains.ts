@@ -172,7 +172,7 @@ export const KUSAMA = {
 
 export const ETHEREUM = {
   name: "Ethereum",
-  rpc: { evm: "https://eth.llamarpc.com" },
+  rpc: { evm: "https://eth-mainnet.public.blastapi.io/" },
   addressPrefix: 1,
   nativeCurrency: {
     name: "ETH",
