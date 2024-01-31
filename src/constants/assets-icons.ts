@@ -34,7 +34,7 @@ const ETH = "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
 const BUSD = "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png";
 const ENB = "https://s2.coinmarketcap.com/static/img/coins/64x64/7716.png";
 
-export const ASSETS_ICONS = {
+export const ASSETS_ICONS: { [key: string]: string } = {
   BTC,
   ACA,
   ASTR,
