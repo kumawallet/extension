@@ -55,18 +55,18 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
 
       <div className="flex flex-col py-6 px-4">
         <Logo
-          className="mx-auto mt-14 w-[15.5rem]"
+          className="mx-auto mt-14 w-[14rem] h-[14rem]"
           fillClassName="fill-chain-default-primary"
           lineClassName="#070707"
         />
-        <p className="font-semibold text-2xl -mt-5 mb-2 text-center">
+        <p className="font-semibold text-2xl mb-2 text-center">
           {t("welcome")}
         </p>
         <p className="font-light text-sm mb-9 text-center">
           {t("description")}
         </p>
 
-        <div className="relative mb-10">
+        <div className="relative mt-3 mb-2">
           <input
             id="password"
             min={8}

@@ -14,7 +14,7 @@ import {
   SwapInfo,
 } from "./components";
 import { HiMiniArrowRight, HiMiniArrowsRightLeft } from "react-icons/hi2";
-import { useThemeContext } from "@src/providers";
+import { useAssetContext, useThemeContext } from "@src/providers";
 import { useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
 import { FiChevronLeft } from "react-icons/fi";
@@ -27,16 +27,20 @@ import { TbExternalLink } from "react-icons/tb";
 
 // waiting, confirming, exchanging, sending, finished, failed, refunded, verifying
 const chipColor: { [key: string]: string } = {
-  ['failed']: "bg-red-600",
-  ['refunded']: "bg-red-600",
-  ['finished']: "bg-green-600",
-  ['waiting']: "bg-yellow-600",
+  ["failed"]: "bg-red-600",
+  ["refunded"]: "bg-red-600",
+  ["finished"]: "bg-green-600",
+  ["waiting"]: "bg-yellow-600",
 };
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
   const { color } = useThemeContext();
   const navigate = useNavigate();
+
+  const {
+    state: { isLoadingAssets },
+  } = useAssetContext();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -74,7 +78,8 @@ export const Swap = () => {
     txInfo,
   } = useSwap();
 
-  const canSend = balanceIsSufficient && recipient.address !== "";
+  const canSend =
+    balanceIsSufficient && recipient.address !== "" && assetsToSell.length > 0;
 
   const debouncedHandleAmount = useCallback(debounce(handleAmounts, 300), [
     amounts,
@@ -83,9 +88,8 @@ export const Swap = () => {
     assetToBuy,
   ]);
 
-
   return (
-    <PageWrapper contentClassName="bg-[#29323C] h-full flex-1">
+    <PageWrapper contentClassName="h-full flex-1">
       <ReEnterPassword />
 
       {mustConfirmTx ? (
@@ -124,15 +128,13 @@ export const Swap = () => {
               selectedIndex={selectedIndex}
               onChange={setSelectedIndex}
             >
-              <Tab.List
-                className={`flex space-x-1 p-1 border-b-[1px] border-b-${color}-primary mt-3`}
-              >
+              <Tab.List className={`flex space-x-1 p-1 mt-3`}>
                 {TABS.map((tab) => (
                   <Tab
                     key={tab}
                     className={({ selected }) =>
                       `px-4 text-base md:text-xl py-1 focus:outline-none relative w-full ${selected
-                        ? `text-${color}-secondary active-tab after:bg-${color}-fill`
+                        ? `text-${color}-primary active-tab after:bg-${color}-fill`
                         : "text-white"
                       }`
                     }
@@ -152,7 +154,7 @@ export const Swap = () => {
                         defaulValue={assetToSell as SwapAsset}
                         label={t("transfer_from") as string}
                         position="left"
-                        isLoading={isLoading}
+                        isLoading={isLoading || isLoadingAssets}
                         isReadOnly={isCreatingSwap}
                       />
                       <HiMiniArrowsRightLeft className="mt-7" size={20} />
@@ -162,7 +164,9 @@ export const Swap = () => {
                         onChange={(asset) => handleAssetChange("buy", asset)}
                         defaulValue={assetToBuy as SwapAsset}
                         label={t("transfer_to") as string}
-                        isLoading={isLoading || isLoadingSellPairs}
+                        isLoading={
+                          isLoading || isLoadingSellPairs || isLoadingAssets
+                        }
                         position="right"
                         isReadOnly={isCreatingSwap}
                       />
@@ -172,7 +176,9 @@ export const Swap = () => {
                       <div>
                         <AssetAmountInput
                           minSellAmount={minSellAmount}
-                          isLoading={isLoading || isLoadingSellAsset}
+                          isLoading={
+                            isLoading || isLoadingSellAsset || isLoadingAssets
+                          }
                           amount={amounts.sell}
                           balance={formatBN(
                             assetToSell.balance?.toString() || "0",
@@ -194,25 +200,30 @@ export const Swap = () => {
                               onChange={(asset) =>
                                 handleAssetChange("sell", asset)
                               }
-                              isLoading={isLoading}
+                              isLoading={isLoading || isLoadingAssets}
                               defaulValue={assetToSell as SwapAsset}
-                              containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
-                              buttonClassName="rounded-l-none"
+                              containerClassName="flex-none w-[40%]"
+                              buttonClassName="rounded-l-none bg-[#343a40] border-none border-l-[0.1px] border-l-[#727e8b17]"
                               position="right"
                               isReadOnly={isCreatingSwap}
-
                             />
                           }
                         />
                         {!balanceIsSufficient && (
                           <InputErrorMessage
-                            message={sellBalanceError ? t(sellBalanceError) as string : ""}
+                            message={
+                              sellBalanceError
+                                ? (t(sellBalanceError) as string)
+                                : ""
+                            }
                           />
                         )}
                       </div>
 
                       <AssetAmountInput
-                        isLoading={isLoading || isLoadingBuyAsset}
+                        isLoading={
+                          isLoading || isLoadingBuyAsset || isLoadingAssets
+                        }
                         amount={amounts.buy}
                         balance={formatBN(
                           assetToBuy.balance?.toString() || "0",
@@ -229,21 +240,21 @@ export const Swap = () => {
                           <SelectableAsset
                             value={assetToBuy as SwapAsset}
                             options={assetsToBuy}
-                            isLoading={isLoading || isLoadingSellPairs}
+                            isLoading={
+                              isLoading || isLoadingSellPairs || isLoadingAssets
+                            }
                             onChange={(asset) =>
                               handleAssetChange("buy", asset)
                             }
                             defaulValue={assetToBuy as SwapAsset}
-                            containerClassName="flex-none w-[40%] border-l-[0.1px] border-l-[#E5E7EB]"
-                            buttonClassName="rounded-l-none"
+                            containerClassName="flex-none w-[40%]"
+                            buttonClassName="rounded-l-none bg-[#343a40] border-none border-l-[0.1px] border-l-[#727e8b17]"
                             position="right"
                             isReadOnly={isCreatingSwap}
-
                           />
                         }
                       />
                     </div>
-
 
                     <RecipientAddress
                       recipentAddressFormat={
@@ -252,7 +263,7 @@ export const Swap = () => {
                           : ""
                       }
                       isOptional={false}
-                      containerClassName="mt-10"
+                      containerClassName="mt-4 mb-2"
                       address={recipient.address}
                       isNotOwnAddress={recipient.isNotOwnAddress}
                       isValidAddress={isValidWASMAddress}
@@ -264,12 +275,9 @@ export const Swap = () => {
                       }
                     />
 
-
-                    {
-                      swapInfoMessage && (
-                        <p className="py-3 text-gray-300">{t(swapInfoMessage)}</p>
-                      )
-                    }
+                    {swapInfoMessage && (
+                      <p className="py-3 text-gray-300">{t(swapInfoMessage)}</p>
+                    )}
 
                     <SwapInfo {...txInfo} />
                   </div>
@@ -277,9 +285,12 @@ export const Swap = () => {
                   <Button
                     isDisabled={!canSend}
                     isLoading={
-                      isLoading || isLoadingBuyAsset || isLoadingSellAsset || isCreatingSwap
+                      isLoading ||
+                      isLoadingBuyAsset ||
+                      isLoadingSellAsset ||
+                      isCreatingSwap
                     }
-                    classname={`font-medium text-base capitalize w-full py-2 bg-[#212529] hover:bg-${color}-primary !mx-0`}
+                    classname={`font-medium text-base capitalize w-full py-2 bg-[#212529] hover:bg-${color}-primary mt-3 !mx-0`}
                     onClick={swap}
                   >
                     {t("proceed")}
@@ -309,24 +320,37 @@ export const Swap = () => {
                               </div>
                               <HiMiniArrowRight size={20} />
                               <div className="flex flex-col gap-1 items-center">
-                                <img src={swap.iconTo || ""} className="w-8 h-8" />
+                                <img
+                                  src={swap.iconTo || ""}
+                                  className="w-8 h-8"
+                                />
                                 <p>
                                   {`${swap.amountTo
                                     } ${swap?.currencyTo?.toUpperCase()}`}
                                 </p>
                               </div>
                             </div>
-
                           </div>
 
                           <div className="mb-3 flex flex-col gap-3">
-                            <p>id:
-                              <a className="hover:bg-slate-400/20 rounded-xl p-1 inline-flex gap-1 items-center" href={`https://stealthex.io/exchange/?id=${swap.id}`} target="_blank" rel="noopener noreferrer">{swap.id}
+                            <p>
+                              id:
+                              <a
+                                className="hover:bg-slate-400/20 rounded-xl p-1 inline-flex gap-1 items-center"
+                                href={`https://stealthex.io/exchange/?id=${swap.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {swap.id}
                                 <TbExternalLink />
                               </a>
                             </p>
-                            <p className="flex items-center gap-2">status:
-                              <span className={`rounded-xl p-1 ${chipColor[swap.status] || "bg-yellow-600"}`}>
+                            <p className="flex items-center gap-2">
+                              status:
+                              <span
+                                className={`rounded-xl p-1 ${chipColor[swap.status] || "bg-yellow-600"
+                                  }`}
+                              >
                                 {swap.status}
                               </span>
                             </p>

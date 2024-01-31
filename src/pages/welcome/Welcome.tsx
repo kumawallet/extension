@@ -36,11 +36,11 @@ export const Welcome = () => {
       {/* <SelectLanguage /> */}
       <div className="py-6 px-4">
         <Logo
-          className="mx-auto mt-14 w-[15.5rem]"
+          className="mx-auto mt-14 w-[14rem] h-[14rem]"
           fillClassName="fill-chain-default-primary"
           lineClassName="#070707"
         />
-        <p className="font-semibold text-2xl -mt-5 mb-2 text-center">
+        <p className="font-semibold text-2xl mb-2 text-center">
           {t("welcome_message")}
         </p>
         <p className="font-light text-sm mb-9 text-center">

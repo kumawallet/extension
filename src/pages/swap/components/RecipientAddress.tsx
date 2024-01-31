@@ -58,7 +58,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
       <input
         type="text"
         disabled={isOptional && !isNotOwnAddress}
-        className="border border-white w-full bg-[#29323C] disabled:cursor-not-allowed disabled:opacity-50 rounded-2xl py-3 px-4 outline-none focus:outline-none "
+        className="w-full bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold disabled:cursor-not-allowed disabled:opacity-50 rounded-xl py-3 px-4 outline-none focus:outline-none "
         value={address}
         onChange={(e) => onAddressChange(e.target.value)}
       />

@@ -2,12 +2,10 @@ import { useTranslation } from "react-i18next";
 import { Action } from "./Action";
 import { useNavigate } from "react-router-dom";
 import { SEND, SWAP } from "@src/routes/paths";
-import SendIcon from "/icons/send.svg";
-import SwapIcon from "/icons/swap.svg";
-import BuyIcon from "/icons/buy.svg";
 import { useMemo } from "react";
 import { useNetworkContext } from "@src/providers";
 import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
+import { Buy, Send, Swap } from "@src/components/ui";
 
 export const Actions = () => {
   const { t } = useTranslation("balance");
@@ -28,23 +26,24 @@ export const Actions = () => {
   return (
     <div className="flex gap-5 justify-center">
       <Action
-        Icon={<img src={SendIcon} width={22} />}
+        Icon={Send}
         title={t("send")}
         onClick={() => navigate(SEND)}
       />
 
       <Action
-        Icon={<img src={SwapIcon} width={22} />}
+        Icon={Swap}
         title={t("swap")}
         onClick={() => navigate(SWAP)}
         isDisabled={!isSwapAvailable}
       />
 
       <Action
-        Icon={<img src={BuyIcon} width={22} />}
+        Icon={Buy}
         title={t("buy")}
         onClick={() => navigate("")}
         isDisabled={true}
+        isCoomingSoon={true}
       />
     </div>
   );

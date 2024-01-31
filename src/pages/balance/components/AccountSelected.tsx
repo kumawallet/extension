@@ -19,12 +19,14 @@ export const AccountSelected = () => {
     <>
       <button
         onClick={copyToClipboard}
-        className={`flex items-center gap-1 w-fit bg-${color}-primary bg-opacity-[0.25] hover:bg-opacity-15 rounded-full px-4 py-1 mx-auto`}
+        className={`flex items-center gap-1 w-fit bg-${color}-primary bg-opacity-[0.25] hover:bg-opacity-15 rounded-full px-4 py-[0.1rem] mx-auto`}
         data-testid="account-button"
       >
-        <Icon iconProps={{
-          className: `text-${color}-primary fill-${color}-primary`,
-        }} />
+        <Icon
+          iconProps={{
+            className: `text-${color}-primary fill-${color}-primary`,
+          }}
+        />
         <p
           className={`text-${color}-primary`}
           style={{
