@@ -40,6 +40,7 @@ export const Security = () => {
   );
   const { showErrorToast } = useToast();
   const navigate = useNavigate();
+  const [isOpenReenterPasswordModal, setOpenReenterPasswordModal] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -103,6 +104,7 @@ export const Security = () => {
         privateKeyOrSeed = privateKeyOrSeed.substring(0, index);
       }
       setPrivateKey(privateKeyOrSeed);
+      setOpenReenterPasswordModal(true)
     } catch (error: unknown) {
       if (typeof error === "string") {
         showErrorToast(tCommon(error));
@@ -137,6 +139,9 @@ export const Security = () => {
 
   return (
     <PageWrapper>
+      {isOpenReenterPasswordModal && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
+
+
       <div className="flex items-center gap-3 mb-10">
         <FiChevronLeft
           className="cursor-pointer"
@@ -216,11 +221,10 @@ export const Security = () => {
           <p className="text-lg font-medium">{t("show_account_keys")}</p>
           <div className="p-2">
             <div className="relative inset-0 flex items-center justify-center">
-              <Button onClick={openModal} classname="text-sm font-medium">
+              <Button onClick={() => privateKey ? openModal() : setOpenReenterPasswordModal(true)} classname="text-sm font-medium">
                 {tCommon("show")}
               </Button>
             </div>
-            {isOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isOpen} as={Fragment}>
               <Dialog
                 as="div"
@@ -311,13 +315,12 @@ export const Security = () => {
             <div className="relative inset-0 flex items-center justify-center">
               <button
                 type="button"
-                onClick={openResetModal}
+                onClick={() => privateKey ? openResetModal() : setOpenReenterPasswordModal(true)}
                 className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-custom-red-bg px-4 py-2 text-sm font-medium"
               >
                 {t("reset")}
               </button>
             </div>
-            {isResetOpen && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
             <Transition appear show={isResetOpen} as={Fragment}>
               <Dialog
                 as="div"
