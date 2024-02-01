@@ -225,7 +225,7 @@ export const Send = () => {
                 onClick={() => navigate(-1)}
               />
 
-              <p className="text-xl">{t("title")}</p>
+              <p className="text-lg">{t("title")}</p>
             </div>
 
             {type === "WASM" ? (

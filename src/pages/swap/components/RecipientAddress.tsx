@@ -1,7 +1,8 @@
 import { FC } from "react";
-import { Switch } from "@headlessui/react";
+import { Popover, Switch } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { useThemeContext } from "@src/providers";
+import { MdInfoOutline } from "react-icons/md";
 
 interface RecipientAddressProps {
   address: string;
@@ -12,6 +13,33 @@ interface RecipientAddressProps {
   onAddressChange: (address: string) => void;
   onTogleRecipient: (value: boolean) => void;
   recipentAddressFormat?: string;
+  infoTooltipMessage?: string;
+}
+
+const Address = ({ recipentAddressFormat, text, tooltipMessage }: {
+  recipentAddressFormat: string | null;
+  text: string;
+  tooltipMessage: string | undefined;
+}) => {
+  return (
+    <div className="flex gap-2 items-center relative">
+      <span>
+        {text}
+      </span>
+      {
+        tooltipMessage && (
+          <Popover className="relative h-[12px]">
+            <Popover.Button>
+              <MdInfoOutline size={12} />
+            </Popover.Button>
+            <Popover.Panel className="absolute z-10 bg-[#212529] rounded-xl top-3 -left-[80px] w-[200px]">
+              <p className="p-3 text-gray-200">{tooltipMessage}</p>
+            </Popover.Panel>
+          </Popover>
+        )
+      }
+    </div>
+  )
 }
 
 export const RecipientAddress: FC<RecipientAddressProps> = ({
@@ -23,6 +51,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
   onAddressChange,
   onTogleRecipient,
   recipentAddressFormat = null,
+  infoTooltipMessage
 }) => {
   const { t } = useTranslation("swap");
   const { color } = useThemeContext();
@@ -34,7 +63,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
           <Switch.Group>
             <div className="flex items-center mb-1">
               <Switch.Label passive className="mr-2 text-xs font-medium">
-                {recipentAddressFormat} {t("recipent_address")}
+                <Address recipentAddressFormat={recipentAddressFormat} text={t("recipent_address")} tooltipMessage={t(infoTooltipMessage || "")} />
               </Switch.Label>
               <Switch
                 checked={isNotOwnAddress}
@@ -51,7 +80,9 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
             </div>
           </Switch.Group>
         ) : (
-          <p className="text-xs font-medium mb-1">{recipentAddressFormat} {t("recipent_address")}</p>
+          <p className="text-xs font-medium mb-1">
+            <Address recipentAddressFormat={recipentAddressFormat} text={t("recipent_address")} tooltipMessage={t(infoTooltipMessage || "")} />
+          </p>
         )
       }
 

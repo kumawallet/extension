@@ -1,6 +1,7 @@
 import { AccountType } from "@src/accounts/types";
 import { MAINNETS, TESTNETS } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
+import { version } from "@src/utils/env";
 
 export type Chain = {
   name: string;
@@ -33,6 +34,7 @@ export default class Chains extends BaseEntity {
   mainnets: Chain[];
   testnets: Chain[];
   custom: Chain[];
+  version: string = "";
 
   private static instance: Chains;
 
@@ -65,6 +67,13 @@ export default class Chains extends BaseEntity {
     const stored = await Chains.get<Chains>();
     if (!stored) throw new Error("failed_to_load_chains");
     const chains = Chains.getInstance();
+    // if (stored.version !== version) {
+    //   chains.mainnets = MAINNETS;
+    //   chains.testnets = TESTNETS;
+    //   chains.version = version;
+    //   await Chains.set<Chains>(chains);
+    //   return;
+    // }
     chains.mainnets = stored.mainnets;
     chains.testnets = stored.testnets;
     chains.custom = stored.custom;
@@ -98,11 +107,7 @@ export default class Chains extends BaseEntity {
   }
 
   getAll() {
-    return [
-      ...this.mainnets,
-      ...this.testnets,
-      ...this.custom,
-    ];
+    return [...this.mainnets, ...this.testnets, ...this.custom];
   }
 
   isAlreadyAdded(chain: Chain) {

@@ -67,14 +67,14 @@ export const SelectableAsset = <T extends SwapAsset>({
       );
 
   return (
-    <div className={`flex flex-col flex-1 ${containerClassName}`}>
+    <div className={`flex flex-col flex-1 relative ${containerClassName || ""}`}>
       {label && (
-        <p className="mb-[2px] font-inter font-bold text-xs md:text-lg">{label}</p>
+        <p className="mb-2 font-inter font-bold text-xs md:text-lg absolute top-[-25px]">{label}</p>
       )}
       <Combobox value={value} onChange={onChange} defaultValue={defaulValue}>
         {({ open }) => (
           <div className="relative h-full">
-            <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-1">
+            <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-3">
               {value.image && <OptImage image={value.image} />}
             </Combobox.Label>
 
@@ -85,7 +85,7 @@ export const SelectableAsset = <T extends SwapAsset>({
             )}
 
             <Combobox.Input
-              className={`!pl-10 min-w-[120px] h-full w-full flex justify-between border border-white items-center bg-[#040404] rounded-lg py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
+              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between border border-white items-center bg-[#040404] rounded-lg py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
               displayValue={(asset: SwapAsset) =>
                 asset?.label?.toUpperCase() || ""
               }
