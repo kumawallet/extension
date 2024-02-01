@@ -5,7 +5,11 @@ type SelectedChain = Chain | null;
 type Api = ApiPromise | ethers.providers.JsonRpcProvider | null;
 
 export interface InitialState {
-  chains: Chains;
+  chains: {
+    mainnets: Chain[];
+    testnets: Chain[];
+    custom: Chain[];
+  };
   selectedChain: SelectedChain;
   api: Api;
   rpc: string | null;

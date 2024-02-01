@@ -281,6 +281,7 @@ export default class Extension {
   }
 
   static async getAllChains(): Promise<Chains> {
+    // await Chains.loadChains();
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
     return chains;

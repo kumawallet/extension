@@ -583,10 +583,10 @@ export const useSwap = () => {
     init(api);
   }, [api, _assets]);
 
-  useEffect(() => {
-    if (!swapper) return;
-    loadActiveSwaps();
-  }, [assets, swapper]);
+  // useEffect(() => {
+  //   if (!swapper) return;
+  //   loadActiveSwaps();
+  // }, [assets, swapper]);
 
   return {
     activeSwaps,
