@@ -281,9 +281,39 @@ export default class Extension {
   }
 
   static async getAllChains(): Promise<Chains> {
-    // await Chains.loadChains();
+    const newChains = await Chains.loadChains();
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
+
+    if (newChains) {
+      const network = await Network.get<Network>();
+      const selectedNetwork = network.chain;
+      const selectedNetworkInMainnets = newChains.mainnets.find(
+        (chain) =>
+          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
+      );
+
+      const selectedNetworkInTestnets = newChains.testnets.find(
+        (chain) =>
+          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
+      );
+
+      let chainToUpdate = null;
+
+      if (selectedNetworkInMainnets) {
+        chainToUpdate = selectedNetworkInMainnets;
+      }
+
+      if (selectedNetworkInTestnets) {
+        chainToUpdate = selectedNetworkInTestnets;
+      }
+
+      if (chainToUpdate) {
+        network.chain = chainToUpdate;
+        await Network.set<Network>(network);
+      }
+    }
+
     return chains;
   }
 

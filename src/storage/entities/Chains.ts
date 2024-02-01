@@ -63,20 +63,30 @@ export default class Chains extends BaseEntity {
     return defaultChains as Chains;
   }
 
-  static async loadChains(): Promise<void> {
+  static async loadChains(): Promise<
+    | {
+        mainnets: Chain[];
+        testnets: Chain[];
+      }
+    | undefined
+  > {
     const stored = await Chains.get<Chains>();
     if (!stored) throw new Error("failed_to_load_chains");
     const chains = Chains.getInstance();
-    // if (stored.version !== version) {
-    //   chains.mainnets = MAINNETS;
-    //   chains.testnets = TESTNETS;
-    //   chains.version = version;
-    //   await Chains.set<Chains>(chains);
-    //   return;
-    // }
+    if (stored.version !== version) {
+      chains.mainnets = MAINNETS;
+      chains.testnets = TESTNETS;
+      chains.version = version;
+      await Chains.set<Chains>(chains);
+      return {
+        mainnets: MAINNETS,
+        testnets: TESTNETS,
+      };
+    }
     chains.mainnets = stored.mainnets;
     chains.testnets = stored.testnets;
     chains.custom = stored.custom;
+    return undefined;
   }
 
   static async saveCustomChain(chain: Chain) {
