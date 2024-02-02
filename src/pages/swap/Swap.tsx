@@ -128,6 +128,7 @@ export const Swap = () => {
             <div className="flex-1 mt-4">
               <div className="flex justify-center items-center gap-3 pt-5">
                 <SelectableAsset
+                  buttonClassName={`border-${color}-primary`}
                   value={assetToSell as SwapAsset}
                   options={assetsToSell}
                   onChange={(asset) => handleAssetChange("sell", asset)}

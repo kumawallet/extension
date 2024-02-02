@@ -340,11 +340,11 @@ export const useSwap = () => {
         amountBridge: amounts.sell,
         chainFrom: {
           name: "",
-          image: `/images/${selectedChain.logo}.png`,
+          image: selectedChain.logo,
         },
         chainBridge: {
           name: "",
-          image: `/images/${selectedChain.logo}.png`,
+          image: selectedChain.logo,
         },
         chainTo: {
           name: "",

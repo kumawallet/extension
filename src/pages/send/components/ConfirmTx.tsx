@@ -39,20 +39,20 @@ export const ConfirmTx: FC<ConfirmTxProps> = ({ onConfirm, onBack, isLoading, fe
       amountTo={amount}
       assetFrom={{
         symbol: asset.symbol,
-        image: asset.id === "-1" ? `/images/${originAccount.logo}.png` : null
+        image: asset.id === "-1" ? originAccount.logo : null
       }}
       assetTo={{
         symbol: asset.symbol,
-        image: asset.id === "-1" ? `/images/${originAccount.logo}.png` : null
+        image: asset.id === "-1" ? originAccount.logo : null
       }}
       chainFrom={{
         name: originChainName,
-        image: `/images/${originAccount.logo}.png`,
+        image: originAccount.logo,
 
       }}
       chainTo={{
         name: destinationChain.name,
-        image: `/images/${destinationChain.logo}.png`,
+        image: destinationChain.logo,
       }}
       onConfirm={onConfirm}
       isLoading={isLoading}

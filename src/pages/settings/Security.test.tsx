@@ -37,6 +37,7 @@ describe("Security", () => {
         showKey: () => "key",
         getTrustedSites: () => getTrustedSites(),
         removeTrustedSite: () => removeTrustedSite(),
+        isAuthorized: () => true
       },
     }));
   });

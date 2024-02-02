@@ -38,7 +38,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
           }}
         >
           <img
-            src={`/images/${chain.logo}.png`}
+            src={chain.logo}
             width={29}
             height={29}
             className="object-contain rounded-full"
@@ -56,7 +56,7 @@ export const SelectableChain: FC<SelectableChainProps> = ({
                 className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md flex items-center gap-2 py-2"
               >
                 <img
-                  src={`/images/${chain.logo}.png`}
+                  src={chain.logo}
                   width={29}
                   height={29}
                   className="object-contain rounded-full"

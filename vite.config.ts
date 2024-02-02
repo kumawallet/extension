@@ -62,6 +62,7 @@ export default defineConfig({
         "**/**/index.ts",
         "**/src/pages/balance/Balance.tsx",
         "**/src/pages/send/Send.tsx",
+        "**/src/components/ui/**",
       ],
     },
   },

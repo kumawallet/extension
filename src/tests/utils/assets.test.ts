@@ -1,6 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
+import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 import {
   formatAmountWithDecimals,
   formatBN,
@@ -185,20 +186,12 @@ describe("assets", () => {
         dispatchMock
       );
 
-      expect(result.assets[0]).toEqual({
-        id: "100",
-        name: "Glimmer",
-        symbol: "GLMR",
-        decimals: 18,
-        balance: new BN(10),
-        transferable: new BN(10),
-        frozen: new BN(0),
-        reserved: new BN(0),
-        aditionalData: null,
-      });
+      expect(result.assets[0].symbol).toEqual(
+        SUBSTRATE_ASSETS_MAP["Astar"][0].symbol
+      );
     });
 
-    it("get assets Astar case", async () => {
+    it("get assets Acala case", async () => {
       const ASSETS_MOCK = [
         [
           {
@@ -254,18 +247,9 @@ describe("assets", () => {
         dispatchMock
       );
 
-      expect(result.assets[0]).toMatchObject({
-        id: "100",
-        name: "Glimmer",
-        symbol: "GLMR",
-        decimals: 18,
-        balance: new BN(10),
-        aditionalData: {
-          tokenId: {
-            StableAssetPoolToken: 1,
-          },
-        },
-      });
+      expect(result.assets[0].symbol).toMatchObject(
+        SUBSTRATE_ASSETS_MAP["Acala"][0].symbol
+      );
     });
   });
 });

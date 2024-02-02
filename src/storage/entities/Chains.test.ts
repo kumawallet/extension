@@ -1,3 +1,4 @@
+import { MAINNETS, TESTNETS } from "@src/constants/chains";
 import Chains, { Chain } from "./Chains";
 
 describe("Chains", () => {
@@ -60,8 +61,8 @@ describe("Chains", () => {
       await Chains.loadChains();
 
       const chains = Chains.getInstance();
-      expect(chains.mainnets).toEqual([]);
-      expect(chains.testnets).toEqual([]);
+      expect(chains.mainnets).toEqual(MAINNETS);
+      expect(chains.testnets).toEqual(TESTNETS);
       expect(chains.custom).toEqual([]);
     });
 

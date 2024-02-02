@@ -1,5 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import { BN, hexToBn, hexToString } from "@polkadot/util";
+import { BN, hexToBn } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
 import { ethers } from "ethers";
 import { captureError } from "./error-handling";

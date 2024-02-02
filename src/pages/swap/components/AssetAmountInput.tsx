@@ -78,7 +78,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
           {isLoading && (
             <div className="absolute top-1/2 -translate-y-1/2 left-5">
-              <Loading containerClass="py-0" iconClass="w-6 h-6" />
+              <Loading containerClass="py-0" iconClass="w-5 h-5s" />
             </div>
           )}
         </div>

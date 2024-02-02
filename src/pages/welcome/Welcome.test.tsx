@@ -23,6 +23,7 @@ describe("Welcome", () => {
     }));
 
     vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
       getWebAPI: () => ({
         tabs: {
           getCurrent: () => Promise.resolve(undefined),

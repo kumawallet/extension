@@ -19,7 +19,7 @@ import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import Chains, { Chain } from "@src/storage/entities/Chains";
-import { CHAINS } from "@src/constants/chains";
+import { CHAINS, MAINNETS, TESTNETS } from "@src/constants/chains";
 
 const initialState: InitialState = {
   chains: Chains.getInstance(),
@@ -377,11 +377,19 @@ describe("NetworkProvider", () => {
   describe("refreshNetworks", () => {
     it("should refresh networks", async () => {
       const Extension: any = await import("@src/Extension");
-      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
+      Extension.default.getAllChains = vi.fn().mockResolvedValue({
+        mainnets: MAINNETS,
+        testnets: TESTNETS,
+        custom: [],
+      });
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state.chains).toEqual(chainsMock);
+        expect(state.chains).toEqual({
+          mainnets: MAINNETS,
+          testnets: TESTNETS,
+          custom: [],
+        });
       });
     });
     it("should show error", async () => {

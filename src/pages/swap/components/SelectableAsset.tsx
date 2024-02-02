@@ -25,8 +25,8 @@ const OptImage = ({ image }: { image: string }) => {
     return (
       <img
         src={image}
-        width={24}
-        height={24}
+        width={19}
+        height={19}
         className="object-contain rounded-full"
       />
     );
@@ -80,12 +80,12 @@ export const SelectableAsset = <T extends SwapAsset>({
 
             {isLoading && (
               <div className="absolute top-1/2 -translate-y-1/2 left-5">
-                <Loading containerClass="py-0" iconClass="w-6 h-6" />
+                <Loading containerClass="py-0" iconClass="w-5 h-5" />
               </div>
             )}
 
             <Combobox.Input
-              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between border border-white items-center bg-[#040404] rounded-lg py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
+              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between border-[1.78px] items-center bg-[#040404] rounded-xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
               displayValue={(asset: SwapAsset) =>
                 asset?.label?.toUpperCase() || ""
               }
