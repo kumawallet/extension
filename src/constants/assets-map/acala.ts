@@ -10,11 +10,11 @@ const getNativeAssetId = ({
   };
 };
 
-const getERC20 = (address: string) => {
-  return {
-    Erc20: address,
-  };
-};
+// const getERC20 = (address: string) => {
+//   return {
+//     Erc20: address,
+//   };
+// };
 
 const getStableAssetId = (id: number) => {
   return {

@@ -170,7 +170,7 @@ export const getWasmAssets = async (
     }
   ) => void
 ) => {
-  let assets: Asset[] = [];
+  const assets: Asset[] = [];
   const unsubs: unknown[] = [];
   try {
     let assetPallet = null;
@@ -215,7 +215,8 @@ export const getWasmAssets = async (
 
     assetBalances.forEach((data, index) => {
       const asset = mappedAssets[index];
-      const _data = getSubtrateNonNativeBalance(data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const _data = getSubtrateNonNativeBalance(data as any);
 
       assets.push({
         ...asset,
@@ -314,7 +315,6 @@ export const getSubtrateNonNativeBalance = (
         };
       }
     | undefined
-    | any
 ) => {
   if (!data) {
     return {
