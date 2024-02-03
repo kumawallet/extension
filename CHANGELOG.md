@@ -1,5 +1,13 @@
 # Changelog
 
+# 0.4.3
+- [#48](https://github.com/blockcoders/kuma-wallet/pull/48) New Logos and interface 
+
+# 0.4.0
+- [#47](https://github.com/blockcoders/kuma-wallet/pull/47) Stealthex integration
+- [#46](https://github.com/blockcoders/kuma-wallet/pull/46) UI improvements
+- [#45](https://github.com/blockcoders/kuma-wallet/pull/45) Zeta chain integration 
+
 # 0.3.10
 - [#44](https://github.com/blockcoders/kuma-wallet/pull/44) Balances can now be displayed in the desired currency.
 
