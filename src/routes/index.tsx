@@ -102,20 +102,16 @@ export const Routes = () => {
   }, [init]);
 
   const getHomeRoute = async () => {
-    if (!init) {
-      return;
-    }
+    if (!init) return
 
     try {
-
       const alreadySignedUp = await messageAPI.alreadySignedUp();
-
       if (!alreadySignedUp) {
         setHomeRoute(<Welcome />);
         return;
       }
-      const isSessionActive = await messageAPI.isSessionActive();
 
+      const isSessionActive = await messageAPI.isSessionActive();
       if (!isSessionActive) {
         setHomeRoute(<SignIn />);
         return;
@@ -124,7 +120,6 @@ export const Routes = () => {
     } catch (error) {
       console.log('error', error)
     }
-
   };
 
   if (location.search.includes("origin=kuma")) {

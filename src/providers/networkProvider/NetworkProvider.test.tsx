@@ -380,7 +380,6 @@ describe("NetworkProvider", () => {
         testnets: TESTNETS,
         custom: [],
       });
-
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);

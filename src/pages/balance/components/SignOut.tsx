@@ -9,7 +9,6 @@ export const SignOut = () => {
 
   const signOut = async () => {
     await messageAPI.signOut()
-    // await Extension.signOut();
     navigate(SIGNIN);
   };
 
