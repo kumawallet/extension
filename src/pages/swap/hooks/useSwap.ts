@@ -340,11 +340,11 @@ export const useSwap = () => {
         amountBridge: amounts.sell,
         chainFrom: {
           name: "",
-          image: `/images/${selectedChain.logo}.png`,
+          image: selectedChain.logo,
         },
         chainBridge: {
           name: "",
-          image: `/images/${selectedChain.logo}.png`,
+          image: selectedChain.logo,
         },
         chainTo: {
           name: "",
@@ -583,10 +583,10 @@ export const useSwap = () => {
     init(api);
   }, [api, _assets]);
 
-  useEffect(() => {
-    if (!swapper) return;
-    loadActiveSwaps();
-  }, [assets, swapper]);
+  // useEffect(() => {
+  //   if (!swapper) return;
+  //   loadActiveSwaps();
+  // }, [assets, swapper]);
 
   return {
     activeSwaps,

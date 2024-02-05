@@ -38,19 +38,17 @@
     "rpc_error": "Network error"
   },
   "welcome": {
-    "welcome_message": "Welcome to Kuma Wallet",
-    "description": "All your accounts in one place",
-    "button_text": "Get started"
-  },
-  "add_account": {
-    "title": "Add Account",
+    "welcome_message": "Welcome to Kuma",
+    "description": "Let's set you up!",
+    "button_text": "Get started",
     "import_wallet": "Import wallet",
     "create_wallet": "Create wallet"
   },
   "sign_in": {
     "welcome": "Welcome back",
+    "description": "to your friendly crypto wallet",
     "password_placeholder": "Type your password",
-    "signin_button_text": "Sign in",
+    "signin_button_text": "Unlock",
     "forgot_password": "Forgot password?"
   },
   "account_form": {
@@ -110,6 +108,8 @@
       "create": "Create"
     },
     "send": "Send",
+    "swap": "Swap",
+    "buy": "Buy",
     "receive": "Receive",
     "assets": "Assets",
     "activity": "Activity",

@@ -54,6 +54,7 @@ describe("SignMessage", () => {
     vi.mock("ethers");
 
     vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
       getWebAPI: () => ({
         windows: {
           getCurrent: () => ({

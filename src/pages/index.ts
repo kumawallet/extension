@@ -1,5 +1,4 @@
 export * from "./accountForm";
-export * from "./addAccount";
 export * from "./balance";
 export * from "./manageAssets";
 export * from "./send";

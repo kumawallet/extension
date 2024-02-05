@@ -1,11 +1,12 @@
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { Welcome } from "./Welcome";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import en from "@src/i18n/en.json";
 
 const useNavigateMock = vi.fn();
+const create = vi.fn();
 
 const renderComponent = () => {
   return render(
@@ -22,14 +23,16 @@ describe("Welcome", () => {
     }));
 
     vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
       getWebAPI: () => ({
-        runtime: {
-          getURL: () => ""
-        },
         tabs: {
-          create: () => ""
-        }
-      })
+          getCurrent: () => Promise.resolve(undefined),
+          create: () => create(),
+        },
+        runtime: {
+          getURL: vi.fn(),
+        },
+      }),
     }))
   });
 
@@ -38,11 +41,14 @@ describe("Welcome", () => {
     expect(screen.getByText(en.welcome.welcome_message)).toBeTruthy();
   });
 
-  it("should call goToAccount function", () => {
+  it("should open new tab", async () => {
     renderComponent();
-
-    fireEvent.click(screen.getByText(en.welcome.button_text));
-
-    expect(useNavigateMock).toHaveBeenCalled();
+    const importBtn = screen.getByText(
+      en.welcome.import_wallet
+    ).parentElement;
+    if (importBtn) {
+      fireEvent.click(importBtn);
+      await waitFor(() => expect(create).toHaveBeenCalled());
+    }
   });
 });

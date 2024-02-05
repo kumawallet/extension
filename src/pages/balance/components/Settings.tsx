@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { BsBoxArrowInRight, BsChevronRight, BsGear } from "react-icons/bs";
+import { BsChevronRight, BsGear } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
@@ -8,13 +8,13 @@ import {
   SETTINGS_GENERAL,
   SETTINGS_CONTACTS,
   SETTINGS_SECURITY,
-  SIGNIN,
   SETTINGS_BUG,
   SETTINGS_ABOUT_US,
 } from "@src/routes/paths";
 import { ICON_SIZE } from "@src/constants/icons";
 import { RxCross2 } from "react-icons/rx";
 import { useThemeContext } from "@src/providers";
+import { FooterIcon } from "./FooterIcon";
 
 const OPTIONS = [
   {
@@ -42,24 +42,15 @@ const OPTIONS = [
 export const Settings = () => {
   const { t } = useTranslation("settings");
   const { color } = useThemeContext();
+  const navigate = useNavigate()
 
-  const navigate = useNavigate();
-
-  const signOut = async () => {
-    await Extension.signOut();
-    navigate(SIGNIN);
-  };
 
   return (
     <Menu>
       {({ close }) => (
         <>
           <Menu.Button>
-            <div
-              className={`flex justify-center items-center rounded-full bg-[#212529] p-2 cursor-pointer text-${color}-primary`}
-            >
-              <BsGear />
-            </div>
+            <FooterIcon icon={BsGear} />
           </Menu.Button>
           <Transition
             as={Fragment}
@@ -94,15 +85,7 @@ export const Settings = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-10 flex justify-end">
-                      <div
-                        className="flex cursor-pointer hover:bg-gray-400 hover:bg-opacity-30 rounded-xl px-3 py-3"
-                        onClick={signOut}
-                      >
-                        <p className="text-lg pr-3">{t("sign_out")}</p>
-                        <BsBoxArrowInRight size={ICON_SIZE} />
-                      </div>
-                    </div>
+
                   </div>
                 </div>
                 <p className="text-center text-sm text-gray-400">

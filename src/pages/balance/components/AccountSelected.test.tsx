@@ -33,7 +33,7 @@ describe("AccountSelected", () => {
   it("should render selectedAccount", async () => {
     renderCoponent();
     const account = screen.getByText(
-      cropAccount("0x041fA537c4Fab3d7B91f67B358c126d37CBDa947")
+      cropAccount("0x041fA537c4Fab3d7B91f67B358c126d37CBDa947", 8)
     );
     expect(account).toBeDefined();
   });

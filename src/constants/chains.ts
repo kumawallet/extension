@@ -1,5 +1,9 @@
 import { AccountType } from "@src/accounts/types";
 import { Chain } from "@src/storage/entities/Chains";
+import { ASSETS_ICONS } from "./assets-icons";
+import ROCOCO_LOGO from "/images/rococo.png";
+import ASSETHUB_LOGO from "/images/assethub.png";
+import ZETA_LOGO from "/images/zeta.png";
 
 const WASM = "WASM" as AccountType.WASM;
 const EVM = "EVM" as AccountType.EVM;
@@ -68,7 +72,7 @@ export const POLKADOT = {
     symbol: "DOT",
     decimals: 10,
   },
-  logo: "polkadot",
+  logo: ASSETS_ICONS["DOT"],
   explorer: {
     wasm: {
       name: "subscan",
@@ -101,7 +105,7 @@ export const ASTAR = {
       url: "https://astar.subscan.io/",
     },
   },
-  logo: "astar",
+  logo: ASSETS_ICONS["ASTR"],
   supportedAccounts: [WASM, EVM],
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.MOONBEAM, PARACHAINS.ACALA],
 };
@@ -123,7 +127,7 @@ export const MOONBEAM = {
       url: "https://moonbeam.moonscan.io/",
     },
   },
-  logo: "moonbeam",
+  logo: ASSETS_ICONS["GLMR"],
   supportedAccounts: [EVM],
   xcm: [RELAY_CHAINS.POLKADOT, PARACHAINS.ASTAR, PARACHAINS.ACALA],
 };
@@ -139,7 +143,7 @@ export const ACALA = {
     symbol: "ACA",
     decimals: 12,
   },
-  logo: "acala",
+  logo: ASSETS_ICONS["ACA"],
   explorer: {
     wasm: {
       name: "subscan",
@@ -159,7 +163,7 @@ export const KUSAMA = {
     symbol: "KSM",
     decimals: 12,
   },
-  logo: "kusama",
+  logo: ASSETS_ICONS["KSM"],
   explorer: {
     wasm: {
       name: "subscan",
@@ -172,7 +176,7 @@ export const KUSAMA = {
 
 export const ETHEREUM = {
   name: "Ethereum",
-  rpc: { evm: "https://eth.llamarpc.com" },
+  rpc: { evm: "https://eth-mainnet.public.blastapi.io/" },
   addressPrefix: 1,
   nativeCurrency: {
     name: "ETH",
@@ -185,7 +189,7 @@ export const ETHEREUM = {
       url: "https://etherscan.io/",
     },
   },
-  logo: "ethereum",
+  logo: ASSETS_ICONS["ETH"],
   supportedAccounts: [EVM],
 };
 
@@ -207,12 +211,12 @@ export const POLYGON = {
       url: "https://polygonscan.com/",
     },
   },
-  logo: "polygon",
+  logo: ASSETS_ICONS["MATIC"],
   supportedAccounts: [EVM],
 };
 
 export const BINANCE = {
-  name: "Binance Smart Chain Mainnet",
+  name: "BNB Chain",
   chain: "BSC",
   rpc: {
     evm: "https://bsc-dataseed1.binance.org",
@@ -222,7 +226,7 @@ export const BINANCE = {
     symbol: "BNB",
     decimals: 18,
   },
-  logo: "binance",
+  logo: ASSETS_ICONS["BNB"],
   explorer: {
     evm: {
       name: "bscscan",
@@ -259,17 +263,15 @@ export const MOONRIVER = {
         url: "https://moonriver.moonscan.io/",
       },
     },
-    logo: "moonriver",
     supportedAccounts: [EVM],
   },
-
   explorer: {
     evm: {
       name: "moonscan",
       url: "https://moonriver.moonscan.io/",
     },
   },
-  logo: "moonriver",
+  logo: ASSETS_ICONS["MOVR"],
   supportedAccounts: [EVM],
   xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.SHIDEN],
 };
@@ -296,7 +298,7 @@ export const SHIDEN = {
       url: "https://shiden.subscan.io/",
     },
   },
-  logo: "shiden",
+  logo: ASSETS_ICONS["SDN"],
   supportedAccounts: [EVM, WASM],
   xcm: [RELAY_CHAINS.KUSAMA, PARACHAINS.MOONRIVER],
 };
@@ -324,7 +326,7 @@ const MOONBASE_ALPHA = {
       url: "https://moonbase.moonscan.io/",
     },
   },
-  logo: "moonbeam",
+  logo: ASSETS_ICONS["GLMR"],
   supportedAccounts: [EVM],
 };
 
@@ -351,7 +353,7 @@ export const SHIBUYA = {
       url: "https://shibuya.subscan.io/",
     },
   },
-  logo: "astar",
+  logo: ASSETS_ICONS["ASTR"],
   supportedAccounts: [EVM, WASM],
 };
 
@@ -370,12 +372,12 @@ export const GOERLI = {
       url: "https://goerli.etherscan.io/",
     },
   },
-  logo: "ethereum",
+  logo: ASSETS_ICONS["ETH"],
   supportedAccounts: [EVM],
 };
 
 export const BNB_TESTNET = {
-  name: "Binance Smart Chain Testnet",
+  name: "BNB Chain Testnet",
   rpc: {
     evm: "https://data-seed-prebsc-1-s1.binance.org:8545",
   },
@@ -391,7 +393,7 @@ export const BNB_TESTNET = {
       url: "https://testnet.bscscan.com/",
     },
   },
-  logo: "binance",
+  logo: ASSETS_ICONS["BNB"],
   supportedAccounts: [EVM],
 };
 
@@ -412,7 +414,7 @@ export const MUMBAI_TESTNET = {
       url: "https://mumbai.polygonscan.com/",
     },
   },
-  logo: "polygon",
+  logo: ASSETS_ICONS["MATIC"],
   supportedAccounts: [EVM],
 };
 
@@ -433,14 +435,14 @@ export const SEPOLIA = {
       url: "https://sepolia.subscan.io/",
     },
   },
-  logo: "ethereum",
+  logo: ASSETS_ICONS["ETH"],
   supportedAccounts: [EVM],
 };
 
 export const MANDALA = {
   name: "Mandala",
   rpc: {
-    wasm: "wss://mandala-rpc.aca-staging.network/ws",
+    wasm: "wss://mandala-tc9-rpc.aca-staging.network",
   },
   addressPrefix: 42,
   nativeCurrency: {
@@ -454,7 +456,7 @@ export const MANDALA = {
       url: "https://acala-testnet.subscan.io/",
     },
   },
-  logo: "acala",
+  logo: ASSETS_ICONS["ACA"],
   supportedAccounts: [WASM],
 };
 
@@ -475,7 +477,7 @@ export const ROCOCO = {
       url: "https://rococo.subscan.io/",
     },
   },
-  logo: "rococo",
+  logo: ROCOCO_LOGO,
   supportedAccounts: [WASM],
   xcm: [PARACHAINS_TESTNETS.ROCOCO_ASSET_HUB],
 };
@@ -497,7 +499,7 @@ export const ROCOCO_ASSET_HUB = {
       url: "https://assethub-rococo.subscan.io/",
     },
   },
-  logo: "assethub",
+  logo: ASSETHUB_LOGO,
   supportedAccounts: [WASM],
   xcm: [RELAY_CHAIN_TESTNETS.ROCOCO],
 };
@@ -519,7 +521,7 @@ export const WESTEND = {
       url: "https://westend.subscan.io/",
     },
   },
-  logo: "kusama",
+  logo: ASSETS_ICONS["KSM"],
   supportedAccounts: [WASM],
 };
 
@@ -533,7 +535,7 @@ export const ZETA_CHAIN_TESTNET: Chain = {
     symbol: "aZETA",
     decimals: 18,
   },
-  logo: "zeta",
+  logo: ZETA_LOGO,
   explorer: {
     evm: {
       name: "",

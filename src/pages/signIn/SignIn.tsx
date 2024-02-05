@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
-import logo from "/logo.svg";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { captureError } from "@src/utils/error-handling";
-import { Button, PageWrapper } from "@src/components/common";
+import {
+  Button,
+  ColoredBackground,
+  Logo,
+  PageWrapper,
+} from "@src/components/common";
 
 interface SignInProps {
   afterSignIn?: () => void;
@@ -46,11 +50,23 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   };
 
   return (
-    <PageWrapper>
-      <div className="flex flex-col">
-        <img src={logo} className="mx-auto mt-20 mb-5 w-36 md:w-40" />
-        <p className="text-center text-xl mb-6">{t("welcome")}</p>
-        <div className="relative mb-10">
+    <PageWrapper contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0">
+      <ColoredBackground />
+
+      <div className="flex flex-col py-6 px-4">
+        <Logo
+          className="mx-auto mt-14 w-[14rem] h-[14rem]"
+          fillClassName="fill-chain-default-primary"
+          lineClassName="#070707"
+        />
+        <p className="font-semibold text-2xl mb-2 text-center">
+          {t("welcome")}
+        </p>
+        <p className="font-light text-sm mb-9 text-center">
+          {t("description")}
+        </p>
+
+        <div className="relative mt-3 mb-2">
           <input
             id="password"
             min={8}
@@ -77,7 +93,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
 
         <div className="flex">
           <Button
-            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto"
+            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto z-10 !bg-[#040404] !text-white"
             aria-disabled={!isValid}
             isDisabled={!isValid}
             onClick={signIn}
@@ -86,7 +102,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
           </Button>
         </div>
         <p
-          className="text-center mb-6"
+          className="text-center mb-6 z-10 cursor-pointer"
           onClick={() => navigate(RESTORE_PASSWORD)}
         >
           {t("forgot_password")}

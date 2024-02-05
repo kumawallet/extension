@@ -23,6 +23,9 @@ describe("Actvity", () => {
           type: AccountType.EVM,
           chains: {
             getAll: vi.fn().mockReturnValue([]),
+            mainnets: [],
+            testnets: [],
+            custom: []
           },
         },
       }),

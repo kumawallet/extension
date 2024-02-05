@@ -1,6 +1,7 @@
+import { FooterIcon } from "@src/pages/balance/components/FooterIcon";
 import { getWebAPI } from "@src/utils/env";
 import { isInPopup } from "@src/utils/utils";
-import { BsFullscreen } from "react-icons/bs";
+import { BiExpandAlt } from "react-icons/bi";
 
 export const FullScreenFAB = () => {
   const openTab = () => {
@@ -12,11 +13,9 @@ export const FullScreenFAB = () => {
   if (!isInPopup()) return null
 
   return (
-    <button
-      className="rounded-full drop-shadow-lg flex justify-center items-center"
+    <FooterIcon
+      icon={BiExpandAlt}
       onClick={openTab}
-    >
-      <BsFullscreen />
-    </button>
+    />
   );
 };

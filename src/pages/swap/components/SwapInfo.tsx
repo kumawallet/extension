@@ -39,15 +39,15 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   }, [bridgeName]);
 
   return (
-    <div className="bg-[#303943] p-3 rounded-xl flex flex-col gap-2">
+    <div className="bg-[#343a40] border border-[#727e8b17] p-3 rounded-xl flex flex-col gap-2">
       {
         bridgeType && (
           <>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center text-[#A3A3A3]">
               <p>{t(`${bridgeType}_name`)}:</p>
               {_bridgeName}
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center text-[#A3A3A3]">
               <p>{t(`${bridgeType}_fee`)}:</p>
               <p>{bridgeFee}</p>
             </div>
@@ -56,7 +56,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
       }
 
       {gasFee && (
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-[#A3A3A3]">
           <p>{t("gas_fee")}:</p>
           <p>
             {gasFee} {selectedChain?.nativeCurrency?.symbol || ""}
@@ -65,7 +65,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
       )}
 
       {destinationAddress && (
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-[#A3A3A3]">
           <p>{t("destination_address")}:</p>
           <p>{cropAccount(destinationAddress as string)}</p>
         </div>

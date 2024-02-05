@@ -17,7 +17,11 @@ import Chains, { Chain } from "@src/storage/entities/Chains";
 import { captureError } from "@src/utils/error-handling";
 
 const initialState: InitialState = {
-  chains: Chains.getInstance(),
+  chains: {
+    mainnets: Chains.getInstance().mainnets,
+    testnets: Chains.getInstance().testnets,
+    custom: Chains.getInstance().custom,
+  },
   selectedChain: null,
   api: null,
   rpc: "",
@@ -110,7 +114,11 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         dispatch({
           type: "init",
           payload: {
-            chains,
+            chains: {
+              mainnets: chains.mainnets,
+              testnets: chains.testnets,
+              custom: chains.custom,
+            } as unknown as Chains,
             selectedChain,
             rpc,
             type: type.toUpperCase(),

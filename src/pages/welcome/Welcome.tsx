@@ -1,52 +1,61 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ADD_ACCOUNT } from "@src/routes/paths";
+import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import {
-  Button,
-  FullScreenFAB,
   Logo,
-  SelectLanguage,
+  // SelectLanguage,
   PageWrapper,
+  ColoredBackground,
 } from "@src/components/common";
+import { OptionButton } from "./components/OptionButton";
+import { getWebAPI } from "@src/utils/env";
+
+const WebAPI = getWebAPI();
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
-
   const navigate = useNavigate();
 
-  const goToAccounts = () => {
-    localStorage.setItem("welcome", String(true));
-    navigate(ADD_ACCOUNT);
+  const openTab = async (route: string) => {
+    const tab = await WebAPI.tabs.getCurrent();
+    if (!tab) {
+      const url = WebAPI.runtime.getURL(
+        `src/entries/newtab/index.html?route=${route}`
+      );
+      WebAPI.tabs.create({ url });
+      return;
+    }
+    navigate(route);
   };
 
   return (
-    <>
-      <PageWrapper>
-        <SelectLanguage />
+    <PageWrapper
+      contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0"
+    >
+      <ColoredBackground />
+      {/* <SelectLanguage /> */}
+      <div className="py-6 px-4">
         <Logo
-          className="mx-auto mt-20 mb-5 w-36 md:w-40"
+          className="mx-auto mt-14 w-[14rem] h-[14rem]"
           fillClassName="fill-chain-default-primary"
+          lineClassName="#070707"
         />
-        <p className="font-medium text-2xl md:text-3xl mb-2 text-center">
+        <p className="font-semibold text-2xl mb-2 text-center">
           {t("welcome_message")}
         </p>
-        <p className="font-light text-xs md:text-sm mb-12 text-center">
+        <p className="font-light text-sm mb-9 text-center">
           {t("description")}
         </p>
-        <div className="flex">
-          <Button
-            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto"
-            onClick={goToAccounts}
-          >
-            {t("button_text")}
-          </Button>
+        <div className="flex flex-col gap-5">
+          <OptionButton onClick={() => openTab(CREATE_ACCOUNT)}>
+            {t("create_wallet")}
+          </OptionButton>
+          <OptionButton onClick={() => openTab(IMPORT_ACCOUNT)}>
+            {t("import_wallet")}
+          </OptionButton>
         </div>
-      </PageWrapper>
 
-      <footer className="fixed bottom-0 left-0 right-0 py-4 px-3 flex justify-end gap-4 max-w-3xl w-full mx-auto">
-        <FullScreenFAB />
-      </footer>
-
-    </>
+      </div>
+    </PageWrapper>
   );
 };

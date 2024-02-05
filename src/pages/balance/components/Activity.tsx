@@ -136,7 +136,7 @@ export const Activity = () => {
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
-  const allChains = chains.getAll();
+  const allChains = [...chains.mainnets, ...chains.testnets, ...chains.custom];
 
   if (isLoading) {
     return <Loading />;

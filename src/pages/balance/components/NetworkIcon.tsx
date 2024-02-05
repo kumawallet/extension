@@ -19,7 +19,7 @@ export const NetworkIcon: FC<NetworkIconProps> = ({
 
   return (
     <img
-      src={`/images/${network?.logo}.png`}
+      src={network?.logo}
       width={width}
       className="object-cover rounded-full"
     />

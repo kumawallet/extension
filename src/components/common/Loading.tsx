@@ -15,10 +15,7 @@ export const Loading: FC<LoadingProps> = ({ containerClass, iconClass }) => {
   return (
     <div className={containerClass || DEFAULT_CONTAINER_CLASSNAME}>
       <AiOutlineLoading3Quarters
-        className={
-          iconClass ||
-          `w-8 h-8 mr-2 text-gray-200 animate-spin fill-${color}-primary`
-        }
+        className={`w-8 h-8 mr-2 text-gray-200 animate-spin fill-${color}-primary ${iconClass}`}
       />
     </div>
   );

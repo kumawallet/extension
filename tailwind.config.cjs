@@ -3,7 +3,7 @@ module.exports = {
   safelist: [
     {
       pattern: /^bg-chain-.*-(primary|secondary|fill|text)$/,
-      variants: ["hover", "after"],
+      variants: ["hover", "after", "hover:enabled"],
     },
     {
       pattern: /(text|border|fill|text|border)-chain/,
@@ -43,9 +43,9 @@ module.exports = {
             fill: "#8077ff",
           },
           astar: {
-            primary: "#1b6dc1d9",
+            primary: "#09a9fb",
             secondary: "#fff",
-            fill: "#1b6dc1d9",
+            fill: "#09a9fb",
           },
           "binance-smart-chain-mainnet": {
             primary: "#f3ba2f",

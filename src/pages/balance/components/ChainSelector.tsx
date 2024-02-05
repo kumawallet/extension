@@ -5,7 +5,6 @@ import {
   useAccountContext,
   useNetworkContext,
   useThemeContext,
-
 } from "@src/providers";
 import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
 import { useTranslation } from "react-i18next";
@@ -127,7 +126,7 @@ export const ChainSelector = () => {
           className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
         >
           <img
-            src={`/images/${selectedChain.logo}.png`}
+            src={selectedChain.logo}
             width={24}
             height={24}
             className="object-cover rounded-full"
@@ -189,7 +188,7 @@ export const ChainSelector = () => {
                                   </div>
                                 ) : (
                                   <img
-                                    src={`/images/${chain.logo}.png`}
+                                    src={chain.logo}
                                     width={30}
                                     height={30}
                                     alt={chain.name}

@@ -14,13 +14,12 @@ import {
 } from "@testing-library/react";
 import {
   selectedWASMChainMock,
-  selectedMultiSupportChain,
 } from "../../tests/mocks/chain-mocks";
 import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import Chains, { Chain } from "@src/storage/entities/Chains";
-import { CHAINS } from "@src/constants/chains";
+import { CHAINS, MAINNETS, TESTNETS } from "@src/constants/chains";
 
 const initialState: InitialState = {
   chains: Chains.getInstance(),
@@ -150,7 +149,10 @@ describe("NetworkProvider", () => {
           type: "select-network",
           payload,
         });
-        expect(newState).toContain(payload);
+
+        expect(newState.selectedChain).toEqual(payload.selectedChain);
+        expect(newState.rpc).toEqual(payload.rpc);
+        expect(newState.type).toEqual(payload.type);
       });
       it("without rpc", () => {
         const payload = {
@@ -161,7 +163,9 @@ describe("NetworkProvider", () => {
           type: "select-network",
           payload,
         });
-        expect(newState).toContain(payload);
+        expect(newState.selectedChain).toEqual(payload.selectedChain);
+        expect(newState.rpc).toEqual("");
+        expect(newState.type).toEqual(payload.type);
       });
       it("without type", () => {
         const payload = {
@@ -172,7 +176,8 @@ describe("NetworkProvider", () => {
           type: "select-network",
           payload,
         });
-        expect(newState).toContain(payload);
+        expect(newState.selectedChain).toEqual(payload.selectedChain);
+        expect(newState.rpc).toEqual(payload.rpc);
       });
     });
     describe("set-api", () => {
@@ -196,14 +201,14 @@ describe("NetworkProvider", () => {
           type: "set-api",
           payload,
         });
-        expect(newState).toContain(payload);
+        expect(newState.api).toEqual(payload.api);
       });
       it("default", () => {
         const newState = reducer(initialState, {
           type: "default" as any,
           payload: {} as any,
         });
-        expect(newState).toContain(initialState);
+        expect(newState).toEqual(initialState);
       });
     });
 
@@ -216,7 +221,7 @@ describe("NetworkProvider", () => {
           type: "refresh-networks",
           payload,
         });
-        expect(newState).toContain(payload);
+        expect(newState.chains).toEqual(payload.chains);
       });
     });
   });
@@ -372,11 +377,19 @@ describe("NetworkProvider", () => {
   describe("refreshNetworks", () => {
     it("should refresh networks", async () => {
       const Extension: any = await import("@src/Extension");
-      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
+      Extension.default.getAllChains = vi.fn().mockResolvedValue({
+        mainnets: MAINNETS,
+        testnets: TESTNETS,
+        custom: [],
+      });
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state.chains).toEqual(chainsMock);
+        expect(state.chains).toEqual({
+          mainnets: MAINNETS,
+          testnets: TESTNETS,
+          custom: [],
+        });
       });
     });
     it("should show error", async () => {
@@ -385,7 +398,7 @@ describe("NetworkProvider", () => {
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state.chains).toContain([]);
+        expect(state.selectedChain).toEqual(null);
       });
     });
   });

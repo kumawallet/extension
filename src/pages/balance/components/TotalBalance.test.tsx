@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
-import {CHAINS} from "@src/constants/chains";
-import {AccountType} from "@src/accounts/types";
+import { CHAINS } from "@src/constants/chains";
+import { AccountType } from "@src/accounts/types";
 
 const renderComponent = () => {
   return render(
@@ -79,30 +79,4 @@ describe("TotalBalance", () => {
     });
   });
 
-  it("should update account name", async () => {
-    const { getByTestId } = renderComponent();
-
-    const accountName = getByTestId("account-name");
-
-    act(() => {
-      fireEvent.click(accountName);
-    });
-
-    await waitFor(() => {
-      expect(getByTestId("account-name-input")).toBeDefined();
-    });
-
-    act(() => {
-      fireEvent.change(getByTestId("account-name-input"), {
-        target: { value: "new name" },
-      });
-      fireEvent.keyDown(getByTestId("account-name-input"), {
-        key: "Enter",
-      });
-    });
-
-    await waitFor(() => {
-      expect(updateAccountName).toBeCalled();
-    });
-  });
 });

@@ -2,13 +2,13 @@ import keyring from "@polkadot/ui-keyring";
 import { isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 
-export const cropAccount = (account: string) => {
+export const cropAccount = (account: string, length = 4) => {
   if (!account) return "";
-  const first4Letters = account.slice(0, 4);
+  const firstLetters = account.slice(0, length);
 
-  const last4Letters = account.slice(account.length - 4, account.length);
+  const lastLetters = account.slice(account.length - length, account.length);
 
-  return `${first4Letters}...${last4Letters}`;
+  return `${firstLetters}...${lastLetters}`;
 };
 
 export const formatAccount = (_account: string) => {

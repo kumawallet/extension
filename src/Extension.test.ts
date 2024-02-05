@@ -814,6 +814,7 @@ describe("Extension", () => {
 
       const get = vi.fn().mockReturnValue(CHAINS);
       _Chains.get = get;
+      _Chains.loadChains = vi.fn().mockReturnValue(undefined);
 
       const result = await Extension.getAllChains();
       expect(result).toMatchObject(CHAINS);

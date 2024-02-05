@@ -322,7 +322,7 @@ export const CallContract: FC<CallContractProps> = ({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <img
-              src={`/images/${selectedChain?.logo}.png`}
+              src={selectedChain?.logo}
               width={20}
               className="object-cover rounded-full"
             />

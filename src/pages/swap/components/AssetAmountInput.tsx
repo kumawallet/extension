@@ -41,11 +41,11 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
   return (
     <div className={containerClassName}>
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-2">
         <p className="font-inter font-bold md:text-lg">{label}</p>
         {
           showBalance && (
-            <p className="font-inter font-bold md:text-lg text-[#9CA3AF]">
+            <p className="font-inter font-bold md:text-lg text-[#9CA3AF] capitalize">
               {t("balance")}: {balance}
             </p>
           )
@@ -55,7 +55,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
       <div className="flex">
         <div className="flex-1 relative h-fit w-[60%]">
           <NumericFormat
-            className={`input-secondary py-3 rounded-2xl pr-12 outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary rounded-r-none`}
+            className={`input-secondary py-3 rounded-xl pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary rounded-r-none`}
             allowNegative={false}
             allowLeadingZeros={false}
             value={isLoading ? "" : amount}
@@ -78,7 +78,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
           {isLoading && (
             <div className="absolute top-1/2 -translate-y-1/2 left-5">
-              <Loading containerClass="py-0" />
+              <Loading containerClass="py-0" iconClass="w-5 h-5s" />
             </div>
           )}
         </div>

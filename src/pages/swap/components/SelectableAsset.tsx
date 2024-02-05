@@ -2,10 +2,10 @@ import { Combobox } from "@headlessui/react";
 import { useThemeContext } from "@src/providers";
 import { useState } from "react";
 import { BsCoin } from "react-icons/bs";
-import { BsChevronExpand } from "react-icons/bs";
 import { SwapAsset } from "../base";
 import { Loading } from "@src/components/common";
 import { VList } from "virtua";
+import { GoChevronDown } from "react-icons/go";
 
 interface SelectableAssetProps<T extends SwapAsset> {
   buttonClassName?: string;
@@ -25,8 +25,8 @@ const OptImage = ({ image }: { image: string }) => {
     return (
       <img
         src={image}
-        width={29}
-        height={29}
+        width={19}
+        height={19}
         className="object-contain rounded-full"
       />
     );
@@ -67,25 +67,25 @@ export const SelectableAsset = <T extends SwapAsset>({
       );
 
   return (
-    <div className={`flex flex-col flex-1 ${containerClassName}`}>
+    <div className={`flex flex-col flex-1 relative ${containerClassName || ""}`}>
       {label && (
-        <p className="mb-[2px] font-inter font-bold md:text-lg">{label}</p>
+        <p className="mb-2 font-inter font-bold text-xs md:text-lg absolute top-[-25px]">{label}</p>
       )}
       <Combobox value={value} onChange={onChange} defaultValue={defaulValue}>
         {({ open }) => (
           <div className="relative h-full">
-            <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-1">
+            <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-3">
               {value.image && <OptImage image={value.image} />}
             </Combobox.Label>
 
             {isLoading && (
               <div className="absolute top-1/2 -translate-y-1/2 left-5">
-                <Loading containerClass="py-0" />
+                <Loading containerClass="py-0" iconClass="w-5 h-5" />
               </div>
             )}
 
             <Combobox.Input
-              className={`!pl-10 min-w-[120px] h-full w-full flex justify-between items-center bg-[#212529] rounded-2xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
+              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between border-[1.78px] items-center bg-[#040404] rounded-xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
               displayValue={(asset: SwapAsset) =>
                 asset?.label?.toUpperCase() || ""
               }
@@ -96,8 +96,8 @@ export const SelectableAsset = <T extends SwapAsset>({
               readOnly={isLoading}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <BsChevronExpand
-                className="h-5 w-5 text-gray-400"
+              <GoChevronDown
+                className="h-5 w-5 text-white"
                 aria-hidden="true"
               />
             </Combobox.Button>

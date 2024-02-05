@@ -214,7 +214,7 @@ export const Send = () => {
       )} ${selectedChain?.nativeCurrency.symbol}`;
 
   return (
-    <PageWrapper contentClassName="bg-[#29323C] h-full">
+    <PageWrapper contentClassName="bg-[#29323C] h-full flex-1">
       <FormProvider {...methods}>
         {!tx ? (
           <div className="mx-auto">
@@ -225,7 +225,7 @@ export const Send = () => {
                 onClick={() => navigate(-1)}
               />
 
-              <p className="text-xl">{t("title")}</p>
+              <p className="text-lg">{t("title")}</p>
             </div>
 
             {type === "WASM" ? (

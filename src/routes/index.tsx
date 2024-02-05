@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 
 import {
   AccountForm,
-  AddAccount,
   Balance,
   ManageAssets,
   Send,
@@ -31,7 +30,7 @@ import {
   useNetworkContext,
 } from "@src/providers";
 import {
-  ADD_ACCOUNT,
+
   BALANCE,
   CALL_CONTRACT,
   CREATE_ACCOUNT,
@@ -51,6 +50,7 @@ import {
   SIGNIN,
   SIGN_MESSAGE,
   SWAP,
+  WELCOME,
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -109,16 +109,12 @@ export const Routes = () => {
       return;
     }
 
-    const isFirstTime = !localStorage.getItem("welcome");
-    if (isFirstTime) {
+    const alreadySignedUp = await Extension.alreadySignedUp();
+    if (!alreadySignedUp) {
       setHomeRoute(<Welcome />);
       return;
     }
-    const alreadySignedUp = await Extension.alreadySignedUp();
-    if (!alreadySignedUp) {
-      setHomeRoute(<AddAccount />);
-      return;
-    }
+
     const isSessionActive = await Extension.isSessionActive();
 
     if (!isSessionActive) {
@@ -160,8 +156,7 @@ export const Routes = () => {
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
-        <Route path="/" element={homeRoute} />
-        <Route path={ADD_ACCOUNT} element={<AddAccount />} />
+        <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={SEND} element={<Send />} />
