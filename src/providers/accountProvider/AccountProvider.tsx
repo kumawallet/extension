@@ -150,8 +150,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const selectedAccount = await messageAPI.getSelectedAccount();
 
-      console.log('getSelectedAccount', selectedAccount)
-
       if (!selectedAccount) return null;
 
       const { chain: selectedChain } = await messageAPI.getNetwork();
