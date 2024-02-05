@@ -38,14 +38,11 @@ if (isProduction) {
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd());
 
-  if (!env.VITE_EXTENSION_PREFIX && !env.VITE_PORT_PREFIX)
-    throw new Error("Missing VITE_EXTENSION_PREFIX or VITE_PORT_PREFIX");
-
   return defineConfig({
     define: {
       "process.env": JSON.stringify({
-        EXTENSION_PREFIX: env.VITE_EXTENSION_PREFIX,
-        PORT_PREFIX: env.VITE_PORT_PREFIX,
+        EXTENSION_PREFIX: env.VITE_EXTENSION_PREFIX || "kuma",
+        PORT_PREFIX: env.VITE_PORT_PREFIX || "kuma",
       }),
     },
     test: {
