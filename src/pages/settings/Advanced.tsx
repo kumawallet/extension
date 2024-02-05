@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import { Loading } from "@src/components/common";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const Advanced = () => {
   const { t } = useTranslation("advanced_settings");
@@ -25,7 +25,7 @@ export const Advanced = () => {
 
   const getSettings = async () => {
     try {
-      const settings = await Extension.getAdvancedSettings();
+      const settings = await messageAPI.getAdvancedSettings();
       setSettings(settings);
     } catch (error) {
       setSettings([]);

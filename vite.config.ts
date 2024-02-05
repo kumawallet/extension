@@ -10,6 +10,7 @@ import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfil
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
 import { isChrome, isProduction } from "./src/utils/env";
+import { loadEnv } from "vite";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");
@@ -34,85 +35,98 @@ if (isProduction) {
   `);
 }
 
-export default defineConfig({
-  test: {
-    testTimeout: 10000,
-    globals: true,
-    environment: "jsdom",
-    setupFiles: "src/tests/setup.ts",
-    coverage: {
-      reporter: ["text", "html", "lcov", "text-summary"],
-      exclude: [
-        ...(configDefaults.coverage.exclude as string[]),
-        "**/src/tests/mocks/**",
-        "**/src/constants/**",
-        "**/src/routes/**",
-        "**/src/components/common/**",
-        "**/src/xcm/**",
-        "**/utils/**",
-        "**/src/entries/**",
-        "**/tailwind.config.cjs",
-        "**/postcss.config.cjs",
-        "**/src/main.tsx",
-        "**/src/manifest.ts",
-        "**/src/components/wrapper/*",
-        "**/src/pages/index.ts",
-        "**/src/pages/callContract/**",
-        "**/src/pages/swap/**",
-        "**/**/index.ts",
-        "**/src/pages/balance/Balance.tsx",
-        "**/src/pages/send/Send.tsx",
-        "**/src/components/ui/**",
-      ],
+export default ({ mode }: { mode: string }) => {
+  const env = loadEnv(mode, process.cwd());
+
+  if (!env.VITE_EXTENSION_PREFIX && !env.VITE_PORT_PREFIX)
+    throw new Error("Missing VITE_EXTENSION_PREFIX or VITE_PORT_PREFIX");
+
+  return defineConfig({
+    define: {
+      "process.env": JSON.stringify({
+        EXTENSION_PREFIX: env.VITE_EXTENSION_PREFIX,
+        PORT_PREFIX: env.VITE_PORT_PREFIX,
+      }),
     },
-  },
-  resolve: {
-    alias: {
-      "@src": root,
-      "@assets": assetsDir,
-      "@entries": entriesDir,
-      "@styles": stylesDir,
-      "@hooks": hookDir,
-      "@utils": utilsDir,
-    },
-  },
-  plugins: [react(), makeManifest(), copyContentStyle()],
-  publicDir,
-  build: {
-    chunkSizeWarningLimit: 1000,
-    outDir,
-    // sourcemap: process.env.__DEV__ === "true",
-    rollupOptions: {
-      input: {
-        devtools: resolve(entriesDir, "devtools", "index.html"),
-        panel: resolve(entriesDir, "panel", "index.html"),
-        content: resolve(entriesDir, "content", "index.ts"),
-        background: isChrome
-          ? resolve(entriesDir, "background", "index.ts")
-          : resolve(entriesDir, "background", "index.html"),
-        popup: resolve(entriesDir, "popup", "index.html"),
-        newtab: resolve(entriesDir, "newtab", "index.html"),
-        options: resolve(entriesDir, "options", "index.html"),
-        scripts: resolve(entriesDir, "scripts", "contentScript.ts"),
+    test: {
+      testTimeout: 10000,
+      globals: true,
+      environment: "jsdom",
+      setupFiles: "src/tests/setup.ts",
+      coverage: {
+        reporter: ["text", "html", "lcov", "text-summary"],
+        exclude: [
+          ...(configDefaults.coverage.exclude as string[]),
+          "**/src/tests/mocks/**",
+          "**/src/constants/**",
+          "**/src/routes/**",
+          "**/src/components/common/**",
+          "**/src/xcm/**",
+          "**/utils/**",
+          "**/src/entries/**",
+          "**/tailwind.config.cjs",
+          "**/postcss.config.cjs",
+          "**/src/main.tsx",
+          "**/src/manifest.ts",
+          "**/src/components/wrapper/*",
+          "**/src/pages/index.ts",
+          "**/src/pages/callContract/**",
+          "**/src/pages/swap/**",
+          "**/**/index.ts",
+          "**/src/pages/balance/Balance.tsx",
+          "**/src/pages/send/Send.tsx",
+          "**/src/components/ui/**",
+        ],
       },
-      output: {
-        entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,
-      },
-      plugins: [rollupNodePolyFill()],
     },
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: "globalThis",
+    resolve: {
+      alias: {
+        "@src": root,
+        "@assets": assetsDir,
+        "@entries": entriesDir,
+        "@styles": stylesDir,
+        "@hooks": hookDir,
+        "@utils": utilsDir,
       },
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          buffer: true,
-          process: true,
-        }),
-        NodeModulesPolyfillPlugin(),
-      ],
     },
-  },
-});
+    plugins: [react(), makeManifest(), copyContentStyle()],
+    publicDir,
+    build: {
+      chunkSizeWarningLimit: 1000,
+      outDir,
+      // sourcemap: process.env.__DEV__ === "true",
+      rollupOptions: {
+        input: {
+          devtools: resolve(entriesDir, "devtools", "index.html"),
+          panel: resolve(entriesDir, "panel", "index.html"),
+          content: resolve(entriesDir, "content", "index.ts"),
+          background: isChrome
+            ? resolve(entriesDir, "background", "index.ts")
+            : resolve(entriesDir, "background", "index.html"),
+          popup: resolve(entriesDir, "popup", "index.html"),
+          newtab: resolve(entriesDir, "newtab", "index.html"),
+          options: resolve(entriesDir, "options", "index.html"),
+          scripts: resolve(entriesDir, "scripts", "contentScript.ts"),
+        },
+        output: {
+          entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,
+        },
+        plugins: [rollupNodePolyFill()],
+      },
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        define: {
+          global: "globalThis",
+        },
+        plugins: [
+          NodeGlobalsPolyfillPlugin({
+            buffer: true,
+            process: true,
+          }),
+          NodeModulesPolyfillPlugin(),
+        ],
+      },
+    },
+  });
+};

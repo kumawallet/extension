@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
@@ -19,6 +18,7 @@ import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 import { Switch } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
 import { useThemeContext } from "@src/providers";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -39,11 +39,11 @@ export const General = () => {
 
   const getSettings = async () => {
     try {
-      const settings = await Extension.getGeneralSettings();
+      const settings = await messageAPI.getGeneralSettings();
       setSettings(settings);
       const laguagesSetting = getSettingByName(settings, SettingKey.LANGUAGES)
         ?.value as Language[];
-      const currenciesSetting = getSettingByName(settings,SettingKey.CURRENCY)?.value as Currency[];
+      const currenciesSetting = getSettingByName(settings, SettingKey.CURRENCY)?.value as Currency[];
 
       const showTestnetsSetting = getSettingByName(
         settings,
@@ -75,7 +75,7 @@ export const General = () => {
 
   const getSelectedCurrency = (currencies: Currency[]) => {
     const selectedCurrency = currencies.find(
-        (currency) => currency.symbol === localStorage.getItem("currency")
+      (currency) => currency.symbol === localStorage.getItem("currency")
     );
     return selectedCurrency?.symbol || "usd";
   }
@@ -110,11 +110,12 @@ export const General = () => {
       if (showTestnetsSetting) {
         settings[settings.indexOf(showTestnetsSetting)].value = !showTestnets;
         setShowTestnets(!showTestnets);
-        await Extension.updateSetting(
-          SettingType.GENERAL,
-          SettingKey.SHOW_TESTNETS,
-          !showTestnets
-        );
+        await messageAPI.updateSetting({
+          type: SettingType.GENERAL,
+          key: SettingKey.SHOW_TESTNETS,
+          value: !showTestnets
+        })
+
       }
     } catch (error) {
       captureError(error);
@@ -160,22 +161,22 @@ export const General = () => {
               );
             case SettingKey.CURRENCY:
               return (
-                  <div key={index} className="flex flex-col gap-2">
-                    <p className="text-lg font-medium">{t("currencies")}</p>
-                    <select
+                <div key={index} className="flex flex-col gap-2">
+                  <p className="text-lg font-medium">{t("currencies")}</p>
+                  <select
                     data-testid="currency-select"
                     className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                    onChange={(e)=> saveCurrency(e.target.value)}
+                    onChange={(e) => saveCurrency(e.target.value)}
                     value={selectedCurrency}
-                    >
-                      {setting.isCurrencyArray() &&
-                          (setting.value as Currency[]).map((option,index)=> (
-                              <option key={index} value={option.symbol}>
-                                {`${option.name}`}
-                              </option>
-                          ))}
-                    </select>
-                  </div>
+                  >
+                    {setting.isCurrencyArray() &&
+                      (setting.value as Currency[]).map((option, index) => (
+                        <option key={index} value={option.symbol}>
+                          {`${option.name}`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               );
             case SettingKey.MANAGE_NETWORKS:
               return (
@@ -208,17 +209,15 @@ export const General = () => {
                           data-testid="show-testnets-switch"
                           checked={showTestnets}
                           onChange={changeShowTestnets}
-                          className={`${
-                            showTestnets
-                              ? `bg-${color}-primary`
-                              : "bg-custom-gray-bg"
-                          } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
+                          className={`${showTestnets
+                            ? `bg-${color}-primary`
+                            : "bg-custom-gray-bg"
+                            } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
                         >
                           <span className="sr-only">{t("show_testnets")}</span>
                           <span
-                            className={`${
-                              showTestnets ? "translate-x-6" : "translate-x-1"
-                            } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
+                            className={`${showTestnets ? "translate-x-6" : "translate-x-1"
+                              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
                           />
                         </Switch>
                       </div>

@@ -19,7 +19,6 @@ import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
 import { BN } from "@polkadot/util";
-import Extension from "@src/Extension";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { ContractPromise } from "@polkadot/api-contract";
 import metadata from "@src/constants/metadata.json";
@@ -33,6 +32,7 @@ import { Action, Asset, AssetContext, InitialState, LoadAssetParams } from "./ty
 import randomcolor from "randomcolor";
 import { API, IAsset } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const initialState: InitialState = {
   network: "",
@@ -312,7 +312,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const loadAssetsFromStorage = async () => {
     try {
-      const assetsFromStorage = await Extension.getAssetsByChain(
+      const assetsFromStorage = await messageAPI.getAssetsByChain(
         selectedChain.name
       );
       const assets: IAsset[] = [];

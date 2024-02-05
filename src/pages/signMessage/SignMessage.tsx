@@ -2,13 +2,13 @@ import { FC } from "react";
 import { Button, PageWrapper, ReEnterPassword } from "@src/components/common";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
-import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { Keyring } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { getWebAPI } from "@src/utils/env";
 import { useToast } from "@src/hooks";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 const WebAPI = getWebAPI();
 
@@ -43,7 +43,7 @@ export const SignMessage: FC<SignMessageProps> = ({
     try {
       let signedMessage = "";
       if (type.toLowerCase() === "wasm") {
-        const mnemonic = await Extension.showKey();
+        const mnemonic = await messageAPI.showKey();
         const keyring = new Keyring({ type: "sr25519" });
 
         const signer = keyring.addFromMnemonic(mnemonic as string);
@@ -52,8 +52,7 @@ export const SignMessage: FC<SignMessageProps> = ({
       }
 
       if (type.toLowerCase() === "evm") {
-        const pk = await Extension.showKey();
-
+        const pk = await messageAPI.showKey();
         const signer = new ethers.Wallet(
           pk as string,
           api as ethers.providers.JsonRpcProvider

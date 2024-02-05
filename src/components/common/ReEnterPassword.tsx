@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 import { useLoading, useToast } from "@src/hooks";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import Extension from "@src/Extension";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
   const { t } = useTranslation("re_enter_password");
@@ -23,15 +23,18 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
   };
 
   useEffect(() => {
-    (() => {
-      setShowDialog(!Extension.isAuthorized());
+    (async () => {
+      const isAuth = await messageAPI.isAuthorized();
+      setShowDialog(!isAuth)
     })();
   }, []);
 
   const signIn = async () => {
     starLoading();
     try {
-      await Extension?.signIn(password);
+      await messageAPI.signIn({
+        password,
+      });
       setShowDialog(false);
       await cb?.();
     } catch (error) {

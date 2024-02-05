@@ -1,25 +1,25 @@
-import {useState, useEffect, useMemo} from "react";
-import {ICON_SIZE} from "@src/constants/icons";
-import {FiChevronLeft} from "react-icons/fi";
-import {useNavigate} from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { ICON_SIZE } from "@src/constants/icons";
+import { FiChevronLeft } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import Contact from "@src/storage/entities/registry/Contact";
-import {useTranslation} from "react-i18next";
-import {useToast} from "@src/hooks";
-import Extension from "@src/Extension";
+import { useTranslation } from "react-i18next";
+import { useToast } from "@src/hooks";
 import {
     Button,
     InputErrorMessage,
     Loading,
     PageWrapper,
 } from "@src/components/common";
-import {BsTrash} from "react-icons/bs";
-import {useForm} from "react-hook-form";
-import {object, string} from "yup";
-import {yupResolver} from "@hookform/resolvers/yup";
-import {decodeAddress, encodeAddress, isAddress} from "@polkadot/util-crypto";
-import {isHex} from "@polkadot/util";
-import {captureError} from "@src/utils/error-handling";
-import {useThemeContext} from "@src/providers";
+import { BsTrash } from "react-icons/bs";
+import { useForm } from "react-hook-form";
+import { object, string } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
+import { isHex } from "@polkadot/util";
+import { captureError } from "@src/utils/error-handling";
+import { useThemeContext } from "@src/providers";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface AccountForm {
     name: string;
@@ -27,9 +27,9 @@ interface AccountForm {
 }
 
 export const Contacts = () => {
-    const {t} = useTranslation("contacts");
-    const {t: tCommon} = useTranslation("common");
-    const {color} = useThemeContext();
+    const { t } = useTranslation("contacts");
+    const { t: tCommon } = useTranslation("common");
+    const { color } = useThemeContext();
     const navigate = useNavigate();
 
     const schema = object({
@@ -62,7 +62,7 @@ export const Contacts = () => {
         register,
         handleSubmit,
         reset,
-        formState: {errors},
+        formState: { errors },
     } = useForm<AccountForm>({
         defaultValues: {
             name: "",
@@ -75,7 +75,7 @@ export const Contacts = () => {
     const [isCreateContact, setIsCreateContact] = useState(false);
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
-    const {showErrorToast} = useToast();
+    const { showErrorToast } = useToast();
 
     useEffect(() => {
         setIsLoading(true);
@@ -84,7 +84,7 @@ export const Contacts = () => {
 
     const getContacts = async () => {
         try {
-            const contacts = await Extension.getContacts();
+            const contacts = await messageAPI.getContacts();
             setContacts(contacts);
         } catch (error) {
             setContacts([]);
@@ -97,10 +97,11 @@ export const Contacts = () => {
 
     const saveContact = handleSubmit(async (form: AccountForm) => {
         try {
-            const {name, address} = form;
-
+            const { name, address } = form;
             const contact = new Contact(name, address);
-            await Extension.saveContact(contact);
+            await messageAPI.saveContact({
+                contact
+            });
             setSearch("");
             getContacts();
         } catch (error) {
@@ -114,7 +115,9 @@ export const Contacts = () => {
 
     const deleteContact = async (address: string) => {
         try {
-            await Extension.removeContact(address);
+            await messageAPI.removeContact({
+                address
+            });
             getContacts();
         } catch (error) {
             showErrorToast(tCommon(error as string));
@@ -146,7 +149,7 @@ export const Contacts = () => {
     }, [contacts, search]);
 
     if (isLoading) {
-        return <Loading/>;
+        return <Loading />;
     }
     return (
         <PageWrapper>
@@ -184,7 +187,7 @@ export const Contacts = () => {
                             className="input-primary"
                             {...register("name")}
                         />
-                        <InputErrorMessage message={errors.name?.message}/>
+                        <InputErrorMessage message={errors.name?.message} />
                     </div>
 
                     <div className="mb-5">
@@ -198,7 +201,7 @@ export const Contacts = () => {
                             className="input-primary"
                             {...register("address")}
                         />
-                        <InputErrorMessage message={errors.address?.message}/>
+                        <InputErrorMessage message={errors.address?.message} />
                     </div>
 
                     <div className="flex gap-4 justify-end mt-5">

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
-import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
@@ -16,6 +15,7 @@ import {
 import Chains from "@src/storage/entities/Chains";
 import { FaChevronRight } from "react-icons/fa";
 import { NetworkIcon } from "./NetworkIcon";
+import { messageAPI } from "@src/messageAPI/api";
 
 const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -56,7 +56,7 @@ export const Activity = () => {
   const getNetworks = async () => {
     try {
       setIsLoading(true);
-      const networks = await Extension.getAllChains();
+      const networks = await messageAPI.getAllChains()
       setNetworks(networks);
     } catch (error) {
       setNetworks({} as Chains);
@@ -69,7 +69,7 @@ export const Activity = () => {
   const getContacts = async () => {
     try {
       setIsLoading(true);
-      const { contacts, ownAccounts } = await Extension.getRegistryAddresses();
+      const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
       setContacts(contacts);
       setOwnAccounts(ownAccounts);
     } catch (error) {

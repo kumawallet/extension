@@ -181,10 +181,10 @@ describe("Vault", () => {
       }));
 
       const result = await Vault.alreadySignedUp();
-      expect(result).toMatchObject({});
+      expect(result).toMatchObject(true);
     });
 
-    it("should return undefined", async () => {
+    it("should return false", async () => {
       const Storage = await import("../Storage");
       Storage.default.getInstance = vi.fn().mockImplementation(() => ({
         storage: {
@@ -193,7 +193,7 @@ describe("Vault", () => {
       }));
 
       const result = await Vault.alreadySignedUp();
-      expect(result).toBe(undefined);
+      expect(result).toBe(false);
     });
   });
 

@@ -11,11 +11,11 @@ import { useTranslation } from "react-i18next";
 import { getAccountType } from "@src/utils/account-utils";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT } from "@src/routes/paths";
-import Extension from "@src/Extension";
 import { AccountType } from "@src/accounts/types";
 import { Chain } from "@src/storage/entities/Chains";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
@@ -44,10 +44,13 @@ export const ChainSelector = () => {
   const getSettings = async () => {
     try {
       const showTestnets = (
-        await Extension.getSetting(
-          SettingType.GENERAL,
-          SettingKey.SHOW_TESTNETS
+        await messageAPI.getSetting(
+          {
+            type: SettingType.GENERAL,
+            key: SettingKey.SHOW_TESTNETS,
+          }
         )
+
       )?.value as boolean;
       setShowTestnets(showTestnets);
     } catch (error) {
@@ -68,10 +71,9 @@ export const ChainSelector = () => {
 
     if (!chainTypeIsSupportedBySelectedAccount) {
       // verify is any account support the new chain type
-      const accounts = await Extension.getAllAccounts(
-        newChainSupportedTypeAccounts
-      );
-
+      const accounts = await messageAPI.getAllAccounts({
+        type: newChainSupportedTypeAccounts,
+      });
       thereIsAccountToSupport = accounts.some((acc) => {
         const accountType = getAccountType(acc.type) as AccountType;
         return newChainSupportedTypeAccounts.includes(accountType);

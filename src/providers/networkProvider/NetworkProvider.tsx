@@ -7,7 +7,6 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import Extension from "@src/Extension";
 import { ethers } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "@src/hooks";
@@ -15,6 +14,7 @@ import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
 import Chains, { Chain } from "@src/storage/entities/Chains";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 const initialState: InitialState = {
   chains: {
@@ -98,14 +98,14 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     (async () => {
       try {
-        const chains = await Extension.getAllChains();
-        const selectedNetwork = await Extension.getNetwork();
+        const chains = await messageAPI.getAllChains();
+        const selectedNetwork = await messageAPI.getNetwork();
         let selectedChain = null;
         let rpc = "";
         let type = "";
 
         if (selectedNetwork?.chain?.name) {
-          const account = await Extension.getSelectedAccount();
+          const account = await messageAPI.getSelectedAccount();
           selectedChain = selectedNetwork?.chain;
           type = getAccountType(account?.type);
           rpc = selectedChain.rpc[type.toLowerCase() as "evm" | "wasm"] || "";
@@ -134,9 +134,8 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const setSelectNetwork = async (network: Chain) => {
     try {
       if (!network) return;
-
-      await Extension.setNetwork(network);
-      const account = await Extension.getSelectedAccount();
+      await messageAPI.setNetwork({ chain: network });
+      const account = await messageAPI.getSelectedAccount();
       const accountType = getAccountType(account?.type)?.toLowerCase();
       const rpc =
         network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
@@ -166,7 +165,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const getSelectedNetwork = async () => {
     try {
-      const { chain: selectedNetwork } = await Extension.getNetwork();
+      const { chain: selectedNetwork } = await messageAPI.getNetwork();
 
       if (selectedNetwork) {
         dispatch({
@@ -215,7 +214,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const refreshNetworks = async () => {
     try {
-      const chains = await Extension.getAllChains();
+      const chains = await messageAPI.getAllChains();
       dispatch({
         type: "refresh-networks",
         payload: { chains },

@@ -61,6 +61,7 @@
     "react-qr-code": "^2.0.12",
     "react-router-dom": "^6.21.3",
     "react-toastify": "^10.0.4",
+    "uuid": "^9.0.1",
     "virtua": "^0.23.0",
     "yup": "^0.32.11"
   },
@@ -75,6 +76,7 @@
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^18.2.49",
     "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "@vitejs/plugin-react": "^4.2.1",

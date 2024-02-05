@@ -79,6 +79,23 @@ describe("ConfirmTx", () => {
         },
       }),
     }));
+    vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
+      getWebAPI: () => ({
+        tabs: {
+          getCurrent: () => Promise.resolve(undefined),
+          create: () => vi.fn(),
+        },
+        runtime: {
+          getURL: vi.fn(),
+          connect: vi.fn().mockReturnValue({
+            onMessage: {
+              addListener: vi.fn(),
+            },
+          }),
+        },
+      }),
+    }))
   });
 
   it("should render correctly", () => {

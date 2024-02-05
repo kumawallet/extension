@@ -133,12 +133,12 @@ describe("WasmForm", () => {
       }),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         showKey: vi.fn().mockResolvedValue("privatekey"),
         isAuthorized: vi.fn().mockReturnValue(true),
-      },
-    }));
+      }
+    }))
 
     vi.mock("@polkadot/api-contract", () => {
       class ContractPromise {

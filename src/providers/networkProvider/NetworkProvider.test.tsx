@@ -101,11 +101,13 @@ describe("NetworkProvider", () => {
         }),
       },
     }));
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         getAllChains: vi.fn().mockReturnValue(() => chainsMock),
       },
-    }));
+    }))
+
+
     vi.mock("ethers", () => ({
       ethers: {
         providers: {
@@ -227,14 +229,13 @@ describe("NetworkProvider", () => {
   });
   describe("useEffect", () => {
     it("should init", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getNetwork = vi
-        .fn()
-        .mockResolvedValue({ chain: selectedWASMChainMock });
-
-      Extension.default.getSelectedAccount = vi
-        .fn()
-        .mockResolvedValue(selectedWASMAccountMock);
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getNetwork = vi.fn().mockReturnValue({
+        chain: selectedWASMChainMock,
+      });
+      Default.messageAPI.getSelectedAccount = vi.fn().mockReturnValue(
+        selectedWASMAccountMock
+      );
 
       renderComponent({});
       await waitFor(() => {
@@ -244,11 +245,10 @@ describe("NetworkProvider", () => {
       });
     });
     it("should show error", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default = {
-        getNetwork: vi.fn().mockRejectedValue("no_network"),
-      };
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getNetwork = vi.fn().mockRejectedValue("no_network");
       renderComponent({});
+
       waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
         expect(state).toEqual(initialState);
@@ -257,11 +257,12 @@ describe("NetworkProvider", () => {
   });
   describe("setSelectedNetwork", () => {
     it("should set new evm chain", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getSelectedAccount = vi
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getSelectedAccount = vi
         .fn()
         .mockResolvedValue(selectedEVMAccountMock);
-      Extension.default.setNetwork = vi.fn().mockResolvedValue(true);
+      Default.messageAPI.setNetwork = vi.fn().mockResolvedValue(true);
+
       renderComponent({ newChain: selectedEVMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
@@ -272,11 +273,11 @@ describe("NetworkProvider", () => {
       });
     });
     it("should show error", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getSelectedAccount = vi
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getSelectedAccount = vi
         .fn()
         .mockResolvedValue(selectedEVMAccountMock);
-      Extension.default.setNetwork = vi.fn().mockRejectedValue("no_network");
+      Default.messageAPI.setNetwork = vi.fn().mockRejectedValue("no_network");
       renderComponent({ newChain: selectedEVMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
@@ -289,10 +290,11 @@ describe("NetworkProvider", () => {
   });
   describe("getSelectedNetwork", () => {
     it("should getSelectedNetwork", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getNetwork = vi
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getNetwork = vi
         .fn()
         .mockResolvedValue({ chain: selectedWASMChainMock });
+
       renderComponent({ newChain: selectedWASMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
@@ -304,10 +306,8 @@ describe("NetworkProvider", () => {
       );
     });
     it("should show error", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getNetwork = vi
-        .fn()
-        .mockRejectedValue("no_default_network");
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getNetwork = vi.fn().mockRejectedValue("no_default_network");
       renderComponent({ newChain: selectedWASMChainMock });
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
@@ -319,16 +319,14 @@ describe("NetworkProvider", () => {
   });
   describe("setNewRpc", () => {
     it("should keep the current rpc", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getNetwork = vi
-        .fn()
-        .mockResolvedValue({ chain: selectedWASMChainMock });
-
-      Extension.default.getSelectedAccount = vi
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getSelectedAccount = vi
         .fn()
         .mockResolvedValue(selectedWASMAccountMock);
-      Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
-
+      Default.messageAPI.getNetwork = vi
+        .fn()
+        .mockResolvedValue({ chain: selectedWASMChainMock });
+      Default.messageAPI.getAllChains = vi.fn().mockResolvedValue(chainsMock);
       renderComponent({
         type: selectedWASMAccountMock.type,
       });
@@ -376,12 +374,13 @@ describe("NetworkProvider", () => {
 
   describe("refreshNetworks", () => {
     it("should refresh networks", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getAllChains = vi.fn().mockResolvedValue({
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getAllChains = vi.fn().mockResolvedValue({
         mainnets: MAINNETS,
         testnets: TESTNETS,
         custom: [],
       });
+
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
@@ -393,8 +392,8 @@ describe("NetworkProvider", () => {
       });
     });
     it("should show error", async () => {
-      const Extension: any = await import("@src/Extension");
-      Extension.default.getAllChains = vi.fn().mockRejectedValue("no_network");
+      const Default = await import("@src/messageAPI/api");
+      Default.messageAPI.getAllChains = vi.fn().mockRejectedValue("no_network");
       renderComponent();
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);

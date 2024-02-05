@@ -1,5 +1,4 @@
-import { HTMLAttributes } from "react";
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, HTMLAttributes } from "react";
 
 interface PageWrapperProps extends PropsWithChildren {
   contentClassName?: HTMLAttributes<HTMLDivElement>["className"];

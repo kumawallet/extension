@@ -3,7 +3,6 @@ import { InputErrorMessage, Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
-import Extension from "@src/Extension";
 import { BALANCE } from "@src/routes/paths";
 import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
 import { number, object, string } from "yup";
@@ -12,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FiChevronLeft } from "react-icons/fi";
 import { decodeAddress } from "@polkadot/util-crypto";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface AssetForm {
   address: string;
@@ -71,7 +71,10 @@ export const ManageAssets = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await Extension.addAsset(selectedChain.name, data);
+      await messageAPI.addAsset({
+        asset: data,
+        chain: selectedChain.name,
+      });
       loadAssets({
         api,
         selectedChain,

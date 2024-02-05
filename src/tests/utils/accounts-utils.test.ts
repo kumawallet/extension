@@ -11,12 +11,14 @@ const mockRockmineAddress = "GwMVmyHMM1jCmSDmbEZHehHnFuxpF9WoRSkE9gVopSmGmDv";
 
 describe("account-utils", () => {
   beforeAll(async () => {
-    vi.mock("@polkadot/ui-keyring", () => ({
-      default: {
+    vi.mock("@polkadot/util-crypto", () => {
+      const actual = vi.importActual("@polkadot/util-crypto");
+      return {
+        ...actual,
         decodeAddress: vi.fn(() => mockEVMAddress),
         encodeAddress: vi.fn(() => mockRockmineAddress),
-      },
-    }));
+      };
+    });
   });
 
   describe("cropAccount", () => {

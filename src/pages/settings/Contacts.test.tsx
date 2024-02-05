@@ -12,18 +12,35 @@ const renderComponent = () => {
   );
 };
 
+const saveContact = vi.fn().mockResolvedValue([]);
+
+
 describe("Contacts", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
       useNavigate: () => vi.fn(),
     }));
-
-    vi.mock("@src/Extension");
+    vi.mock("@src/storage/entities/registry/Contact", () => ({
+      default: class Contact {
+        constructor() { }
+      }
+    }))
+    vi.mock("@src/storage/entities/BaseEntity", () => ({
+      default: class BaseEntity {
+        constructor() { }
+      }
+    }))
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        getContacts: vi.fn().mockReturnValue([]),
+        saveContact: () => saveContact(),
+      }
+    }))
   });
 
   it("should render", async () => {
-    const _Extension = (await import("@src/Extension")).default;
-    _Extension.getContacts = vi.fn().mockResolvedValue([
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.getContacts = vi.fn().mockResolvedValue([
       {
         name: "alice",
         address: "0x123",
@@ -43,8 +60,8 @@ describe("Contacts", () => {
   });
 
   it("should show no contacts", async () => {
-    const _Extension = (await import("@src/Extension")).default;
-    _Extension.getContacts = vi.fn().mockResolvedValue([]);
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.getContacts = vi.fn().mockResolvedValue([]);
 
     const { getByText } = renderComponent();
 
@@ -55,10 +72,9 @@ describe("Contacts", () => {
   });
 
   it("should create contact", async () => {
-    const saveContact = vi.fn().mockResolvedValue([]);
-    const _Extension = (await import("@src/Extension")).default;
-    _Extension.getContacts = vi.fn().mockResolvedValue([]);
-    _Extension.saveContact = saveContact;
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.getContacts = vi.fn().mockResolvedValue([]);
+    Default.messageAPI.saveContact = saveContact;
 
     const { getByText, getByTestId } = renderComponent();
 

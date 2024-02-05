@@ -1,4 +1,3 @@
-import keyring from "@polkadot/ui-keyring";
 import { isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 
@@ -33,9 +32,9 @@ export const transformAddress = (address: string, addressPrefix = 0) => {
 
   if (address.startsWith("0x")) return address;
 
-  const publicKey = keyring.decodeAddress(address);
+  const publicKey = decodeAddress(address);
 
-  const formattedAddress = keyring.encodeAddress(publicKey, addressPrefix);
+  const formattedAddress = encodeAddress(publicKey, addressPrefix);
 
   return formattedAddress;
 };
