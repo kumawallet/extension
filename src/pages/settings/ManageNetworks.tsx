@@ -112,7 +112,7 @@ export const ManageNetworks = () => {
     try {
       const networks = await messageAPI.getAllChains()
       setNetworks(networks);
-      const selectedNetwork = networks.getAll()[0];
+      const selectedNetwork = networks.mainnets[0];
       setSelectedNetwork(selectedNetwork);
       setValue("name", selectedNetwork.name);
     } catch (error) {
@@ -125,8 +125,7 @@ export const ManageNetworks = () => {
   };
 
   const changeNetwork = (chainName: string) => {
-    const network = networks
-      .getAll()
+    const network = [...networks.mainnets, ...networks.testnets, ...networks.custom]
       .find((network) => network.name === chainName);
 
     setSelectedNetwork(network);
@@ -261,7 +260,7 @@ export const ManageNetworks = () => {
           {...register("name")}
         >
           {networks &&
-            networks?.getAll?.().map((network, index) => {
+            [...networks.mainnets, ...networks.testnets, ...networks.custom].map((network, index) => {
               return (
                 <option key={index} value={network.name}>
                   {network.name}

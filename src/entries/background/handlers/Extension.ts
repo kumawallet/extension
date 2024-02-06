@@ -47,6 +47,8 @@ import {
   RequestRestorePassword,
   RequestSaveContact,
   RequestSaveCustomChain,
+  RequestSendEvmTx,
+  RequestSendSubstrateTx,
   RequestSetNetwork,
   RequestSignIn,
   RequestSignUp,
@@ -56,7 +58,29 @@ import {
   RequestUpdateSetting,
   ResponseType,
 } from "./request-types";
+import { ethers } from "ethers";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 // import { Port } from "./types";
+import PolkadotKeyring from "@polkadot/ui-keyring";
+import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
+import { BN } from "@polkadot/util";
+import notificationIcon from "/icon-128.png";
+
+export const getProvider = (rpc: string, type: string) => {
+  if (type.toLowerCase() === "evm")
+    return new ethers.providers.JsonRpcProvider(rpc as string);
+
+  if (type.toLowerCase() === "wasm")
+    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
+};
+
+const getWebAPI = (): typeof chrome => {
+  return navigator.userAgent.match(/chrome|chromium|crios/i)
+    ? chrome
+    : window.browser;
+};
+
+const WebAPI = getWebAPI();
 
 export default class Extension {
   get version() {
@@ -413,6 +437,218 @@ export default class Extension {
     return Swap.addSwap(protocol, swap);
   }
 
+  private async sendSubstrateTx({
+    amount,
+    asset,
+    destinationAddress,
+    destinationNetwork,
+    hexExtrinsic,
+    networkName,
+    originAddress,
+    rpc,
+  }: RequestSendSubstrateTx) {
+    try {
+      const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
+      const seed = await this.showKey();
+      const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
+      const { block } = await provider.rpc.chain.getBlock();
+
+      const unsub = await provider
+        .tx(hexExtrinsic)
+        .signAndSend(sender, async ({ events, txHash, status }) => {
+          if (String(status.type) === "Ready") {
+            const hash = txHash.toString();
+            const date = Date.now();
+            const activity: Partial<Record> = {
+              fromBlock: block.header.number.toString(),
+              address: destinationAddress,
+              type: RecordType.TRANSFER,
+              reference: AccountType.WASM,
+              hash,
+              status: RecordStatus.PENDING,
+              createdAt: date,
+              lastUpdated: date,
+              error: undefined,
+              network: networkName,
+              recipientNetwork: destinationNetwork,
+              data: {
+                from: originAddress,
+                to: destinationAddress,
+                gas: "",
+                gasPrice: "",
+                symbol: asset.symbol,
+                value: String(amount),
+                asset: {
+                  id: asset.id,
+                  // color: asset.color,
+                },
+              },
+            };
+            await this.addActivity({
+              txHash: hash,
+              record: activity as Record,
+            });
+            this.sendUpdateActivityMessage();
+          }
+          if (status.isFinalized) {
+            const failedEvents = events.filter(({ event }) =>
+              provider?.events.system.ExtrinsicFailed.is(event)
+            );
+            let status = RecordStatus.PENDING;
+            let error = undefined;
+            if (failedEvents.length > 0) {
+              failedEvents.forEach(
+                ({
+                  event: {
+                    data: [_error],
+                  },
+                }: {
+                  event: {
+                    data: Partial<{
+                      isModule: boolean;
+                      asModule:
+                        | Uint8Array
+                        | {
+                            error: BN;
+                            index: BN;
+                          }
+                        | {
+                            error: BN | Uint8Array;
+                            index: BN;
+                          };
+                      toString: () => string;
+                    }>[];
+                  };
+                }) => {
+                  if (_error.isModule) {
+                    const decoded = provider.registry.findMetaError(
+                      _error.asModule as
+                        | Uint8Array
+                        | {
+                            error: BN;
+                            index: BN;
+                          }
+                        | {
+                            error: BN | Uint8Array;
+                            index: BN;
+                          }
+                    );
+                    const { docs, method, section } = decoded;
+                    error = `${section}.${method}: ${docs.join(" ")}`;
+                  } else {
+                    error = _error.toString?.();
+                  }
+                }
+              );
+              status = RecordStatus.FAIL;
+            } else {
+              status = RecordStatus.SUCCESS;
+
+              // swap && (await Extension.addSwap(swap.protocol, { id: swap.id }));
+            }
+            const hash = txHash.toString();
+            await this.updateActivity({ txHash: hash, status, error });
+            this.sendTxNotification({ title: `tx ${status}`, message: hash });
+            this.sendUpdateActivityMessage();
+            unsub();
+          }
+        });
+
+      return true;
+    } catch (error) {
+      this.sendTxNotification({
+        title: "tx error",
+        message: "",
+      });
+    }
+  }
+
+  private async sendEvmTx({
+    amount,
+    asset,
+    destinationAddress,
+    destinationNetwork,
+    // fee,
+    networkName,
+    originAddress,
+    rpc,
+    txHash,
+  }: RequestSendEvmTx) {
+    try {
+      const api = (await getProvider(
+        rpc,
+        AccountType.EVM
+      )) as ethers.providers.JsonRpcProvider;
+      const txReceipt = await api.getTransaction(txHash);
+      const date = Date.now();
+      const activity: Partial<Record> = {
+        address: destinationAddress,
+        type: RecordType.TRANSFER,
+        reference: AccountType.EVM,
+        hash: txHash,
+        status: RecordStatus.PENDING,
+        createdAt: date,
+        lastUpdated: date,
+        error: undefined,
+        network: networkName,
+        recipientNetwork: destinationNetwork,
+        data: {
+          from: originAddress,
+          to: destinationAddress,
+          gas: txReceipt.gasLimit.toString(),
+          gasPrice: txReceipt.gasPrice?.toString() || "",
+          symbol: asset.symbol,
+          value: String(amount),
+          asset: {
+            id: asset.id,
+          },
+        },
+      };
+      await this.addActivity({ txHash, record: activity as Record });
+      this.sendUpdateActivityMessage();
+      const result = await txReceipt.wait();
+      const status =
+        result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+      // result.status === 1 &&
+      //   swap &&
+      //   (await Extension.addSwap(swap.protocol, { id: swap.id }));
+      const error = "";
+      await this.updateActivity({ txHash, status, error });
+      this.sendTxNotification({ title: `tx ${status}`, message: txHash });
+      this.sendUpdateActivityMessage();
+    } catch (error) {
+      this.sendTxNotification({ title: `tx failed`, message: txHash });
+      await this.updateActivity({
+        txHash,
+        status: RecordStatus.FAIL,
+        error: String(error),
+      });
+      // captureError(error);
+    }
+  }
+
+  private sendUpdateActivityMessage() {
+    WebAPI.runtime.sendMessage({
+      origin: "kuma",
+      method: "update_activity",
+    });
+  }
+
+  private sendTxNotification({
+    title,
+    message,
+  }: {
+    title: string;
+    message: string;
+  }) {
+    WebAPI.notifications.create("id", {
+      title,
+      message,
+      iconUrl: notificationIcon,
+      type: "basic",
+    });
+  }
+
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -512,6 +748,11 @@ export default class Extension {
         return this.getSwapsByProtocol(request as RequestSwapProtocol);
       case "pri(swap.addSwap)":
         return this.addSwap(request as RequestAddSwap);
+
+      case "pri(send.sendSubstrateTx)":
+        return this.sendSubstrateTx(request as RequestSendSubstrateTx);
+      case "pri(send.sendEvmTx)":
+        return this.sendEvmTx(request as RequestSendEvmTx);
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

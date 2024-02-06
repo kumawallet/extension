@@ -81,7 +81,11 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       const { chains } = action.payload;
       return {
         ...state,
-        chains,
+        chains: {
+          mainnets: chains.mainnets,
+          testnets: chains.testnets,
+          custom: chains.custom,
+        } as unknown as Chains,
       };
     }
     default:

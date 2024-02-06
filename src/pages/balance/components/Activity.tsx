@@ -12,7 +12,7 @@ import {
   useAccountContext,
   useThemeContext,
 } from "@src/providers";
-import Chains from "@src/storage/entities/Chains";
+import { Chain } from "@src/storage/entities/Chains";
 import { FaChevronRight } from "react-icons/fa";
 import { NetworkIcon } from "./NetworkIcon";
 import { messageAPI } from "@src/messageAPI/api";
@@ -42,7 +42,7 @@ export const Activity = () => {
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
-  const [networks, setNetworks] = useState({} as Chains);
+  const [networks, setNetworks] = useState({} as Chain[]);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
@@ -57,9 +57,9 @@ export const Activity = () => {
     try {
       setIsLoading(true);
       const networks = await messageAPI.getAllChains()
-      setNetworks(networks);
+      setNetworks([...networks.mainnets, ...networks.testnets, ...networks.custom]);
     } catch (error) {
-      setNetworks({} as Chains);
+      setNetworks([]);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
@@ -83,7 +83,6 @@ export const Activity = () => {
   const getLink = (network: string, hash: string) => {
     const { explorer } =
       networks
-        .getAll()
         .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
       {};
     const { evm, wasm } = explorer || {};

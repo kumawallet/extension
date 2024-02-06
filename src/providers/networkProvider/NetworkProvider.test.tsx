@@ -217,7 +217,11 @@ describe("NetworkProvider", () => {
     describe("refresh-networks", () => {
       it("should refresh networks", () => {
         const payload = {
-          chains: chainsMock as unknown as Chains,
+          chains: {
+            mainnets: MAINNETS,
+            testnets: TESTNETS,
+            custom: [] as Chain[],
+          } as Chains,
         };
         const newState = reducer(initialState, {
           type: "refresh-networks",

@@ -112,7 +112,9 @@ export const Routes = () => {
       }
 
       const isSessionActive = await messageAPI.isSessionActive();
-      if (!isSessionActive) {
+      const isAuthorized = await messageAPI.isAuthorized();
+
+      if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
         return;
       }

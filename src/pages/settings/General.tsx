@@ -150,7 +150,7 @@ export const General = () => {
                     onChange={(e) => saveLanguage(e.target.value)}
                     value={selectedLanguage}
                   >
-                    {setting.isLanguageArray() &&
+                    {
                       (setting.value as Language[]).map((option, index) => (
                         <option key={index} value={option.lang}>
                           {`${option.name} (${option.englishName})`}
@@ -169,7 +169,7 @@ export const General = () => {
                     onChange={(e) => saveCurrency(e.target.value)}
                     value={selectedCurrency}
                   >
-                    {setting.isCurrencyArray() &&
+                    {
                       (setting.value as Currency[]).map((option, index) => (
                         <option key={index} value={option.symbol}>
                           {`${option.name}`}

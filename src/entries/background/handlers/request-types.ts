@@ -141,6 +141,33 @@ export interface RequestAddSwap {
   swap: SwapData;
 }
 
+interface RequestSendTxBase {
+  amount: string;
+  asset: {
+    symbol: string;
+    id: string;
+  };
+  originAddress: string;
+  destinationAddress: string;
+  destinationNetwork: string;
+  networkName: string;
+  rpc: string;
+}
+
+export interface RequestSendSubstrateTx extends RequestSendTxBase {
+  hexExtrinsic: string;
+}
+
+export interface RequestSendEvmTx extends RequestSendTxBase {
+  txHash: string;
+  fee: {
+    gasLimit: string;
+    maxFeePerGas: string;
+    maxPriorityFeePerGas: string;
+    type?: number;
+  };
+}
+
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
@@ -207,6 +234,9 @@ export interface Request {
 
   "pri(swap.getSwapsByProtocol)": [RequestSwapProtocol, SwapData[]];
   "pri(swap.addSwap)": [RequestAddSwap, void];
+
+  "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
+  "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
 }
 
 export type MessageTypes = keyof Request;

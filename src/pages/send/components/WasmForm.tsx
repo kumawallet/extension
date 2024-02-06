@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import { Button, Loading, ReEnterPassword } from "@src/components/common";
+import { Button, Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -90,16 +90,10 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   };
 
   const onSubmit = handleSubmit(async () => {
-    const signedTx = await (extrinsic as polkadotExtrinsic)?.signAsync(
-      sender as KeyringPair,
-      {
-        tip: Number(aditional.tip) * currencyUnits || "0",
-      }
-    );
-
+    const txHah = (extrinsic as SubmittableExtrinsic<"promise">)?.toHex()
     confirmTx({
       type: AccountType.WASM,
-      tx: signedTx as polkadotExtrinsic,
+      tx: txHah,
       fee,
     });
   });
@@ -212,13 +206,16 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
             destinationAccount,
             bnAmount
           );
+
         }
+
 
         const { partialFee } = await (
           extrinsic as SubmittableExtrinsic<"promise">
         ).paymentInfo(sender as KeyringPair);
         estimatedFee = partialFee;
       }
+
 
       setExtrinsic(extrinsic);
 
@@ -243,7 +240,6 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         loadSender();
       }
     })()
-
   }, []);
 
   useEffect(() => {
@@ -307,7 +303,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
   return (
     <>
-      <ReEnterPassword cb={loadSender} />
+      {/* <ReEnterPassword cb={loadSender} /> */}
       <CommonFormFields />
       <ShowBalance />
 
