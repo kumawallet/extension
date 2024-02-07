@@ -2,7 +2,7 @@ Kuma Wallet
 ===========
 
 <p align="center">
-  <img width="340" src="./images/logo.svg" />
+  <img width="340" src="./public/logo.svg" />
 </p>
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kumawallet/extension/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kumawallet/extension/tree/main)

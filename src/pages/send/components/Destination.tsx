@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import { Combobox } from "@headlessui/react";
-import Extension from "@src/Extension";
 import { useFormContext } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import Contact from "@src/storage/entities/registry/Contact";
@@ -12,6 +11,7 @@ import { Chain } from "@src/storage/entities/Chains";
 import { AccountType } from "@src/accounts/types";
 import { isHex } from "@polkadot/util";
 import { transformAddress } from "@src/utils/account-utils";
+import { messageAPI } from "@src/messageAPI/api";
 
 
 const filterAddress = (account: Register | Contact, type: AccountType) => {
@@ -49,7 +49,8 @@ export const Destination = () => {
       (async () => {
         try {
           const { contacts, ownAccounts, recent } =
-            await Extension.getRegistryAddresses();
+            await messageAPI.getRegistryAddresses();
+          // await Extension.getRegistryAddresses();
 
           let _ownAccounts: Contact[] = [];
 

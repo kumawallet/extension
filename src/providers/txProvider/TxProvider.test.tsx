@@ -153,12 +153,16 @@ describe("TxProvider", () => {
       }),
     }));
 
-    vi.mock("@src/Extension");
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        updateActivity: vi.fn(),
+      },
+    }));
   });
 
   it("should load wasm activity", async () => {
-    const _Extension = (await import("@src/Extension")).default;
-    _Extension.getActivity = vi.fn().mockReturnValue(activiyMock);
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.getActivity = vi.fn().mockReturnValue(activiyMock);
 
     const providers = await import("@src/providers");
     providers.useNetworkContext = () =>
@@ -241,8 +245,8 @@ describe("TxProvider", () => {
   });
 
   it("should load evm activity", async () => {
-    const _Extension = (await import("@src/Extension")).default;
-    _Extension.getActivity = vi.fn().mockReturnValue([
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.getActivity = vi.fn().mockReturnValue([
       {
         ...activiyMock[0],
         reference: "EVM",

@@ -29,8 +29,8 @@ describe("Destination", () => {
       }),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         getRegistryAddresses: vi.fn().mockReturnValue({
           contacts: [
             {
@@ -50,8 +50,8 @@ describe("Destination", () => {
             },
           ],
         }),
-      },
-    }));
+      }
+    }))
 
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({

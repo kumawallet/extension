@@ -1,26 +1,9 @@
-import { AccountType } from "@src/accounts/types";
-import { default as IRecord } from "@src/storage/entities/activity/Record";
-import {
-  RecordStatus,
-  RecordType,
-  TransferData,
-} from "@src/storage/entities/activity/types";
-import { makeQuerys } from "@src/utils/utils";
-import { ethers } from "ethers";
-import Extension from "@src/Extension";
-import notificationIcon from "/icon-128.png";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { TxToProcess } from "@src/types";
-import { BN } from "@polkadot/util";
-import { captureError } from "@src/utils/error-handling";
-
-export const getProvider = (rpc: string, type: string) => {
-  if (type.toLowerCase() === "evm")
-    return new ethers.providers.JsonRpcProvider(rpc as string);
-
-  if (type.toLowerCase() === "wasm")
-    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
-};
+import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { PORT_CONTENT, PORT_EXTENSION } from "@src/constants/env";
+import PolkadotKeyring from "@polkadot/ui-keyring";
+import { AccountsStore } from "@polkadot/extension-base/stores";
+import kumaHandler from "./handlers/kumaHandler";
+import { assert } from "@polkadot/util";
 
 const getWebAPI = (): typeof chrome => {
   return navigator.userAgent.match(/chrome|chromium|crios/i)
@@ -28,311 +11,35 @@ const getWebAPI = (): typeof chrome => {
     : window.browser;
 };
 
-const WebAPI = getWebAPI();
+const webAPI = getWebAPI();
 
-const openPopUp = (params: Record<string, string>) => {
-  const querys = makeQuerys(params);
+// listen to all messages and handle appropriately
+webAPI.runtime.onConnect.addListener((_port): void => {
+  // only listen to what we know about
+  assert(
+    [PORT_CONTENT, PORT_EXTENSION].includes(_port.name),
+    `Unknown connection from ${_port.name}`
+  );
+  let port: chrome.runtime.Port | undefined = _port;
 
-  return WebAPI.windows.create({
-    url: WebAPI.runtime.getURL(`src/entries/popup/index.html${querys}`), // ?method="sign_message&params={}"
-    type: "popup",
-    top: 0,
-    left: 0,
-    width: 357,
-    height: 600,
-    focused: true,
+  port.onDisconnect.addListener(() => {
+    port = undefined;
   });
-};
 
-// read messages from content
-WebAPI.runtime.onMessage.addListener(async function (request, sender) {
-  if (request.origin === "kuma") {
-    try {
-      switch (request.method) {
-        case "process_tx": {
-          processTx(request.tx);
-          return;
-        }
-
-        case "call_contract":
-        case "sign_message": {
-          await openPopUp({ ...request, tabId: sender.tab?.id });
-          return;
-        }
-
-        case "call_contract_response":
-        case "sign_message_response": {
-          if (request.from !== "popup") return;
-          await WebAPI.tabs.sendMessage(Number(request.toTabId), {
-            ...request,
-            from: "bg",
-          });
-          if (request.fromWindowId)
-            await WebAPI.windows.remove(request.fromWindowId as number);
-
-          return;
-        }
-
-        case "get_account_info": {
-          getSelectedAccount().then(async (res) => {
-            await WebAPI.tabs.sendMessage(Number(sender.tab?.id), {
-              origin: "kuma",
-              method: `${request.method}_response`,
-              response: {
-                address: res?.value.address,
-                type: res?.type,
-              },
-              from: "bg",
-            });
-          });
-          return;
-        }
-
-        default:
-          break;
-      }
-    } catch (error) {
-      await WebAPI.tabs.sendMessage(Number(request.toTabId), {
-        ...{
-          ...request,
-          method: `${request.method}_response`,
-        },
-        from: "bg",
-        error,
-      });
-      return error;
-    }
-
-    return true;
-  }
+  port.onMessage.addListener((data) => {
+    if (port) kumaHandler(data, port);
+  });
 });
 
-WebAPI.runtime.onConnect.addListener(function (port) {
-  if (port.name === "sign_message") {
-    port.onDisconnect.addListener(async function (port) {
-      const queries = port.sender?.url?.split("?")[1];
-      const { tabId, origin, method } = Object.fromEntries(
-        new URLSearchParams(queries)
-      );
-      await WebAPI.tabs.sendMessage(Number(tabId), {
-        origin,
-        method: `${method}_response`,
-        response: null,
-        from: "bg",
-      });
+// Init polkadot
+cryptoWaitReady()
+  .then((): void => {
+    PolkadotKeyring.loadAll({
+      store: new AccountsStore(),
+      type: "sr25519",
     });
-  }
-});
-
-const getSelectedAccount = () => {
-  return Extension.getSelectedAccount();
-};
-
-const processTx = (tx: TxToProcess) => {
-  if (tx?.tx.type === AccountType.WASM) {
-    processWasmTx(tx);
-  } else {
-    processEVMTx(tx);
-  }
-};
-
-const processWasmTx = async ({
-  amount,
-  asset,
-  originAddress,
-  destinationAddress,
-  // originNetwork,
-  destinationNetwork,
-  networkInfo,
-  tx,
-  rpc,
-  swap,
-}: TxToProcess) => {
-  try {
-    const { txHash, type } = tx;
-    const api = (await getProvider(rpc, AccountType.WASM)) as ApiPromise;
-    const { block } = await api.rpc.chain.getBlock();
-
-    const unsub = await api
-      ?.tx(txHash)
-      ?.send(async ({ events, txHash, status }) => {
-        if (String(status.type) === "Ready") {
-          const hash = txHash.toString();
-          const date = Date.now();
-          const activity: Partial<IRecord> = {
-            fromBlock: block.header.number.toString(),
-            address: destinationAddress,
-            type: RecordType.TRANSFER,
-            reference: type,
-            hash,
-            status: RecordStatus.PENDING,
-            createdAt: date,
-            lastUpdated: date,
-            error: undefined,
-            network: networkInfo.name,
-            recipientNetwork: destinationNetwork,
-            data: {
-              from: originAddress,
-              to: destinationAddress,
-              gas: "",
-              gasPrice: "",
-              symbol: asset.symbol,
-              value: String(amount),
-              asset: {
-                id: asset.id,
-                color: asset.color,
-              },
-            } as TransferData,
-          };
-          await Extension.addActivity(hash, activity as IRecord);
-          sendUpdateActivityMessage();
-        }
-        if (status.isFinalized) {
-          const failedEvents = events.filter(({ event }) =>
-            api?.events.system.ExtrinsicFailed.is(event)
-          );
-          let status = RecordStatus.PENDING;
-          let error = undefined;
-          if (failedEvents.length > 0) {
-            failedEvents.forEach(
-              ({
-                event: {
-                  data: [_error],
-                },
-              }: {
-                event: {
-                  data: Partial<{
-                    isModule: boolean;
-                    asModule:
-                      | Uint8Array
-                      | {
-                          error: BN;
-                          index: BN;
-                        }
-                      | {
-                          error: BN | Uint8Array;
-                          index: BN;
-                        };
-                    toString: () => string;
-                  }>[];
-                };
-              }) => {
-                if (_error.isModule) {
-                  const decoded = api.registry.findMetaError(
-                    _error.asModule as
-                      | Uint8Array
-                      | {
-                          error: BN;
-                          index: BN;
-                        }
-                      | {
-                          error: BN | Uint8Array;
-                          index: BN;
-                        }
-                  );
-                  const { docs, method, section } = decoded;
-                  error = `${section}.${method}: ${docs.join(" ")}`;
-                } else {
-                  error = _error.toString?.();
-                }
-              }
-            );
-            status = RecordStatus.FAIL;
-          } else {
-            status = RecordStatus.SUCCESS;
-
-            swap && (await Extension.addSwap(swap.protocol, { id: swap.id }));
-          }
-          const hash = txHash.toString();
-          await Extension.updateActivity(hash, status, error);
-          sendNotification(`tx ${status}`, hash);
-          sendUpdateActivityMessage();
-          unsub();
-        }
-      });
-  } catch (error) {
-    sendNotification(`tx error`, "");
-  }
-};
-
-const processEVMTx = async ({
-  amount,
-  asset,
-  originAddress,
-  destinationAddress,
-  // originNetwork,
-  destinationNetwork,
-  networkInfo,
-  tx,
-  rpc,
-  swap,
-}: TxToProcess) => {
-  const { txHash } = tx;
-  try {
-    const api = (await getProvider(
-      rpc,
-      AccountType.EVM
-    )) as ethers.providers.JsonRpcProvider;
-    const txReceipt = await api.getTransaction(txHash);
-    const date = Date.now();
-
-    const activity: Partial<IRecord> = {
-      address: destinationAddress,
-      type: RecordType.TRANSFER,
-      reference: AccountType.EVM,
-      hash: txHash,
-      status: RecordStatus.PENDING,
-      createdAt: date,
-      lastUpdated: date,
-      error: undefined,
-      network: networkInfo.name,
-      recipientNetwork: destinationNetwork,
-      data: {
-        from: originAddress,
-        to: destinationAddress,
-        gas: "",
-        gasPrice: "",
-        symbol: asset.symbol,
-        value: String(amount),
-        asset: {
-          id: asset.id,
-          color: asset.color,
-        },
-      } as TransferData,
-    };
-    await Extension.addActivity(txHash, activity as IRecord);
-    sendUpdateActivityMessage();
-    const result = await txReceipt.wait();
-    const status =
-      result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
-
-    result.status === 1 &&
-      swap &&
-      (await Extension.addSwap(swap.protocol, { id: swap.id }));
-
-    const error = "";
-    await Extension.updateActivity(txHash, status, error);
-    sendNotification(`tx ${status}`, txHash);
-    sendUpdateActivityMessage();
-  } catch (error) {
-    sendNotification(`tx failed`, txHash);
-    await Extension.updateActivity(txHash, RecordStatus.FAIL, String(error));
-    captureError(error);
-  }
-};
-
-const sendNotification = (title: string, message: string) => {
-  WebAPI.notifications.create("id", {
-    title,
-    message,
-    iconUrl: notificationIcon,
-    type: "basic",
+    console.log("polkadot keyring loaded");
+  })
+  .catch((error): void => {
+    console.error("initialization failed", error);
   });
-};
-
-const sendUpdateActivityMessage = () => {
-  WebAPI.runtime.sendMessage({
-    origin: "kuma",
-    method: "update_activity",
-  });
-};

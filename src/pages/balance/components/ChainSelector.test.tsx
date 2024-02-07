@@ -17,14 +17,15 @@ const setSelectNetwork = vi.fn();
 
 describe("ChainSelector", () => {
   beforeAll(() => {
-    vi.mock("@src/Extension", () => ({
-      default: {
-        getAllAccounts: vi.fn().mockReturnValue(accountsMocks),
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         getSetting: vi.fn().mockReturnValue({
           value: true,
         }),
+        getAllAccounts: vi.fn().mockReturnValue(accountsMocks),
+
       },
-    }));
+    }))
     vi.mock("@src/providers", () => ({
       useAccountContext: vi.fn().mockReturnValue({
         state: {

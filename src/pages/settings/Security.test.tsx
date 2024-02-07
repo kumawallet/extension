@@ -31,15 +31,15 @@ describe("Security", () => {
       useNavigate: () => vi.fn(),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         resetWallet: () => vi.fn(),
         showKey: () => "key",
         getTrustedSites: () => getTrustedSites(),
         removeTrustedSite: () => removeTrustedSite(),
         isAuthorized: () => true
       },
-    }));
+    }))
   });
 
   it("should render", async () => {

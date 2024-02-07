@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
-import Extension from "@src/Extension";
 import { Loading } from "@src/components/common";
 import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
 import { BsArrowUpRight } from "react-icons/bs";
@@ -13,9 +12,10 @@ import {
   useAccountContext,
   useThemeContext,
 } from "@src/providers";
-import Chains from "@src/storage/entities/Chains";
+import { Chain } from "@src/storage/entities/Chains";
 import { FaChevronRight } from "react-icons/fa";
 import { NetworkIcon } from "./NetworkIcon";
+import { messageAPI } from "@src/messageAPI/api";
 
 const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -42,7 +42,7 @@ export const Activity = () => {
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
-  const [networks, setNetworks] = useState({} as Chains);
+  const [networks, setNetworks] = useState({} as Chain[]);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
@@ -56,10 +56,10 @@ export const Activity = () => {
   const getNetworks = async () => {
     try {
       setIsLoading(true);
-      const networks = await Extension.getAllChains();
-      setNetworks(networks);
+      const networks = await messageAPI.getAllChains()
+      setNetworks([...networks.mainnets, ...networks.testnets, ...networks.custom]);
     } catch (error) {
-      setNetworks({} as Chains);
+      setNetworks([]);
       showErrorToast(tCommon(error as string));
     } finally {
       setIsLoading(false);
@@ -69,7 +69,7 @@ export const Activity = () => {
   const getContacts = async () => {
     try {
       setIsLoading(true);
-      const { contacts, ownAccounts } = await Extension.getRegistryAddresses();
+      const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
       setContacts(contacts);
       setOwnAccounts(ownAccounts);
     } catch (error) {
@@ -83,7 +83,6 @@ export const Activity = () => {
   const getLink = (network: string, hash: string) => {
     const { explorer } =
       networks
-        .getAll()
         .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
       {};
     const { evm, wasm } = explorer || {};

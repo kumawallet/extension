@@ -45,6 +45,7 @@ describe("WasmForm", () => {
                     partialFee: new BN("1000000"),
                   },
                   signAsync: () => "",
+                  toHex: () => "0x123",
                 }),
               },
               assets: {
@@ -58,6 +59,8 @@ describe("WasmForm", () => {
                     partialFee: new BN("1000000"),
                   }),
                   signAsync: () => "",
+                  toHex: () => "0x123",
+
                 }),
               },
               xcmPallet: {
@@ -66,6 +69,8 @@ describe("WasmForm", () => {
                     partialFee: new BN("1000000"),
                   }),
                   signAsync: () => "",
+                  toHex: () => "0x123",
+
                 }),
               },
             },
@@ -133,12 +138,12 @@ describe("WasmForm", () => {
       }),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         showKey: vi.fn().mockResolvedValue("privatekey"),
         isAuthorized: vi.fn().mockReturnValue(true),
-      },
-    }));
+      }
+    }))
 
     vi.mock("@polkadot/api-contract", () => {
       class ContractPromise {
@@ -152,6 +157,7 @@ describe("WasmForm", () => {
                     refTime: new BN("100"),
                   }),
                 },
+                toHex: () => "0x123",
               }),
             },
             tx: {
@@ -160,6 +166,7 @@ describe("WasmForm", () => {
                   partialFee: new BN("100000000"),
                 },
                 signAsync: () => "",
+                toHex: () => "0x123",
               }),
             },
           };

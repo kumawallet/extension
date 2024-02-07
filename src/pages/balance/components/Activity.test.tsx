@@ -44,29 +44,30 @@ describe("Actvity", () => {
       }),
     }));
 
-    vi.mock("@src/Extension");
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        getAllChains: vi.fn().mockReturnValue(
+          {
+            getAll: vi.fn().mockReturnValue([
+              {
+                name: "test",
+                explorer: {
+                  evm: "http://test.com",
+                  wasm: "wss://test.com",
+                },
+              },
+            ]),
+          }
+        ),
+        getRegistryAddresses: vi.fn().mockReturnValue({
+          contacts: [],
+          ownAccounts: [],
+        }),
+      }
+    }));
   });
 
   it("should render", async () => {
-    const Extension = (await import("@src/Extension")).default;
-
-    Extension.getAllChains = vi.fn().mockReturnValue({
-      getAll: vi.fn().mockReturnValue([
-        {
-          name: "test",
-          explorer: {
-            evm: "http://test.com",
-            wasm: "wss://test.com",
-          },
-        },
-      ]),
-    });
-
-    Extension.getRegistryAddresses = vi.fn().mockReturnValue({
-      contacts: [],
-      ownAccounts: [],
-    });
-
     const { getByTestId } = renderComponent();
     await waitFor(() => {
       expect(getByTestId("search-input")).toBeDefined();

@@ -201,7 +201,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     );
 
   return (
-    <PageWrapper>
+    <PageWrapper contentClassName="flex-1">
       {!signUp && !resetPassword && <ReEnterPassword />}
 
       <div className="flex gap-3 items-center">

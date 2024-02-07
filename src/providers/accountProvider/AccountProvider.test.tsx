@@ -13,6 +13,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { AccountFormType } from "@src/pages";
 import { InitialState } from "./types";
+import { AccountType } from "@src/accounts/types";
 
 const testIds = {
   createAccount: "create-account",
@@ -51,15 +52,23 @@ const TestComponent = () => {
       />
       <button
         data-testid={testIds.createAccount}
-        onClick={() => createAccount({} as AccountFormType)}
+        onClick={() => createAccount({
+          seed: "mock_seed",
+        } as AccountFormType)}
       />
       <button
         data-testid={testIds.importAccount}
-        onClick={() => importAccount({} as AccountFormType)}
+        onClick={() => importAccount({
+          password: "mock_password",
+          privateKeyOrSeed: "mock_private_key",
+          accountType: AccountType.EVM,
+        } as AccountFormType)}
       />
       <button
         data-testid={testIds.deriveAccount}
-        onClick={() => deriveAccount({} as AccountFormType)}
+        onClick={() => deriveAccount({
+          accountType: AccountType.EVM,
+        } as AccountFormType)}
       />
       <button
         data-testid={testIds.updateAccountName}
@@ -85,9 +94,9 @@ const importAccount = vi.fn().mockReturnValue(true);
 const changeAccountName = vi.fn();
 
 const setSelectedAccount = vi.fn();
-const getSelectedAccount = vi.fn();
+const getSelectedAccount = vi.fn().mockReturnValue(selectedEVMAccountMock);
 const getAllAccounts = vi.fn();
-const getNetwork = vi.fn();
+// const getNetwork = vi.fn();
 
 describe("AccountProvider", () => {
   beforeAll(() => {
@@ -100,27 +109,24 @@ describe("AccountProvider", () => {
         setSelectNetwork: vi.fn(),
       }),
     }));
-    vi.mock("../authProvider/AuthProvider.tsx", () => ({
-      useAuthContext: vi.fn().mockReturnValue({
-        createAccount: () => createAccount(),
-        deriveAccount: () => deriveAccount(),
-        importAccount: () => importAccount(),
-      }),
-    }));
     vi.mock("@src/hooks", () => ({
       useToast: vi.fn().mockReturnValue({
         showErrorToast: vi.fn(),
       }),
     }));
-    vi.mock("@src/Extension", () => ({
-      default: {
-        setSelectedAccount: () => setSelectedAccount(),
-        getSelectedAccount: () => getSelectedAccount(),
-        getNetwork: () => getNetwork(),
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         getAllAccounts: () => getAllAccounts(),
         changeAccountName: () => changeAccountName(),
+        getSelectedAccount: () => getSelectedAccount(),
+        setSelectedAccount: () => setSelectedAccount(),
+        getNetwork: () => vi.fn(),
+        isSessionActive: () => true,
+        importAccount: () => importAccount(),
+        deriveAccount: () => deriveAccount(),
+        createAccounts: () => createAccount(),
       },
-    }));
+    }))
   });
 
   describe("reducer", () => {
@@ -196,17 +202,15 @@ describe("AccountProvider", () => {
   });
 
   it("should call get selected account", async () => {
-    const Extension = (await import("@src/Extension")).default;
-
     const getNetwork = vi.fn().mockReturnValue({
       chain: CHAINS[0].chains[2],
     });
 
-    Extension.getSelectedAccount = vi
-      .fn()
-      .mockReturnValue(selectedEVMAccountMock);
+    const Default = await import("@src/messageAPI/api");
+    Default.messageAPI.getNetwork = getNetwork;
 
-    Extension.getNetwork = getNetwork;
+    Default.messageAPI.getSelectedAccount = vi.fn().mockReturnValue(selectedEVMAccountMock);
+
 
     renderComponent();
 

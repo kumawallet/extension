@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { Fragment, useEffect, useState } from "react";
 import { useToast } from "@src/hooks";
 import { Button, InputErrorMessage, Loading } from "@src/components/common";
-import Extension from "@src/Extension";
 import Chains, { Chain } from "@src/storage/entities/Chains";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -20,6 +19,7 @@ import { AccountType } from "@src/accounts/types";
 import { CHAINS } from "@src/constants/chains";
 import { Listbox, Transition } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
+import { messageAPI } from "@src/messageAPI/api";
 
 const defaultValues: Chain = {
   name: "New Network",
@@ -110,9 +110,9 @@ export const ManageNetworks = () => {
 
   const getNetworks = async () => {
     try {
-      const networks = await Extension.getAllChains();
+      const networks = await messageAPI.getAllChains()
       setNetworks(networks);
-      const selectedNetwork = networks.getAll()[0];
+      const selectedNetwork = networks.mainnets[0];
       setSelectedNetwork(selectedNetwork);
       setValue("name", selectedNetwork.name);
     } catch (error) {
@@ -125,8 +125,7 @@ export const ManageNetworks = () => {
   };
 
   const changeNetwork = (chainName: string) => {
-    const network = networks
-      .getAll()
+    const network = [...networks.mainnets, ...networks.testnets, ...networks.custom]
       .find((network) => network.name === chainName);
 
     setSelectedNetwork(network);
@@ -154,8 +153,9 @@ export const ManageNetworks = () => {
 
   const _onSubmit = handleSubmit(async (data) => {
     try {
-      await Extension.saveCustomChain(data);
-      getNetworks();
+      await messageAPI.saveCustomChain({
+        chain: data
+      });
       setIsCreating(false);
       refreshNetworks();
     } catch (error) {
@@ -171,7 +171,9 @@ export const ManageNetworks = () => {
 
   const deleteNetwork = async () => {
     try {
-      await Extension.removeCustomChain(selectedNetwork?.name as string);
+      await messageAPI.removeCustomChain({
+        chainName: selectedNetwork?.name as string
+      });
       getNetworks();
 
       const networkIsSelected = selectedChain.name === selectedNetwork?.name;
@@ -258,7 +260,7 @@ export const ManageNetworks = () => {
           {...register("name")}
         >
           {networks &&
-            networks?.getAll?.().map((network, index) => {
+            [...networks.mainnets, ...networks.testnets, ...networks.custom].map((network, index) => {
               return (
                 <option key={index} value={network.name}>
                   {network.name}

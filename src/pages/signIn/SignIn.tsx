@@ -1,6 +1,5 @@
 import { FC, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
@@ -12,6 +11,7 @@ import {
   Logo,
   PageWrapper,
 } from "@src/components/common";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface SignInProps {
   afterSignIn?: () => void;
@@ -37,7 +37,9 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
 
   const signIn = async () => {
     try {
-      await Extension?.signIn(password);
+      await messageAPI?.signIn({
+        password,
+      });
       if (afterSignIn) {
         afterSignIn();
         return;

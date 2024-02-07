@@ -105,16 +105,15 @@ describe("EvmForm", () => {
       }),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
         showKey: vi.fn().mockResolvedValue("privatekey"),
         isAuthorized: vi.fn().mockReturnValue(true),
-      },
-    }));
+      }
+    }))
 
     vi.mock("ethers", async () => {
       const ethers = (await vi.importActual("ethers")) as any;
-
       return {
         ...ethers,
         ethers: {
@@ -211,7 +210,7 @@ describe("EvmForm", () => {
     expect(confirmTx).toHaveBeenCalled();
   });
 
-  it("should return error calculating gas fee", async () => {
+  // it("should return error calculating gas fee", async () => {
 
-  })
+  // })
 });
