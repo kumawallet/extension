@@ -1,6 +1,9 @@
 # Changelog
 
 # 0.4.3
+- [#49](https://github.com/blockcoders/kuma-wallet/pull/49) Move state to background
+
+# 0.4.3
 - [#48](https://github.com/blockcoders/kuma-wallet/pull/48) New Logos and interface 
 
 # 0.4.0

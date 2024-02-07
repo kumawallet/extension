@@ -393,5 +393,3 @@ public/manifest.json
 public/contentStyle.css
 
 *.timestamp-*.mjs
-
-package-lock.json
