@@ -23,10 +23,9 @@ import {
   Security,
   AboutUs,
 } from "@src/pages/settings";
-import Extension from "@src/Extension";
 import {
   useAccountContext,
-  useAuthContext,
+
   useNetworkContext,
 } from "@src/providers";
 import {
@@ -55,6 +54,7 @@ import {
 
 import { Loading } from "@src/components/common/Loading";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
+import { messageAPI } from "@src/messageAPI/api";
 
 const getInitialEntry = (query: string) => {
   if (query.includes("sign_message")) {
@@ -75,16 +75,13 @@ const getInitialEntry = (query: string) => {
 
 export const Routes = () => {
   const { t } = useTranslation("account_form");
-  const {
-    state: { isInit },
-    restorePassword,
-  } = useAuthContext();
+
 
   const {
     state: { init },
   } = useNetworkContext();
 
-  const { deriveAccount, createAccount, importAccount } = useAccountContext();
+  const { deriveAccount, createAccount, importAccount, restorePassword } = useAccountContext();
 
   const [homeRoute, setHomeRoute] = useState(<Loading />);
   const [canDerive, setCanDerive] = useState(false);
@@ -92,8 +89,8 @@ export const Routes = () => {
 
   const getWalletStatus = async () => {
     const [candDerive, alreadySignedUp] = await Promise.all([
-      Extension.areAccountsInitialized(),
-      Extension.alreadySignedUp(),
+      messageAPI.areAccountsInitialized(),
+      messageAPI.alreadySignedUp(),
     ]);
     setCanDerive(candDerive);
     setImportIsSignUp(!alreadySignedUp);
@@ -102,26 +99,29 @@ export const Routes = () => {
   useEffect(() => {
     getHomeRoute();
     getWalletStatus();
-  }, [Extension, isInit, init]);
+  }, [init]);
 
   const getHomeRoute = async () => {
-    if (!isInit || !init) {
-      return;
-    }
+    if (!init) return
 
-    const alreadySignedUp = await Extension.alreadySignedUp();
-    if (!alreadySignedUp) {
-      setHomeRoute(<Welcome />);
-      return;
-    }
+    try {
+      const alreadySignedUp = await messageAPI.alreadySignedUp();
+      if (!alreadySignedUp) {
+        setHomeRoute(<Welcome />);
+        return;
+      }
 
-    const isSessionActive = await Extension.isSessionActive();
+      const isSessionActive = await messageAPI.isSessionActive();
+      const isAuthorized = await messageAPI.isAuthorized();
 
-    if (!isSessionActive) {
-      setHomeRoute(<SignIn />);
-      return;
+      if (!isSessionActive || !isAuthorized) {
+        setHomeRoute(<SignIn />);
+        return;
+      }
+      setHomeRoute(<Balance />);
+    } catch (error) {
+      console.log('error', error)
     }
-    setHomeRoute(<Balance />);
   };
 
   if (location.search.includes("origin=kuma")) {

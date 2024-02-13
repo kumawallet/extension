@@ -81,8 +81,8 @@ describe("AssetProvider", () => {
       };
     });
 
-    vi.mock("@src/Extension", () => ({
-      default: {
+    vi.mock("@src/messageAPI/api", async () => ({
+      messageAPI: {
         getAssetsByChain: vi.fn().mockReturnValue([
           {
             id: "1",
@@ -92,8 +92,10 @@ describe("AssetProvider", () => {
             address: "0x123",
           },
         ]),
-      },
-    }));
+      }
+    }))
+
+
 
     vi.mock("@src/storage/entities/BaseEntity", () => {
       class BaseEntityMock {

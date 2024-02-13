@@ -49,7 +49,7 @@ export default class Vault {
 
   static async alreadySignedUp(): Promise<boolean> {
     const stored = await Storage.getInstance().storage.get(null);
-    return !!stored && stored[this.name];
+    return !!stored && Boolean(stored[this.name]);
   }
 
   static async getEncryptedVault(): Promise<string | undefined> {

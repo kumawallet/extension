@@ -15,6 +15,7 @@ const renderComponent = () => {
 };
 
 const showErrorToast = vi.fn();
+const addAsset = vi.fn();
 
 describe("ManageAssets", () => {
   beforeAll(() => {
@@ -43,6 +44,12 @@ describe("ManageAssets", () => {
       useNavigate: () => vi.fn(),
     }));
 
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        addAsset: () => addAsset(),
+      }
+    }))
+
     vi.mock("@src/Extension");
 
     vi.mock("@src/hooks", () => ({
@@ -58,12 +65,6 @@ describe("ManageAssets", () => {
   });
 
   it("should fill the form and submit", async () => {
-    // mock extension
-    const _Extension = (await import("@src/Extension")).default;
-
-    const addAsset = vi.fn();
-    _Extension.addAsset = addAsset;
-
     const { getByText, getByTestId } = renderComponent();
 
     const addressInput = getByTestId("address");
@@ -94,11 +95,8 @@ describe("ManageAssets", () => {
 
   it("should show error on submit", async () => {
     // mock extension
-    const _Extension = (await import("@src/Extension")).default;
-
-    const addAsset = vi.fn().mockRejectedValue(new Error("error"));
-    _Extension.addAsset = addAsset;
-
+    const Default = await import("@src/messageAPI/api")
+    Default.messageAPI.addAsset = vi.fn().mockRejectedValue(new Error("error"));
     const { getByText, getByTestId } = renderComponent();
 
     const addressInput = getByTestId("address");

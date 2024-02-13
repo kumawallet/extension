@@ -19,12 +19,12 @@ const getGeneralSettings = vi.fn().mockReturnValue([
     ],
   },
   {
-    name:SettingKey.CURRENCY,
-    isCurrencyArray : () => true,
+    name: SettingKey.CURRENCY,
+    isCurrencyArray: () => true,
     value: [
       {
         symbol: "usd",
-        name:"US Dollar ($)",
+        name: "US Dollar ($)",
       },
       {},
     ],
@@ -54,13 +54,21 @@ describe("General", () => {
       useNavigate: () => () => navigate(),
     }));
 
-    vi.mock("@src/Extension");
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        getGeneralSettings: () => getGeneralSettings(),
+        updateSetting: () => updateSetting(),
+      },
+    }))
+
+    vi.mock("@src/storage/entities/BaseEntity", () => ({
+      default: class BaseEntity {
+        constructor() { }
+      }
+    }))
   });
 
   it("should render", async () => {
-    const Extension = (await import("@src/Extension")).default;
-    Extension.getGeneralSettings = getGeneralSettings;
-    Extension.updateSetting = updateSetting;
 
     const { getByTestId } = renderComponent();
     await waitFor(() => {

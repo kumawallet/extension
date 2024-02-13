@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import {
   Logo,
-  // SelectLanguage,
   PageWrapper,
   ColoredBackground,
 } from "@src/components/common";
@@ -33,7 +32,6 @@ export const Welcome = () => {
       contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0"
     >
       <ColoredBackground />
-      {/* <SelectLanguage /> */}
       <div className="py-6 px-4">
         <Logo
           className="mx-auto mt-14 w-[14rem] h-[14rem]"

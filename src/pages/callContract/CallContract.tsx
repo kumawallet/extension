@@ -13,10 +13,10 @@ import { BN0, BigNumber0, PROOF_SIZE, REF_TIME } from "@src/constants/assets";
 import { formatBN } from "@src/utils/assets";
 import { BN } from "@polkadot/util";
 import { Keyring } from "@polkadot/api";
-import Extension from "@src/Extension";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { getWebAPI } from "@src/utils/env";
 import { BigNumber, Contract, ethers, utils } from "ethers";
+import { messageAPI } from "@src/messageAPI/api";
 
 const WebAPI = getWebAPI();
 
@@ -149,7 +149,7 @@ export const CallContract: FC<CallContractProps> = ({
       } else {
         if (!address.startsWith("0x")) throw new Error("invalid_address");
 
-        const seed = await Extension.showKey();
+        const seed = await messageAPI.showKey();
         const wallet = new ethers.Wallet(
           seed as string,
           api as ethers.providers.JsonRpcProvider
@@ -232,15 +232,21 @@ export const CallContract: FC<CallContractProps> = ({
   };
 
   useEffect(() => {
-    if (!api || !Extension.isAuthorized()) return;
 
+    if (!api) return;
     (async () => {
+      const isAuthorized = await messageAPI.isAuthorized();
+
+      if (!isAuthorized) {
+        return;
+      }
+
       init();
     })();
   }, [params, api]);
 
   const send = async () => {
-    const seed = await Extension.showKey();
+    const seed = await messageAPI.showKey();
     const { id } = await WebAPI.windows.getCurrent();
 
     starLoading();

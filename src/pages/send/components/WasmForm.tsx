@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useMemo } from "react";
-import { Button, Loading, ReEnterPassword } from "@src/components/common";
+import { Button, Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { CommonFormFields } from "./CommonFormFields";
 import { useFormContext } from "react-hook-form";
@@ -10,7 +10,6 @@ import {
   useThemeContext,
 } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
-import Extension from "@src/Extension";
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { useToast } from "@src/hooks";
@@ -28,6 +27,7 @@ import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseXCM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
 import { formatBN } from "@src/utils/assets";
+import { messageAPI } from "@src/messageAPI/api";
 
 const defaultFees = {
   estimatedFee: new BN("0"),
@@ -83,23 +83,17 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
 
   const loadSender = async () => {
-    const seed = await Extension.showKey();
+    const seed = await messageAPI.showKey()
     const keyring = new Keyring({ type: "sr25519" });
     const sender = keyring.addFromMnemonic(seed as string);
     setSender(sender);
   };
 
   const onSubmit = handleSubmit(async () => {
-    const signedTx = await (extrinsic as polkadotExtrinsic)?.signAsync(
-      sender as KeyringPair,
-      {
-        tip: Number(aditional.tip) * currencyUnits || "0",
-      }
-    );
-
+    const txHah = (extrinsic as SubmittableExtrinsic<"promise">)?.toHex()
     confirmTx({
       type: AccountType.WASM,
-      tx: signedTx as polkadotExtrinsic,
+      tx: txHah,
       fee,
     });
   });
@@ -212,13 +206,16 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
             destinationAccount,
             bnAmount
           );
+
         }
+
 
         const { partialFee } = await (
           extrinsic as SubmittableExtrinsic<"promise">
         ).paymentInfo(sender as KeyringPair);
         estimatedFee = partialFee;
       }
+
 
       setExtrinsic(extrinsic);
 
@@ -237,9 +234,12 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   };
 
   useEffect(() => {
-    if (Extension.isAuthorized()) {
-      loadSender();
-    }
+    (async () => {
+      const isAuthorized = await messageAPI.isAuthorized();
+      if (isAuthorized) {
+        loadSender();
+      }
+    })()
   }, []);
 
   useEffect(() => {
@@ -303,7 +303,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
 
   return (
     <>
-      <ReEnterPassword cb={loadSender} />
+      {/* <ReEnterPassword cb={loadSender} /> */}
       <CommonFormFields />
       <ShowBalance />
 

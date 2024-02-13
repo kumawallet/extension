@@ -10,12 +10,12 @@ import {
   ReEnterPassword,
 } from "@src/components/common";
 import { useToast, useLoading } from "@src/hooks";
-import Extension from "@src/Extension";
 import { BsEye, BsTrash } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAccountContext, useThemeContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
+import { messageAPI } from "@src/messageAPI/api";
 
 export const Security = () => {
   const { t } = useTranslation("security");
@@ -70,7 +70,7 @@ export const Security = () => {
   const resetWallet = async () => {
     startLoadingReset();
     try {
-      await Extension.resetWallet();
+      await messageAPI.resetWallet();
       localStorage.removeItem("color");
       window.location.reload();
     } catch (error) {
@@ -94,7 +94,7 @@ export const Security = () => {
 
   const getPrivateKeyOrSeed = async (): Promise<void> => {
     try {
-      let privateKeyOrSeed: string | undefined = await Extension.showKey();
+      let privateKeyOrSeed: string | undefined = await messageAPI.showKey();
       if (!privateKeyOrSeed) {
         throw new Error("no_private_key_or_seed");
       }
@@ -114,7 +114,7 @@ export const Security = () => {
 
   const getSites = async () => {
     try {
-      const sites = await Extension.getTrustedSites();
+      const sites = await messageAPI.getTrustedSites();
       setSites(sites);
     } catch (error) {
       setSites([]);
@@ -126,7 +126,9 @@ export const Security = () => {
 
   const removeSite = async (site: string) => {
     try {
-      await Extension.removeTrustedSite(site);
+      await messageAPI.removeTrustedSite({
+        site,
+      });
       getSites();
     } catch (error) {
       showErrorToast(tCommon(error as string));

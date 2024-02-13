@@ -39,7 +39,16 @@ describe("SignMessage", () => {
       }),
     }));
 
-    vi.mock("@src/Extension");
+
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        getTrustedSites: vi.fn().mockReturnValue(["http://vitest.local"]),
+        showKey: () => "test key",
+        addTrustedSite: vi.fn(),
+        isAuthorized: vi.fn().mockReturnValue(true),
+      },
+
+    }))
 
     vi.mock("@polkadot/keyring", () => {
       return {
@@ -78,14 +87,6 @@ describe("SignMessage", () => {
   });
 
   it("should sign evm message", async () => {
-    const Extension = (await import("@src/Extension")).default as any;
-    Extension.getTrustedSites = vi
-      .fn()
-      .mockReturnValue(["http://vitest.local"]);
-    Extension.showKey = () => "test key";
-    Extension.addTrustedSite = vi.fn();
-    Extension.isAuthorized = vi.fn().mockReturnValue(true);
-
     const providers = (await import("@src/providers")) as Record<string, any>;
 
     providers.useNetworkContext = vi.fn().mockReturnValue({

@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronRight, BsGear } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import Extension from "@src/Extension";
 import { useTranslation } from "react-i18next";
 import {
   SETTINGS_GENERAL,
@@ -15,6 +14,8 @@ import { ICON_SIZE } from "@src/constants/icons";
 import { RxCross2 } from "react-icons/rx";
 import { useThemeContext } from "@src/providers";
 import { FooterIcon } from "./FooterIcon";
+import { version } from "@src/utils/env";
+
 
 const OPTIONS = [
   {
@@ -89,7 +90,7 @@ export const Settings = () => {
                   </div>
                 </div>
                 <p className="text-center text-sm text-gray-400">
-                  {Extension.version}
+                  {version}
                 </p>
               </div>
             </Menu.Items>

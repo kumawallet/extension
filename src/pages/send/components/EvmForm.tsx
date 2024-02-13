@@ -1,7 +1,6 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import { AccountType } from "@src/accounts/types";
 import { Loading, Button, ReEnterPassword } from "@src/components/common";
-import Extension from "@src/Extension";
 import { useToast } from "@src/hooks";
 import {
   useAccountContext,
@@ -23,6 +22,7 @@ import { MapResponseEVM } from "@src/xcm/interfaces";
 import { ShowBalance } from "./ShowBalance";
 import { isValidAddress } from "@src/utils/account-utils";
 import { formatBN } from "@src/utils/assets";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface EvmFormProps {
   confirmTx: confirmTx;
@@ -75,7 +75,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const destinationIsInvalid = Boolean(errors?.destinationAccount?.message);
 
   const loadSender = async () => {
-    const pk = await Extension.showKey();
+    const pk = await messageAPI.showKey();
 
     const wallet = new ethers.Wallet(
       pk as string,
@@ -86,9 +86,16 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   };
 
   useEffect(() => {
-    if (Extension.isAuthorized()) {
-      loadSender();
-    }
+
+    (async () => {
+      const isAuthorized = await messageAPI.isAuthorized();
+
+      if (isAuthorized) {
+        loadSender();
+      }
+
+    })()
+
   }, []);
 
   useEffect(() => {

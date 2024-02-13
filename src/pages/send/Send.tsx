@@ -11,16 +11,14 @@ import { AccountType } from "@src/accounts/types";
 import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import { IAsset, SendForm, Tx, TxToProcess } from "@src/types";
+import { IAsset, SendForm, Tx } from "@src/types";
 import { BigNumber, Contract } from "ethers";
-import { getWebAPI } from "@src/utils/env";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
 import { isValidAddress } from "@src/utils/account-utils";
 import { formatBN } from "@src/utils/assets";
 import { captureError } from "@src/utils/error-handling";
-
-const WebAPI = getWebAPI();
+import { messageAPI } from "@src/messageAPI/api";
 
 export const Send = () => {
   const { t } = useTranslation("send");
@@ -91,27 +89,22 @@ export const Send = () => {
     const isXcm = getValues("isXcm");
     const to = getValues("to");
 
-    const txToSend: Partial<TxToProcess> = {
-      amount,
-      originAddress,
-      destinationAddress,
-      rpc: rpc as string,
-      asset: {
-        id: asset.id,
-        symbol: asset.symbol || "",
-        color: asset.color || "",
-      },
-      destinationNetwork,
-      networkInfo: selectedChain,
-      originNetwork: selectedChain,
-    };
-
     try {
       if (tx?.type === AccountType.WASM) {
-        txToSend.tx = {
-          txHash: tx.tx.toHex(),
-          type: AccountType.WASM,
-        };
+        await messageAPI.sendSubstrateTx({
+          hexExtrinsic: tx.tx,
+          amount: amount.toString(),
+          asset: {
+            id: asset.id,
+            symbol: asset.symbol || "",
+          },
+          destinationAddress,
+          originAddress,
+          destinationNetwork,
+          networkName: selectedChain?.name || "",
+          rpc: rpc as string,
+        })
+
       } else {
         const isNativeAsset = asset?.id === "-1";
 
@@ -169,22 +162,26 @@ export const Send = () => {
           );
         }
 
-        txToSend.tx = {
-          txHash: _tx.hash,
-          type: AccountType.EVM,
-        };
+        // async to avoid waiting for the tx to be mined
+        messageAPI.sendEvmTx({
+          txHash: _tx.hash as string,
+          fee: {
+            gasLimit: tx?.fee.gasLimit?.toString() || "",
+            maxFeePerGas: tx?.fee["max fee per gas"]?.toString() || "",
+            maxPriorityFeePerGas: tx?.fee["max priority fee per gas"]?.toString() || "",
+          },
+          amount: amount.toString(),
+          asset: {
+            id: asset.id,
+            symbol: asset.symbol || "",
+          },
+          destinationAddress,
+          originAddress,
+          destinationNetwork,
+          networkName: selectedChain?.name || "",
+          rpc: rpc as string,
+        })
       }
-
-      const { id } = await WebAPI.windows.getCurrent();
-
-      await WebAPI.runtime.sendMessage({
-        from: "popup",
-        origin: "kuma",
-        method: "process_tx",
-        popupId: id,
-        tx: txToSend,
-      });
-
       showSuccessToast(t("tx_send"));
       navigate(BALANCE, {
         state: {

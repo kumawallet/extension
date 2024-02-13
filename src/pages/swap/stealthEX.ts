@@ -1,6 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import Extension from "@src/Extension";
 import {
   ACALA,
   ASTAR,
@@ -24,6 +23,7 @@ import {
 import { ActiveSwaps, InitProps, SwapAsset, Swapper } from "./base";
 import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { AccountType } from "@src/accounts/types";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface StealthExToken {
   id: string;
@@ -400,7 +400,8 @@ export class StealthEX implements Swapper {
     const isNativeAsset = assetToSell.symbol === nativeAsset.symbol;
 
     if (this.api instanceof ApiPromise) {
-      const seed = await Extension.showKey();
+      const seed = await messageAPI.showKey();
+      // const seed = await Extension.showKey();
       const keyring = new Keyring({ type: "sr25519" });
       const sender = keyring.addFromMnemonic(seed as string);
 
@@ -482,7 +483,8 @@ export class StealthEX implements Swapper {
     const isNativeAsset = assetToTransfer?.id === "-1";
 
     if (this.api instanceof ApiPromise) {
-      const seed = await Extension.showKey();
+      const seed = await messageAPI.showKey();
+      // const seed = await Extension.showKey();
       const keyring = new Keyring({ type: "sr25519" });
       const sender = keyring.addFromMnemonic(seed as string);
 
@@ -510,7 +512,8 @@ export class StealthEX implements Swapper {
         txHash = (await extrinsic.signAsync(sender)).toHex();
       }
     } else if (this.api instanceof ethers.providers.JsonRpcProvider) {
-      const pk = await Extension.showKey();
+      const pk = await messageAPI.showKey();
+      // const pk = await Extension.showKey();
       const wallet = new ethers.Wallet(pk as string, this.api);
 
       type = AccountType.EVM;
@@ -572,7 +575,10 @@ export class StealthEX implements Swapper {
   }
 
   async getActiveSwaps(): Promise<ActiveSwaps[]> {
-    const swapsInStorage = await Extension.getSwapsByProtocol("stealthex");
+    const swapsInStorage = await messageAPI.getSwapsByProtocol({
+      protocol: this.protocol,
+    });
+    // const swapsInStorage = await Extension.getSwapsByProtocol("stealthex");
 
     const swapsIds = swapsInStorage
       .filter((swap) => swap.id)
@@ -605,7 +611,11 @@ export class StealthEX implements Swapper {
   }
 
   async saveSwapInStorage(swapId: string) {
-    await Extension.addSwap(this.protocol, { id: swapId });
+    await messageAPI.addSwap({
+      protocol: this.protocol,
+      swap: { id: swapId },
+    });
+    // await Extension.addSwap(this.protocol, { id: swapId });
   }
 
   canChangeSetAssetToSell() {

@@ -31,8 +31,19 @@ describe("Welcome", () => {
         },
         runtime: {
           getURL: vi.fn(),
+          connect: vi.fn().mockReturnValue({
+            onMessage: {
+              addListener: vi.fn(),
+            },
+          }),
         },
       }),
+    }))
+
+    vi.mock("@src/storage/entities/BaseEntity", () => ({
+      default: class {
+        constructor() { }
+      }
     }))
   });
 

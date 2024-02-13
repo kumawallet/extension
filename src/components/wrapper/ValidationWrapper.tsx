@@ -1,4 +1,3 @@
-import Extension from "@src/Extension";
 import { useLoading } from "@src/hooks";
 import { SignIn } from "@src/pages";
 import { useAccountContext, useNetworkContext } from "@src/providers";
@@ -12,6 +11,7 @@ import {
 import { ConfirmTrustedSite } from "../common";
 import { parseIncomingQuery } from "@src/utils/utils";
 import { getWebAPI } from "@src/utils/env";
+import { messageAPI } from "@src/messageAPI/api";
 
 const WebAPI = getWebAPI();
 
@@ -39,7 +39,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
   const { isLoading, starLoading, endLoading } = useLoading(true);
 
   const getTrustedSites = async () => {
-    const sites = await Extension.getTrustedSites();
+    const sites = await messageAPI.getTrustedSites();
     setTrustedSites(sites);
   };
 
@@ -48,9 +48,9 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
   };
 
   const saveTrustedSite = async () => {
-    const trustedSites = await Extension.getTrustedSites();
+    const trustedSites = await messageAPI.getTrustedSites();
     if (trustedSites && !trustedSites.includes(origin)) {
-      await Extension.addTrustedSite(origin);
+      await messageAPI.addTrustedSite({ site: origin });
       setTrustedSites([...trustedSites, origin]);
     }
   };
@@ -70,7 +70,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
 
   const load = async () => {
     starLoading();
-    const isSessionActive = await Extension.isSessionActive();
+    const isSessionActive = await messageAPI.isSessionActive();
     setIsSessionActive(isSessionActive);
 
     await getTrustedSites();

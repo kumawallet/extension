@@ -7,13 +7,13 @@ import {
   useReducer,
 } from "react";
 import { RecordStatus } from "@src/storage/entities/activity/types";
-import Extension from "@src/Extension";
 import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import { useNetworkContext, useAccountContext } from "@src/providers";
 import { Action, InitialState, TxContext } from "./types";
 import Record from "@src/storage/entities/activity/Record";
 import { getWebAPI } from "@src/utils/env";
+import { messageAPI } from "@src/messageAPI/api";
 
 const WebAPI = getWebAPI();
 
@@ -65,7 +65,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const loadActivity = async () => {
-    const records = await Extension.getActivity();
+    const records = await messageAPI.getActivity();
     dispatch({
       type: "init-activity",
       payload: {
@@ -117,7 +117,11 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
 
                 const _hash = hash.toString();
 
-                await Extension.updateActivity(_hash, status, error);
+                await messageAPI.updateActivity({
+                  txHash: _hash,
+                  status,
+                  error,
+                });
 
                 dispatch({
                   type: "update-activity-status",
@@ -158,7 +162,11 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
         error,
       },
     });
-    await Extension.updateActivity(hash, status, error);
+    await messageAPI.updateActivity({
+      txHash: hash,
+      status,
+      error,
+    })
   };
 
   const processPendingTxs = async (activityArray: Record[]) => {

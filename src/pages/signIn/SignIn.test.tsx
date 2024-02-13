@@ -27,9 +27,13 @@ describe("SignIn", () => {
       useNavigate: () => () => navigate(),
     }));
 
-    vi.mock("@src/Extension", () => ({
-      default: { signIn: () => signIn() },
-    }));
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        signIn: () => signIn(),
+      },
+
+    }))
+
   });
 
   it("should render", () => {

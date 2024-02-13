@@ -37,7 +37,7 @@ const links = [
     url: aboutUsLinks.blockcoders,
     icon: (
       <img
-        src={"/images/blockcoders.png"}
+        src={"/images/blockcoders.svg"}
         alt={"blockcoders"}
         width={30}
         height={30}
