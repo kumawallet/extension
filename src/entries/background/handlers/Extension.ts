@@ -649,6 +649,10 @@ export default class Extension {
     });
   }
 
+  private ping() {
+    return "pong";
+  }
+
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -753,6 +757,9 @@ export default class Extension {
         return this.sendSubstrateTx(request as RequestSendSubstrateTx);
       case "pri(send.sendEvmTx)":
         return this.sendEvmTx(request as RequestSendEvmTx);
+
+      case "pri(ping)":
+        return this.ping();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

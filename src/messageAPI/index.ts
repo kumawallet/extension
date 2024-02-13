@@ -73,3 +73,7 @@ port.onMessage.addListener((data: any): void => {
     handler.resolve(data.response);
   }
 });
+
+port.onDisconnect.addListener((port) => {
+  console.log("Disconnected from port", port);
+});

@@ -237,6 +237,8 @@ export interface Request {
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+
+  "pri(ping)": [null, string];
 }
 
 export type MessageTypes = keyof Request;
