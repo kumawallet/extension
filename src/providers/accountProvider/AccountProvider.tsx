@@ -115,7 +115,9 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const getAllAccounts = async (type: AccountType[] | null = null) => {
     try {
       const _type = type || selectedChain?.supportedAccounts;
-      const accounts = await messageAPI.getAllAccounts(_type);
+      const accounts = await messageAPI.getAllAccounts({
+        type: _type,
+      });
       dispatch({
         type: "set-accounts",
         payload: {

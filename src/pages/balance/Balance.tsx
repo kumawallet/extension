@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext, useThemeContext } from "@src/providers";
-import Chains from "@src/storage/entities/Chains";
 
 
 export interface Asset {

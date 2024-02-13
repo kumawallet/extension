@@ -313,7 +313,9 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const loadAssetsFromStorage = async () => {
     try {
       const assetsFromStorage = await messageAPI.getAssetsByChain(
-        selectedChain.name
+        {
+          chain: selectedChain.name
+        }
       );
       const assets: IAsset[] = [];
 

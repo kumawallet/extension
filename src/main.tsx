@@ -13,8 +13,10 @@ import * as Sentry from "@sentry/react";
 import { Error } from "./components/common";
 import { useEffect } from "react";
 import { sendMessage } from "./messageAPI";
+import { isProduction, version } from "./utils/env";
 
 Sentry.init({
+  release: isProduction ? version : undefined,
   dsn: import.meta.env.VITE_SENTRY_DSN,
 });
 
