@@ -50,8 +50,10 @@ export const Settings = () => {
     <Menu>
       {({ close }) => (
         <>
-          <Menu.Button>
-            <FooterIcon icon={BsGear} />
+          <Menu.Button as={Fragment}>
+            <>
+              <FooterIcon icon={BsGear} />
+            </>
           </Menu.Button>
           <Transition
             as={Fragment}
