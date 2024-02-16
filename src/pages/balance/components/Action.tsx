@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useThemeContext } from "@src/providers";
-import { Soon } from "@src/components/ui";
+import { Soon } from "@src/components/icons";
 
 interface ActionProps {
   Icon: FC<{ className?: string, color?: string }>

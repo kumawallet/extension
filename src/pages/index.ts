@@ -9,3 +9,5 @@ export * from "./signMessage";
 export * from "./welcome";
 export * from "./callContract";
 export * from "./swap";
+export * from "./createWallet";
+export * from "./importWallet";

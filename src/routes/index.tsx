@@ -13,6 +13,8 @@ import {
   Welcome,
   CallContract,
   Swap,
+  CreateWallet,
+  ImportWallet,
 } from "@src/pages";
 import {
   Advanced,
@@ -23,13 +25,8 @@ import {
   Security,
   AboutUs,
 } from "@src/pages/settings";
+import { useAccountContext } from "@src/providers";
 import {
-  useAccountContext,
-
-  useNetworkContext,
-} from "@src/providers";
-import {
-
   BALANCE,
   CALL_CONTRACT,
   CREATE_ACCOUNT,
@@ -55,6 +52,10 @@ import {
 import { Loading } from "@src/components/common/Loading";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 import { messageAPI } from "@src/messageAPI/api";
+import { useLoading } from "@src/hooks";
+import { getWebAPI } from "@src/utils/env";
+
+const webAPI = getWebAPI();
 
 const getInitialEntry = (query: string) => {
   if (query.includes("sign_message")) {
@@ -77,15 +78,37 @@ export const Routes = () => {
   const { t } = useTranslation("account_form");
 
 
-  const {
-    state: { init },
-  } = useNetworkContext();
-
-  const { deriveAccount, createAccount, importAccount, restorePassword } = useAccountContext();
+  const { deriveAccount, createAccount, importAccount, restorePassword } =
+    useAccountContext();
 
   const [homeRoute, setHomeRoute] = useState(<Loading />);
   const [canDerive, setCanDerive] = useState(false);
   const [importIsSignUp, setImportIsSignUp] = useState(true);
+
+  const [isInit, setIsInit] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false);
+
+  const { isLoading, endLoading } = useLoading(true);
+
+  useEffect(() => {
+    (async () => {
+      const alreadySignedUp = await messageAPI.alreadySignedUp();
+
+      console.log('alreadySignedUp', alreadySignedUp)
+      if (!alreadySignedUp) {
+        const tab = await webAPI.tabs.getCurrent();
+
+        if (!tab) {
+          const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
+          webAPI.tabs.create({ url });
+          return;
+        }
+      }
+
+      setIsInit(true);
+      setIsSignedUp(alreadySignedUp);
+    })();
+  }, []);
 
   const getWalletStatus = async () => {
     const [candDerive, alreadySignedUp] = await Promise.all([
@@ -97,17 +120,17 @@ export const Routes = () => {
   };
 
   useEffect(() => {
-    getHomeRoute();
-    getWalletStatus();
-  }, [init]);
+    if (isInit) {
+      getHomeRoute();
+    }
+    // getWalletStatus();
+  }, [isInit]);
 
   const getHomeRoute = async () => {
-    if (!init) return
-
     try {
-      const alreadySignedUp = await messageAPI.alreadySignedUp();
-      if (!alreadySignedUp) {
+      if (!isSignedUp) {
         setHomeRoute(<Welcome />);
+        endLoading();
         return;
       }
 
@@ -116,11 +139,13 @@ export const Routes = () => {
 
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
+        endLoading();
         return;
       }
       setHomeRoute(<Balance />);
+      endLoading();
     } catch (error) {
-      console.log('error', error)
+      console.log("error", error);
     }
   };
 
@@ -153,6 +178,10 @@ export const Routes = () => {
     );
   }
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
@@ -167,36 +196,38 @@ export const Routes = () => {
         <Route
           path={IMPORT_ACCOUNT}
           element={
-            <AccountForm
-              title={t("import.title")}
-              onSubmitFn={importAccount}
-              buttonText={t("import.button_text")}
-              signUp={importIsSignUp}
-              fields={{
-                privateKeyOrSeed: true,
-                accountType: true,
-              }}
-              afterSubmitMessage={t("import.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              callback={getWalletStatus}
-            />
+            <ImportWallet />
+            // <AccountForm
+            //   title={t("import.title")}
+            //   onSubmitFn={importAccount}
+            //   buttonText={t("import.button_text")}
+            //   signUp={importIsSignUp}
+            //   fields={{
+            //     privateKeyOrSeed: true,
+            //     accountType: true,
+            //   }}
+            //   afterSubmitMessage={t("import.submit_message")}
+            //   goAfterSubmit={BALANCE}
+            //   backButton
+            //   callback={getWalletStatus}
+            // />
           }
         />
         <Route
           path={CREATE_ACCOUNT}
           element={
-            <AccountForm
-              title={t("create_or_derivate.title")}
-              onSubmitFn={createAccount}
-              buttonText={t("create_or_derivate.button_text")}
-              signUp={true}
-              afterSubmitMessage={t("create_or_derivate.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              generateSeed
-              callback={getWalletStatus}
-            />
+            <CreateWallet />
+            // <AccountForm
+            //   title={t("create_or_derivate.title")}
+            //   onSubmitFn={createAccount}
+            //   buttonText={t("create_or_derivate.button_text")}
+            //   signUp={true}
+            //   afterSubmitMessage={t("create_or_derivate.submit_message")}
+            //   goAfterSubmit={BALANCE}
+            //   backButton
+            //   generateSeed
+            //   callback={getWalletStatus}
+            // />
           }
         />
         <Route

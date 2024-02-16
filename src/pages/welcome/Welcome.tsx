@@ -2,58 +2,35 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
 import {
-  Logo,
-  PageWrapper,
-  ColoredBackground,
+  Button,
 } from "@src/components/common";
-import { OptionButton } from "./components/OptionButton";
-import { getWebAPI } from "@src/utils/env";
-
-const WebAPI = getWebAPI();
+import { AccountFormWrapper } from "@src/components/accountForm";
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
   const navigate = useNavigate();
 
-  const openTab = async (route: string) => {
-    const tab = await WebAPI.tabs.getCurrent();
-    if (!tab) {
-      const url = WebAPI.runtime.getURL(
-        `src/entries/newtab/index.html?route=${route}`
-      );
-      WebAPI.tabs.create({ url });
-      return;
-    }
-    navigate(route);
-  };
 
   return (
-    <PageWrapper
-      contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0"
-    >
-      <ColoredBackground />
-      <div className="py-6 px-4">
-        <Logo
-          className="mx-auto mt-14 w-[14rem] h-[14rem]"
-          fillClassName="fill-chain-default-primary"
-          lineClassName="#070707"
-        />
-        <p className="font-semibold text-2xl mb-2 text-center">
+    <AccountFormWrapper
+      topMessage={
+        <div className="px-2 mb-3 text-center text-base">
           {t("welcome_message")}
-        </p>
-        <p className="font-light text-sm mb-9 text-center">
-          {t("description")}
-        </p>
-        <div className="flex flex-col gap-5">
-          <OptionButton onClick={() => openTab(CREATE_ACCOUNT)}>
-            {t("create_wallet")}
-          </OptionButton>
-          <OptionButton onClick={() => openTab(IMPORT_ACCOUNT)}>
-            {t("import_wallet")}
-          </OptionButton>
         </div>
-
+      }
+      description={t("description")}
+      centerInnerTitle
+    >
+      <div className="flex flex-col -z">
+        <Button classname="w-full" onClick={() => navigate(CREATE_ACCOUNT)}>
+          {t("create_wallet")}
+        </Button>
+        <Button classname="w-full" onClick={() => navigate(IMPORT_ACCOUNT)}>
+          {t("import_wallet")}
+        </Button>
       </div>
-    </PageWrapper>
+
+
+    </AccountFormWrapper>
   );
 };

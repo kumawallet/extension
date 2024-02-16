@@ -5,7 +5,7 @@ import { SEND, SWAP } from "@src/routes/paths";
 import { useMemo } from "react";
 import { useNetworkContext } from "@src/providers";
 import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
-import { Buy, Send, Swap } from "@src/components/ui";
+import { Buy, Send, Swap } from "@src/components/icons";
 
 export const Actions = () => {
   const { t } = useTranslation("balance");

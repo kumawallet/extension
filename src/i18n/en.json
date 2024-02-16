@@ -35,12 +35,12 @@
     "contact_not_found": "Contact not found",
     "no_contacts_found": "No contacts found",
     "error": "An error has occurred",
-    "rpc_error": "Network error"
+    "rpc_error": "Network error",
+    "copy_to_clipboard": "Copy to clipboard"
   },
   "welcome": {
-    "welcome_message": "Welcome to Kuma",
-    "description": "Let's set you up!",
-    "button_text": "Get started",
+    "welcome_message": "Your friendly multichain wallet to explore blockchain",
+    "description": "Choose how you want to set up your wallet",
     "import_wallet": "Import wallet",
     "create_wallet": "Create wallet"
   },
@@ -52,41 +52,43 @@
     "forgot_password": "Forgot password?"
   },
   "account_form": {
-    "import": {
-      "title": "Import Account",
-      "button_text": "Import",
-      "submit_message": "Account imported"
-    },
-    "create_or_derivate": {
-      "title": "Create Account",
-      "button_text": "Create",
-      "submit_message": "Account created"
-    },
-    "restore": {
-      "title": "Reset Password",
-      "button_text": "Restore",
-      "submit_message": "Password restored"
-    },
-    "form": {
-      "continue_button_text": "Continue",
-      "recovery_phrase_warning": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
-      "account_type": "Account type",
-      "private_key": "Private key",
-      "private_key_validation": "Invalid Private Key",
-      "seed_phrase": "Seed Phrase",
-      "seed_phrase_validation": "Invalid Seed Phrase",
-      "recovery_phrase": "Recovery Phrase",
-      "account_name": "Account Name (optional)",
-      "account_name_placeholder": "Max 32 characters",
-      "password": "Password",
-      "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
-      "confirm_password": "Confirm password",
-      "confirm_password_requirements": "Passwords don't match.",
-      "required": "Required",
-      "confirm_recovery_phrase": "Confirm recovery phrase",
-      "confirm_recovery_phrase_description": "Please confirm your recovery phrase by dragging the words in the correct order.",
-      "next": "Next"
-    }
+    "create_password_title": "Create password",
+    "create_password_description": "Enter your password to create a seed for your recovery phrase.",
+    "enter_password": "Enter password",
+    "re_enter_password": "Re-enter password",
+    "i_agree": "I agree to the",
+    "terms_of_service": "Terms of Service",
+    "recovery_phrase_title": "Recovery phrase",
+    "recovery_phrase_description": "Your secret recovery phrase is used to recover your crypto. \n\nSave these 12 words in a secure location, such as a password manager, and never share them with anyone.",
+    "confirm_recovery_phrase_title": "You saved it, right ?",
+    "confirm_recovery_phrase_description": "Verify that you saved your secret recovery phrase by completing the missing words in the right order.",
+    "import_account_title": "Import Account",
+    "import_account_description": "Choose your preferred way to import an account.",
+    "import_account_warning": "Please note that substrate based accounts only can be imported from seed phrases.",
+    "import_from_seed_phrase": "Import from seed phrase",
+    "import_from_private_key": "Import from private key",
+    "import_from_recovery_phrase_title": "Paste recovery phrase",
+    "import_from_recovery_phrase_description": "Type your recovery phrase below",
+    "import_from_private_key_title": "Import by private key",
+    "import_from_private_key_description": "Enter your private key to import an existing wallett.",
+    "12_words": "12 words",
+    "24_words": "24 words",
+    "show_recovery_phrase": "Show recovery phrase",
+    "congrats_title": "Congrats!",
+    "congrats_description": "Your wallet is ready. GO!",
+    "continue": "Continue",
+    "create_wallet": "Create wallet",
+    "finish": "Finish",
+    "exit": "Exit",
+    "import": "Import",
+    "home": "Home",
+    "invalid_seed": "Invalid seed phrase",
+    "invalid_private_key": "Invalid private key",
+    "confirm_password_requirements": "Passwords do not match",
+    "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
+    "password_requirements_error": "the password does not meet the requirements",
+    "private_key": "Private key",
+    "import_account": "Import account"
   },
   "balance": {
     "chain_selector": {
