@@ -8,6 +8,7 @@ interface AccountFormWrapperProps extends PropsWithChildren {
   onBack?: () => void
   title?: string
   description: string
+  descriptionClassName?: string
   centerInnerTitle?: boolean
   topMessage?: JSX.Element
 }
@@ -20,12 +21,13 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
   title,
   description,
   centerInnerTitle = false,
-  topMessage = null
+  topMessage = null,
+  descriptionClassName = ""
 }) => {
   return (
     <PageWrapper
-      contentClassName="flex-1 !py-0 !px-0 md:px-4 bg-[#1F1432]"
-      innerContentClassName="!static z-0 !max-w-2xl"
+      contentClassName="flex-1 !py-0 !px-0 md:px-0 bg-[#1F1432]"
+      innerContentClassName="!static z-0 !max-w-[584px] !px-0"
     >
       <ColoredBackground
         bg1ClassName="z-[-1] h-[unset] w-[unset]"
@@ -33,31 +35,33 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
         starClassName="z-[-1]"
       />
       <div className="flex flex-col h-full">
-        <div className="hidden md:flex justify-center items-center gap-2 mx-auto py-4">
-          <Logo className="w-10 h-10" />
-          <KumaLetters className="w-20" />
+        <div className="hidden md:flex justify-center items-center gap-2 mx-auto pt-12 pb-4">
+          <Logo className="w-16 h-16" />
+          <KumaLetters className="w-32" />
         </div>
 
         {topMessage}
 
-        <div className="bg-[#1C1C1C] md:rounded-t-2xl px-4 md:px-12 py-5 flex flex-col flex-1">
+        <div className="bg-[#1C1C1C] md:rounded-t-2xl px-4 md:px-12 pt-5 pb-10 flex flex-col flex-1">
           {
             showBackButton && (
-              <div className="py-1 mb-3">
+              <div className="py-1 mb-5">
                 <button
-                  className="text-white text-xs font-bold flex items-center gap-1"
+                  className="text-white text-xl font-bold flex items-center gap-1"
                   onClick={onBack}
                 >
                   <GoChevronLeft className="inline" size={15} />
-                  <span>back</span>
+                  <span>Back</span>
                 </button>
               </div>
             )
           }
           <div className="flex-1 flex flex-col">
-            <div className={`flex flex-col gap-2 ${centerInnerTitle ? "text-center" : ""}`}>
-              {title && <h3 className="font-medium text-xl md:text-3xl">{title}</h3>}
-              <p className="whitespace-pre-line md:text-sm text-gray-300">{description}</p>
+            <div className={`flex flex-col gap-6 ${centerInnerTitle ? "text-center" : ""}`}>
+              {title && <h3 className="font-medium text-xl md:text-[2rem]">{title}</h3>}
+              {description &&
+                <p className={`whitespace-pre-line md:text-base text-gray-300 ${descriptionClassName}`}>{description}</p>
+              }
             </div>
             {children}
           </div>

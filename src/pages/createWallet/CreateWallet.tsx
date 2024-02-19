@@ -70,8 +70,8 @@ export const CreateWallet = () => {
         break;
       case 4:
         setTexts({
-          title: t("congrats_title"),
-          description: t("congrats_description"),
+          title: "",
+          description: "",
           button: t("exit")
         })
         break;
@@ -134,7 +134,7 @@ export const CreateWallet = () => {
       title={texts.title}
       description={texts.description}
       footer={
-        <Button classname="w-full py-4" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
+        <Button classname="w-full py-6 text-2xl" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
       }
       onBack={isLoading ? undefined : onBack}
       centerInnerTitle={step === 4}

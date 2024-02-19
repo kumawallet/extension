@@ -54,7 +54,7 @@ export const RecoveryPhrase = () => {
         </div>
       </div>
 
-      <button className="flex items-center gap-2" onClick={copyToClipboard}>
+      <button className="flex items-center gap-2 text-base" onClick={copyToClipboard}>
         <Icon
           messagePosition="left"
         />

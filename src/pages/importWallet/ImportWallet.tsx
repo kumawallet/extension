@@ -119,8 +119,8 @@ export const ImportWallet = () => {
         break;
       case 4:
         setTexts({
-          title: t("congrats_title"),
-          description: t("congrats_description"),
+          title: "",
+          description: "",
           button: t("continue")
         })
         break;
@@ -146,7 +146,7 @@ export const ImportWallet = () => {
     <AccountFormWrapper
       showBackButton={step < 4}
       footer={
-        step > 1 ? (<Button isDisabled={buttonIsDisabled} isLoading={isLoading} classname="w-full py-5 text-base md:text-xl" onClick={handleSubmit(onContinue)}>{texts.button}</Button>
+        step > 1 ? (<Button isDisabled={buttonIsDisabled} isLoading={isLoading} classname="w-full py-6 text-2xl" onClick={handleSubmit(onContinue)}>{texts.button}</Button>
         ) : null
       }
       title={texts.title}

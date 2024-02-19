@@ -15,12 +15,12 @@ interface ButtonProps {
   onClick?: () => void;
   spinnerClassname?: SVGAttributes<SVGElement>["className"];
   style?: CSSProperties;
-  variant?: "text" | "outlined" | "contained";
+  variant?: "text" | "outlined" | "contained" | "contained-gray";
 }
 
 const DEFAULT_SPINNER_CLASSNAME = "mx-auto animate-spin fill-white";
 const BASE_CLASSNAME =
-  "min-w-fit min-h-[35px] w-fit rounded-lg px-4 py-2 transition duration-500 ease select-none disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:cursor-not-allowed";
+  "min-w-fit min-h-[35px] w-fit rounded-lg px-4 py-2 transition duration-500 ease select-none disabled:opacity-30 disabled:hover:cursor-not-allowed";
 
 const getVariantStyles = (
   variant: ButtonProps["variant"],
@@ -33,6 +33,8 @@ const getVariantStyles = (
       return `text-${themeColor}-secondary bg-transparent border-[0.5px] border-${themeColor}-primary hover:bg-${themeColor}-fill hover:bg-opacity-80 hover:border-${themeColor}-fill`;
     case "contained":
       return `text-${themeColor}-secondary bg-${themeColor}-fill border-0 hover:bg-opacity-70`;
+    case "contained-gray":
+      return `text-${themeColor}-secondary bg-[#636669] border-0 hover:bg-${themeColor}-fill `;
     default:
       return `text-${themeColor}-primary bg-transparent border-0`;
   }

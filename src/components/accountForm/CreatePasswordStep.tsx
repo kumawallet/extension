@@ -24,9 +24,6 @@ export const CreatePasswordStep = () => {
         innerRef={refPassword}
         {...registerPassword}
       />
-
-      <p className="text-gray-300">{t("password_requirements")}</p>
-
       <PasswordInput
         isHidden={!showPassword}
         placeholder={t('re_enter_password')}
@@ -34,6 +31,9 @@ export const CreatePasswordStep = () => {
         error={errors.confirmPassword?.message as string || ""}
         {...registerConfirmPassword}
       />
+
+      <p className="text-gray-300">{t("password_requirements")}</p>
+
 
       <div className="flex items-center">
         <input

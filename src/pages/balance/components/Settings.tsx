@@ -51,9 +51,7 @@ export const Settings = () => {
       {({ close }) => (
         <>
           <Menu.Button as={Fragment}>
-            <>
-              <FooterIcon icon={BsGear} />
-            </>
+            <FooterIcon icon={BsGear} />
           </Menu.Button>
           <Transition
             as={Fragment}
