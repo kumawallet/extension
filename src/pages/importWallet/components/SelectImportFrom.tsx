@@ -3,9 +3,10 @@ import { useAccountContext } from "@src/providers"
 import { FC, useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { ImportWalletFormValues } from "../validations"
 
 interface SelectImportFromProps {
-  onContinue: () => void
+  onContinue: (data: ImportWalletFormValues) => void
 }
 
 export const SelectImportFrom: FC<SelectImportFromProps> = ({ onContinue }) => {
@@ -18,6 +19,7 @@ export const SelectImportFrom: FC<SelectImportFromProps> = ({ onContinue }) => {
 
   const onSelected = (type: 'seed' | 'privateKey') => {
     setValue('type', type)
+    // @ts-expect-error -- *
     handleSubmit(onContinue)()
   }
 

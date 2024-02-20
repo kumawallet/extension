@@ -111,6 +111,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     privateKeyOrSeed:
       fields?.privateKeyOrSeed && fields?.accountType
         ? string().when("accountType", {
+          // @ts-expect-error -- *
           is: (value: string) => value && value === "EVM",
           then: string().test(
             "evm validation",
