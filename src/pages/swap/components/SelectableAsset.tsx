@@ -87,7 +87,7 @@ export const SelectableAsset = <T extends SwapAsset>({
             <Combobox.Input
               className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between border-[1.78px] items-center bg-[#040404] rounded-xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary ${buttonClassName}`}
               displayValue={(asset: SwapAsset) =>
-                asset?.label?.toUpperCase() || ""
+                asset?.name?.toUpperCase() || ""
               }
               onChange={(e) => setQuery(e.target.value)}
               aria-disabled={isLoading}
