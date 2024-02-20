@@ -160,10 +160,6 @@ export class StealthEX implements Swapper {
   public protocol: string = "stealthex";
   public bridgeFee: string = "0.4%";
   public swap_info: string = "stealthex_swap_message";
-  private pairs: {
-    asset: string;
-    pairs: string[];
-  }[] = [];
   private tokens: StealthExToken[] = [];
   public type = "swapper";
 
@@ -176,15 +172,17 @@ export class StealthEX implements Swapper {
   async init({ chainName, api }: InitProps) {
     this.api = api;
 
-    this.tokens = await this.getTokens();
+    const tokens = await this.getTokens();
 
+    this.tokens = tokens;
     const nativeTokens = StealthEx_MAP_NATIVE_TOKENS[chainName] || [];
 
-    const pairTokens = await this.getPairTokensFromNativeCurrency(
-      nativeTokens.map((token) => token.stealthExName)
+    const pairs = tokens.filter(
+      (_t) =>
+        !nativeTokens.some(
+          (_nt) => _nt.stealthExName.toLowerCase() === _t.symbol.toLowerCase()
+        )
     );
-
-    this.pairs = pairTokens;
 
     const nativeAssets = nativeTokens.map((ntoken) => {
       const token = this.tokens.find(
@@ -205,30 +203,8 @@ export class StealthEX implements Swapper {
 
     return {
       nativeAssets,
-      pairs: [],
+      pairs,
     };
-  }
-
-  async getPairs(asset: string): Promise<SwapAsset[]> {
-    const _pairs = this.pairs.find((pair) => pair.asset === asset)?.pairs || [];
-
-    const pairs = this.tokens
-      .filter((token) => _pairs.includes(token.symbol))
-      .map(
-        (token, index) =>
-          ({
-            name: token.name,
-            label: token.symbol,
-            image: token.image,
-            id: token.id || index,
-            balance: "0",
-            decimals: 0,
-            network: token.network,
-            symbol: token?.symbol.toUpperCase() || "",
-          } as SwapAsset)
-      );
-
-    return pairs;
   }
 
   sendPetition({
@@ -241,13 +217,13 @@ export class StealthEX implements Swapper {
     return this.gqlClient.request(document, variables);
   }
 
-  async getTokens(): Promise<StealthExToken[]> {
+  async getTokens(): Promise<SwapAsset[]> {
     const {
-      getTokens: { tokens },
+      getTokensToSwap: { tokens },
     } = (await this.sendPetition({
       document: gql`
         query {
-          getTokens {
+          getTokensToSwap {
             tokens {
               image
               name
@@ -258,45 +234,20 @@ export class StealthEX implements Swapper {
         }
       `,
     })) as {
-      getTokens: {
-        tokens: StealthExToken[];
+      getTokensToSwap: {
+        tokens: SwapAsset[];
       };
     };
 
-    return tokens;
-  }
+    const _formatedTokens = tokens.map((token) => ({
+      ...token,
+      id: token.symbol,
+      balance: "0",
+      decimals: 0,
+      label: token.symbol.toUpperCase(),
+    }));
 
-  async getPairTokensFromNativeCurrency(nativeCurrencies: string[]): Promise<
-    {
-      asset: string;
-      pairs: string[];
-    }[]
-  > {
-    const {
-      getPairTokensFromNativeCurrency: { pairs },
-    } = (await this.sendPetition({
-      document: gql`
-        query {
-          getPairTokensFromNativeCurrency(nativeCurrencies: [${nativeCurrencies.map(
-            (nativeCurrency) => `"${nativeCurrency}"`
-          )}]) {
-            pairs {
-              asset
-              pairs
-            }
-          }
-        }
-      `,
-    })) as {
-      getPairTokensFromNativeCurrency: {
-        pairs: {
-          asset: string;
-          pairs: string[];
-        }[];
-      };
-    };
-
-    return pairs;
+    return _formatedTokens;
   }
 
   async getEstimatedAmount({

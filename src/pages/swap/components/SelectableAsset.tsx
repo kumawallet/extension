@@ -104,40 +104,31 @@ export const SelectableAsset = <T extends SwapAsset>({
             {!isReadOnly && options?.length > 0 && open && (
               <Combobox.Options
                 className={`absolute mt-1 top-10 ${position === "left" ? "left-o" : "right-0"} max-h-60 w-[140%] sm:w-full overflow-auto rounded-md bg-[#212529] py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50`}
-                style={{
-                  height: 300,
-                }}
               >
-                <VList
-                  style={{
-                    height: 300,
-                  }}
-                >
-                  {filteredAsset?.map((opt, index) => (
-                    <Combobox.Option
-                      key={index.toString()}
-                      value={opt}
-                      className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-xl py-2"
+                {filteredAsset?.map((opt, index) => (
+                  <Combobox.Option
+                    key={index.toString()}
+                    value={opt}
+                    className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-xl py-2"
+                  >
+                    <div
+                      className="flex gap-2"
                     >
-                      <div
-                        className="flex gap-2"
-                      >
-                        {opt.image && <OptImage image={opt.image} />}
-                        <div className="flex flex-col">
-                          <div className="flex gap-2 items-center">
-                            <span className="md:text-xl">
-                              {opt.label?.toUpperCase()}
-                            </span>
-                            <span className="rounded-xl py-1 px-2 text-xs bg-gray-500/20">
+                      {opt.image && <OptImage image={opt.image} />}
+                      <div className="flex flex-col">
+                        <div className="flex gap-2 items-center">
+                          <span className="md:text-xl">
+                            {opt.name}
+                          </span>
+                          {/* <span className="rounded-xl py-1 px-2 text-xs bg-gray-500/20">
                               {opt.network}
-                            </span>
-                          </div>
-                          <span className="py-1 text-gray-400">{opt.name}</span>
+                            </span> */}
                         </div>
+                        {/* <span className="py-1 text-gray-400">{opt.name}</span> */}
                       </div>
-                    </Combobox.Option>
-                  ))}
-                </VList>
+                    </div>
+                  </Combobox.Option>
+                ))}
               </Combobox.Options>
             )}
           </div>

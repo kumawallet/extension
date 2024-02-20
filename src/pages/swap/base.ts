@@ -106,7 +106,7 @@ export abstract class Swapper {
     type: string;
   }>;
 
-  abstract getPairs(asset: string): Promise<SwapAsset[]>;
+  // abstract getPairs(asset: string): Promise<SwapAsset[]>;
 
   abstract mustConfirmTx(): boolean;
 

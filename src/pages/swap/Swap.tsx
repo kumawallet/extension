@@ -20,7 +20,7 @@ import { formatBN } from "@src/utils/assets";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 // import { Tab } from "@headlessui/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
 // import { TbExternalLink } from "react-icons/tb";

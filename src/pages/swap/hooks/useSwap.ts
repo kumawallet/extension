@@ -13,12 +13,11 @@ import { ApiPromise } from "@polkadot/api";
 import { ethers } from "ethers";
 import { StealthEX } from "../stealthEX";
 import { ActiveSwaps, SwapAsset, Swapper } from "../base";
-import { getWebAPI } from "@src/utils/env";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
-import { TxToProcess } from "@src/types";
 import { AccountType } from "@src/accounts/types";
+import { messageAPI } from "@src/messageAPI/api";
 
 export interface TxInfoState {
   bridgeType: string;
@@ -67,8 +66,6 @@ interface Tx {
   swapId: string;
 }
 
-const WebAPI = getWebAPI();
-
 export const useSwap = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("swap");
@@ -100,11 +97,6 @@ export const useSwap = () => {
     isLoading: isLoadingSellAsset,
     starLoading: starLoadingSellAsset,
     endLoading: endLoadingSellAsset,
-  } = useLoading();
-  const {
-    isLoading: isLoadingSellPairs,
-    starLoading: starLoadingSellPairs,
-    endLoading: endLoadingSellPairs,
   } = useLoading();
   const {
     isLoading: isCreatingSwap,
@@ -215,22 +207,24 @@ export const useSwap = () => {
         bridgeFee: _swapper.bridgeFee,
       }));
 
-      const { nativeAssets } = await _swapper.init({
+      const { nativeAssets, pairs } = await _swapper.init({
         nativeCurrency,
         chainName,
         api,
       });
 
+      endLoading();
       setAssets([...nativeAssets]);
-
       setAssetToSell(nativeAssets[0]);
       setAssetsToSell(nativeAssets);
+      setAssetsToBuy(pairs);
+      setAssetToBuy(pairs[0]);
       setSwapper(_swapper);
     } catch (error) {
       showErrorToast("Error fetching assets");
       captureError(error);
+      endLoading();
     }
-    endLoading();
   };
 
   const handleRecipientChange = (label: string, value: unknown) => {
@@ -405,27 +399,6 @@ export const useSwap = () => {
     if (!swapper) return;
     starLoading();
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const txToSend: Partial<TxToProcess> = {
-        amount: amounts.sell,
-        originAddress: selectedAccount.value.address,
-        destinationAddress: tx.addressBridge,
-        rpc: rpc as string,
-        asset: {
-          id: assetToSell?.id || "",
-          symbol: assetToSell?.label || "",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          color: (assetToSell as any).color || "",
-        },
-        destinationNetwork: selectedChain?.name,
-        networkInfo: selectedChain,
-        originNetwork: selectedChain,
-        // tx: {
-        //   type: "",
-        //   txHash: "",
-        // },
-      };
-
       const isConfirmNeeded = swapper.mustConfirmTx();
 
       if (isConfirmNeeded) {
@@ -443,25 +416,40 @@ export const useSwap = () => {
           destinationAccount: tx.addressBridge,
         });
 
-        const { id } = await WebAPI.windows.getCurrent();
-
-        txToSend.tx = {
-          type: type as AccountType,
-          txHash,
-        };
-
-        txToSend.swap = {
-          protocol: swapper!.protocol,
-          id: tx.swapId,
-        };
-
-        await WebAPI.runtime.sendMessage({
-          from: "popup",
-          origin: "kuma",
-          method: "process_tx",
-          popupId: id,
-          tx: txToSend,
-        });
+        if (type === AccountType.WASM) {
+          await messageAPI.sendSubstrateTx({
+            hexExtrinsic: txHash,
+            amount: amounts.sell,
+            asset: {
+              id: assetToTransfer.id,
+              symbol: assetToTransfer.symbol || "",
+            },
+            destinationAddress: tx.addressBridge,
+            originAddress: selectedAccount.value.address,
+            destinationNetwork: selectedChain?.name,
+            networkName: selectedChain?.name || "",
+            rpc: rpc as string,
+          });
+        } else {
+          messageAPI.sendEvmTx({
+            amount: amounts.sell,
+            asset: {
+              id: assetToTransfer.id,
+              symbol: assetToTransfer.symbol || "",
+            },
+            destinationAddress: tx.addressBridge,
+            originAddress: selectedAccount.value.address,
+            destinationNetwork: selectedChain?.name,
+            networkName: selectedChain?.name || "",
+            rpc: rpc as string,
+            txHash,
+            fee: {
+              gasLimit: "0",
+              maxFeePerGas: "0",
+              maxPriorityFeePerGas: "0",
+            },
+          });
+        }
 
         showSuccessToast(t("tx_send"));
         // await swapper.saveSwapInStorage(tx.swapId);
@@ -547,21 +535,6 @@ export const useSwap = () => {
           balance: selectedAsset.balance,
           decimals: selectedAsset.decimals,
         }));
-
-        starLoadingSellPairs();
-        setAssetsToBuy([]);
-        setAssetToBuy({
-          label: "",
-          balance: new BN("0").toString(),
-          decimals: 0,
-          symbol: "",
-        });
-        const pairs = await swapper!.getPairs(assetToSell.symbol as string);
-        if (pairs.length > 0) {
-          setAssetsToBuy(pairs);
-          setAssetToBuy(pairs[0]);
-        }
-        endLoadingSellPairs();
       }
     })();
   }, [assetToSell?.label, _assets]);
@@ -605,7 +578,7 @@ export const useSwap = () => {
     isLoadingActiveSwaps,
     isLoadingBuyAsset,
     isLoadingSellAsset,
-    isLoadingSellPairs,
+    // isLoadingSellPairs,
     isValidWASMAddress,
     minSellAmount,
     mustConfirmTx,
