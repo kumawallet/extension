@@ -21,5 +21,6 @@ export const useSteps = (steps: number[]) => {
     step,
     nextStep,
     prevStep,
+    setStep,
   };
 };

@@ -34,7 +34,7 @@ const getVariantStyles = (
     case "contained":
       return `text-${themeColor}-secondary bg-${themeColor}-fill border-0 hover:bg-opacity-70`;
     case "contained-gray":
-      return `text-${themeColor}-secondary bg-[#636669] border-0 hover:bg-${themeColor}-fill `;
+      return `text-${themeColor}-secondary bg-[#636669] border-0 hover:bg-${themeColor}-fill disabled:hover:bg-[#636669]`;
     default:
       return `text-${themeColor}-primary bg-transparent border-0`;
   }
@@ -57,7 +57,7 @@ export const Button: FC<ButtonProps & PropsWithChildren> = ({
 
   return (
     <button
-      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles}`}
+      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles} bg-`}
       onClick={onClick}
       disabled={isDisabled || isLoading}
       style={style}

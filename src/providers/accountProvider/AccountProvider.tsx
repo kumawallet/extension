@@ -233,7 +233,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const importAccount = useCallback(async (account: AccountFormType) => {
     try {
       const isSessionActive = await messageAPI.isSessionActive();
-      if (!account.password && !isSessionActive) throw new Error("password_required");
+
+      if (!isSessionActive && !account.password) throw new Error("password_required");
       if (!account.privateKeyOrSeed) throw new Error("private_key_or_seed_required");
       if (!account.accountType) throw new Error("account_type_required");
       const type = getImportedType(account.accountType);
@@ -247,7 +248,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       await getSelectedAccount();
       return true;
     } catch (error) {
-      console.error("import account error")
       captureError(error);
       showErrorToast(tCommon("failed_to_import_account"));
       return false

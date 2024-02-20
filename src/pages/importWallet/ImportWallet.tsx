@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCreateWallet } from "../createWallet/hooks/useCreateWallet";
 import { Congrats, CreatePasswordStep, AccountFormWrapper } from "@src/components/accountForm";
 import { Button } from "@src/components/common";
@@ -20,8 +20,10 @@ export const ImportWallet = () => {
   const { t } = useTranslation("account_form")
   const { importAccount } = useAccountContext()
   const { isLoading, starLoading, endLoading } = useLoading()
-  const { step, prevStep, nextStep, goToWelcome } = useCreateWallet();
+  const { step, prevStep, nextStep, goToWelcome, setStep } = useCreateWallet();
   const { texts, setTexts } = useAccountFormTexts()
+
+  const [isSignUp, setIsSignUp] = useState(false)
 
   const methods = useForm<ImportWalletFormValues>({
     defaultValues: {
@@ -55,10 +57,10 @@ export const ImportWallet = () => {
       return navigate(BALANCE)
     }
 
-    if (step === 3) {
-      starLoading()
+    const isImportedFromInside = step === 2 && isSignUp
 
-      const isSignUp = await messageAPI.alreadySignedUp()
+    if (step === 3 || isImportedFromInside) {
+      starLoading()
 
       const result = await importAccount({
         name: "Account",
@@ -71,6 +73,10 @@ export const ImportWallet = () => {
       endLoading()
 
       if (result) {
+        if (isImportedFromInside) {
+          setStep(4)
+          return
+        }
         nextStep();
       }
 
@@ -127,6 +133,14 @@ export const ImportWallet = () => {
     }
 
   }, [step])
+
+
+  useEffect(() => {
+    (async () => {
+      const isSignUp = await messageAPI.alreadySignedUp()
+      setIsSignUp(isSignUp)
+    })()
+  }, [])
 
 
   const buttonIsDisabled = useMemo(() => {

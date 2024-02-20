@@ -94,7 +94,6 @@ export const Routes = () => {
     (async () => {
       const alreadySignedUp = await messageAPI.alreadySignedUp();
 
-      console.log('alreadySignedUp', alreadySignedUp)
       if (!alreadySignedUp) {
         const tab = await webAPI.tabs.getCurrent();
 

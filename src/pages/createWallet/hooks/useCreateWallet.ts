@@ -8,7 +8,7 @@ const STEPS = [1, 2, 3, 4];
 
 export const useCreateWallet = () => {
   const navigate = useNavigate();
-  const { nextStep, prevStep, step } = useSteps(STEPS);
+  const { nextStep, prevStep, step, setStep } = useSteps(STEPS);
 
   const [alreadySignedUp, setAlreadySignUp] = useState(false);
 
@@ -28,5 +28,6 @@ export const useCreateWallet = () => {
     prevStep,
     step,
     goToWelcome,
+    setStep,
   };
 };
