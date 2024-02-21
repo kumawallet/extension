@@ -25,9 +25,9 @@ export const SelectImportFrom: FC<SelectImportFromProps> = ({ onContinue }) => {
 
   useEffect(() => {
 
-    if (selectedAccount?.type.toLowerCase().includes("evm")) {
+    if (selectedAccount?.type?.toLowerCase().includes("evm")) {
       setTypeToImport('evm')
-    } else if (selectedAccount?.type.toLowerCase().includes("wasm")) {
+    } else if (selectedAccount?.type?.toLowerCase().includes("wasm")) {
       setTypeToImport('wasm')
     }
 
