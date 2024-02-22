@@ -1,6 +1,7 @@
 import { FC, PropsWithChildren } from "react"
 import { ColoredBackground, KumaLetters, Logo, PageWrapper } from "../common"
 import { GoChevronLeft } from "react-icons/go";
+import { useTranslation } from "react-i18next";
 
 interface AccountFormWrapperProps extends PropsWithChildren {
   footer?: JSX.Element | null
@@ -24,6 +25,8 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
   topMessage = null,
   descriptionClassName = ""
 }) => {
+  const { t } = useTranslation("account_form")
+
   return (
     <PageWrapper
       contentClassName="flex-1 !py-0 !px-0 md:px-0 bg-[#1F1432]"
@@ -47,11 +50,11 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
             showBackButton && (
               <div className="py-1 mb-5">
                 <button
-                  className="text-white text-xl font-bold flex items-center gap-1"
+                  className="text-gray-300 text-xl font-light flex items-center gap-1"
                   onClick={onBack}
                 >
-                  <GoChevronLeft className="inline" size={15} />
-                  <span>Back</span>
+                  <GoChevronLeft className="inline" size={20} />
+                  <span>{t('back')}</span>
                 </button>
               </div>
             )

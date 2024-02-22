@@ -35,17 +35,17 @@ export const CreatePasswordStep = () => {
       <p className="text-gray-300">{t("password_requirements")}</p>
 
 
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <input
           id="checked-checkbox"
           type="checkbox"
           value=""
           checked={getValues('agreeWithTerms')}
           onChange={() => setValue('agreeWithTerms', !getValues('agreeWithTerms'))}
-          className="w-4 h-4 bg-transparent border border-white" />
-        <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+          className="w-4 h-4 bg-transparent border border-white rounded-sm checked:bg-blue-500" />
+        <label htmlFor="checked-checkbox" className="text-base text-gray-300">
           {t("i_agree")}
-          <a href="#">{" "}{t("terms_of_service")}</a>
+          <a href="#" className="text-blue-500">{" "}{t("terms_of_service")}</a>
         </label>
       </div>
     </div>

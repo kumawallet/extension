@@ -18,7 +18,7 @@ const WordOption = ({
   const { color } = useThemeContext()
 
   return (
-    <button className={`rounded-3xl text-center w-1/2 py-3 ${isActive ? `bg-${color}-primary text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
+    <button className={`rounded-3xl text-center w-1/2 py-3 font-medium text-xl ${isActive ? `bg-${color}-primary text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
       {text}
     </button>
   )
@@ -43,7 +43,7 @@ export const ImportFromSeed = () => {
 
   return (
     <>
-      <div className="flex bg-[#24243B] rounded-3xl w-full mt-3 mb-3">
+      <div className="flex bg-[#24243B] rounded-3xl w-full mt-6 mb-7">
         <WordOption
           text={t("12_words")}
           isActive={seedLength === 12}
@@ -63,7 +63,7 @@ export const ImportFromSeed = () => {
         onChangeWords={onChangeSeed}
         showWords={showWords}
       />
-      <button className="flex gap-2 items-center mt-3" onClick={() => setShowWords(!showWords)}>
+      <button className="flex gap-2 items-center mt-4 font-poppins font-medium" onClick={() => setShowWords(!showWords)}>
         <PiEyeLight size={18} />
         {t("show_recovery_phrase")}
       </button>

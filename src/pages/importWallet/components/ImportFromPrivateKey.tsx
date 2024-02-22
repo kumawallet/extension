@@ -25,7 +25,7 @@ export const ImportFromPrivateKey = () => {
           {...registerPrivateKey}
         />
       </div>
-      <p className="text-gray-300 mt-10">{t("import_account_warning")}</p>
+      <p className="text-gray-300 mt-10 text-sm tracking-wider">{t("import_account_warning")}</p>
     </>
   )
 }

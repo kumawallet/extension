@@ -33,6 +33,9 @@
   "homepage": "https://github.com/kumawallet/extension/blob/main/README.md",
   "bugs": "https://github.com/kumawallet/extension/issues",
   "dependencies": {
+    "@fontsource-variable/inter": "^5.0.16",
+    "@fontsource-variable/quicksand": "^5.0.16",
+    "@fontsource/poppins": "^5.0.8",
     "@headlessui/react": "^1.7.18",
     "@hookform/resolvers": "^2.9.11",
     "@metamask/browser-passworder": "^4.3.0",
@@ -70,6 +73,7 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@polkadot/types-codec": "10.11.2",
+    "@tailwindcss/forms": "^0.5.7",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/chrome": "^0.0.260",

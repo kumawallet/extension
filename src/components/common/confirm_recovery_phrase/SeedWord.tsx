@@ -20,7 +20,7 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   const [{ isOver, canDrop }, drop] = useDrop({
     drop: onDrop,
     accept,
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
@@ -37,7 +37,7 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   return (
     <div
       ref={drop}
-      className={`${backgroundColor} w-auto px-3 border ${borderColor} rounded-md py-2 text-center cursor-pointer`}
+      className={`${backgroundColor} w-auto px-3 border ${borderColor} rounded-md py-2 text-center cursor-pointer font-poppins text-gray-200`}
       data-testid="seedword"
     >
       {word === "" ? <span>&nbsp;</span> : `${index}. ${word}`}

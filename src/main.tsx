@@ -1,3 +1,6 @@
+import '@fontsource-variable/inter';
+import '@fontsource-variable/quicksand';
+import '@fontsource/poppins';
 import {
   AssetProvider,
   AccountProvider,

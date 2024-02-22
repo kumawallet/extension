@@ -29,7 +29,7 @@ export const PasswordInput: FC<PasswordInputProps> = ({
       <input
         ref={innerRef}
         type={isHidden ? "password" : "text"}
-        className={`w-full ${showIcon ? "pl-4 pr-12" : "px-4"} py-6 border border-[#636669] rounded-xl bg-transparent text-white focus:outline-none text-xl`}
+        className={`w-full ${showIcon ? "pl-4 pr-12" : "px-4"} py-6 border border-[#636669] rounded-xl bg-transparent text-white focus:outline-none text-xl placeholder:font-normal placeholder:text-gray-200 focus:ring-white`}
         placeholder={placeholder}
         {...other}
       />

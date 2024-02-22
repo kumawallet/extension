@@ -12,8 +12,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
-        inter: ["Inter", "sans-serif"],
+        poppins: ["Poppins ", "sans-serif"],
+        inter: ["Inter Variable", "sans-serif"],
+        quicksand: ["Quicksand Variable", "sans-serif"],
       },
       animation: {
         "spin-slow": "spin 20s linear infinite",
@@ -106,5 +107,4 @@ module.exports = {
       },
     },
   },
-  plugins: [],
 };
