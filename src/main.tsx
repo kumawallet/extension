@@ -11,8 +11,6 @@ import "./utils/i18n";
 import "react-toastify/dist/ReactToastify.min.css";
 import * as Sentry from "@sentry/react";
 import { Error } from "./components/common";
-import { useEffect } from "react";
-import { sendMessage } from "./messageAPI";
 import { isProduction, version } from "./utils/env";
 
 Sentry.init({
@@ -21,20 +19,6 @@ Sentry.init({
 });
 
 export const Main = () => {
-
-  useEffect(() => {
-    // ping to keep connection alive with background service worker
-    // https://github.com/GoogleChrome/developer.chrome.com/issues/504
-    const intervalId = setInterval(async () => {
-      try {
-        await sendMessage('pri(ping)', null)
-      } catch (error) {
-        console.log('failed to ping')
-      }
-    }, 1000);
-    return () => clearInterval(intervalId)
-  }, [])
-
   return (
     <Sentry.ErrorBoundary fallback={<Error />}>
       <NetworkProvider>
