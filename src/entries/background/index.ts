@@ -43,3 +43,17 @@ cryptoWaitReady()
   .catch((error): void => {
     console.error("initialization failed", error);
   });
+
+const init = () => {
+  const isManifestV3 = webAPI.runtime.getManifest().manifest_version === 3;
+
+  if (isManifestV3) {
+    // to prevent the background script from being unloaded
+    setInterval(() => {
+      const timestamp = new Date().toISOString();
+      webAPI.storage.session.set({ timestamp });
+    }, 2000);
+  }
+};
+
+init();
