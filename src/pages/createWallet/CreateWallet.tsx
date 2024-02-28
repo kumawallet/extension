@@ -6,7 +6,7 @@ import {
 } from "@src/components/accountForm";
 import {
   ConfirmRecoveryPhrase,
-  RecoveryPhrase,
+
 } from "./components";
 import { useEffect, useMemo } from "react";
 import { Button } from "@src/components/common";
@@ -21,6 +21,7 @@ import { CreateWalletFormValues, validationSteps } from "./validations";
 import { useLoading } from "@src/hooks";
 import { useAccountFormTexts } from "@src/hooks/common/useAccountFormTexts";
 import { messageAPI } from "@src/messageAPI/api";
+import { RecoveryPhrase } from "@src/components/accountForm/RecoveryPhrase";
 
 
 export const CreateWallet = () => {
@@ -99,7 +100,7 @@ export const CreateWallet = () => {
 
 
       const result = await createAccount({
-        name: "Account 1",
+        name: "",
         seed: data.seed,
         password: data.password,
         isSignUp: !isSignUp,

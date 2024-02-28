@@ -88,8 +88,13 @@
     "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
     "password_requirements_error": "the password does not meet the requirements",
     "private_key": "Private key",
-    "import_account": "Import account",
-    "back": "Back"
+    "back": "Back",
+    "create_new_account": "Create new account",
+    "create_with_new_seed_phrase": "Create with a new seed phrase",
+    "derive_from_existing_account": "Derive from an existing account",
+    "accounts": "Accounts",
+    "derive_description": "Choose an account to derive from",
+    "private_key_placeholder": "Enter private key"
   },
   "balance": {
     "chain_selector": {

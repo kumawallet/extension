@@ -150,6 +150,13 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
     if (!api) return
 
+    if (!selectedAccount?.type?.toLowerCase()?.includes(type)) {
+      dispatch({
+        type: "end-loading",
+      });
+      return;
+    }
+
     let assets: Asset[] = [];
     try {
       const _nativeBalance = await getNativeAsset(api, selectedAccount);
@@ -507,11 +514,16 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       api &&
       selectedChain?.name
     ) {
+
       if (selectedAccount?.type?.includes(type)) {
         loadAssets({
           api,
           selectedAccount,
           selectedChain
+        });
+      } else {
+        dispatch({
+          type: "end-loading",
         });
       }
     }

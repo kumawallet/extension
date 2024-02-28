@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { PiEyeClosedLight, PiEyeLight } from "react-icons/pi";
-import { CreateWalletFormValues } from "../validations";
+import { CreateWalletFormValues } from "../../pages/createWallet/validations";
 
 export const RecoveryPhrase = () => {
   const { t } = useTranslation("common");
@@ -37,8 +37,8 @@ export const RecoveryPhrase = () => {
 
           <div
             className={`absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-40 p-4 rounded-xl flex items-center justify-center  ${!isHide
-                ? "hidden group-hover:backdrop-blur group-hover:block"
-                : "block"
+              ? "hidden group-hover:backdrop-blur group-hover:block"
+              : "block"
               }`}
           >
             <button onClick={onUnhide}>

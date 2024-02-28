@@ -13,7 +13,6 @@ import {
 import { ICON_SIZE } from "@src/constants/icons";
 import { RxCross2 } from "react-icons/rx";
 import { useThemeContext } from "@src/providers";
-import { FooterIcon } from "./FooterIcon";
 import { version } from "@src/utils/env";
 
 
@@ -50,8 +49,8 @@ export const Settings = () => {
     <Menu>
       {({ close }) => (
         <>
-          <Menu.Button as={Fragment}>
-            <FooterIcon icon={BsGear} />
+          <Menu.Button>
+            <BsGear size={24} />
           </Menu.Button>
           <Transition
             as={Fragment}

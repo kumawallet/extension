@@ -31,6 +31,13 @@ const initialState: InitialState = {
 
 const NetworkContext = createContext({} as NetworkContext);
 
+const getNetworkRpc = (rpc: { wasm: string, evm: "" }, networkType: "wasm" | "evm") => {
+  if (rpc[networkType as "wasm" | "evm"]) return networkType
+
+  return Object.keys(rpc)[0] as "wasm" | "evm"
+
+}
+
 export const getProvider = async (rpc: string, type: string) => {
   if (type.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc as string);
@@ -111,8 +118,10 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         if (selectedNetwork?.chain?.name) {
           const account = await messageAPI.getSelectedAccount();
           selectedChain = selectedNetwork?.chain;
-          type = getAccountType(account?.type);
-          rpc = selectedChain.rpc[type.toLowerCase() as "evm" | "wasm"] || "";
+          const networkYype = getAccountType(account?.type)?.toLowerCase();
+          // TODO: change
+          type = getNetworkRpc(selectedChain.rpc, networkYype);
+          rpc = selectedChain.rpc[type as "wasm" | "evm"]
         }
 
         dispatch({
@@ -125,7 +134,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
             } as unknown as Chains,
             selectedChain,
             rpc,
-            type: type.toUpperCase(),
+            type,
           },
         });
       } catch (error) {
@@ -141,8 +150,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       await messageAPI.setNetwork({ chain: network });
       const account = await messageAPI.getSelectedAccount();
       const accountType = getAccountType(account?.type)?.toLowerCase();
+
+      const type = getNetworkRpc(network.rpc, accountType)
+
+
       const rpc =
-        network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
+        network.rpc[type];
 
       if (state.api && "getBalance" in state.api) {
         (state.api as ethers.providers.JsonRpcProvider).removeAllListeners(
@@ -157,7 +170,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: {
           selectedChain: network,
           rpc,
-          type: accountType.toUpperCase(),
+          type: type,
           api: null,
         },
       });

@@ -9,7 +9,6 @@ import {
   useAssetContext,
   useNetworkContext,
 } from "@src/providers";
-import { AccountSelected } from "./AccountSelected";
 
 interface TotalBalanceProps {
   balance?: number;

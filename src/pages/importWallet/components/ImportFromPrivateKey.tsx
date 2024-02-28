@@ -14,10 +14,10 @@ export const ImportFromPrivateKey = () => {
 
   return (
     <>
-      <div className="relative w-full mt-12">
+      <div className="relative w-full mt-4 md:mt-12">
         <PasswordInput
           isHidden={!showPrivateKey}
-          placeholder={t('private_key')}
+          placeholder={t('private_key_placeholder')}
           showIcon
           onToggleVisibility={() => setShowPrivateKey(!showPrivateKey)}
           innerRef={ref}
@@ -25,7 +25,7 @@ export const ImportFromPrivateKey = () => {
           {...registerPrivateKey}
         />
       </div>
-      <p className="text-gray-300 mt-10 text-sm tracking-wider">{t("import_account_warning")}</p>
+      <p className="text-gray-300 mt-4 md:mt-10 md:text-sm md:tracking-wider">{t("import_account_warning")}</p>
     </>
   )
 }

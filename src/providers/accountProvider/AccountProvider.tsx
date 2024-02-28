@@ -99,7 +99,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
     state: { selectedChain, rpc },
     setNewRpc,
-    setSelectNetwork,
   } = useNetworkContext();
   const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
@@ -112,11 +111,10 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     return type;
   };
 
-  const getAllAccounts = async (type: AccountType[] | null = null) => {
+  const getAllAccounts = async () => {
     try {
-      const _type = type || selectedChain?.supportedAccounts;
       const accounts = await messageAPI.getAllAccounts({
-        type: _type,
+        type: null,
       });
       dispatch({
         type: "set-accounts",
@@ -156,13 +154,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
       const { chain: selectedChain } = await messageAPI.getNetwork();
 
-      // for first time when there is no default chain selected
-      if (!selectedChain) {
-        const selectedAccountIsWasm = selectedAccount?.key.includes("WASM");
-        setSelectNetwork(
-          selectedAccountIsWasm ? DEFAULT_WASM_CHAIN : DEFAULT_EVM_CHAIN
-        );
-      }
 
       dispatch({
         type: "set-selected-account",
@@ -212,7 +203,10 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const deriveAccount = useCallback(async (account: AccountFormType) => {
+  const deriveAccount = useCallback(async (account: {
+    name: string;
+    accountType: AccountType;
+  }) => {
     try {
       const isSessionActive = await messageAPI.isSessionActive();
       if (!isSessionActive) throw new Error("login_required");
@@ -224,6 +218,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       await getSelectedAccount();
       return true;
     } catch (error) {
+      console.log("error", error)
       captureError(error);
       showErrorToast(tCommon("failed_to_derive_account"));
       return false;
@@ -297,6 +292,10 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       getSelectedAccount();
     }
   }, [rpc]);
+
+  useEffect(() => {
+    getAllAccounts()
+  }, []);
 
   return (
     <AccountContext.Provider
