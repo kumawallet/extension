@@ -9,6 +9,7 @@ interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onToggleVisibility?: () => void;
   showIcon?: boolean;
   innerRef: LegacyRef<HTMLInputElement>
+  leftIcon?: JSX.Element | null
 }
 
 const ICON_SIZE = 20;
@@ -20,6 +21,7 @@ export const PasswordInput: FC<PasswordInputProps> = ({
   onToggleVisibility,
   showIcon = false,
   innerRef,
+  leftIcon,
   ...other
 }) => {
   const { t } = useTranslation("account_form")
@@ -29,7 +31,7 @@ export const PasswordInput: FC<PasswordInputProps> = ({
       <input
         ref={innerRef}
         type={isHidden ? "password" : "text"}
-        className={`w-full bg-[#1C1C27] ${showIcon ? "pl-4 pr-12" : "px-4"} py-4 md:py-6 rounded-xl bg-transparent text-white focus:outline-none md:text-xl placeholder:font-normal placeholder:text-gray-200 focus:ring-white`}
+        className={`w-full bg-[#1C1C27] ${showIcon ? "pl-4 pr-12" : "px-4"} ${leftIcon ? "pl-12" : ""} border border-gray-300 py-4 md:py-6 rounded-xl bg-transparent text-white focus:outline-none md:text-xl placeholder:font-normal placeholder:text-gray-200 focus:ring-white`}
         placeholder={placeholder}
         {...other}
       />
@@ -42,6 +44,14 @@ export const PasswordInput: FC<PasswordInputProps> = ({
           >
             {isHidden ? <PiEyeLight size={ICON_SIZE} /> : <PiEyeClosedLight size={ICON_SIZE} />}
           </button>
+        )
+      }
+
+      {
+        leftIcon && (
+          <div className="absolute top-1/2 left-6 -translate-y-1/2">
+            {leftIcon}
+          </div>
         )
       }
 

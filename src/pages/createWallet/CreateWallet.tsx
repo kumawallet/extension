@@ -15,7 +15,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup"
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { useNavigate } from "react-router-dom";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { BALANCE } from "@src/routes/paths";
 import { CreateWalletFormValues, validationSteps } from "./validations";
 import { useLoading } from "@src/hooks";
@@ -29,8 +29,9 @@ export const CreateWallet = () => {
   const { t } = useTranslation("account_form")
   const { isLoading, starLoading, endLoading } = useLoading()
   const { step, prevStep, nextStep, goToWelcome } = useCreateWallet();
-  const { createAccount } = useAccountContext()
+  const { createAccount, getAllAccounts } = useAccountContext()
   const { texts, setTexts, } = useAccountFormTexts()
+  const { initializeNetwork } = useNetworkContext()
 
   const methods = useForm<CreateWalletFormValues>({
     defaultValues: {
@@ -108,6 +109,8 @@ export const CreateWallet = () => {
       endLoading()
 
       if (result) {
+        initializeNetwork()
+        getAllAccounts()
         nextStep();
       }
       return

@@ -16,6 +16,11 @@ interface CreateWalletFromInsideProps {
   onClose: () => void
 }
 
+interface CreateWalletFromInsideForm {
+  seed: string
+  account: Account | null
+}
+
 export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
   onBack,
   onFinish,
@@ -27,7 +32,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
 
   const { isLoading, starLoading, endLoading } = useLoading()
 
-  const methods = useForm({
+  const methods = useForm<CreateWalletFromInsideForm>({
     defaultValues: {
       seed: mnemonicGenerate(12),
       account: null
@@ -36,7 +41,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
 
   const { handleSubmit, setValue, watch } = methods
 
-  const onCreateFromSeed = async (data: { seed: string }) => {
+  const onCreateFromSeed = async (data: CreateWalletFromInsideForm) => {
     starLoading()
 
     const result = await createAccount({
@@ -52,14 +57,12 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
     }
   }
 
-  const onDerivate = async (data: {
-    account: Account
-  }) => {
+  const onDerivate = async (data: CreateWalletFromInsideForm) => {
     starLoading()
 
     const result = await deriveAccount({
       name: "",
-      accountType: data.account.type
+      accountType: data.account!.type
     })
 
     if (result) {

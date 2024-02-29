@@ -31,7 +31,7 @@ export const SeedGrid: FC<SeedGridProps> = ({
           const indexWasRemoved = indexesRemoved?.some(removedIndex => removedIndex === index)
           return (
             <div
-              className={`flex border bg-[#1C1C27] ${indexWasRemoved ? "border-[#7C4DC4]" : "border-[#FFFFFF80]"} rounded-lg px-2 py-3 items-center font-poppins text-baseque `}
+              className={`flex border bg-[#1C1C27] ${indexWasRemoved ? "border-[#7C4DC4]" : "border-transparent"} rounded-lg px-2 py-3 items-center font-poppins text-baseque `}
               key={index}
               onClick={() => {
                 if (onClickWord && indexWasRemoved && words[index]) {

@@ -1,16 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
-import {
-  Button,
-} from "@src/components/common";
+import { Button } from "@src/components/common";
 import { AccountFormWrapper } from "@src/components/accountForm";
-import { CiCirclePlus, CiImport } from "react-icons/ci";
+import { GoChevronRight } from "react-icons/go";
+import { ASteriskCircle, SendForeward } from "@src/components/icons";
 
 export const Welcome = () => {
   const { t } = useTranslation("welcome");
   const navigate = useNavigate();
-
 
   return (
     <AccountFormWrapper
@@ -24,20 +22,26 @@ export const Welcome = () => {
       centerInnerTitle
     >
       <div className="flex flex-col gap-3">
-        <Button classname="w-full py-5 rounded-xl" variant="contained-gray" onClick={() => navigate(CREATE_ACCOUNT)}>
-          <div className="flex justify-between items-center px-4">
-            <span className="text-xl">
-              {t("create_wallet")}
-            </span>
-            <CiCirclePlus size={23} />
+        <Button
+          classname="w-full py-5 rounded-xl"
+          variant="contained-black"
+          onClick={() => navigate(CREATE_ACCOUNT)}
+        >
+          <div className="flex items-center justify-around px-2">
+            <ASteriskCircle className="w-6 h-6" />
+            <span className="text-xl font-normal">{t("create_wallet")}</span>
+            <GoChevronRight size={12} />
           </div>
         </Button>
-        <Button classname="w-full py-5 rounded-xl" variant="contained-gray" onClick={() => navigate(IMPORT_ACCOUNT)}>
-          <div className="flex justify-between items-center px-4">
-            <span className="text-xl">
-              {t("import_wallet")}
-            </span>
-            <CiImport size={23} />
+        <Button
+          classname="w-full py-5 rounded-xl"
+          variant="contained-black"
+          onClick={() => navigate(IMPORT_ACCOUNT)}
+        >
+          <div className="flex items-center justify-around px-2">
+            <SendForeward className="w-6 h-6" />
+            <span className="text-xl font-normal">{t("import_wallet")}</span>{" "}
+            <GoChevronRight size={12} />
           </div>
         </Button>
       </div>

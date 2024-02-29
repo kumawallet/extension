@@ -71,7 +71,7 @@ export const ConfirmRecoveryPhrase = () => {
       <div className="grid grid-cols-3 gap-x-10 mt-10">
         {
           wordsRemoved.map((word, index) => (
-            <button key={index} className="bg-[#9C89B3] py-2 px-4 rounded-md font-poppins text-base" onClick={() => onAddWord(index)}>{word}</button>
+            <button key={index} className="bg-[#1C1C27] py-2 px-4 rounded-md font-poppins text-base" onClick={() => onAddWord(index)}>{word}</button>
           ))
         }
       </div>

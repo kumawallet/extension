@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useCreateWallet } from "../createWallet/hooks/useCreateWallet";
 import { Congrats, CreatePasswordStep, AccountFormWrapper } from "@src/components/accountForm";
 import { Button } from "@src/components/common";
@@ -9,21 +9,20 @@ import { useTranslation } from "react-i18next";
 import { FormProvider, useForm } from "react-hook-form";
 import { ImportWalletFormValues, validationSteps } from "./validations";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useLoading } from "@src/hooks";
 import { AccountType } from "@src/accounts/types";
 import { BALANCE } from "@src/routes/paths";
-import { messageAPI } from "@src/messageAPI/api";
 
 export const ImportWallet = () => {
   const navigate = useNavigate()
   const { t } = useTranslation("account_form")
-  const { importAccount } = useAccountContext()
+  const { importAccount, getAllAccounts } = useAccountContext()
   const { isLoading, starLoading, endLoading } = useLoading()
   const { step, prevStep, nextStep, goToWelcome, setStep } = useCreateWallet();
   const { texts, setTexts } = useAccountFormTexts()
+  const { initializeNetwork } = useNetworkContext()
 
-  const [isSignUp, setIsSignUp] = useState(false)
 
   const methods = useForm<ImportWalletFormValues>({
     defaultValues: {
@@ -57,15 +56,14 @@ export const ImportWallet = () => {
       return navigate(BALANCE)
     }
 
-    const isImportedFromInside = step === 2 && isSignUp
 
-    if (step === 3 || isImportedFromInside) {
+    if (step === 3) {
       starLoading()
 
       const result = await importAccount({
         name: "Account",
         privateKeyOrSeed: data.privateKeyOrSeed,
-        isSignUp: !isSignUp,
+        isSignUp: true,
         password: data.password,
         accountType: data.type === 'seed' ? AccountType.WASM : AccountType.EVM
       })
@@ -73,10 +71,9 @@ export const ImportWallet = () => {
       endLoading()
 
       if (result) {
-        if (isImportedFromInside) {
-          setStep(4)
-          return
-        }
+        setStep(4)
+        initializeNetwork()
+        getAllAccounts()
         nextStep();
       }
 
@@ -133,14 +130,6 @@ export const ImportWallet = () => {
     }
 
   }, [step])
-
-
-  useEffect(() => {
-    (async () => {
-      const isSignUp = await messageAPI.alreadySignedUp()
-      setIsSignUp(isSignUp)
-    })()
-  }, [])
 
 
   const buttonIsDisabled = useMemo(() => {

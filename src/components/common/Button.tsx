@@ -36,7 +36,7 @@ const getVariantStyles = (
     case "contained-gray":
       return `text-${themeColor}-secondary bg-[#636669] border-0 hover:bg-${themeColor}-fill disabled:hover:bg-[#636669]`;
     case "contained-black":
-      return `text-${themeColor}-secondary bg-[#1C1C27] border-0 hover:bg-gray-800`;
+      return `text-${themeColor}-secondary bg-[#1C1C27] border-0 hover:bg-${themeColor}-fill`;
     default:
       return `text-${themeColor}-primary bg-transparent border-0`;
   }

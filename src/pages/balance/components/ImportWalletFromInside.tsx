@@ -42,7 +42,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
     starLoading()
 
     const result = await importAccount({
-      name: "Account",
+      name: "",
       privateKeyOrSeed: data.privateKeyOrSeed,
       isSignUp: false,
       password: data.password,
