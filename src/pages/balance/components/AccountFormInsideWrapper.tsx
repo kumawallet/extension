@@ -92,7 +92,7 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
             <div className="flex items-center justify-between px-2 font-semibold">
               <div className="flex items-center gap-2">
                 <ASteriskCircle className="w-4 h-4" />
-                <span className="text-xs">{option1Text}</span>
+                <span className="text-[0.85rem]">{option1Text}</span>
               </div>
               <GoChevronRight size={12} />
             </div>
@@ -105,7 +105,7 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
             <div className="flex items-center justify-between px-2 font-semibold">
               <div className="flex items-center gap-2">
                 <SendForeward className="w-4 h-4" />
-                <span className="text-xs">{option2Text}</span>
+                <span className="text-[0.85rem]">{option2Text}</span>
               </div>
               <GoChevronRight size={12} />
             </div>

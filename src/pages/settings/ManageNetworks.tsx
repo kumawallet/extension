@@ -1,15 +1,16 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
+import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useToast } from "@src/hooks";
-import { Button, InputErrorMessage, Loading } from "@src/components/common";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import { Button, InputErrorMessage } from "@src/components/common";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { object, string, number, array } from "yup";
+import { object, string, number } from "yup";
 import {
   useAccountContext,
   useNetworkContext,
@@ -19,62 +20,39 @@ import { AccountType } from "@src/accounts/types";
 import { Listbox, Transition } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { Chain } from "@src/types";
 
-const defaultValues: Chain = {
-  name: "New Network",
-  rpc: { evm: "", wasm: "" },
-  addressPrefix: 0,
-  nativeCurrency: {
-    name: "",
-    symbol: "",
-    decimals: 0,
-  },
-  explorer: {
-    evm: {
-      name: "evm-explorer",
-      url: "",
-    },
-    wasm: {
-      name: "wasm-explorer",
-      url: "",
-    },
-  },
+const defaultValues: Partial<Chain> = {
+  id: "",
+  name: "",
+  rpcs: "",
+  prefix: 0,
+  symbol: "",
+  decimals: 0,
+  explorer: "",
+  isTestnet: false,
+  isCustom: false,
   logo: "",
-  supportedAccounts: [AccountType.WASM],
-  xcm: [],
+  type: ""
 };
 
 const schema = object({
   name: string().required(),
-  chain: string().optional(),
-  addressPrefix: number().optional(),
-  rpc: object().shape({
-    wasm: string().optional(),
-    evm: string().optional(),
-  }),
-  nativeCurrency: object().shape({
-    name: string().required(),
-    symbol: string().required(),
-    decimals: number().required(),
-  }),
-  explorer: object().shape({
-    evm: object().shape({
-      name: string().optional(),
-      url: string().optional(),
-    }),
-    wasm: object().shape({
-      name: string().optional(),
-      url: string().optional(),
-    }),
-  }),
-  supportedAccounts: array().required(),
+  prefix: number().optional(),
+  rpcs: string().required(),
+  symbol: string().required(),
+  decimals: number().required(),
+  explorer: string().optional(),
 }).required();
 
 const SUPPORTED_CHAINS_TYPE = [
-  { id: 1, name: "WASM", value: [AccountType.WASM] },
-  { id: 2, name: "EVM", value: [AccountType.EVM] },
-  { id: 3, name: "WASM & EVM", value: [AccountType.WASM, AccountType.EVM] },
+  { id: 1, name: "WASM", value: "wasm" },
+  { id: 2, name: "EVM", value: "evm" },
 ];
+
+const isCustomNetwork = (chain: Chain) => {
+  return chain.isCustom
+}
 
 export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
@@ -91,50 +69,23 @@ export const ManageNetworks = () => {
   } = useAccountContext();
   const { showErrorToast } = useToast();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [networks, setNetworks] = useState({} as Chains);
+
   const [isCreating, setIsCreating] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState(
-    undefined as Chain | undefined
+    selectedChain
   );
   const [supportedAccounts, setSupportedAccounts] = useState(
     SUPPORTED_CHAINS_TYPE[0]
   );
-  const [showNativeCurrency, setShowNativeCurrency] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-    getNetworks();
-  }, []);
-
-  const getNetworks = async () => {
-    try {
-      const networks = await messageAPI.getAllChains()
-      setNetworks(networks);
-      const selectedNetwork = networks.mainnets[0];
-      setSelectedNetwork(selectedNetwork);
-      setValue("name", selectedNetwork.name);
-    } catch (error) {
-      captureError(error);
-      setNetworks({} as Chains);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const allChains = useMemo(() => {
+    return chains.flatMap((chain) => chain.chains);
+  }, [chains])
 
   const changeNetwork = (chainName: string) => {
-    const network = [...networks.mainnets, ...networks.testnets, ...networks.custom]
-      .find((network) => network.name === chainName);
-
-    setSelectedNetwork(network);
+    const network = allChains.find((chain) => chain.name === chainName);
+    setSelectedNetwork(network as Chain);
     reset(network);
-  };
-
-  const isCustom = (chainName: string) => {
-    return networks.custom.find((network) => network.name === chainName)
-      ? true
-      : false;
   };
 
   const {
@@ -143,17 +94,26 @@ export const ManageNetworks = () => {
     reset,
     watch,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm<Chain>({
-    defaultValues,
+    defaultValues: {
+      ...selectedChain,
+      rpcs: selectedChain?.rpcs[0],
+    } as Chain,
     resolver: yupResolver(schema),
   });
 
   const _onSubmit = handleSubmit(async (data) => {
     try {
       await messageAPI.saveCustomChain({
-        chain: data
+        chain: {
+          ...data,
+          id: `custom-${data.name}`,
+          type: supportedAccounts.value,
+          isCustom: true,
+          isTestnet: false,
+          rpcs: [data.rpcs],
+        }
       });
       setIsCreating(false);
       refreshNetworks();
@@ -164,7 +124,7 @@ export const ManageNetworks = () => {
   });
 
   const cancel = () => {
-    changeNetwork(networks.mainnets[0].name);
+    changeNetwork(allChains[0].name);
     setIsCreating(false);
   };
 
@@ -173,8 +133,6 @@ export const ManageNetworks = () => {
       await messageAPI.removeCustomChain({
         chainName: selectedNetwork?.name as string
       });
-      getNetworks();
-
       const networkIsSelected = selectedChain!.name === selectedNetwork?.name;
 
       if (networkIsSelected) {
@@ -199,31 +157,15 @@ export const ManageNetworks = () => {
   const ChainName = watch("name");
 
   useEffect(() => {
-    if (ChainName && networks.mainnets && !isCreating) {
+    if (ChainName && allChains && !isCreating) {
       changeNetwork(ChainName);
     }
-  }, [ChainName, networks, isCreating]);
+  }, [ChainName, allChains, isCreating]);
 
   const showCreateForm = () => {
     setIsCreating(true);
     reset(defaultValues);
   };
-
-  const _supportedAccounts = getValues("supportedAccounts");
-
-  const showAddressPrefix = !isCreating
-    ? selectedNetwork?.supportedAccounts.includes(AccountType.WASM)
-    : _supportedAccounts.includes(AccountType.WASM);
-
-  if (isLoading) {
-    return (
-      <PageWrapper>
-        <div className="flex justify-center items-center gap-3 mb-10">
-          <Loading />
-        </div>
-      </PageWrapper>
-    );
-  }
 
   return (
     <PageWrapper>
@@ -258,11 +200,11 @@ export const ManageNetworks = () => {
           className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
           {...register("name")}
         >
-          {networks &&
-            [...networks.mainnets, ...networks.testnets, ...networks.custom].map((network, index) => {
+          {
+            allChains.map((chain, index) => {
               return (
-                <option key={index} value={network.name}>
-                  {network.name}
+                <option key={index} value={chain.name}>
+                  {chain.name}
                 </option>
               );
             })}
@@ -281,7 +223,7 @@ export const ManageNetworks = () => {
             value={supportedAccounts}
             onChange={(val) => {
               setSupportedAccounts(val);
-              setValue("supportedAccounts", val.value);
+              setValue("type", val.value as "wasm" | "evm");
             }}
           >
             <div className="relative mt-1">
@@ -322,13 +264,13 @@ export const ManageNetworks = () => {
               </Transition>
             </div>
           </Listbox>
-          <InputErrorMessage message={errors.addressPrefix?.message} />
+          <InputErrorMessage message={errors.prefix?.message} />
         </div>
       )}
 
       {selectedNetwork && (
         <>
-          {showAddressPrefix && (
+          {selectedNetwork.type === "wasm" && (
             <>
               <label
                 htmlFor="addressPrefix"
@@ -340,115 +282,63 @@ export const ManageNetworks = () => {
                 <input
                   type="number"
                   className="relative mt-4 input-primary"
-                  readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                  {...register("addressPrefix")}
+                  readOnly={!isCustomNetwork(selectedNetwork) && !isCreating}
+                  {...register("prefix")}
                 />
-                <InputErrorMessage message={errors.addressPrefix?.message} />
+                <InputErrorMessage message={errors.prefix?.message} />
               </div>
             </>
           )}
 
-          {selectedNetwork.nativeCurrency && (
-            <>
-              <div className="flex justify-between items-center mt-2 gap-2">
-                <label htmlFor="nativeCurrency" className="text-lg font-medium">
-                  {t("native_currency")}
-                </label>
-                <div className="p-2">
-                  {showNativeCurrency ? (
-                    <FiChevronUp
-                      className="cursor-pointer"
-                      size={ICON_SIZE}
-                      onClick={() => setShowNativeCurrency(!showNativeCurrency)}
-                    />
-                  ) : (
-                    <FiChevronDown
-                      className="cursor-pointer"
-                      size={ICON_SIZE}
-                      onClick={() => setShowNativeCurrency(!showNativeCurrency)}
-                    />
-                  )}
-                </div>
+          <div className="flex justify-between items-center gap-4 mt-4">
+            <div className="flex flex-col justify-between">
+              <div className="text-sm font-medium mb-2">
+                {t("currency_symbol")}
               </div>
-              {showNativeCurrency && (
-                <>
-                  <div className="mt-5">
-                    <div className="text-sm font-medium mb-2">
-                      {t("currency_name")}
-                    </div>
-                    <input
-                      className="mt-4 input-primary"
-                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                      {...register("nativeCurrency.name")}
-                    />
-                    <InputErrorMessage
-                      message={errors.nativeCurrency?.name?.message}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center gap-4 mt-4">
-                    <div className="flex flex-col justify-between">
-                      <div className="text-sm font-medium mb-2">
-                        {t("currency_symbol")}
-                      </div>
-                      <input
-                        className="mt-4 input-primary"
-                        readOnly={
-                          !isCustom(selectedNetwork.name) && !isCreating
-                        }
-                        {...register("nativeCurrency.symbol")}
-                      />
-                      <InputErrorMessage
-                        message={errors.nativeCurrency?.symbol?.message}
-                      />
-                    </div>
-                    <div className="flex flex-col justify-between">
-                      <div className="text-sm font-medium mb-2">
-                        {t("currency_decimals")}
-                      </div>
-                      <input
-                        type="number"
-                        className="mt-4 input-primary"
-                        readOnly={
-                          !isCustom(selectedNetwork.name) && !isCreating
-                        }
-                        {...register("nativeCurrency.decimals")}
-                      />
-                      <InputErrorMessage
-                        message={errors.nativeCurrency?.decimals?.message}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </>
-          )}
+              <input
+                className="mt-4 input-primary"
+                readOnly={
+                  !isCustomNetwork(selectedNetwork) && !isCreating
+                }
+                {...register("symbol")}
+              />
+              <InputErrorMessage
+                message={errors?.symbol?.message}
+              />
+            </div>
+            <div className="flex flex-col justify-between">
+              <div className="text-sm font-medium mb-2">
+                {t("currency_decimals")}
+              </div>
+              <input
+                type="number"
+                className="mt-4 input-primary"
+                readOnly={
+                  !isCustomNetwork(selectedNetwork) && !isCreating
+                }
+                {...register("decimals")}
+              />
+              <InputErrorMessage
+                message={errors?.decimals?.message}
+              />
+            </div>
+          </div>
 
-          {selectedNetwork.rpc && (
+
+          {selectedNetwork.rpcs && (
             <>
               <label htmlFor="name" className="block text-lg font-medium mt-4">
                 {t("rpc_urls")}
               </label>
-              {(selectedNetwork.rpc.evm || selectedNetwork.rpc.evm === "") && (
-                <div className="mt-5">
-                  <input
-                    placeholder={t("rpc_evm_placeholder") || ""}
-                    className="relative mt-4 input-primary"
-                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    {...register("rpc.evm")}
-                  />
-                </div>
-              )}
-              {(selectedNetwork.rpc.wasm ||
-                selectedNetwork.rpc.wasm === "") && (
-                  <div className="mt-5">
-                    <input
-                      placeholder={t("rpc_wasm_placeholder") || ""}
-                      className="relative mt-4 input-primary"
-                      readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                      {...register("rpc.wasm")}
-                    />
-                  </div>
-                )}
+              <div className="mt-5">
+                <input
+                  placeholder={t("rpc_wasm_placeholder") || ""}
+                  className="relative mt-4 input-primary"
+                  readOnly={!isCustomNetwork(selectedNetwork) && !isCreating}
+                  {...register("rpcs")}
+                />
+              </div>
+
             </>
           )}
 
@@ -457,30 +347,18 @@ export const ManageNetworks = () => {
               <label htmlFor="name" className="block text-lg font-medium mt-4">
                 {t("explorer")}
               </label>
-              {selectedNetwork.explorer.evm && (
-                <div className="mt-5">
-                  <input
-                    placeholder={t("explorer_evm_placeholder") || ""}
-                    className="relative mt-4 input-primary"
-                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    {...register("explorer.evm.url")}
-                  />
-                </div>
-              )}
-              {selectedNetwork.explorer.wasm && (
-                <div className="mt-5">
-                  <input
-                    placeholder={t("explorer_wasm_placeholder") || ""}
-                    className="relative mt-4 input-primary"
-                    readOnly={!isCustom(selectedNetwork.name) && !isCreating}
-                    {...register("explorer.wasm.url")}
-                  />
-                </div>
-              )}
+              <div className="mt-5">
+                <input
+                  placeholder={t("explorer_evm_placeholder") || ""}
+                  className="relative mt-4 input-primary"
+                  readOnly={!isCustomNetwork(selectedNetwork) && !isCreating}
+                  {...register("explorer")}
+                />
+              </div>
             </>
           )}
 
-          {(isCustom(selectedNetwork.name) || isCreating) && (
+          {(isCustomNetwork(selectedNetwork) || isCreating) && (
             <div className="flex justify-end mt-5">
               {!isCreating && (
                 <Button

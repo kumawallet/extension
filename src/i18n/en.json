@@ -52,6 +52,11 @@
     "forgot_password": "Forgot password?"
   },
   "account_form": {
+    "restore": {
+      "title": "Reset Password",
+      "button_text": "Restore",
+      "submit_message": "Password restored"
+    },
     "create_password_title": "Create password",
     "create_password_description": "Enter your password to create a seed for your recovery phrase.",
     "enter_password": "Enter password",
@@ -112,8 +117,8 @@
     },
     "accounts": {
       "accounts": "Accounts",
-      "import": "Import",
-      "create": "Create"
+      "import": "Import account",
+      "create": "Create account"
     },
     "send": "Send",
     "swap": "Swap",

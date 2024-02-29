@@ -125,13 +125,13 @@ export const AccountList = () => {
 
                           <div className="flex justify-between my-6">
                             <Button
-                              classname="!w-[48%]"
+                              classname="!w-[48%] py-3"
                               onClick={() => setActionSelected('create')}
                             >
                               {t("accounts.create")}
                             </Button>
                             <Button
-                              classname="!w-[48%]"
+                              classname="!w-[48%] py-3"
                               onClick={() => setActionSelected('import')}
                             >
                               {t("accounts.import")}

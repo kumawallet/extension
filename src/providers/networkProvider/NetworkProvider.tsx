@@ -48,6 +48,17 @@ const getChains = async (): Promise<ChainsState> => {
 
     // TODO: conditional for customs
 
+    const customChains = await messageAPI.getCustomChains();
+
+
+    if (customChains.length > 0) {
+      chains.push({
+        title: "custom",
+        // @ts-expect-error --- To handle old chain format
+        chains: customChains,
+      });
+    }
+
     if (showTesnets) {
       chains.push(
         ...[
@@ -150,6 +161,11 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         }
       }
 
+      // @ts-expect-error --- To handle old chain format
+      if (!selectedChainFromStorage?.chain?.id) {
+        // @ts-expect-error --- To handle old chain format
+        await messageAPI.setNetwork({ chain: allChains[0] });
+      }
 
       // @ts-expect-error --- To handle old chain format
       const selectedChain = selectedChainFromStorage?.chain?.id ? selectedChainFromStorage.chain as Chain : allChains[0];

@@ -384,6 +384,12 @@ export default class Extension {
     await Chains.removeCustomChain(chainName);
   }
 
+  private async getCustomChains(): Promise<Chain[]> {
+    const chains = await Chains.get<Chains>();
+    if (!chains) throw new Error("failed_to_get_chains");
+    return chains.custom;
+  }
+
   private async getXCMChains({
     chainName,
   }: RequestGetXCMChains): Promise<Chain[]> {
@@ -708,6 +714,8 @@ export default class Extension {
         return this.saveCustomChain(request as RequestSaveCustomChain);
       case "pri(network.removeCustomChain)":
         return this.removeCustomChain(request as RequestRemoveCustomChain);
+      case "pri(network.getCustomChains)":
+        return this.getCustomChains();
       case "pri(network.getXCMChains)":
         return this.getXCMChains(request as RequestGetXCMChains);
 

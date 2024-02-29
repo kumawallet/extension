@@ -22,6 +22,9 @@ export const networkMessages = {
   removeCustomChain: (params: RequestRemoveCustomChain) => {
     return sendMessage("pri(network.removeCustomChain)", params);
   },
+  getCustomChains: () => {
+    return sendMessage("pri(network.getCustomChains)", null);
+  },
   getXCMChains: (params: RequestGetXCMChains) => {
     return sendMessage("pri(network.getXCMChains)", params);
   },

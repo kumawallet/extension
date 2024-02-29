@@ -1,7 +1,6 @@
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import { PORT_CONTENT, PORT_EXTENSION } from "@src/constants/env";
 import PolkadotKeyring from "@polkadot/ui-keyring";
-import { AccountsStore } from "@polkadot/extension-base/stores";
 import kumaHandler from "./handlers/kumaHandler";
 import { assert } from "@polkadot/util";
 
@@ -35,7 +34,6 @@ webAPI.runtime.onConnect.addListener((_port): void => {
 cryptoWaitReady()
   .then((): void => {
     PolkadotKeyring.loadAll({
-      store: new AccountsStore(),
       type: "sr25519",
     });
     console.log("polkadot keyring loaded");
@@ -44,16 +42,19 @@ cryptoWaitReady()
     console.error("initialization failed", error);
   });
 
+const keepBackgroundAlive = () => {
+  // Chrome suspends background pages after a few seconds of inactivity
+  // To prevent this, we need to keep the background page alive every 2 seconds
+  setInterval(() => {
+    const timestamp = new Date().toISOString();
+    webAPI.storage.session.set({ timestamp });
+  }, 2000);
+};
+
 const init = () => {
   const isManifestV3 = webAPI.runtime.getManifest().manifest_version === 3;
 
-  if (isManifestV3) {
-    // to prevent the background script from being unloaded
-    setInterval(() => {
-      const timestamp = new Date().toISOString();
-      webAPI.storage.session.set({ timestamp });
-    }, 2000);
-  }
+  if (isManifestV3) keepBackgroundAlive();
 };
 
 init();

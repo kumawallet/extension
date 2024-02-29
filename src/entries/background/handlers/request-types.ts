@@ -195,6 +195,8 @@ export interface Request {
   "pri(network.getAllChains)": [null, Chains];
   "pri(network.saveCustomChain)": [RequestSaveCustomChain, void];
   "pri(network.removeCustomChain)": [RequestRemoveCustomChain, void];
+  "pri(network.getCustomChains)": [null, Chain[]];
+
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
