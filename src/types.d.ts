@@ -3,7 +3,6 @@ import { BN } from "@polkadot/util";
 import { utils, providers, Wallet, BigNumber } from "ethers";
 import { AccountType } from "./accounts/types";
 import { Asset } from "./pages";
-import { Chain } from "./storage/entities/Chains";
 import { ContractPromise } from "@polkadot/api-contract";
 
 export type polkadotExtrinsic =
@@ -89,3 +88,22 @@ export interface TxToProcess {
     id: string;
   };
 }
+
+export interface Chain {
+  id: string;
+  name: string;
+  rpcs: string[];
+  symbol: string;
+  decimals: number;
+  logo: string;
+  explorer?: string;
+  prefix?: number;
+  isTestnet?: boolean;
+  isCustom?: boolean;
+  type: "wasm" | "evm" | "move";
+}
+
+export type ChainsState = {
+  title: string;
+  chains: Chain[];
+}[];

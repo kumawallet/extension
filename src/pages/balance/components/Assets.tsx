@@ -9,7 +9,6 @@ import {
 } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
-import { ApiPromise } from "@polkadot/api";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
 
@@ -18,7 +17,7 @@ export const Assets = () => {
   const { color } = useThemeContext();
   const navigate = useNavigate();
   const {
-    state: { type, api },
+    state: { api, selectedChain },
   } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
@@ -50,19 +49,19 @@ export const Assets = () => {
   }, [assets, showAllAssets]);
 
   useEffect(() => {
-    if (!type || !api) {
+    if (!api) {
       setShowManageAssets(false);
       return;
     }
 
-    if (type === "EVM") {
+    if (selectedChain?.type === "evm") {
       setShowManageAssets(true);
     }
 
-    if (type === "WASM" && (api as ApiPromise).query.contracts) {
-      setShowManageAssets(true);
-    }
-  }, [type, api]);
+    // if (selectedChain?.type === "substrate" && (api as ApiPromise).query.contracts) {
+    //   setShowManageAssets(true);
+    // }
+  }, [api]);
 
   return (
     <div className="flex flex-col gap-2">

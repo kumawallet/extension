@@ -12,10 +12,10 @@ import {
   useAccountContext,
   useThemeContext,
 } from "@src/providers";
-import { Chain } from "@src/storage/entities/Chains";
 import { FaChevronRight } from "react-icons/fa";
 import { NetworkIcon } from "./NetworkIcon";
 import { messageAPI } from "@src/messageAPI/api";
+import { Chain } from "@src/types";
 
 const chipColor = {
   [RecordStatus.FAIL]: "bg-red-600",
@@ -28,7 +28,7 @@ export const Activity = () => {
   const { color } = useThemeContext();
 
   const {
-    state: { type, chains },
+    state: { chains, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -42,29 +42,16 @@ export const Activity = () => {
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("" as string);
-  const [networks, setNetworks] = useState({} as Chain[]);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
 
   useEffect(() => {
     if (selectedAccount) {
-      Promise.all([getNetworks(), getContacts()]);
+      Promise.all([getContacts()]);
     }
   }, [selectedAccount.key]);
 
-  const getNetworks = async () => {
-    try {
-      setIsLoading(true);
-      const networks = await messageAPI.getAllChains()
-      setNetworks([...networks.mainnets, ...networks.testnets, ...networks.custom]);
-    } catch (error) {
-      setNetworks([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getContacts = async () => {
     try {
@@ -80,16 +67,13 @@ export const Activity = () => {
     }
   };
 
-  const getLink = (network: string, hash: string) => {
-    const { explorer } =
-      networks
-        .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
-      {};
-    const { evm, wasm } = explorer || {};
-    if (type.toLowerCase() === "wasm") {
-      return `${wasm?.url}extrinsic/${hash}`;
+
+  const getLink = (chain: Chain, hash: string) => {
+    const chainType = chain?.type
+    if (chainType === "wasm") {
+      return `${chain?.explorer}/extrinsic/${hash}`;
     } else {
-      return `${evm?.url}tx/${hash}`;
+      return `${selectedChain?.explorer}/tx/${hash}`;
     }
   };
 
@@ -135,7 +119,7 @@ export const Activity = () => {
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
-  const allChains = [...chains.mainnets, ...chains.testnets, ...chains.custom];
+  const allChains = chains.flatMap((c) => c.chains);
 
   if (isLoading) {
     return <Loading />;
@@ -176,7 +160,7 @@ export const Activity = () => {
               <div className="flex items-center justify-between gap-3">
                 <a
                   className={`text-${color}-primary hover:bg-${color}-primary hover:bg-opacity-30 rounded-full p-1`}
-                  href={getLink(network, hash)}
+                  href={getLink(selectedChain as Chain, hash)}
                   target="_blank"
                   rel="noreferrer"
                 >

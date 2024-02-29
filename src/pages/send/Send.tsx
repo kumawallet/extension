@@ -11,7 +11,7 @@ import { AccountType } from "@src/accounts/types";
 import { ConfirmTx, WasmForm, EvmForm } from "./components";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import { IAsset, SendForm, Tx } from "@src/types";
+import { Chain, IAsset, SendForm, Tx } from "@src/types";
 import { BigNumber, Contract } from "ethers";
 import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { MapResponseEVM } from "@src/xcm/interfaces";
@@ -28,7 +28,7 @@ export const Send = () => {
   const { isLoading, starLoading, endLoading } = useLoading();
 
   const {
-    state: { selectedChain, type, rpc },
+    state: { selectedChain, },
   } = useNetworkContext();
 
   const {
@@ -60,8 +60,8 @@ export const Send = () => {
 
   const methods = useForm<SendForm>({
     defaultValues: {
-      from: selectedChain,
-      to: selectedChain,
+      from: selectedChain as Chain,
+      to: selectedChain as Chain,
       destinationAccount: "",
       amount: 0,
       asset: {},
@@ -73,7 +73,7 @@ export const Send = () => {
 
   const { getValues } = methods;
 
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.decimals || 1;
   const currencyUnits = 10 ** decimals;
 
   const asset = getValues("asset") as IAsset;
@@ -102,7 +102,7 @@ export const Send = () => {
           originAddress,
           destinationNetwork,
           networkName: selectedChain?.name || "",
-          rpc: rpc as string,
+          rpc: selectedChain?.rpcs[0] as string,
         })
 
       } else {
@@ -118,7 +118,7 @@ export const Send = () => {
         );
 
         if (isXcm) {
-          const { method, extrinsicValues } = XCM_MAPPING[selectedChain.name][
+          const { method, extrinsicValues } = XCM_MAPPING[selectedChain!.name][
             to.name
           ]({
             address: destinationAddress,
@@ -179,7 +179,7 @@ export const Send = () => {
           originAddress,
           destinationNetwork,
           networkName: selectedChain?.name || "",
-          rpc: rpc as string,
+          rpc: selectedChain?.rpcs[0] as string,
         })
       }
       showSuccessToast(t("tx_send"));
@@ -208,7 +208,7 @@ export const Send = () => {
         tx?.fee.estimatedTotal.toString() || "",
         asset.decimals,
         8
-      )} ${selectedChain?.nativeCurrency.symbol}`;
+      )} ${selectedChain?.symbol}`;
 
   return (
     <PageWrapper contentClassName="bg-[#29323C] h-full flex-1">
@@ -225,7 +225,7 @@ export const Send = () => {
               <p className="text-lg">{t("title")}</p>
             </div>
 
-            {type === "WASM" ? (
+            {selectedChain?.type === "wasm" ? (
               <WasmForm confirmTx={setTx} />
             ) : (
               <EvmForm confirmTx={setTx} />
@@ -240,7 +240,7 @@ export const Send = () => {
                 tx.fee.estimatedFee.toString(),
                 asset?.decimals,
                 10
-              )} ${selectedChain?.nativeCurrency.symbol || ""}`,
+              )} ${selectedChain?.symbol || ""}`,
               estimatedTotal: estimatedTotal,
             }}
             onConfirm={sendTx}

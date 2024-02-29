@@ -73,7 +73,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   });
 
   const _api = api as ApiPromise;
-  const decimals = selectedChain?.nativeCurrency?.decimals || 1;
+  const decimals = selectedChain?.decimals || 1;
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
   const asset = watch("asset");
@@ -124,7 +124,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
         const xcmPalletVersion = await xcmPallet.palletVersion();
 
         const { method, pallet, extrinsicValues } = XCM_MAPPING[
-          selectedChain.name
+          selectedChain!.name
         ][to.name]({
           address: destinationAccount,
           amount: bnAmount,
@@ -298,7 +298,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
     }
   }, [fee, asset, amount, isNativeAsset]);
 
-  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.nativeCurrency.symbol}}`
+  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.symbol}}`
 
 
   return (

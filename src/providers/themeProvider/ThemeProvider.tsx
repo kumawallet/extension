@@ -19,7 +19,7 @@ const ThemeContext = createContext(
 
 export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
   const {
-    state: { selectedChain, chains },
+    state: { selectedChain },
   } = useNetworkContext();
 
   const [color, setColor] = useState(
@@ -28,21 +28,17 @@ export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (selectedChain?.name) {
-      const isCustom = chains?.custom?.find(
-        (chain) => chain.name === selectedChain.name
-      );
 
-      const isTestnet = chains?.testnets?.find(
-        (chain) => chain.name === selectedChain.name
-      )
 
-      const color = !isCustom && !isTestnet
+      const isCustomOrTestnet = selectedChain.isCustom || selectedChain.isTestnet;
+
+      const color = !isCustomOrTestnet
         ? `chain-${selectedChain.name.toLowerCase().replace(/ /g, "-")}`
         : DEFAULT_COLOR;
       setColor(color);
       localStorage.setItem("color", color);
     }
-  }, [selectedChain, chains]);
+  }, [selectedChain]);
 
   return (
     <ThemeContext.Provider

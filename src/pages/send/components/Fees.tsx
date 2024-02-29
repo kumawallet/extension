@@ -15,14 +15,16 @@ export const Fees: FC<FeesProps> = ({
 }) => {
   const { t } = useTranslation("send");
   const {
-    state: { type },
+    state: { selectedChain },
   } = useNetworkContext();
 
-  if (!type) return null;
+  if (!selectedChain) return null;
+
+
 
   return (
     <div className="flex flex-col gap-1 w-full">
-      {type === "EVM" && (
+      {selectedChain.type === "evm" && (
         <div className="flex justify-between gap-2">
           <p>{t("gas_limit")}</p>
           <p className="font-bold font-inter">{String(gasLimit)} gwei</p>

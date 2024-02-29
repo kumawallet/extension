@@ -1,28 +1,21 @@
 import { AccountType } from "@src/accounts/types";
-import Chains from "@src/storage/entities/Chains";
+import { Chain, ChainsState } from "@src/types";
 
 type SelectedChain = Chain | null;
 type Api = ApiPromise | ethers.providers.JsonRpcProvider | null;
 
 export interface InitialState {
-  chains: {
-    mainnets: Chain[];
-    testnets: Chain[];
-    custom: Chain[];
-  };
+  chains: ChainsState;
   selectedChain: SelectedChain;
   api: Api;
-  rpc: string | null;
   init: boolean;
-  type: string;
 }
 
 export interface NetworkContext {
   state: InitialState;
   setSelectNetwork: (network: Chain) => void;
-  getSelectedNetwork: () => Promise<Chain | null | undefined>;
-  setNewRpc: (rpc: string) => void;
   refreshNetworks: (supportedAccounts?: AccountType[]) => void;
+  initializeNetwork: () => void;
 }
 
 export type Action =
@@ -48,8 +41,6 @@ export type Action =
       type: "set-api";
       payload: {
         api: Api;
-        rpc?: string;
-        type?: string;
       };
     }
   | {

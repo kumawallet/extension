@@ -122,7 +122,11 @@
     "assets": "Assets",
     "activity": "Activity",
     "show_all_assets": "Show all assets",
-    "manage_assets": "Manage assets"
+    "manage_assets": "Manage assets",
+    "wasm_based": "Substrate based",
+    "evm_based": "EVM",
+    "wasm_baed_testnets": "Substrate based testnets",
+    "evm_based_testnets": "EVM testnets"
   },
   "settings": {
     "title": "Settings",

@@ -16,7 +16,6 @@ import {
 } from "@src/providers";
 import { getAccountType } from "../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
-import { CHAINS } from "@src/constants/chains";
 import { Listbox, Transition } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
@@ -81,7 +80,7 @@ export const ManageNetworks = () => {
   const { t } = useTranslation("manage_networks");
   const { t: tCommon } = useTranslation("common");
   const {
-    state: { selectedChain },
+    state: { selectedChain, chains },
     refreshNetworks,
     setSelectNetwork,
   } = useNetworkContext();
@@ -176,7 +175,7 @@ export const ManageNetworks = () => {
       });
       getNetworks();
 
-      const networkIsSelected = selectedChain.name === selectedNetwork?.name;
+      const networkIsSelected = selectedChain!.name === selectedNetwork?.name;
 
       if (networkIsSelected) {
         const actualAccountType = getAccountType(
@@ -184,7 +183,7 @@ export const ManageNetworks = () => {
         ) as AccountType;
 
         await refreshNetworks();
-        setSelectNetwork(CHAINS[0].chains[0]);
+        setSelectNetwork(chains[0].chains[0]);
         if (actualAccountType !== "WASM") {
           // default to polkadot
           const accounts = await getAllAccounts([AccountType.WASM]);

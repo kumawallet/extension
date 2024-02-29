@@ -8,15 +8,15 @@ import { SelectableAsset } from "./SelectableAsset";
 import { SelectableChain } from "./SelectableChain";
 import { useNetworkContext } from "@src/providers";
 import { useEffect, useState } from "react";
-import { Chain } from "@src/storage/entities/Chains";
 import { XCMAlertMessage } from "./XCMAlertMessage";
-import { messageAPI } from "@src/messageAPI/api";
+import { XCM } from "@src/constants/xcm";
+import { Chain } from "@src/types";
 
 export const CommonFormFields = () => {
     const { t } = useTranslation("send");
 
     const {
-        state: { selectedChain },
+        state: { selectedChain, chains },
     } = useNetworkContext();
 
     const {
@@ -31,26 +31,32 @@ export const CommonFormFields = () => {
     const [destinationChains, setDestinationChains] = useState<Chain[]>([]);
 
     const getDestinationChains = async () => {
-        let chains = [selectedChain];
+        let _chains = [selectedChain as Chain];
 
-        if (selectedChain.xcm) {
-            const xcmChains = await messageAPI.getXCMChains({
-                chainName: selectedChain.name,
-            });
-            chains = [...chains, ...xcmChains];
+        const xcmChainList = XCM[selectedChain?.id || ""] || []
+
+        if (xcmChainList.length > 0) {
+            // const xcmChains = await messageAPI.getXCMChains({
+            //     chainName: selectedChain.name,
+            // });
+            const allChains = chains.flatMap((chain) => chain.chains);
+
+            const xcmChains = allChains.filter((chain) => xcmChainList.includes(chain.id))
+
+            _chains = [..._chains, ...xcmChains];
         }
 
-        setDestinationChains(chains);
+        setDestinationChains(_chains);
     };
 
     useEffect(() => {
-        if (selectedChain.name) {
+        if (selectedChain?.name) {
             getDestinationChains();
         }
     }, [selectedChain]);
 
     useEffect(() => {
-        setValue("isXcm", to.name !== selectedChain.name);
+        setValue("isXcm", to.name !== selectedChain?.name);
     }, [to]);
 
     return (

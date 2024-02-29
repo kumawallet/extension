@@ -17,7 +17,7 @@ import { getWebAPI } from "@src/utils/env";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
-import { TxToProcess } from "@src/types";
+import { Chain, TxToProcess } from "@src/types";
 import { AccountType } from "@src/accounts/types";
 
 export interface TxInfoState {
@@ -74,7 +74,7 @@ export const useSwap = () => {
   const { t } = useTranslation("swap");
 
   const {
-    state: { api, selectedChain, rpc },
+    state: { api, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -202,9 +202,8 @@ export const useSwap = () => {
   const init = async (api: ApiPromise | ethers.providers.JsonRpcProvider) => {
     starLoading();
     try {
-      const nativeCurrency =
-        selectedChain?.nativeCurrency.symbol?.toLowerCase();
-      const chainName = selectedChain?.name;
+      const nativeCurrency = selectedChain!.symbol?.toLowerCase();
+      const chainName = selectedChain!.name;
 
       const _swapper = new StealthEX();
 
@@ -315,7 +314,10 @@ export const useSwap = () => {
         amountFrom: amounts.sell,
         addressFrom: selectedAccount.value.address,
         addressTo: recipient.address,
-        nativeAsset: selectedChain?.nativeCurrency,
+        nativeAsset: {
+          symbol: selectedChain!.symbol,
+          decimals: selectedChain!.decimals,
+        },
         assetToSell: {
           symbol: assetToSell.label as string,
           decimals: assetToSell.decimals as number,
@@ -340,11 +342,11 @@ export const useSwap = () => {
         amountBridge: amounts.sell,
         chainFrom: {
           name: "",
-          image: selectedChain.logo,
+          image: selectedChain!.logo,
         },
         chainBridge: {
           name: "",
-          image: selectedChain.logo,
+          image: selectedChain!.logo,
         },
         chainTo: {
           name: "",
@@ -410,7 +412,7 @@ export const useSwap = () => {
         amount: amounts.sell,
         originAddress: selectedAccount.value.address,
         destinationAddress: tx.addressBridge,
-        rpc: rpc as string,
+        rpc: selectedChain?.rpcs[0],
         asset: {
           id: assetToSell?.id || "",
           symbol: assetToSell?.label || "",
@@ -418,8 +420,8 @@ export const useSwap = () => {
           color: (assetToSell as any).color || "",
         },
         destinationNetwork: selectedChain?.name,
-        networkInfo: selectedChain,
-        originNetwork: selectedChain,
+        networkInfo: selectedChain as Chain,
+        originNetwork: selectedChain!.name,
         // tx: {
         //   type: "",
         //   txHash: "",

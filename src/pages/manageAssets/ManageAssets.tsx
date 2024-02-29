@@ -12,6 +12,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { FiChevronLeft } from "react-icons/fi";
 import { decodeAddress } from "@polkadot/util-crypto";
 import { messageAPI } from "@src/messageAPI/api";
+import { Chain } from "@src/types";
 
 interface AssetForm {
   address: string;
@@ -29,7 +30,7 @@ export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
   const { t: tCommon } = useTranslation("common");
   const {
-    state: { selectedChain, type, api },
+    state: { selectedChain, api },
   } = useNetworkContext();
   const { state: { selectedAccount } } = useAccountContext()
   const { loadAssets } = useAssetContext();
@@ -44,7 +45,7 @@ export const ManageAssets = () => {
         tCommon("invalid_address") as string,
         (val) => {
           try {
-            return type === "EVM"
+            return selectedChain?.type === "evm"
               ? isHex(val)
               : !!u8aToHex(decodeAddress(val as string));
           } catch (error) {
@@ -57,7 +58,7 @@ export const ManageAssets = () => {
         .required(t("required") as string),
       symbol: string().required(t("required") as string),
     });
-  }, [t, type]);
+  }, [t, selectedChain]);
 
   const {
     register,
@@ -73,11 +74,11 @@ export const ManageAssets = () => {
     try {
       await messageAPI.addAsset({
         asset: data,
-        chain: selectedChain.name,
+        chain: selectedChain!.name,
       });
       loadAssets({
         api,
-        selectedChain,
+        selectedChain: selectedChain as Chain,
         selectedAccount
       });
       navigate(BALANCE);
@@ -87,10 +88,10 @@ export const ManageAssets = () => {
   });
 
   useEffect(() => {
-    if (type === "WASM" && selectedChain) {
-      setValue("decimals", selectedChain?.nativeCurrency?.decimals);
+    if (selectedChain?.type === "wasm" && selectedChain) {
+      setValue("decimals", selectedChain?.decimals);
     }
-  }, [selectedChain, type]);
+  }, [selectedChain, selectedChain?.type]);
 
   return (
     <>
@@ -139,7 +140,7 @@ export const ManageAssets = () => {
             </label>
             <input
               data-testid="decimals"
-              disabled={type === "WASM"}
+              disabled={selectedChain?.type === "wasm"}
               id="decimals"
               {...register("decimals")}
               className="input-primary disabled:opacity-60"

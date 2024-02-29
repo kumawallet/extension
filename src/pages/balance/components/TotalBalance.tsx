@@ -25,15 +25,11 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   const {
     state: { assets },
-    loadAssets,
-  } = useAssetContext();
-  const {
-    state: { api, selectedChain },
-  } = useNetworkContext();
 
-  const updateAllAssets = async () => {
-    loadAssets({ api, selectedAccount, selectedChain });
-  };
+  } = useAssetContext();
+
+
+
 
   const totalBalance = assets.reduce(
     (total, item) => total + (item.amount || 0),
@@ -44,7 +40,6 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   useEffect(() => {
     setCurrencyLogo(getCurrencyInfo().logo);
-    updateAllAssets();
   }, [selectedAccount]);
 
   return (

@@ -17,7 +17,7 @@ import { BsGear } from "react-icons/bs";
 import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 import { Switch } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
-import { useThemeContext } from "@src/providers";
+import { useNetworkContext, useThemeContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
 
 export const General = () => {
@@ -31,6 +31,7 @@ export const General = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [showTestnets, setShowTestnets] = useState(false);
   const { showErrorToast } = useToast();
+  const { initializeNetwork } = useNetworkContext()
 
   useEffect(() => {
     setIsLoading(true);
@@ -115,8 +116,8 @@ export const General = () => {
           key: SettingKey.SHOW_TESTNETS,
           value: !showTestnets
         })
-
       }
+      initializeNetwork()
     } catch (error) {
       captureError(error);
       showErrorToast(tCommon("failed_to_update_setting"));
