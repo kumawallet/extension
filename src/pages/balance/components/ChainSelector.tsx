@@ -64,13 +64,23 @@ export const ChainSelector = () => {
                           onClick={() => setSelectNetwork(chain)}
                         >
                           <div className="flex items-center gap-3">
-                            <img
-                              src={chain.logo}
-                              width={24}
-                              height={24}
-                              alt={chain.name}
-                              className="object-cover rounded-full"
-                            />
+                            {
+                              chain.isCustom ? (
+                                <div
+                                  className="w-6 h-6 bg-gray-400 flex items-center justify-center rounded-full"
+                                >
+                                  {chain.name[0]}
+                                </div>
+                              ) : (
+                                <img
+                                  src={chain.logo}
+                                  width={24}
+                                  height={24}
+                                  alt={chain.name}
+                                  className="object-cover rounded-full"
+                                />
+                              )
+                            }
                             <span className="text-xl">{chain.name}</span>
                           </div>
                         </button>

@@ -1,7 +1,8 @@
 import { ASSETS_ICONS } from "../assets-icons";
+import { Chain } from "@src/types";
 import ROCOCO_LOGO from "/images/rococo.png";
 import ASSETHUB_LOGO from "/images/assethub.png";
-import { Chain } from "@src/types";
+import PASEO_LOGO from "/images/paseo.svg";
 
 export const SUBTRATE_CHAINS: Chain[] = [
   {
@@ -153,6 +154,19 @@ export const SUBTRATE_CHAINS: Chain[] = [
     decimals: 18,
     explorer: "https://shibuya.subscan.io",
     logo: ASSETS_ICONS["ASTR"],
+    isTestnet: true,
+    isCustom: false,
+    type: "wasm",
+  },
+  {
+    id: "paseo",
+    name: "Paseo",
+    rpcs: ["wss://paseo.rpc.amforc.com", "wss://rpc.dotters.network/paseo"],
+    prefix: 42,
+    symbol: "PAS",
+    decimals: 10,
+    explorer: "https://paseo.subscan.io",
+    logo: PASEO_LOGO,
     isTestnet: true,
     isCustom: false,
     type: "wasm",
