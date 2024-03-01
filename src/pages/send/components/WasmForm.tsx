@@ -6,8 +6,7 @@ import { useFormContext } from "react-hook-form";
 import {
   useAccountContext,
   useAssetContext,
-  useNetworkContext,
-  useThemeContext,
+  useNetworkContext
 } from "@src/providers";
 import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/keyring";
@@ -41,7 +40,6 @@ interface WasmFormProps {
 export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
 
   const {
     state: { selectedAccount },
@@ -338,7 +336,7 @@ export const WasmForm: FC<WasmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-primary transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-primary-default transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

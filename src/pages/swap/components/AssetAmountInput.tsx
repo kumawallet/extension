@@ -1,6 +1,5 @@
-import { Loading } from "@src/components/common";
-import { useThemeContext } from "@src/providers";
 import { FC } from "react";
+import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 
@@ -37,7 +36,6 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 }) => {
   const { t } = useTranslation("swap");
 
-  const { color } = useThemeContext();
 
   return (
     <div className={containerClassName}>
@@ -55,7 +53,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
       <div className="flex">
         <div className="flex-1 relative h-fit w-[60%]">
           <NumericFormat
-            className={`input-secondary py-3 rounded-xl pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary rounded-r-none`}
+            className={`input-secondary py-3 rounded-xl pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-r-none`}
             allowNegative={false}
             allowLeadingZeros={false}
             value={isLoading ? "" : amount}

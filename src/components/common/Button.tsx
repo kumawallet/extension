@@ -5,7 +5,6 @@ import {
   PropsWithChildren,
   SVGAttributes,
 } from "react";
-import { useThemeContext } from "@src/providers";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface ButtonProps {
@@ -24,21 +23,20 @@ const BASE_CLASSNAME =
 
 const getVariantStyles = (
   variant: ButtonProps["variant"],
-  themeColor: string
 ) => {
   switch (variant) {
     case "text":
-      return `text-${themeColor}-secondary bg-transparent border-0 hover:bg-${themeColor}-fill hover:bg-opacity-80`;
+      return `bg-transparent border-0  hover:bg-opacity-80`;
     case "outlined":
-      return `text-${themeColor}-secondary bg-transparent border-[0.5px] border-${themeColor}-primary hover:bg-${themeColor}-fill hover:bg-opacity-80 hover:border-${themeColor}-fill`;
+      return `bg-transparent border-[0.5px]  hover:bg-opacity-80`;
     case "contained":
-      return `text-${themeColor}-secondary bg-${themeColor}-fill border-0 hover:bg-opacity-70`;
+      return `bg-linear border-0 hover:bg-opacity-70`;
     case "contained-gray":
-      return `text-${themeColor}-secondary bg-[#636669] border-0 hover:bg-${themeColor}-fill disabled:hover:bg-[#636669]`;
+      return `bg-[#636669] border-0 hover:bg-linear disabled:hover:bg-[#636669]`;
     case "contained-black":
-      return `text-${themeColor}-secondary bg-[#1C1C27] border-0 hover:bg-${themeColor}-fill`;
+      return `bg-[#1C1C27] border-0 hover:bg-linear`;
     default:
-      return `text-${themeColor}-primary bg-transparent border-0`;
+      return `bg-transparent border-0`;
   }
 };
 
@@ -53,9 +51,7 @@ export const Button: FC<ButtonProps & PropsWithChildren> = ({
   variant = "contained",
   ...props
 }) => {
-  const { color } = useThemeContext();
-
-  const variantStyles = getVariantStyles(variant, color);
+  const variantStyles = getVariantStyles(variant);
 
   return (
     <button

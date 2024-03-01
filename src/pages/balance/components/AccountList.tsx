@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import {
   useAccountContext,
   useNetworkContext,
-  useThemeContext,
 } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { Button } from "@src/components/common";
@@ -17,7 +16,6 @@ import { CgClose } from "react-icons/cg";
 export const AccountList = () => {
   const { t } = useTranslation("balance");
 
-  const { color } = useThemeContext();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -63,7 +61,7 @@ export const AccountList = () => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-full">
-          <p className={`text-${color}-primary text-base`}>
+          <p className="text-primary-default text-base">
             {selectedAccount?.value?.name}
           </p>
           <GoChevronDown size={18} />

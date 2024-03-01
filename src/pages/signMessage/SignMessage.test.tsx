@@ -33,12 +33,6 @@ const renderComponent = () => {
 
 describe("SignMessage", () => {
   beforeAll(() => {
-    vi.mock("@src/providers", () => ({
-      useThemeContext: () => ({
-        color: "red",
-      }),
-    }));
-
 
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {

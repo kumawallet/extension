@@ -59,9 +59,6 @@ describe("EvmForm", () => {
           },
         }
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
 
     vi.mock("react-hook-form", () => ({

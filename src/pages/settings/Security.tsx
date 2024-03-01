@@ -13,14 +13,13 @@ import { useToast, useLoading } from "@src/hooks";
 import { BsEye, BsTrash } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
-import { useAccountContext, useThemeContext } from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { messageAPI } from "@src/messageAPI/api";
 
 export const Security = () => {
   const { t } = useTranslation("security");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
   const { getSelectedAccount } = useAccountContext();
   const {
     isLoading: isLoadingReset,
@@ -187,10 +186,10 @@ export const Security = () => {
               )
               .map((site, index) => (
                 <div
-                  className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2`}
+                  className={`flex justify-between items-center hover:bg-primary-default hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer gap-2`}
                   key={index}
                 >
-                  <p className={`text-${color}-primary px-2 break-all w-[75%]`}>
+                  <p className={`text-primabg-primary-default px-2 break-all w-[75%]`}>
                     {site}
                   </p>
                   <div className="w-[20%] flex justify-end">
@@ -264,7 +263,7 @@ export const Security = () => {
                         </Dialog.Title>
                         <div className="flex flex-col mt-4">
                           <p
-                            className={`text-sm text-white text-center break-all rounded-lg border p-2 bg-custom-gray-bg border-${color}-primary`}
+                            className={`text-sm text-white text-center break-all rounded-lg border p-2 bg-custom-gray-bg border-primary-default`}
                           >
                             {account?.value.address}
                           </p>

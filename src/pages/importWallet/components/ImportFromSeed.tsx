@@ -4,7 +4,6 @@ import { useFormContext } from "react-hook-form"
 import { ImportWalletFormValues } from "../validations"
 import { PiEyeLight } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
-import { useThemeContext } from "@src/providers";
 
 const WordOption = ({
   text,
@@ -15,10 +14,8 @@ const WordOption = ({
   isActive: boolean
   onClick: () => void
 }) => {
-  const { color } = useThemeContext()
-
   return (
-    <button className={`rounded-3xl text-center w-1/2 py-2 md:py-3 font-medium md:text-xl ${isActive ? `bg-${color}-primary text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
+    <button className={`rounded-3xl text-center w-1/2 py-2 md:py-3 font-medium md:text-xl ${isActive ? `bg-linear text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
       {text}
     </button>
   )

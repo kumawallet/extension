@@ -2,7 +2,6 @@ import { FC } from "react";
 import { Button } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useThemeContext } from "@src/providers";
 import { FiChevronLeft } from "react-icons/fi";
 import { Fees } from "@src/pages/send/components/Fees";
 import { ChainInfo } from "./ChainInfo";
@@ -70,7 +69,6 @@ export const TxInfo: FC<TxInfoProps> = ({
   onConfirm,
 }) => {
   const { t } = useTranslation("send");
-  const { color } = useThemeContext();
 
   return (
     <div className="mx-auto px-2">
@@ -187,7 +185,7 @@ export const TxInfo: FC<TxInfoProps> = ({
         </div>
       </div>
       <Button
-        classname={`font-medium text-base bg-${color}-primary w-full py-2 md:py-4 rounded-md`}
+        classname={`font-medium text-base bg-linear w-full py-2 md:py-4 rounded-md`}
         onClick={onConfirm}
         isLoading={isLoading}
         isDisabled={isLoading}

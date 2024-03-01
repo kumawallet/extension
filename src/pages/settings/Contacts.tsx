@@ -18,7 +18,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { isHex } from "@polkadot/util";
 import { captureError } from "@src/utils/error-handling";
-import { useThemeContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
 
 interface AccountForm {
@@ -29,7 +28,6 @@ interface AccountForm {
 export const Contacts = () => {
     const { t } = useTranslation("contacts");
     const { t: tCommon } = useTranslation("common");
-    const { color } = useThemeContext();
     const navigate = useNavigate();
 
     const schema = object({
@@ -243,7 +241,7 @@ export const Contacts = () => {
                         {groupedContacts.map(([letter, contacts]) => (
                             <section key={letter}>
                                 <h3
-                                    className={`text-lg font-medium my-2 text-${color}-primary`}
+                                    className={`text-lg font-medium my-2 text-primary-default`}
                                 >
                                     {letter}
                                 </h3>
@@ -251,7 +249,7 @@ export const Contacts = () => {
                                     <div
                                         data-testid="contact"
                                         key={index}
-                                        className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
+                                        className={`flex justify-between items-center hover:bg-prtext-primary-default hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
                                     >
                                         <div className="overflow-hidden text-ellipsis w-[75%] break-all">
                                             <p className="text-lg font-medium">{contact?.name}</p>

@@ -22,9 +22,6 @@ describe("Security", () => {
       useAccountContext: () => ({
         getSelectedAccount: () => getSelectedAccount(),
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
 
     vi.mock("react-router-dom", () => ({

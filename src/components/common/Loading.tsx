@@ -1,4 +1,3 @@
-import { useThemeContext } from "@src/providers";
 import { FC } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
@@ -10,12 +9,10 @@ interface LoadingProps {
 }
 
 export const Loading: FC<LoadingProps> = ({ containerClass, iconClass }) => {
-  const { color } = useThemeContext();
-
   return (
     <div className={containerClass || DEFAULT_CONTAINER_CLASSNAME}>
       <AiOutlineLoading3Quarters
-        className={`w-8 h-8 mr-2 text-gray-200 animate-spin fill-${color}-primary ${iconClass}`}
+        className={`w-8 h-8 mr-2 text-gray-200 animate-spin fill-primary-default ${iconClass}`}
       />
     </div>
   );

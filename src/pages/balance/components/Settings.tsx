@@ -12,7 +12,6 @@ import {
 } from "@src/routes/paths";
 import { ICON_SIZE } from "@src/constants/icons";
 import { RxCross2 } from "react-icons/rx";
-import { useThemeContext } from "@src/providers";
 import { version } from "@src/utils/env";
 
 
@@ -41,7 +40,6 @@ const OPTIONS = [
 
 export const Settings = () => {
   const { t } = useTranslation("settings");
-  const { color } = useThemeContext();
   const navigate = useNavigate()
 
 
@@ -78,7 +76,7 @@ export const Settings = () => {
                         <div
                           key={opt.text}
                           onClick={() => navigate(opt.href)}
-                          className={`flex justify-between items-center hover:bg-${color}-primary hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
+                          className={`flex justify-between items-center hover:bg-primary-default hover:bg-opacity-40 rounded-xl px-3 py-3 cursor-pointer`}
                         >
                           <p className="text-xl">{t(opt.text)}</p>
                           <BsChevronRight />

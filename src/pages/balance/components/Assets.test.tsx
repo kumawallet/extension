@@ -50,9 +50,6 @@ describe("Assets", () => {
           isLoadingAssets: false,
         },
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
     vi.mock("@src/utils/env", () => ({
       version: "1.0.0",

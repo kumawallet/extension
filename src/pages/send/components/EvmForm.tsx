@@ -6,7 +6,6 @@ import {
   useAccountContext,
   useAssetContext,
   useNetworkContext,
-  useThemeContext,
 } from "@src/providers";
 import { Contract, ethers, Wallet, BigNumber } from "ethers";
 import { useFormContext } from "react-hook-form";
@@ -31,7 +30,6 @@ interface EvmFormProps {
 export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
 
   const {
     state: { api, selectedChain },
@@ -336,7 +334,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-primary-default transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

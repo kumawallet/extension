@@ -14,13 +14,13 @@ import {
   SwapInfo,
 } from "./components";
 import { HiMiniArrowsRightLeft } from "react-icons/hi2";
-import { useAssetContext, useThemeContext } from "@src/providers";
+import { useAssetContext } from "@src/providers";
 import { useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 // import { Tab } from "@headlessui/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
 // import { TbExternalLink } from "react-icons/tb";
@@ -35,7 +35,6 @@ import { SwapAsset } from "./base";
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const {
@@ -128,7 +127,7 @@ export const Swap = () => {
             <div className="flex-1 mt-4">
               <div className="flex justify-center items-center gap-3 pt-5">
                 <SelectableAsset
-                  buttonClassName={`border-${color}-primary`}
+                  buttonClassName={`border-prrimary-default`}
                   value={assetToSell as SwapAsset}
                   options={assetsToSell}
                   onChange={(asset) => handleAssetChange("sell", asset)}
@@ -269,7 +268,7 @@ export const Swap = () => {
                 isLoadingSellAsset ||
                 isCreatingSwap
               }
-              classname={`font-medium text-base capitalize w-full py-2 bg-[#212529] hover:bg-${color}-primary mt-7 !mx-0`}
+              classname={`font-medium text-base capitalize w-full py-2 mt-7 !mx-0`}
               onClick={swap}
             >
               {t("proceed")}

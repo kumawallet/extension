@@ -56,10 +56,7 @@ describe("ChainSelector", () => {
           },
         },
         setSelectNetwork: () => setSelectNetwork(),
-      }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
+      })
     }));
     vi.mock("react-router-dom", () => ({
       useNavigate: () => vi.fn(),

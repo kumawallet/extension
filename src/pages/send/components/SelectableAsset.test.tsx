@@ -38,9 +38,6 @@ describe("SelectableAsset", () => {
           selectedChain: selectedEVMChainMock,
         },
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
 
     vi.mock("react-hook-form", () => ({

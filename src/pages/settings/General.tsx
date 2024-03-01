@@ -17,13 +17,12 @@ import { BsGear } from "react-icons/bs";
 import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
 import { Switch } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
-import { useNetworkContext, useThemeContext } from "@src/providers";
+import { useNetworkContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
   const { t: tCommon, i18n: i18nCommon } = useTranslation("common");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState([] as Setting[]);
@@ -211,7 +210,7 @@ export const General = () => {
                           checked={showTestnets}
                           onChange={changeShowTestnets}
                           className={`${showTestnets
-                            ? `bg-${color}-primary`
+                            ? `bg-primary-default`
                             : "bg-custom-gray-bg"
                             } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
                         >

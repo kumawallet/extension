@@ -26,9 +26,6 @@ describe("Receive", () => {
           selectedAccount: selectedEVMAccountMock,
         },
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
 
     vi.mock("@src/utils/env", () => ({

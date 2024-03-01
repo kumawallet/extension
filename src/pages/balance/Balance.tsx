@@ -4,7 +4,7 @@ import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
 import { useLocation } from "react-router-dom";
-import { useNetworkContext, useThemeContext } from "@src/providers";
+import { useNetworkContext } from "@src/providers";
 
 
 export interface Asset {
@@ -34,7 +34,6 @@ const Bg = () => (
 export const Balance = () => {
   const { t } = useTranslation("balance");
   const { state } = useLocation();
-  const { color } = useThemeContext();
   const {
     state: { selectedChain },
   } = useNetworkContext();
@@ -74,7 +73,7 @@ export const Balance = () => {
                   key={tab}
                   className={({ selected }) =>
                     `px-4 py-1 focus:outline-none relative ${selected
-                      ? `text-${color}-primary active-tab after:bg-${color}-fill`
+                      ? `text-primary-default active-tab`
                       : "text-white"
                     }`
                   }
