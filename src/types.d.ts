@@ -107,3 +107,30 @@ export type ChainsState = {
   title: string;
   chains: Chain[];
 }[];
+
+export interface OldChain {
+  name: string;
+  rpc: {
+    wasm?: string;
+    evm?: string;
+  };
+  addressPrefix: number;
+  nativeCurrency: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+  logo: string;
+  explorer: {
+    wasm?: {
+      name: string;
+      url: string;
+    };
+    evm?: {
+      name: string;
+      url: string;
+    };
+  };
+  supportedAccounts: string[];
+  xcm?: string[];
+}

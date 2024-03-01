@@ -16,6 +16,7 @@ import { messageAPI } from "@src/messageAPI/api";
 import { Chain, ChainsState } from "@src/types";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
+import { migrateOldCustomChains } from "@src/utils/chains";
 
 const initialState: InitialState = {
   chains: [],
@@ -48,10 +49,23 @@ const getChains = async (): Promise<ChainsState> => {
 
     // TODO: conditional for customs
 
-    const customChains = await messageAPI.getCustomChains();
+    let customChains = await messageAPI.getCustomChains();
 
 
     if (customChains.length > 0) {
+      // @ts-expect-error --- To handle old chain format
+      const customChainsToMigrate = customChains.filter((chain) => !chain.id);
+
+      if (customChainsToMigrate.length > 0) {
+        // @ts-expect-error --- To handle old chain format
+        const { newChains } = await migrateOldCustomChains(customChainsToMigrate)
+        if (newChains.length > 0) {
+          // @ts-expect-error --- To handle old chain format
+          customChains = newChains
+        }
+      }
+
+
       chains.push({
         title: "custom",
         // @ts-expect-error --- To handle old chain format
