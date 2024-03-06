@@ -15,7 +15,7 @@ import {
   useAccountContext,
   useNetworkContext,
 } from "@src/providers";
-import { getAccountType } from "../../utils/account-utils";
+import { getAccountType } from "../../../utils/account-utils";
 import { AccountType } from "@src/accounts/types";
 import { Listbox, Transition } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";

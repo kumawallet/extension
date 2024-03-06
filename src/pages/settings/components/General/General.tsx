@@ -19,6 +19,7 @@ import { Switch } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
 import { useNetworkContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
+import { topbarText, topbarIcon, topbarContainer } from '../../style/style'
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -100,7 +101,7 @@ export const General = () => {
       captureError(error);
       showErrorToast(tCommon("failed_to_update_setting"));
     }
-  }
+  0}
 
   const changeShowTestnets = async () => {
     try {
@@ -129,24 +130,24 @@ export const General = () => {
 
   return (
     <PageWrapper>
-      <div className="flex items-center gap-3 mb-10">
+      <div className={topbarContainer}>
         <FiChevronLeft
-          className="cursor-pointer"
+          className={topbarIcon}
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className="font-medium text-2xl">{t("title")}</p>
+        <p className={topbarText}>{t("title")}</p>
       </div>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col h-full px-4 pt-2 gap-5">
         {settings.map((setting, index) => {
           switch (setting.name) {
             case SettingKey.LANGUAGES:
               return (
                 <div key={index} className="flex flex-col gap-2">
-                  <p className="text-lg font-medium">{t(setting.name)}</p>
+                  <p className="text-base font-light">{t(setting.name)}</p>
                   <select
                     data-testid="language-select"
-                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="text-sm font-medium focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-[#1C1C27]  placeholder-[#1C1C27] text-white"
                     onChange={(e) => saveLanguage(e.target.value)}
                     value={selectedLanguage}
                   >
@@ -162,10 +163,10 @@ export const General = () => {
             case SettingKey.CURRENCY:
               return (
                 <div key={index} className="flex flex-col gap-2">
-                  <p className="text-lg font-medium">{t("currencies")}</p>
+                  <p className="text-base font-light">{t("currencies")}</p>
                   <select
                     data-testid="currency-select"
-                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    className="text-sm  font-medium focus:ring-blue-500 bg- focus:border-blue-500 block w-full p-2.5 bg-[#1C1C27] placeholder-[#1C1C27] text-white"
                     onChange={(e) => saveCurrency(e.target.value)}
                     value={selectedCurrency}
                   >
@@ -178,53 +179,53 @@ export const General = () => {
                   </select>
                 </div>
               );
-            case SettingKey.MANAGE_NETWORKS:
-              return (
-                <div
-                  key={index}
-                  className="flex justify-between items-center gap-2"
-                >
-                  <p className="text-lg font-medium">{t(setting.name)}</p>
-                  <button
-                    data-testid="manage-networks-button"
-                    type="button"
-                    className="inline-flex justify-between items-center cursor-pointer rounded-md border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
-                    onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
-                  >
-                    <BsGear color="white" size={ICON_SIZE} />
-                  </button>
-                </div>
-              );
-            case SettingKey.SHOW_TESTNETS:
-              return (
-                <div
-                  key={index}
-                  className="flex justify-between items-center gap-2"
-                >
-                  <p className="text-lg font-medium">{t(setting.name)}</p>
-                  <div className="flex items-center justify-end">
-                    <Switch.Group>
-                      <div className="flex items-center">
-                        <Switch
-                          data-testid="show-testnets-switch"
-                          checked={showTestnets}
-                          onChange={changeShowTestnets}
-                          className={`${showTestnets
-                            ? `bg-primary-default`
-                            : "bg-custom-gray-bg"
-                            } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
-                        >
-                          <span className="sr-only">{t("show_testnets")}</span>
-                          <span
-                            className={`${showTestnets ? "translate-x-6" : "translate-x-1"
-                              } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
-                          />
-                        </Switch>
-                      </div>
-                    </Switch.Group>
-                  </div>
-                </div>
-              );
+            // case SettingKey.MANAGE_NETWORKS:
+            //   return (
+            //     <div
+            //       key={index}
+            //       className="flex justify-between items-center gap-2"
+            //     >
+            //       <p className="text-lg font-medium">{t(setting.name)}</p>
+            //       <button
+            //         data-testid="manage-networks-button"
+            //         type="button"
+            //         className="inline-flex justify-between items-center cursor-pointer border border-transparent hover:bg-gray-400 hover:bg-opacity-30 px-4 py-2 text-sm font-medium"
+            //         onClick={() => navigate(SETTINGS_MANAGE_NETWORKS)}
+            //       >
+            //         <BsGear color="white" size={ICON_SIZE} />
+            //       </button>
+            //     </div>
+            //   );
+            // case SettingKey.SHOW_TESTNETS:
+            //   return (
+            //     <div
+            //       key={index}
+            //       className="flex justify-between items-center gap-2"
+            //     >
+            //       <p className="text-lg font-medium">{t(setting.name)}</p>
+            //       <div className="flex items-center justify-end">
+            //         <Switch.Group>
+            //           <div className="flex items-center">
+            //             <Switch
+            //               data-testid="show-testnets-switch"
+            //               checked={showTestnets}
+            //               onChange={changeShowTestnets}
+            //               className={`${showTestnets
+            //                 ? `bg-primary-default`
+            //                 : "bg-custom-gray-bg"
+            //                 } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
+            //             >
+            //               <span className="sr-only">{t("show_testnets")}</span>
+            //               <span
+            //                 className={`${showTestnets ? "translate-x-6" : "translate-x-1"
+            //                   } inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200`}
+            //               />
+            //             </Switch>
+            //           </div>
+            //         </Switch.Group>
+            //       </div>
+            //     </div>
+            //   );
           }
         })}
       </div>

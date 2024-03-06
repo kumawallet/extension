@@ -18,3 +18,4 @@ export const PageWrapper: FC<PageWrapperProps> = ({
     </div>
   );
 };
+  

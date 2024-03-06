@@ -19,11 +19,11 @@ import {
 import {
   Advanced,
   BugReport,
-  Contacts,
+  AddressBook,
   General,
   ManageNetworks,
   Security,
-  AboutUs,
+  Settings
 } from "@src/pages/settings";
 import { useAccountContext } from "@src/providers";
 import {
@@ -35,13 +35,13 @@ import {
   RECEIVE,
   RESTORE_PASSWORD,
   SEND,
-  SETTINGS_ABOUT_US,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
+  SETTINGS,
   SIGNIN,
   SIGN_MESSAGE,
   SWAP,
@@ -201,13 +201,13 @@ export const Routes = () => {
         />
 
         {/* setting views */}
+        <Route path={SETTINGS} element={<Settings />} />
         <Route path={SETTINGS_GENERAL} element={<General />} />
         <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
-        <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
+        <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
-        <Route path={SETTINGS_ABOUT_US} element={<AboutUs />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>

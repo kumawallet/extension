@@ -1,7 +1,7 @@
 import { ICON_SIZE } from "@src/constants/icons";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiChevronDown, FiChevronLeft, FiChevronUp } from "react-icons/fi";
+import {  FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import {
   PageWrapper,
@@ -10,12 +10,13 @@ import {
   ReEnterPassword,
 } from "@src/components/common";
 import { useToast, useLoading } from "@src/hooks";
-import { BsEye, BsTrash } from "react-icons/bs";
+import { BsEye, BsTrash, BsChevronRight, BsChevronDown } from "react-icons/bs";
 import { RESTORE_PASSWORD } from "@src/routes/paths";
 import { Dialog, Transition } from "@headlessui/react";
 import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { messageAPI } from "@src/messageAPI/api";
+import { topbarIcon, topbarText, topbarContainer,styleButtomNav } from '../../style/style'
 
 export const Security = () => {
   const { t } = useTranslation("security");
@@ -138,44 +139,57 @@ export const Security = () => {
     return <Loading />;
   }
 
+  const ShowSites= () =>{
+    return 
+  }
+
   return (
     <PageWrapper>
       {isOpenReenterPasswordModal && <ReEnterPassword cb={getPrivateKeyOrSeed} />}
-
-
-      <div className="flex items-center gap-3 mb-10">
+      <div className={topbarContainer}>
         <FiChevronLeft
-          className="cursor-pointer"
+          className={topbarIcon}
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className="font-medium text-2xl">{t("title")}</p>
+        <p className={topbarText}>{t("title")}</p>
       </div>
-      <div className="flex flex-col mt-5 gap-2">
-        <div className="flex justify-between items-center">
-          <p className="text-lg font-medium">{t("trusted_sites")}</p>
-          <div className="p-2" data-testid="show-sites">
-            {showSites ? (
-              <FiChevronUp
-                className="cursor-pointer"
-                size={ICON_SIZE}
-                onClick={toggleShowSites}
-              />
-            ) : (
-              <FiChevronDown
-                className="cursor-pointer"
-                size={ICON_SIZE}
-                onClick={toggleShowSites}
-              />
-            )}
+
+      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  onClick={() => navigate(RESTORE_PASSWORD)}>
+          <p className="text-sm">{t("restore_password")}</p>
+          <BsChevronRight />
+      </Button>
+
+      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  >
+          <p className="text-sm">{t('auto-lock')}</p>
+          <BsChevronRight />
+      </Button>
+
+      <div className="flex flex-col gap-2">
+        <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between` } onClick={toggleShowSites}>
+          <p className="text-sm ">{t("trusted_sites")}</p>
+          <div  data-testid="show-sites">
+          {!showSites ? (
+      <BsChevronRight
+        className="cursor-pointer"
+        size={ICON_SIZE}
+        onClick={toggleShowSites}
+      />
+    ) : (
+      <BsChevronDown
+        className="cursor-pointer"
+        size={ICON_SIZE}
+        onClick={toggleShowSites}
+      />
+    )}
           </div>
-        </div>
+        </Button>
         {showSites && (
           <>
             <input
               id="search"
               placeholder={t("search") || "Search"}
-              className="input-primary"
+              className="input-primary bg-[#1C1C27]"
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
@@ -207,18 +221,8 @@ export const Security = () => {
             )}
           </>
         )}
-        <div className="flex justify-between items-center">
-          <p className="text-lg font-medium">{t("credentials")}</p>
-          <div className="p-2">
-            <Button
-              classname="text-sm font-medium"
-              onClick={() => navigate(RESTORE_PASSWORD)}
-            >
-              {t("restore_password")}
-            </Button>
-          </div>
-        </div>
-        <div className="flex justify-between items-center">
+        
+        {/* <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("show_account_keys")}</p>
           <div className="p-2">
             <div className="relative inset-0 flex items-center justify-center">
@@ -309,8 +313,8 @@ export const Security = () => {
               </Dialog>
             </Transition>
           </div>
-        </div>
-        <div className="flex justify-between items-center">
+        </div> */}
+        {/* <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("reset_wallet")}</p>
           <div className="p-2">
             <div className="relative inset-0 flex items-center justify-center">
@@ -388,7 +392,7 @@ export const Security = () => {
               </Dialog>
             </Transition>
           </div>
-        </div>
+        </div> */}
       </div>
     </PageWrapper>
   );

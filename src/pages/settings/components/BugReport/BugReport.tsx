@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { issuesLinks } from "@src/utils/constants";
+import { FaGithub, FaDiscord } from "react-icons/fa";
 
 export const BugReport = () => {
   const navigate = useNavigate();
@@ -11,37 +12,39 @@ export const BugReport = () => {
 
   return (
     <PageWrapper>
-      <div className="flex items-center gap-3 mb-10">
+      <div className="flex items-center mb-10">
         <FiChevronLeft
           className="cursor-pointer"
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className="font-medium text-2xl">{t("title")}</p>
+        <p className="font-medium text-base">{t("title")}</p>
       </div>
+      <div className=" m-4">
       <div className="mb-10">
-        <p className="text-xl font-medium mb-4">{t("collaborate")}</p>
-        <p className="text-gray-500 mb-2">{t("collaborate_description")}</p>
+        <p className="text-base font-medium mb-4">{t("collaborate")}</p>
+        <p className="text-white-500 mb-4">{t("collaborate_description")}</p>
         <a
           href={issuesLinks.github as unknown as string}
-          className="text-blue-500 hover:underline"
+          className="text-blue-500 hover:underline flex"
           target="_blank"
           rel="noreferrer"
         >
-          {t("collaborate_link")}
+          <FaGithub className="text-white mt-[0.1rem] mr-2"/>{t("collaborate_link")}
         </a>
       </div>
       <div>
-        <p className="text-xl font-medium mb-4">{t("report_an_issue")}</p>
-        <p className="text-gray-500 mb-2">{t("report_an_issue_description")}</p>
+        <p className="text-base font-medium mb-4">{t("report_an_issue")}</p>
+        <p className="text-white-500 mb-4">{t("report_an_issue_description")}</p>
         <a
           href={issuesLinks.discord as unknown as string}
-          className="text-blue-500 hover:underline"
+          className="text-blue-500 hover:underline flex"
           target="_blank"
           rel="noreferrer"
         >
-          {t("report_an_issue_link")}
+          <FaDiscord className=" mt-[0.1rem] mr-2"/>{t("report_an_issue_link")}
         </a>
+      </div>
       </div>
     </PageWrapper>
   );

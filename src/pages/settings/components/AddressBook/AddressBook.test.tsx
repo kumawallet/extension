@@ -1,21 +1,21 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
-import { Contacts } from "./Contacts";
+import { AddressBook } from "./AddressBook";
 import i18n from "@src/utils/i18n";
 import { en } from "@src/i18n";
 
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <Contacts />
+      <AddressBook />
     </I18nextProvider>
   );
 };
 
-const saveContact = vi.fn().mockResolvedValue([]);
+const saveAddress = vi.fn().mockResolvedValue([]);
 
 
-describe("Contacts", () => {
+describe("AddressBook", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
       useNavigate: () => vi.fn(),
@@ -104,7 +104,7 @@ describe("Contacts", () => {
       fireEvent.click(saveButton);
     });
     await waitFor(() => {
-      expect(saveContact).toHaveBeenCalled();
+      expect(saveAddress).toHaveBeenCalled();
     });
   });
 });
