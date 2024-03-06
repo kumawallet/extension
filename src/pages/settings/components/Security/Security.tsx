@@ -189,7 +189,7 @@ export const Security = () => {
             <input
               id="search"
               placeholder={t("search") || "Search"}
-              className="input-primary bg-[#1C1C27]"
+              className="input-primary border-0 bg-[#1C1C27]"
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
