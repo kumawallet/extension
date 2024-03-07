@@ -254,7 +254,7 @@ export const AddressBook = () => {
                                         setSearch(e.target.value);
                                             }}
                         />
-                        <CiSearch className="absolute top-1/2 left-2 transform font-mediums -translate-y-1/2 text-white" /> {/* Posicionamos el icono absolutamente */}
+                        <CiSearch className="absolute top-1/2 left-2 transform font-mediums -translate-y-1/2 text-white" />
                     </div>
 
                     <p className="text-sm font-medium mt-8">My Contacts</p>
