@@ -19,12 +19,13 @@ import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { isHex } from "@polkadot/util";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { Modal } from "./Add Address/Add-Address";
+import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { topbarText, topbarIcon, topbarContainer } from '../../style/style'
+import '../../style/input.css'
 import { CiSearch } from "react-icons/ci";
 import { PiGhost } from "react-icons/pi";
-import { Modal } from "./Add Address/Add-Address"
 import { IoCloseOutline } from "react-icons/io5";
-import '../../style/input.css'
 
 
 
@@ -156,12 +157,15 @@ export const AddressBook = () => {
     }, [contacts, search]);
     const checkInput = (event: React.FormEvent<HTMLInputElement>) => {
         const input = event.currentTarget as HTMLInputElement;
+        setAddressValue(input.value)
         if (input.value !== "") {
             input.classList.add("hasData");
         } else {
             input.classList.remove("hasData");
         }
     }
+    const [addressValue, setAddressValue] = useState("")
+    const { Icon, copyToClipboard } = useCopyToClipboard(addressValue);
     if (isLoading) {
         return <Loading />;
     }
@@ -212,11 +216,24 @@ export const AddressBook = () => {
                     <input
                         data-testid="address"
                         id="address"
+                        value={addressValue}
                         className="input w-full mt-2 relative ml-6"
                         onInput={checkInput}
                         {...register("address")}
                     />
                     <span className="floatingLabel text-base ml-6">{t("insert_address")}</span>
+                    <button
+                    onClick={copyToClipboard}
+                    className={`absolute flex items-center justify-center hover:bg-opacity-15 right-4`}
+                    data-testid="account-button"
+                    >
+                    <Icon
+                        iconProps={{
+                            className: `m-auto text-white `,
+                        }}
+                    />
+                    </button>
+                    
                     <InputErrorMessage message={errors.address?.message} />
                     </div>
                     <Button
