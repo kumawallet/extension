@@ -184,7 +184,7 @@
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
-    "search": "Search by transaction hash or address"
+    "search": "Search"
   },
   "receive": {
     "title": "Share your address"

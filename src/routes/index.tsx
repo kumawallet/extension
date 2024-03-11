@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   AccountForm,
   Balance,
+  ActivityDetail,
   ManageAssets,
   Send,
   Receive,
@@ -28,6 +29,7 @@ import {
 import { useAccountContext } from "@src/providers";
 import {
   BALANCE,
+  ACTIVITY_DETAIL,
   CALL_CONTRACT,
   CREATE_ACCOUNT,
   IMPORT_ACCOUNT,
@@ -172,6 +174,7 @@ export const Routes = () => {
       <RRoutes>
         <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
+        <Route path={ACTIVITY_DETAIL} element={<ActivityDetail />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />

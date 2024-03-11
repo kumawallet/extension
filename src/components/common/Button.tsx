@@ -14,7 +14,7 @@ interface ButtonProps {
   onClick?: () => void;
   spinnerClassname?: SVGAttributes<SVGElement>["className"];
   style?: CSSProperties;
-  variant?: "text" | "outlined" | "contained" | "contained-gray" | "contained-black";
+  variant?: "text" | "outlined" | "contained" | "contained-gray" | "contained-black"| "contained-litlle-gray";
 }
 
 const DEFAULT_SPINNER_CLASSNAME = "mx-auto animate-spin fill-white";
@@ -25,6 +25,8 @@ const getVariantStyles = (
   variant: ButtonProps["variant"],
 ) => {
   switch (variant) {
+    case "contained-litlle-gray":
+        return'bg-[#343A40] border-0 hover:bg-opacity-80'
     case "text":
       return `bg-transparent border-0  hover:bg-opacity-80`;
     case "outlined":
