@@ -20,14 +20,14 @@ import { useToast } from "@src/hooks";
 import { XCM } from '@src/constants/xcm'
 import { estimatedFee, getHash,getValue, getTip} from '@src/pages/balance/components/funtions/Txfunctions'
 
-import { items, itemsValue , countendItems , button, networks, copyButton} from './style/activityDetails'
+import { styleAD } from './style/activityDetails'
 import { FaChevronRight } from "react-icons/fa";
 
 
 export const ActivityDetail = () => {
 
     const { t: tCommon } = useTranslation("common");
-    const { t } = useTranslation("bug_report");
+    const { t } = useTranslation("activity_details");
     const navigate = useNavigate();
     
     const { showErrorToast } = useToast();
@@ -126,21 +126,21 @@ export const ActivityDetail = () => {
 return(
    <PageWrapper contentClassName="mt-1/2 ">
     <div className="mt-1 m-3">
-        <HeaderBack title="Transaction detail" navigate={navigate} />
+        <HeaderBack title={t("title")} navigate={navigate} />
       <div className="grid gap-5">
       {Object.entries(transaction).map(([key, value]) => key === "Hash" ? 
                     (
-                        <div className={countendItems}>
-                            <p className={items}>{key}</p>
-                            <p className={itemsValue}>{value}
+                        <div className={styleAD.countendItems}>
+                            <p className={styleAD.items}>{key}</p>
+                            <p className={styleAD.itemsValue}>{value}
                             <button
                                 onClick={copyToClipboard}
-                                className={copyButton}
+                                className={styleAD.copyButton}
                                 data-testid="account-button"
                             >
                               <Icon
                                   iconProps={{
-                                      className: copyButton,
+                                      className: styleAD.copyButton,
                                   }}
                               />
                             </button>
@@ -149,24 +149,24 @@ return(
                     )
                     :key === "Sender" || key === "Recipient" ? 
                     (
-                      <div className={countendItems}>
-                        <p className={items}>{key}</p>
+                      <div className={styleAD.countendItems}>
+                        <p className={styleAD.items}>{key}</p>
                           {value.contact ? (
                             <div className='grid w-full'>
-                                <p className={itemsValue}>{value.contact}</p>
-                                <p className={itemsValue}>{value.value}</p>
+                                <p className={styleAD.itemsValue}>{value.contact}</p>
+                                <p className={styleAD.itemsValue}>{value.value}</p>
                             </div>
                         ) : (
-                            <p className={itemsValue}>{value.value}</p>
+                            <p className={styleAD.itemsValue}>{value.value}</p>
                         )}
                         
                       </div>
                     )
                     : key === "Status" ?
                     (
-                        <div className={countendItems}>
-                            <p className={items}>{key}</p>
-                            <div className={itemsValue}>
+                        <div className={styleAD.countendItems}>
+                            <p className={styleAD.items}>{key}</p>
+                            <div className={styleAD.itemsValue}>
                               <Status status={value} />
                             </div>
                         </div>
@@ -174,28 +174,30 @@ return(
                     (
                       getXCM(network,recipientNetwork) ?
                       (
-                        <div className={countendItems}>
-                        <p className={items}>{key}</p>
-                        <div className={networks}>
-                          <NetworkIcon
-                            networkName={network}
-                            width={16}
-                            chains={allChains}
-                          />
-                          <FaChevronRight size={12} />
-                          <NetworkIcon
-                            networkName={recipientNetwork}
-                            chains={allChains}
-                            width={16}
-                          />
+                        <div className={styleAD.countendItems}>
+                        <p className={styleAD.items}>{key}</p>
+                        <div className={styleAD.countainerNetworks}>
+                            <div className={styleAD.networks}>
+                              <NetworkIcon
+                                networkName={network}
+                                width={16}
+                                chains={allChains}
+                              />
+                              <FaChevronRight size={12} />
+                              <NetworkIcon
+                                networkName={recipientNetwork}
+                                chains={allChains}
+                                width={16}
+                              />
+                            </div>
+                            <p className={styleAD.textNetwork}>{t("xcm")}</p>
                         </div>
-                        <p className={itemsValue}>Transfer executed using XCM</p>
                     </div>
                       )
                       :
-                      (<div className={countendItems}>
-                        <p className={items}>{key}</p>
-                        <div className={networks}>
+                      (<div className={styleAD.countendItems}>
+                        <p className={styleAD.items}>{key}</p>
+                        <div className={styleAD.networks}>
                           <NetworkIcon
                             networkName={network}
                             width={16}
@@ -212,16 +214,16 @@ return(
 
                     ) :
                     (
-                      <div className={countendItems}>
-                          <p className={items}>{key}</p>
-                          <p className={itemsValue}>{value}</p>
+                      <div className={styleAD.countendItems}>
+                          <p className={styleAD.items}>{key}</p>
+                          <p className={styleAD.itemsValue}>{value}</p>
                       </div>
                     
                     ))}
       </div>
       </div>
-      <Button classname={button} onClick={() => getLink(selectedChain as Chain, hash)}>
-          View on block explorer
+      <Button classname={styleAD.button} onClick={() => getLink(selectedChain as Chain, hash)}>
+          {t("explorer")}
       </Button>
       <Footer />
    </PageWrapper>
