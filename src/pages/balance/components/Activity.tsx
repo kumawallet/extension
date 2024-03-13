@@ -170,7 +170,7 @@ export const Activity = () => {
             hash,
             recipientNetwork,
             type,
-            swap
+            isSwap
 
           }) => (
             <Button
@@ -197,7 +197,7 @@ export const Activity = () => {
                   rel="noreferrer"
                 >
                   <div className={`relative ${stylesActivity.circleIcon}`}>
-                  { swap ? (
+                  { isSwap ? (
                      
                      <SwapIcon size="18"/>
                      
@@ -222,14 +222,14 @@ export const Activity = () => {
                   </div>
                 </a>
                  <div className={stylesActivity.countainerText}>
-                  { swap ? (
-                    <p className={stylesActivity.textTxType}>Swap</p>
+                  { isSwap ? (
+                    <p className={stylesActivity.textTxType}>{t("swap")}</p>
                   ) 
                   : selectedAccount?.value?.address !== address ? ( 
-                     <p className={stylesActivity.textTxType}>Send</p>
+                     <p className={stylesActivity.textTxType}>{t("send")}</p>
                      ) 
                      : ( 
-                      <p className={stylesActivity.textTxType}>Receive</p>
+                      <p className={stylesActivity.textTxType}>{t("receive")}</p>
                      )
                    }
                     <p className={stylesActivity.textAddress}>{getContactName(address)}</p>

@@ -184,7 +184,10 @@
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
-    "search": "Search"
+    "search": "Search",
+    "send": "Send",
+    "swap": "Swap",
+    "receive": "Receive"
   },
   "activity_details":{
     "title": "Transaction detail",
