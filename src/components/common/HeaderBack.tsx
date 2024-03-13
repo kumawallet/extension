@@ -5,7 +5,8 @@ import {
   } from "react";
   import { FiChevronLeft } from "react-icons/fi";
   import { iconBack,textHeaderBack} from '@src/pages/style/general'
-  import { ICON_SIZE } from '@src/constants/icons'
+  import { ICON_SIZE } from '@src/constants/icons';
+  import { styleHeaderBack } from '@src/components/common/styles/HeaderBack'
   interface HeaderProps {
     classname?: HTMLAttributes<HTMLButtonElement>["className"];
     style?: CSSProperties;
@@ -20,7 +21,8 @@ import {
     navigate,
   }) => {
   
-    return (<div className="flex items-center mb-10">
+    return (
+    <div className={styleHeaderBack.countainer}>
     <FiChevronLeft
       className={`${iconBack} ${classname}`}
       size={ICON_SIZE}

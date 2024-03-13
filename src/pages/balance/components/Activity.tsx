@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import { Status } from '@src/components/common/TxStatus'
 import { Loading,Button, } from "@src/components/common";
-import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
+import { RecordData } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import { ACTIVITY_DETAIL } from '@src/routes/paths'
 import {
@@ -17,20 +17,16 @@ import { messageAPI } from "@src/messageAPI/api";
 import { Chain } from "@src/types";
 import {estimatedFee} from '@src/pages/balance/components/funtions/Txfunctions'
 
+
 import { CiSearch } from "react-icons/ci";
 import { HiOutlineInboxArrowDown } from "react-icons/hi2";
-import {  PiNavigationArrow  } from "react-icons/pi";
+import { SendIcon } from "@src/components/icons/SendIcon"
 import { BsChevronRight } from "react-icons/bs";
 import { stylesActivity} from '@src/pages/balance/components/style/activity';
-import { ICON_SIZE} from '@src/constants/icons';
+import { SwapIcon } from "@src/components/icons/SwapIcon"
+import { IoIosCloseCircle } from "react-icons/io";
 
 
-
-const chipColor = {
-  [RecordStatus.FAIL]: "bg-red-600 ",
-  [RecordStatus.SUCCESS]: "bg-green-600 text-[#06371D]",
-  [RecordStatus.PENDING]: "bg-yellow-600 text-[#573800]",
-};
 export const Activity = () => {
   const { t } = useTranslation("activity");
   const navigate = useNavigate();
@@ -76,6 +72,33 @@ export const Activity = () => {
     }
   };
 
+  const getContactName = (address: string) => {
+    const contact = contacts.find((c) => c.address === address);
+    const ownAccount = ownAccounts.find((c) => c.address === address);
+    return contact || ownAccount
+      ? contact?.name || ownAccount?.name
+      : address.slice(0, 6) + "..." + address.slice(-4);
+  };
+  
+  const getAmount = (data: RecordData) => {
+    if (!data || !data.value) return "$0.0";
+      if (data.value.length > 7 && /^0+\.0*[1-9][0-9]*$/.test(data.value)) {
+          return `< 0.00001 ${data.symbol}`;
+      }
+      else if(data.value.length > 7){
+        const value = parseFloat(data.value);
+        const million =   Math.floor(value / 1000000);
+        if(million >= 1)
+        {   
+          return `${million}M ${data.symbol}`
+        }
+        else{
+          return `${value.toFixed(3)} ${data.symbol}`
+        }
+      }
+      return `${data.value} ${data.symbol}`;
+}
+
 
   const getLink = (chain: Chain, hash: string) => {
     const chainType = chain?.type
@@ -86,19 +109,14 @@ export const Activity = () => {
     }
   };
 
-  const getContactName = (address: string) => {
-    const contact = contacts.find((c) => c.address === address);
-    const ownAccount = ownAccounts.find((c) => c.address === address);
-    return contact || ownAccount
-      ? contact?.name || ownAccount?.name
-      : address.slice(0, 6) + "..." + address.slice(-4);
-  };
+  const allChains = chains.flatMap((c) => c.chains);
 
-  const getValue = (data: RecordData) => {
-    if (!data || !data.value) return "$0.0";
-    return data.symbol ? `${data.value} ${data.symbol}` : `$${data.value}`;
-  };
+  const logo = (symbol : string) =>{
+    const asset: Chain | undefined = allChains.find((obj) => obj.symbol === symbol);
+    return !asset ? undefined : asset.logo.toString();
 
+}
+  
   const filteredRecords = useMemo(() => {
     const _search = search.trim().toLocaleLowerCase();
     if (!_search) return activity;
@@ -116,9 +134,11 @@ export const Activity = () => {
 
 
 
+
   if (isLoading) {
     return <Loading />;
   }
+  
 
   return (
     <>
@@ -150,6 +170,7 @@ export const Activity = () => {
             hash,
             recipientNetwork,
             type,
+            swap
 
           }) => (
             <Button
@@ -175,34 +196,61 @@ export const Activity = () => {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  { selectedAccount?.value?.address !== address ? ( 
-                    <div className={`${stylesActivity.flexItemsCenter}${stylesActivity.circleIcon}`}>
-                      <PiNavigationArrow  size={ICON_SIZE}  className={stylesActivity.sendIcon}/>
-                    </div>) : ( 
-                    <div className={stylesActivity.circleIcon}>
-                      <HiOutlineInboxArrowDown  size={ICON_SIZE}  />
-                    </div>)}
+                  <div className={`relative ${stylesActivity.circleIcon}`}>
+                  { swap ? (
+                     
+                     <SwapIcon size="18"/>
+                     
+                   
+                  ) 
+                  :
+                  selectedAccount?.value?.address === data.from ? ( 
+                      <SendIcon  size="18"/>
+                  ) 
+                  : 
+                  ( 
+                      <HiOutlineInboxArrowDown />
+                  )
+                  }
+                   <div className={stylesActivity.countainerAssetIcon}>
+                    {
+                    !logo(data.symbol) ? 
+                    ( <IoIosCloseCircle  className={stylesActivity.faildIcon} />) :
+                    (<img src={logo(data.symbol)} alt="Logo" />)
+                    }
+                    </div>
+                  </div>
                 </a>
-                <div className={`${stylesActivity.gridData}`}>
-                  { selectedAccount?.value?.address !== address ? ( 
+                 <div className={stylesActivity.countainerText}>
+                  { swap ? (
+                    <p className={stylesActivity.textTxType}>Swap</p>
+                  ) 
+                  : selectedAccount?.value?.address !== address ? ( 
                      <p className={stylesActivity.textTxType}>Send</p>
-                     ) : ( 
-                      <p className={stylesActivity.textTxType}>Receive</p>)}
+                     ) 
+                     : ( 
+                      <p className={stylesActivity.textTxType}>Receive</p>
+                     )
+                   }
                     <p className={stylesActivity.textAddress}>{getContactName(address)}</p>
                   </div>
                 </div>
               <Status status={status} />
+              <div className={stylesActivity.countainerDivEnd}>
               <div className={stylesActivity.flexItemsCenter}>
-                <div className={`${stylesActivity.gridData}${stylesActivity.countainerAmounts}`}>
-                  <p className={stylesActivity.textAmount}>
-                    {getValue(data)}
-                  </p>
-                  <p className={stylesActivity.textFee}>
-                    {estimatedFee(data)}
-                  </p>
-                </div>
-              <BsChevronRight  />
+                <div className={`${stylesActivity.countainerText}${stylesActivity.countainerAmounts}`}>
+                
+                <p className={`${getAmount(data).length > 10 ? 'text-[px] ': 'text-[10px]'} font-bold`}>
+                  {getAmount(data)}
+                </p>
+                <p className={stylesActivity.textFee}>
+                  {estimatedFee(data)}
+                </p>
               </div>
+            <BsChevronRight className={stylesActivity.iconArrow} />
+            </div>
+              </div>
+              
             </Button>
           )
         )}
