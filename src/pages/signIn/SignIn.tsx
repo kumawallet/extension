@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
-import { BALANCE, RESTORE_PASSWORD } from "@src/routes/paths";
+import { BALANCE, FORGOT_PASS } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { captureError } from "@src/utils/error-handling";
@@ -103,12 +103,12 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             {t("signin_button_text")}
           </Button>
         </div>
-        <p
+        <a
           className="text-center mb-6 z-10 cursor-pointer"
-          onClick={() => navigate(RESTORE_PASSWORD)}
+          onClick={() => navigate(FORGOT_PASS)}
         >
           {t("forgot_password")}
-        </p>
+        </a>
       </div>
     </PageWrapper>
   );
