@@ -84,6 +84,7 @@ export const AddressBook = () => {
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
     const { showErrorToast } = useToast();
+    const [addressValue, setAddressValue] = useState("");
 
     useEffect(() => {
         setIsLoading(true);
@@ -133,6 +134,10 @@ export const AddressBook = () => {
     };
 
     const toggleCreateContact = () => {
+        reset({
+            name: "",
+            address: "",
+        })
         setIsCreateContact(!isCreateContact);
     };
 
@@ -164,7 +169,6 @@ export const AddressBook = () => {
             input.classList.remove("hasData");
         }
     }
-    const [addressValue, setAddressValue] = useState("")
     const { Icon, copyToClipboard } = useCopyToClipboard(addressValue);
     if (isLoading) {
         return <Loading />;
@@ -191,7 +195,9 @@ export const AddressBook = () => {
                     </div>
                 
             </div>
-            <Modal isOpen={isCreateContact} onClose={toggleCreateContact}>
+            <Modal isOpen={isCreateContact} onClose={()=>{  reset();
+                                                            toggleCreateContact();
+                                                            }}>
                 <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-screen-lg bg-[#333343]/50 rounded-lg p-6 pt-2 max-w-3xl w-full md:px-10">
                     <div className="w-full flex justify-between items-center mb-5">
                     <p className="text-base">{t("add_new_address")}</p>
@@ -212,11 +218,10 @@ export const AddressBook = () => {
                     <span className="floatingLabel text-base ml-6">{t("insert_name")}</span>
                     <InputErrorMessage message={errors.name?.message} />
                     </div>
-                    <div className="relative mb-4 bg-[#1C1C27] h-12 flex items-center">
+                    <div className="relative mb-4 bg-[#1C1C27] h-12 flex items-center pr-6">
                     <input
                         data-testid="address"
                         id="address"
-                        value={addressValue}
                         className="input w-full mt-2 relative ml-6"
                         onInput={checkInput}
                         {...register("address")}

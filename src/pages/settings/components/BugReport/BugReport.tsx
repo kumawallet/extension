@@ -26,11 +26,11 @@ export const BugReport = () => {
         <p className="text-white-500 mb-4">{t("collaborate_description")}</p>
         <a
           href={issuesLinks.github as unknown as string}
-          className="text-blue-500 hover:underline flex"
+          className="flex items-center text-blue-500 hover:underline flex"
           target="_blank"
           rel="noreferrer"
         >
-          <FaGithub className="text-white mt-[0.1rem] mr-2"/>{t("collaborate_link")}
+          <FaGithub className="text-white mb-[3px] mr-2"/>{t("collaborate_link")}
         </a>
       </div>
       <div>
@@ -42,7 +42,7 @@ export const BugReport = () => {
           target="_blank"
           rel="noreferrer"
         >
-          <FaDiscord className=" mt-[0.1rem] mr-2"/>{t("report_an_issue_link")}
+          <FaDiscord className=" mt-[0.2rem] mr-2"/>{t("report_an_issue_link")}
         </a>
       </div>
       </div>

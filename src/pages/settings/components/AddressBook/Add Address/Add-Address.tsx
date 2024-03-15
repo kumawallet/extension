@@ -8,6 +8,7 @@ interface ModalProps  {
 }
 
 export const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
+ 
   return (
     <Transition show={isOpen} as={Fragment}>
       <Dialog onClose={onClose}>
