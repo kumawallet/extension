@@ -1,11 +1,25 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
-import {
-  useNetworkContext,
-} from "@src/providers";
+import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
+import { ShowTestnets } from "./ShowTestnets";
+import { ChainsState } from "@src/types";
 
+const canShowTestnetToggle = (
+  chains: ChainsState,
+  chainGroup: { title: string }
+) => {
+  const haveCustom = chains.some((chain) => chain.title === "custom");
+
+  if (haveCustom && chainGroup.title === "custom") {
+    return true;
+  } else if (chainGroup.title === "evm_based") {
+    return true;
+  }
+
+  return false;
+};
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
@@ -55,20 +69,19 @@ export const ChainSelector = () => {
                 {chains.map((chainGroup) => (
                   <div key={chainGroup.title} className="flex flex-col gap-3">
                     <p className="text-base">{t(chainGroup.title)}</p>
-
                     <div className="flex flex-col gap-2">
                       {chainGroup.chains.map((chain) => (
-                        <button
-                          key={chain.id}
-                          className={`flex items-center justify-between border ${selectedChain?.id === chain.id ? "border-green-500" : "border-gray-600"} rounded-xl py-2 px-4`}
-                          onClick={() => setSelectNetwork(chain)}
-                        >
-                          <div className="flex items-center gap-3">
-                            {
-                              chain.isCustom ? (
-                                <div
-                                  className="w-6 h-6 bg-gray-400 flex items-center justify-center rounded-full"
-                                >
+                        <Fragment key={chain.id}>
+                          <button
+                            className={`flex items-center justify-between border ${selectedChain?.id === chain.id
+                                ? "border-green-500"
+                                : "border-gray-600"
+                              } rounded-xl py-2 px-4`}
+                            onClick={() => setSelectNetwork(chain)}
+                          >
+                            <div className="flex items-center gap-3">
+                              {chain.isCustom ? (
+                                <div className="w-6 h-6 bg-gray-400 flex items-center justify-center rounded-full">
                                   {chain.name[0]}
                                 </div>
                               ) : (
@@ -79,13 +92,17 @@ export const ChainSelector = () => {
                                   alt={chain.name}
                                   className="object-cover rounded-full"
                                 />
-                              )
-                            }
-                            <span className="text-xl">{chain.name}</span>
-                          </div>
-                        </button>
+                              )}
+                              <span className="text-xl">{chain.name}</span>
+                            </div>
+                          </button>
+                        </Fragment>
                       ))}
                     </div>
+
+                    {canShowTestnetToggle(chains, chainGroup) && (
+                      <ShowTestnets />
+                    )}
                   </div>
                 ))}
               </div>
