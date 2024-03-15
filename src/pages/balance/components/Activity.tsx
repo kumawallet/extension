@@ -156,7 +156,7 @@ export const Activity = () => {
       </div>
       <div className={stylesActivity.countainerTx}>
         {activity.length === 0 && (
-          <div className={` ${stylesActivity.flexItemsCenter}${stylesActivity.countainerEmptyActivity}`}>
+          <div className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.countainerEmptyActivity}`}>
             <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
           </div>
         )}
@@ -174,7 +174,7 @@ export const Activity = () => {
 
           }) => (
             <Button
-              variant="contained-litlle-gray"
+              variant="contained-little-gray"
               key={hash}
               classname={stylesActivity.TxButton}
               onClick={() => navigate(ACTIVITY_DETAIL, {state: {
@@ -189,7 +189,7 @@ export const Activity = () => {
               }})}
               
             >
-              <div className={`${stylesActivity.flexItemsCenter}${stylesActivity.countainerButton}`}>
+              <div className={`${stylesActivity.flexItemsCenter} ${stylesActivity.countainerButton}`}>
                 <a
                   className={stylesActivity.explorer}
                   href={getLink(selectedChain as Chain, hash)}
