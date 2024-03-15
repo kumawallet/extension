@@ -195,6 +195,8 @@ export interface Request {
   "pri(network.getAllChains)": [null, Chains];
   "pri(network.saveCustomChain)": [RequestSaveCustomChain, void];
   "pri(network.removeCustomChain)": [RequestRemoveCustomChain, void];
+  "pri(network.getCustomChains)": [null, Chain[]];
+
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
@@ -237,6 +239,8 @@ export interface Request {
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+
+  "pri(ping)": [null, string];
 }
 
 export type MessageTypes = keyof Request;

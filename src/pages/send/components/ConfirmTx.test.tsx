@@ -37,9 +37,6 @@ describe("ConfirmTx", () => {
           selectedAccount: selectedEVMAccountMock,
         },
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
     }));
 
     vi.mock("react-router-dom", () => ({

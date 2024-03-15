@@ -187,9 +187,6 @@ export default class Extension {
   }
 
   private async resetWallet() {
-    if (!Auth.isAuthorized()) {
-      throw new Error("not_authorized");
-    }
     await Storage.getInstance().resetWallet();
   }
 
@@ -382,6 +379,12 @@ export default class Extension {
 
   private async removeCustomChain({ chainName }: RequestRemoveCustomChain) {
     await Chains.removeCustomChain(chainName);
+  }
+
+  private async getCustomChains(): Promise<Chain[]> {
+    const chains = await Chains.get<Chains>();
+    if (!chains) throw new Error("failed_to_get_chains");
+    return chains.custom;
   }
 
   private async getXCMChains({
@@ -649,6 +652,10 @@ export default class Extension {
     });
   }
 
+  private ping() {
+    return "pong";
+  }
+
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -704,6 +711,8 @@ export default class Extension {
         return this.saveCustomChain(request as RequestSaveCustomChain);
       case "pri(network.removeCustomChain)":
         return this.removeCustomChain(request as RequestRemoveCustomChain);
+      case "pri(network.getCustomChains)":
+        return this.getCustomChains();
       case "pri(network.getXCMChains)":
         return this.getXCMChains(request as RequestGetXCMChains);
 
@@ -753,6 +762,9 @@ export default class Extension {
         return this.sendSubstrateTx(request as RequestSendSubstrateTx);
       case "pri(send.sendEvmTx)":
         return this.sendEvmTx(request as RequestSendEvmTx);
+
+      case "pri(ping)":
+        return this.ping();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

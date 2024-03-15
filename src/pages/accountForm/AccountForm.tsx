@@ -111,6 +111,7 @@ export const AccountForm: FC<AddAccountFormProps> = ({
     privateKeyOrSeed:
       fields?.privateKeyOrSeed && fields?.accountType
         ? string().when("accountType", {
+          // @ts-expect-error -- *
           is: (value: string) => value && value === "EVM",
           then: string().test(
             "evm validation",
@@ -323,12 +324,6 @@ export const AccountForm: FC<AddAccountFormProps> = ({
             {passwordIsRequired && (
               <>
                 <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    {t("form.password")}
-                  </label>
                   <div className="relative">
                     <input
                       data-testid="password"
@@ -336,7 +331,8 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                       min={8}
                       onPaste={(e) => e.preventDefault()}
                       type={passwordType}
-                      className="input-primary"
+                      placeholder={t("form.password")}
+                      className="input-primary bg-[#1C1C27]"
                       {...register("password")}
                     />
 
@@ -359,19 +355,14 @@ export const AccountForm: FC<AddAccountFormProps> = ({
                   )}
                 </div>
                 <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium mb-1"
-                  >
-                    {t("form.confirm_password")}
-                  </label>
                   <div className="relative">
                     <input
                       data-testid="confirmPassword"
+                      placeholder={t("form.confirm_password")}
                       id="confirmPassword"
                       onPaste={(e) => e.preventDefault()}
                       type={confirmPasswordType}
-                      className="input-primary"
+                      className="input-primary bg-[#1C1C27]"
                       {...register("confirmPassword")}
                       onKeyDown={({ key }) => key === "Enter" && submit()}
                     />

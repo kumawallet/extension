@@ -65,7 +65,7 @@ export const CallContract: FC<CallContractProps> = ({
   const { isLoading, starLoading, endLoading } = useLoading();
 
   const {
-    state: { api, selectedChain, type },
+    state: { api, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -79,19 +79,19 @@ export const CallContract: FC<CallContractProps> = ({
   const [canSign, setCanSign] = useState(false);
 
   useEffect(() => {
-    if (!type) return;
+    if (!selectedChain?.type) return;
 
-    if (type === "WASM") {
+    if (selectedChain.type === "wasm") {
       setFees(defaultWasmFees);
     } else {
       setFees(defaultEVMFees);
     }
-  }, [type]);
+  }, [selectedChain]);
 
   const init = async () => {
     starLoading();
     try {
-      if (type === "WASM") {
+      if (selectedChain?.type === "wasm") {
         const contract = new ContractPromise(api, abi, address);
 
         const _params: any = [];
@@ -251,7 +251,7 @@ export const CallContract: FC<CallContractProps> = ({
 
     starLoading();
     try {
-      if (type === "WASM") {
+      if (selectedChain?.type === "wasm") {
         if (typeof tx === "string") {
           await WebAPI.runtime.sendMessage({
             from: "popup",
@@ -383,7 +383,7 @@ export const CallContract: FC<CallContractProps> = ({
 
         {Object.keys(fees).length > 0 && (
           <div className="flex flex-col gap-1 w-full py-2">
-            {type === "EVM" && (
+            {selectedChain?.type === "evm" && (
               <div className="flex justify-between gap-2">
                 <p>{t("gas_limit")}</p>
                 <p className="font-bold">
@@ -397,7 +397,7 @@ export const CallContract: FC<CallContractProps> = ({
               <p>
                 {formatBN(
                   String(fees["estimated fee"]),
-                  selectedChain.nativeCurrency?.decimals
+                  selectedChain?.decimals
                 )}
               </p>
             </div>
@@ -408,8 +408,8 @@ export const CallContract: FC<CallContractProps> = ({
               <p className="font-bold">
                 {`${formatBN(
                   String(fees["estimated total"]),
-                  selectedChain.nativeCurrency?.decimals
-                )} ${selectedChain.nativeCurrency.symbol}`}
+                  selectedChain?.decimals
+                )} ${selectedChain?.symbol}`}
               </p>
             </div>
           </div>

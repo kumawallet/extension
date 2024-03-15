@@ -4,21 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
 import {
   useAssetContext,
-  useNetworkContext,
-  useThemeContext,
+  useNetworkContext
 } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
-import { ApiPromise } from "@polkadot/api";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
   const {
-    state: { type, api },
+    state: { api, selectedChain },
   } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
@@ -50,19 +47,19 @@ export const Assets = () => {
   }, [assets, showAllAssets]);
 
   useEffect(() => {
-    if (!type || !api) {
+    if (!api) {
       setShowManageAssets(false);
       return;
     }
 
-    if (type === "EVM") {
+    if (selectedChain?.type === "evm") {
       setShowManageAssets(true);
     }
 
-    if (type === "WASM" && (api as ApiPromise).query.contracts) {
-      setShowManageAssets(true);
-    }
-  }, [type, api]);
+    // if (selectedChain?.type === "substrate" && (api as ApiPromise).query.contracts) {
+    //   setShowManageAssets(true);
+    // }
+  }, [api]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -75,7 +72,7 @@ export const Assets = () => {
             <Switch
               checked={showAllAssets}
               onChange={() => setShowAllAssets(!showAllAssets)}
-              className={`${showAllAssets ? `bg-${color}-primary` : "bg-custom-gray-bg"
+              className={`${showAllAssets ? `bg-primary-default` : "bg-custom-gray-bg"
                 } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
             >
               <span className="sr-only">{t("show_all_assets")}</span>

@@ -5,7 +5,6 @@ import {
   PropsWithChildren,
   SVGAttributes,
 } from "react";
-import { useThemeContext } from "@src/providers";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface ButtonProps {
@@ -15,26 +14,33 @@ interface ButtonProps {
   onClick?: () => void;
   spinnerClassname?: SVGAttributes<SVGElement>["className"];
   style?: CSSProperties;
-  variant?: "text" | "outlined" | "contained";
+  variant?: "text" | "outlined" | "contained" | "contained-gray" | "contained-black" | "countained-red" | "contained-little-gray";
 }
 
 const DEFAULT_SPINNER_CLASSNAME = "mx-auto animate-spin fill-white";
 const BASE_CLASSNAME =
-  "min-w-fit min-h-[35px] w-fit rounded-lg px-4 py-2 m-2 transition duration-500 ease select-none disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:cursor-not-allowed";
+  "min-w-fit min-h-[35px] w-fit rounded-lg px-4 py-2 transition duration-500 ease select-none disabled:opacity-30 disabled:hover:cursor-not-allowed";
 
 const getVariantStyles = (
   variant: ButtonProps["variant"],
-  themeColor: string
 ) => {
   switch (variant) {
+    case "contained-little-gray":
+      return 'bg-[#343A40] border-0 hover:bg-opacity-80'
     case "text":
-      return `text-${themeColor}-secondary bg-transparent border-0 hover:bg-${themeColor}-fill hover:bg-opacity-80`;
+      return `bg-transparent border-0  hover:bg-opacity-80`;
     case "outlined":
-      return `text-${themeColor}-secondary bg-transparent border-[0.5px] border-${themeColor}-primary hover:bg-${themeColor}-fill hover:bg-opacity-80 hover:border-${themeColor}-fill`;
+      return `bg-transparent border-[0.5px]  hover:bg-opacity-80`;
     case "contained":
-      return `text-${themeColor}-secondary bg-${themeColor}-fill border-0 hover:bg-opacity-70`;
+      return `bg-linear border-0 hover:bg-opacity-70`;
+    case "contained-gray":
+      return `bg-[#636669] border-0 hover:bg-linear disabled:hover:bg-[#636669]`;
+    case "contained-black":
+      return `bg-[#1C1C27] border-0 hover:bg-linear`;
+    case "countained-red":
+      return `bg-[#D62A2A] border-0 hover:bg-opacity-80`
     default:
-      return `text-${themeColor}-primary bg-transparent border-0`;
+      return `bg-transparent border-0`;
   }
 };
 
@@ -49,13 +55,11 @@ export const Button: FC<ButtonProps & PropsWithChildren> = ({
   variant = "contained",
   ...props
 }) => {
-  const { color } = useThemeContext();
-
-  const variantStyles = getVariantStyles(variant, color);
+  const variantStyles = getVariantStyles(variant);
 
   return (
     <button
-      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles}`}
+      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles} bg-`}
       onClick={onClick}
       disabled={isDisabled || isLoading}
       style={style}

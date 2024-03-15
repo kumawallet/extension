@@ -59,7 +59,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
         <div className="flex justify-between items-center text-[#A3A3A3]">
           <p>{t("gas_fee")}:</p>
           <p>
-            {gasFee} {selectedChain?.nativeCurrency?.symbol || ""}
+            {gasFee} {selectedChain?.symbol || ""}
           </p>
         </div>
       )}

@@ -4,13 +4,12 @@ import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { QR_CODE_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
-import { useAccountContext, useThemeContext } from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
 import { useCopyToClipboard } from "@src/hooks";
 
 export const Receive = () => {
   const { t } = useTranslation("receive");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
   const {
     state: { selectedAccount },
@@ -47,7 +46,7 @@ export const Receive = () => {
             onClick={copyToClipboard}
             data-testid="account-button"
           >
-            <p className={`text-${color}-primary`}>{account}</p>
+            <p className={`text-primary-default`}>{account}</p>
             <Icon messageTopSeparation={20} messagePosition="right" />
           </button>
         </div>

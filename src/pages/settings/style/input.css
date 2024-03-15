@@ -1,0 +1,27 @@
+.input {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    display: flex;
+    flex: 1;
+    padding: 0.2rem 0rem;
+    background-color: transparent;
+    outline: none;
+}
+  
+.input:focus ~ .floatingLabel,
+.input.hasData ~ .floatingLabel {
+    top: 10px;
+    left: 0px;
+    font-size: 11px;
+    opacity: 1;
+}
+  
+.floatingLabel {
+    position: absolute;
+    pointer-events: none;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.2s ease all;
+}

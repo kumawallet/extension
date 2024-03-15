@@ -6,7 +6,6 @@ import {
   useAccountContext,
   useAssetContext,
   useNetworkContext,
-  useThemeContext,
 } from "@src/providers";
 import { Contract, ethers, Wallet, BigNumber } from "ethers";
 import { useFormContext } from "react-hook-form";
@@ -31,7 +30,6 @@ interface EvmFormProps {
 export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const { t } = useTranslation("send");
   const { t: tCommon } = useTranslation("common");
-  const { color } = useThemeContext();
 
   const {
     state: { api, selectedChain },
@@ -66,7 +64,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   const [evmTx, setEvmTx] = useState<evmTx | Contract | null>(null);
 
   const _api = api as ethers.providers.JsonRpcProvider;
-  const decimals = selectedChain?.nativeCurrency.decimals || 1;
+  const decimals = selectedChain?.decimals || 1;
   const currencyUnits = 10 ** decimals;
   const amount = watch("amount");
   const asset = watch("asset");
@@ -124,7 +122,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
 
         if (isXcm) {
           const { method, abi, contractAddress, extrinsicValues } = XCM_MAPPING[
-            selectedChain.name
+            selectedChain!.name
           ][to.name]({
             address: destinationAccount,
             amount: bnAmount,
@@ -310,7 +308,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
   }, [fee, asset, amount, isNativeAsset]);
 
 
-  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.nativeCurrency.symbol}}`
+  const estimatedTotal = isNativeAsset ? `${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${asset?.symbol}` : `${amount} ${asset?.symbol} + ${formatBN(fee.estimatedTotal.toString(), asset.decimals, 8)} ${selectedChain?.symbol}}`
 
 
   return (
@@ -336,7 +334,7 @@ export const EvmForm: FC<EvmFormProps> = ({ confirmTx }) => {
       )}
 
       <Button
-        classname={`font-medium text-base bg-[#212529] hover:bg-${color}-fill transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
+        classname={`font-medium text-base bg-[#212529] hover:bg-primary-default transition-all w-full py-2 md:py-4 rounded-md mt-7 mx-0`}
         isDisabled={!canContinue || !isEnoughToPay}
         onClick={onSubmit}
         style={{

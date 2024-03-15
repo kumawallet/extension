@@ -5,23 +5,23 @@ import { SEND, SWAP } from "@src/routes/paths";
 import { useMemo } from "react";
 import { useNetworkContext } from "@src/providers";
 import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
-import { Buy, Send, Swap } from "@src/components/ui";
+import { Buy, Send, Swap } from "@src/components/icons";
 
 export const Actions = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
 
   const {
-    state: { selectedChain, type },
+    state: { selectedChain },
   } = useNetworkContext();
 
   const isSwapAvailable = useMemo(() => {
-    if (!selectedChain?.name || !type) return false;
+    if (!selectedChain?.name) return false;
 
-    return SUPPORTED_CHAINS_FOR_SWAP[
-      type.toLowerCase() as "wasm" | "evm"
-    ].includes(selectedChain?.name);
-  }, [selectedChain, type]);
+    const chainType = selectedChain.type === "wasm" ? "wasm" : "evm"
+
+    return SUPPORTED_CHAINS_FOR_SWAP[chainType].includes(selectedChain?.name);
+  }, [selectedChain]);
 
   return (
     <div className="flex gap-5 justify-center">

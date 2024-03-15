@@ -71,7 +71,7 @@ export const useSwap = () => {
   const { t } = useTranslation("swap");
 
   const {
-    state: { api, selectedChain, rpc },
+    state: { api, selectedChain },
   } = useNetworkContext();
 
   const {
@@ -194,9 +194,8 @@ export const useSwap = () => {
   const init = async (api: ApiPromise | ethers.providers.JsonRpcProvider) => {
     starLoading();
     try {
-      const nativeCurrency =
-        selectedChain?.nativeCurrency.symbol?.toLowerCase();
-      const chainName = selectedChain?.name;
+      const nativeCurrency = selectedChain!.symbol?.toLowerCase();
+      const chainName = selectedChain!.name;
 
       const _swapper = new StealthEX();
 
@@ -309,7 +308,10 @@ export const useSwap = () => {
         amountFrom: amounts.sell,
         addressFrom: selectedAccount.value.address,
         addressTo: recipient.address,
-        nativeAsset: selectedChain?.nativeCurrency,
+        nativeAsset: {
+          symbol: selectedChain!.symbol,
+          decimals: selectedChain!.decimals,
+        },
         assetToSell: {
           symbol: assetToSell.label as string,
           decimals: assetToSell.decimals as number,
@@ -334,11 +336,11 @@ export const useSwap = () => {
         amountBridge: amounts.sell,
         chainFrom: {
           name: "",
-          image: selectedChain.logo,
+          image: selectedChain!.logo,
         },
         chainBridge: {
           name: "",
-          image: selectedChain.logo,
+          image: selectedChain!.logo,
         },
         chainTo: {
           name: "",
@@ -426,9 +428,9 @@ export const useSwap = () => {
             },
             destinationAddress: tx.addressBridge,
             originAddress: selectedAccount.value.address,
-            destinationNetwork: selectedChain?.name,
+            destinationNetwork: selectedChain?.name || "",
             networkName: selectedChain?.name || "",
-            rpc: rpc as string,
+            rpc: selectedChain?.rpcs[0] as string,
           });
         } else {
           messageAPI.sendEvmTx({
@@ -439,9 +441,9 @@ export const useSwap = () => {
             },
             destinationAddress: tx.addressBridge,
             originAddress: selectedAccount.value.address,
-            destinationNetwork: selectedChain?.name,
+            destinationNetwork: selectedChain?.name || "",
             networkName: selectedChain?.name || "",
-            rpc: rpc as string,
+            rpc: selectedChain?.rpcs[0] as string,
             txHash,
             fee: {
               gasLimit: "0",

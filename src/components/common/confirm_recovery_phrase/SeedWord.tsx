@@ -1,4 +1,3 @@
-import { useThemeContext } from "@src/providers";
 import { FC, memo } from "react";
 import { useDrop } from "react-dnd";
 
@@ -15,12 +14,11 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   accept,
   index,
 }: SeedWordProps) {
-  const { color } = useThemeContext();
 
   const [{ isOver, canDrop }, drop] = useDrop({
     drop: onDrop,
     accept,
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
@@ -29,15 +27,15 @@ export const SeedWord: FC<SeedWordProps> = memo(function Dustbin({
   const isActive = isOver && canDrop;
   let backgroundColor = "bg-custom-gray-bg";
   const borderColor =
-    accept === "word" ? `border-${color}-primary` : "border-custom-gray-bg";
+    accept === "word" ? `border-primary-default` : "border-custom-gray-bg";
   if (isActive) {
-    backgroundColor = `bg-${color}-primary`;
+    backgroundColor = `bg-primary-default`;
   }
 
   return (
     <div
       ref={drop}
-      className={`${backgroundColor} w-auto px-3 border ${borderColor} rounded-md py-2 text-center cursor-pointer`}
+      className={`${backgroundColor} w-auto px-3 border ${borderColor} rounded-md py-2 text-center cursor-pointer font-poppins text-gray-200`}
       data-testid="seedword"
     >
       {word === "" ? <span>&nbsp;</span> : `${index}. ${word}`}

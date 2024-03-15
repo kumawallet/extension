@@ -1,124 +1,33 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { BsChevronDown } from "react-icons/bs";
-import {
-  useAccountContext,
-  useNetworkContext,
-  useThemeContext,
-} from "@src/providers";
-import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
+import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
-import { getAccountType } from "@src/utils/account-utils";
-import { useNavigate } from "react-router-dom";
-import { CREATE_ACCOUNT } from "@src/routes/paths";
-import { AccountType } from "@src/accounts/types";
-import { Chain } from "@src/storage/entities/Chains";
-import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
-import { captureError } from "@src/utils/error-handling";
-import { messageAPI } from "@src/messageAPI/api";
+import { ShowTestnets } from "./ShowTestnets";
+import { ChainsState } from "@src/types";
+
+const canShowTestnetToggle = (
+  chains: ChainsState,
+  chainGroup: { title: string }
+) => {
+  const haveCustom = chains.some((chain) => chain.title === "custom");
+
+  if (haveCustom && chainGroup.title === "custom") {
+    return true;
+  } else if (chainGroup.title === "evm_based") {
+    return true;
+  }
+
+  return false;
+};
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
     setSelectNetwork,
   } = useNetworkContext();
-  const {
-    state: { selectedAccount },
-    getAllAccounts,
-    setSelectedAccount,
-  } = useAccountContext();
-  const { color } = useThemeContext()
-
-  const [chainToChange, setChainToChange] = useState<Chain | null>(null);
-  const [openModal, setopenModal] = useState(false);
-  const [needToCreateAccount, setNeedToCreateAccount] = useState(false);
-  const [showTestnets, setShowTestnets] = useState(false);
-
-  useEffect(() => {
-    getSettings();
-  }, []);
-
-  const getSettings = async () => {
-    try {
-      const showTestnets = (
-        await messageAPI.getSetting(
-          {
-            type: SettingType.GENERAL,
-            key: SettingKey.SHOW_TESTNETS,
-          }
-        )
-
-      )?.value as boolean;
-      setShowTestnets(showTestnets);
-    } catch (error) {
-      captureError(error);
-    }
-  };
-
-  const selecteNetwork = async (chain: Chain, close: () => void) => {
-    let chainTypeIsSupportedBySelectedAccount = false;
-    let thereIsAccountToSupport = false;
-
-    const newChainSupportedTypeAccounts = chain.supportedAccounts;
-    const accountType = getAccountType(selectedAccount.type) as AccountType;
-
-    // verify is curreny account support the new chain type
-    chainTypeIsSupportedBySelectedAccount =
-      newChainSupportedTypeAccounts.includes(accountType);
-
-    if (!chainTypeIsSupportedBySelectedAccount) {
-      // verify is any account support the new chain type
-      const accounts = await messageAPI.getAllAccounts({
-        type: newChainSupportedTypeAccounts,
-      });
-      thereIsAccountToSupport = accounts.some((acc) => {
-        const accountType = getAccountType(acc.type) as AccountType;
-        return newChainSupportedTypeAccounts.includes(accountType);
-      });
-    }
-
-    if (!thereIsAccountToSupport && !chainTypeIsSupportedBySelectedAccount) {
-      setopenModal(true);
-      setNeedToCreateAccount(true);
-      setChainToChange(chain);
-    } else {
-      if (chainTypeIsSupportedBySelectedAccount) {
-        changeChain(chain);
-      } else {
-        const accounts = await getAllAccounts(chain.supportedAccounts);
-        changeChain(chain);
-        await setSelectedAccount(accounts[0], false);
-      }
-    }
-
-    close?.();
-  };
-
-  const changeChain = (chain?: Chain) => {
-    setSelectNetwork(chain || (chainToChange as Chain));
-    onClose();
-  };
-
-  const onClose = () => {
-    setopenModal(false);
-
-    setTimeout(() => {
-      setChainToChange(null);
-      setNeedToCreateAccount(false);
-    }, 500);
-  };
-
-  const isCustomChain = (chain: Chain) => {
-    return filteredChains.custom.some((c) => c.name === chain.name);
-  }
-
-  const filteredChains = {
-    ...chains,
-    testnets: showTestnets ? chains.testnets : [],
-  };
 
   return (
     <>
@@ -128,7 +37,7 @@ export const ChainSelector = () => {
           className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
         >
           <img
-            src={selectedChain.logo}
+            src={selectedChain?.logo}
             width={24}
             height={24}
             className="object-cover rounded-full"
@@ -156,62 +65,44 @@ export const ChainSelector = () => {
                   className="input-primary"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                {Object.keys(filteredChains).map((spec) => (
-                  <div key={spec}>
-                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
-                      .length > 0 && (
-                        <div className="flex items-center gap-3 whitespace-nowrap">
-                          <p className="text-[#808385] text-lg">
-                            {t(`chain_selector.${spec}`)}
-                          </p>
-                          <div className="h-[1px] w-full bg-[#343A40]" />
-                        </div>
-                      )}
-                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
-                      .filter(({ name }) =>
-                        name.toLowerCase().includes(search.toLowerCase())
-                      )
-                      .map((chain, index) => (
-                        <Menu.Item key={index.toString()}>
-                          {({ close }) => (
-                            <div
-                              className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
-                              onClick={() => {
-                                selecteNetwork(chain, close);
-                              }}
-                            >
-                              {
-                                isCustomChain(chain) ? (
-                                  <div
-                                    className="w-[30px] h-[30px] rounded-full flex justify-center items-center p-1 bg-gray-400"
-                                  >
-                                    <p className="text-black font-bold font-inter">{chain.name.substring(0, 2)}</p>
-                                  </div>
-                                ) : (
-                                  <img
-                                    src={chain.logo}
-                                    width={30}
-                                    height={30}
-                                    alt={chain.name}
-                                    className="object-cover rounded-full"
-                                  />
-
-                                )
-                              }
-                              {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
-                              <div className="flex gap-3 items-center">
-                                <p className="text-xl">{chain.name}</p>
-                                {chain.name === selectedChain?.name && (
-                                  <p className="text-[#56DF53]">
-                                    {t("chain_selector.connected")}
-                                  </p>
-                                )}
-                              </div>
+              <div className="flex flex-col gap-4">
+                {chains.map((chainGroup) => (
+                  <div key={chainGroup.title} className="flex flex-col gap-3">
+                    <p className="text-base">{t(chainGroup.title)}</p>
+                    <div className="flex flex-col gap-2">
+                      {chainGroup.chains.map((chain) => (
+                        <Fragment key={chain.id}>
+                          <button
+                            className={`flex items-center justify-between border ${selectedChain?.id === chain.id
+                                ? "border-green-500"
+                                : "border-gray-600"
+                              } rounded-xl py-2 px-4`}
+                            onClick={() => setSelectNetwork(chain)}
+                          >
+                            <div className="flex items-center gap-3">
+                              {chain.isCustom ? (
+                                <div className="w-6 h-6 bg-gray-400 flex items-center justify-center rounded-full">
+                                  {chain.name[0]}
+                                </div>
+                              ) : (
+                                <img
+                                  src={chain.logo}
+                                  width={24}
+                                  height={24}
+                                  alt={chain.name}
+                                  className="object-cover rounded-full"
+                                />
+                              )}
+                              <span className="text-xl">{chain.name}</span>
                             </div>
-                          )}
-                        </Menu.Item>
+                          </button>
+                        </Fragment>
                       ))}
+                    </div>
+
+                    {canShowTestnetToggle(chains, chainGroup) && (
+                      <ShowTestnets />
+                    )}
                   </div>
                 ))}
               </div>
@@ -219,15 +110,6 @@ export const ChainSelector = () => {
           </Menu.Items>
         </Transition>
       </Menu>
-      <ConfirmChainChangeModal
-        isOpen={openModal}
-        onClose={onClose}
-        chainToChange={chainToChange}
-        onConfirm={() =>
-          needToCreateAccount ? navigate(CREATE_ACCOUNT) : changeChain()
-        }
-        needToCreateAccount={needToCreateAccount}
-      />
     </>
   );
 };

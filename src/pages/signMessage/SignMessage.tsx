@@ -31,7 +31,7 @@ export const SignMessage: FC<SignMessageProps> = ({
   const { t: tCommon } = useTranslation("common");
 
   const {
-    state: { api, type },
+    state: { api, selectedChain },
   } = useNetworkContext();
   const {
     state: { selectedAccount },
@@ -42,7 +42,7 @@ export const SignMessage: FC<SignMessageProps> = ({
   const sign = async () => {
     try {
       let signedMessage = "";
-      if (type.toLowerCase() === "wasm") {
+      if (selectedChain?.type === "wasm") {
         const mnemonic = await messageAPI.showKey();
         const keyring = new Keyring({ type: "sr25519" });
 
@@ -51,7 +51,7 @@ export const SignMessage: FC<SignMessageProps> = ({
         signedMessage = u8aToHex(_message);
       }
 
-      if (type.toLowerCase() === "evm") {
+      if (selectedChain?.type === "evm") {
         const pk = await messageAPI.showKey();
         const signer = new ethers.Wallet(
           pk as string,

@@ -30,9 +30,6 @@ describe("ManageAssets", () => {
           api: null
         },
       }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
       useAccountContext: () => ({
         state: {
           selectedAccount: {}

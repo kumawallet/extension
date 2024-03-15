@@ -10,16 +10,15 @@ import Register from "@src/storage/entities/registry/Register";
 import { Chain } from "@src/storage/entities/Chains";
 import { AccountType } from "@src/accounts/types";
 import { isHex } from "@polkadot/util";
-import { transformAddress } from "@src/utils/account-utils";
 import { messageAPI } from "@src/messageAPI/api";
 
 
-const filterAddress = (account: Register | Contact, type: AccountType) => {
+const filterAddress = (account: Register | Contact, type: "wasm" | "evm") => {
   const address = account.address;
 
-  if (isHex(address) && type.includes("EVM")) return true
+  if (isHex(address) && type.includes("evm")) return true
 
-  if (!isHex(address) && type.includes("WASM")) return true
+  if (!isHex(address) && type.includes("wasm")) return true
 
   return false
 }
@@ -28,7 +27,7 @@ export const Destination = () => {
   const { showErrorToast } = useToast();
   const { t } = useTranslation("common");
   const {
-    state: { selectedChain, type },
+    state: { selectedChain },
   } = useNetworkContext();
   const {
     state: { selectedAccount },
@@ -50,33 +49,29 @@ export const Destination = () => {
         try {
           const { contacts, ownAccounts, recent } =
             await messageAPI.getRegistryAddresses();
-          // await Extension.getRegistryAddresses();
 
           let _ownAccounts: Contact[] = [];
 
+
           _ownAccounts = !isXcm ? ownAccounts.filter(
-            (acc) => acc.name !== selectedAccount.value.name
+            (acc) => acc.address !== selectedAccount.value.address
           ) : ownAccounts
 
-          const filterByType = (to as Chain).supportedAccounts[0] === (type as AccountType) ? type as AccountType : (to as Chain).supportedAccounts[0] as AccountType;
+
+          const type = to.type
 
           setAccountToSelect([
             {
               label: "recent",
-              values: recent.filter((v) => filterAddress(v, filterByType))
+              values: recent.filter((acc) => filterAddress(acc, type)),
             },
             {
               label: "contacts",
-              values: contacts.filter((v) => filterAddress(v, filterByType)),
+              values: contacts.filter((acc) => filterAddress(acc, type)),
             },
             {
               label: "own accounts",
-              values: _ownAccounts.filter((v) => filterAddress(v, filterByType)).map(v => ({
-                ...v, address: transformAddress(
-                  v?.address,
-                  selectedChain?.addressPrefix
-                )
-              })),
+              values: _ownAccounts.filter((acc) => filterAddress(acc, type)),
             },
           ]);
 
@@ -86,7 +81,7 @@ export const Destination = () => {
         }
       })();
     }
-  }, [selectedAccount?.key, selectedChain?.name, isXcm, type, to?.name]);
+  }, [selectedAccount?.key, selectedChain?.name, isXcm, to?.name]);
 
 
 

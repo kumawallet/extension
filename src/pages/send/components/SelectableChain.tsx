@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { Listbox } from "@headlessui/react";
-import { Chain } from "@src/storage/entities/Chains";
 import { useFormContext } from "react-hook-form";
+import { Chain } from "@src/types";
 
 interface SelectableChainProps {
   canSelectChain?: boolean;

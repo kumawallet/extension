@@ -18,11 +18,6 @@ describe("SignIn", () => {
   beforeEach(() => {
     renderComponent();
 
-    vi.mock("@src/providers", () => ({
-      useThemeContext: () => ({
-        color: "red",
-      }),
-    }));
     vi.mock("react-router-dom", () => ({
       useNavigate: () => () => navigate(),
     }));

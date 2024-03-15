@@ -5,48 +5,48 @@ import { useTranslation } from "react-i18next";
 import {
   AccountForm,
   Balance,
+  ActivityDetail,
   ManageAssets,
   Send,
   Receive,
   SignIn,
+  ForgotPass,
   SignMessage,
   Welcome,
   CallContract,
   Swap,
+  CreateWallet,
+  ImportWallet,
 } from "@src/pages";
 import {
   Advanced,
   BugReport,
-  Contacts,
+  AddressBook,
   General,
   ManageNetworks,
   Security,
-  AboutUs,
+  Settings
 } from "@src/pages/settings";
+import { useAccountContext } from "@src/providers";
 import {
-  useAccountContext,
-
-  useNetworkContext,
-} from "@src/providers";
-import {
-
   BALANCE,
+  ACTIVITY_DETAIL,
   CALL_CONTRACT,
   CREATE_ACCOUNT,
-  DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
   RECEIVE,
   RESTORE_PASSWORD,
   SEND,
-  SETTINGS_ABOUT_US,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
+  SETTINGS,
   SIGNIN,
+  FORGOT_PASS,
   SIGN_MESSAGE,
   SWAP,
   WELCOME,
@@ -55,6 +55,10 @@ import {
 import { Loading } from "@src/components/common/Loading";
 import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 import { messageAPI } from "@src/messageAPI/api";
+import { useLoading } from "@src/hooks";
+import { getWebAPI } from "@src/utils/env";
+
+const webAPI = getWebAPI();
 
 const getInitialEntry = (query: string) => {
   if (query.includes("sign_message")) {
@@ -76,38 +80,46 @@ const getInitialEntry = (query: string) => {
 export const Routes = () => {
   const { t } = useTranslation("account_form");
 
-
-  const {
-    state: { init },
-  } = useNetworkContext();
-
-  const { deriveAccount, createAccount, importAccount, restorePassword } = useAccountContext();
+  const { restorePassword } = useAccountContext();
 
   const [homeRoute, setHomeRoute] = useState(<Loading />);
-  const [canDerive, setCanDerive] = useState(false);
-  const [importIsSignUp, setImportIsSignUp] = useState(true);
 
-  const getWalletStatus = async () => {
-    const [candDerive, alreadySignedUp] = await Promise.all([
-      messageAPI.areAccountsInitialized(),
-      messageAPI.alreadySignedUp(),
-    ]);
-    setCanDerive(candDerive);
-    setImportIsSignUp(!alreadySignedUp);
-  };
+  const [isInit, setIsInit] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false);
+
+  const { isLoading, endLoading } = useLoading(true);
 
   useEffect(() => {
-    getHomeRoute();
-    getWalletStatus();
-  }, [init]);
+    (async () => {
+      const alreadySignedUp = await messageAPI.alreadySignedUp();
+
+      if (!alreadySignedUp) {
+        const tab = await webAPI.tabs.getCurrent();
+
+        if (!tab) {
+          const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
+          webAPI.tabs.create({ url });
+          return;
+        }
+      }
+
+      setIsInit(true);
+      setIsSignedUp(alreadySignedUp);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (isInit) {
+      getHomeRoute();
+    }
+    // getWalletStatus();
+  }, [isInit]);
 
   const getHomeRoute = async () => {
-    if (!init) return
-
     try {
-      const alreadySignedUp = await messageAPI.alreadySignedUp();
-      if (!alreadySignedUp) {
+      if (!isSignedUp) {
         setHomeRoute(<Welcome />);
+        endLoading();
         return;
       }
 
@@ -116,11 +128,13 @@ export const Routes = () => {
 
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
+        endLoading();
         return;
       }
       setHomeRoute(<Balance />);
+      endLoading();
     } catch (error) {
-      console.log('error', error)
+      console.log("error", error);
     }
   };
 
@@ -153,52 +167,25 @@ export const Routes = () => {
     );
   }
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
         <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
+        <Route path={ACTIVITY_DETAIL} element={<ActivityDetail />} />
         <Route path={SIGNIN} element={<SignIn />} />
+        <Route path={FORGOT_PASS} element={<ForgotPass />} />
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
         <Route path={SWAP} element={<Swap />} />
 
-        <Route
-          path={IMPORT_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("import.title")}
-              onSubmitFn={importAccount}
-              buttonText={t("import.button_text")}
-              signUp={importIsSignUp}
-              fields={{
-                privateKeyOrSeed: true,
-                accountType: true,
-              }}
-              afterSubmitMessage={t("import.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              callback={getWalletStatus}
-            />
-          }
-        />
-        <Route
-          path={CREATE_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("create_or_derivate.title")}
-              onSubmitFn={createAccount}
-              buttonText={t("create_or_derivate.button_text")}
-              signUp={true}
-              afterSubmitMessage={t("create_or_derivate.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              generateSeed
-              callback={getWalletStatus}
-            />
-          }
-        />
+        <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
+        <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
         <Route
           path={RESTORE_PASSWORD}
           element={
@@ -214,36 +201,19 @@ export const Routes = () => {
               afterSubmitMessage={t("restore.submit_message")}
               goAfterSubmit={SIGNIN}
               backButton
-              callback={getWalletStatus}
-            />
-          }
-        />
-        <Route
-          path={DERIVE_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("create_or_derivate.title")}
-              onSubmitFn={!canDerive ? createAccount : deriveAccount}
-              signUp={false}
-              buttonText={t("create_or_derivate.button_text")}
-              fields={!canDerive ? {} : { accountType: true }}
-              afterSubmitMessage={t("create_or_derivate.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              generateSeed={!canDerive}
-              callback={!canDerive ? getWalletStatus : () => null}
+              callback={() => null}
             />
           }
         />
 
         {/* setting views */}
+        <Route path={SETTINGS} element={<Settings />} />
         <Route path={SETTINGS_GENERAL} element={<General />} />
         <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
-        <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
+        <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
-        <Route path={SETTINGS_ABOUT_US} element={<AboutUs />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>
