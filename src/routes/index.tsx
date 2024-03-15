@@ -186,7 +186,7 @@ export const Routes = () => {
 
         <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
-        <Route
+        {/* <Route
           path={RESTORE_PASSWORD}
           element={
             <AccountForm
@@ -204,7 +204,7 @@ export const Routes = () => {
               callback={() => null}
             />
           }
-        />
+        /> */}
 
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />

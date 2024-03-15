@@ -1,7 +1,7 @@
 import { ICON_SIZE } from "@src/constants/icons";
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {  FiChevronLeft } from "react-icons/fi";
+import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import {
   PageWrapper,
@@ -16,7 +16,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { messageAPI } from "@src/messageAPI/api";
-import { topbarIcon, topbarText, topbarContainer,styleButtomNav } from '../../style/style'
+import { topbarIcon, topbarText, topbarContainer, styleButtomNav } from '../../style/style'
 
 export const Security = () => {
   const { t } = useTranslation("security");
@@ -139,8 +139,8 @@ export const Security = () => {
     return <Loading />;
   }
 
-  const ShowSites= () =>{
-    return 
+  const ShowSites = () => {
+    return
   }
 
   return (
@@ -155,33 +155,33 @@ export const Security = () => {
         <p className={topbarText}>{t("title")}</p>
       </div>
 
-      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  onClick={() => navigate(RESTORE_PASSWORD)}>
-          <p className="text-sm">{t("restore_password")}</p>
-          <BsChevronRight />
+      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}>
+        <p className="text-sm">{t("restore_password")}</p>
+        <BsChevronRight />
       </Button>
 
       <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  >
-          <p className="text-sm">{t('auto-lock')}</p>
-          <BsChevronRight />
+        <p className="text-sm">{t('auto-lock')}</p>
+        <BsChevronRight />
       </Button>
 
       <div className="flex flex-col gap-2">
-        <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between` } onClick={toggleShowSites}>
+        <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`} onClick={toggleShowSites}>
           <p className="text-sm ">{t("trusted_sites")}</p>
-          <div  data-testid="show-sites">
-          {!showSites ? (
-      <BsChevronRight
-        className="cursor-pointer"
-        size={ICON_SIZE}
-        onClick={toggleShowSites}
-      />
-    ) : (
-      <BsChevronDown
-        className="cursor-pointer"
-        size={ICON_SIZE}
-        onClick={toggleShowSites}
-      />
-    )}
+          <div data-testid="show-sites">
+            {!showSites ? (
+              <BsChevronRight
+                className="cursor-pointer"
+                size={ICON_SIZE}
+                onClick={toggleShowSites}
+              />
+            ) : (
+              <BsChevronDown
+                className="cursor-pointer"
+                size={ICON_SIZE}
+                onClick={toggleShowSites}
+              />
+            )}
           </div>
         </Button>
         {showSites && (
@@ -221,7 +221,7 @@ export const Security = () => {
             )}
           </>
         )}
-        
+
         {/* <div className="flex justify-between items-center">
           <p className="text-lg font-medium">{t("show_account_keys")}</p>
           <div className="p-2">
