@@ -4,15 +4,35 @@ import { PageWrapper, Button} from "@src/components/common"
 import { HeaderBack } from "@src/components/common/HeaderBack"
 import { useNavigate } from "react-router-dom";
 import { styleForgotPass } from "@src/pages/signIn/styles/ForgotPass"
+import { useLoading, useToast } from "@src/hooks";
+import { messageAPI } from "@src/messageAPI/api";
 
 
 export const ForgotPass = () => {
     
     const navigate = useNavigate();
     const { t } = useTranslation("forgot_pass");
-    
-    const [isChecked, setIsChecked] = useState(false);
+    const { t: tCommon } = useTranslation("common");
 
+    const [isChecked, setIsChecked] = useState(false);
+    const {
+        starLoading: startLoadingReset,
+        endLoading: endLoadingReset,
+      } = useLoading();
+      const { showErrorToast } = useToast();
+
+    const resetWallet = async () => {
+        startLoadingReset();
+        try {
+          await messageAPI.resetWallet();
+          localStorage.removeItem("color");
+          window.location.reload();
+        } catch (error) {
+          console.log(error)
+          showErrorToast(tCommon(error as string));
+          endLoadingReset();
+        }
+      };
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked);
       };
@@ -41,7 +61,7 @@ export const ForgotPass = () => {
                 />
                 <p className={styleForgotPass.textCheckBox}>{t("confirmation")}</p>
                 </div>
-                <Button variant="countained-red" classname={styleForgotPass.buttom} isDisabled={!isChecked}>
+                <Button variant="countained-red" classname={styleForgotPass.buttom} isDisabled={!isChecked} onClick={resetWallet}>
                     {t("reset")}
                 </Button>
             </div>

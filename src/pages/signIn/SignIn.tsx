@@ -4,6 +4,7 @@ import { useToast } from "@src/hooks";
 import { BALANCE, FORGOT_PASS } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
+import { PiEyeClosed } from "react-icons/pi";
 import { captureError } from "@src/utils/error-handling";
 import {
   Button,
@@ -12,7 +13,8 @@ import {
   PageWrapper,
 } from "@src/components/common";
 import { messageAPI } from "@src/messageAPI/api";
-
+import { styleSingIn } from "@src/pages/signIn/styles/SingIn";
+import { Key } from "@src/components/icons/Key"
 interface SignInProps {
   afterSignIn?: () => void;
 }
@@ -52,23 +54,22 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   };
 
   return (
-    <PageWrapper contentClassName="bg-[#1F1432] h-[100dvh] relative !px-0 !py-0">
+    <PageWrapper contentClassName={styleSingIn.pageWrapper}>
       <ColoredBackground />
-
-      <div className="flex flex-col py-6 px-4">
+      <div className={styleSingIn.countainerBody}>
         <Logo
-          className="mx-auto mt-14 w-[14rem] h-[14rem]"
+          className={styleSingIn.logo}
           fillClassName="fill-chain-default-primary"
           lineClassName="#070707"
         />
-        <p className="font-semibold text-2xl mb-2 text-center">
+        <p className={styleSingIn.welcome}>
           {t("welcome")}
         </p>
-        <p className="font-light text-sm mb-9 text-center">
+        <p className={styleSingIn.description}>
           {t("description")}
         </p>
 
-        <div className="relative mt-3 mb-2">
+        <div className={styleSingIn.countainerForm}>
           <input
             id="password"
             min={8}
@@ -76,35 +77,33 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             onPaste={(e) => e.preventDefault()}
             type={passwordType}
             value={password}
-            className="input-primary"
+            className={styleSingIn.input}
             onChange={({ target }) => setPassword(target.value)}
             onKeyDown={({ key }) => key === "Enter" && signIn()}
           />
-
+          <Key className={styleSingIn.iconKey}/>
           <button
-            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer z-50"
+            className={styleSingIn.inputButton}
             onClick={togglePassword}
           >
             {passwordType === "password" ? (
-              <BsEyeSlash className="cursor-pointer" size={20} />
+              <PiEyeClosed  className={styleSingIn.iconEye} size={20} />
             ) : (
-              <BsEye className="cursor-pointer" size={20} />
+              <BsEye className={styleSingIn.iconEye} size={20} />
             )}
           </button>
         </div>
 
-        <div className="flex">
           <Button
-            classname="font-medium text-base max-w-md  w-full py-2 md:py-4 mx-auto z-10 !bg-[#040404] !text-white"
+            classname={styleSingIn.button}
             aria-disabled={!isValid}
             isDisabled={!isValid}
             onClick={signIn}
           >
             {t("signin_button_text")}
           </Button>
-        </div>
         <a
-          className="text-center mb-6 z-10 cursor-pointer"
+          className={styleSingIn.forgotPass}
           onClick={() => navigate(FORGOT_PASS)}
         >
           {t("forgot_password")}

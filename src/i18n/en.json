@@ -45,11 +45,11 @@
     "create_wallet": "Create wallet"
   },
   "sign_in": {
-    "welcome": "Welcome back",
-    "description": "to your friendly crypto wallet",
-    "password_placeholder": "Type your password",
+    "welcome": "Welcome back!",
+    "description": "Explore the cryptoverse.",
+    "password_placeholder": "Enter password",
     "signin_button_text": "Unlock",
-    "forgot_password": "Forgot password?"
+    "forgot_password": "Whoops! Forgot your password?"
   },
   "forgot_pass" : {
     "title": "Forgot password",
