@@ -9,6 +9,7 @@ import {
   Send,
   Receive,
   SignIn,
+  ForgotPass,
   SignMessage,
   Welcome,
   CallContract,
@@ -43,6 +44,7 @@ import {
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
   SIGNIN,
+  FORGOT_PASS,
   SIGN_MESSAGE,
   SWAP,
   WELCOME,
@@ -173,6 +175,7 @@ export const Routes = () => {
         <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
         <Route path={SIGNIN} element={<SignIn />} />
+        <Route path={FORGOT_PASS} element={<ForgotPass />} />
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />

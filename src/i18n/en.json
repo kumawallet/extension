@@ -45,11 +45,20 @@
     "create_wallet": "Create wallet"
   },
   "sign_in": {
-    "welcome": "Welcome back",
-    "description": "to your friendly crypto wallet",
-    "password_placeholder": "Type your password",
+    "welcome": "Welcome back!",
+    "description": "Explore the cryptoverse.",
+    "password_placeholder": "Enter password",
     "signin_button_text": "Unlock",
-    "forgot_password": "Forgot password?"
+    "forgot_password": "Whoops! Forgot your password?"
+  },
+  "forgot_pass" : {
+    "title": "Forgot password",
+    "paragraph_1" : "Kuma does not keep a copy of your password. If you’re having trouble unlocking your account, you will need to reset your wallet. ",
+    "paragraph_2" : "This action will delete your current wallet and Secret Recovery Phrase from this device, along with the list of accounts you’ve curated. After resetting with a Secret Recovery Phrase, you’ll see a list of accounts based on the Secret Recovery Phrase you use to reset. This new list will automatically include accounts that have a balance.",
+    "paragraph_3" : "If you have any doubts you can find more information on our ",
+    "docs" : "docs",
+    "confirmation": "Yes,I understand",
+    "reset": "Reset wallet" 
   },
   "account_form": {
     "restore": {
