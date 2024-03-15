@@ -459,7 +459,21 @@ export default class Extension {
       const unsub = await provider
         .tx(hexExtrinsic)
         .signAndSend(sender, async ({ events, txHash, status }) => {
-          if (String(status.type) === "Ready") {
+          if (String(status.type) === "InBlock") {
+            let fee = "";
+            let tip = "";
+
+            events.forEach(({ event }) => {
+              const eventData = event.toHuman()?.data as any;
+              if (eventData?.actualFee) {
+                fee = eventData.actualFee.replace(/,/g, "");
+              }
+
+              if (eventData?.tip) {
+                tip = eventData.tip.replace(/,/g, "");
+              }
+            });
+
             const hash = txHash.toString();
             const date = Date.now();
             const activity: Partial<Record> = {
@@ -475,6 +489,8 @@ export default class Extension {
               network: networkName,
               recipientNetwork: destinationNetwork,
               data: {
+                fee,
+                tip,
                 from: originAddress,
                 to: destinationAddress,
                 gas: "",
