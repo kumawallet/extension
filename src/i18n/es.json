@@ -153,14 +153,14 @@
     "explorer_evm_placeholder": "ej.: https://etherscan.io/tx/",
     "explorer_wasm_placeholder": "ej.: https://polkascan.io/pre/kusama/transaction/"
   },
-  "contacts": {
+  "addressBook": {
     "title": "Contactos",
     "name": "Nombre",
     "address": "Dirección",
     "save_contact": "Guardar contacto",
     "insert_name": "Ingrese el nombre del contacto",
     "insert_address": "Ingrese la dirección del contacto",
-    "search": "Buscar contactos por nombre o dirección",
+    "search": "Buscar",
     "new_contact": "Nuevo contacto",
     "required": "Requerido"
   },

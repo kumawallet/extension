@@ -153,7 +153,7 @@
     "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
     "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
-  "contacts": {
+  "addressBook": {
     "title": "Contatti",
     "name": "Nome",
     "address": "Indirizzo",

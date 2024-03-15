@@ -20,3 +20,4 @@ export const SIGN_MESSAGE = "/sign-message";
 export const SIGNIN = "/sign-in";
 export const SWAP = "/swap";
 export const WELCOME = "/";
+export const SETTINGS = "/settings"

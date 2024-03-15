@@ -19,14 +19,24 @@ import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { isHex } from "@polkadot/util";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { Modal } from "./Add Address/Add-Address";
+import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
+import { topbarText, topbarIcon, topbarContainer } from '../../style/style'
+import '../../style/input.css'
+import { CiSearch } from "react-icons/ci";
+import { PiGhost } from "react-icons/pi";
+import { IoCloseOutline } from "react-icons/io5";
+
+
+
 
 interface AccountForm {
     name: string;
     address: string;
 }
 
-export const Contacts = () => {
-    const { t } = useTranslation("contacts");
+export const AddressBook = () => {
+    const { t } = useTranslation("adressBook");
     const { t: tCommon } = useTranslation("common");
     const navigate = useNavigate();
 
@@ -74,6 +84,7 @@ export const Contacts = () => {
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
     const { showErrorToast } = useToast();
+    const [addressValue, setAddressValue] = useState("");
 
     useEffect(() => {
         setIsLoading(true);
@@ -123,6 +134,10 @@ export const Contacts = () => {
     };
 
     const toggleCreateContact = () => {
+        reset({
+            name: "",
+            address: "",
+        })
         setIsCreateContact(!isCreateContact);
     };
 
@@ -145,99 +160,117 @@ export const Contacts = () => {
             letterA.localeCompare(letterB)
         );
     }, [contacts, search]);
-
+    const checkInput = (event: React.FormEvent<HTMLInputElement>) => {
+        const input = event.currentTarget as HTMLInputElement;
+        setAddressValue(input.value)
+        if (input.value !== "") {
+            input.classList.add("hasData");
+        } else {
+            input.classList.remove("hasData");
+        }
+    }
+    const { Icon, copyToClipboard } = useCopyToClipboard(addressValue);
     if (isLoading) {
         return <Loading />;
     }
     return (
         <PageWrapper>
-            <div className="flex items-center gap-3 mb-10">
+            <div className={topbarContainer}>
                 <FiChevronLeft
-                    className="cursor-pointer"
+                    className={topbarIcon}
                     size={ICON_SIZE}
                     onClick={() => navigate(-1)}
                 />
-                <p className="font-medium text-2xl">{t("title")}</p>
-                {!isCreateContact && (
-                    <div className="flex-1 flex justify-end">
-                        <Button
-                            data-testid="new-contact"
-                            classname=" text-sm"
-                            onClick={toggleCreateContact}
-                        >
-                            {t("new_contact")}
-                        </Button>
-                    </div>
-                )}
+                <p className={topbarText}>{t("title")}</p>
             </div>
-            {isCreateContact ? (
-                <>
-                    <div className="mb-5">
-                        <label htmlFor="name" className="block text-sm font-medium mb-1">
-                            {t("name")}
-                        </label>
-                        <input
-                            data-testid="name"
-                            id="name"
-                            placeholder={t("insert_name") as string}
-                            max={32}
-                            min={1}
-                            className="input-primary"
-                            {...register("name")}
-                        />
-                        <InputErrorMessage message={errors.name?.message} />
+            <div className="flex-1 flex justify-star mb-4">
+                    <div className="flex-1 flex justify-star">
+                       <Button
+                    data-testid="new-contact"
+                    classname=" text-sm"
+                    onClick={toggleCreateContact}
+                >
+                    {t("new_contact")}
+                </Button>
                     </div>
-
-                    <div className="mb-5">
-                        <label htmlFor="name" className="block text-sm font-medium mb-1">
-                            {t("address")}
-                        </label>
-                        <input
-                            data-testid="address"
-                            id="address"
-                            placeholder={t("insert_address") as string}
-                            className="input-primary"
-                            {...register("address")}
-                        />
-                        <InputErrorMessage message={errors.address?.message} />
+                
+            </div>
+            <Modal isOpen={isCreateContact} onClose={toggleCreateContact}>
+                <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-screen-lg bg-[#333343]/50 rounded-lg p-6 pt-2 max-w-3xl w-full md:px-10">
+                    <div className="w-full flex justify-between items-center mb-5">
+                    <p className="text-base">{t("add_new_address")}</p>
+                    <button className="absolute text-xl top-2 text-white right-4" onClick={toggleCreateContact}>
+                        <IoCloseOutline />
+                    </button>
                     </div>
-
-                    <div className="flex gap-4 justify-end mt-5">
-                        <Button
-                            variant="text"
-                            classname="text-sm"
-                            onClick={toggleCreateContact}
-                        >
-                            {tCommon("cancel")}
-                        </Button>
-                        <Button
-                            data-testid="save"
-                            classname={`text-sm`}
-                            onClick={saveContact}
-                        >
-                            {tCommon("save")}
-                        </Button>
-                    </div>
-                </>
-            ) : (
-                <>
+                    <div className="relative mb-4 bg-[#1C1C27] h-12 flex items-center">
                     <input
-                        id="search"
-                        placeholder={t("search") as string}
-                        className="input-primary"
-                        onChange={(e) => {
-                            setSearch(e.target.value);
+                        data-testid="name"
+                        id="name"
+                        max={32}
+                        min={1}
+                        className="input w-full mt-2 relative ml-6"
+                        onInput={checkInput}
+                        {...register("name")}
+                    />
+                    <span className="floatingLabel text-base ml-6">{t("insert_name")}</span>
+                    <InputErrorMessage message={errors.name?.message} />
+                    </div>
+                    <div className="relative mb-4 bg-[#1C1C27] h-12 flex items-center pr-6">
+                    <input
+                        data-testid="address"
+                        id="address"
+                        className="input w-full mt-2 relative ml-6"
+                        onInput={checkInput}
+                        {...register("address")}
+                    />
+                    <span className="floatingLabel text-base ml-6">{t("insert_address")}</span>
+                    <button
+                    onClick={copyToClipboard}
+                    className={`absolute flex items-center justify-center hover:bg-opacity-15 right-4`}
+                    data-testid="account-button"
+                    >
+                    <Icon
+                        iconProps={{
+                            className: `m-auto text-white `,
                         }}
                     />
+                    </button>
+                    
+                    <InputErrorMessage message={errors.address?.message} />
+                    </div>
+                    <Button
+                    data-testid="save"
+                    classname={`text-sm w-full mt-4`}
+                    onClick={saveContact}
+                    >
+                    {tCommon("save")}
+                    </Button>
+                </div>
+                </Modal>
+                    <div className="relative">
+                        <input
+                            id="search"
+                            placeholder={t("search")}
+                            className="input-primary bg-[#1C1C27] pl-8 border-0 font-bold"
+                            onChange={(e) => {
+                                        setSearch(e.target.value);
+                                            }}
+                        />
+                        <CiSearch className="absolute top-1/2 left-2 transform font-mediums -translate-y-1/2 text-white" />
+                    </div>
 
+                    <p className="text-sm font-medium mt-8">My Contacts</p>
                     <div className="flex flex-col gap-1 mt-5">
-                        {contacts.length === 0 && (
-                            <div className="flex justify-center items-center mt-5">
-                                <p className="text-lg font-medium">
-                                    {tCommon("no_contacts_found")}
-                                </p>
-                            </div>
-                        )}
+                            {contacts.length === 0 && (
+                                <div className="grid place-items-center mt-5 opacity-50 ">
+                                    <PiGhost className=" text-[6rem] font-light" />
+                                    <p className="text-base font-medium  ">
+                                        {tCommon("no_contacts_found")}
+                                    </p>
+                                </div>
+                            )}
+                        
                         {groupedContacts.map(([letter, contacts]) => (
                             <section key={letter}>
                                 <h3
@@ -266,8 +299,6 @@ export const Contacts = () => {
                             </section>
                         ))}
                     </div>
-                </>
-            )}
         </PageWrapper>
     );
 };
