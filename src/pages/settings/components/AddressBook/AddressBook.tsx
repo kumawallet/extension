@@ -195,9 +195,7 @@ export const AddressBook = () => {
                     </div>
                 
             </div>
-            <Modal isOpen={isCreateContact} onClose={()=>{  reset();
-                                                            toggleCreateContact();
-                                                            }}>
+            <Modal isOpen={isCreateContact} onClose={toggleCreateContact}>
                 <div className="fixed bottom-0 left-0 right-0 mx-auto max-w-screen-lg bg-[#333343]/50 rounded-lg p-6 pt-2 max-w-3xl w-full md:px-10">
                     <div className="w-full flex justify-between items-center mb-5">
                     <p className="text-base">{t("add_new_address")}</p>
