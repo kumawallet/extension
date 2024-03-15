@@ -193,7 +193,16 @@
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
-    "search": "Search by transaction hash or address"
+    "search": "Search",
+    "send": "Send",
+    "swap": "Swap",
+    "receive": "Receive"
+  },
+  "activity_details":{
+    "title": "Transaction detail",
+    "xcm": "Transfer executed using XCM",
+    "explorer": "View on block explorer"
+
   },
   "receive": {
     "title": "Share your address"

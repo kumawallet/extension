@@ -1,29 +1,35 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import { useToast } from "@src/hooks";
-import { Loading } from "@src/components/common";
-import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
-import { BsArrowUpRight } from "react-icons/bs";
+import { Status } from '@src/components/common/TxStatus'
+import { Loading,Button, } from "@src/components/common";
+import { RecordData } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
-import { formatDate } from "@src/utils/utils";
+import { ACTIVITY_DETAIL } from '@src/routes/paths'
 import {
   useNetworkContext,
   useTxContext,
   useAccountContext,
 } from "@src/providers";
-import { FaChevronRight } from "react-icons/fa";
-import { NetworkIcon } from "./NetworkIcon";
 import { messageAPI } from "@src/messageAPI/api";
 import { Chain } from "@src/types";
+import {estimatedFee} from '@src/pages/balance/components/funtions/Txfunctions'
 
-const chipColor = {
-  [RecordStatus.FAIL]: "bg-red-600",
-  [RecordStatus.SUCCESS]: "bg-green-600",
-  [RecordStatus.PENDING]: "bg-yellow-600",
-};
+
+import { CiSearch } from "react-icons/ci";
+import { HiOutlineInboxArrowDown } from "react-icons/hi2";
+import { SendIcon } from "@src/components/icons/SendIcon"
+import { BsChevronRight } from "react-icons/bs";
+import { stylesActivity} from '@src/pages/balance/components/style/activity';
+import { SwapIcon } from "@src/components/icons/SwapIcon"
+import { IoIosCloseCircle } from "react-icons/io";
+
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
+  const navigate = useNavigate();
 
   const {
     state: { chains, selectedChain },
@@ -43,6 +49,7 @@ export const Activity = () => {
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
   const { showErrorToast } = useToast();
+ 
 
   useEffect(() => {
     if (selectedAccount) {
@@ -65,6 +72,33 @@ export const Activity = () => {
     }
   };
 
+  const getContactName = (address: string) => {
+    const contact = contacts.find((c) => c.address === address);
+    const ownAccount = ownAccounts.find((c) => c.address === address);
+    return contact || ownAccount
+      ? contact?.name || ownAccount?.name
+      : address.slice(0, 6) + "..." + address.slice(-4);
+  };
+  
+  const getAmount = (data: RecordData) => {
+    if (!data || !data.value) return "$0.0";
+      if (data.value.length > 7 && /^0+\.0*[1-9][0-9]*$/.test(data.value)) {
+          return `< 0.00001 ${data.symbol}`;
+      }
+      else if(data.value.length > 7){
+        const value = parseFloat(data.value);
+        const million =   Math.floor(value / 1000000);
+        if(million >= 1)
+        {   
+          return `${million}M ${data.symbol}`
+        }
+        else{
+          return `${value.toFixed(3)} ${data.symbol}`
+        }
+      }
+      return `${data.value} ${data.symbol}`;
+}
+
 
   const getLink = (chain: Chain, hash: string) => {
     const chainType = chain?.type
@@ -75,35 +109,16 @@ export const Activity = () => {
     }
   };
 
-  const getContactName = (address: string) => {
-    const contact = contacts.find((c) => c.address === address);
-    const ownAccount = ownAccounts.find((c) => c.address === address);
-    return contact || ownAccount
-      ? contact?.name || ownAccount?.name
-      : address.slice(0, 6) + "..." + address.slice(-4);
-  };
+  const allChains = chains.flatMap((c) => c.chains);
 
-  const getValue = (data: RecordData) => {
-    if (!data || !data.value) return "$0.0";
-    return data.symbol ? `${data.value} ${data.symbol}` : `$${data.value}`;
-  };
+  const logo = (symbol : string) =>{
+    const asset: Chain | undefined = allChains.find((obj) => obj.symbol === symbol);
+    return !asset ? undefined : asset.logo.toString();
 
-  const getStatusColor = (status: RecordStatus) => {
-    switch (status) {
-      case RecordStatus.PENDING:
-        return "goldenrod";
-      case RecordStatus.SUCCESS:
-        return "#469999";
-      case RecordStatus.FAIL:
-        return "red";
-      default:
-        return "white";
-    }
-  };
-
+}
+  
   const filteredRecords = useMemo(() => {
     const _search = search.trim().toLocaleLowerCase();
-
     if (!_search) return activity;
 
     return activity
@@ -117,85 +132,126 @@ export const Activity = () => {
       .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
-  const allChains = chains.flatMap((c) => c.chains);
+
+
 
   if (isLoading) {
     return <Loading />;
   }
+  
 
   return (
     <>
-      <input
-        data-testid="search-input"
-        id="search"
-        placeholder={t("search") as string}
-        className="input-primary"
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
-      />
-
-      <div className="flex flex-col my-5 overflow-y-auto h-full">
+      <div className={stylesActivity.containerGlobal}>
+          <input
+            data-testid="search-input"
+            id="search"
+            placeholder={t("search") as string}
+            className={stylesActivity.inputTxSearch}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
+          <CiSearch className={stylesActivity.iconSearch} />
+      </div>
+      <div className={stylesActivity.countainerTx}>
         {activity.length === 0 && (
-          <div className="flex justify-center items-center mt-5">
-            <p className="text-lg font-medium">{t("empty")}</p>
+          <div className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.countainerEmptyActivity}`}>
+            <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
           </div>
         )}
         {filteredRecords.map(
           ({
             address,
             status,
-            lastUpdated,
+            reference,
             data,
             network,
             hash,
             recipientNetwork,
+            type,
+            isSwap
+
           }) => (
-            <div
+            <Button
+              variant="contained-little-gray"
               key={hash}
-              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-2 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
+              classname={stylesActivity.TxButton}
+              onClick={() => navigate(ACTIVITY_DETAIL, {state: {
+                                                                  hash: hash,
+                                                                  status: status,
+                                                                  reference: reference,
+                                                                  address: address,
+                                                                  network: network,
+                                                                  recipientNetwork: recipientNetwork,
+                                                                  data: data,
+                                                                  type: type,
+              }})}
+              
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className={`${stylesActivity.flexItemsCenter} ${stylesActivity.countainerButton}`}>
                 <a
-                  className={`text-primary-default hover:bg-pritext-primary-default hover:bg-opacity-30 rounded-full p-1`}
+                  className={stylesActivity.explorer}
                   href={getLink(selectedChain as Chain, hash)}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <BsArrowUpRight size={23} color={getStatusColor(status)} />
+                  <div className={`relative ${stylesActivity.circleIcon}`}>
+                  { isSwap ? (
+                     
+                     <SwapIcon size="18"/>
+                     
+                   
+                  ) 
+                  :
+                  selectedAccount?.value?.address === data.from ? ( 
+                      <SendIcon  size="18"/>
+                  ) 
+                  : 
+                  ( 
+                      <HiOutlineInboxArrowDown />
+                  )
+                  }
+                   <div className={stylesActivity.countainerAssetIcon}>
+                    {
+                    !logo(data.symbol) ? 
+                    ( <IoIosCloseCircle  className={stylesActivity.faildIcon} />) :
+                    (<img src={logo(data.symbol)} alt="Logo" />)
+                    }
+                    </div>
+                  </div>
                 </a>
-                <div className="overflow-hidden text-ellipsis px-1">
-                  <p className="text-xs">{getContactName(address)}</p>
-                  <p className="text-xs">{`${formatDate(
-                    lastUpdated as number
-                  )}`}</p>
-                  <p
-                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${chipColor[status as RecordStatus]
-                      }`}
-                  >
-                    {status}
-                  </p>
+                 <div className={stylesActivity.countainerText}>
+                  { isSwap ? (
+                    <p className={stylesActivity.textTxType}>{t("swap")}</p>
+                  ) 
+                  : selectedAccount?.value?.address !== address ? ( 
+                     <p className={stylesActivity.textTxType}>{t("send")}</p>
+                     ) 
+                     : ( 
+                      <p className={stylesActivity.textTxType}>{t("receive")}</p>
+                     )
+                   }
+                    <p className={stylesActivity.textAddress}>{getContactName(address)}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col text-lg px-1">
-                <p className="text-sm whitespace-nowrap mb-1 text-center">
-                  {getValue(data)}
+              <Status status={status} />
+              <div className={stylesActivity.countainerDivEnd}>
+              <div className={stylesActivity.flexItemsCenter}>
+                <div className={`${stylesActivity.countainerText}${stylesActivity.countainerAmounts}`}>
+                
+                <p className={`${getAmount(data).length > 10 ? 'text-[px] ': 'text-[10px]'} font-bold`}>
+                  {getAmount(data)}
                 </p>
-                <div className="flex justify-evenly items-center gap-1">
-                  <NetworkIcon
-                    networkName={network}
-                    width={16}
-                    chains={allChains}
-                  />
-                  <FaChevronRight size={14} />
-                  <NetworkIcon
-                    networkName={recipientNetwork}
-                    chains={allChains}
-                    width={16}
-                  />
-                </div>
+                <p className={stylesActivity.textFee}>
+                  {estimatedFee(data)}
+                </p>
               </div>
+            <BsChevronRight className={stylesActivity.iconArrow} />
             </div>
+              </div>
+              
+            </Button>
           )
         )}
       </div>

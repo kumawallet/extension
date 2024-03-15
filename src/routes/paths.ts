@@ -1,4 +1,5 @@
 export const BALANCE = "/balance";
+export const ACTIVITY_DETAIL = "/activity-detail";
 export const CALL_CONTRACT = "/call-contract";
 export const CREATE_ACCOUNT = "/create-account";
 export const DERIVE_ACCOUNT = "/derive-account";
