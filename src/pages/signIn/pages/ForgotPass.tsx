@@ -37,6 +37,7 @@ export const ForgotPass = () => {
         // open in full screen
         const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
         webAPI.tabs.create({ url });
+        window.close()
       } else {
         window.location.reload();
       }

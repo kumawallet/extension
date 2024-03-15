@@ -54,7 +54,9 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
   };
 
   return (
-    <PageWrapper contentClassName={styleSingIn.pageWrapper}>
+    <PageWrapper contentClassName={styleSingIn.pageWrapper}
+      innerContentClassName={styleSingIn.innerWrapper}
+    >
       <ColoredBackground />
       <div className={styleSingIn.countainerBody}>
         <Logo
@@ -81,27 +83,27 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
             onChange={({ target }) => setPassword(target.value)}
             onKeyDown={({ key }) => key === "Enter" && signIn()}
           />
-          <Key className={styleSingIn.iconKey}/>
+          <Key className={styleSingIn.iconKey} />
           <button
             className={styleSingIn.inputButton}
             onClick={togglePassword}
           >
             {passwordType === "password" ? (
-              <PiEyeClosed  className={styleSingIn.iconEye} size={20} />
+              <PiEyeClosed className={styleSingIn.iconEye} size={20} />
             ) : (
               <BsEye className={styleSingIn.iconEye} size={20} />
             )}
           </button>
         </div>
 
-          <Button
-            classname={styleSingIn.button}
-            aria-disabled={!isValid}
-            isDisabled={!isValid}
-            onClick={signIn}
-          >
-            {t("signin_button_text")}
-          </Button>
+        <Button
+          classname={styleSingIn.button}
+          aria-disabled={!isValid}
+          isDisabled={!isValid}
+          onClick={signIn}
+        >
+          {t("signin_button_text")}
+        </Button>
         <a
           className={styleSingIn.forgotPass}
           onClick={() => navigate(FORGOT_PASS)}

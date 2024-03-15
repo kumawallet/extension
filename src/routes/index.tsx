@@ -99,6 +99,7 @@ export const Routes = () => {
         if (!tab) {
           const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
           webAPI.tabs.create({ url });
+          window.close()
           return;
         }
       }
