@@ -14,7 +14,7 @@ export const PageWrapper: FC<PageWrapperProps> = ({
 
   return (
     <div className={`${defaultContentClassName} ${contentClassName || ""}`}>
-      <div className={`max-w-3xl w-full mx-auto md:px-10 relative ${innerContentClassName}`}>{children}</div>
+      <div className={`max-w-[357px] w-full mx-auto relative ${innerContentClassName}`}>{children}</div>
     </div>
   );
 };

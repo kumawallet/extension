@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren } from "react"
-import { ColoredBackground, KumaLetters, Logo, PageWrapper } from "../common"
+import { LogoAccountForm } from "@src/components/common/LogoAccountForm"
+import { ColoredBackground, KumaLetters, PageWrapper } from "../common"
 import { GoChevronLeft } from "react-icons/go";
 import { useTranslation } from "react-i18next";
 
@@ -39,7 +40,7 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
       />
       <div className="flex flex-col h-full">
         <div className="hidden md:flex justify-center items-center gap-2 mx-auto pt-12 pb-4">
-          <Logo className="w-16 h-16" />
+          <LogoAccountForm className="w-16 h-16" />
           <KumaLetters className="w-32" />
         </div>
 
