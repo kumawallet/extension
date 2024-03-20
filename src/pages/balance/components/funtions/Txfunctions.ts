@@ -13,10 +13,16 @@ export const getTip = (data: any, tip?: string) => {
   return `${tip || data.tip} ${data.symbol}`;
 };
 
-export const estimatedFee = (data: any, chainDecimals: number) => {
+export const estimatedFee = (
+  data: {
+    fee: string;
+    symbol: string;
+  },
+  chainDecimals: number
+) => {
   if (data.fee) {
-    return `${utils.formatUnits(data.fee, chainDecimals)} ${data.symbol}`;
+    const fee = utils.formatUnits(data.fee, chainDecimals);
+    return `${Number(fee).toFixed(2)} ${data.symbol}`;
   }
-  const fee = utils.formatEther(BigInt(data.gas) * BigInt(data.gasPrice));
-  return `${fee} ${data.symbol}`;
+  return "";
 };

@@ -165,11 +165,6 @@ export const Send = () => {
         // async to avoid waiting for the tx to be mined
         messageAPI.sendEvmTx({
           txHash: _tx.hash as string,
-          fee: {
-            gasLimit: tx?.fee.gasLimit?.toString() || "",
-            maxFeePerGas: tx?.fee["max fee per gas"]?.toString() || "",
-            maxPriorityFeePerGas: tx?.fee["max priority fee per gas"]?.toString() || "",
-          },
           amount: amount.toString(),
           asset: {
             id: asset.id,
@@ -180,7 +175,9 @@ export const Send = () => {
           destinationNetwork,
           networkName: selectedChain?.name || "",
           rpc: selectedChain?.rpcs[0] as string,
+
         })
+
       }
       showSuccessToast(t("tx_send"));
       navigate(BALANCE, {

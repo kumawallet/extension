@@ -187,7 +187,7 @@ export const EVM_CHAINS: Chain[] = [
   },
   {
     id: "shibuya-evm",
-    name: "Shibuya",
+    name: "Shibuya EVM",
     rpcs: ["https://evm.shibuya.astar.network"],
     symbol: "SBY",
     decimals: 18,

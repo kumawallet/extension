@@ -134,3 +134,23 @@ export interface OldChain {
   supportedAccounts: string[];
   xcm?: string[];
 }
+
+export interface Transaction {
+  id: string;
+  amount: string;
+  asset: string;
+  blockNumber: number;
+  fee: string;
+  hash: string;
+  originNetwork: string;
+  recipient: string;
+  sender: string;
+  status: string;
+  targetNetwork: string;
+  tip: string;
+  timestamp: number;
+  type: string;
+  isSwap: boolean;
+}
+
+export type HistoricTransaction = Transaction;

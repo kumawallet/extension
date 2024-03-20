@@ -431,6 +431,7 @@ export const useSwap = () => {
             destinationNetwork: selectedChain?.name || "",
             networkName: selectedChain?.name || "",
             rpc: selectedChain?.rpcs[0] as string,
+            isSwap: true,
           });
         } else {
           messageAPI.sendEvmTx({
@@ -445,11 +446,7 @@ export const useSwap = () => {
             networkName: selectedChain?.name || "",
             rpc: selectedChain?.rpcs[0] as string,
             txHash,
-            fee: {
-              gasLimit: "0",
-              maxFeePerGas: "0",
-              maxPriorityFeePerGas: "0",
-            },
+            isSwap: true,
           });
         }
 

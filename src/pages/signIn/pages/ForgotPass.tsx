@@ -43,7 +43,6 @@ export const ForgotPass = () => {
       }
 
     } catch (error) {
-      console.log(error)
       showErrorToast(tCommon(error as string));
       endLoadingReset();
     }
