@@ -30,7 +30,7 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
 
   return (
     <PageWrapper
-      contentClassName="flex-1 !py-0 !px-0 md:px-0 bg-[#1F1432]"
+      contentClassName="flex-1 !py-0 !px-0 md:px-0  md:pb-0 bg-[#1F1432] snap-none"
       innerContentClassName="!static z-0 !max-w-[584px] !px-0"
     >
       <ColoredBackground
@@ -39,19 +39,19 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
         starClassName="z-[-1]"
       />
       <div className="flex flex-col h-full">
-        <div className="hidden md:flex justify-center items-center gap-2 mx-auto pt-12 pb-4">
+        <div className="hidden md:flex justify-center items-center gap-2 mx-auto pt-8 pb-4">
           <LogoAccountForm className="w-16 h-16" />
           <KumaLetters className="w-32" />
         </div>
 
         {topMessage}
 
-        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 pt-5 pb-10 flex flex-col flex-1">
+        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 md:pb-0 pt-5 pb-10 flex flex-col flex-1">
           {
             showBackButton && (
-              <div className="py-1 mb-5">
+              <div className="py-1 mb-1">
                 <button
-                  className="text-gray-300 text-xl font-light flex items-center gap-1"
+                  className="text-gray-300 text-sm font-light flex items-center gap-1"
                   onClick={onBack}
                 >
                   <GoChevronLeft className="inline" size={20} />
@@ -60,11 +60,11 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
               </div>
             )
           }
-          <div className="flex-1 flex flex-col">
-            <div className={`flex flex-col gap-6 ${centerInnerTitle ? "text-center" : ""}`}>
-              {title && <h3 className="font-medium text-xl md:text-[2rem]">{title}</h3>}
+          <div className="flex-1 flex flex-col ">
+            <div className={`flex flex-col gap-3 ${centerInnerTitle ? "text-center" : ""}`}>
+              {title && <h3 className="font-mediumm text-lg md:text-[1.5rem]">{title}</h3>}
               {description &&
-                <p className={`whitespace-pre-line md:text-base text-gray-300 ${descriptionClassName}`}>{description}</p>
+                <p className={`whitespace-pre-line leading-snug md:text-sm text-gray-300 ${descriptionClassName}`}>{description}</p>
               }
             </div>
             {children}

@@ -23,7 +23,7 @@ export const SeedGrid: FC<SeedGridProps> = ({
 
 
   return (
-    <div className={`grid ${gridTotal === 12 ? "grid-cols-3" : "grid-cols-3 md:grid-cols-4"} gap-y-4 gap-x-2 md:gap-x-10`}>
+    <div className={`grid ${gridTotal === 12 ? "grid-cols-3" : "grid-cols-3 md:grid-cols-4"} gap-y-3 gap-x-2 md:gap-x-10`}>
       {
         Array.from({
           length: gridTotal
@@ -31,7 +31,7 @@ export const SeedGrid: FC<SeedGridProps> = ({
           const indexWasRemoved = indexesRemoved?.some(removedIndex => removedIndex === index)
           return (
             <div
-              className={`flex border bg-[#1C1C27] ${indexWasRemoved ? "border-[#7C4DC4]" : "border-transparent"} rounded-lg px-2 py-3 items-center font-poppins text-baseque `}
+              className={`flex border bg-[#1C1C27] ${indexWasRemoved ? "border-[#7C4DC4]" : "border-transparent"} rounded-lg px-2 py-2 items-center font-poppins text-baseque `}
               key={index}
               onClick={() => {
                 if (onClickWord && indexWasRemoved && words[index]) {
