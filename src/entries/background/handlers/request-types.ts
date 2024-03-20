@@ -34,8 +34,8 @@ export interface RequestImportAccount {
   isSignUp: boolean | undefined;
 }
 
-export interface RequestRestorePassword {
-  privateKeyOrSeed: string;
+export interface RequestChangePassword {
+  currentPassword: string;
   newPassword: string;
 }
 
@@ -171,7 +171,7 @@ export interface RequestSendEvmTx extends RequestSendTxBase {
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
-  "pri(accounts.restorePassword)": [RequestRestorePassword, void];
+  "pri(accounts.changePassword)": [RequestChangePassword, void];
   "pri(accounts.removeAccount)": [RequestRemoveAccout, void];
   "pri(accounts.changeAccountName)": [RequestChangeAccountName, void];
   "pri(accounts.areAccountsInitialized)": [null, boolean];

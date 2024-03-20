@@ -32,6 +32,7 @@ import {
   RequestAddSwap,
   RequestAddTrustedSite,
   RequestChangeAccountName,
+  RequestChangePassword,
   RequestCreateAccount,
   RequestDeriveAccount,
   RequestGetAccount,
@@ -44,7 +45,6 @@ import {
   RequestRemoveContact,
   RequestRemoveCustomChain,
   RequestRemoveTrustedSite,
-  RequestRestorePassword,
   RequestSaveContact,
   RequestSaveCustomChain,
   RequestSendEvmTx,
@@ -100,6 +100,27 @@ export default class Extension {
 
   private isAuthorized(): boolean {
     return Auth.isAuthorized();
+  }
+
+  private async changePassword({
+    currentPassword,
+    newPassword,
+  }: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<void> {
+    this.validatePasswordFormat(currentPassword);
+    this.validatePasswordFormat(newPassword);
+
+    const seed = await this.showKey();
+
+    if (!seed) throw new Error("failed_to_get_seed");
+
+    await AccountManager.changePassword(
+      seed as string,
+      currentPassword,
+      newPassword
+    );
   }
 
   private async signUp({ password, privateKeyOrSeed }: RequestSignUp) {
@@ -166,15 +187,6 @@ export default class Extension {
       type
     );
     this.setSelectedAccount(account);
-  }
-
-  private async restorePassword({
-    privateKeyOrSeed,
-    newPassword,
-  }: RequestRestorePassword) {
-    this.validatePasswordFormat(newPassword);
-    this.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
-    await AccountManager.restorePassword(privateKeyOrSeed, newPassword);
   }
 
   private removeAccount({ key }: RequestRemoveAccout) {
@@ -683,8 +695,8 @@ export default class Extension {
         return this.createAccounts(request as RequestCreateAccount);
       case "pri(accounts.importAccount)":
         return this.importAccount(request as RequestImportAccount);
-      case "pri(accounts.restorePassword)":
-        return this.restorePassword(request as RequestRestorePassword);
+      case "pri(accounts.changePassword)":
+        return this.changePassword(request as RequestChangePassword);
       case "pri(accounts.removeAccount)":
         return this.removeAccount(request as RequestRemoveAccout);
       case "pri(accounts.changeAccountName)":

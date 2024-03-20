@@ -311,5 +311,15 @@
     "tx_send":"Transaction sent",
     "error_fetching_swaps": "Error fetching swaps",
     "error_setting_max_amount": "Error setting max amount"
+  },
+  "change_password": {
+    "title": "Change your password",
+    "current_password": "Current password",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "password_tip": "Use letters, numbers and characters to add extra security.",
+    "yes_i_understand": "Yes, I understand",
+    "password_changed": "Password changed",
+    "save": "Save"
   }
 }

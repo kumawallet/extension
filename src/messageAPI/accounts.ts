@@ -1,12 +1,12 @@
 import {
   RequestChangeAccountName,
+  RequestChangePassword,
   RequestCreateAccount,
   RequestDeriveAccount,
   RequestGetAccount,
   RequestGetAllAccounts,
   RequestImportAccount,
   RequestRemoveAccout,
-  RequestRestorePassword,
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 import Account from "@src/storage/entities/Account";
@@ -18,8 +18,8 @@ export const accountMessages = {
   importAccount: (params: RequestImportAccount) => {
     return sendMessage("pri(accounts.importAccount)", params);
   },
-  restorePassword: (params: RequestRestorePassword) => {
-    return sendMessage("pri(accounts.restorePassword)", params);
+  changePassword: (params: RequestChangePassword) => {
+    return sendMessage("pri(accounts.changePassword)", params);
   },
   removeAccount: (params: RequestRemoveAccout) => {
     return sendMessage("pri(accounts.removeAccount)", params);
