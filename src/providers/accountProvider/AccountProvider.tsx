@@ -242,24 +242,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const restorePassword = useCallback(
-    async ({ privateKeyOrSeed, password: newPassword }: AccountFormType) => {
-      try {
-        if (!privateKeyOrSeed) throw new Error("recovery_phrase_required");
-        if (!newPassword) throw new Error("password_required");
-        await messageAPI.restorePassword({
-          privateKeyOrSeed,
-          newPassword,
-        });
-        return true;
-      } catch (error) {
-        captureError(error);
-        showErrorToast(tCommon("failed_to_restore_password"));
-        return false;
-      }
-    },
-    []
-  );
 
   useEffect(() => {
     if (selectedChain?.id) {
@@ -282,7 +264,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         importAccount,
         createAccount,
         updateAccountName,
-        restorePassword,
+
       }}
     >
       {children}
