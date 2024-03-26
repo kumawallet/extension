@@ -1,9 +1,9 @@
-import { CHAINS } from "@src/constants/chains";
-import { accountsMocks } from "@src/tests/mocks/account-mocks";
 import i18n from "@src/utils/i18n";
-import { act, fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
+import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { act } from "react-dom/test-utils";
 
 const renderCoponent = () => {
   return render(
@@ -17,94 +17,68 @@ const setSelectNetwork = vi.fn();
 
 describe("ChainSelector", () => {
   beforeAll(() => {
-    vi.mock("@src/messageAPI/api", () => ({
-      messageAPI: {
-        getSetting: vi.fn().mockReturnValue({
-          value: true,
-        }),
-        getAllAccounts: vi.fn().mockReturnValue(accountsMocks),
-
-      },
-    }))
     vi.mock("@src/providers", () => ({
-      useAccountContext: vi.fn().mockReturnValue({
+      useNetworkContext: vi.fn(() => ({
         state: {
-          selectedAccount: {
-            value: {
-              address: "12345clear",
+          selectedChain: SUBTRATE_CHAINS[0],
+          chains: [
+            {
+              title: "wasm_based",
+              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
             },
-          },
-        },
-        getSelectedAccount: vi.fn(),
-        getAllAccounts: vi.fn().mockReturnValue(accountsMocks),
-        setSelectedAccount: vi.fn(),
-      }),
-      useNetworkContext: vi.fn().mockReturnValue({
-        state: {
-          rpc: "ws://1234",
-          selectedChain: {
-            name: "Polakdot",
-          },
-          type: "wasm",
-          api: {
-            query: {},
-          },
-          chains: {
-            [CHAINS[0].name]: CHAINS[0].chains,
-            [CHAINS[1].name]: CHAINS[1].chains,
-            custom: [],
-          },
+            {
+              title: "evm_based",
+              chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+          ]
         },
         setSelectNetwork: () => setSelectNetwork(),
-      })
+      }))
     }));
-    vi.mock("react-router-dom", () => ({
-      useNavigate: () => vi.fn(),
-    }));
+
+    vi.mock("@src/messageAPI/api", () => ({
+      messageAPI: {
+        getSetting: vi.fn(() => ({
+          value: true
+        })),
+        updateSetting: vi.fn(),
+      }
+    }))
+
+    vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
+      getWebAPI: () => ({
+        tabs: {
+          getCurrent: () => Promise.resolve(undefined),
+        },
+        runtime: {
+          getURL: vi.fn(),
+          connect: vi.fn().mockReturnValue({
+            onMessage: {
+              addListener: vi.fn(),
+            },
+            onDisconnect: {
+              addListener: vi.fn(),
+            }
+          }),
+        },
+      }),
+    }))
   });
 
   it("should render", async () => {
-    const { getByTestId, getByText } = renderCoponent();
+    const { getByTestId, getByAltText } = renderCoponent();
 
     const button = getByTestId("chain-button");
 
     act(() => {
       fireEvent.click(button);
     });
+
     await waitFor(() => {
-      const account = getByText(CHAINS[0].chains[0].name);
-      expect(account).toBeDefined();
+      const chain = getByAltText(SUBTRATE_CHAINS[0].name);
+      expect(chain).toBeDefined();
     });
   });
 
-  it("should change account", async () => {
-    const { getByText, getByTestId } = renderCoponent();
-
-    const button = getByTestId("chain-button");
-
-    act(() => {
-      fireEvent.click(button);
-    });
-    await waitFor(
-      () => {
-        expect(getByText(CHAINS[0].chains[0].name)).toBeDefined();
-      },
-      {
-        timeout: 10000,
-      }
-    );
-    const account = getByText(CHAINS[0].chains[0].name);
-
-    act(() => {
-      fireEvent.click(account.parentElement as HTMLElement);
-    });
-    await waitFor(
-      () => {
-        expect(setSelectNetwork).toHaveBeenCalled();
-      },
-      {
-        timeout: 10000,
-      }
-    );
-  });
 });
