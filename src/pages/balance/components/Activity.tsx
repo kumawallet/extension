@@ -16,8 +16,6 @@ import {
 import { messageAPI } from "@src/messageAPI/api";
 import { Chain } from "@src/types";
 import { estimatedFee } from '@src/pages/balance/components/funtions/Txfunctions'
-
-
 import { CiSearch } from "react-icons/ci";
 import { HiOutlineInboxArrowDown } from "react-icons/hi2";
 import { SendIcon } from "@src/components/icons/SendIcon"

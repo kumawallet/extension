@@ -1,10 +1,9 @@
-import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import { SelectableChain } from "./SelectableChain";
 import { render } from "@testing-library/react";
-import { Chain } from "@src/storage/entities/Chains";
-import { POLKADOT } from "@src/constants/chains";
+import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { Chain } from "@src/types";
 
-const OPTION_CHAINS_MOCKS: Chain[] = [POLKADOT];
+const OPTION_CHAINS_MOCKS: Chain[] = SUBTRATE_CHAINS;
 
 describe("SelectableChain", () => {
   beforeAll(() => {
@@ -19,12 +18,12 @@ describe("SelectableChain", () => {
     const { getByText } = render(
       <SelectableChain
         canSelectChain={true}
-        selectedChain={selectedEVMChainMock}
+        selectedChain={SUBTRATE_CHAINS[0]}
         optionChains={OPTION_CHAINS_MOCKS}
       />
     );
 
-    expect(getByText(selectedEVMChainMock.name)).toBeDefined();
+    expect(getByText(SUBTRATE_CHAINS[0].name)).toBeDefined();
   });
 
   it("should render null", () => {

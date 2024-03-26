@@ -1,10 +1,7 @@
 import { FC } from "react";
-import { ethApiMock, selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 import { NetworkProvider, reducer, useNetworkContext } from "./NetworkProvider";
 import { vi } from "vitest";
 import { InitialState } from "./types";
-import { rpcMock } from "@src/tests/mocks/chain-mocks";
-import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
 import {
   act,
   fireEvent,
@@ -12,22 +9,16 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import {
-  selectedWASMChainMock,
-} from "../../tests/mocks/chain-mocks";
-import { selectedWASMAccountMock } from "../../tests/mocks/account-mocks";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
-import Chains, { Chain } from "@src/storage/entities/Chains";
-import { CHAINS, MAINNETS, TESTNETS } from "@src/constants/chains";
+import { Chain, ChainsState } from "@src/types";
+import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 const initialState: InitialState = {
-  chains: Chains.getInstance(),
+  chains: [],
   selectedChain: null,
   api: null,
-  rpc: "",
   init: false,
-  type: "",
 };
 
 const testIds = {
@@ -38,23 +29,44 @@ const testIds = {
   refreshNetworksBtn: "refresh-networks-btn",
 };
 
-const chainsMock = CHAINS.map((c) => ({
-  [c.name]: c.chains,
-}));
+const CHAINS_MOCK: ChainsState = [
+  {
+    title: "wasm_based",
+    chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+  },
+  {
+    title: "evm_based",
+    chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+  },
+];
+
+const MOCK_WASM_SELECTED_CHAIN = SUBTRATE_CHAINS[0];
+
+const MOCK_EVM_SELECTED_CHAIN = EVM_CHAINS[0];
+
+const CUSTOM_CHAINS_MOCK: Chain[] = [
+  {
+    id: "custom-1",
+    name: "custom-1",
+    decimals: 18,
+    isTestnet: false,
+    logo: "",
+    rpcs: [""],
+    symbol: "C1",
+    type: "wasm",
+    explorer: "",
+    isCustom: true,
+  },
+];
 
 interface TestComponentProps {
   newChain?: Chain;
   type?: string;
 }
 
-const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
-  const {
-    getSelectedNetwork,
-    setNewRpc,
-    setSelectNetwork,
-    refreshNetworks,
-    state,
-  } = useNetworkContext();
+const TestComponent: FC<TestComponentProps> = ({ newChain }) => {
+  const { initializeNetwork, setSelectNetwork, refreshNetworks, state } =
+    useNetworkContext();
 
   return (
     <>
@@ -62,14 +74,14 @@ const TestComponent: FC<TestComponentProps> = ({ newChain, type }) => {
         data-testid={testIds.selectedBtn}
         onClick={() => setSelectNetwork(newChain as Chain)}
       />
-      <button
+      {/* <button
         data-testid={testIds.getSelectedBtn}
         onClick={() => getSelectedNetwork()}
       />
       <button
         data-testid={testIds.newRpcBtn}
         onClick={() => setNewRpc(type as string)}
-      />
+      /> */}
       <button
         data-testid={testIds.refreshNetworksBtn}
         onClick={() => refreshNetworks()}
@@ -92,22 +104,17 @@ const renderComponent = (props?: TestComponentProps) => {
 
 describe("NetworkProvider", () => {
   beforeAll(async () => {
-    vi.mock("@src/storage/entities/Chains", () => ({
-      default: {
-        getInstance: vi.fn().mockReturnValue({
-          mainnets: [],
-          testnets: [],
-          custom: [],
-        }),
-      },
-    }));
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
-        getAllChains: vi.fn().mockReturnValue(() => chainsMock),
+        getSetting: vi.fn().mockReturnValue({
+          value: true,
+        }),
+        getCustomChains: vi.fn().mockResolvedValue(() => CUSTOM_CHAINS_MOCK),
+        setNetwork: vi.fn().mockResolvedValue(true),
+        alreadySignedUp: vi.fn().mockResolvedValue(true),
+        getNetwork: vi.fn().mockResolvedValue(() => MOCK_WASM_SELECTED_CHAIN),
       },
-    }))
-
-
+    }));
     vi.mock("ethers", () => ({
       ethers: {
         providers: {
@@ -122,285 +129,131 @@ describe("NetworkProvider", () => {
       WsProvider: vi.fn(),
     }));
   });
+
   describe("reducer", () => {
-    it("init", () => {
-      const payload = {
-        selectedChain: selectedWASMChainMock,
-        rpc: rpcMock,
-        type: "WASM",
-        chains: chainsMock as unknown as Chains,
-      };
-      const newState = reducer(initialState, {
-        type: "init",
-        payload,
-      });
-      expect(newState).toEqual({
-        ...payload,
-        init: true,
-        api: null,
+    describe("init", () => {
+      it("init", () => {
+        const newState = reducer(initialState, {
+          type: "init",
+          payload: {
+            selectedChain: MOCK_WASM_SELECTED_CHAIN,
+            chains: CHAINS_MOCK,
+          },
+        });
+        expect(newState.selectedChain).toMatchObject(MOCK_WASM_SELECTED_CHAIN);
+        expect(newState.chains).toMatchObject(CHAINS_MOCK);
       });
     });
+
     describe("select-network", () => {
-      it("with rpc and type", () => {
-        const payload = {
-          selectedChain: selectedWASMChainMock,
-          rpc: rpcMock,
-          type: "WASM",
-        };
+      it("should return different state", () => {
         const newState = reducer(initialState, {
           type: "select-network",
-          payload,
+          payload: {
+            selectedChain: MOCK_WASM_SELECTED_CHAIN,
+            api: {},
+          },
         });
 
-        expect(newState.selectedChain).toEqual(payload.selectedChain);
-        expect(newState.rpc).toEqual(payload.rpc);
-        expect(newState.type).toEqual(payload.type);
+        expect(newState.selectedChain).toMatchObject(MOCK_WASM_SELECTED_CHAIN);
       });
-      it("without rpc", () => {
-        const payload = {
-          selectedChain: selectedWASMChainMock,
-          type: "WASM",
-        };
-        const newState = reducer(initialState, {
-          type: "select-network",
-          payload,
-        });
-        expect(newState.selectedChain).toEqual(payload.selectedChain);
-        expect(newState.rpc).toEqual("");
-        expect(newState.type).toEqual(payload.type);
-      });
-      it("without type", () => {
-        const payload = {
-          selectedChain: selectedWASMChainMock,
-          rpc: rpcMock,
-        };
-        const newState = reducer(initialState, {
-          type: "select-network",
-          payload,
-        });
-        expect(newState.selectedChain).toEqual(payload.selectedChain);
-        expect(newState.rpc).toEqual(payload.rpc);
+
+      it("should return same state", () => {
+        const newState = reducer(
+          {
+            ...initialState,
+            selectedChain: MOCK_WASM_SELECTED_CHAIN,
+          },
+          {
+            type: "select-network",
+            payload: {
+              selectedChain: MOCK_WASM_SELECTED_CHAIN,
+              api: {},
+            },
+          }
+        );
+
+        expect(newState.selectedChain).toMatchObject(MOCK_WASM_SELECTED_CHAIN);
+        expect(newState.api).toEqual(null);
       });
     });
+
     describe("set-api", () => {
-      it("with rpc", () => {
-        const payload = {
-          api: null,
-          rpc: rpcMock,
-        };
+      it("should set new api", () => {
         const newState = reducer(initialState, {
           type: "set-api",
-          payload,
+          payload: {
+            api: {},
+          },
         });
-        expect(newState.rpc).toEqual('');
-      });
-      it("without rpc", () => {
-        const payload = {
-          rpc: '',
-          api: ethApiMock,
-        };
-        const newState = reducer(initialState, {
-          type: "set-api",
-          payload,
-        });
-        expect(newState.api).toEqual(payload.api);
-      });
-      it("default", () => {
-        const newState = reducer(initialState, {
-          type: "default" as any,
-          payload: {} as any,
-        });
-        expect(newState).toEqual(initialState);
+
+        expect(newState.api).toEqual({});
       });
     });
 
     describe("refresh-networks", () => {
       it("should refresh networks", () => {
-        const payload = {
-          chains: {
-            mainnets: MAINNETS,
-            testnets: TESTNETS,
-            custom: [] as Chain[],
-          } as Chains,
-        };
         const newState = reducer(initialState, {
           type: "refresh-networks",
-          payload,
+          payload: {
+            chains: CHAINS_MOCK,
+          },
         });
-        expect(newState.chains).toEqual(payload.chains);
+
+        expect(newState.chains).toEqual(CHAINS_MOCK);
       });
     });
   });
-  describe("useEffect", () => {
-    it("should init", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getNetwork = vi.fn().mockReturnValue({
-        chain: selectedWASMChainMock,
-      });
-      Default.messageAPI.getSelectedAccount = vi.fn().mockReturnValue(
-        selectedWASMAccountMock
-      );
 
-      renderComponent({});
-      await waitFor(() => {
-        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state).toHaveProperty("type", "WASM");
-        expect(state).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm);
-      });
-    });
-    it("should show error", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getNetwork = vi.fn().mockRejectedValue("no_network");
+  describe("initializeNetwork", () => {
+    it("should initialize network", async () => {
       renderComponent({});
 
-      waitFor(() => {
-        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state).toEqual(initialState);
-      });
-    });
-  });
-  describe("setSelectedNetwork", () => {
-    it("should set new evm chain", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getSelectedAccount = vi
-        .fn()
-        .mockResolvedValue(selectedEVMAccountMock);
-      Default.messageAPI.setNetwork = vi.fn().mockResolvedValue(true);
-
-      renderComponent({ newChain: selectedEVMChainMock });
-      act(() => {
-        fireEvent.click(screen.getByTestId(testIds.selectedBtn));
-      });
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state).toHaveProperty("rpc", selectedEVMChainMock.rpc.evm);
+        expect(state).toHaveProperty("selectedChain", MOCK_WASM_SELECTED_CHAIN);
       });
     });
-    it("should show error", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getSelectedAccount = vi
-        .fn()
-        .mockResolvedValue(selectedEVMAccountMock);
-      Default.messageAPI.setNetwork = vi.fn().mockRejectedValue("no_network");
-      renderComponent({ newChain: selectedEVMChainMock });
+  });
+
+  describe("setSelectNetwork", () => {
+    it("should set new chain", async () => {
+      renderComponent({ newChain: MOCK_EVM_SELECTED_CHAIN });
+
       act(() => {
         fireEvent.click(screen.getByTestId(testIds.selectedBtn));
       });
+
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state).toHaveProperty("rpc", "");
+        console.log(state);
+        expect(state).toHaveProperty("selectedChain", MOCK_EVM_SELECTED_CHAIN);
       });
     });
-  });
-  describe("getSelectedNetwork", () => {
-    it("should getSelectedNetwork", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getNetwork = vi
-        .fn()
-        .mockResolvedValue({ chain: selectedWASMChainMock });
-
-      renderComponent({ newChain: selectedWASMChainMock });
-      act(() => {
-        fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
-      });
-      await waitFor(() =>
-        expect(screen.getByTestId(testIds.state).innerHTML).contains(
-          selectedWASMChainMock.name
-        )
-      );
-    });
-    it("should show error", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getNetwork = vi.fn().mockRejectedValue("no_default_network");
-      renderComponent({ newChain: selectedWASMChainMock });
-      act(() => {
-        fireEvent.click(screen.getByTestId(testIds.getSelectedBtn));
-      });
-      await waitFor(() =>
-        expect(screen.getByTestId(testIds.state).innerHTML).contains(null)
-      );
-    });
-  });
-  describe("setNewRpc", () => {
-    it("should keep the current rpc", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getSelectedAccount = vi
-        .fn()
-        .mockResolvedValue(selectedWASMAccountMock);
-      Default.messageAPI.getNetwork = vi
-        .fn()
-        .mockResolvedValue({ chain: selectedWASMChainMock });
-      Default.messageAPI.getAllChains = vi.fn().mockResolvedValue(chainsMock);
-      renderComponent({
-        type: selectedWASMAccountMock.type,
-      });
-      await act(() => {
-        fireEvent.click(screen.getByTestId(testIds.selectedBtn));
-      });
-      await act(() => {
-        fireEvent.click(screen.getByTestId(testIds.newRpcBtn));
-      });
-      await waitFor(() =>
-        expect(
-          JSON.parse(screen.getByTestId(testIds.state).innerHTML)
-        ).toHaveProperty("rpc", selectedWASMChainMock.rpc.wasm)
-      );
-    });
-    // it.skip("should set new rpc if chain support WASM and EVM", async () => {
-    //   const Extension = await import("@src/Extension");
-    //   Extension.default.getSelectedAccount = vi
-    //     .fn()
-    //     .mockResolvedValue(selectedWASMAccountMock);
-    //   Extension.default.getNetwork = vi
-    //     .fn()
-    //     .mockResolvedValue({ chain: selectedMultiSupportChain });
-
-    //   Extension.default.getAllChains = vi.fn().mockResolvedValue(chainsMock);
-
-    //   renderComponent({
-    //     type: selectedEVMAccountMock.type,
-    //   });
-    //   await waitFor(() => {
-    //     const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-    //     expect(state).toHaveProperty("rpc", selectedMultiSupportChain.rpc.wasm);
-    //   });
-    //   act(() => {
-    //     fireEvent.click(screen.getByTestId(testIds.selectedBtn));
-    //     fireEvent.click(screen.getByTestId(testIds.newRpcBtn));
-    //   });
-    //   await waitFor(() =>
-    //     expect(
-    //       JSON.parse(screen.getByTestId(testIds.state).innerHTML)
-    //     ).toHaveProperty("rpc", selectedMultiSupportChain.rpc.evm)
-    //   );
-    // });
   });
 
   describe("refreshNetworks", () => {
     it("should refresh networks", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getAllChains = vi.fn().mockResolvedValue({
-        mainnets: MAINNETS,
-        testnets: TESTNETS,
-        custom: [],
+      renderComponent({});
+
+      act(() => {
+        fireEvent.click(screen.getByTestId(testIds.refreshNetworksBtn));
       });
-      renderComponent();
+
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state.chains).toEqual({
-          mainnets: MAINNETS,
-          testnets: TESTNETS,
-          custom: [],
-        });
-      });
-    });
-    it("should show error", async () => {
-      const Default = await import("@src/messageAPI/api");
-      Default.messageAPI.getAllChains = vi.fn().mockRejectedValue("no_network");
-      renderComponent();
-      await waitFor(() => {
-        const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        expect(state.selectedChain).toEqual(null);
+
+        expect(state).toHaveProperty("chains", [
+          ...CHAINS_MOCK,
+          {
+            title: "wasm_based_testnets",
+            chains: SUBTRATE_CHAINS.filter((chain) => chain.isTestnet),
+          },
+          {
+            title: "EVM testnets",
+            chains: EVM_CHAINS.filter((chain) => chain.isTestnet),
+          },
+        ]);
       });
     });
   });

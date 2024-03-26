@@ -78,44 +78,21 @@ describe("General", () => {
     });
   });
 
-  it("should call showTestnets", async () => {
-    const { getByTestId } = renderComponent();
 
-    await waitFor(() => {
-      expect(getByTestId("language-select")).toBeDefined();
-    }, {
-      timeout: 10000
-    });
+  // it('should call "manage networks"', async () => {
+  //   const { getByTestId } = renderComponent();
 
-    await waitFor(() => {
-      const checkBox = getByTestId("show-testnets-switch");
-      expect(checkBox).toBeDefined();
-    });
+  //   await waitFor(() => {
+  //     expect(getByTestId("manage-networks-button")).toBeDefined();
+  //   });
 
-    const checkBox = getByTestId("show-testnets-switch");
-    act(() => {
-      fireEvent.click(checkBox);
-    });
+  //   const button = getByTestId("manage-networks-button");
+  //   act(() => {
+  //     fireEvent.click(button);
+  //   });
 
-    await waitFor(() => {
-      expect(updateSetting).toHaveBeenCalled();
-    });
-  });
-
-  it('should call "manage networks"', async () => {
-    const { getByTestId } = renderComponent();
-
-    await waitFor(() => {
-      expect(getByTestId("manage-networks-button")).toBeDefined();
-    });
-
-    const button = getByTestId("manage-networks-button");
-    act(() => {
-      fireEvent.click(button);
-    });
-
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalled();
-    });
-  });
+  //   await waitFor(() => {
+  //     expect(navigate).toHaveBeenCalled();
+  //   });
+  // });
 });

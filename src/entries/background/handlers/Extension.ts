@@ -476,6 +476,7 @@ export default class Extension {
             let tip = "";
 
             events.forEach(({ event }) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const eventData = event.toHuman()?.data as any;
               if (eventData?.actualFee) {
                 fee = eventData.actualFee.replace(/,/g, "");
@@ -488,6 +489,7 @@ export default class Extension {
 
             const hash = txHash.toString();
             const date = Date.now();
+
             const activity: Partial<Record> = {
               fromBlock: block.header.number.toString(),
               address: destinationAddress,
@@ -513,7 +515,8 @@ export default class Extension {
                   id: asset.id,
                   // color: asset.color,
                 },
-              },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any,
             };
             await this.addActivity({
               txHash: hash,
@@ -633,7 +636,8 @@ export default class Extension {
           asset: {
             id: asset.id,
           },
-        },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
       };
       await this.addActivity({ txHash, record: activity as Record });
       this.sendUpdateActivityMessage();

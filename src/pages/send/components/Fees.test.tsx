@@ -2,7 +2,6 @@ import i18n from "@src/utils/i18n";
 import { render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Fees } from "./Fees";
-import { selectedEVMChainMock } from "@src/tests/mocks/chain-mocks";
 
 const evmFees = {
   gasLimit: "21000",
@@ -24,8 +23,9 @@ describe("Fees", () => {
     vi.mock("@src/providers", () => ({
       useNetworkContext: () => ({
         state: {
-          type: "EVM",
-          selectedChain: selectedEVMChainMock,
+          selectedChain: {
+            type: "evm",
+          },
         },
       }),
     }));
@@ -58,9 +58,8 @@ describe("Fees", () => {
 
     const { container } = renderComponent({
       ...evmFees,
-      estimatedTotal: "1 USDT + 0.001 ETH"
+      estimatedTotal: "1 USDT + 0.001 ETH",
     });
-
 
     expect(container.innerHTML).contain("1 USDT");
   });

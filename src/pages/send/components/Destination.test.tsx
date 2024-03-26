@@ -19,7 +19,7 @@ describe("Destination", () => {
       useNetworkContext: () => ({
         state: {
           selectedChain: selectedEVMChainMock,
-          type: "EVM"
+          type: "evm"
         },
       }),
       useAccountContext: () => ({
@@ -64,7 +64,7 @@ describe("Destination", () => {
 
           if (val === "to") return {
             name: "Ethereum",
-            supportedAccounts: ["EVM"],
+            type: "evm",
           }
 
         }),
