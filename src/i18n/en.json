@@ -139,7 +139,7 @@
     "manage_assets": "Manage assets",
     "wasm_based": "Substrate based",
     "evm_based": "EVM",
-    "wasm_baed_testnets": "Substrate based testnets",
+    "wasm_based_testnets": "Substrate based testnets",
     "evm_based_testnets": "EVM testnets"
   },
   "settings": {

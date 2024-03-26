@@ -24,16 +24,12 @@ export type Action =
       payload: {
         chains: Chains;
         selectedChain: SelectedChain;
-        rpc: string;
-        type: string;
       };
     }
   | {
       type: "select-network";
       payload: {
         selectedChain: SelectedChain;
-        rpc?: string;
-        type?: string;
         api?: Api;
       };
     }
