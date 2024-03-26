@@ -7,8 +7,6 @@ import { captureError } from "@src/utils/error-handling";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
 import Register from "@src/storage/entities/registry/Register";
-import { Chain } from "@src/storage/entities/Chains";
-import { AccountType } from "@src/accounts/types";
 import { isHex } from "@polkadot/util";
 import { messageAPI } from "@src/messageAPI/api";
 
@@ -49,6 +47,7 @@ export const Destination = () => {
         try {
           const { contacts, ownAccounts, recent } =
             await messageAPI.getRegistryAddresses();
+
 
           let _ownAccounts: Contact[] = [];
 
