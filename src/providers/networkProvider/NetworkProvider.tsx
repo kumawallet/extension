@@ -47,10 +47,7 @@ const getChains = async (): Promise<ChainsState> => {
       },
     ];
 
-    // TODO: conditional for customs
-
     let customChains = await messageAPI.getCustomChains();
-
 
     if (customChains.length > 0) {
       // @ts-expect-error --- To handle old chain format
@@ -77,7 +74,7 @@ const getChains = async (): Promise<ChainsState> => {
       chains.push(
         ...[
           {
-            title: "wasm_baed_testnets",
+            title: "wasm_based_testnets",
             chains: SUBTRATE_CHAINS.filter((chain) => chain.isTestnet),
           },
           {
@@ -189,8 +186,6 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         payload: {
           chains,
           selectedChain,
-          rpc: "",
-          type: "",
         },
       });
     } catch (error) {
@@ -218,8 +213,6 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "select-network",
         payload: {
           selectedChain: chain,
-          rpc: "",
-          type: "",
           api: null,
         },
       });
