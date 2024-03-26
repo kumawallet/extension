@@ -132,13 +132,19 @@ export default class AccountManager {
     await BackUp.set(backup);
   }
 
-  static async restorePassword(
+  static async changePassword(
     privateKeyOrSeed: string,
-    password: string
+    password: string,
+    newPassword: string
   ): Promise<void> {
     const backup = await BackUp.get<BackUp>();
     if (!backup || !backup.data) throw new Error("backup_not_found");
-    await Auth.restorePassword(backup.data, password, privateKeyOrSeed);
+    await Auth.restorePassword(
+      backup.data,
+      password,
+      newPassword,
+      privateKeyOrSeed
+    );
     await AccountManager.saveBackup(privateKeyOrSeed);
   }
 }

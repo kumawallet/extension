@@ -1,50 +1,45 @@
-
-
-import { useEffect, useState } from 'react'
-import { Switch } from '@headlessui/react'
-import { messageAPI } from '@src/messageAPI/api'
-import { useNetworkContext } from '@src/providers'
-import { SettingKey, SettingType } from '@src/storage/entities/settings/types'
-import { useTranslation } from 'react-i18next'
+import { useEffect, useState } from "react";
+import { Switch } from "@headlessui/react";
+import { messageAPI } from "@src/messageAPI/api";
+import { useNetworkContext } from "@src/providers";
+import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
+import { useTranslation } from "react-i18next";
 
 export const ShowTestnets = () => {
   const { t } = useTranslation("general_settings");
 
-  const [showTestnets, setShowTestnets] = useState(false)
-  const { state: { selectedChain }, refreshNetworks } = useNetworkContext()
+  const [showTestnets, setShowTestnets] = useState(false);
+  const {
+    state: { selectedChain },
+    refreshNetworks,
+  } = useNetworkContext();
 
   useEffect(() => {
-
     (async () => {
-
       const setting = await messageAPI.getSetting({
         key: SettingKey.SHOW_TESTNETS,
-        type: SettingType.GENERAL
-      })
+        type: SettingType.GENERAL,
+      });
 
-      const showTestnets = (setting?.value as boolean) || false
+      const showTestnets = (setting?.value as boolean) || false;
 
-      setShowTestnets(showTestnets)
-
-    })()
-
-  }, [])
+      setShowTestnets(showTestnets);
+    })();
+  }, []);
 
   const onToggle = async () => {
-    setShowTestnets(value => !value);
+    setShowTestnets((value) => !value);
     await messageAPI.updateSetting({
       type: SettingType.GENERAL,
       key: SettingKey.SHOW_TESTNETS,
-      value: !showTestnets
-    })
-    refreshNetworks()
-  }
+      value: !showTestnets,
+    });
+    refreshNetworks();
+  };
 
   return (
-    <div
-      className="flex justify-between items-center gap-2"
-    >
-      <p className="text-lg font-medium">{t('show_testnets')}</p>
+    <div className="flex justify-between items-center gap-2">
+      <p className="text-lg font-medium">{t("show_testnets")}</p>
 
       <div className="flex items-center justify-end">
         <Switch.Group>
@@ -55,9 +50,7 @@ export const ShowTestnets = () => {
               aria-disabled={selectedChain?.isTestnet}
               checked={showTestnets}
               onChange={onToggle}
-              className={`${showTestnets
-                ? `bg-primary-default`
-                : "bg-custom-gray-bg"
+              className={`${showTestnets ? `bg-primary-default` : "bg-custom-gray-bg"
                 } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50`}
             >
               <span className="sr-only">{t("show_testnets")}</span>
@@ -70,5 +63,5 @@ export const ShowTestnets = () => {
         </Switch.Group>
       </div>
     </div>
-  )
-}
+  );
+};

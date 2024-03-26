@@ -73,6 +73,7 @@ export default ({ mode }: { mode: string }) => {
           "**/src/pages/balance/Balance.tsx",
           "**/src/pages/send/Send.tsx",
           "**/src/components/ui/**",
+          "**/src/components/icons/**",
         ],
       },
     },

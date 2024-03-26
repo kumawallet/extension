@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-
 import {
-  AccountForm,
   Balance,
   ActivityDetail,
   ManageAssets,
@@ -17,6 +14,8 @@ import {
   Swap,
   CreateWallet,
   ImportWallet,
+  ChangePassword,
+
 } from "@src/pages";
 import {
   Advanced,
@@ -27,7 +26,6 @@ import {
   Security,
   Settings
 } from "@src/pages/settings";
-import { useAccountContext } from "@src/providers";
 import {
   BALANCE,
   ACTIVITY_DETAIL,
@@ -36,7 +34,6 @@ import {
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
   RECEIVE,
-  RESTORE_PASSWORD,
   SEND,
   SETTINGS_ADVANCED,
   SETTINGS_BUG,
@@ -50,6 +47,8 @@ import {
   SIGN_MESSAGE,
   SWAP,
   WELCOME,
+  CHANGE_PASSWORD,
+
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -78,10 +77,6 @@ const getInitialEntry = (query: string) => {
 };
 
 export const Routes = () => {
-  const { t } = useTranslation("account_form");
-
-  const { restorePassword } = useAccountContext();
-
   const [homeRoute, setHomeRoute] = useState(<Loading />);
 
   const [isInit, setIsInit] = useState(false);
@@ -113,7 +108,6 @@ export const Routes = () => {
     if (isInit) {
       getHomeRoute();
     }
-    // getWalletStatus();
   }, [isInit]);
 
   const getHomeRoute = async () => {
@@ -184,28 +178,9 @@ export const Routes = () => {
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
         <Route path={SWAP} element={<Swap />} />
-
         <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
-        {/* <Route
-          path={RESTORE_PASSWORD}
-          element={
-            <AccountForm
-              title={t("restore.title")}
-              onSubmitFn={restorePassword}
-              buttonText={t("restore.button_text")}
-              resetPassword={true}
-              signUp={false}
-              fields={{
-                privateKeyOrSeed: true,
-              }}
-              afterSubmitMessage={t("restore.submit_message")}
-              goAfterSubmit={SIGNIN}
-              backButton
-              callback={() => null}
-            />
-          }
-        /> */}
+        <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
 
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />

@@ -33,12 +33,14 @@ describe("Receive", () => {
       getWebAPI: () => ({
         tabs: {
           getCurrent: () => Promise.resolve(undefined),
-          create: () => vi.fn(),
         },
         runtime: {
           getURL: vi.fn(),
           connect: vi.fn().mockReturnValue({
             onMessage: {
+              addListener: vi.fn(),
+            },
+            onDisconnect: {
               addListener: vi.fn(),
             },
           }),

@@ -61,7 +61,7 @@ export const Swap = () => {
     // isLoadingActiveSwaps,
     isLoadingBuyAsset,
     isLoadingSellAsset,
-    isLoadingSellPairs,
+
     isValidWASMAddress,
     minSellAmount,
     mustConfirmTx,
@@ -145,7 +145,7 @@ export const Swap = () => {
                   defaulValue={assetToBuy as SwapAsset}
                   label={t("transfer_to") as string}
                   isLoading={
-                    isLoading || isLoadingSellPairs || isLoadingAssets
+                    isLoading || isLoadingAssets
                   }
                   position="right"
                   isReadOnly={isCreatingSwap}
@@ -221,7 +221,7 @@ export const Swap = () => {
                       value={assetToBuy as SwapAsset}
                       options={assetsToBuy}
                       isLoading={
-                        isLoading || isLoadingSellPairs || isLoadingAssets
+                        isLoading || isLoadingAssets
                       }
                       onChange={(asset) =>
                         handleAssetChange("buy", asset)

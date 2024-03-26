@@ -393,8 +393,12 @@ describe("AccountManager", () => {
       const ethers = await import("ethers");
       ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
 
-      const result = await AccountManager.restorePassword(
-        "recovery phrase",
+      const MOCK_SEED =
+        "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match";
+
+      const result = await AccountManager.changePassword(
+        MOCK_SEED,
+        "Test.123",
         "Test.123"
       );
 
@@ -405,10 +409,10 @@ describe("AccountManager", () => {
       Backup.get = vi.fn().mockImplementation(() => null);
 
       try {
-        await AccountManager.restorePassword(
-          "invalid recovery phrase",
-          "Test.123"
-        );
+        const MOCK_SEED =
+          "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match";
+
+        await AccountManager.changePassword(MOCK_SEED, "Test.123", "Test.123");
       } catch (error) {
         expect(String(error)).toEqual("Error: backup_not_found");
       }

@@ -22,6 +22,7 @@ import { stylesActivity } from "@src/pages/balance/components/style/activity";
 import { SwapIcon } from "@src/components/icons/SwapIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import { transformAddress } from "@src/utils/account-utils";
+import { RecordStatus } from "@src/storage/entities/activity/types";
 
 const isSameAddress = (address1: string, address2: string) => {
   return (
@@ -250,7 +251,7 @@ export const Activity = () => {
                   </div>
                 </div>
               </div>
-              <Status status={status} />
+              <Status status={status as RecordStatus} />
               <div className={stylesActivity.countainerDivEnd}>
                 <div className={stylesActivity.flexItemsCenter}>
                   <div

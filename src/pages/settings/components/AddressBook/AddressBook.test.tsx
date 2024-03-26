@@ -3,6 +3,7 @@ import { I18nextProvider } from "react-i18next";
 import { AddressBook } from "./AddressBook";
 import i18n from "@src/utils/i18n";
 import { en } from "@src/i18n";
+import { PropsWithChildren } from "react";
 
 const renderComponent = () => {
   return render(
@@ -12,30 +13,28 @@ const renderComponent = () => {
   );
 };
 
-const saveAddress = vi.fn().mockResolvedValue([]);
-
+const saveContact = vi.fn();
 
 describe("AddressBook", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
       useNavigate: () => vi.fn(),
     }));
-    vi.mock("@src/storage/entities/registry/Contact", () => ({
-      default: class Contact {
-        constructor() { }
-      }
-    }))
-    vi.mock("@src/storage/entities/BaseEntity", () => ({
-      default: class BaseEntity {
-        constructor() { }
-      }
-    }))
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
         getContacts: vi.fn().mockReturnValue([]),
         saveContact: () => saveContact(),
       }
     }))
+    vi.mock("./Add-Address/Add-Address", async () => {
+      const original = (await vi.importActual('./Add-Address/Add-Address')) as object;
+
+      return {
+        ...original,
+        Modal: ({ children }: PropsWithChildren) => <div data-testid="modal">{children}</div>,
+      };
+
+    })
   });
 
   it("should render", async () => {
@@ -84,10 +83,11 @@ describe("AddressBook", () => {
     });
 
     const newContactButton = getByTestId("new-contact");
+    fireEvent.click(newContactButton);
 
-    act(() => {
-      fireEvent.click(newContactButton);
-    });
+    await waitFor(() =>
+      getByTestId("name")
+    )
 
     const nameInput = getByTestId("name");
     const addressInput = getByTestId("address");
@@ -104,7 +104,7 @@ describe("AddressBook", () => {
       fireEvent.click(saveButton);
     });
     await waitFor(() => {
-      expect(saveAddress).toHaveBeenCalled();
+      expect(saveContact).toHaveBeenCalled();
     });
   });
 });

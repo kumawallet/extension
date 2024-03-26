@@ -152,7 +152,7 @@ describe("Extension", () => {
           value: "0x123",
           type: AccountType.WASM,
         }),
-        restorePassword: vi.fn(),
+        changePassword: vi.fn(),
         remove: vi.fn(),
         changeName: vi.fn(),
         areAccountsInitialized: vi.fn().mockReturnValue(true),
@@ -328,14 +328,31 @@ describe("Extension", () => {
     });
   });
 
-  it("should restore password", async () => {
-    const SEED =
-      "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
+  it("should change password", async () => {
+    const SelectedAccount = (
+      await import("../../../storage/entities/SelectedAccount")
+    ).default;
+    SelectedAccount.get = vi.fn().mockReturnValue({
+      value: {
+        type: AccountType.EVM,
+        address: "EVM-1234",
+        keyring: "EVM",
+      },
+      key: "EVM-1234",
+    });
+
+    const Vault = (await import("../../../storage/entities/Vault")).default;
+    Vault.getKeyring = vi.fn().mockReturnValue({
+      getKey: () => {
+        return "1234";
+      },
+    });
+
     const PASSWORD = "Test.123";
     const extension = new Extension();
 
-    const result = await extension["restorePassword"]({
-      privateKeyOrSeed: SEED,
+    const result = await extension["changePassword"]({
+      currentPassword: PASSWORD,
       newPassword: PASSWORD,
     });
     expect(result).toBe(undefined);

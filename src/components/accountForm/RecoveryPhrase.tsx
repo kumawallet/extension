@@ -20,7 +20,7 @@ export const RecoveryPhrase = () => {
 
   return (
     <>
-      <div className="relative border-[0.3px] border-[#fff5] rounded-md px-3 py-5 overflow-hidden mb-4 mt-4">
+      <div className="relative border-[0.3px] border-[#fff5] rounded-md px-3 py-3 overflow-hidden mb-4 mt-4 ">
         <div className="grid grid-cols-3 gap-y-5 text-center">
           {seed.split(" ").map((word, index) => (
             <p key={index.toString()} className="text-base">
@@ -53,7 +53,7 @@ export const RecoveryPhrase = () => {
       </div>
 
       <button
-        className="flex items-center gap-2 text-base"
+        className="flex items-center gap-2 text-sm mb-2"
         onClick={copyToClipboard}
       >
         <Icon messagePosition="left" />

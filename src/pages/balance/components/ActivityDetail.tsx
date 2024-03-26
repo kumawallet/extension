@@ -8,7 +8,6 @@ import { Footer } from "@src/pages/balance/components";
 import Contact from "@src/storage/entities/registry/Contact";
 import { NetworkIcon } from "./NetworkIcon";
 import { Status } from "@src/components/common/TxStatus";
-import { } from "@src/pages/balance/components/funtions/Txfunctions";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { Chain } from "@src/types";
 import { messageAPI } from "@src/messageAPI/api";
@@ -228,6 +227,3 @@ export const ActivityDetail = () => {
     </PageWrapper>
   );
 };
-{
-  /* */
-}

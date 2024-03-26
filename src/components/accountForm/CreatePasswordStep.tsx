@@ -18,7 +18,7 @@ export const CreatePasswordStep = () => {
   const { ref: refConfirmPassword, ...registerConfirmPassword } = register("confirmPassword")
 
   return (
-    <div className="flex flex-col gap-5 mt-6 md:mt-10">
+    <div className="flex flex-col gap-5 mt-4 md:mt-7">
       <PasswordInput
         isHidden={!showPassword}
         placeholder={t('enter_password')}
@@ -46,8 +46,8 @@ export const CreatePasswordStep = () => {
           value=""
           checked={getValues('agreeWithTerms')}
           onChange={() => setValue('agreeWithTerms', !getValues('agreeWithTerms'))}
-          className="w-4 h-4 bg-transparent border border-gray-300 rounded-sm checked:bg-[#12B28C] checked:border-[#12B28C]" />
-        <label htmlFor="checked-checkbox" className="text-base text-gray-300">
+          className="w-3 h-3 bg-transparent border border-gray-300 rounded-sm checked:bg-[#12B28C] checked:border-[#12B28C]" />
+        <label htmlFor="checked-checkbox" className="text-sm text-gray-300">
           {t("i_agree")}
           <a href="#" className="text-blue-500">{" "}{t("terms_of_service")}</a>
         </label>

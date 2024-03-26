@@ -96,17 +96,6 @@ describe("AssetProvider", () => {
     }))
 
 
-
-    vi.mock("@src/storage/entities/BaseEntity", () => {
-      class BaseEntityMock {
-        constructor() { }
-      }
-
-      return {
-        default: BaseEntityMock,
-      };
-    });
-
     vi.mock("@polkadot/api-contract", () => {
       class ContractPromise {
         constructor() {
@@ -127,7 +116,7 @@ describe("AssetProvider", () => {
       };
     });
 
-    vi.mock("@src/providers", () => ({
+    vi.mock("@src/providers/networkProvider", () => ({
       useNetworkContext: () => ({
         state: {
           selectedChain: selectedWASMChainMock,
@@ -199,6 +188,15 @@ describe("AssetProvider", () => {
           },
         },
       }),
+
+
+      NetworkProvider: ({ children }: { children: React.ReactNode }) => {
+        return <>{children}</>;
+      }
+
+    }));
+
+    vi.mock("@src/providers/accountProvider", () => ({
       useAccountContext: () => ({
         state: {
           selectedAccount: {
@@ -212,7 +210,10 @@ describe("AssetProvider", () => {
           },
         },
       }),
-    }));
+      AccountProvider: ({ children }: { children: React.ReactNode }) => {
+        return <>{children}</>;
+      }
+    }))
 
     vi.mock("@src/utils/assets", async () => {
       const assetUtils = (await vi.importActual("@src/utils/assets")) as Record<
@@ -227,6 +228,8 @@ describe("AssetProvider", () => {
         }),
       };
     });
+
+
   });
 
   describe("reducer", () => {

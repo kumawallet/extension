@@ -138,12 +138,12 @@ export const CreateWallet = () => {
       title={texts.title}
       description={texts.description}
       footer={
-        <Button classname="w-full py-6 text-2xl" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
+        <Button classname="w-full py-4 text-2xl mb-1" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
       }
       onBack={isLoading ? undefined : onBack}
       centerInnerTitle={step === 4}
     >
-      <FormProvider {...methods}>
+      <FormProvider {...methods} >
         {step === 1 ? (
           <CreatePasswordStep />
         ) : step === 2 ? (

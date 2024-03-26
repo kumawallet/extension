@@ -62,16 +62,16 @@ export const ConfirmRecoveryPhrase = () => {
   }, [])
 
   return (
-    <div className="mt-12">
+    <div className="mt-5">
       <SeedGrid
         words={words}
         onClickWord={onRemoveWord}
         indexesRemoved={indexesRemoved}
       />
-      <div className="grid grid-cols-3 gap-x-10 mt-10">
+      <div className="grid grid-cols-3 gap-x-10 mt-5">
         {
           wordsRemoved.map((word, index) => (
-            <button key={index} className="bg-[#1C1C27] py-2 px-4 rounded-md font-poppins text-base" onClick={() => onAddWord(index)}>{word}</button>
+            <button key={index} className="bg-[#1C1C27] py-2 px-3 rounded-md font-poppins text-base" onClick={() => onAddWord(index)}>{word}</button>
           ))
         }
       </div>
