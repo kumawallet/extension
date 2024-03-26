@@ -13,6 +13,7 @@ export const activitysMock: Partial<Record>[] = [
     recipientNetwork: "recipientNetwork",
     reference: "reference",
     data: {
+      fee: "",
       asset: {
         id: "2",
         color: "red",

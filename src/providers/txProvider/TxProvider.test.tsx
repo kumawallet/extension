@@ -19,6 +19,7 @@ const activiyMock: Partial<Record>[] = [
     recipientNetwork: "mainnet",
     reference: "WASM",
     data: {
+      fee: "",
       asset: {
         id: "1",
         color: "#ffff",

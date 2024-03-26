@@ -5,7 +5,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 import en from "@src/i18n/en.json";
 import { CREATE_ACCOUNT, IMPORT_ACCOUNT } from "@src/routes/paths";
-import { getWebApiMock } from "@src/tests/mocks/web-api-mock";
 
 
 const useNavigateMock = vi.fn();
