@@ -14,4 +14,7 @@ export const activityMessages = {
   updateActivity: (params: RequestUpdateActivity) => {
     return sendMessage("pri(activity.updateActivity)", params);
   },
+  getHistoricActivity: () => {
+    return sendMessage("pri(activity.getHistoricActivity)", null);
+  },
 };

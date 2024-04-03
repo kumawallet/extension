@@ -9,7 +9,7 @@ import {
 import { Map } from "../interfaces";
 
 export const MOONRIVER_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.KUSAMA]: ({ address, amount }) => {
+  kusama: ({ address, amount }) => {
     const _address =
       "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
 
@@ -26,7 +26,7 @@ export const MOONRIVER_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.SHIDEN]: ({ address, amount, assetSymbol }) => {
+  shiden: ({ address, amount, assetSymbol }) => {
     const addressIsHex = address.startsWith("0x");
 
     const _address = addressIsHex
@@ -77,6 +77,6 @@ enum MOONRIVER_ASSETS {
 }
 
 export const MOONRIVER_ASSETS_MAPPING = {
-  [RELAY_CHAINS.KUSAMA]: [MOONRIVER_ASSETS.xcKSM],
-  [PARACHAINS.SHIDEN]: [MOONRIVER_ASSETS.MOVR, MOONRIVER_ASSETS.xcSDN],
+  kusama: [MOONRIVER_ASSETS.xcKSM],
+  shiden: [MOONRIVER_ASSETS.MOVR, MOONRIVER_ASSETS.xcSDN],
 };

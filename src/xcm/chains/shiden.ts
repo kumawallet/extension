@@ -13,7 +13,7 @@ import {
 import { Map, Version } from "../interfaces";
 
 export const SHIDEN_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.KUSAMA]: ({ address, amount, xcmPalletVersion }) => ({
+  kusama: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
     method: XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS,
     extrinsicValues: {
@@ -34,7 +34,7 @@ export const SHIDEN_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  [PARACHAINS.MOONRIVER]: ({ address, amount, assetSymbol }) => {
+  "moonriver-evm": ({ address, amount, assetSymbol }) => {
     let method = null;
     let assets = null;
     let weightLimit = null;
@@ -110,6 +110,6 @@ enum SHIDEN_ASSETS {
 }
 
 export const SHIDEN_ASSETS_MAPPING = {
-  [RELAY_CHAINS.KUSAMA]: [SHIDEN_ASSETS.KSM],
-  [PARACHAINS.MOONRIVER]: [SHIDEN_ASSETS.SDN, SHIDEN_ASSETS.MOVR],
+  kusama: [SHIDEN_ASSETS.KSM],
+  "moonbeam-evm": [SHIDEN_ASSETS.SDN, SHIDEN_ASSETS.MOVR],
 };

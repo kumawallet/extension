@@ -12,7 +12,7 @@ import {
 import { Map } from "../interfaces";
 
 export const ACALA_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.POLKADOT]: ({ address, amount, xcmPalletVersion }) => ({
+  polkadot: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
     method: XCM.pallets.X_TOKENS.methods.TRANSFER,
     extrinsicValues: {
@@ -29,7 +29,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  [PARACHAINS.ASTAR]: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  astar: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let currencyId = null;
     const destWeightLimit = "Unlimited";
 
@@ -82,12 +82,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.MOONBEAM]: ({
-    address,
-    amount,
-    assetSymbol,
-    xcmPalletVersion,
-  }) => {
+  moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let currencyId = null;
     let destWeightLimit: string | { Limited: number } = "Unlimited";
 
@@ -152,7 +147,7 @@ enum ACALA_ASSETS {
 }
 
 export const ACALA_ASSETS_MAPPING = {
-  [RELAY_CHAINS.POLKADOT]: [ACALA_ASSETS.DOT],
-  [PARACHAINS.ASTAR]: [ACALA_ASSETS.ACA, ACALA_ASSETS.ASTR],
-  [PARACHAINS.MOONBEAM]: [ACALA_ASSETS.ACA, ACALA_ASSETS.GLMR],
+  polkadot: [ACALA_ASSETS.DOT],
+  astar: [ACALA_ASSETS.ACA, ACALA_ASSETS.ASTR],
+  "moonbeam-evm": [ACALA_ASSETS.ACA, ACALA_ASSETS.GLMR],
 };

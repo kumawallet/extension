@@ -65,6 +65,7 @@ export const SelectableAsset: FC<SelectableAssetProps> = ({
     }
   }, [assets, to, state]);
 
+
   return (
     <Listbox value={selectedAsset} onChange={_onChangeAsset}>
       <div className="relative mt-1" data-testid="select-asset">

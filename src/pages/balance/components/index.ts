@@ -5,7 +5,6 @@ export * from "./AccountSelected";
 export * from "./Activity";
 export * from "./Assets";
 export * from "./ChainSelector";
-export * from "./ConfirmChainChangeModal";
 export * from "./Footer";
 export * from "./Header";
 export * from "./NetworkIcon";

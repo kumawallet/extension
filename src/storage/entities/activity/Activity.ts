@@ -57,14 +57,15 @@ export default class Activity extends BaseEntity {
   addRecord(key: AccountKey, txHash: string, record: Record): void {
     this.data[key] = {
       ...this.data[key],
-      [txHash.toLowerCase()]: record,
+      [txHash?.toLowerCase()]: record,
     };
   }
 
   getRecords(key: AccountKey, network: string): Record[] {
     const records = this.data[key] ? Object.values(this.data[key]) : [];
+
     return records
-      .filter((r) => r.network.toLowerCase() === network.toLowerCase())
+      .filter((r) => r.originNetwork?.toLowerCase() === network?.toLowerCase())
       .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));
   }
 }

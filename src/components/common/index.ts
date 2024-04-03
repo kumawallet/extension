@@ -14,3 +14,4 @@ export * from "./SelectLanguage";
 export * from "./SucessMessage";
 export * from "./txInfo/TxInfo";
 export * from "./KumaLetters";
+export * from "./SelectableOptionModal";

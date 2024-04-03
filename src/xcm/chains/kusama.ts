@@ -9,7 +9,7 @@ import {
 import { Map } from "../interfaces";
 
 export const KUSAMA_EXTRINSICS: { [key: string]: Map } = {
-  [KUSAMA_PARACHAINS.MOONRIVER.name]: ({ address, amount }) => ({
+  "moonriver-evm": ({ address, amount }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {
@@ -31,7 +31,7 @@ export const KUSAMA_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  [KUSAMA_PARACHAINS.SHIDEN.name]: ({ address, amount, xcmPalletVersion }) => ({
+  shiden: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {

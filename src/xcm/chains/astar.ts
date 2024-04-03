@@ -9,37 +9,30 @@ import {
   getAssets,
   getBeneficiary,
   getDest,
+  getXTokensAsset,
 } from "../utils";
 import { Map } from "../interfaces";
 
 export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.POLKADOT]: ({ address, amount, xcmPalletVersion }) => ({
-    pallet: XCM.pallets.POLKADOT_XCM.NAME,
-    method: XCM.pallets.POLKADOT_XCM.methods.RESERVE_WITHDRAW_ASSETS,
+  polkadot: ({ address, amount, xcmPalletVersion }) => ({
+    pallet: XCM.pallets.X_TOKENS.NAME,
+    method: XCM.pallets.X_TOKENS.methods.TRANSFER_MULTIASSET,
     extrinsicValues: {
-      dest: getDest({
-        parents: 1,
-        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-      }),
-      beneficiary: getBeneficiary({
-        address,
-        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-      }),
-      assets: getAssets({
+      asset: getXTokensAsset({
         fungible: amount,
         parents: 1,
         version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
       }),
-      feeAssetItem: 0,
+      dest: getBeneficiary({
+        parents: 1,
+        address,
+        version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+      }),
+      destWeightLimit: "Unlimited",
     },
   }),
 
-  [PARACHAINS.MOONBEAM]: ({
-    address,
-    amount,
-    assetSymbol,
-    xcmPalletVersion,
-  }) => {
+  moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let assets = null;
     switch (assetSymbol?.toLowerCase()) {
       case "astr": {
@@ -90,7 +83,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.ACALA]: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  acala: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let assets = null;
     let method = null;
 
@@ -155,7 +148,7 @@ enum ASTAR_ASSETS {
 }
 
 export const ASTAR_ASSETS_MAPPING = {
-  [RELAY_CHAINS.POLKADOT]: [ASTAR_ASSETS.DOT],
-  [PARACHAINS.MOONBEAM]: [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.GLMR],
-  [PARACHAINS.ACALA]: [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.ACA],
+  polkadot: [ASTAR_ASSETS.DOT],
+  "moonbeam-evm": [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.GLMR],
+  acala: [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.ACA],
 };
