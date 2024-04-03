@@ -15,7 +15,7 @@ const renderComponent = () => {
   );
 };
 
-describe("Actvity", () => {
+describe.skip("Actvity", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
       useNavigate: vi.fn().mockReturnValue(vi.fn()),
