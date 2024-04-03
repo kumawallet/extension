@@ -419,7 +419,7 @@ export const getSubtrateNonNativeBalance = (
 export const formatFees = (fees: string, decimals: number) => {
   const formated = formatBN(fees, decimals, 6);
 
-  const _decimals = formated.split(".")[1];
+  const _decimals = formated.split(".")[1] || "";
   const threeFirstDecimals = _decimals.slice(0, 3);
   if (threeFirstDecimals === "000") {
     return formated;

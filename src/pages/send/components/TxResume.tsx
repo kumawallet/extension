@@ -1,3 +1,4 @@
+import { Fragment } from "react"
 import { useFormContext } from 'react-hook-form'
 import { SendTxForm } from '../Send'
 import { formatFees } from '@src/utils/assets'
@@ -40,10 +41,10 @@ export const TxResume = () => {
     <div className='grid grid-cols-[34%_66%] gap-y-5'>
       {
         Object.entries(transaction).map(([key, value]) => (
-          <>
+          <Fragment key={key}>
             <div className='text-sm'>{t(key)}</div>
             <div className='text-sm text-[#9CA3AF]'>{value}</div>
-          </>
+          </Fragment>
         ))
       }
     </div>

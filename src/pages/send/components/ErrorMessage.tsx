@@ -36,7 +36,7 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
     }
 
     if (isNativeAsset) {
-      const bnFee = new BN(fee);
+      const bnFee = transformAmountStringToBN(fee, asset.decimals);
 
       const totalBalance = bnAmount.add(bnFee);
       const haveSufficientBalance = totalBalance.lte(new BN(asset.balance));
@@ -45,7 +45,9 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
     }
 
     const haveEnoughBalance = bnAmount.gte(new BN(amount));
-    const haveEnoughFee = new BN(asset.balance).gte(new BN(fee));
+    const haveEnoughFee = new BN(asset.balance).gte(
+      transformAmountStringToBN(fee, asset.decimals)
+    );
 
     const haveSufficientBalance = haveEnoughBalance && haveEnoughFee;
     setValue("haveSufficientBalance", haveSufficientBalance);

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { useAssetContext, useNetworkContext } from "@src/providers";
@@ -14,7 +14,6 @@ import { formatBN } from "@src/utils/assets";
 import { useDebounce } from "react-use";
 import { AssetIcon } from "@src/components/common";
 import { RxCross2 } from "react-icons/rx";
-import { getValue } from "@src/pages/balance/components/funtions/Txfunctions";
 
 const ICON_WIDTH = 18;
 
@@ -78,7 +77,11 @@ const SelectItem = <
                 width={iconWidth}
               />
             ) : (
-              <img src={value?.[iconField] || ""} width={iconWidth} className="rounded-full" />
+              <img
+                src={value?.[iconField] || ""}
+                width={iconWidth}
+                className="rounded-full"
+              />
             )}
 
             <span className={selectedLabelClassName}>
@@ -121,7 +124,6 @@ const SelectItem = <
                   </div>
 
                   <div className="overflow-y-scroll">
-
                     <div className="flex flex-col gap-2 px-5">
                       {items.map((item, index) => (
                         <button
@@ -149,7 +151,9 @@ const SelectItem = <
                               />
                             )}
 
-                            <span className="ml-3 text-xl">{item[labelField]}</span>
+                            <span className="ml-3 text-xl">
+                              {item[labelField]}
+                            </span>
                           </div>
                         </button>
                       ))}
@@ -162,66 +166,6 @@ const SelectItem = <
         </Dialog>
       </Transition>
     </>
-    // <Listbox
-    //   onChange={onChangeValue}
-    //   value={value}
-    //   as="div"
-    //   className={containerClassname}
-    // >
-    //   <Listbox.Button
-    //     className={`flex items-center text-sm gap-1 ${buttonClassname}`}
-    //   >
-    //     <div className={`flex items-center gap-1 ${selectedItemContainerClassName}`}>
-    //       {iconField === "symbol" ? (
-    //         <AssetIcon
-    //           asset={
-    //             {
-    //               symbol: value?.[iconField] || "",
-    //             } as IAsset
-    //           }
-    //           width={iconWidth}
-    //         />
-    //       ) : (
-    //         <img src={value?.[iconField] || ""} width={iconWidth} />
-    //       )}
-
-    //       <span className={selectedLabelClassName}>{value?.[labelField]}</span>
-    //     </div>
-    //     {hasMultipleItems && <HiMiniChevronDown size={18} />}
-    //   </Listbox.Button>
-    //   <Transition
-    //     as={Fragment}
-    //     enter="transition ease-out duration-100"
-    //     enterFrom="transform opacity-0 scale-95"
-    //     enterTo="transform opacity-100 scale-100"
-    //     leave="transition ease-in duration-75"
-    //     leaveFrom="transform opacity-100 scale-100"
-    //     leaveTo="transform opacity-0 scale-95"
-    //   >
-    //     <Listbox.Options className="absolute mt-2 w-auto origin-left rounded-md bg-[#171720] shadow-lg ring-1 ring-black/5 focus:outline-none">
-    //       {items.map((item, index) => (
-    //         <Listbox.Option key={index} value={item}>
-    //           <div className="text-white p-2 flex gap-2 items-center hover:bg-gray-500 hover:bg-opacity-30">
-    //             {iconField === "symbol" ? (
-    //               <AssetIcon
-    //                 asset={
-    //                   {
-    //                     symbol: item?.[iconField] || "",
-    //                   } as IAsset
-    //                 }
-    //                 width={iconWidth}
-    //               />
-    //             ) : (
-    //               <img src={item?.[iconField] || ""} width={iconWidth} />
-    //             )}
-
-    //             <span className="ml-3">{item[labelField]}</span>
-    //           </div>
-    //         </Listbox.Option>
-    //       ))}
-    //     </Listbox.Options>
-    //   </Transition>
-    // </Listbox>
   );
 };
 
@@ -252,23 +196,9 @@ export const AssetToSend = () => {
   const targetChain = watch("targetNetwork");
   const selectedAsset = watch("asset");
   const isXCM = watch("isXcm");
-  // const amount = watch("amount")
-
-  const [assetsToSelect, setAssetsToSelect] = useState<AssetToSelect[]>(() => {
-    if (originNetwork) {
-      return assets.map(({ id, symbol, decimals, balance, address }) => ({
-        id,
-        symbol,
-        decimals,
-        balance: String(balance),
-        address,
-      }));
-    }
-
-    return [];
-  });
 
   const [chainsToSend, setChainsToSend] = useState<Chain[]>([targetChain]);
+  const [amount, setAmount] = useState<string>(getValues("amount"));
 
   useEffect(() => {
     if (!originNetwork?.id) return;
@@ -280,7 +210,6 @@ export const AssetToSend = () => {
         xcmChainsList.includes(chain.id)
       );
       setChainsToSend([originNetwork, ...xcmChains]);
-      return;
     } else {
       setChainsToSend([originNetwork]);
     }
@@ -290,8 +219,8 @@ export const AssetToSend = () => {
     setValue("isXcm", targetChain.id !== originNetwork.id);
   }, [targetChain]);
 
-  useEffect(() => {
-    if (!originNetwork || !targetChain) return;
+  const assetsToSelect = useMemo(() => {
+    if (!originNetwork || !targetChain) return [];
 
     if (isXCM) {
       const xcmAssets =
@@ -307,16 +236,6 @@ export const AssetToSend = () => {
 
       const defaultAsset = _assets[0];
 
-      setAssetsToSelect(
-        _assets.map(({ id, symbol, decimals, balance, address }) => ({
-          id,
-          symbol,
-          decimals,
-          balance: String(balance),
-          address,
-        }))
-      );
-
       setValue("asset", {
         id: defaultAsset?.id || "",
         symbol: defaultAsset?.symbol || "",
@@ -324,17 +243,14 @@ export const AssetToSend = () => {
         balance: String(defaultAsset?.balance || "0"),
         address: defaultAsset?.address,
       });
+      return _assets.map(({ id, symbol, decimals, balance, address }) => ({
+        id,
+        symbol,
+        decimals,
+        balance: String(balance),
+        address,
+      }));
     } else {
-      setAssetsToSelect(
-        assets.map(({ id, symbol, decimals, balance, address }) => ({
-          id,
-          symbol,
-          decimals,
-          balance: String(balance),
-          address,
-        }))
-      );
-
       setValue("asset", {
         id: assets[0]?.id || "",
         symbol: originNetwork.symbol,
@@ -342,10 +258,15 @@ export const AssetToSend = () => {
         balance: String(assets[0]?.balance || "0"),
         address: assets[0]?.address || "",
       });
+      return assets.map(({ id, symbol, decimals, balance, address }) => ({
+        id,
+        symbol,
+        decimals,
+        balance: String(balance),
+        address,
+      }));
     }
-  }, [isXCM, originNetwork, targetChain, assets]);
-
-  const [amount, setAmount] = useState<string>(getValues("amount"));
+  }, [originNetwork, assets, isXCM]);
 
   useDebounce(
     () => {
@@ -369,7 +290,7 @@ export const AssetToSend = () => {
                   id: asset.id,
                   symbol: asset.symbol,
                   decimals: asset.decimals,
-                  balance: asset.balance,
+                  balance: asset?.balance,
                   address: asset.address,
                 });
               }}
@@ -400,6 +321,7 @@ export const AssetToSend = () => {
         {/* Second row */}
         <div className={`${styles.row} py-1`}>
           <NumericFormat
+            data-testid="amount-input"
             className="bg-transparent text-[#9CA3AF] outline-none border-none px-1 text-lg font-bold w-[15ch]"
             onValueChange={({ value }) => {
               setAmount(value);

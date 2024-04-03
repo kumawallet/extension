@@ -36,6 +36,7 @@ export const AddressBook = () => {
   return (
     <>
       <button
+        data-testid="open-address-book"
         className="flex items-center gap-1 text-[#7C4DC4]"
         onClick={() => setIsModalOpen(true)}
       >
@@ -50,6 +51,7 @@ export const AddressBook = () => {
         isLoading={isLoading}
         Item={({ item }) => (
           <button
+            data-testid="select-contact"
             className="flex flex-col hover:bg-gray-500 hover:bg-opacity-30 w-full p-2"
             onClick={() => {
               setValue("recipientAddress", item.address);
