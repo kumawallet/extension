@@ -13,12 +13,12 @@ const WATCH_MOCK: Partial<SendTxForm> = {
     decimals: 10,
     balance: "1",
   } as SendTxForm["asset"],
-  fee: "0.1",
+  fee: "100000000",
   originNetwork: {
     symbol: "DOT",
   } as SendTxForm["originNetwork"],
   isTipEnabled: true,
-  tip: "0.1",
+  tip: "100000000",
 };
 
 const functionMocks = {
