@@ -21,6 +21,8 @@ export const Recipient: FC<RecipientProps> = ({ containerClassname = "" }) => {
       <div className="flex flex-col gap-1 mb-1">
         <label htmlFor="recipient">{t("recipient_address")}</label>
         <input
+          id="recipient"
+          autoComplete="false"
           {...register("recipientAddress")}
           className="border border-[#636669] bg-transparent text-white px-2 py-4  rounded-2xl"
         />

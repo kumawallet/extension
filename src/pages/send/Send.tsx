@@ -29,6 +29,7 @@ import { validateRecipientAddress } from "@src/utils/transfer";
 const schema = object({
   recipientAddress: string().when(["targetNetwork"], ([targetNetwork], schema) => {
     return schema.test("recipientAddress", "invalid_address", (value) => {
+      if (value?.trim() === "") return true
       if (!value || !targetNetwork) return false;
       return validateRecipientAddress(value, targetNetwork.type);
     })

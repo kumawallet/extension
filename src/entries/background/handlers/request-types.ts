@@ -14,6 +14,7 @@ import {
   SettingValue,
 } from "@src/storage/entities/settings/types";
 import { HistoricTransaction } from "@src/types";
+import { providers } from "ethers";
 
 export interface RequestSignUp {
   password: string;
@@ -159,10 +160,11 @@ interface RequestSendTxBase {
 
 export interface RequestSendSubstrateTx extends RequestSendTxBase {
   hexExtrinsic: string;
+  tip?: string;
 }
 
 export interface RequestSendEvmTx extends RequestSendTxBase {
-  txHash: string;
+  evmTx?: providers.TransactionRequest;
 }
 
 export interface Request {

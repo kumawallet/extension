@@ -248,6 +248,8 @@
     "assets": "Assets",
     "details": "Details",
     "confirm": "Confirm",
+    "select_asset": "Select asset",
+    "select_chain": "Select chain",
     "tx_send": "Transaction sent",
     "sender": "Sender",
     "network": "Network",

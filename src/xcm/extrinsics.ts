@@ -1,9 +1,3 @@
-import {
-  PARACHAINS,
-  PARACHAINS_TESTNETS,
-  RELAY_CHAINS,
-  RELAY_CHAIN_TESTNETS,
-} from "@src/constants/chains";
 import { IXCM_MAPPING } from "./interfaces";
 import {
   POLKADOT_EXTRINSICS,

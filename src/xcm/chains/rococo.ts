@@ -1,4 +1,4 @@
-import { PARACHAINS_TESTNETS, ROCOCO_PARACHAINS } from "@src/constants/chains";
+import { ROCOCO_PARACHAINS } from "@src/constants/chains";
 import { Map } from "../interfaces";
 import {
   XCM,

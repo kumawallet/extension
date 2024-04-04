@@ -6,6 +6,9 @@ import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { BN } from "@polkadot/util";
 import { SendTxForm } from "../Send";
 
+type MOCK_WATCH_TYPE = keyof Partial<SendTxForm>;
+
+
 const WATCH_MOCK: Partial<SendTxForm> = {
   originNetwork: {
     id: "polkadot",
@@ -65,7 +68,7 @@ describe("AssetToSend", () => {
     vi.mock("react-hook-form", () => ({
       useFormContext: vi.fn(() => ({
         register: vi.fn(),
-        watch: vi.fn((key: string) => WATCH_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => WATCH_MOCK[key]),
         setValue: functionMocks.setValue,
         getValues: vi.fn(),
       })),

@@ -1,8 +1,4 @@
-import {
-  KUSAMA_PARACHAINS,
-  PARACHAINS,
-  RELAY_CHAINS,
-} from "@src/constants/chains";
+import { KUSAMA_PARACHAINS } from "@src/constants/chains";
 import {
   XCM,
   XCM_DEFAULT_VERSIONS,

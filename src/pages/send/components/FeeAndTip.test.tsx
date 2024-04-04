@@ -5,6 +5,8 @@ import i18n from "@src/utils/i18n";
 import { FeeAndTip } from "./FeeAndTip";
 import { BigNumber } from "ethers";
 
+type MOCK_WATCH_TYPE = keyof Partial<SendTxForm>;
+
 const FEE_MOCK = "1000000000000";
 
 const FORM_WASM_XCM_MOCK: Partial<SendTxForm> = {
@@ -287,7 +289,8 @@ describe("FeeAndTip", () => {
 
     it("should be a xcm transfer", async () => {
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_WASM_XCM_MOCK[key]),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_WASM_XCM_MOCK[key]),
         getValues: vi.fn(() => true), // only for isXcm value,
         setValue: vi.fn(),
       });
@@ -301,7 +304,7 @@ describe("FeeAndTip", () => {
 
     it("should be a native asset transfer", async () => {
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_WASM_NATIVE_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_WASM_NATIVE_MOCK[key]),
         getValues: vi.fn(() => false), // only for isXcm value,
         setValue: vi.fn(),
       });
@@ -315,7 +318,7 @@ describe("FeeAndTip", () => {
 
     it("should be a asset transfer", async () => {
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_WASM_ASSET_TRANSFER_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_WASM_ASSET_TRANSFER_MOCK[key]),
         getValues: vi.fn(() => false), // only for isXcm value,
         setValue: vi.fn(),
       });
@@ -357,7 +360,7 @@ describe("FeeAndTip", () => {
       const setValueMock = vi.fn();
 
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_EVM_XCM_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_EVM_XCM_MOCK[key]),
         getValues: vi.fn(() => true), // only for isXcm value,
         setValue: setValueMock,
       });
@@ -373,7 +376,7 @@ describe("FeeAndTip", () => {
       const setValueMock = vi.fn();
 
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_EVM_NATIVE_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_EVM_NATIVE_MOCK[key]),
         getValues: vi.fn(() => false), // only for isXcm value,
         setValue: setValueMock,
       });
@@ -390,7 +393,7 @@ describe("FeeAndTip", () => {
       const setValueMock = vi.fn();
 
       reactHookFormMocks.useFormContext.mockReturnValue({
-        watch: vi.fn((key: string) => FORM_EVM_ERC20_TRANSFER_MOCK[key]),
+        watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_EVM_ERC20_TRANSFER_MOCK[key]),
         getValues: vi.fn(() => false), // only for isXcm value,
         setValue: setValueMock,
       });

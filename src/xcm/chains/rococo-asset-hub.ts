@@ -1,4 +1,3 @@
-import { RELAY_CHAIN_TESTNETS } from "@src/constants/chains";
 import { Map } from "../interfaces";
 import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
 

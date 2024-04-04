@@ -351,11 +351,14 @@ export default class Extension {
     const selectedChain = await Network.get<Network>();
 
     const address = selectedAccount?.value.address;
+    // @ts-expect-error -- *
     const chainPrefix = selectedChain?.chain?.prefix;
 
+    // @ts-expect-error -- *
     const formatedAddress = transformAddress(address, chainPrefix || 0);
 
     return await getChainHistoricHandler({
+      // @ts-expect-error -- *
       chainId: selectedChain!.chain!.id,
       address: formatedAddress,
     });
@@ -439,6 +442,7 @@ export default class Extension {
     error,
     fee,
   }: RequestUpdateActivity) {
+    // @ts-expect-error -- *
     await Activity.updateRecordStatus(txHash, status, error, fee);
   }
 

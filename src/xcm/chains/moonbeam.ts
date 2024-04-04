@@ -1,10 +1,6 @@
 import { numberToHex, u8aToHex } from "@polkadot/util";
 import { decodeAddress } from "@polkadot/util-crypto";
-import {
-  PARACHAINS,
-  POLKADOT_PARACHAINS,
-  RELAY_CHAINS,
-} from "@src/constants/chains";
+import { POLKADOT_PARACHAINS } from "@src/constants/chains";
 import xTokensAbi from "@src/abi/xtokens_moonbeam_abi.json";
 import { Map } from "../interfaces";
 

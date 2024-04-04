@@ -4,6 +4,8 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { ErrorMessage } from "./ErrorMessage";
 
+type MOCK_WATCH_TYPE = keyof Partial<SendTxForm>;
+
 const WATCH_MOCK: Partial<SendTxForm> = {
   amount: "2",
   asset: {
@@ -36,7 +38,7 @@ describe("ErrorMessage", () => {
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({
         setValue: functionMocks.setValue,
-        watch: (key: string) => WATCH_MOCK[key],
+        watch: (key: MOCK_WATCH_TYPE) => WATCH_MOCK[key],
       }),
     }));
   });

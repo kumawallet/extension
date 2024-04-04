@@ -1,8 +1,4 @@
-import {
-  PARACHAINS,
-  POLKADOT_PARACHAINS,
-  RELAY_CHAINS,
-} from "@src/constants/chains";
+import { POLKADOT_PARACHAINS } from "@src/constants/chains";
 import {
   XCM,
   XCM_DEFAULT_VERSIONS,

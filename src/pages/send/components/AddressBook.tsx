@@ -52,7 +52,7 @@ export const AddressBook = () => {
         Item={({ item }) => (
           <button
             data-testid="select-contact"
-            className="flex flex-col hover:bg-gray-500 hover:bg-opacity-30 w-full p-2"
+            className="flex flex-col bg-[#1C1C27] hover:bg-gray-500 hover:bg-opacity-30 w-full p-2 rounded-xl"
             onClick={() => {
               setValue("recipientAddress", item.address);
               setIsModalOpen(false);

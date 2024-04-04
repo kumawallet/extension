@@ -6,6 +6,7 @@ const EVM_ERRORS = [
   "insufficient funds for intrinsic transaction cost",
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isKnownEstimatedFeeError = (error: any): boolean => {
   const reason = error?.reason;
 

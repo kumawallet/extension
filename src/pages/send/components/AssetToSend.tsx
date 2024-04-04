@@ -1,5 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAssetContext, useNetworkContext } from "@src/providers";
 import { NumericFormat } from "react-number-format";
@@ -12,10 +11,12 @@ import { XCM_ASSETS_MAPPING } from "@src/xcm/assets";
 import { FiArrowDownCircle } from "react-icons/fi";
 import { formatBN } from "@src/utils/assets";
 import { useDebounce } from "react-use";
-import { AssetIcon } from "@src/components/common";
-import { RxCross2 } from "react-icons/rx";
+import { AssetIcon, SelectableOptionModal } from "@src/components/common";
 
 const ICON_WIDTH = 18;
+
+type IconField<T> = keyof T;
+type LabelField<T> = keyof T;
 
 const SelectItem = <
   T extends {
@@ -25,24 +26,26 @@ const SelectItem = <
   onChangeValue,
   value,
   items,
-  labelField = "",
+  labelField = "symbol",
   buttonClassname = "",
   containerClassname = "",
   iconField = "symbol",
   iconWidth = ICON_WIDTH,
   selectedLabelClassName = "",
   selectedItemContainerClassName = "",
+  modalTitle = "",
 }: {
   buttonClassname?: string;
   containerClassname?: string;
   onChangeValue: (value: T) => void;
   value: T | null;
   items: T[];
-  labelField: string;
-  iconField: string;
+  labelField: LabelField<T>;
+  iconField: IconField<T>;
   iconWidth?: number;
   selectedLabelClassName?: string;
   selectedItemContainerClassName?: string;
+  modalTitle?: string;
 }) => {
   const hasMultipleItems = items.length > 0;
 
@@ -62,7 +65,8 @@ const SelectItem = <
       <div className={containerClassname}>
         <button
           onClick={openModal}
-          className={`flex items-center text-sm gap-1 ${buttonClassname}`}
+          className={`flex items-center text-sm gap-1 ${value ? "" : "animate-spin"
+            } ${buttonClassname}`}
         >
           <div
             className={`flex items-center gap-1 ${selectedItemContainerClassName}`}
@@ -78,93 +82,64 @@ const SelectItem = <
               />
             ) : (
               <img
-                src={value?.[iconField] || ""}
+                src={value?.[iconField] as string}
                 width={iconWidth}
                 className="rounded-full"
               />
             )}
 
             <span className={selectedLabelClassName}>
+              {/* 
+// @ts-expect-error -- * */}
               {value?.[labelField]}
             </span>
           </div>
           {hasMultipleItems && <HiMiniChevronDown size={18} />}
         </button>
       </div>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => null}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+
+      <SelectableOptionModal<T>
+        isOpen={isOpen}
+        items={items}
+        closeModal={closeModal}
+        emptyMessage="No items"
+        title={modalTitle}
+        Item={({ item }) => (
+          <button
+            onClick={() => {
+              onChangeValue(item);
+              closeModal();
+            }}
+            className="flex flex-col bg-[#1C1C27] hover:bg-gray-500 hover:bg-opacity-30 w-full p-2 rounded-xl"
           >
-            <div className="fixed inset-0 bg-black/25" />
-          </Transition.Child>
+            <div className="flex gap-2 items-center">
+              {iconField === "symbol" ? (
+                <AssetIcon
+                  asset={
+                    {
+                      symbol: item?.[iconField] || "",
+                    } as IAsset
+                  }
+                  width={ICON_WIDTH}
+                />
+              ) : (
+                <img
+                  // @ts-expect-error -- *
+                  src={item?.[iconField] || ""}
+                  width={ICON_WIDTH}
+                  className="rounded-full"
+                />
+              )}
 
-          <div className="fixed bottom-0 left-0 right-0 overflow-y-auto bg-[#333343] pt-6 rounded-t-2xl h-3/5">
-            <div className="flex items-center justify-center text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full">
-                  <div className="flex justify-end px-6 mb-6">
-                    <button className="p-1" onClick={closeModal}>
-                      <RxCross2 size={18} />
-                    </button>
-                  </div>
-
-                  <div className="overflow-y-scroll">
-                    <div className="flex flex-col gap-2 px-5">
-                      {items.map((item, index) => (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            onChangeValue(item);
-                            closeModal();
-                          }}
-                        >
-                          <div className="text-white p-2 flex gap-2 items-center hover:bg-gray-500 hover:bg-opacity-30">
-                            {iconField === "symbol" ? (
-                              <AssetIcon
-                                asset={
-                                  {
-                                    symbol: item?.[iconField] || "",
-                                  } as IAsset
-                                }
-                                width={30}
-                              />
-                            ) : (
-                              <img
-                                src={item?.[iconField] || ""}
-                                width={30}
-                                className="rounded-full"
-                              />
-                            )}
-
-                            <span className="ml-3 text-xl">
-                              {item[labelField]}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
+              <span className="ml-3 text-xl">
+                {/* 
+// @ts-expect-error -- * */}
+                {item[labelField]}
+              </span>
             </div>
-          </div>
-        </Dialog>
-      </Transition>
+          </button>
+        )}
+      />
     </>
   );
 };
@@ -286,6 +261,8 @@ export const AssetToSend = () => {
             <SelectItem<AssetToSelect>
               items={assetsToSelect}
               onChangeValue={(asset) => {
+                if (selectedAsset?.id === asset.id) return;
+
                 setValue("asset", {
                   id: asset.id,
                   symbol: asset.symbol,
@@ -294,6 +271,7 @@ export const AssetToSend = () => {
                   address: asset.address,
                 });
               }}
+              // @ts-expect-error -- *
               value={
                 selectedAsset || {
                   symbol: originNetwork.symbol,
@@ -306,6 +284,7 @@ export const AssetToSend = () => {
               labelField="symbol"
               iconField="symbol"
               selectedLabelClassName="text-[#D0D0D0]"
+              modalTitle={t("select_asset")}
             />
           </div>
 
@@ -357,6 +336,7 @@ export const AssetToSend = () => {
         <SelectItem<Chain>
           items={chainsToSend}
           onChangeValue={(chain) => {
+            if (targetChain.id === chain.id) return;
             setValue("targetNetwork", chain);
           }}
           value={targetChain}
@@ -366,6 +346,7 @@ export const AssetToSend = () => {
           iconField="logo"
           iconWidth={24}
           selectedLabelClassName="text-lg ml-16"
+          modalTitle={t("select_chain")}
         />
       </div>
     </>

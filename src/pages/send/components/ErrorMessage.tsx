@@ -29,29 +29,35 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
 
     let bnAmount = transformAmountStringToBN(amount, asset.decimals);
 
-    if (isTipEnabled) {
-      const bnTip = transformAmountStringToBN(tip || "0", asset.decimals);
-
-      bnAmount = bnAmount.add(new BN(bnTip));
-    }
-
     if (isNativeAsset) {
-      const bnFee = transformAmountStringToBN(fee, asset.decimals);
+      const bnFee = new BN(fee);
+
+      if (isTipEnabled) {
+        const bnTip = transformAmountStringToBN(tip || "0", asset.decimals);
+
+        bnAmount = bnAmount.add(new BN(bnTip));
+      }
 
       const totalBalance = bnAmount.add(bnFee);
       const haveSufficientBalance = totalBalance.lte(new BN(asset.balance));
       setValue("haveSufficientBalance", haveSufficientBalance);
       return haveSufficientBalance;
+    } else {
+      let bnBalance = new BN(asset.balance);
+
+      if (isTipEnabled) {
+        const bnTip = transformAmountStringToBN(tip || "0", asset.decimals);
+
+        bnBalance = bnBalance.add(new BN(bnTip));
+      }
+
+      const haveEnoughBalance = bnAmount.gte(new BN(amount));
+      const haveEnoughFee = bnBalance.gte(new BN(fee));
+
+      const haveSufficientBalance = haveEnoughBalance && haveEnoughFee;
+      setValue("haveSufficientBalance", haveSufficientBalance);
+      return haveEnoughBalance && haveEnoughFee;
     }
-
-    const haveEnoughBalance = bnAmount.gte(new BN(amount));
-    const haveEnoughFee = new BN(asset.balance).gte(
-      transformAmountStringToBN(fee, asset.decimals)
-    );
-
-    const haveSufficientBalance = haveEnoughBalance && haveEnoughFee;
-    setValue("haveSufficientBalance", haveSufficientBalance);
-    return haveEnoughBalance && haveEnoughFee;
   }, [amount, asset, fee, originNetwork, isTipEnabled, tip]);
 
   if (haveSufficientBalance || amount.trim() === "0") return null;
