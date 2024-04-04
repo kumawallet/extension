@@ -12,6 +12,7 @@ import { FiArrowDownCircle } from "react-icons/fi";
 import { formatBN } from "@src/utils/assets";
 import { useDebounce } from "react-use";
 import { AssetIcon, SelectableOptionModal } from "@src/components/common";
+import { GoCircle, GoCheckCircle } from "react-icons/go";
 
 const ICON_WIDTH = 18;
 
@@ -104,13 +105,14 @@ const SelectItem = <
         closeModal={closeModal}
         emptyMessage="No items"
         title={modalTitle}
+        filterBy={[labelField as string]}
         Item={({ item }) => (
           <button
             onClick={() => {
               onChangeValue(item);
               closeModal();
             }}
-            className="flex flex-col bg-[#1C1C27] hover:bg-gray-500 hover:bg-opacity-30 w-full p-2 rounded-xl"
+            className="flex items-center justify-between bg-[#1C1C27] hover:bg-gray-500 hover:bg-opacity-30 w-full py-2 px-4 rounded-xl"
           >
             <div className="flex gap-2 items-center">
               {iconField === "symbol" ? (
@@ -136,6 +138,13 @@ const SelectItem = <
 // @ts-expect-error -- * */}
                 {item[labelField]}
               </span>
+            </div>
+            <div>
+              {value?.[labelField] === item[labelField] ? (
+                <GoCheckCircle size={16} color="#2CEC84" />
+              ) : (
+                <GoCircle size={16} color="#AEAEB2" />
+              )}
             </div>
           </button>
         )}

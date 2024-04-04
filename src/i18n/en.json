@@ -241,6 +241,7 @@
     "amount": "Amount",
     "total": "Total",
     "available": "Available",
+    "no_contacts": "No contacts added yet",
     "estimated_fee": "Estimated fee",
     "tip": "Tip (optional)",
     "transfer": "Transfer",

@@ -1,7 +1,8 @@
-import { Fragment } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { RxCross2 } from "react-icons/rx";
 import { Loading } from "./Loading";
+import { CiSearch } from "react-icons/ci";
 
 interface SelectableOptionModalProps<T> {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SelectableOptionModalProps<T> {
   Item: (props: { item: T }) => JSX.Element;
   isLoading?: boolean;
   emptyMessage?: string;
+  filterBy?: string[];
 }
 
 export const SelectableOptionModal = <T,>({
@@ -21,7 +23,26 @@ export const SelectableOptionModal = <T,>({
   Item,
   isLoading,
   emptyMessage,
+  filterBy
 }: SelectableOptionModalProps<T>) => {
+  const [search, setSearch] = useState("");
+
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const _search = search.toLowerCase().trim();
+
+      if (_search === "") return true;
+
+      if (filterBy) {
+        return filterBy.some((key) => {
+          const value = (item as any)[key];
+          return value.toLowerCase().includes(_search);
+        });
+      }
+
+    });
+  }, [items, search]);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => null}>
@@ -57,11 +78,23 @@ export const SelectableOptionModal = <T,>({
                         <span>{emptyMessage}</span>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-2">
-                        {items.map((item, index) => (
-                          <Item key={index} item={item} />
-                        ))}
-                      </div>
+                      <>
+                        <div className="flex items-center rounded-xl p-2 border border-[#636669] gap-2 bg-[#212529] mb-1">
+                          <CiSearch size={16} />
+                          <input
+                            className="p-2 bg-transparent w-full focus:outline-none focus:border-none"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          {filteredItems.map((item, index) => (
+                            <Item key={index} item={item} />
+                          ))}
+                        </div>
+                      </>
                     )}
                   </>
                 )}

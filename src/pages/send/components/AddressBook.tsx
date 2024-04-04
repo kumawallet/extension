@@ -49,6 +49,7 @@ export const AddressBook = () => {
         closeModal={() => setIsModalOpen(false)}
         emptyMessage={t("no_contacts")}
         isLoading={isLoading}
+        filterBy={["name", "address"]}
         Item={({ item }) => (
           <button
             data-testid="select-contact"
