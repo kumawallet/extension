@@ -29,7 +29,6 @@ export const HeaderBack: FC<HeaderProps> = ({
         onClick={() => navigate(-1)}
         style={style}
       />
-      <a />
       <p className={textHeaderBack}>{title}</p>
       <></>
     </div>);

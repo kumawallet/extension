@@ -1,6 +1,8 @@
 import { ASSETS_ICONS } from "@src/constants/assets-icons";
 import { FC, useMemo } from "react";
-import { FaRegCopy } from "react-icons/fa6";
+import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
+import { More } from "@src/components/icons/more";
+import {getHash} from "./funtions/Txfunctions";
 
 interface WalletProps {
   name: string;
@@ -10,6 +12,7 @@ interface WalletProps {
   onSelect: () => void;
   showSelectedIcon?: boolean;
   showCopyIcon?: boolean;
+  more: () => void;
 }
 
 export const Wallet: FC<WalletProps> = ({
@@ -19,10 +22,12 @@ export const Wallet: FC<WalletProps> = ({
   onSelect,
   isSelected,
   showSelectedIcon = false,
-  showCopyIcon = true
+  showCopyIcon = true,
+  more,
 }) => {
 
   const iconURL = useMemo(() => {
+
 
     if (type.toLowerCase().includes("wasm")) {
       return ASSETS_ICONS['DOT']
@@ -35,17 +40,19 @@ export const Wallet: FC<WalletProps> = ({
 
   }, [type])
 
+  const { Icon, copyToClipboard } = useCopyToClipboard(address);
+
   return (
     <div
-      className={`flex items-center px-3 py-2 bg-[#1C1C27] rounded-lg ${isSelected && !showSelectedIcon ? "border border-[#2CEC84]" : ""
+      className={`flex items-center px-4 py-3 bg-[#1C1C27] rounded-lg ${isSelected && !showSelectedIcon ? "border border-[#2CEC84]" : ""
         }`}
     >
       <button className="w-[90%] flex gap-2 items-center overflow-hidden text-ellipsis" onClick={onSelect}>
         <img src={iconURL} alt="" width={26} height={26} className="aspect-square rounded-full" />
         <div className="flex flex-col w-">
-          <span className="text-start text-sm md:text-lg font-semibold">{name}</span>
-          <span className="overflow-hidden text-ellipsis font-inter font-light max-w-[30ch]">
-            {address}
+          <span className="text-start text-sm font-semibold">{name}</span>
+          <span className="overflow-hidden text-ellipsis text-xs font-inter font-light max-w-[30ch]">
+            {getHash(address)}
           </span>
         </div>
       </button>
@@ -53,7 +60,16 @@ export const Wallet: FC<WalletProps> = ({
       <div className="w-[10%] flex items-center gap-1 justify-center">
         {
           showCopyIcon && (
-            <FaRegCopy size={16} />
+            <div className="flex gap-3">
+              <button onClick={copyToClipboard}>
+                <Icon />
+              </button>
+              <button onClick={more} >
+                <More size="18"/>
+              </button>
+            </div>
+            
+
           )
         }
 
@@ -61,7 +77,7 @@ export const Wallet: FC<WalletProps> = ({
           showSelectedIcon && (
             <button
               onClick={onSelect}
-              className={`p-1 text-[6px] rounded-full border relative  ${isSelected ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon" : "border-gray-300"
+              className={`p-4 text-[6px] rounded-full border relative  ${isSelected ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon" : "border-gray-300"
                 }`}
             />
           )

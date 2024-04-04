@@ -56,6 +56,7 @@ import {
   RequestTypes,
   RequestUpdateActivity,
   RequestUpdateSetting,
+  RequestValidatePassword,
   ResponseType,
 } from "./request-types";
 import { ethers } from "ethers";
@@ -204,6 +205,14 @@ export default class Extension {
 
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
+  }
+
+  private async validatePassword({ password, key , keyring }: RequestValidatePassword) {
+    await Auth.validatePassword(password);
+    if (!keyring || !password || !key ) return undefined;
+    const  address = key.split("-")[1];
+    const newkeyring = await Vault.getKeyring(keyring);
+    return newkeyring.getKey(address);
   }
 
   private alreadySignedUp() {
@@ -724,6 +733,8 @@ export default class Extension {
         return this.resetWallet();
       case "pri(auth.signIn)":
         return this.signIn(request as RequestSignIn);
+      case "pri(auth.validatePassword)":
+        return this.validatePassword(request as RequestValidatePassword)
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":
