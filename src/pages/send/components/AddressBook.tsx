@@ -1,43 +1,28 @@
 import { SelectableOptionModal } from "@src/components/common";
-import { useLoading } from "@src/hooks";
-import { messageAPI } from "@src/messageAPI/api";
 import Contact from "@src/storage/entities/registry/Contact";
-import { useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SendTxForm } from "../Send";
 import { LiaBookSolid } from "react-icons/lia";
 
-export const AddressBook = () => {
+interface AddressBookProps {
+  contacts: Contact[];
+  isLoading: boolean;
+}
+
+export const AddressBook: FC<AddressBookProps> = ({ contacts, isLoading }) => {
   const { t } = useTranslation("send");
 
   const { setValue } = useFormContext<SendTxForm>();
 
-  const { isLoading, starLoading, endLoading } = useLoading();
-
-  const [contacts, setContacts] = useState<Contact[]>([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      starLoading();
-      try {
-        const { contacts } = await messageAPI.getRegistryAddresses();
-
-        setContacts(contacts);
-      } catch (error) {
-        console.log("error_loading_contacts");
-      }
-      endLoading();
-    })();
-  }, []);
 
   return (
     <>
       <button
         data-testid="open-address-book"
-        className="flex items-center gap-1 text-[#7C4DC4]"
+        className="flex items-center gap-1 text-[#7C4DC4] text-xs font-medium"
         onClick={() => setIsModalOpen(true)}
       >
         <LiaBookSolid size={16} />

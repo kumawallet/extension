@@ -35,6 +35,7 @@ export const SelectableOptionModal = <T,>({
 
       if (filterBy) {
         return filterBy.some((key) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const value = (item as any)[key];
           return value.toLowerCase().includes(_search);
         });
@@ -42,6 +43,11 @@ export const SelectableOptionModal = <T,>({
 
     });
   }, [items, search]);
+
+  const handleOnClose = () => {
+    setSearch("");
+    closeModal();
+  }
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -62,7 +68,7 @@ export const SelectableOptionModal = <T,>({
                 title
               )}
 
-              <button className="p-1" onClick={closeModal}>
+              <button className="p-1" onClick={handleOnClose}>
                 <RxCross2 size={18} />
               </button>
             </div>

@@ -238,6 +238,7 @@
     "bal": "Bal",
     "max": "MAX",
     "recipient_address": "Recipient address",
+    "add_address":"Add address",
     "amount": "Amount",
     "total": "Total",
     "available": "Available",

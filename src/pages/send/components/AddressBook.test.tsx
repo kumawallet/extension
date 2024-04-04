@@ -22,7 +22,14 @@ const functionMocks = {
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <AddressBook />
+      <AddressBook
+        contacts={[{
+          name: "John Doe",
+          address: "0x1234567890123456789012345678901234567890",
+        }]}
+        isLoading={false}
+
+      />
     </I18nextProvider>
   );
 };

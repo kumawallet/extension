@@ -26,9 +26,11 @@ describe("Recipient", () => {
       }),
     }));
 
-    vi.mock("./AddressBook", () => ({
-      AddressBook: () => <div>AddressBook</div>
+    vi.mock("./AddressBookOptions", () => ({
+      AddressBookOptions: () => <div>AddressBookOptions</div>
     }))
+
+
   })
 
   describe("render", () => {
