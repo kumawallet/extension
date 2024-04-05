@@ -103,11 +103,7 @@ export default class Auth {
   }
   static async validatePassword(password: string) {
     const auth = Auth.getInstance();
-    try {
-      await auth.validatePassword(password);
-    } catch (error) {
-      throw error;
-    }
+    await auth.validatePassword(password);
   }
 
   async setAuth(password: string) {
