@@ -59,19 +59,21 @@ import {
   RequestValidatePassword,
   ResponseType,
 } from "./request-types";
-import { ethers } from "ethers";
+import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-// import { Port } from "./types";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
+import { getChainHistoricHandler } from "@src/services/historic-transactions";
+import { Transaction } from "@src/types";
+import { transformAddress } from "@src/utils/account-utils";
 
 export const getProvider = (rpc: string, type: string) => {
-  if (type.toLowerCase() === "evm")
+  if (type?.toLowerCase() === "evm")
     return new ethers.providers.JsonRpcProvider(rpc as string);
 
-  if (type.toLowerCase() === "wasm")
+  if (type?.toLowerCase() === "wasm")
     return ApiPromise.create({ provider: new WsProvider(rpc as string) });
 };
 
@@ -353,6 +355,24 @@ export default class Extension {
     await Registry.removeContact(address);
   }
 
+  private async getHistoricActivity() {
+    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
+    const selectedChain = await Network.get<Network>();
+
+    const address = selectedAccount?.value.address;
+    // @ts-expect-error -- *
+    const chainPrefix = selectedChain?.chain?.prefix;
+
+    // @ts-expect-error -- *
+    const formatedAddress = transformAddress(address, chainPrefix || 0);
+
+    return await getChainHistoricHandler({
+      // @ts-expect-error -- *
+      chainId: selectedChain!.chain!.id,
+      address: formatedAddress,
+    });
+  }
+
   private async getActivity(): Promise<Record[]> {
     return Activity.getRecords();
   }
@@ -429,8 +449,10 @@ export default class Extension {
     txHash,
     status,
     error,
+    fee,
   }: RequestUpdateActivity) {
-    await Activity.updateRecordStatus(txHash, status, error);
+    // @ts-expect-error -- *
+    await Activity.updateRecordStatus(txHash, status, error, fee);
   }
 
   private async addAsset({ chain, asset }: RequestAddAsset) {
@@ -470,6 +492,8 @@ export default class Extension {
     networkName,
     originAddress,
     rpc,
+    isSwap,
+    tip,
   }: RequestSendSubstrateTx) {
     try {
       const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
@@ -477,9 +501,12 @@ export default class Extension {
       const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
       const { block } = await provider.rpc.chain.getBlock();
 
-      const unsub = await provider
-        .tx(hexExtrinsic)
-        .signAndSend(sender, async ({ events, txHash, status }) => {
+      const unsub = await provider.tx(hexExtrinsic).signAndSend(
+        sender,
+        {
+          tip: tip || undefined,
+        },
+        async ({ events, txHash, status }) => {
           if (String(status.type) === "InBlock") {
             let fee = "";
             let tip = "";
@@ -487,6 +514,7 @@ export default class Extension {
             events.forEach(({ event }) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const eventData = event.toHuman()?.data as any;
+
               if (eventData?.actualFee) {
                 fee = eventData.actualFee.replace(/,/g, "");
               }
@@ -497,39 +525,30 @@ export default class Extension {
             });
 
             const hash = txHash.toString();
-            const date = Date.now();
+            const timestamp = Math.round(new Date().getTime() / 1000);
 
-            const activity: Partial<Record> = {
-              fromBlock: block.header.number.toString(),
-              address: destinationAddress,
-              type: RecordType.TRANSFER,
-              reference: AccountType.WASM,
+            const transaction: Transaction = {
+              id: hash,
+              amount: amount,
+              asset: asset.symbol,
+              blockNumber: Number(block.header.number.toString()),
+              fee,
               hash,
+              originNetwork: networkName,
+              targetNetwork: destinationNetwork,
+              sender: originAddress,
+              recipient: destinationAddress,
               status: RecordStatus.PENDING,
-              createdAt: date,
-              lastUpdated: date,
-              error: undefined,
-              network: networkName,
-              recipientNetwork: destinationNetwork,
-              data: {
-                fee,
-                tip,
-                from: originAddress,
-                to: destinationAddress,
-                gas: "",
-                gasPrice: "",
-                symbol: asset.symbol,
-                value: String(amount),
-                asset: {
-                  id: asset.id,
-                  // color: asset.color,
-                },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              } as any,
+              tip,
+              timestamp,
+              type: RecordType.TRANSFER,
+              isSwap: isSwap || false,
             };
+
             await this.addActivity({
               txHash: hash,
-              record: activity as Record,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              record: transaction as unknown as any,
             });
             this.sendUpdateActivityMessage();
           }
@@ -595,7 +614,8 @@ export default class Extension {
             this.sendUpdateActivityMessage();
             unsub();
           }
-        });
+        }
+      );
 
       return true;
     } catch (error) {
@@ -611,63 +631,73 @@ export default class Extension {
     asset,
     destinationAddress,
     destinationNetwork,
-    // fee,
     networkName,
     originAddress,
     rpc,
-    txHash,
+    isSwap,
+    evmTx,
   }: RequestSendEvmTx) {
+    if (!evmTx) {
+      return;
+    }
     try {
       const api = (await getProvider(
         rpc,
         AccountType.EVM
       )) as ethers.providers.JsonRpcProvider;
-      const txReceipt = await api.getTransaction(txHash);
-      const date = Date.now();
-      const activity: Partial<Record> = {
-        address: destinationAddress,
-        type: RecordType.TRANSFER,
-        reference: AccountType.EVM,
+
+      const seed = await this.showKey();
+
+      const singer = new Wallet(seed as string, api);
+
+      const tx = await singer.sendTransaction(evmTx);
+      const txHash = tx.hash;
+
+      const transaction: Transaction = {
+        id: txHash,
+        amount: amount,
+        asset: asset.symbol,
+        blockNumber: tx.blockNumber!,
         hash: txHash,
+        originNetwork: networkName,
+        recipient: destinationAddress,
+        targetNetwork: destinationNetwork,
+        sender: originAddress,
         status: RecordStatus.PENDING,
-        createdAt: date,
-        lastUpdated: date,
-        error: undefined,
-        network: networkName,
-        recipientNetwork: destinationNetwork,
-        data: {
-          from: originAddress,
-          to: destinationAddress,
-          gas: txReceipt.gasLimit.toString(),
-          gasPrice: txReceipt.gasPrice?.toString() || "",
-          symbol: asset.symbol,
-          value: String(amount),
-          asset: {
-            id: asset.id,
-          },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any,
+        type: RecordType.TRANSFER,
+        tip: "",
+        timestamp: tx.timestamp!,
+        fee: "",
+        isSwap: isSwap || false,
       };
-      await this.addActivity({ txHash, record: activity as Record });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await this.addActivity({ txHash, record: transaction as any });
       this.sendUpdateActivityMessage();
+
+      const txReceipt = await api.getTransaction(txHash);
+
       const result = await txReceipt.wait();
+
       const status =
         result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
-      // result.status === 1 &&
-      //   swap &&
-      //   (await Extension.addSwap(swap.protocol, { id: swap.id }));
+
+      const { gasUsed, effectiveGasPrice } = result;
+
+      const fee = utils.formatEther(gasUsed.mul(effectiveGasPrice).toString());
+
       const error = "";
-      await this.updateActivity({ txHash, status, error });
+      await this.updateActivity({ txHash, status, error, fee });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
       this.sendUpdateActivityMessage();
+      return true;
     } catch (error) {
-      this.sendTxNotification({ title: `tx failed`, message: txHash });
-      await this.updateActivity({
-        txHash,
-        status: RecordStatus.FAIL,
-        error: String(error),
-      });
-      // captureError(error);
+      this.sendTxNotification({ title: `tx failed`, message: "" });
+      // await this.updateActivity({
+      //   txHash,
+      //   status: RecordStatus.FAIL,
+      //   error: String(error),
+      // });
     }
   }
 
@@ -777,6 +807,8 @@ export default class Extension {
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
+      case "pri(activity.getHistoricActivity)":
+        return this.getHistoricActivity();
       case "pri(activity.getActivity)":
         return this.getActivity();
       case "pri(activity.addActivity)":

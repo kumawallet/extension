@@ -1,9 +1,8 @@
-import { RELAY_CHAIN_TESTNETS } from "@src/constants/chains";
 import { Map } from "../interfaces";
 import { XCM, getAssets, getBeneficiary, getDest } from "../utils";
 
 export const ROCOCO_ASSET_HUB_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAIN_TESTNETS.ROCOCO]: ({ address, amount }) => ({
+  rococo: ({ address, amount }) => ({
     pallet: XCM.pallets.POLKADOT_XCM.NAME,
     method: XCM.pallets.POLKADOT_XCM.methods.LIMITED_TELEPORT_ASSETS,
     extrinsicValues: {
@@ -31,5 +30,5 @@ enum ASSET_HUB_ASSETS {
 }
 
 export const ROCOCO_ASSET_HUB_ASSETS_MAPPING = {
-  [RELAY_CHAIN_TESTNETS.ROCOCO]: [ASSET_HUB_ASSETS.ROC],
+  rococo: [ASSET_HUB_ASSETS.ROC],
 };

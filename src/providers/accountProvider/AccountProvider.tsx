@@ -16,7 +16,6 @@ import { AccountKey, AccountType } from "@src/accounts/types";
 import { Action, AccountContext, InitialState } from "./types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
-import { account } from "@polkadot/api-derive/balances";
 
 const initialState: InitialState = {
   accounts: [],
@@ -60,12 +59,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       };
     }
     case "update-account-name": {
-      const { name, accountKey  } = action.payload;
+      const { name, accountKey } = action.payload;
       const {
-        selectedAccount: { key , value },
+        selectedAccount: { key, value },
       } = state;
 
-      const newName = accountKey === key ? name  : value.name;
+      const newName = accountKey === key ? name : value.name;
       return {
         ...state,
         accounts: state.accounts.map((account) => {
@@ -91,13 +90,13 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     }
     case "delete-account": {
       const { key } = action.payload;
-      const  allAccounts  = state.accounts;
-     
+      const allAccounts = state.accounts;
+
       const resultAccounts = allAccounts.filter((account) => account.key !== key)
       console.log(resultAccounts)
       return {
         ...state,
-        accounts: resultAccounts ,
+        accounts: resultAccounts,
         selectedAccount: resultAccounts[0]
       };
     }
@@ -156,20 +155,20 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const deleteAccount = async (key:  AccountKey) => {
+  const deleteAccount = async (key: AccountKey) => {
     try {
-      await messageAPI.removeAccount({  key: key });
-      const  allAccounts  = state.accounts;
-      if(allAccounts.length > 1){
-      dispatch({
-        type: "delete-account",
-        payload: {
-          key,
-        },
-      });
-      return "successful";
-    }
-      else{
+      await messageAPI.removeAccount({ key: key });
+      const allAccounts = state.accounts;
+      if (allAccounts.length > 1) {
+        dispatch({
+          type: "delete-account",
+          payload: {
+            key,
+          },
+        });
+        return "successful";
+      }
+      else {
         return null;
       }
     } catch (error) {

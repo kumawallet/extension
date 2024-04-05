@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN, hexToBn } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { captureError } from "./error-handling";
 import { Asset } from "@src/providers/assetProvider/types";
 import {
@@ -145,6 +145,25 @@ export const transformAmountStringToBN = (amount: string, decimals: number) => {
     return amountBN;
   } catch (error) {
     return new BN("0");
+  }
+};
+
+export const transformAmountStringToBigNumber = (
+  amount: string,
+  decimals: number
+) => {
+  try {
+    const [amountWithoutDot, dotAmount] = amount.split(".");
+    const _dotAmount = dotAmount || "";
+    const missingUnits = decimals - _dotAmount.length;
+    const amountWithMissingUnits = `${amountWithoutDot}${_dotAmount}${"0".repeat(
+      missingUnits
+    )}`;
+
+    const amountBN = BigNumber.from(amountWithMissingUnits);
+    return amountBN;
+  } catch (error) {
+    return BigNumber.from("0");
   }
 };
 
@@ -395,4 +414,17 @@ export const getSubtrateNonNativeBalance = (
     reserved,
     transferable: balance.sub(frozen).sub(reserved),
   };
+};
+
+export const formatFees = (fees: string, decimals: number) => {
+  const formated = formatBN(fees, decimals, 6);
+
+  const _decimals = formated.split(".")[1] || "";
+  const threeFirstDecimals = _decimals.slice(0, 3);
+  if (threeFirstDecimals === "000") {
+    return formated;
+  }
+
+  const amount = formated.split(".")[0];
+  return `${amount}.${threeFirstDecimals}`;
 };

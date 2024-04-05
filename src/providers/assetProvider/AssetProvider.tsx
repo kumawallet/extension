@@ -16,7 +16,7 @@ import {
   getWasmAssets,
 } from "@src/utils/assets";
 import { ApiPromise } from "@polkadot/api";
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import AccountEntity from "@src/storage/entities/Account";
 import { BN } from "@polkadot/util";
 import erc20Abi from "@src/constants/erc20.abi.json";
@@ -200,7 +200,8 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "end-loading",
       });
     } finally {
-      getAssetsUSDPrice(assets, selectedChain?.name);
+      if (!selectedChain.isTestnet && !selectedChain.isCustom)
+        getAssetsUSDPrice(assets, selectedChain?.name);
     }
     return assets;
   };
@@ -354,13 +355,15 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
             try {
               if (chain.type === "evm") {
-                const contract = new ethers.Contract(
+                const contract = new Contract(
                   asset.address,
                   erc20Abi,
                   api
                 );
 
+
                 const balance = await contract.balanceOf(accountAddress);
+
 
                 assets[index].balance = balance;
 
@@ -445,7 +448,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         addresToQuery.map(async ({ asset, index }) => {
           const query = asset.symbol;
 
-          const network = COINGECKO_ASSET_MAP[query.toLowerCase()] || query;
+          const network = COINGECKO_ASSET_MAP[query?.toLowerCase()] || query;
 
           const price = await getAssetUSDPrice(network).catch(() => 0);
 
