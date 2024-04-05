@@ -110,6 +110,18 @@
     "derive_description": "Choose an account to derive from",
     "private_key_placeholder": "Enter private key"
   },
+  "account": {
+    "title": "Account",
+    "delete_message": "Are you sure you want to delete this account?",
+    "account": "Account: ",
+    "address": "Address",
+    "private_key": "Private key",
+    "seed_phrase": "Seed phrase",
+    "private_alert": "Please note that anyone with your seed phrase can steal assets from your account",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "view_explorer": "View Explorer"
+  },  
   "balance": {
     "chain_selector": {
       "connected": "connected",
@@ -128,7 +140,8 @@
       "accounts": "Accounts",
       "import": "Import account",
       "create": "Create account"
-    },
+      
+    },  
     "send": "Send",
     "swap": "Swap",
     "buy": "Buy",

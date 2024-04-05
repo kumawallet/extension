@@ -12,20 +12,20 @@ import { Wallet } from "./Wallet";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { CgClose } from "react-icons/cg";
+import {AccountDetails } from "./AccountDetails"
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
-
+  const { t: tAccount } = useTranslation("account");
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [actionSelected, setActionSelected] = useState<'create' | 'import' | null>(null);
-
+  const [actionSelected, setActionSelected] = useState<'create' | 'import' | 'detail' | null>(null);
   const {
     state: { selectedChain },
   } = useNetworkContext();
 
-  const {
+  const { 
     state: { selectedAccount, accounts },
     setSelectedAccount,
     getAllAccounts
@@ -34,6 +34,7 @@ export const AccountList = () => {
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);
   };
+  const [accountData,setAccountData] = useState<Account | null>(null);
 
   const filteredAccounts = useMemo(() => {
     const acc = accounts?.map((acc) => ({
@@ -47,6 +48,7 @@ export const AccountList = () => {
     setActionSelected(null);
     getAllAccounts();
   }
+  
 
   const onCloseModal = () => {
     setIsOpen(false);
@@ -83,7 +85,7 @@ export const AccountList = () => {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full text-center">
+            <div className="flex justify-center min-h-full text-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -93,7 +95,7 @@ export const AccountList = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full transform overflow-hidden rounded-b-2xl bg-[#171720]  p-4 text-left align-middle shadow-xl h-fit transition-all">
+                <Dialog.Panel className="w-[357px] transform overflow-hidden rounded-b-2xl bg-[#171720]  p-4 text-left align-middle shadow-xl h-fit transition-all">
 
 
                   <div className="py-2 px-4">
@@ -115,6 +117,8 @@ export const AccountList = () => {
                                 address={account?.value?.address}
                                 name={account?.value?.name}
                                 type={account?.type}
+                                more={() => { setAccountData(account);
+                                  setActionSelected('detail')}}
                                 onSelect={() => changeSelectedAccount(account as Account)}
                                 isSelected={account?.key === selectedAccount?.key}
                               />
@@ -146,7 +150,19 @@ export const AccountList = () => {
                                 onBack={() => setActionSelected(null)}
                                 onFinish={onFinshCreatingOrImporting}
                               />
-                            ) : (
+                            ): actionSelected === 'detail' ? (
+                              <>
+                                {accountData ? (
+                                    <AccountDetails
+                                      title={`${tAccount("title")}`}
+                                      onBack={() => setActionSelected(null)}
+                                      accountData={accountData}
+                                    />
+                                  ) : setActionSelected(null)}
+                              
+                              </>
+                            ) :
+                             (
                               <ImportWalletFromInside
                                 onClose={onCloseModal}
                                 onBack={() => setActionSelected(null)}
