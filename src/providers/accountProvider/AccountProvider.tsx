@@ -93,7 +93,6 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       const allAccounts = state.accounts;
 
       const resultAccounts = allAccounts.filter((account) => account.key !== key)
-      console.log(resultAccounts)
       return {
         ...state,
         accounts: resultAccounts,
