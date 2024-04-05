@@ -16,6 +16,7 @@ import { AccountKey, AccountType } from "@src/accounts/types";
 import { Action, AccountContext, InitialState } from "./types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { account } from "@polkadot/api-derive/balances";
 
 const initialState: InitialState = {
   accounts: [],
@@ -59,14 +60,16 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       };
     }
     case "update-account-name": {
-      const { name } = action.payload;
+      const { name, accountKey  } = action.payload;
       const {
-        selectedAccount: { key },
+        selectedAccount: { key , value },
       } = state;
+
+      const newName = accountKey === key ? name  : value.name;
       return {
         ...state,
         accounts: state.accounts.map((account) => {
-          if (account.key === key) {
+          if (account.key === accountKey) {
             return {
               ...account,
               value: {
@@ -81,9 +84,21 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
           ...state.selectedAccount,
           value: {
             ...state.selectedAccount.value,
-            name,
+            name: newName,
           },
         },
+      };
+    }
+    case "delete-account": {
+      const { key } = action.payload;
+      const  allAccounts  = state.accounts;
+     
+      const resultAccounts = allAccounts.filter((account) => account.key !== key)
+      console.log(resultAccounts)
+      return {
+        ...state,
+        accounts: resultAccounts ,
+        selectedAccount: resultAccounts[0]
       };
     }
     default:
@@ -132,8 +147,31 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "update-account-name",
         payload: {
           name,
+          accountKey
         },
       });
+    } catch (error) {
+      captureError(error);
+      showErrorToast(tCommon("failed_to_update_account"));
+    }
+  };
+
+  const deleteAccount = async (key:  AccountKey) => {
+    try {
+      await messageAPI.removeAccount({  key: key });
+      const  allAccounts  = state.accounts;
+      if(allAccounts.length > 1){
+      dispatch({
+        type: "delete-account",
+        payload: {
+          key,
+        },
+      });
+      return "successful";
+    }
+      else{
+        return null;
+      }
     } catch (error) {
       captureError(error);
       showErrorToast(tCommon("failed_to_update_account"));
@@ -264,6 +302,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         importAccount,
         createAccount,
         updateAccountName,
+        deleteAccount,
 
       }}
     >
