@@ -61,8 +61,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
       <div className={styleSingIn.countainerBody}>
         <Logo
           className={styleSingIn.logo}
-          fillClassName="fill-chain-default-primary"
-          lineClassName="#070707"
+          size="200"
         />
         <p className={styleSingIn.welcome}>
           {t("welcome")}
