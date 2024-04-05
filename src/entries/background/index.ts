@@ -36,7 +36,7 @@ cryptoWaitReady()
     PolkadotKeyring.loadAll({
       type: "sr25519",
     });
-    console.log("polkadot keyring loaded");
+    console.log("keyring loaded");
   })
   .catch((error): void => {
     console.error("initialization failed", error);

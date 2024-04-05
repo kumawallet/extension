@@ -101,6 +101,10 @@ export default class Auth {
       throw error;
     }
   }
+  static async validatePassword(password: string) {
+    const auth = Auth.getInstance();
+    await auth.validatePassword(password);
+  }
 
   async setAuth(password: string) {
     this.password = password;
@@ -135,14 +139,18 @@ export default class Auth {
   static async restorePassword(
     backup: string,
     password: string,
+    newPassword: string,
     privateKeyOrSeed: string
   ) {
     const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
     if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
     Auth.isUnlocked = true;
-    Auth.password = decryptedBackup as string;
+    if (Auth.password !== password) {
+      throw new Error("invalid_current_password");
+    }
+
     const vault = await Vault.getInstance();
-    Auth.password = password;
+    Auth.password = newPassword;
     await Vault.set(vault);
   }
 }

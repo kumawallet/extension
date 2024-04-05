@@ -110,6 +110,18 @@
     "derive_description": "Choose an account to derive from",
     "private_key_placeholder": "Enter private key"
   },
+  "account": {
+    "title": "Account",
+    "delete_message": "Are you sure you want to delete this account?",
+    "account": "Account: ",
+    "address": "Address",
+    "private_key": "Private key",
+    "seed_phrase": "Seed phrase",
+    "private_alert": "Please note that anyone with your seed phrase can steal assets from your account",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "view_explorer": "View Explorer"
+  },  
   "balance": {
     "chain_selector": {
       "connected": "connected",
@@ -128,7 +140,8 @@
       "accounts": "Accounts",
       "import": "Import account",
       "create": "Create account"
-    },
+      
+    },  
     "send": "Send",
     "swap": "Swap",
     "buy": "Buy",
@@ -139,7 +152,7 @@
     "manage_assets": "Manage assets",
     "wasm_based": "Substrate based",
     "evm_based": "EVM",
-    "wasm_baed_testnets": "Substrate based testnets",
+    "wasm_based_testnets": "Substrate based testnets",
     "evm_based_testnets": "EVM testnets"
   },
   "settings": {
@@ -230,23 +243,34 @@
     "reset": "Reset"
   },
   "send": {
-    "title": "Send token",
+    "send_title": "Send",
+    "review_transfer_title": "Review transfer",
     "from": "From",
     "to": "To",
-    "destination_account": "Destination account",
+    "asset": "Asset",
+    "bal": "Bal",
+    "max": "MAX",
+    "recipient_address": "Recipient address",
+    "add_address":"Add address",
     "amount": "Amount",
     "total": "Total",
     "available": "Available",
-    "gas_limit": "Gas limit",
+    "no_contacts": "No contacts added yet",
     "estimated_fee": "Estimated fee",
-    "estimated_total": "Estimated total",
     "tip": "Tip (optional)",
     "transfer": "Transfer",
     "chains": "Chains",
     "assets": "Assets",
     "details": "Details",
     "confirm": "Confirm",
+    "select_asset": "Select asset",
+    "select_chain": "Select chain",
     "tx_send": "Transaction sent",
+    "sender": "Sender",
+    "network": "Network",
+    "tip_review": "Tip",
+    "address_book": "Address book",
+    "transer_using_xcm": "Transfer executed using XCM",
     "insufficient_balance": "Insufficient balance",
     "continue": "Continue",
     "invalid_address": "Invalid address",
@@ -254,8 +278,7 @@
     "invalid_method": "Invalid method",
     "invalid_params": "Invalid params",
     "invalid_abi": "Invalid ABI",
-    "contract_error": "An error occurred with the contract",
-    "xcm_alert_message": "Make sure to transfer enough tokens to pay the fee with this token on the other chain."
+    "contract_error": "An error occurred with the contract"
   },
   "manage_assets": {
     "title": "Manage Assets",
@@ -311,5 +334,15 @@
     "tx_send":"Transaction sent",
     "error_fetching_swaps": "Error fetching swaps",
     "error_setting_max_amount": "Error setting max amount"
+  },
+  "change_password": {
+    "title": "Change your password",
+    "current_password": "Current password",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "password_tip": "Use letters, numbers and characters to add extra security.",
+    "yes_i_understand": "Yes, I understand",
+    "password_changed": "Password changed",
+    "save": "Save"
   }
 }

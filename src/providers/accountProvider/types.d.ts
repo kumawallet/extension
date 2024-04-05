@@ -20,7 +20,9 @@ interface AccountContext {
   importAccount: (account: AccountFormType) => Promise<boolean>;
   createAccount: (account: AccountFormType) => Promise<boolean>;
   updateAccountName: (accountKey: AccountKey, name: string) => Promise<void>;
-  restorePassword: (account: AccountFormType) => Promise<boolean>;
+  deleteAccount: (
+    accountKey: AccountKey
+  ) => Promise<"successful" | null | undefined>;
 }
 
 type Action =
@@ -46,5 +48,12 @@ type Action =
       type: "update-account-name";
       payload: {
         name: string;
+        accountKey?: string;
+      };
+    }
+  | {
+      type: "delete-account";
+      payload: {
+        key: string;
       };
     };

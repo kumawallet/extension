@@ -1,4 +1,4 @@
-import { PARACHAINS_TESTNETS, ROCOCO_PARACHAINS } from "@src/constants/chains";
+import { ROCOCO_PARACHAINS } from "@src/constants/chains";
 import { Map } from "../interfaces";
 import {
   XCM,
@@ -9,11 +9,7 @@ import {
 } from "../utils";
 
 export const ROCOCO_EXTRINSICS: { [key: string]: Map } = {
-  [PARACHAINS_TESTNETS.ROCOCO_ASSET_HUB]: ({
-    address,
-    amount,
-    xcmPalletVersion,
-  }) => ({
+  "rococo-asset-hub": ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.LIMITED_TELEPORT_ASSETS,
     extrinsicValues: {

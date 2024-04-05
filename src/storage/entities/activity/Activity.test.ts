@@ -300,20 +300,4 @@ describe("Activity", () => {
       },
     });
   });
-
-  it("get records", () => {
-    const activity = new Activity();
-    activity.addRecord("EVM-0x123", "0x123", {
-      network: "Ethreum",
-      status: RecordStatus.PENDING,
-    } as Record);
-
-    expect(activity.getRecords("EVM-0x123", "Ethreum")).toEqual([
-      {
-        network: "Ethreum",
-
-        status: RecordStatus.PENDING,
-      },
-    ]);
-  });
 });

@@ -13,9 +13,6 @@ import {
   SettingType,
 } from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
-import { BsGear } from "react-icons/bs";
-import { SETTINGS_MANAGE_NETWORKS } from "@src/routes/paths";
-import { Switch } from "@headlessui/react";
 import { captureError } from "@src/utils/error-handling";
 import { useNetworkContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
@@ -101,29 +98,8 @@ export const General = () => {
       captureError(error);
       showErrorToast(tCommon("failed_to_update_setting"));
     }
-  0}
-
-  const changeShowTestnets = async () => {
-    try {
-      const showTestnetsSetting = settings.find(
-        (setting) => setting.name === SettingKey.SHOW_TESTNETS
-      );
-      if (showTestnetsSetting) {
-        settings[settings.indexOf(showTestnetsSetting)].value = !showTestnets;
-        setShowTestnets(!showTestnets);
-        await messageAPI.updateSetting({
-          type: SettingType.GENERAL,
-          key: SettingKey.SHOW_TESTNETS,
-          value: !showTestnets
-        })
-      }
-      initializeNetwork()
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon("failed_to_update_setting"));
-    }
-  };
-
+    0
+  }
   if (isLoading) {
     return <Loading />;
   }

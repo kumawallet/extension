@@ -1,7 +1,7 @@
-import Record from "@src/storage/entities/activity/Record";
+import { Transaction } from "@src/types";
 
 export interface InitialState {
-  activity: Record[];
+  activity: Transaction[];
 }
 
 export interface TxContext {
@@ -12,7 +12,7 @@ export type Action =
   | {
       type: "init-activity";
       payload: {
-        activity: Record[];
+        activity: Transaction[];
       };
     }
   | {

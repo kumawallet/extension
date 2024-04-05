@@ -27,7 +27,10 @@ export const formatAccount = (_account: string) => {
   return { address, type };
 };
 
-export const transformAddress = (address: string, addressPrefix = 0) => {
+export const transformAddress = (
+  address: string,
+  addressPrefix: number | undefined = 0
+) => {
   if (!address) return "";
 
   if (address.startsWith("0x")) return address;

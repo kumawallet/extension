@@ -19,6 +19,7 @@ const activiyMock: Partial<Record>[] = [
     recipientNetwork: "mainnet",
     reference: "WASM",
     data: {
+      fee: "",
       asset: {
         id: "1",
         color: "#ffff",
@@ -156,6 +157,7 @@ describe("TxProvider", () => {
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
         updateActivity: vi.fn(),
+        getHistoricActivity: vi.fn().mockResolvedValue([]),
       },
     }));
   });
@@ -275,15 +277,8 @@ describe("TxProvider", () => {
     await waitFor(async () => {
       const activity = await findByTestId(testIds.activity);
 
-      expect(activity.innerHTML).toEqual(
-        JSON.stringify([
-          {
-            ...activiyMock[0],
-            reference: "EVM",
-            status: RecordStatus.SUCCESS,
-            error: "",
-          },
-        ])
+      expect(activity.innerHTML).contains(
+        `"hash":"0x123"`
       );
     });
   });

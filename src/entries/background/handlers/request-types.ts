@@ -13,6 +13,8 @@ import {
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
+import { HistoricTransaction } from "@src/types";
+import { providers } from "ethers";
 
 export interface RequestSignUp {
   password: string;
@@ -34,8 +36,8 @@ export interface RequestImportAccount {
   isSignUp: boolean | undefined;
 }
 
-export interface RequestRestorePassword {
-  privateKeyOrSeed: string;
+export interface RequestChangePassword {
+  currentPassword: string;
   newPassword: string;
 }
 
@@ -52,6 +54,11 @@ export interface RequestSignIn {
   password: string;
 }
 
+export interface RequestValidatePassword{
+  password: string;
+  key: AccountKey;
+  keyring: AccountType;
+}
 export interface RequestGetAccount {
   key: AccountKey;
 }
@@ -108,6 +115,7 @@ export interface RequestAddActivity {
 export interface RequestUpdateActivity {
   txHash: string;
   status: RecordStatus;
+  fee?: string;
   error?: string | undefined;
 }
 
@@ -152,26 +160,22 @@ interface RequestSendTxBase {
   destinationNetwork: string;
   networkName: string;
   rpc: string;
+  isSwap?: boolean;
 }
 
 export interface RequestSendSubstrateTx extends RequestSendTxBase {
   hexExtrinsic: string;
+  tip?: string;
 }
 
 export interface RequestSendEvmTx extends RequestSendTxBase {
-  txHash: string;
-  fee: {
-    gasLimit: string;
-    maxFeePerGas: string;
-    maxPriorityFeePerGas: string;
-    type?: number;
-  };
+  evmTx?: providers.TransactionRequest;
 }
 
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
-  "pri(accounts.restorePassword)": [RequestRestorePassword, void];
+  "pri(accounts.changePassword)": [RequestChangePassword, void];
   "pri(accounts.removeAccount)": [RequestRemoveAccout, void];
   "pri(accounts.changeAccountName)": [RequestChangeAccountName, void];
   "pri(accounts.areAccountsInitialized)": [null, boolean];
@@ -179,12 +183,12 @@ export interface Request {
   "pri(accounts.getAllAccounts)": [RequestGetAllAccounts, Account[]];
   "pri(accounts.deriveAccount)": [RequestDeriveAccount, Account];
   "pri(accounts.setSelectedAccount)": [Account, void];
-
   "pri(accounts.getSelectedAccount)": [null, Account | undefined];
 
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
+  "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined]
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
@@ -216,6 +220,7 @@ export interface Request {
   "pri(contacts.saveContact)": [RequestSaveContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
+  "pri(activity.getHistoricActivity)": [null, HistoricTransaction[] | null];
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];

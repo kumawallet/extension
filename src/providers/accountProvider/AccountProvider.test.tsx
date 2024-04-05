@@ -1,4 +1,3 @@
-import { CHAINS } from "@src/constants/chains";
 import {
   act,
   fireEvent,
@@ -14,6 +13,7 @@ import i18n from "@src/utils/i18n";
 import { AccountFormType } from "@src/pages";
 import { InitialState } from "./types";
 import { AccountType } from "@src/accounts/types";
+import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 const testIds = {
   createAccount: "create-account",
@@ -52,23 +52,30 @@ const TestComponent = () => {
       />
       <button
         data-testid={testIds.createAccount}
-        onClick={() => createAccount({
-          seed: "mock_seed",
-        } as AccountFormType)}
+        onClick={() =>
+          createAccount({
+            seed: "mock_seed",
+          } as AccountFormType)
+        }
       />
       <button
         data-testid={testIds.importAccount}
-        onClick={() => importAccount({
-          password: "mock_password",
-          privateKeyOrSeed: "mock_private_key",
-          accountType: AccountType.EVM,
-        } as AccountFormType)}
+        onClick={() =>
+          importAccount({
+            password: "mock_password",
+            privateKeyOrSeed: "mock_private_key",
+            accountType: AccountType.EVM,
+          } as AccountFormType)
+        }
       />
       <button
         data-testid={testIds.deriveAccount}
-        onClick={() => deriveAccount({
-          accountType: AccountType.EVM,
-        } as AccountFormType)}
+        onClick={() =>
+          deriveAccount({
+            name: "",
+            accountType: AccountType.EVM,
+          })
+        }
       />
       <button
         data-testid={testIds.updateAccountName}
@@ -94,20 +101,18 @@ const importAccount = vi.fn().mockReturnValue(true);
 const changeAccountName = vi.fn();
 
 const setSelectedAccount = vi.fn();
-const getSelectedAccount = vi.fn().mockReturnValue(selectedEVMAccountMock);
-const getAllAccounts = vi.fn();
+const getSelectedAccount = vi.fn().mockReturnValue(() => selectedEVMAccountMock);
+const getAllAccounts = vi.fn().mockReturnValue([selectedEVMAccountMock]);
 // const getNetwork = vi.fn();
 
 describe("AccountProvider", () => {
   beforeAll(() => {
-    vi.mock("../networkProvider/NetworkProvider.tsx", () => ({
-      useNetworkContext: vi.fn().mockReturnValue({
+    vi.mock("../networkProvider/NetworkProvider", () => ({
+      useNetworkContext: vi.fn(() => ({
         state: {
-          selectedChain: CHAINS[0].chains[1],
-        },
-        setNewRpc: vi.fn(),
-        setSelectNetwork: vi.fn(),
-      }),
+          selectedChain: SUBTRATE_CHAINS[0],
+        }
+      })),
     }));
     vi.mock("@src/hooks", () => ({
       useToast: vi.fn().mockReturnValue({
@@ -126,7 +131,7 @@ describe("AccountProvider", () => {
         deriveAccount: () => deriveAccount(),
         createAccounts: () => createAccount(),
       },
-    }))
+    }));
   });
 
   describe("reducer", () => {
@@ -151,7 +156,9 @@ describe("AccountProvider", () => {
     it("should update account name", () => {
       const account = {
         key: "key",
-        name: "originalName",
+        value: {
+          name: "originalName",
+        }
       } as unknown as Account;
 
       const state = {
@@ -164,6 +171,7 @@ describe("AccountProvider", () => {
         type: "update-account-name",
         payload: {
           name: "newName",
+          accountKey: "key",
         },
       });
       expect(result.accounts[0].value.name).toEqual("newName");
@@ -202,15 +210,13 @@ describe("AccountProvider", () => {
   });
 
   it("should call get selected account", async () => {
-    const getNetwork = vi.fn().mockReturnValue({
-      chain: CHAINS[0].chains[2],
-    });
+    const getSelectedAccount = vi
+      .fn()
+      .mockReturnValue(selectedEVMAccountMock);
 
     const Default = await import("@src/messageAPI/api");
-    Default.messageAPI.getNetwork = getNetwork;
 
-    Default.messageAPI.getSelectedAccount = vi.fn().mockReturnValue(selectedEVMAccountMock);
-
+    Default.messageAPI.getSelectedAccount = getSelectedAccount
 
     renderComponent();
 
@@ -219,7 +225,7 @@ describe("AccountProvider", () => {
       fireEvent.click(btn);
     });
     await waitFor(() => {
-      expect(getNetwork).toHaveBeenCalled();
+      expect(getSelectedAccount).toHaveBeenCalled();
     });
   });
 
@@ -233,16 +239,6 @@ describe("AccountProvider", () => {
     await waitFor(() => expect(getAllAccounts).toHaveBeenCalled());
   });
 
-  it("should change account name", async () => {
-    renderComponent();
-
-    const btn = screen.getByTestId(testIds.updateAccountName);
-    act(() => {
-      fireEvent.click(btn);
-    });
-    await waitFor(() => expect(changeAccountName).toHaveBeenCalled());
-  });
-
   it("should set selected account", async () => {
     renderComponent();
 
@@ -251,5 +247,14 @@ describe("AccountProvider", () => {
       fireEvent.click(btn);
     });
     await waitFor(() => expect(setSelectedAccount).toHaveBeenCalled());
+  });
+
+  it("should change account name", async () => {
+    renderComponent();
+    const btn2 = screen.getByTestId(testIds.updateAccountName);
+    act(() => {
+      fireEvent.click(btn2);
+    });
+    await waitFor(() => expect(changeAccountName).toHaveBeenCalled());
   });
 });

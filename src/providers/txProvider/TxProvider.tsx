@@ -40,6 +40,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       const index = _activity.findIndex((a) => a.hash === hash);
       if (index !== -1) {
         _activity[index].status = status;
+        // @ts-expect-error -- *
+
         _activity[index].error = error;
       }
 
@@ -65,14 +67,36 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const loadActivity = async () => {
-    const records = await messageAPI.getActivity();
+    const [savedTxs, historicTxs] = await Promise.all([
+      messageAPI.getActivity(),
+      messageAPI.getHistoricActivity()
+        .then(txs => {
+          if (!txs) return []
+          return txs
+        })
+        .catch(() => []),
+    ])
+
+    const allTxs: any[] = [...savedTxs]
+
+    for (const tx of historicTxs) {
+      const index = allTxs.findIndex((t) => t.hash === tx.hash);
+      if (index === -1) {
+        allTxs.push(tx);
+      }
+    }
+
+    const orderedTxs = allTxs.sort((a, b) => {
+      return b.timestamp - a.timestamp
+    })
+
     dispatch({
       type: "init-activity",
       payload: {
-        activity: records,
+        activity: orderedTxs,
       },
     });
-    return records;
+    return orderedTxs;
   };
 
   const searchWasmTx = async (blockNumber: number, extHash: string) => {
@@ -170,15 +194,15 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const processPendingTxs = async (activityArray: Record[]) => {
-    for (const activity of activityArray) {
-      if (activity.status === RecordStatus.PENDING) {
-        if (activity.reference === "WASM") {
-          searchWasmTx(Number(activity?.fromBlock), activity.hash);
-        } else {
-          searchEvmTx(activity.hash);
-        }
-      }
-    }
+    // for (const activity of activityArray) {
+    //   if (activity.status === RecordStatus.PENDING) {
+    //     if (activity.reference === "WASM") {
+    //       searchWasmTx(Number(activity?.fromBlock), activity.hash);
+    //     } else {
+    //       searchEvmTx(activity.hash);
+    //     }
+    //   }
+    // }
   };
 
   const activityListener = ({
@@ -197,12 +221,6 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     if (selectedAccount.key && selectedChain?.name && api) {
       (async () => {
         const records = await loadActivity();
-        dispatch({
-          type: "init-activity",
-          payload: {
-            activity: records,
-          },
-        });
         processPendingTxs(records);
       })();
     }

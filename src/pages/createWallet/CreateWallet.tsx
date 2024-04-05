@@ -3,10 +3,10 @@ import {
   Congrats,
   CreatePasswordStep,
   AccountFormWrapper,
+  RecoveryPhrase
 } from "@src/components/accountForm";
 import {
   ConfirmRecoveryPhrase,
-
 } from "./components";
 import { useEffect, useMemo } from "react";
 import { Button } from "@src/components/common";
@@ -20,8 +20,6 @@ import { BALANCE } from "@src/routes/paths";
 import { CreateWalletFormValues, validationSteps } from "./validations";
 import { useLoading } from "@src/hooks";
 import { useAccountFormTexts } from "@src/hooks/common/useAccountFormTexts";
-import { messageAPI } from "@src/messageAPI/api";
-import { RecoveryPhrase } from "@src/components/accountForm/RecoveryPhrase";
 
 
 export const CreateWallet = () => {
@@ -97,16 +95,15 @@ export const CreateWallet = () => {
     if (step === 3) {
       starLoading()
 
-      const isSignUp = await messageAPI.alreadySignedUp()
-
 
       const result = await createAccount({
         name: "",
         seed: data.seed,
         password: data.password,
-        isSignUp: !isSignUp,
+        isSignUp: true,
       })
       endLoading()
+
 
       if (result) {
         initializeNetwork()
@@ -138,7 +135,7 @@ export const CreateWallet = () => {
       title={texts.title}
       description={texts.description}
       footer={
-        <Button classname="w-full py-4 text-2xl mb-1" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
+        <Button data-testid="footer-button" classname="w-full py-4 text-2xl mb-1" isDisabled={buttonIsDisabled} isLoading={isLoading} onClick={handleSubmit(onContinue)}>{texts.button}</Button>
       }
       onBack={isLoading ? undefined : onBack}
       centerInnerTitle={step === 4}

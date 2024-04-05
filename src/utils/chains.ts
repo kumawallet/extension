@@ -18,7 +18,7 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
           symbol: _oldChain.nativeCurrency.symbol,
           decimals: _oldChain.nativeCurrency.decimals,
           logo: "",
-          explorer: _oldChain.explorer.wasm.url as string,
+          explorer: _oldChain.explorer.wasm?.url || "",
           isTestnet: false,
           isCustom: true,
           type: "wasm",
@@ -33,7 +33,7 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
           symbol: _oldChain.nativeCurrency.symbol,
           decimals: _oldChain.nativeCurrency.decimals,
           logo: "",
-          explorer: _oldChain.explorer.evm.url as string,
+          explorer: _oldChain.explorer.evm?.url || "",
           isTestnet: false,
           isCustom: true,
           type: "evm",
@@ -51,7 +51,8 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
 
     for (const newChain of newChains) {
       await messageAPI.saveCustomChain({
-        chain: newChain,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        chain: newChain as any,
       });
     }
   } catch (error) {
