@@ -156,7 +156,9 @@ describe("AccountProvider", () => {
     it("should update account name", () => {
       const account = {
         key: "key",
-        name: "originalName",
+        value: {
+          name: "originalName",
+        }
       } as unknown as Account;
 
       const state = {
@@ -169,6 +171,7 @@ describe("AccountProvider", () => {
         type: "update-account-name",
         payload: {
           name: "newName",
+          accountKey: "key",
         },
       });
       expect(result.accounts[0].value.name).toEqual("newName");
