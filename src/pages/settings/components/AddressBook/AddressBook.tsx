@@ -143,7 +143,6 @@ export const AddressBook = () => {
             letterA.localeCompare(letterB)
         );
     }, [contacts, search]);
-
     if (isLoading) {
         return <Loading />;
     }

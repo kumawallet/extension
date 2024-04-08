@@ -54,7 +54,7 @@ export interface RequestSignIn {
   password: string;
 }
 
-export interface RequestValidatePassword{
+export interface RequestValidatePassword {
   password: string;
   key: AccountKey;
   keyring: AccountType;
@@ -188,7 +188,7 @@ export interface Request {
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
-  "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined]
+  "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
@@ -220,7 +220,7 @@ export interface Request {
   "pri(contacts.saveContact)": [RequestSaveContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
-  "pri(activity.getHistoricActivity)": [null, HistoricTransaction[] | null];
+  "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];

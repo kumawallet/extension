@@ -157,7 +157,7 @@ describe("TxProvider", () => {
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
         updateActivity: vi.fn(),
-        getHistoricActivity: vi.fn().mockResolvedValue([]),
+        getHistoricActivity: vi.fn().mockResolvedValue({ transactions: [], hasNextPage: false }),
       },
     }));
   });

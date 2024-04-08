@@ -9,5 +9,5 @@ export abstract class HistoricTransactionsService {
     this.address = address;
   }
 
-  abstract getHistoricTransactions: () => Promise<HistoricTransaction[]>;
+  abstract getHistoricTransactions: () => Promise<HistoricTransaction>;
 }

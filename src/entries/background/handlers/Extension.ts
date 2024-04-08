@@ -209,10 +209,14 @@ export default class Extension {
     await Auth.signIn(password);
   }
 
-  private async validatePassword({ password, key , keyring }: RequestValidatePassword) {
+  private async validatePassword({
+    password,
+    key,
+    keyring,
+  }: RequestValidatePassword) {
     await Auth.validatePassword(password);
-    if (!keyring || !password || !key ) return undefined;
-    const  address = key.split("-")[1];
+    if (!keyring || !password || !key) return undefined;
+    const address = key.split("-")[1];
     const newkeyring = await Vault.getKeyring(keyring);
     return newkeyring.getKey(address);
   }
@@ -764,7 +768,7 @@ export default class Extension {
       case "pri(auth.signIn)":
         return this.signIn(request as RequestSignIn);
       case "pri(auth.validatePassword)":
-        return this.validatePassword(request as RequestValidatePassword)
+        return this.validatePassword(request as RequestValidatePassword);
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

@@ -179,7 +179,7 @@ export const ActivityDetail = () => {
                 </div>
               ) : key === "Network" ? (
                 getXCM(originNetwork, targetNetwork) ? (
-                  <div className={styleAD.countainerNetworks}>
+                  <div className={styleAD.containerNetworks}>
                     <div className={styleAD.networks}>
                       <NetworkIcon
                         networkName={originNetwork}

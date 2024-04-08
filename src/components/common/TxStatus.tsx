@@ -26,7 +26,7 @@ export const Status: FC<statusProps> = ({
     style,
 }) => {
     return (
-        <div className={`${styleTxStatus.countainer} ${chipColor[status as RecordStatus]} ${classname}`} style={style} onClick={onClick}>
+        <div className={`${styleTxStatus.container} ${chipColor[status as RecordStatus]} ${classname}`} style={style} onClick={onClick}>
             {status === RecordStatus.SUCCESS ? (
                 <>
                     <FaCircleCheck className={styleTxStatus.icons} />

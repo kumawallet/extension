@@ -1,11 +1,11 @@
 export const SUBQUERY_CHAINS: {
   [key: string]: string;
 } = {
-  polkadot: "",
+  polkadot: "https://api.subquery.network/sq/kumawallet/kuma-polkadot",
   acala: "",
-  astar: "",
-  "astar-evm": "",
-  "moonbeam-evm": "",
+  astar: "https://api.subquery.network/sq/kumawallet/kuma-astar",
+  "astar-evm": "https://api.subquery.network/sq/kumawallet/kuma-astar",
+  "moonbeam-evm": "https://api.subquery.network/sq/kumawallet/kuma-moonbeam",
   ethereum: "",
   polygon: "",
   binance: "",

@@ -55,7 +55,7 @@ export const ForgotPass = () => {
     <PageWrapper>
 
       <HeaderBack navigate={navigate} title={t("title")} />
-      <div className={styleForgotPass.countainerBody}>
+      <div className={styleForgotPass.containerBody}>
         <p className={styleForgotPass.text}>
           {t("paragraph_1")}
         </p>
@@ -66,7 +66,7 @@ export const ForgotPass = () => {
           {t("paragraph_3")}
           <a className={styleForgotPass.docs}>{t("docs")}</a>
         </p>
-        <div className={styleForgotPass.countainerCheckBox}>
+        <div className={styleForgotPass.containerCheckBox}>
           <input
             type="checkbox"
             checked={isChecked}
