@@ -3,6 +3,7 @@ import {
   BsFillEyeSlashFill,
   BsEyeFill,
 } from "react-icons/bs";
+import { FiEye } from "react-icons/fi";
 import { formatAmountWithDecimals, getCurrencyInfo } from "@src/utils/assets";
 import {
   useAccountContext,
@@ -43,7 +44,23 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   }, [selectedAccount]);
 
   return (
-    <div className="mx-auto">
+    <div className="mx-auto ">
+      <div className="flex justify-center w-full">
+      {!showBalance ? (
+          <FiEye 
+            data-testid="show-balance"
+            size={15}
+            onClick={toggleBalance}
+          />
+        ) : (
+          <BsFillEyeSlashFill
+            data-testid="hide-balance"
+            size={15}
+            onClick={toggleBalance}
+          />
+        )}
+      </div>
+      
       <div className="flex mb-4 gap-2 items-center justify-center">
         <div className="flex gap-2 items-center">
           <p className="text-2xl">{currencyLogo}</p>
@@ -53,19 +70,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
               : "***"}
           </p>
         </div>
-        {!showBalance ? (
-          <BsEyeFill
-            data-testid="show-balance"
-            size={23}
-            onClick={toggleBalance}
-          />
-        ) : (
-          <BsFillEyeSlashFill
-            data-testid="hide-balance"
-            size={23}
-            onClick={toggleBalance}
-          />
-        )}
+        
       </div>
     </div>
   );

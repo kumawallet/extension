@@ -78,7 +78,7 @@ export const Wallet: FC<WalletProps> = ({
         {showSelectedIcon && (
           <button
             onClick={onSelect}
-            className={`p-4 text-[6px] rounded-full border relative  ${isSelected
+            className={`p-1 text-[6px] rounded-full border relative  ${isSelected
                 ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
                 : "border-gray-300"
               }`}

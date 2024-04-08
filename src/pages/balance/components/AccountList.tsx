@@ -12,7 +12,8 @@ import { Wallet } from "./Wallet";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { CgClose } from "react-icons/cg";
-import {AccountDetails } from "./AccountDetails"
+import {AccountDetails } from "./AccountDetails";
+import { IconWallet } from "@src/components/icons/wallet"
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
@@ -62,7 +63,10 @@ export const AccountList = () => {
       <button data-testid="account-button"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-full">
+        <div className="flex items-center bg-[#212529] gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-xl">
+          <div className="p-1 bg-[#343A40] mr-[0.1rem]  rounded-full">
+            <IconWallet size="18"/>
+          </div>
           <p className="text-primary-default text-base">
             {selectedAccount?.value?.name}
           </p>
@@ -163,11 +167,18 @@ export const AccountList = () => {
                               </>
                             ) :
                              (
-                              <ImportWalletFromInside
-                                onClose={onCloseModal}
-                                onBack={() => setActionSelected(null)}
-                                onFinish={onFinshCreatingOrImporting}
-                              />
+                              <>
+                                
+                                <ImportWalletFromInside
+                                  onClose={onCloseModal}
+                                  onBack={() => setActionSelected(null)}
+                                  onFinish={onFinshCreatingOrImporting}
+                                />
+
+                                
+                                
+                              </>
+                              
                             )
                           }
                         </>

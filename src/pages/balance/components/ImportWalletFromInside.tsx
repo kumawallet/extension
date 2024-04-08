@@ -68,6 +68,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
 
   return (
     <FormProvider {...methods}>
+      
       <AccountFormInsideWrapper
         onClose={onClose}
         onBack={_onBack}
@@ -75,6 +76,8 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
         step1Title={t("import_account_title")}
         option1Title={t("import_from_seed_phrase")}
         option2Title={t("import_from_private_key")}
+        option1TitleContent={t("import_from_recovery_phrase_title")}
+        option2TitleContent={t("import_from_private_key_title")}
         option1Description={t("import_from_recovery_phrase_description")}
         option2Description={t("import_from_private_key_description")}
         option1Text={t("import_from_seed_phrase")}
@@ -83,7 +86,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           <>
             <ImportFromSeed />
             <Button
-              classname="w-full py-3 md:py-5 text-base md:text-xl mt-2"
+              classname="w-full py-5 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
               isLoading={isLoading}
@@ -96,7 +99,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           <>
             <ImportFromPrivateKey />
             <Button
-              classname="w-full py-3 md:py-5 text-base md:text-xl mt-2"
+              classname="w-full py-5 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
               isLoading={isLoading}
@@ -106,6 +109,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           </>
         }
       />
+      
     </FormProvider>
   );
 };

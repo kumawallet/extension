@@ -5,6 +5,7 @@ import { SEND } from "@src/routes/paths";
 import { formatAmountWithDecimals, formatUSDAmount } from "@src/utils/assets";
 import { BsArrowUpRight } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { FaChevronRight } from "react-icons/fa6";
 
 interface AssetProps {
   asset: IAsset;
@@ -38,7 +39,7 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
       <div
         className={`bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-primary-default rounded-full`}
       >
-        <BsArrowUpRight size={23} onClick={() => navigate(SEND, {
+        <FaChevronRight  size={21} onClick={() => navigate(SEND, {
           state: {
             symbol: asset.symbol,
           }
