@@ -154,3 +154,8 @@ export interface Transaction {
 }
 
 export type HistoricTransaction = Transaction;
+
+export interface AddressBookForm {
+  name: string;
+  address: string;
+}

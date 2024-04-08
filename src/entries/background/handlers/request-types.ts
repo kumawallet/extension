@@ -14,6 +14,7 @@ import {
   SettingValue,
 } from "@src/storage/entities/settings/types";
 import { HistoricTransaction } from "@src/types";
+import { providers } from "ethers";
 
 export interface RequestSignUp {
   password: string;
@@ -53,6 +54,11 @@ export interface RequestSignIn {
   password: string;
 }
 
+export interface RequestValidatePassword {
+  password: string;
+  key: AccountKey;
+  keyring: AccountType;
+}
 export interface RequestGetAccount {
   key: AccountKey;
 }
@@ -159,10 +165,11 @@ interface RequestSendTxBase {
 
 export interface RequestSendSubstrateTx extends RequestSendTxBase {
   hexExtrinsic: string;
+  tip?: string;
 }
 
 export interface RequestSendEvmTx extends RequestSendTxBase {
-  txHash: string;
+  evmTx?: providers.TransactionRequest;
 }
 
 export interface Request {
@@ -181,6 +188,7 @@ export interface Request {
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
+  "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];

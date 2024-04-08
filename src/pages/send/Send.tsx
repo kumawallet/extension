@@ -1,250 +1,230 @@
-import { useMemo, useState } from "react";
-import { PageWrapper } from "@src/components/common";
+import { useCallback, useState } from "react";
+import { Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
-import { FormProvider, useForm } from "react-hook-form";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import {
+  useAccountContext,
+  useAssetContext,
+  useNetworkContext,
+} from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { number, object, string } from "yup";
-import { useLoading, useToast } from "@src/hooks";
-import { useNavigate } from "react-router-dom";
-import { AccountType } from "@src/accounts/types";
-import { ConfirmTx, WasmForm, EvmForm } from "./components";
+import { object, string } from "yup";
+import { useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import { Chain, IAsset, SendForm, Tx } from "@src/types";
-import { BigNumber, Contract } from "ethers";
-import { XCM_MAPPING } from "@src/xcm/extrinsics";
-import { MapResponseEVM } from "@src/xcm/interfaces";
-import { isValidAddress } from "@src/utils/account-utils";
-import { formatBN } from "@src/utils/assets";
+import { Chain } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { Recipient } from "./components/Recipient";
+import { AssetToSend } from "./components/AssetToSend";
+import { FeeAndTip } from "./components/FeeAndTip";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { useNavigate } from "react-router-dom";
+import { providers } from "ethers";
+import { ErrorMessage } from "./components/ErrorMessage";
+import { TxResume } from "./components/TxResume";
+import { transformAmountStringToBN } from "@src/utils/assets";
+import { validateRecipientAddress } from "@src/utils/transfer";
+
+const schema = object({
+  recipientAddress: string().when(["targetNetwork"], ([targetNetwork], schema) => {
+    return schema.test("recipientAddress", "invalid_address", (value) => {
+      if (value?.trim() === "") return true
+      if (!value || !targetNetwork) return false;
+      return validateRecipientAddress(value, targetNetwork.type);
+    })
+  }),
+  asset: object({}).required("Required"),
+  originNetwork: object({}).required("Required"),
+  targetNetwork: object({}).required("Required"),
+  amount: string().required("Required"),
+  tip: string(),
+});
+
+export interface SendTxForm {
+  asset: {
+    id: string;
+    symbol: string;
+    decimals: number;
+    balance: string;
+    address?: string;
+  };
+  amount: string;
+  evmTx?: providers.TransactionRequest;
+  extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
+  fee: string;
+  isLoadingFee?: boolean;
+  isXcm?: boolean;
+  originNetwork: Chain;
+  recipientAddress: string;
+  senderAddress: string;
+  targetNetwork: Chain;
+  tip?: string;
+  isTipEnabled: boolean;
+  haveSufficientBalance: boolean;
+}
 
 export const Send = () => {
   const { t } = useTranslation("send");
-  const { t: tCommon } = useTranslation("common");
   const navigate = useNavigate();
-  const { showErrorToast, showSuccessToast } = useToast();
-  const { isLoading, starLoading, endLoading } = useLoading();
+  const { showSuccessToast, showErrorToast } = useToast();
 
   const {
-    state: { selectedChain, },
+    state: { assets },
+  } = useAssetContext();
+
+  const {
+    state: { selectedChain },
   } = useNetworkContext();
 
   const {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const [tx, setTx] = useState<Tx | null>();
-
-  const schema = useMemo(() => {
-    return object({
-      from: object()
-        .typeError(t("required") as string)
-        .required(t("required") as string),
-      to: object()
-        .typeError(t("required") as string)
-        .required(t("required") as string),
-      destinationAccount: string()
-        .typeError(t("required") as string)
-        .test(
-          "valid address",
-          tCommon("invalid_address") as string,
-          (address) => isValidAddress(address)
-        )
-        .required(t("required") as string),
-      amount: number().required(t("required") as string),
-      asset: object().required(t("required") as string),
-    }).required();
-  }, []);
-
-  const methods = useForm<SendForm>({
+  const methods = useForm<SendTxForm>({
     defaultValues: {
-      from: selectedChain as Chain,
-      to: selectedChain as Chain,
-      destinationAccount: "",
-      amount: 0,
-      asset: {},
+      recipientAddress: "",
+      senderAddress: selectedAccount.value.address,
+      asset: {
+        id: assets[0]?.id,
+        symbol: selectedChain?.symbol,
+        decimals: selectedChain?.decimals || 1,
+        balance: "0",
+        address: assets[0]?.address,
+      },
+      originNetwork: selectedChain as Chain,
+      targetNetwork: selectedChain as Chain,
+      amount: "0",
+      tip: "0",
+      fee: "0",
       isXcm: false,
+      isLoadingFee: false,
+      isTipEnabled: false,
+      haveSufficientBalance: false,
     },
     resolver: yupResolver(schema),
-    mode: "all",
+    mode: "onBlur"
   });
 
-  const { getValues } = methods;
+  const {
+    watch,
+    handleSubmit,
+    formState: { isValid },
+  } = methods;
 
-  const decimals = selectedChain?.decimals || 1;
-  const currencyUnits = 10 ** decimals;
+  const [isConfirmingTx, setIsConfirmingTx] = useState(false);
 
-  const asset = getValues("asset") as IAsset;
-  const amount = getValues("amount");
+  const onBack = useCallback(() => {
+    if (isConfirmingTx) return setIsConfirmingTx(false);
 
-  const sendTx = async () => {
-    starLoading();
-    const amount = getValues("amount");
-    const destinationAddress = getValues("destinationAccount");
-    const originAddress = selectedAccount.value.address;
-    const asset = getValues("asset") as IAsset;
-    const destinationNetwork = getValues("to").name;
-    const isXcm = getValues("isXcm");
-    const to = getValues("to");
+    navigate(-1);
+  }, [isConfirmingTx]);
 
-    try {
-      if (tx?.type === AccountType.WASM) {
-        await messageAPI.sendSubstrateTx({
-          hexExtrinsic: tx.tx,
-          amount: amount.toString(),
-          asset: {
-            id: asset.id,
-            symbol: asset.symbol || "",
-          },
-          destinationAddress,
-          originAddress,
-          destinationNetwork,
-          networkName: selectedChain?.name || "",
-          rpc: selectedChain?.rpcs[0] as string,
-        })
+  const onSubmit: SubmitHandler<SendTxForm> = useCallback(
+    async (data) => {
+      if (!isConfirmingTx) return setIsConfirmingTx(true);
 
-      } else {
-        const isNativeAsset = asset?.id === "-1";
+      try {
+        const {
+          amount,
+          asset,
+          recipientAddress: destinationAddress,
+          senderAddress: originAddress,
+          originNetwork,
+          targetNetwork,
+          extrinsicHash,
+          evmTx,
+          tip,
+        } = data;
 
-        let _tx;
-        const _amount = isNativeAsset
-          ? amount * currencyUnits
-          : amount * 10 ** (asset?.decimals || (0 as number));
+        const txType = originNetwork.type;
 
-        const bnAmount = BigNumber.from(
-          _amount.toLocaleString("fullwide", { useGrouping: false })
-        );
-
-        if (isXcm) {
-          const { method, extrinsicValues } = XCM_MAPPING[selectedChain!.name][
-            to.name
-          ]({
-            address: destinationAddress,
-            amount: bnAmount,
-            assetSymbol: asset.symbol,
-            xcmPalletVersion: "",
-          }) as MapResponseEVM;
-
-          // TODO: refactor
-          _tx = await (tx?.tx as Contract)[method](
-            ...Object.keys(extrinsicValues).map(
-              (key) =>
-                extrinsicValues[
-                key as
-                | "currency_address"
-                | "amount"
-                | "destination"
-                | "weight"
-                ]
-            ),
-            {
-              gasLimit: tx?.fee.gasLimit,
-              maxFeePerGas: tx?.fee["max fee per gas"],
-              maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
-              type: 2,
-            }
-          );
-        } else if (isNativeAsset) {
-          _tx = await tx?.sender.sendTransaction({
-            ...tx.tx,
-          });
-        } else {
-          _tx = await (tx?.tx as Contract).transfer(
+        if (txType === "wasm") {
+          messageAPI.sendSubstrateTx({
+            amount: amount,
+            asset: {
+              id: asset.id,
+              symbol: asset.symbol,
+            },
             destinationAddress,
-            bnAmount,
-            {
-              gasLimit: tx?.fee.gasLimit,
-              maxFeePerGas: tx?.fee["max fee per gas"],
-              maxPriorityFeePerGas: tx?.fee["max priority fee per gas"],
-            }
-          );
+            originAddress,
+            destinationNetwork: targetNetwork.name,
+            networkName: originNetwork.name,
+            rpc: originNetwork.rpcs[0] as string,
+            isSwap: false,
+            hexExtrinsic: extrinsicHash as string,
+            tip: tip
+              ? transformAmountStringToBN(
+                tip,
+                originNetwork.decimals
+              )?.toString()
+              : undefined,
+          });
+        } else if (txType === "evm") {
+          messageAPI.sendEvmTx({
+            amount: amount,
+            asset: {
+              id: asset.id,
+              symbol: asset.symbol,
+            },
+            destinationAddress,
+            originAddress,
+            destinationNetwork: targetNetwork.name,
+            networkName: originNetwork.name,
+            rpc: originNetwork.rpcs[0] as string,
+            isSwap: false,
+            evmTx,
+          });
         }
 
-        // async to avoid waiting for the tx to be mined
-        messageAPI.sendEvmTx({
-          txHash: _tx.hash as string,
-          amount: amount.toString(),
-          asset: {
-            id: asset.id,
-            symbol: asset.symbol || "",
+        showSuccessToast(t("tx_send"));
+        navigate(BALANCE, {
+          state: {
+            tab: "activity",
           },
-          destinationAddress,
-          originAddress,
-          destinationNetwork,
-          networkName: selectedChain?.name || "",
-          rpc: selectedChain?.rpcs[0] as string,
-
-        })
-
+        });
+      } catch (error) {
+        captureError(error);
+        showErrorToast(error);
       }
-      showSuccessToast(t("tx_send"));
-      navigate(BALANCE, {
-        state: {
-          tab: "activity",
-        },
-      });
-    } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const _error: any = error;
-      showErrorToast(_error?.body || _error?.error?.message || _error.message || _error);
-      captureError(_error)
-    }
-    endLoading();
-  };
+    },
+    [isConfirmingTx]
+  );
 
-  const estimatedTotal =
-    asset?.id === "-1"
-      ? `${formatBN(
-        tx?.fee.estimatedTotal.toString() || "",
-        asset.decimals,
-        8
-      )} ${asset?.symbol}`
-      : `${amount} ${asset?.symbol} + ${formatBN(
-        tx?.fee.estimatedTotal.toString() || "",
-        asset.decimals,
-        8
-      )} ${selectedChain?.symbol}`;
+  const isLoadingFees = watch("isLoadingFee");
+  const haveSufficientBalance = watch("haveSufficientBalance");
 
   return (
-    <PageWrapper contentClassName="bg-[#29323C] h-full flex-1">
+    <PageWrapper
+      contentClassName="h-full flex-1"
+      innerContentClassName="flex flex-col"
+    >
+      <div className="flex gap-3 items-center mb-7">
+        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
+        <p className="text-lg">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
+      </div>
+
       <FormProvider {...methods}>
-        {!tx ? (
-          <div className="mx-auto">
-            <div className="flex gap-3 items-center mb-7">
-              <FiChevronLeft
-                size={26}
-                className="cursor-pointer"
-                onClick={() => navigate(-1)}
-              />
+        <div className="flex-1">
+          {!isConfirmingTx ? (
+            <>
+              <Recipient containerClassname="mb-4" />
+              <AssetToSend />
+              <FeeAndTip containerClassname="mt-4" />
+              <ErrorMessage containerClassname="mt-2" />
+            </>
+          ) : (
+            <TxResume />
+          )}
+        </div>
 
-              <p className="text-lg">{t("title")}</p>
-            </div>
-
-            {selectedChain?.type === "wasm" ? (
-              <WasmForm confirmTx={setTx} />
-            ) : (
-              <EvmForm confirmTx={setTx} />
-            )}
-          </div>
-        ) : (
-          <ConfirmTx
-            fee={{
-              gasLimit:
-                tx.type === AccountType.EVM ? tx.fee.gasLimit.toString() : "",
-              estimatedFee: `${formatBN(
-                tx.fee.estimatedFee.toString(),
-                asset?.decimals,
-                10
-              )} ${selectedChain?.symbol || ""}`,
-              estimatedTotal: estimatedTotal,
-            }}
-            onConfirm={sendTx}
-            isLoading={isLoading}
-            onBack={() => setTx(null)}
-          />
-        )}
+        <Button
+          isDisabled={isLoadingFees || !isValid || !haveSufficientBalance}
+          classname="w-full py-3"
+          onClick={handleSubmit(onSubmit)}
+        >
+          {t("send")}
+        </Button>
       </FormProvider>
     </PageWrapper>
   );

@@ -129,6 +129,10 @@ export const Activity = () => {
     // .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
   if (isLoading) {
     return <Loading />;
   }

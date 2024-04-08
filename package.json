@@ -65,6 +65,7 @@
     "react-qr-code": "^2.0.12",
     "react-router-dom": "^6.22.3",
     "react-toastify": "^10.0.5",
+    "react-use": "^17.5.0",
     "uuid": "^9.0.1",
     "virtua": "^0.24.0",
     "yup": "^1.4.0"
@@ -73,7 +74,6 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@polkadot/types-codec": "10.12.2",
-    "@tailwindcss/forms": "^0.5.7",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/chrome": "^0.0.260",

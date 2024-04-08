@@ -56,9 +56,10 @@ import {
   RequestTypes,
   RequestUpdateActivity,
   RequestUpdateSetting,
+  RequestValidatePassword,
   ResponseType,
 } from "./request-types";
-import { ethers, utils } from "ethers";
+import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
@@ -208,6 +209,18 @@ export default class Extension {
     await Auth.signIn(password);
   }
 
+  private async validatePassword({
+    password,
+    key,
+    keyring,
+  }: RequestValidatePassword) {
+    await Auth.validatePassword(password);
+    if (!keyring || !password || !key) return undefined;
+    const address = key.split("-")[1];
+    const newkeyring = await Vault.getKeyring(keyring);
+    return newkeyring.getKey(address);
+  }
+
   private alreadySignedUp() {
     return Vault.alreadySignedUp();
   }
@@ -351,11 +364,14 @@ export default class Extension {
     const selectedChain = await Network.get<Network>();
 
     const address = selectedAccount?.value.address;
+    // @ts-expect-error -- *
     const chainPrefix = selectedChain?.chain?.prefix;
 
+    // @ts-expect-error -- *
     const formatedAddress = transformAddress(address, chainPrefix || 0);
 
     return await getChainHistoricHandler({
+      // @ts-expect-error -- *
       chainId: selectedChain!.chain!.id,
       address: formatedAddress,
     });
@@ -439,6 +455,7 @@ export default class Extension {
     error,
     fee,
   }: RequestUpdateActivity) {
+    // @ts-expect-error -- *
     await Activity.updateRecordStatus(txHash, status, error, fee);
   }
 
@@ -480,6 +497,7 @@ export default class Extension {
     originAddress,
     rpc,
     isSwap,
+    tip,
   }: RequestSendSubstrateTx) {
     try {
       const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
@@ -487,9 +505,12 @@ export default class Extension {
       const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
       const { block } = await provider.rpc.chain.getBlock();
 
-      const unsub = await provider
-        .tx(hexExtrinsic)
-        .signAndSend(sender, async ({ events, txHash, status }) => {
+      const unsub = await provider.tx(hexExtrinsic).signAndSend(
+        sender,
+        {
+          tip: tip || undefined,
+        },
+        async ({ events, txHash, status }) => {
           if (String(status.type) === "InBlock") {
             let fee = "";
             let tip = "";
@@ -513,7 +534,7 @@ export default class Extension {
             const transaction: Transaction = {
               id: hash,
               amount: amount,
-              asset: asset.id,
+              asset: asset.symbol,
               blockNumber: Number(block.header.number.toString()),
               fee,
               hash,
@@ -597,7 +618,8 @@ export default class Extension {
             this.sendUpdateActivityMessage();
             unsub();
           }
-        });
+        }
+      );
 
       return true;
     } catch (error) {
@@ -616,21 +638,30 @@ export default class Extension {
     networkName,
     originAddress,
     rpc,
-    txHash,
     isSwap,
+    evmTx,
   }: RequestSendEvmTx) {
+    if (!evmTx) {
+      return;
+    }
     try {
       const api = (await getProvider(
         rpc,
         AccountType.EVM
       )) as ethers.providers.JsonRpcProvider;
-      const txReceipt = await api.getTransaction(txHash);
+
+      const seed = await this.showKey();
+
+      const singer = new Wallet(seed as string, api);
+
+      const tx = await singer.sendTransaction(evmTx);
+      const txHash = tx.hash;
 
       const transaction: Transaction = {
         id: txHash,
         amount: amount,
         asset: asset.symbol,
-        blockNumber: txReceipt.blockNumber!,
+        blockNumber: tx.blockNumber!,
         hash: txHash,
         originNetwork: networkName,
         recipient: destinationAddress,
@@ -639,7 +670,7 @@ export default class Extension {
         status: RecordStatus.PENDING,
         type: RecordType.TRANSFER,
         tip: "",
-        timestamp: txReceipt.timestamp!,
+        timestamp: tx.timestamp!,
         fee: "",
         isSwap: isSwap || false,
       };
@@ -647,6 +678,9 @@ export default class Extension {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await this.addActivity({ txHash, record: transaction as any });
       this.sendUpdateActivityMessage();
+
+      const txReceipt = await api.getTransaction(txHash);
+
       const result = await txReceipt.wait();
 
       const status =
@@ -660,13 +694,14 @@ export default class Extension {
       await this.updateActivity({ txHash, status, error, fee });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
       this.sendUpdateActivityMessage();
+      return true;
     } catch (error) {
-      this.sendTxNotification({ title: `tx failed`, message: txHash });
-      await this.updateActivity({
-        txHash,
-        status: RecordStatus.FAIL,
-        error: String(error),
-      });
+      this.sendTxNotification({ title: `tx failed`, message: "" });
+      // await this.updateActivity({
+      //   txHash,
+      //   status: RecordStatus.FAIL,
+      //   error: String(error),
+      // });
     }
   }
 
@@ -732,6 +767,8 @@ export default class Extension {
         return this.resetWallet();
       case "pri(auth.signIn)":
         return this.signIn(request as RequestSignIn);
+      case "pri(auth.validatePassword)":
+        return this.validatePassword(request as RequestValidatePassword);
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

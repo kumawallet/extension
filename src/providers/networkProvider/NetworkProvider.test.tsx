@@ -226,7 +226,6 @@ describe("NetworkProvider", () => {
 
       await waitFor(() => {
         const state = JSON.parse(screen.getByTestId(testIds.state).innerHTML);
-        console.log(state);
         expect(state).toHaveProperty("selectedChain", MOCK_EVM_SELECTED_CHAIN);
       });
     });

@@ -40,6 +40,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       const index = _activity.findIndex((a) => a.hash === hash);
       if (index !== -1) {
         _activity[index].status = status;
+        // @ts-expect-error -- *
+
         _activity[index].error = error;
       }
 

@@ -408,6 +408,7 @@ export const useSwap = () => {
           (asset) => asset.symbol === assetToSell.label
         )!;
 
+        // TODO: fix
         const { txHash, type } = await swapper.confirmTx({
           assetToTransfer: {
             id: assetToTransfer.id,
@@ -445,6 +446,8 @@ export const useSwap = () => {
             destinationNetwork: selectedChain?.name || "",
             networkName: selectedChain?.name || "",
             rpc: selectedChain?.rpcs[0] as string,
+            // @ts-expect-error -- *
+
             txHash,
             isSwap: true,
           });

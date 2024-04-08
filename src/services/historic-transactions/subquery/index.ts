@@ -28,7 +28,6 @@ export class SubqueryHandler extends HistoricTransactionsService {
 
       return result?.transactions.nodes || [];
     } catch (error) {
-      console.log("error loading historic transactions", error);
       return [];
     }
   };

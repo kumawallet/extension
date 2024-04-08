@@ -79,6 +79,32 @@ export const getAssets = ({
   };
 };
 
+export const getXTokensAsset = ({
+  version = "V2",
+  fungible = BN0,
+  interior = "Here",
+  parents = 0,
+}: {
+  version?: Version;
+  fungible: fungibleAsset;
+  interior?: interior;
+  parents?: parents;
+}) => {
+  return {
+    [version]: {
+      id: {
+        Concrete: {
+          parents,
+          interior,
+        },
+      },
+      fun: {
+        Fungible: fungible,
+      },
+    },
+  };
+};
+
 export const transformAddress = (address: string) => {
   const isHex = address.startsWith("0x");
 
@@ -142,6 +168,7 @@ export const XCM = {
       NAME: "xTokens",
       methods: {
         TRANSFER: "transfer",
+        TRANSFER_MULTIASSET: "transferMultiasset",
       },
     },
   },
