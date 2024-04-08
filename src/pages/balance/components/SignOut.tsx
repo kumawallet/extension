@@ -3,6 +3,7 @@ import { FooterIcon } from "./FooterIcon"
 import { SIGNIN } from "@src/routes/paths";
 import { MdOutlineLock } from "react-icons/md";
 import { messageAPI } from "@src/messageAPI/api";
+import { Padlock } from "@src/components/icons/Padlock"
 
 export const SignOut = () => {
   const navigate = useNavigate();
@@ -13,9 +14,8 @@ export const SignOut = () => {
   };
 
   return (
-    <FooterIcon
-      icon={MdOutlineLock}
-      onClick={signOut}
-    />
+    <button onClick={signOut}>
+      <Padlock size="25" color="#B0B0CE"/>
+    </button>
   )
 }

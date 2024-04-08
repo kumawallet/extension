@@ -14,7 +14,7 @@ export const ImportFromPrivateKey = () => {
 
   return (
     <>
-      <div className="relative w-full mt-4 md:mt-12">
+      <div className="relative w-full mt-4 md:mt-12  bg-[#1C1C27]">
         <PasswordInput
           isHidden={!showPrivateKey}
           placeholder={t('private_key_placeholder')}
@@ -23,9 +23,10 @@ export const ImportFromPrivateKey = () => {
           innerRef={ref}
           error={errors.privateKeyOrSeed?.message as string || ""}
           {...registerPrivateKey}
+          className="border-0 bg-[#1C1C27] h-4 w-full px-4 py-6 hover:border-0 text-white"
         />
       </div>
-      <p className="text-gray-300 mt-4 md:mt-10 md:text-sm md:tracking-wider">{t("import_account_warning")}</p>
+      <p className="text-white opacity-80 mb-10 mt-4 md:mt-10 md:text-sm md:tracking-wider">{t("import_account_warning")}</p>
     </>
   )
 }

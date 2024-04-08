@@ -2,12 +2,16 @@ import { FC } from "react";
 
 interface SwapProps {
   className?: string;
-  color?: string
+  color?: string;
+  size?: string;
 }
 
-export const Swap: FC<SwapProps> = ({ className = "", color = "white" }) => (
-  <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}
-  >
-    <path d="M31.5542 37.1485C36.2097 34.053 39.2781 28.7599 39.2781 22.75C39.2781 13.2076 31.5424 5.47192 22 5.47192C20.6803 5.47192 19.3952 5.61986 18.1604 5.90008M31.5542 37.1485V31.8438M31.5542 37.1485H37.4594M12.401 8.38147C7.77054 11.481 4.72186 16.7595 4.72186 22.75C4.72186 32.2925 12.4575 40.0282 22 40.0282C23.3197 40.0282 24.6048 39.8803 25.8396 39.6M12.401 8.38147V13.6563M12.401 8.38147H6.54061" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
+export const Swap: FC<SwapProps> = ({ className = "", color = "white", size = "5" }) => (
+  <svg width={size} height={size} viewBox="0 0 32 31" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+<path d="M30.2083 20.6279C30.2083 25.6267 26.1654 29.6696 21.1666 29.6696L22.5229 27.4092" stroke={color} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M1.79169 10.2946C1.79169 5.29585 5.8346 1.25293 10.8334 1.25293L9.47711 3.51335" stroke={color} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19.6812 19.8012C19.6812 24.2058 16.1162 27.7707 11.7117 27.7707C7.30707 27.7707 3.74207 24.2058 3.74207 19.8012C3.74207 15.3966 7.30707 11.8315 11.7117 11.8315C11.9183 11.8315 12.1121 11.8445 12.3317 11.8574C16.2454 12.1545 19.3712 15.2803 19.6683 19.1941C19.6683 19.3878 19.6812 19.5816 19.6812 19.8012Z" stroke={color} stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28.2708 11.1986C28.2708 15.6031 24.7058 19.1682 20.3013 19.1682H19.6683C19.3712 15.2545 16.2454 12.1286 12.3317 11.8315V11.1986C12.3317 6.79398 15.8967 3.229 20.3013 3.229C24.7058 3.229 28.2708 6.79398 28.2708 11.1986Z" stroke={color} stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
 )

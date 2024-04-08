@@ -3,13 +3,17 @@ import { FC } from "react";
 interface SendProps {
   className?: string;
   color?: string;
+  size?: string;
 }
 
 export const Send: FC<SendProps> = ({
   className = "",
   color = "white",
+  size = "5"
 }) => (
-  <svg width="44" height="45" viewBox="0 0 44 45" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M38.4545 6.00441C34.4935 1.7387 4.69855 12.1882 4.72316 16.0034C4.75106 20.3297 16.3589 21.6606 19.5762 22.5633C21.5111 23.106 22.0292 23.6625 22.4753 25.6914C24.4958 34.8798 25.5102 39.45 27.8223 39.552C31.5075 39.715 42.3202 10.1674 38.4545 6.00441Z" stroke={color} strokeWidth="1.72291" />
-  </svg>
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+<path d="M10.0143 9.03121L20.9805 5.37579C25.9018 3.73538 28.5755 6.42204 26.948 11.3433L23.2926 22.3095C20.8385 29.685 16.8085 29.685 14.3543 22.3095L13.2693 19.0545L10.0143 17.9695C2.63887 15.5154 2.63887 11.4983 10.0143 9.03121Z" stroke={color} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.5147 18.4989L18.1389 13.8618" stroke={color} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
 )

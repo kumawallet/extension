@@ -89,7 +89,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         Option1Component={
           <>
             <RecoveryPhrase />
-            <Button variant="contained-black" isLoading={isLoading} classname="w-full py-3 md:py-5 text-base md:text-xl mt-2" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
+            <Button variant="contained-black" isLoading={isLoading} classname="w-full py-5 text-base mt-5" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
           </>
         }
         Option2Component={
@@ -97,7 +97,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
             <SelectAccountToDerive
               onSelect={(account) => setValue("account", account)}
             />
-            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full py-3 md:py-5 text-base md:text-xl mt-2" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button>
+            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full mt-5 py-5 text-base" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button>
           </>
         }
       />

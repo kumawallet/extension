@@ -15,7 +15,7 @@ const WordOption = ({
   onClick: () => void
 }) => {
   return (
-    <button className={`rounded-3xl text-center w-1/2 py-2 md:py-3 font-medium md:text-xl ${isActive ? `bg-linear text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
+    <button className={`rounded-2xl text-center w-1/2 py-3 font-medium md:text-xl ${isActive ? `bg-linear text-white` : "text-[#B0B0CE]"}`} onClick={onClick}>
       {text}
     </button>
   )
@@ -60,9 +60,11 @@ export const ImportFromSeed = () => {
         onChangeWords={onChangeSeed}
         showWords={showWords}
       />
-      <button className="flex gap-2 items-center  mt-2 md:mt-4 font-poppins font-medium" onClick={() => setShowWords(!showWords)}>
+      <button className="flex gap-2 items-center  mt-2 md:mt-4 font-poppins text-white opacity-80 font-normal" onClick={() => setShowWords(!showWords)}>
         <PiEyeLight size={18} />
-        {t("show_recovery_phrase")}
+        <p className="text-[0.65rem]">
+          {t("show_recovery_phrase")}
+        </p>
       </button>
       {errors.privateKeyOrSeed?.message && <p className="text-red-500 text-xs">{t(errors.privateKeyOrSeed?.message)}</p>}
     </>
