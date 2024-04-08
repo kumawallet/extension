@@ -58,7 +58,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
       innerContentClassName={styleSingIn.innerWrapper}
     >
       <ColoredBackground />
-      <div className={styleSingIn.countainerBody}>
+      <div className={styleSingIn.containerBody}>
         <Logo
           className={styleSingIn.logo}
           fillClassName="fill-chain-default-primary"
@@ -71,7 +71,7 @@ export const SignIn: FC<SignInProps> = ({ afterSignIn }) => {
           {t("description")}
         </p>
 
-        <div className={styleSingIn.countainerForm}>
+        <div className={styleSingIn.containerForm}>
           <input
             id="password"
             min={8}

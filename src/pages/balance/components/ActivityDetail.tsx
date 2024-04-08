@@ -179,7 +179,7 @@ export const ActivityDetail = () => {
                 </div>
               ) : key === "Network" ? (
                 getXCM(originNetwork, targetNetwork) ? (
-                  <div className={styleAD.countainerNetworks}>
+                  <div className={styleAD.containerNetworks}>
                     <div className={styleAD.networks}>
                       <NetworkIcon
                         networkName={originNetwork}
@@ -213,17 +213,10 @@ export const ActivityDetail = () => {
               ) : (
                 <p className={styleAD.itemsValue}>{value}</p>
               )}
-<<<<<<< HEAD
-            </div>
-          ))}
-        </div>
-      </div>
-=======
             </div >
           ))}
         </div >
       </div >
->>>>>>> develop
       <Button
         classname={styleAD.button}
         onClick={() => getLink(selectedChain as Chain, hash)}
@@ -231,10 +224,6 @@ export const ActivityDetail = () => {
         {t("explorer")}
       </Button>
       <Footer />
-<<<<<<< HEAD
-    </PageWrapper>
-=======
     </PageWrapper >
->>>>>>> develop
   );
 };

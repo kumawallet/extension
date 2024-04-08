@@ -20,15 +20,22 @@ export const getChainHistoricHandler = async ({
 }: {
   chainId: string;
   address: string;
-}): Promise<HistoricTransaction[] | null> => {
+}): Promise<HistoricTransaction> => {
   const chainConfig = CHAINS_CONFIG[chainId];
 
-  if (!chainConfig) return null;
+  if (!chainConfig)
+    return {
+      transactions: [],
+      hasNextPage: false,
+    };
 
   if (chainConfig === "subquery") {
     const subquery = new SubqueryHandler(chainId, address);
     return subquery.getHistoricTransactions();
   }
 
-  return null;
+  return {
+    transactions: [],
+    hasNextPage: false,
+  };
 };

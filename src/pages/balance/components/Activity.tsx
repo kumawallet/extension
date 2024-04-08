@@ -13,7 +13,6 @@ import {
 } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
 import { Chain } from "@src/types";
-import { estimatedFee } from "@src/pages/balance/components/funtions/Txfunctions";
 import { CiSearch } from "react-icons/ci";
 import { HiOutlineInboxArrowDown } from "react-icons/hi2";
 import { SendIcon } from "@src/components/icons/SendIcon";
@@ -23,6 +22,7 @@ import { SwapIcon } from "@src/components/icons/SwapIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import { transformAddress } from "@src/utils/account-utils";
 import { RecordStatus } from "@src/storage/entities/activity/types";
+import { formatFees } from "@src/utils/assets";
 
 const isSameAddress = (address1: string, address2: string) => {
   return (
@@ -44,7 +44,8 @@ export const Activity = () => {
   } = useAccountContext();
 
   const {
-    state: { activity },
+    state: { activity, hasNextPage, isLoading: isLoadingTxs },
+    loadMoreActivity
   } = useTxContext();
 
   const { t: tCommon } = useTranslation("common");
@@ -129,14 +130,27 @@ export const Activity = () => {
     // .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
   }, [search, activity]);
 
-<<<<<<< HEAD
-=======
 
->>>>>>> develop
-  if (isLoading) {
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, clientHeight, scrollHeight } =
+        document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - 20 && hasNextPage && !isLoadingTxs) {
+        loadMoreActivity();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isLoadingTxs, hasNextPage]);
+
+
+  if (isLoading || isLoadingTxs) {
     return <Loading />;
   }
-
 
   return (
     <>
@@ -152,10 +166,10 @@ export const Activity = () => {
         />
         <CiSearch className={stylesActivity.iconSearch} />
       </div>
-      <div className={stylesActivity.countainerTx}>
+      <div className={stylesActivity.containerTx}>
         {activity.length === 0 && (
           <div
-            className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.countainerEmptyActivity}`}
+            className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.containerEmptyActivity}`}
           >
             <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
           </div>
@@ -198,7 +212,7 @@ export const Activity = () => {
               }
             >
               <div
-                className={`${stylesActivity.flexItemsCenter} ${stylesActivity.countainerButton}`}
+                className={`${stylesActivity.flexItemsCenter} ${stylesActivity.containerButton}`}
               >
                 <div className={stylesActivity.flexItemsCenter}>
                   <a
@@ -219,7 +233,7 @@ export const Activity = () => {
                       ) : (
                         <HiOutlineInboxArrowDown />
                       )}
-                      <div className={stylesActivity.countainerAssetIcon}>
+                      <div className={stylesActivity.containerAssetIcon}>
                         {!logo(asset) ? (
                           <IoIosCloseCircle
                             className={stylesActivity.faildIcon}
@@ -236,7 +250,7 @@ export const Activity = () => {
                   </a>
 
                   {/* title */}
-                  <div className={stylesActivity.countainerText}>
+                  <div className={stylesActivity.containerText}>
                     {isSwap ? (
                       <p className={stylesActivity.textTxType}>{t("swap")}</p>
                     ) : !isSameAddress(
@@ -256,10 +270,10 @@ export const Activity = () => {
                 </div>
               </div>
               <Status status={status as RecordStatus} />
-              <div className={stylesActivity.countainerDivEnd}>
+              <div className={stylesActivity.containerDivEnd}>
                 <div className={stylesActivity.flexItemsCenter}>
                   <div
-                    className={`${stylesActivity.countainerText}${stylesActivity.countainerAmounts}`}
+                    className={`${stylesActivity.containerText}${stylesActivity.containerAmounts}`}
                   >
                     <p
                       className={`${getAmount({
@@ -276,13 +290,8 @@ export const Activity = () => {
                       })}
                     </p>
                     <p className={stylesActivity.textFee}>
-                      {estimatedFee(
-                        {
-                          fee,
-                          symbol: asset,
-                        },
-                        selectedChain?.decimals || 1
-                      )}
+                      {`${formatFees(fee, selectedChain?.decimals || 1)} ${selectedChain?.symbol || ""
+                        }`}
                     </p>
                   </div>
                   <BsChevronRight className={stylesActivity.iconArrow} />

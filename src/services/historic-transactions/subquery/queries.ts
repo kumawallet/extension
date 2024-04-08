@@ -1,9 +1,11 @@
 import { gql } from "graphql-request";
 
-const getWalletTransactions = (address: string) => {
+const getWalletTransactions = (address: string, offset = 0, first = 20) => {
   return gql`
     {
       transactions(
+        first: ${first},
+        offset: ${offset},
         filter: {
           or: [
             {
@@ -19,6 +21,9 @@ const getWalletTransactions = (address: string) => {
           ]
         }
       ) {
+        pageInfo {
+          hasNextPage
+        }
         nodes {
           id
           amount

@@ -33,7 +33,7 @@ export const estimatedFee = (
 ) => {
   if (data.fee) {
     const fee = utils.formatUnits(data.fee, chainDecimals);
-    return `${Number(fee).toFixed(2)} ${data.symbol}`;
+    return `${Number(fee)} ${data.symbol}`;
   }
   return "";
 };

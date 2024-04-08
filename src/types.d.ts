@@ -153,7 +153,10 @@ export interface Transaction {
   isSwap: boolean;
 }
 
-export type HistoricTransaction = Transaction;
+export type HistoricTransaction = {
+  transactions: Transaction[];
+  hasNextPage: boolean;
+};
 
 export interface AddressBookForm {
   name: string;

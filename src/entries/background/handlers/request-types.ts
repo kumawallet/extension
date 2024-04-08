@@ -220,7 +220,7 @@ export interface Request {
   "pri(contacts.saveContact)": [RequestSaveContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
-  "pri(activity.getHistoricActivity)": [null, HistoricTransaction[] | null];
+  "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];

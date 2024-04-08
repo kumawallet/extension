@@ -22,7 +22,7 @@ export const HeaderBack: FC<HeaderProps> = ({
 }) => {
 
   return (
-    <div className={styleHeaderBack.countainer}>
+    <div className={styleHeaderBack.container}>
       <FiChevronLeft
         className={`${iconBack} ${classname}`}
         size={ICON_SIZE}
