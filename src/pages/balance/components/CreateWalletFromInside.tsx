@@ -86,6 +86,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         option2Description={t("derive_description")}
         option1Text={t("create_with_new_seed_phrase")}
         option2Text={t("derive_from_existing_account")}
+        hideOption2
         Option1Component={
           <>
             <RecoveryPhrase />
@@ -94,10 +95,10 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         }
         Option2Component={
           <>
-            <SelectAccountToDerive
+            {/* <SelectAccountToDerive
               onSelect={(account) => setValue("account", account)}
             />
-            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full mt-5 py-5 text-base" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button>
+            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full mt-5 py-5 text-base" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button> */}
           </>
         }
       />

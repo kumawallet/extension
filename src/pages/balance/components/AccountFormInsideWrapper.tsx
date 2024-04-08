@@ -15,11 +15,13 @@ interface AccountFormInsideWrapperProps {
   option1Description?: string;
   option1Text: string;
   option1Title: string;
+  hideOption1?: boolean;
   Option2Component: JSX.Element;
   option2TitleContent?: string;
   option2Description?: string;
   option2Text: string;
   option2Title: string;
+  hideOption2?: boolean;
   step1Title: string;
 }
 
@@ -38,6 +40,8 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
   option2Text,
   option2Title,
   step1Title,
+  hideOption1,
+  hideOption2,
 }) => {
   const [step, setStep] = useState(1);
   const { t } = useTranslation("account_form");
@@ -80,50 +84,69 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
       </div>
       {optionSelected && (
         <>
-          <div className={`${ title === "Recovery phrase" || title === "Accounts" ? "mt-3" : "mt-10"}`}> 
+          <div
+            className={`${title === "Recovery phrase" || title === "Accounts"
+                ? "mt-3"
+                : "mt-10"
+              }`}
+          >
             <p className="text-xl font-bold">
-            {optionSelected === 1 ? option1TitleContent : option2TitleContent}
+              {optionSelected === 1 ? option1TitleContent : option2TitleContent}
             </p>
           </div>
-          <div className={`py-1 text-white opacity-80 font-extralight ${ optionSelected === 1 ? "mb-0" : "mb-3"}`}>
+          <div
+            className={`py-1 text-white opacity-80 font-extralight ${optionSelected === 1 ? "mb-0" : "mb-3"
+              }`}
+          >
             <p>
               {optionSelected === 1 ? option1Description : option2Description}
             </p>
           </div>
         </>
-        
       )}
 
       {step === 1 ? (
         <div className="flex flex-col gap-5">
-          { title === "Import Account" ? (<p className="text-[0.75rem] text-white opacity-80">{t("import_account_description")}</p>) : null}
-          <Button
-            variant="contained-black"
-            onClick={() => _onSelecteOption(1)}
-            classname="w-full py-5"
-          >
-            <div className="flex items-center justify-between px-2 font-semibold ">
-              <div className="flex items-center gap-2">
-                <ASteriskCircle className="w-4 h-4" />
-                <span className="text-[0.85rem]">{option1Text}</span>
+          {title === "Import Account" ? (
+            <p className="text-[0.75rem] text-white opacity-80">
+              {t("import_account_description")}
+            </p>
+          ) : null}
+          {!hideOption1 && (
+            <Button
+              variant="contained-black"
+              onClick={() => _onSelecteOption(1)}
+              classname="w-full py-5"
+            >
+              <div className="flex items-center justify-between px-2 font-semibold ">
+                <div className="flex items-center gap-2">
+                  <ASteriskCircle className="w-4 h-4" />
+                  <span className="text-[0.85rem]">{option1Text}</span>
+                </div>
+                <GoChevronRight size={12} />
               </div>
-              <GoChevronRight size={12} />
-            </div>
-          </Button>
-          <Button
-            variant="contained-black"
-            onClick={() => _onSelecteOption(2)}
-            classname="w-full py-5"
-          >
-            <div className="flex items-center justify-between px-2 font-semibold">
-              <div className="flex items-center gap-2">
-                <SendForeward className="w-4 h-4" />
-                <span className="text-[0.85rem]">{option2Text}</span>
+            </Button>
+          )}
+          {!hideOption2 && (
+            <Button
+              variant="contained-black"
+              onClick={() => _onSelecteOption(2)}
+              classname="w-full py-5"
+            >
+              <div className="flex items-center justify-between px-2 font-semibold">
+                <div className="flex items-center gap-2">
+                  <SendForeward className="w-4 h-4" />
+                  <span className="text-[0.85rem]">{option2Text}</span>
+                </div>
+                <GoChevronRight size={12} />
               </div>
-              <GoChevronRight size={12} />
-            </div>
-          </Button>
-          { title === "Import Account" ? <p className="text-[0.75rem]  text-white opacity-80">{t("import_account_warning")}</p> : null}
+            </Button>
+          )}
+          {title === "Import Account" ? (
+            <p className="text-[0.75rem]  text-white opacity-80">
+              {t("import_account_warning")}
+            </p>
+          ) : null}
         </div>
       ) : (
         <div className="py-2">

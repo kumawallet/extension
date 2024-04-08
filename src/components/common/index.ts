@@ -12,7 +12,6 @@ export * from "./InputErroMessage";
 export * from "./KumaLetters";
 export * from "./Loading";
 export * from "./Logo";
-export * from "./LogoAccountForm";
 export * from "./PageWrapper";
 export * from "./ReEnterPassword";
 export * from "./SelectLanguage";

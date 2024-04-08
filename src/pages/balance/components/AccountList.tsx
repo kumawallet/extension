@@ -12,7 +12,7 @@ import { Wallet } from "./Wallet";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { CgClose } from "react-icons/cg";
-import {AccountDetails } from "./AccountDetails";
+import { AccountDetails } from "./AccountDetails";
 import { IconWallet } from "@src/components/icons/wallet"
 
 export const AccountList = () => {
@@ -26,7 +26,7 @@ export const AccountList = () => {
     state: { selectedChain },
   } = useNetworkContext();
 
-  const { 
+  const {
     state: { selectedAccount, accounts },
     setSelectedAccount,
     getAllAccounts
@@ -35,7 +35,7 @@ export const AccountList = () => {
   const changeSelectedAccount = (account: Account) => {
     setSelectedAccount(account);
   };
-  const [accountData,setAccountData] = useState<Account | null>(null);
+  const [accountData, setAccountData] = useState<Account | null>(null);
 
   const filteredAccounts = useMemo(() => {
     const acc = accounts?.map((acc) => ({
@@ -49,7 +49,7 @@ export const AccountList = () => {
     setActionSelected(null);
     getAllAccounts();
   }
-  
+
 
   const onCloseModal = () => {
     setIsOpen(false);
@@ -65,7 +65,7 @@ export const AccountList = () => {
       >
         <div className="flex items-center bg-[#212529] gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-xl">
           <div className="p-1 bg-[#343A40] mr-[0.1rem]  rounded-full">
-            <IconWallet size="18"/>
+            <IconWallet size="18" />
           </div>
           <p className="text-primary-default text-base">
             {selectedAccount?.value?.name}
@@ -121,8 +121,10 @@ export const AccountList = () => {
                                 address={account?.value?.address}
                                 name={account?.value?.name}
                                 type={account?.type}
-                                more={() => { setAccountData(account);
-                                  setActionSelected('detail')}}
+                                more={() => {
+                                  setAccountData(account);
+                                  setActionSelected('detail')
+                                }}
                                 onSelect={() => changeSelectedAccount(account as Account)}
                                 isSelected={account?.key === selectedAccount?.key}
                               />
@@ -154,32 +156,32 @@ export const AccountList = () => {
                                 onBack={() => setActionSelected(null)}
                                 onFinish={onFinshCreatingOrImporting}
                               />
-                            ): actionSelected === 'detail' ? (
+                            ) : actionSelected === 'detail' ? (
                               <>
                                 {accountData ? (
-                                    <AccountDetails
-                                      title={`${tAccount("title")}`}
-                                      onBack={() => setActionSelected(null)}
-                                      accountData={accountData}
-                                    />
-                                  ) : setActionSelected(null)}
-                              
+                                  <AccountDetails
+                                    title={`${tAccount("title")}`}
+                                    onBack={() => setActionSelected(null)}
+                                    accountData={accountData}
+                                  />
+                                ) : setActionSelected(null)}
+
                               </>
                             ) :
-                             (
-                              <>
-                                
-                                <ImportWalletFromInside
-                                  onClose={onCloseModal}
-                                  onBack={() => setActionSelected(null)}
-                                  onFinish={onFinshCreatingOrImporting}
-                                />
+                              (
+                                <>
 
-                                
-                                
-                              </>
-                              
-                            )
+                                  <ImportWalletFromInside
+                                    onClose={onCloseModal}
+                                    onBack={() => setActionSelected(null)}
+                                    onFinish={onFinshCreatingOrImporting}
+                                  />
+
+
+
+                                </>
+
+                              )
                           }
                         </>
                       )
