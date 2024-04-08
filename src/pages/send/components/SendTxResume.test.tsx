@@ -53,6 +53,26 @@ describe("SendTxResume", () => {
         getValues: (key: string) => functionMocks.getValues(key),
       }),
     }));
+
+    vi.mock("@src/utils/env", () => ({
+      version: "1.0.0",
+      getWebAPI: () => ({
+        tabs: {
+          getCurrent: () => Promise.resolve(undefined),
+        },
+        runtime: {
+          getURL: vi.fn(),
+          connect: vi.fn().mockReturnValue({
+            onMessage: {
+              addListener: vi.fn(),
+            },
+            onDisconnect: {
+              addListener: vi.fn(),
+            },
+          }),
+        },
+      }),
+    }))
   });
 
   describe("render", () => {
