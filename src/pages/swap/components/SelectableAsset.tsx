@@ -3,7 +3,6 @@ import { useState } from "react";
 import { BsCoin } from "react-icons/bs";
 import { SwapAsset } from "../base";
 import { Loading } from "@src/components/common";
-import { VList } from "virtua";
 import { GoChevronDown } from "react-icons/go";
 
 interface SelectableAssetProps<T extends SwapAsset> {

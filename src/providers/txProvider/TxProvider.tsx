@@ -2,6 +2,7 @@ import {
   createContext,
   FC,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useReducer,
@@ -19,6 +20,8 @@ const WebAPI = getWebAPI();
 
 const initialState: InitialState = {
   activity: [],
+  hasNextPage: false,
+  isLoading: true,
 };
 
 const TxContext = createContext({} as TxContext);
@@ -26,11 +29,19 @@ const TxContext = createContext({} as TxContext);
 export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
     case "init-activity": {
-      const { activity } = action.payload;
+      const { activity, hasNextPage } = action.payload;
 
       return {
         ...state,
         activity,
+        hasNextPage,
+        isLoading: false,
+      };
+    }
+    case "load-more-activity": {
+      return {
+        ...state,
+        isLoading: true,
       };
     }
     case "update-activity-status": {
@@ -67,36 +78,49 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const loadActivity = async () => {
-    const [savedTxs, historicTxs] = await Promise.all([
-      messageAPI.getActivity(),
-      messageAPI.getHistoricActivity()
-        .then(txs => {
-          if (!txs) return []
-          return txs
-        })
-        .catch(() => []),
-    ])
+    try {
+      const [savedTxs, { transactions, hasNextPage }] = await Promise.all([
+        messageAPI.getActivity(),
+        messageAPI
+          .getHistoricActivity()
+          .then((response) => response)
+          .catch(() => {
+            return { transactions: [], hasNextPage: false };
+          }),
+      ]);
 
-    const allTxs: any[] = [...savedTxs]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const allTxs: any[] = [...savedTxs];
 
-    for (const tx of historicTxs) {
-      const index = allTxs.findIndex((t) => t.hash === tx.hash);
-      if (index === -1) {
-        allTxs.push(tx);
+      for (const tx of transactions) {
+        const index = allTxs.findIndex((t) => t.hash === tx.hash);
+        if (index === -1) {
+          allTxs.push(tx);
+        }
       }
+
+      const orderedTxs = allTxs.sort((a, b) => {
+        return b.timestamp - a.timestamp;
+      });
+
+      dispatch({
+        type: "init-activity",
+        payload: {
+          activity: orderedTxs,
+          hasNextPage,
+        },
+      });
+      return orderedTxs;
+    } catch (error) {
+      dispatch({
+        type: "init-activity",
+        payload: {
+          activity: [],
+          hasNextPage: false,
+        },
+      });
+      return [];
     }
-
-    const orderedTxs = allTxs.sort((a, b) => {
-      return b.timestamp - a.timestamp
-    })
-
-    dispatch({
-      type: "init-activity",
-      payload: {
-        activity: orderedTxs,
-      },
-    });
-    return orderedTxs;
   };
 
   const searchWasmTx = async (blockNumber: number, extHash: string) => {
@@ -190,7 +214,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       txHash: hash,
       status,
       error,
-    })
+    });
   };
 
   const processPendingTxs = async (activityArray: Record[]) => {
@@ -217,6 +241,22 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const loadMoreActivity = async () => {
+    dispatch({
+      type: "loading-activity",
+    });
+
+    const { transactions, hasNextPage } =
+      await messageAPI.getHistoricActivity();
+    dispatch({
+      type: "load-more-activity",
+      payload: {
+        activity: transactions,
+        hasNextPage,
+      },
+    });
+  };
+
   useEffect(() => {
     if (selectedAccount.key && selectedChain?.name && api) {
       (async () => {
@@ -238,6 +278,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
     <TxContext.Provider
       value={{
         state,
+        loadMoreActivity,
       }}
     >
       {children}

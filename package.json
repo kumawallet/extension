@@ -46,7 +46,6 @@
     "@polkadot/util": "12.6.2",
     "@polkadot/util-crypto": "12.6.2",
     "@sentry/react": "^7.107.0",
-    "@types/lodash.debounce": "^4.0.9",
     "axios": "^1.6.8",
     "ethers": "^5.7.2",
     "graphql-request": "^6.1.0",
@@ -67,7 +66,6 @@
     "react-toastify": "^10.0.5",
     "react-use": "^17.5.0",
     "uuid": "^9.0.1",
-    "virtua": "^0.24.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {
@@ -77,6 +75,7 @@
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/chrome": "^0.0.260",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20.11.28",
     "@types/randomcolor": "^0.5.9",
     "@types/react": "^18.2.66",

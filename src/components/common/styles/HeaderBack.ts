@@ -1,3 +1,3 @@
 export const styleHeaderBack = {
-    countainer : "flex items-center mb-10"
-}
+  container: "flex items-center mb-10",
+};
