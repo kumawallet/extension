@@ -22,7 +22,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { useNavigate } from "react-router-dom";
 import { providers } from "ethers";
 import { ErrorMessage } from "./components/ErrorMessage";
-import { TxResume } from "./components/TxResume";
+import { SendTxResume } from "./components/SendTxResume";
 import { transformAmountStringToBN } from "@src/utils/assets";
 import { validateRecipientAddress } from "@src/utils/transfer";
 
@@ -214,7 +214,7 @@ export const Send = () => {
               <ErrorMessage containerClassname="mt-2" />
             </>
           ) : (
-            <TxResume />
+            <SendTxResume />
           )}
         </div>
 

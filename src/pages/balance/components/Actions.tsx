@@ -16,11 +16,12 @@ export const Actions = () => {
   } = useNetworkContext();
 
   const isSwapAvailable = useMemo(() => {
-    if (!selectedChain?.name) return false;
+    const chainId = selectedChain?.id;
+    if (!chainId) return false;
 
     const chainType = selectedChain.type === "wasm" ? "wasm" : "evm"
 
-    return SUPPORTED_CHAINS_FOR_SWAP[chainType].includes(selectedChain?.name);
+    return SUPPORTED_CHAINS_FOR_SWAP[chainType].includes(chainId);
   }, [selectedChain]);
 
   return (

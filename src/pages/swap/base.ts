@@ -1,17 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
-import {
-  ACALA,
-  ASTAR,
-  BINANCE,
-  ETHEREUM,
-  KUSAMA,
-  MOONBEAM,
-  MOONRIVER,
-  POLKADOT,
-  POLYGON,
-  SHIDEN,
-} from "@src/constants/chains";
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 
 export interface SwapAsset {
   symbol: string;
@@ -39,7 +27,7 @@ export interface ActiveSwaps {
 }
 
 export interface InitProps {
-  chainName: string;
+  chainId: string;
   nativeCurrency: string;
   api: ApiPromise | ethers.providers.JsonRpcProvider;
 }
@@ -102,7 +90,8 @@ export abstract class Swapper {
     amount: string;
     destinationAccount: string;
   }): Promise<{
-    txHash: string;
+    extrinsicHash?: string;
+    evmTx?: providers.TransactionRequest | null;
     type: string;
   }>;
 
@@ -114,12 +103,6 @@ export abstract class Swapper {
 }
 
 export const SUPPORTED_CHAINS_FOR_SWAP = {
-  wasm: [POLKADOT.name, ASTAR.name, ACALA.name, KUSAMA.name, SHIDEN.name],
-  evm: [
-    MOONBEAM.name,
-    MOONRIVER.name,
-    ETHEREUM.name,
-    POLYGON.name,
-    BINANCE.name,
-  ],
+  wasm: ["polkadot", "astar", "acala", "kusama", "shiden", "rococo"],
+  evm: ["moonbeam-evm", "moonriver-evm", "ethereum", "polygon", "binance"],
 };

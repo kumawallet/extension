@@ -17,6 +17,7 @@ interface AssetAmountInputProps {
   onValueChange: (amount: string) => void;
   selectableAsset: JSX.Element;
   showBalance?: boolean
+  isPairValid?: boolean
 }
 
 export const AssetAmountInput: FC<AssetAmountInputProps> = ({
@@ -32,7 +33,8 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   onMax,
   onValueChange,
   selectableAsset,
-  showBalance = true
+  showBalance = true,
+  isPairValid
 }) => {
   const { t } = useTranslation("swap");
 
@@ -83,7 +85,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
         {selectableAsset}
       </div>
-      {minSellAmount && (
+      {minSellAmount && isPairValid && (
         <p>
           {t("min_amount")}: {minSellAmount}
         </p>

@@ -1,13 +1,13 @@
 import i18n from "@src/utils/i18n";
 import { render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
-import { TxResume } from "./TxResume";
+import { SendTxResume } from "./SendTxResume";
 import { cropAccount } from "@src/utils/account-utils";
 
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <TxResume />
+      <SendTxResume />
     </I18nextProvider>
   );
 };
@@ -46,7 +46,7 @@ const functionMocks = {
   }),
 };
 
-describe("TxResume", () => {
+describe("SendTxResume", () => {
   beforeAll(() => {
     vi.mock("react-hook-form", () => ({
       useFormContext: () => ({

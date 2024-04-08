@@ -18,6 +18,7 @@ import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
 import { AccountType } from "@src/accounts/types";
 import { messageAPI } from "@src/messageAPI/api";
+import { transformAddress } from "@src/utils/account-utils";
 
 export interface TxInfoState {
   bridgeType: string;
@@ -27,7 +28,7 @@ export interface TxInfoState {
   destinationAddress: string | null;
 }
 
-interface Tx {
+export interface Tx {
   addressBridge: string;
   addressFrom: string;
   addressTo: string;
@@ -181,6 +182,8 @@ export const useSwap = () => {
     buy: "0",
   });
 
+  const [isPairValid, setIsPairValid] = useState(true);
+
   const [minSellAmount, setMinSellAmount] = useState<string | null>(null);
 
   const [activeSwaps, setActiveSwaps] = useState<ActiveSwaps[]>([]);
@@ -195,7 +198,7 @@ export const useSwap = () => {
     starLoading();
     try {
       const nativeCurrency = selectedChain!.symbol?.toLowerCase();
-      const chainName = selectedChain!.name;
+      const chainId = selectedChain!.id;
 
       const _swapper = new StealthEX();
 
@@ -208,7 +211,7 @@ export const useSwap = () => {
 
       const { nativeAssets, pairs } = await _swapper.init({
         nativeCurrency,
-        chainName,
+        chainId,
         api,
       });
 
@@ -248,6 +251,8 @@ export const useSwap = () => {
         amount: value,
       });
 
+      setIsPairValid(estimatedAmount !== "0");
+
       setMinSellAmount(minAmount);
 
       setAmounts((prevState) => ({
@@ -283,7 +288,7 @@ export const useSwap = () => {
 
   const setMaxAmout = () => {
     try {
-      const amount = assetToSell.balance?.toString();
+      const amount = assetToSell?.balance?.toString();
       const formatedAmount = formatBN(amount || "", assetToSell.decimals);
 
       setAmounts((prevState) => ({
@@ -306,7 +311,10 @@ export const useSwap = () => {
         currencyDecimals: assetToSell.decimals as number,
         currencyTo: assetToBuy.symbol as string,
         amountFrom: amounts.sell,
-        addressFrom: selectedAccount.value.address,
+        addressFrom: transformAddress(
+          selectedAccount.value.address,
+          selectedChain?.prefix
+        ),
         addressTo: recipient.address,
         nativeAsset: {
           symbol: selectedChain!.symbol,
@@ -409,7 +417,7 @@ export const useSwap = () => {
         )!;
 
         // TODO: fix
-        const { txHash, type } = await swapper.confirmTx({
+        const { evmTx, extrinsicHash, type } = await swapper.confirmTx({
           assetToTransfer: {
             id: assetToTransfer.id,
             address: assetToTransfer.address || "",
@@ -421,7 +429,7 @@ export const useSwap = () => {
 
         if (type === AccountType.WASM) {
           await messageAPI.sendSubstrateTx({
-            hexExtrinsic: txHash,
+            hexExtrinsic: extrinsicHash!,
             amount: amounts.sell,
             asset: {
               id: assetToTransfer.id,
@@ -446,15 +454,12 @@ export const useSwap = () => {
             destinationNetwork: selectedChain?.name || "",
             networkName: selectedChain?.name || "",
             rpc: selectedChain?.rpcs[0] as string,
-            // @ts-expect-error -- *
-
-            txHash,
+            evmTx: evmTx!,
             isSwap: true,
           });
         }
 
         showSuccessToast(t("tx_send"));
-        // await swapper.saveSwapInStorage(tx.swapId);
         navigate(BALANCE, {
           state: {
             tab: "activity",
@@ -489,7 +494,7 @@ export const useSwap = () => {
     let isSufficient = false;
 
     if (assetToSell?.balance) {
-      const assetBalance = new BN(assetToSell.balance.toString());
+      const assetBalance = new BN(assetToSell?.balance.toString() || "0");
       const amountBalance = transformAmountStringToBN(
         amounts.sell,
         assetToSell.decimals || 0
@@ -534,8 +539,8 @@ export const useSwap = () => {
 
         setAssetToSell((prevState) => ({
           ...prevState,
-          balance: selectedAsset.balance,
-          decimals: selectedAsset.decimals,
+          balance: selectedAsset?.balance,
+          decimals: selectedAsset?.decimals,
         }));
       }
     })();
@@ -596,5 +601,6 @@ export const useSwap = () => {
     swapInfoMessage,
     tx,
     txInfo,
+    isPairValid,
   };
 };
