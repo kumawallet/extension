@@ -30,10 +30,8 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
   } = useAssetContext();
 
 
-
-
   const totalBalance = assets.reduce(
-    (total, item) => total + (item.amount || 0),
+  (total, item) => total + (item.amount || 0),
     0
   );
 

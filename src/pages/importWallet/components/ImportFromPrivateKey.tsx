@@ -27,7 +27,7 @@ export const ImportFromPrivateKey = () => {
           className="border-0 bg-[#1C1C27] h-4 w-full px-4 py-6 hover:border-0 text-white"
         />
       </div>
-      <p className="text-white opacity-80 mb-10 mt-4 md:mt-10 md:text-sm md:tracking-wider">{t("import_account_warning")}</p>
+      <p className="text-white opacity-80 mb-10 mt-4 text-xs font-light md:tracking-wider">{t("import_account_warning")}</p>
     </>
   )
 }

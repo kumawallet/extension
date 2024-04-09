@@ -54,17 +54,29 @@ export const getNatitveAssetBalance = async (
   }
 };
 
-export const getAssetUSDPrice = async (query: string) => {
-  const _query = query.toLowerCase();
-  const currency = localStorage.getItem("currency") || "usd";
+export const getAssetUSDPrice = async (query: string[]) => {
+  const gqlQuery = `
+  query {
+    getTokenPrice(tokens: [${query}]) {
+      tokens {
+        usd
+      }
+    }
+  }
+`;
   try {
-    const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=${currency}`
-    );
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query: gqlQuery }),
+    });
 
-    const json = await data.json();
-
-    return json?.[_query]?.[currency] || 0;
+    const data = await response.json();
+    const objPrice = data.data.getTokenPrice.tokens
+    const price = objPrice.map((item:any) => item.usd)
+    return price || [];
   } catch (error) {
     captureError(error);
     return 0;
@@ -309,11 +321,8 @@ export const getSubtrateNativeBalance = (
   const reserved = new BN(String(data?.reserved || 0));
   const miscFrozen = new BN(String(data?.miscFrozen || data?.frozen || 0));
   const feeFrozen = new BN(String(data?.feeFrozen || 0));
-
   const frozen = miscFrozen.add(feeFrozen);
-
   const transferable = free.sub(frozen).sub(reserved);
-
   return {
     balance: free,
     transferable,

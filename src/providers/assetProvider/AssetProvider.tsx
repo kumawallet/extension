@@ -200,7 +200,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "end-loading",
       });
     } finally {
-      if (!selectedChain.isTestnet && !selectedChain.isCustom)
+      // if (!selectedChain.isTestnet && !selectedChain.isCustom)
         getAssetsUSDPrice(assets, selectedChain?.name);
     }
     return assets;
@@ -443,26 +443,21 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           });
         }
       }
-
-      await Promise.all(
-        addresToQuery.map(async ({ asset, index }) => {
-          const query = asset.symbol;
-
-          const network = COINGECKO_ASSET_MAP[query?.toLowerCase()] || query;
-
-          const price = await getAssetUSDPrice(network).catch(() => 0);
-
-          const _balance = Number(
+      let symbol : string[] = []; 
+      let balance : number[] = [];
+      addresToQuery.map(async ({ asset}) => {
+          symbol.push(`${JSON.stringify(asset.symbol)}`);
+          balance.push(Number(
             formatAmountWithDecimals(Number(asset.balance), 6, asset?.decimals)
-          );
-
-          copyAssets[index].price = price;
-          copyAssets[index].amount = Number((price * _balance).toFixed(2));
-
-          return;
-        })
-      );
-
+          )) 
+          
+      })
+      const price = await getAssetUSDPrice(symbol);
+      price.map((item:any, index :number) => {
+        copyAssets[index].price = item;
+        copyAssets[index].amount = Number((item * balance[index]).toFixed(2));
+        return;
+      })
       dispatch({
         type: "update-assets",
         payload: {
