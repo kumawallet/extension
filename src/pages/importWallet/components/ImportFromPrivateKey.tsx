@@ -16,6 +16,7 @@ export const ImportFromPrivateKey = () => {
     <>
       <div className="relative w-full mt-4 md:mt-12  bg-[#1C1C27]">
         <PasswordInput
+          data-testid="privateKey"
           isHidden={!showPrivateKey}
           placeholder={t('private_key_placeholder')}
           showIcon

@@ -68,6 +68,7 @@ export const ImportWallet = () => {
         accountType: data.type === 'seed' ? AccountType.WASM : AccountType.EVM
       })
 
+
       endLoading()
 
       if (result) {
@@ -149,7 +150,7 @@ export const ImportWallet = () => {
     <AccountFormWrapper
       showBackButton={step < 4}
       footer={
-        step > 1 ? (<Button isDisabled={buttonIsDisabled} isLoading={isLoading} classname="w-full py-6 text-2xl" onClick={handleSubmit(onContinue)}>{texts.button}</Button>
+        step > 1 ? (<Button data-testid="footer-button" isDisabled={buttonIsDisabled} isLoading={isLoading} classname="w-full py-6 text-2xl" onClick={handleSubmit(onContinue)}>{texts.button}</Button>
         ) : null
       }
       title={texts.title}
