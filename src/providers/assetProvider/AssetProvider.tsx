@@ -200,7 +200,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "end-loading",
       });
     } finally {
-      // if (!selectedChain.isTestnet && !selectedChain.isCustom)
+      if (!selectedChain.isTestnet && !selectedChain.isCustom)
         getAssetsUSDPrice(assets, selectedChain?.name);
     }
     return assets;

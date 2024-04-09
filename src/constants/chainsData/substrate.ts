@@ -104,13 +104,11 @@ export const SUBTRATE_CHAINS: Chain[] = [
   // TESTNETS ========================================
 
   {
-    id:"polkadot",
-    name: "RococoDOT",
-    // id: "rococo",
-    // name: "Rococo",
+    id: "rococo",
+    name: "Rococo",
     rpcs: ["wss://rococo-rpc.polkadot.io"],
     prefix: 42,
-    symbol: "DOT",
+    symbol: "ROC",
     decimals: 12,
     explorer: "https://rococo.subscan.io",
     logo: ROCOCO_LOGO,
