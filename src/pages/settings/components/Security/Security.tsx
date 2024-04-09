@@ -28,6 +28,7 @@ export const Security = () => {
       </div>
 
       <Button
+        data-testid="change-password"
         variant="contained-black"
         classname={`${styleButtomNav} w-full justify-between`}
         onClick={() => navigate(CHANGE_PASSWORD)}

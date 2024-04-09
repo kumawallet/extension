@@ -11,7 +11,6 @@ export const RECEIVE = "/receive";
 export const SEND = "/send";
 export const SETTINGS = "/settings";
 export const SETTINGS_ABOUT_US = "/settings-about-us";
-export const SETTINGS_ADVANCED = "/settings-advanced";
 export const SETTINGS_BUG = "/settings-bug";
 export const SETTINGS_CONTACTS = "/settings-contacts";
 export const SETTINGS_GENERAL = "/settings-general";
