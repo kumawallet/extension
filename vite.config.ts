@@ -75,6 +75,8 @@ export default ({ mode }: { mode: string }) => {
           "**/src/messageAPI/**",
           "**/src/pages/balance/components/SelectAccountToDerive.tsx ",
           "**/src/pages/styles/**",
+          "**/src/pages/settings/components/ManageNetworks.tsx",
+          "**/src/pages/signMessage/**",
         ],
       },
     },
