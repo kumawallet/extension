@@ -57,6 +57,7 @@ import {
   RequestUpdateActivity,
   RequestUpdateSetting,
   RequestValidatePassword,
+  RequestSetAutoLock,
   ResponseType,
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
@@ -208,7 +209,9 @@ export default class Extension {
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
   }
-
+  private async setAutoLock ({ time }: RequestSetAutoLock){
+    await Auth.setAutoLock(time);
+  }
   private async validatePassword({
     password,
     key,
@@ -769,6 +772,8 @@ export default class Extension {
         return this.signIn(request as RequestSignIn);
       case "pri(auth.validatePassword)":
         return this.validatePassword(request as RequestValidatePassword);
+      case "pri(auth.setAutoLock)":
+        return this.setAutoLock(request as RequestSetAutoLock);
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

@@ -28,10 +28,11 @@ export default class CacheAuth extends BaseEntity {
     return entity as CacheAuth;
   }
 
-  static async unlock() {
+  static async unlock(time?: number) {
+    const minutes = time || 30
     const cache = CacheAuth.getInstance();
     cache.isUnlocked = true;
-    cache.timeout = new Date().getTime() + 1000 * 60 * 30;
+    cache.timeout = new Date().getTime() + 1000 * 60 * minutes; //in minutes
     await CacheAuth.set<CacheAuth>(cache);
   }
 
