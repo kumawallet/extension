@@ -6,7 +6,6 @@ import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Register from "@src/storage/entities/registry/Register";
-import { SwapData } from "@src/storage/entities/registry/Swap";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
   SettingKey,
@@ -140,15 +139,6 @@ export interface RequestRemoveTrustedSite {
   site: string;
 }
 
-export interface RequestSwapProtocol {
-  protocol: string;
-}
-
-export interface RequestAddSwap {
-  protocol: string;
-  swap: SwapData;
-}
-
 interface RequestSendTxBase {
   amount: string;
   asset: {
@@ -238,9 +228,6 @@ export interface Request {
   "pri(trustedSites.getTrustedSites)": [null, string[]];
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
   "pri(trustedSites.removeTrustedSite)": [RequestRemoveTrustedSite, void];
-
-  "pri(swap.getSwapsByProtocol)": [RequestSwapProtocol, SwapData[]];
-  "pri(swap.addSwap)": [RequestAddSwap, void];
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];

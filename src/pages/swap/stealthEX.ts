@@ -505,46 +505,14 @@ export class StealthEX implements Swapper {
   }
 
   async getActiveSwaps(): Promise<ActiveSwaps[]> {
-    const swapsInStorage = await messageAPI.getSwapsByProtocol({
-      protocol: this.protocol,
-    });
-    // const swapsInStorage = await Extension.getSwapsByProtocol("stealthex");
-
-    const swapsIds = swapsInStorage
-      .filter((swap) => swap.id)
-      .map((swap) => swap.id);
-
-    if (!swapsIds.length) return [];
-
-    const { getActiveSwaps } = (await this.sendPetition({
-      document: gql`
-        {
-          getActiveSwaps(swapsIds: ["${swapsIds.join('","')}"]) {
-            id
-            addressFrom
-            addressTo
-            amountFrom
-            amountTo
-            currencyFrom
-            currencyTo
-            iconFrom
-            iconTo
-            status
-          }
-        } 
-      `,
-    })) as {
-      getActiveSwaps: ActiveSwaps[];
-    };
-
-    return getActiveSwaps.reverse();
+    return [];
   }
 
-  async saveSwapInStorage(swapId: string) {
-    await messageAPI.addSwap({
-      protocol: this.protocol,
-      swap: { id: swapId },
-    });
+  async saveSwapInStorage() {
+    // await messageAPI.addSwap({
+    //   protocol: this.protocol,
+    //   swap: { id: swapId },
+    // });
     // await Extension.addSwap(this.protocol, { id: swapId });
   }
 

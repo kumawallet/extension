@@ -22,14 +22,12 @@ import Chains, { Chain } from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import Swap from "@src/storage/entities/registry/Swap";
 import { AccountType } from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
   RequestAddActivity,
   RequestAddAsset,
-  RequestAddSwap,
   RequestAddTrustedSite,
   RequestChangeAccountName,
   RequestChangePassword,
@@ -52,7 +50,6 @@ import {
   RequestSetNetwork,
   RequestSignIn,
   RequestSignUp,
-  RequestSwapProtocol,
   RequestTypes,
   RequestUpdateActivity,
   RequestUpdateSetting,
@@ -479,14 +476,6 @@ export default class Extension {
     return TrustedSites.removeSite(site);
   }
 
-  private async getSwapsByProtocol({ protocol }: RequestSwapProtocol) {
-    return Swap.getSwapsByProtocol(protocol);
-  }
-
-  private async addSwap({ protocol, swap }: RequestAddSwap) {
-    return Swap.addSwap(protocol, swap);
-  }
-
   private async sendSubstrateTx({
     amount,
     asset,
@@ -831,11 +820,6 @@ export default class Extension {
         return this.addTrustedSite(request as RequestAddTrustedSite);
       case "pri(trustedSites.removeTrustedSite)":
         return this.removeTrustedSite(request as RequestRemoveTrustedSite);
-
-      case "pri(swap.getSwapsByProtocol)":
-        return this.getSwapsByProtocol(request as RequestSwapProtocol);
-      case "pri(swap.addSwap)":
-        return this.addSwap(request as RequestAddSwap);
 
       case "pri(send.sendSubstrateTx)":
         return this.sendSubstrateTx(request as RequestSendSubstrateTx);

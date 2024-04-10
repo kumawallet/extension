@@ -1,7 +1,3 @@
-export * from "./balance/components/funtions/Txfunctions";
-export * from "./balance/components";
-export * from "./balance/components/style/activity";
-export * from "./balance/components/style/activityDetails";
 export * from "./balance";
 export * from "./callContract";
 export * from "./changePassword";
@@ -28,7 +24,6 @@ export * from "./signIn";
 export * from "./signIn/styles/SingIn";
 export * from "./signMessage";
 export * from "./style/general";
-export * from "./styles/general";
 export * from "./swap/components";
 export * from "./swap/hooks";
 export * from "./swap";
