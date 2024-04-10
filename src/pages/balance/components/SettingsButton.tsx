@@ -10,8 +10,9 @@ export const ButtonSettings = () => {
       data-testid="settings"
       onClick={() => navigate(SETTINGS)}
       className='flex justify-center items-center p-2 rounded-lg hover:bg-gray-500 hover:bg-opacity-20 transition-colors'
-    >
-      <Setting size="24" color='#B0B0CE' />
-    </button>
+
+      >
+        <Setting size="26" color='#B0B0CE' />
+      </button>
   );
 };

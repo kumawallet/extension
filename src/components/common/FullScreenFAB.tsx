@@ -12,7 +12,7 @@ export const FullScreenFAB = () => {
   if (!isInPopup()) return null
 
   return (
-    <button data-testid="full-screen" onClick={openTab}>
+    <button data-testid="full-screen" onClick={openTab} className="hover:bg-gray-500 p-2">
       <Maximize size="50" color="#B0B0CE" />
     </button>
   );

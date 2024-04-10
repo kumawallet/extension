@@ -1,9 +1,10 @@
-import { Fragment, useState } from "react";
+import { Fragment, ReactElement, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { ShowTestnets } from "./ShowTestnets";
 import { ChainsState } from "@src/types";
+import { TfiClose } from "react-icons/tfi";
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -22,6 +23,7 @@ const canShowTestnetToggle = (
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] =  useState(false);
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
@@ -30,10 +32,14 @@ export const ChainSelector = () => {
 
   return (
     <>
+      { isOpen ? <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" /> : null } 
       <Menu>
+        
+      
         <Menu.Button
           data-testid="chain-button"
           className="flex bg-[#212529] gap-2 items-center rounded-xl bg-opacity-20 px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          onClick={() => setIsOpen(true)}
         >
           <img
             src={selectedChain?.logo}
@@ -45,6 +51,7 @@ export const ChainSelector = () => {
             {selectedChain?.name}
           </p>
         </Menu.Button>
+        
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"
@@ -54,15 +61,22 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-99px)] max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
-            <div className="px-6 py-2 pt-2 text-start">
-              <div className="flex flex-col gap-1 py-2">
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-108px)] max-w-lg top-10 w-full bg-[#29323C] outline-0 z-50">
+          
+            <div className=" px-6 py-2 pt-2 text-start">
+              
+              <div className="relativeflex flex-col gap-1 py-2 mt-2 ">
+                <Menu.Button data-testid="chain-button" className="absolute top-6 right-6" onClick={()=>setIsOpen(false)}>
+                  <TfiClose  className="font-thin text-[0.7rem]" />
+                </Menu.Button>
+                <p className="text-base font-light mb-2">Networks</p>
+                <p className="text-xs opacity-80 mb-2 font-light">Enable networks you wish to visualize your assets on</p>
                 <input
                   type="text"
                   placeholder={t("chain_selector.search") || "Search"}
                   value={search}
                   onChange={({ target }) => setSearch(target.value)}
-                  className="input-primary"
+                  className="w-full bg-[#212529] border-[0.02rem] rounded-lg placeholder:text-white placeholder:font-light placeholder:opacity-80 text-white pl-7 pr-5 py-3"
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -107,7 +121,8 @@ export const ChainSelector = () => {
                 ))}
               </div>
             </div>
-          </Menu.Items>
+            </Menu.Items>
+            
         </Transition>
       </Menu>
     </>
