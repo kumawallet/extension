@@ -12,7 +12,7 @@ export const SignOut = () => {
   };
 
   return (
-    <button data-testid="sign-out" onClick={signOut}>
+    <button data-testid="sign-out" onClick={signOut} className="p-2 hover:bg-gray-500">
       <Padlock size="25" color="#B0B0CE" />
     </button>
   )
