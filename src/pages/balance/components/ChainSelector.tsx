@@ -1,6 +1,5 @@
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { BsChevronDown } from "react-icons/bs";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { ShowTestnets } from "./ShowTestnets";
@@ -34,7 +33,7 @@ export const ChainSelector = () => {
       <Menu>
         <Menu.Button
           data-testid="chain-button"
-          className="flex !bg-[#212529] gap-2 items-center rounded-xl bg-black bg-opacity-20 px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          className="flex bg-[#212529] gap-2 items-center rounded-xl bg-opacity-20 px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
         >
           <img
             src={selectedChain?.logo}
@@ -42,7 +41,9 @@ export const ChainSelector = () => {
             height={24}
             className="object-cover rounded-full"
           />
-          <p className="overflow-hidden text-ellipsis mr-1">{selectedChain?.name}</p>
+          <p className="overflow-hidden text-ellipsis mr-1">
+            {selectedChain?.name}
+          </p>
         </Menu.Button>
         <Transition
           as={Fragment}

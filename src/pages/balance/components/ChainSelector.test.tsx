@@ -5,7 +5,7 @@ import { ChainSelector } from "./ChainSelector";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { act } from "react-dom/test-utils";
 
-const renderCoponent = () => {
+const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
       <ChainSelector />
@@ -67,7 +67,7 @@ describe("ChainSelector", () => {
   });
 
   it("should render", async () => {
-    const { getByTestId, getByAltText } = renderCoponent();
+    const { getByTestId, getByAltText } = renderComponent();
 
     const button = getByTestId("chain-button");
 

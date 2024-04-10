@@ -20,12 +20,12 @@ interface ImportWalletFromInsideProps {
 export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
   onBack,
   onFinish,
-  onClose
+  onClose,
 }) => {
   const { t } = useTranslation("account_form");
 
-  const { isLoading, starLoading, endLoading } = useLoading()
-  const { importAccount } = useAccountContext()
+  const { isLoading, starLoading, endLoading } = useLoading();
+  const { importAccount } = useAccountContext();
 
   const methods = useForm({
     defaultValues: {
@@ -38,20 +38,24 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
 
   const { handleSubmit, watch, setValue } = methods;
 
-  const onImportAccount = async (data: any) => {
-    starLoading()
+  const onImportAccount = async (data: {
+    type: string;
+    seedLength: number;
+    privateKeyOrSeed: string;
+  }) => {
+    starLoading();
 
     const result = await importAccount({
       name: "",
       privateKeyOrSeed: data.privateKeyOrSeed,
       isSignUp: false,
-      password: data.password,
-      accountType: data.type === 'seed' ? AccountType.WASM : AccountType.EVM
-    })
+      password: null,
+      accountType: data.type === "seed" ? AccountType.WASM : AccountType.EVM,
+    });
 
-    endLoading()
+    endLoading();
     if (result) {
-      onFinish()
+      onFinish();
     }
   };
 
@@ -64,15 +68,16 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
   const _onBack = () => {
     setValue("privateKeyOrSeed", "");
     onBack();
-  }
+  };
 
   return (
     <FormProvider {...methods}>
-      
       <AccountFormInsideWrapper
         onClose={onClose}
         onBack={_onBack}
-        onSelecteOption={(option) => setValue("type", option === 1 ? "seed" : "private")}
+        onSelecteOption={(option) =>
+          setValue("type", option === 1 ? "seed" : "private")
+        }
         step1Title={t("import_account_title")}
         option1Title={t("import_from_seed_phrase")}
         option2Title={t("import_from_private_key")}
@@ -86,6 +91,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           <>
             <ImportFromSeed />
             <Button
+              data-testid="import-seed-button"
               classname="w-full py-5 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
@@ -99,6 +105,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           <>
             <ImportFromPrivateKey />
             <Button
+              data-testid="import-pk-button"
               classname="w-full py-5 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
@@ -109,8 +116,6 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
           </>
         }
       />
-      
     </FormProvider>
   );
 };
-
