@@ -91,7 +91,7 @@ export const Settings = () => {
             </div>
           </div>
         </div>
-        <p className="text-center text-sm text-gray-400">
+        <p data-testid="version" className="text-center text-sm text-gray-400">
           {version}
         </p>
       </div>

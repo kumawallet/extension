@@ -4,7 +4,7 @@ import { AccountFormInsideWrapper } from "./AccountFormInsideWrapper";
 import { RecoveryPhrase } from "@src/components/accountForm/RecoveryPhrase";
 import { FormProvider, useForm } from "react-hook-form";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { SelectAccountToDerive } from "./SelectAccountToDerive";
+// import { SelectAccountToDerive } from "./SelectAccountToDerive";
 import { Button } from "@src/components/common";
 import { useAccountContext } from "@src/providers";
 import { useLoading } from "@src/hooks";
@@ -57,22 +57,22 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
     }
   }
 
-  const onDerivate = async (data: CreateWalletFromInsideForm) => {
-    starLoading()
+  // const onDerivate = async (data: CreateWalletFromInsideForm) => {
+  //   starLoading()
 
-    const result = await deriveAccount({
-      name: "",
-      accountType: data.account!.type
-    })
+  //   const result = await deriveAccount({
+  //     name: "",
+  //     accountType: data.account!.type
+  //   })
 
-    if (result) {
-      onFinish()
-    }
+  //   if (result) {
+  //     onFinish()
+  //   }
 
-    endLoading()
-  }
+  //   endLoading()
+  // }
 
-  const account = watch("account")
+  // const account = watch("account")
 
   return (
     <FormProvider {...methods}>
@@ -90,7 +90,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         Option1Component={
           <>
             <RecoveryPhrase />
-            <Button variant="contained-black" isLoading={isLoading} classname="w-full py-5 text-base mt-5" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
+            <Button data-testid="create-button" variant="contained-black" isLoading={isLoading} classname="w-full py-5 text-base mt-5" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
           </>
         }
         Option2Component={

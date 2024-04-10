@@ -18,7 +18,7 @@ import {
 
 } from "@src/pages";
 import {
-  Advanced,
+
   BugReport,
   AddressBook,
   General,
@@ -35,7 +35,7 @@ import {
   MANAGE_ASSETS,
   RECEIVE,
   SEND,
-  SETTINGS_ADVANCED,
+
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
@@ -185,7 +185,6 @@ export const Routes = () => {
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />
         <Route path={SETTINGS_GENERAL} element={<General />} />
-        <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
         <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />

@@ -6,7 +6,6 @@ import { networkMessages } from "./network";
 import { assetsMessages } from "./assets";
 import { settingsMessages } from "./settings";
 import { trustedSitesMessages } from "./trustedSites";
-import { swapMessages } from "./swap";
 import { sendMessages } from "./send";
 
 export const messageAPI = {
@@ -18,6 +17,5 @@ export const messageAPI = {
   ...assetsMessages,
   ...settingsMessages,
   ...trustedSitesMessages,
-  ...swapMessages,
   ...sendMessages,
 };

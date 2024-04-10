@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import { BALANCE, FORGOT_PASS } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
-import { BsEye, BsEyeSlash } from "react-icons/bs";
+import { BsEye } from "react-icons/bs";
 import { PiEyeClosed } from "react-icons/pi";
 import { captureError } from "@src/utils/error-handling";
 import {
@@ -15,6 +15,8 @@ import {
 import { messageAPI } from "@src/messageAPI/api";
 import { styleSingIn } from "@src/pages/signIn/styles/SingIn";
 import { Key } from "@src/components/icons/Key"
+
+
 interface SignInProps {
   afterSignIn?: () => void;
 }

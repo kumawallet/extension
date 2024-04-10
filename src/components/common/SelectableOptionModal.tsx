@@ -95,7 +95,7 @@ export const SelectableOptionModal = <T,>({
                           />
                         </div>
 
-                        <div className="flex flex-col gap-2">
+                        <div data-testid="filtered-items-container" className="flex flex-col gap-2">
                           {filteredItems.map((item, index) => (
                             <Item key={index} item={item} />
                           ))}
