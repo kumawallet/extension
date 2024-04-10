@@ -100,7 +100,7 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
                   <InputErrorMessage message={errors.address?.message} />
                 </div>
                 <Button
-                  data-testid="save"
+                  data-testid="save-button"
                   classname={`text-sm w-full mt-4`}
                   onClick={onSaveContact}
                 >

@@ -265,7 +265,7 @@ export const AssetToSend = () => {
       <div className="bg-[#1C1C27] flex flex-col mb-2 rounded-[10px] py-2">
         {/* First row */}
         <div className={styles.row}>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1" data-testid="asset-to-send">
             <span className="text-[#9CA3AF] font-medium">{t("asset")}</span>
             <SelectItem<AssetToSelect>
               items={assetsToSelect}

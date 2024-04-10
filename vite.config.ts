@@ -74,6 +74,7 @@ export default ({ mode }: { mode: string }) => {
           "**/src/components/icons/**",
           "**/src/messageAPI/**",
           "**/src/pages/balance/components/SelectAccountToDerive.tsx ",
+          "**/src/pages/styles/**",
         ],
       },
     },
