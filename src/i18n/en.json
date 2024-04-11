@@ -329,12 +329,16 @@
     "swapper_name": "Swapper name",
     "swapper_fee": "Swapper fee",
     "gas_fee": "Gas fee",
+    "estimated_fee": "Estimated fee",
     "destination_address": "Destination address",
     "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",
     "tx_send":"Transaction sent",
     "error_fetching_swaps": "Error fetching swaps",
     "error_setting_max_amount": "Error setting max amount",
-    "pair_not_supported": "Pair not supported"
+    "pair_not_supported": "Pair not supported",
+    "tx_confirm_info": "Info",
+    "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
+    "send_title": "Review Transfer"
   },
   "change_password": {
     "title": "Change your password",
