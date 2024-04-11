@@ -192,7 +192,6 @@ export const getWasmAssets = async (
   const assets: Asset[] = [];
   const unsubs: unknown[] = [];
   try {
-    let assetPallet = null;
     let balanceMethod:
       | (PromiseResult<GenericStorageEntryFunction> &
           StorageEntryBase<"promise", GenericStorageEntryFunction, AnyTuple> &
@@ -202,23 +201,20 @@ export const getWasmAssets = async (
     switch (chainName) {
       case "Acala":
       case "Mandala":
-        assetPallet = api.query.assetRegistry?.assetMetadatas;
         balanceMethod = api.query.tokens.accounts;
         break;
       default:
-        assetPallet = api.query.assets?.metadata;
         balanceMethod = api.query.assets?.account;
         break;
     }
 
-    if (!assetPallet || !balanceMethod)
+    if (!balanceMethod)
       return {
         assets,
         unsubs,
       };
 
     const mappedAssets = SUBSTRATE_ASSETS_MAP[chainName] || [];
-
     const assetBalances = await Promise.all(
       mappedAssets.map((asset) => {
         const params = [];
