@@ -15,7 +15,7 @@ module.exports = {
       },
       colors: {
         primary: {
-          default: "#7C4DC4",
+          default: "#E6007A",
         },
         "custom-red": {
           bg: "#e74c3c",

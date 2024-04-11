@@ -17,7 +17,7 @@ export const AccountSelected = () => {
     <>
       <button
         onClick={copyToClipboard}
-        className={`flex items-center gap-1 w-fit bg-primary-default bg-opacity-[0.25] hover:bg-opacity-15 rounded-full px-4 py-[0.1rem] mx-auto`}
+        className={`flex items-center gap-1 w-fit bg-primary-default bg-opacity-[0.20] hover:bg-opacity-15 rounded-full px-4 py-[0.1rem] mx-auto`}
         data-testid="account-button"
       >
         <Icon

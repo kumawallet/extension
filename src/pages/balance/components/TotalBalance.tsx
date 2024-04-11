@@ -1,9 +1,6 @@
 import { type FC, useEffect, useState } from "react";
-import {
-  BsFillEyeSlashFill,
-  BsEyeFill,
-} from "react-icons/bs";
-import { FiEye } from "react-icons/fi";
+import { BsEye } from "react-icons/bs";
+import {  PiEyeClosed } from "react-icons/pi";
 import { formatAmountWithDecimals, getCurrencyInfo } from "@src/utils/assets";
 import {
   useAccountContext,
@@ -14,6 +11,8 @@ import {
 interface TotalBalanceProps {
   balance?: number;
   accountName?: string;
+  // showBalance : boolean;
+  // toggleBalance: () => void;
 }
 
 export const TotalBalance: FC<TotalBalanceProps> = () => {
@@ -47,15 +46,15 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
     <div className="mx-auto ">
       <div className="flex justify-center w-full">
       {!showBalance ? (
-          <FiEye 
+          <PiEyeClosed 
             data-testid="show-balance"
-            size={15}
+            size={12}
             onClick={toggleBalance}
           />
         ) : (
-          <BsFillEyeSlashFill
+          <BsEye
             data-testid="hide-balance"
-            size={15}
+            size={12}
             onClick={toggleBalance}
           />
         )}

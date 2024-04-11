@@ -26,30 +26,20 @@ export const ConfirmMessage: FC<ConfirmMessageProps> = ({
         "
                 onClose={onClose}
             >
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-100"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
-                </Transition.Child>
-                <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex justify-center items-center min-h-full text-center">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
-                        >
-                            <Dialog.Panel className="relative w-[250px] transform overflow-hidden rounded-2xl bg-[#171720]  p-3 text-left align-middle shadow-xl h-[150px] transition-all flex items-center">
-                                <div className="flex flex-col items-center justify-center">
+                <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+            <div className="fixed inset-0 overflow-y-auto">
+                <div className="flex justify-center items-end min-h-full text-center">
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                    >
+                        <Dialog.Panel className="relative w-full max-w-[357px] transform overflow-hidden rounded-2xl bg-[#171720]  p-3 text-left align-middle shadow-xl h-[250px] transition-all flex justify-center items-center">
+                            <div className="flex flex-col items-center justify-center">
                                     <button onClick={onClose} className="absolute top-2 right-2">
                                         <CgClose size={16} />
                                     </button>
@@ -65,14 +55,14 @@ export const ConfirmMessage: FC<ConfirmMessageProps> = ({
                                             onClick={onClose}
                                         >
                                             Cancel
-                                        </Button>
-                                        <Button
-                                            data-testid="confirm-delete-button"
+                                            </Button>
+                                            <Button
+                                            variant="countained-red"
                                             classname="!w-[6rem] py-2 text-[0.7rem]"
                                             onClick={confirmed}
-                                        >
-                                            Continue
-                                        </Button>
+                                            >
+                                            Delete
+                                            </Button>
                                     </div>
                                 </div>
                             </Dialog.Panel>

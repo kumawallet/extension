@@ -111,7 +111,7 @@
     "private_key_placeholder": "Enter private key"
   },
   "account": {
-    "title": "Account",
+    "title": "Account detail",
     "delete_message": "Are you sure you want to delete this account?",
     "account": "Account: ",
     "address": "Address",
@@ -134,7 +134,9 @@
       "mainnets": "Mainnets",
       "testnets": "Testnets",
       "custom": "Custom",
-      "search": "Search by name"
+      "search": "Search",
+      "title": "Networks",
+      "description": "Enable networks you wish to visualize your assets on"
     },
     "accounts": {
       "accounts": "Accounts",

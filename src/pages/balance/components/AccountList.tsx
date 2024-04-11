@@ -9,7 +9,7 @@ import { Wallet } from "./Wallet";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { AccountDetails } from "./AccountDetails";
-import { CgClose } from "react-icons/cg";
+import { TfiClose } from "react-icons/tfi";
 import { IconWallet } from "@src/components/icons/wallet";
 
 export const AccountList = () => {
@@ -63,7 +63,7 @@ export const AccountList = () => {
           >
             {selectedAccount?.value?.name}
           </p>
-          <GoChevronDown size={18} />
+          <GoChevronDown size={14} />
         </div>
       </button>
 
@@ -101,7 +101,7 @@ export const AccountList = () => {
                             {t("accounts.accounts")}
                           </p>
                           <button onClick={onCloseModal}>
-                            <CgClose size={18} />
+                            <TfiClose className="text-sm" />
                           </button>
                         </div>
 

@@ -240,7 +240,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
           ) : (
             <p>{t("seed_phrase")}</p>
           )}
-          <div className="relative my-8">
+          <div className={`relative ${!validated && !hideKeys ? "my-8" : "my-0"}`}>
             <textarea
               className="text-center text-xs h-[100px]  focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-[#1C1C27]  placeholder-gray-400 text-white resize-none relative select-none"
               value={privateKey}
@@ -325,7 +325,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
           {!getLink() ? null : hideKeys || (!hideKeys && validated) ? (
             <a
               href={getLink()}
-              className="flex items-center gap-2"
+              className="flex text-xs items-center gap-2 opacity-80"
               target="_blank"
               rel="noreferrer"
             >
