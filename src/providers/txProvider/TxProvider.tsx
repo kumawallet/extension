@@ -211,7 +211,7 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
       if (activity.status === RecordStatus.PENDING) {
         if (activity.reference === "WASM") {
           // eslint-disable-next-line
-          searchWasmTx(activity?.blockNumber, activity.hash);
+          searchWasmTx((activity as any)?.blockNumber, activity.hash);
         } else {
           searchEvmTx(activity.hash);
         }
