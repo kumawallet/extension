@@ -28,7 +28,7 @@ export const accountMessages = {
     return sendMessage("pri(accounts.changeAccountName)", params);
   },
   areAccountsInitialized: () => {
-    return sendMessage("pri(accounts.areAccountsInitialized)", null);
+    return sendMessage("pri(accounts.areAccountsInitialized)");
   },
   getAccount: (params: RequestGetAccount) => {
     return sendMessage("pri(accounts.getAccount)", params);
@@ -43,6 +43,6 @@ export const accountMessages = {
     return sendMessage("pri(accounts.setSelectedAccount)", params);
   },
   getSelectedAccount: () => {
-    return sendMessage("pri(accounts.getSelectedAccount)", null);
+    return sendMessage("pri(accounts.getSelectedAccount)");
   },
 };

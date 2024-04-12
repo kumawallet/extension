@@ -231,8 +231,6 @@ export interface Request {
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
-
-  "pri(ping)": [null, string];
 }
 
 export type MessageTypes = keyof Request;
@@ -250,3 +248,34 @@ export type ResponseTypes = {
 
 export type ResponseType<TMessageType extends keyof Request> =
   Request[TMessageType][1];
+
+type KeysWithDefinedValues<T> = {
+  [K in keyof T]: T[K] extends undefined ? never : K;
+}[keyof T];
+
+type NoUndefinedValues<T> = {
+  [K in KeysWithDefinedValues<T>]: T[K];
+};
+
+type IsNull<T, K extends keyof T> = {
+  [K1 in Exclude<keyof T, K>]: T[K1];
+} & T[K] extends null
+  ? K
+  : never;
+
+type NullKeys<T> = { [K in keyof T]: IsNull<T, K> }[keyof T];
+
+export type SubscriptionMessageTypes = NoUndefinedValues<{
+  [MessageType in keyof Request]: Request[MessageType][2];
+}>;
+
+export type MessageTypesWithSubscriptions = keyof SubscriptionMessageTypes;
+export type MessageTypesWithNoSubscriptions = Exclude<
+  MessageTypes,
+  keyof SubscriptionMessageTypes
+>;
+
+export declare type KnownSubscriptionDataTypes<T extends MessageTypes> =
+  Request[T][2];
+
+export type MessageTypesWithNullRequest = NullKeys<RequestTypes>;

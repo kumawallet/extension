@@ -11,10 +11,10 @@ export const networkMessages = {
     return sendMessage("pri(network.setNetwork)", params);
   },
   getNetwork: () => {
-    return sendMessage("pri(network.getNetwork)", null);
+    return sendMessage("pri(network.getNetwork)");
   },
   getAllChains: () => {
-    return sendMessage("pri(network.getAllChains)", null);
+    return sendMessage("pri(network.getAllChains)");
   },
   saveCustomChain: (params: RequestSaveCustomChain) => {
     return sendMessage("pri(network.saveCustomChain)", params);
@@ -23,7 +23,7 @@ export const networkMessages = {
     return sendMessage("pri(network.removeCustomChain)", params);
   },
   getCustomChains: () => {
-    return sendMessage("pri(network.getCustomChains)", null);
+    return sendMessage("pri(network.getCustomChains)");
   },
   getXCMChains: (params: RequestGetXCMChains) => {
     return sendMessage("pri(network.getXCMChains)", params);

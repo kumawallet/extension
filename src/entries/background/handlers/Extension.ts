@@ -65,6 +65,7 @@ import notificationIcon from "/icon-128.png";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
 import { Transaction } from "@src/types";
 import { transformAddress } from "@src/utils/account-utils";
+import { Port } from "./types";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -716,15 +717,12 @@ export default class Extension {
     });
   }
 
-  private ping() {
-    return "pong";
-  }
-
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
-    request: RequestTypes[TMessageType]
-    // port: Port
+    request: RequestTypes[TMessageType],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    port: Port
   ): Promise<ResponseType<TMessageType>> {
     switch (type) {
       case "pri(accounts.createAccounts)":
@@ -825,9 +823,6 @@ export default class Extension {
         return this.sendSubstrateTx(request as RequestSendSubstrateTx);
       case "pri(send.sendEvmTx)":
         return this.sendEvmTx(request as RequestSendEvmTx);
-
-      case "pri(ping)":
-        return this.ping();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);
