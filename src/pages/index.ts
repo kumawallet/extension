@@ -17,7 +17,6 @@ export * from "./settings/components/BugReport/BugReport";
 export * from "./settings/components/General/General";
 export * from "./settings/components/ManageNetworks";
 export * from "./settings/components/Security/Security";
-export * from "./settings/components/SocialNetworks/SocialNetworks";
 export * from "./settings";
 export * from "./settings/style/style";
 export * from "./signIn";

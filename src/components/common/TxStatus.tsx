@@ -4,6 +4,7 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { IoIosCloseCircle } from "react-icons/io";
 import { PiWarningOctagonFill } from "react-icons/pi";
 import { styleTxStatus } from "@src/components/common/styles/TxStatus";
+import { useTranslation } from "react-i18next";
 
 interface statusProps {
     status: RecordStatus;
@@ -25,27 +26,28 @@ export const Status: FC<statusProps> = ({
     onClick,
     style,
 }) => {
+    const { t } = useTranslation("activity_details");
     return (
         <div className={`${styleTxStatus.container} ${chipColor[status as RecordStatus]} ${classname}`} style={style} onClick={onClick}>
             {status === RecordStatus.SUCCESS ? (
                 <>
                     <FaCircleCheck className={styleTxStatus.icons} />
                     <p className={styleTxStatus.text}>
-                        Complete
+                       {t("status.complete")}
                     </p>
                 </>
             ) : status === RecordStatus.PENDING ? (
                 <>
                     <PiWarningOctagonFill className={styleTxStatus.icons} />
                     <p className={styleTxStatus.text}>
-                        In Process
+                    {t("status.in_process")}
                     </p>
                 </>
             ) : (
                 <>
                     <IoIosCloseCircle className={styleTxStatus.icons} />
                     <p className={styleTxStatus.text}>
-                        Failed
+                    {t("status.failed")}
                     </p>
                 </>
             )}

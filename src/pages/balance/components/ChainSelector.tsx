@@ -33,7 +33,7 @@ export const ChainSelector = () => {
 
   return (
     <>
-      { isOpen ? <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" /> : null } 
+       { isOpen ? <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" onClick={() =>setIsOpen(false)} /> : null }
       <Menu>
         
       
@@ -62,6 +62,7 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
+          
           <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh)] max-w-lg top-10 w-full bg-[#2C3137] outline-0 z-50">
           
             <div className=" px-8 py-2 pt-2 text-start">

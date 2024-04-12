@@ -113,9 +113,13 @@ export const ActivityDetail = () => {
       }
       : { value: address.slice(0, 12) + "..." + address.slice(-12) };
   };
-
+ const statusTranslate = () => {
+  console.log(status);
+   return status === "" ?  "in_process" : status.toLowerCase()
+   
+ }
   const transaction = {
-    hash:
+    [t("hash")]:
       <div className={styleAD.itemsValue}>
         {getHash(hash)}
         <button
@@ -131,13 +135,13 @@ export const ActivityDetail = () => {
         </button>
       </div>
     ,
-    type: type,
-    status:
+   [t("type")]: type,
+   [t("status.name")]:
       <div className={styleAD.itemsValue}>
         <Status status={status} />
       </div>
     ,
-    sender:
+    [t("sender")]:
       <>
         {getContactName(sender).contact ? (
           <div className="grid w-full">
@@ -149,7 +153,7 @@ export const ActivityDetail = () => {
         )}
       </>
     ,
-    recipient: <>
+    [t("recipient")]: <>
       {getContactName(recipient).contact ? (
         <div className="grid w-full">
           <p className={styleAD.itemsValue}>{getContactName(recipient).contact}</p>
@@ -160,7 +164,7 @@ export const ActivityDetail = () => {
       )}
     </>
     ,
-    network: getXCM(originNetwork, targetNetwork) ? (
+   [t("network")]: getXCM(originNetwork, targetNetwork) ? (
       <div className={styleAD.containerNetworks}>
         <div className={styleAD.networks}>
           <NetworkIcon
@@ -192,18 +196,18 @@ export const ActivityDetail = () => {
         />
       </div>
     ),
-    amount: getValue({
+    [t("amount")]: getValue({
       value: amount,
       symbol: asset,
     }),
-    "estimeted_fee": estimatedFee(
+    [t("estimeted_fee")]: estimatedFee(
       {
         fee,
         symbol: asset,
       },
       selectedChain?.decimals as number
     ),
-    tip: getTip({
+    [t("tip")]: getTip({
       tip,
       symbol: asset,
     }),

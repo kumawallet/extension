@@ -25,3 +25,30 @@
     transform: translateY(-50%);
     transition: 0.2s ease all;
 }
+
+.flotingLabelData{
+    position: absolute;
+    pointer-events: none;
+    top: -2px;
+    left: 0px;
+    transform: translateY(50%);
+    transition: 0.2s ease all;
+}
+.inputData{
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 600;
+    display: flex;
+    flex: 1;
+    padding: 0.2rem 0rem;
+    background-color: transparent;
+    outline: none;
+}
+
+
+.inputData.hasData ~ .flotingLabelData {
+    top: 10px;
+    left: 0px;
+    font-size: 0.8rem;
+    opacity: 1;
+}

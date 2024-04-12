@@ -19,6 +19,15 @@ import { AiOutlineFileSearch, AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { BsEye } from "react-icons/bs";
 
+
+import { AddressForm } from "@src/types";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { object, string } from "yup";
+import { isHex } from "@polkadot/util";
+import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
+import { FormProvider, useForm } from "react-hook-form";
+
+
 interface AccountDetailsProps {
   onBack: () => void;
   onClose?: () => void;
@@ -64,6 +73,9 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
   const isValid = useMemo(() => {
     return password && password.length >= 8;
   }, [password]);
+
+  
+  
 
   const webAPI = getWebAPI();
 
@@ -171,9 +183,43 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
       return false;
     }
   };
+  const schema = object({
+    name: string().required(t("required") as string),
+    address: string()
+        .typeError(t("required") as string)
+        .test(
+            "valid address",
+            tCommon("invalid_address") as string,
+            (address) => {
+                try {
+                    if (!address) return false;
+
+                    if (isHex(address)) {
+                        return isAddress(address);
+                    } else {
+                        encodeAddress(decodeAddress(address));
+                    }
+
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+        )
+        .required(t("required") as string),
+}).required();
+
+  const methods = useForm<AddressForm>({
+    defaultValues: {
+        name: accountData.value.name,
+        address: getHash(accountData.value.address),
+    },
+    resolver: yupResolver(schema),
+});
 
   return (
     <>
+    <FormProvider {...methods}>
       <div className="w-full">
         <button className="flex items-center" onClick={onBack}>
           <FiChevronLeft size={ICON_SIZE} />
@@ -220,8 +266,9 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
         <ConfirmMessage
           isOpen={isOpen}
           onClose={() => setIsOpen(!isOpen)}
-          messageOne={t("delete_message")}
-          messageTwo={`${t("account")} ${getHash(accountData.value.address)}`}
+          type="delete"
+          name={accountData.value.name}
+          address={accountData.value.address}
           confirmed={deleteSelectedAccount}
         />
 
@@ -325,7 +372,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
           {!getLink() ? null : hideKeys || (!hideKeys && validated) ? (
             <a
               href={getLink()}
-              className="flex text-xs items-center gap-2 opacity-80"
+              className="flex items-center gap-2"
               target="_blank"
               rel="noreferrer"
             >
@@ -335,6 +382,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
           ) : null}
         </div>
       </div>
+      </FormProvider>
     </>
   );
 };

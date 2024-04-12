@@ -158,7 +158,7 @@ export type HistoricTransaction = {
   hasNextPage: boolean;
 };
 
-export interface AddressBookForm {
+export interface AddressForm {
   name: string;
   address: string;
 }

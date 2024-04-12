@@ -91,6 +91,7 @@ export const Balance = () => {
                 <Activity />
               </Tab.Panel>
             </Tab.Panels>
+            
           </Tab.Group>
         </div>
       </PageWrapper>

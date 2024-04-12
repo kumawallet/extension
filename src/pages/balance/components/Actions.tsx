@@ -17,7 +17,9 @@ export const Actions = () => {
 
   const isSwapAvailable = useMemo(() => {
     const chainId = selectedChain?.id;
+    const network = selectedChain?.isTestnet
     if (!chainId) return false;
+    if (network) return false;
 
     const chainType = selectedChain.type === "wasm" ? "wasm" : "evm"
 

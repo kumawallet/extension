@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { IoCloseOutline } from "react-icons/io5";
 import { Button, InputErrorMessage } from "@src/components/common";
 import { useCopyToClipboard } from "@src/hooks";
-import { AddressBookForm } from "@src/types";
+import { AddressForm } from "@src/types";
 
 interface AddAddressModalProps {
   isOpen: boolean;
@@ -18,14 +18,14 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
   onClose,
   onSaveContact,
 }) => {
-  const { t } = useTranslation("adressBook");
+  const { t } = useTranslation("address_book");
   const { t: tCommon } = useTranslation("common");
 
   const {
     register,
     formState: { errors },
     watch,
-  } = useFormContext<AddressBookForm>();
+  } = useFormContext<AddressForm>();
 
   const checkInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget as HTMLInputElement;
