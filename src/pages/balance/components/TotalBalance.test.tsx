@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
-import { CHAINS } from "@src/constants/chains";
 import { AccountType } from "@src/accounts/types";
+import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 const renderComponent = () => {
   return render(
@@ -31,7 +31,7 @@ describe("TotalBalance", () => {
       }),
       useNetworkContext: () => ({
         state: {
-          selectedChain: CHAINS[0].chains[3],
+          selectedChain: SUBTRATE_CHAINS[0],
           type: AccountType.EVM,
           api: null
         },

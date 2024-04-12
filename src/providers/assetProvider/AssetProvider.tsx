@@ -297,7 +297,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const loadPolkadotAssets = async ({ api, selectedAccount, selectedChain }: LoadAssetParams) => {
     const { assets, unsubs } = await getWasmAssets(
       api,
-      selectedChain!.name,
+      selectedChain!.id,
       selectedAccount?.value?.address,
       (
         assetId: string,
@@ -335,7 +335,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     try {
       const assetsFromStorage = await messageAPI.getAssetsByChain(
         {
-          chain: chain.name
+          chain: chain.id
         }
       );
       const assets: IAsset[] = [];

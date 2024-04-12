@@ -1,12 +1,5 @@
 import { BN } from "bn.js";
 import { BigNumber } from "ethers";
-import {
-  BINANCE,
-  ETHEREUM,
-  PARACHAINS,
-  POLYGON,
-  ZETA_CHAIN_TESTNET,
-} from "./chains";
 
 export const REF_TIME = new BN("1000000000000");
 export const PROOF_SIZE = new BN("1000000000000");
@@ -15,7 +8,7 @@ export const BigNumber0 = BigNumber.from(0);
 export const BN0 = new BN("0");
 
 export const defaultAssetConfig = {
-  [PARACHAINS.MOONBEAM]: [
+  "moonbeam-evm": [
     {
       address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080",
       symbol: "DOT",
@@ -28,7 +21,7 @@ export const defaultAssetConfig = {
     },
   ],
 
-  [PARACHAINS.MOONRIVER]: [
+  "moonriver-evm": [
     {
       address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080",
       symbol: "KSM",
@@ -41,7 +34,7 @@ export const defaultAssetConfig = {
     },
   ],
 
-  [ZETA_CHAIN_TESTNET.name]: [
+  "zeta-chain": [
     {
       address: "0xd97B1de3619ed2c6BEb3860147E30cA8A7dC9891",
       symbol: "tBNB",
@@ -64,7 +57,7 @@ export const defaultAssetConfig = {
     },
   ],
 
-  [BINANCE.name]: [
+  binance: [
     {
       address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
       symbol: "BUSD",
@@ -102,7 +95,7 @@ export const defaultAssetConfig = {
     },
   ],
 
-  [POLYGON.name]: [
+  polygon: [
     {
       address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
       symbol: "DAI",
@@ -120,7 +113,7 @@ export const defaultAssetConfig = {
     },
   ],
 
-  [ETHEREUM.name]: [
+  ethereum: [
     {
       address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
       symbol: "DAI",

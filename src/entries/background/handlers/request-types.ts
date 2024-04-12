@@ -1,6 +1,6 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
 import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
@@ -12,7 +12,7 @@ import {
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
-import { HistoricTransaction } from "@src/types";
+import { Chain, HistoricTransaction } from "@src/types";
 import { providers } from "ethers";
 
 export interface RequestSignUp {

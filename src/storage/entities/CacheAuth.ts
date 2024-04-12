@@ -14,6 +14,10 @@ export default class CacheAuth extends BaseEntity {
     return CacheAuth.instance;
   }
 
+  static getName() {
+    return "Auth";
+  }
+
   static async init() {
     await CacheAuth.get<CacheAuth>();
   }

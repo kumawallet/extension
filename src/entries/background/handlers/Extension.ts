@@ -18,7 +18,7 @@ import Registry from "@src/storage/entities/registry/Registry";
 import Contact from "@src/storage/entities/registry/Contact";
 import Record from "@src/storage/entities/activity/Record";
 import Activity from "@src/storage/entities/activity/Activity";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
@@ -37,7 +37,6 @@ import {
   RequestGetAllAccounts,
   RequestGetAssetsByChain,
   RequestGetSetting,
-  RequestGetXCMChains,
   RequestImportAccount,
   RequestRemoveAccout,
   RequestRemoveContact,
@@ -63,7 +62,7 @@ import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
-import { Transaction } from "@src/types";
+import { Chain, Transaction } from "@src/types";
 import { transformAddress } from "@src/utils/account-utils";
 import { Port } from "./types";
 
@@ -238,6 +237,26 @@ export default class Extension {
   }
 
   private async isSessionActive() {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Auth") return false;
+        const object = Allstored[key];
+
+        if (object.timeout > -1) {
+          return true;
+        }
+      });
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Network"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     return Auth.isSessionActive();
   }
 
@@ -293,6 +312,26 @@ export default class Extension {
   }
 
   private async getNetwork(): Promise<Network> {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Network") return false;
+        const object = Allstored[key];
+
+        if (object.chain) {
+          return true;
+        }
+      });
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Network"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     return Network.get<Network>();
   }
 
@@ -335,8 +374,7 @@ export default class Extension {
     if (!registry) throw new Error("failed_to_get_registry");
     const { chain } = await Network.get<Network>();
     if (!chain) throw new Error("failed_to_get_network");
-    const types = chain.supportedAccounts || [];
-    const accounts = await AccountManager.getAll(types);
+    const accounts = await AccountManager.getAll();
     if (!accounts) throw new Error("failed_to_get_accounts");
     return {
       ownAccounts: accounts
@@ -362,14 +400,12 @@ export default class Extension {
     const selectedChain = await Network.get<Network>();
 
     const address = selectedAccount?.value.address;
-    // @ts-expect-error -- *
     const chainPrefix = selectedChain?.chain?.prefix;
 
     // @ts-expect-error -- *
     const formatedAddress = transformAddress(address, chainPrefix || 0);
 
     return await getChainHistoricHandler({
-      // @ts-expect-error -- *
       chainId: selectedChain!.chain!.id,
       address: formatedAddress,
     });
@@ -377,43 +413,6 @@ export default class Extension {
 
   private async getActivity(): Promise<Record[]> {
     return Activity.getRecords();
-  }
-
-  private async getAllChains(): Promise<Chains> {
-    const newChains = await Chains.loadChains();
-    const chains = await Chains.get<Chains>();
-    if (!chains) throw new Error("failed_to_get_chains");
-
-    if (newChains) {
-      const network = await Network.get<Network>();
-      const selectedNetwork = network.chain;
-      const selectedNetworkInMainnets = newChains.mainnets.find(
-        (chain) =>
-          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
-      );
-
-      const selectedNetworkInTestnets = newChains.testnets.find(
-        (chain) =>
-          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
-      );
-
-      let chainToUpdate = null;
-
-      if (selectedNetworkInMainnets) {
-        chainToUpdate = selectedNetworkInMainnets;
-      }
-
-      if (selectedNetworkInTestnets) {
-        chainToUpdate = selectedNetworkInTestnets;
-      }
-
-      if (chainToUpdate) {
-        network.chain = chainToUpdate;
-        await Network.set<Network>(network);
-      }
-    }
-
-    return chains;
   }
 
   private async saveCustomChain({ chain }: RequestSaveCustomChain) {
@@ -425,19 +424,28 @@ export default class Extension {
   }
 
   private async getCustomChains(): Promise<Chain[]> {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate chains
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Chains") return false;
+        const object = Allstored[key];
+
+        if (object.custom) {
+          return true;
+        }
+      });
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Chains"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
     return chains.custom;
-  }
-
-  private async getXCMChains({
-    chainName,
-  }: RequestGetXCMChains): Promise<Chain[]> {
-    const { xcm } = (await Chains.getByName(chainName)) || {};
-    if (!xcm) throw new Error("failed_to_get_chain");
-    const chains = await Chains.get<Chains>();
-    if (!chains) throw new Error("failed_to_get_chains");
-    return chains.getAll().filter((chain) => xcm.includes(chain.name));
   }
 
   private async addActivity({ txHash, record }: RequestAddActivity) {
@@ -769,16 +777,12 @@ export default class Extension {
         return this.setNetwork(request as RequestSetNetwork);
       case "pri(network.getNetwork)":
         return this.getNetwork();
-      case "pri(network.getAllChains)":
-        return this.getAllChains();
       case "pri(network.saveCustomChain)":
         return this.saveCustomChain(request as RequestSaveCustomChain);
       case "pri(network.removeCustomChain)":
         return this.removeCustomChain(request as RequestRemoveCustomChain);
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
-      case "pri(network.getXCMChains)":
-        return this.getXCMChains(request as RequestGetXCMChains);
 
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();

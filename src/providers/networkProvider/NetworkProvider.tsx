@@ -50,14 +50,11 @@ const getChains = async (): Promise<ChainsState> => {
     let customChains = await messageAPI.getCustomChains();
 
     if (customChains.length > 0) {
-      // @ts-expect-error --- To handle old chain format
       const customChainsToMigrate = customChains.filter((chain) => !chain.id);
 
       if (customChainsToMigrate.length > 0) {
-        // @ts-expect-error --- To handle old chain format
         const { newChains } = await migrateOldCustomChains(customChainsToMigrate)
         if (newChains.length > 0) {
-          // @ts-expect-error --- To handle old chain format
           customChains = newChains
         }
       }
@@ -65,7 +62,6 @@ const getChains = async (): Promise<ChainsState> => {
 
       chains.push({
         title: "custom",
-        // @ts-expect-error --- To handle old chain format
         chains: customChains,
       });
     }
@@ -161,24 +157,21 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       const allChains = chains.map((chain) => chain.chains).flat();
 
       // TODO: migrate this to background
+      // @ts-expect-error --- To handle old chain format
       if (selectedChainFromStorage?.chain?.supportedAccounts) {
         const newChainFormat = allChains.find((chain) =>
           selectedChainFromStorage.chain?.name === chain.name
         );
 
         if (newChainFormat) {
-          // @ts-expect-error --- To handle old chain format
           await messageAPI.setNetwork({ chain: newChainFormat });
         }
       }
 
-      // @ts-expect-error --- To handle old chain format
       if (!selectedChainFromStorage?.chain?.id) {
-        // @ts-expect-error --- To handle old chain format
         await messageAPI.setNetwork({ chain: allChains[0] });
       }
 
-      // @ts-expect-error --- To handle old chain format
       const selectedChain = selectedChainFromStorage?.chain?.id ? selectedChainFromStorage.chain as Chain : allChains[0];
 
       dispatch({
@@ -197,7 +190,6 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const setSelectNetwork = async (chain: Chain) => {
     try {
 
-      // @ts-expect-error --- To handle old chain format
       await messageAPI.setNetwork({ chain });
 
       if (state.api && "getBalance" in state.api) {

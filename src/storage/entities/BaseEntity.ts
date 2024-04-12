@@ -18,16 +18,20 @@ export default class BaseEntity {
   }
 
   static async get<T>(): Promise<T | undefined> {
-    const stored = await Storage.getInstance().storage.get(this.name);
-    if (!stored || !stored[this.name]) return this.getDefaultValue();
-    return this.fromData(stored[this.name]);
+    const stored = await Storage.getInstance().storage.get(this.getName());
+    if (!stored || !stored[this.getName()]) return this.getDefaultValue();
+    return this.fromData(stored[this.getName()]);
   }
 
   static async set<T>(data: T): Promise<void> {
-    await Storage.getInstance().storage.set({ [this.name]: data });
+    await Storage.getInstance().storage.set({ [this.getName()]: data });
   }
 
   static async remove(): Promise<void> {
-    await Storage.getInstance().storage.remove(this.name);
+    await Storage.getInstance().storage.remove(this.getName());
+  }
+
+  static getName() {
+    return this.name;
   }
 }
