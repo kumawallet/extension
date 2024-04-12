@@ -219,7 +219,7 @@ export const Send = () => {
           classname="w-full py-3"
           onClick={handleSubmit(onSubmit)}
         >
-          {t("send")}
+          {t("send_title")}
         </Button>
       </FormProvider>
     </PageWrapper>

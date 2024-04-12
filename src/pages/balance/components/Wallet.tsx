@@ -55,13 +55,13 @@ export const Wallet: FC<WalletProps> = ({
         />
         <div className="flex flex-col w-">
           <span className="text-start text-sm font-semibold">{name}</span>
-          <span className="overflow-hidden text-ellipsis text-xs font-inter font-light max-w-[30ch]">
+          <span className="overflow-hidden text-ellipsis text-[0.7rem] font-inter font-light max-w-[30ch]">
             {getHash(address)}
           </span>
         </div>
       </button>
 
-      <div className="w-[10%] flex items-center gap-1 justify-center">
+      <div className="w-[10%] flex items-center gap-1 justify-center ml-4">
         <div className="flex gap-3">
           {showCopyIcon && (
             <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>

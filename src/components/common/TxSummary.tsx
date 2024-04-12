@@ -1,4 +1,6 @@
-import { FC, Fragment } from 'react'
+import { FC, Fragment } from 'react';
+import { useTranslation } from "react-i18next";
+
 
 interface TxSummaryProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -6,12 +8,11 @@ interface TxSummaryProps {
 }
 
 export const TxSummary: FC<TxSummaryProps> = ({
-  tx
+  tx,
 }) => {
 
-
   return (
-    <div className='grid grid-cols-[34%_66%] gap-y-5 h-fit'>
+    <div className='grid grid-cols-[32%_68%] gap-y-4 h-fit'>
       {
         Object.entries(tx).map(([key, value]) => (
           <Fragment key={key}>

@@ -90,7 +90,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         Option1Component={
           <>
             <RecoveryPhrase />
-            <Button data-testid="create-button" variant="contained-black" isLoading={isLoading} classname="w-full py-5 text-base mt-5" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
+            <Button data-testid="create-button" variant="contained-black" isLoading={isLoading} classname="w-full py-3 text-base mt-5" onClick={handleSubmit(onCreateFromSeed)}>{t("create_wallet")}</Button>
           </>
         }
         Option2Component={

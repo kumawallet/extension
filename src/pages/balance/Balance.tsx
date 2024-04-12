@@ -38,6 +38,7 @@ export const Balance = () => {
     state: { selectedChain },
   } = useNetworkContext();
 
+  // const [showBalance, setShowBalance] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const TABS = [t("assets"), t("activity")];
@@ -90,6 +91,7 @@ export const Balance = () => {
                 <Activity />
               </Tab.Panel>
             </Tab.Panels>
+            
           </Tab.Group>
         </div>
       </PageWrapper>

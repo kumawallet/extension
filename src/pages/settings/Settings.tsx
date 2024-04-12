@@ -15,8 +15,11 @@ import {
 import { PageWrapper, Button } from "@src/components/common";
 import { version } from "@src/utils/env";
 import { ICON_SIZE } from "@src/constants/icons";
-import { links } from "./components/SocialNetworks/SocialNetworks";
 import { topbarIcon, topbarText, topbarContainer, styleButtomNav } from './style/style';
+import { aboutUsLinks } from "../../utils/constants";
+import { FaRegKeyboard } from "react-icons/fa6";
+import { FaTwitter, FaDiscord, FaTelegramPlane } from "react-icons/fa";
+
 
 const OPTIONS = [
   {
@@ -25,7 +28,7 @@ const OPTIONS = [
     icon: BiHomeAlt2
   },
   {
-    text: "Adress book",
+    text: "address_book",
     href: SETTINGS_CONTACTS,
     icon: LuBook
   },
@@ -41,11 +44,38 @@ const OPTIONS = [
   }
 ];
 
+
+
+
+
+
 export const Settings = () => {
   const { t } = useTranslation("settings");
   const navigate = useNavigate()
 
-
+  const links = [
+    {
+      title: `${t("webside")}`,
+      url: aboutUsLinks.kuma,
+      icon: FaRegKeyboard,
+    },
+    {
+      title: "Twitter",
+      url: aboutUsLinks.twitter,
+      icon: FaTwitter,
+    },
+    {
+      title: "Discord",
+      url: aboutUsLinks.discord,
+      icon: FaDiscord,
+    },
+    
+    {
+      title: "Telegram",
+      url: aboutUsLinks.telegram,
+      icon: FaTelegramPlane,
+    },
+  ]
   return (
     <PageWrapper>
       <div className="h-full flex flex-col overflow-auto settings-container">

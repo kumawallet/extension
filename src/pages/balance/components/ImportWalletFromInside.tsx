@@ -92,7 +92,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
             <ImportFromSeed />
             <Button
               data-testid="import-seed-button"
-              classname="w-full py-5 text-base  mt-2"
+              classname="w-full py-3 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
               isLoading={isLoading}
@@ -106,7 +106,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
             <ImportFromPrivateKey />
             <Button
               data-testid="import-pk-button"
-              classname="w-full py-5 text-base  mt-2"
+              classname="w-full py-3 text-base  mt-2"
               onClick={handleSubmit(onImportAccount)}
               isDisabled={buttonIsDisabled}
               isLoading={isLoading}

@@ -111,7 +111,7 @@
     "private_key_placeholder": "Enter private key"
   },
   "account": {
-    "title": "Account",
+    "title": "Account detail",
     "delete_message": "Are you sure you want to delete this account?",
     "account": "Account: ",
     "address": "Address",
@@ -119,7 +119,7 @@
     "seed_phrase": "Seed phrase",
     "private_alert": "Please note that anyone with your seed phrase can steal assets from your account",
     "cancel": "Cancel",
-    "continue": "Continue",
+    "delete": "Delete",
     "view_explorer": "View Explorer"
   },  
   "balance": {
@@ -134,13 +134,14 @@
       "mainnets": "Mainnets",
       "testnets": "Testnets",
       "custom": "Custom",
-      "search": "Search by name"
+      "search": "Search",
+      "title": "Networks",
+      "description": "Enable networks you wish to visualize your assets on"
     },
     "accounts": {
       "accounts": "Accounts",
       "import": "Import account",
       "create": "Create account"
-      
     },  
     "send": "Send",
     "swap": "Swap",
@@ -160,10 +161,12 @@
     "general": "General",
     "advanced": "Advanced",
     "contacts": "Contacts",
+    "address_book" : "Address book",
     "security": "Security",
     "bug_report": "Bug report",
     "about_us": "About us",
-    "sign_out": "Sign out"
+    "sign_out": "Sign out",
+    "webside": "Webside"
   },
   "general_settings": {
     "title": "General",
@@ -192,7 +195,7 @@
     "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
     "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
-  "adressBook": {
+  "address_book": {
     "title": "Address Book",
     "name": "Name",
     "address": "Address",
@@ -202,7 +205,8 @@
     "insert_address": "Address",
     "search": "Search",
     "new_contact": "Add Address",
-    "required": "Required"
+    "required": "Required",
+    "my_contacts" : "My Contacts"
   },
   "activity": {
     "title": "Activity",
@@ -215,8 +219,20 @@
   "activity_details":{
     "title": "Transaction detail",
     "xcm": "Transfer executed using XCM",
-    "explorer": "View on block explorer"
-
+    "explorer": "View on block explorer",
+    "hash" : "Hash",
+    "type" : "Type",
+    "status" :{ 
+      "name": "Status",
+      "complete": "Complete",
+      "failed": "Failed",
+      "in_process" : "In Process"},
+    "sender": "Sender",
+    "recipient" : "Recipient",
+    "network" : "Network",
+    "amount": "Amount",
+    "estimeted_fee" : "Estimated fee",
+    "tip" : "Tip"
   },
   "receive": {
     "title": "Share your address"
