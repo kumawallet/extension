@@ -16,6 +16,10 @@ export default class Registry extends BaseEntity {
     };
   }
 
+  static getName() {
+    return "Registry";
+  }
+
   static async getDefaultValue<Registry>(): Promise<Registry> {
     return new Registry() as Registry;
   }

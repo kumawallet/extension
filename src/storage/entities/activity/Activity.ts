@@ -13,6 +13,10 @@ export default class Activity extends BaseEntity {
     this.data = {};
   }
 
+  static getName() {
+    return "Activity";
+  }
+
   static async init(): Promise<void> {
     await Activity.set<Activity>(new Activity());
   }

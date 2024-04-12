@@ -11,6 +11,10 @@ export default class Network extends BaseEntity {
     this.chain = null;
   }
 
+  static getName() {
+    return "Network";
+  }
+
   public static getInstance() {
     if (!Network.instance) {
       Network.instance = new Network();
@@ -32,10 +36,6 @@ export default class Network extends BaseEntity {
     const network = await super.get<Network>();
     if (!network) throw new Error("network_not_found");
     return network;
-  }
-
-  static getName() {
-    return "Network";
   }
 
   get() {
