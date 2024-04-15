@@ -8,6 +8,8 @@ import ImportedEVMKeyring from "./keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "./keyrings/imported/ImportedWASMKeyring";
 import HDKeyring from "./keyrings/hd/HDKeyring";
 
+const STORAGE_NAME = "Vault";
+
 export default class Vault {
   keyrings: Keyrings;
 
@@ -24,10 +26,10 @@ export default class Vault {
 
   private static async getFromStorage(): Promise<Vault> {
     const vault = new Vault();
-    const stored = await Storage.getInstance().storage.get(this.name);
-    if (!stored || !stored[this.name]) throw new Error("vault_not_found");
+    const stored = await Storage.getInstance().storage.get(STORAGE_NAME);
+    if (!stored || !stored[STORAGE_NAME]) throw new Error("vault_not_found");
     const data = (await Auth.getInstance().decryptVault(
-      stored[this.name]
+      stored[STORAGE_NAME]
     )) as Vault;
     if (!data) {
       throw new Error("vault_not_found");
@@ -47,15 +49,33 @@ export default class Vault {
     await Vault.set(new Vault());
   }
 
-  static async alreadySignedUp(): Promise<boolean> {
+  static alreadySignedUp = async () => {
+    // migration
+
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find(
+        (key) => typeof Allstored[key] === "string" && key !== STORAGE_NAME
+      );
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ [STORAGE_NAME]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     const stored = await Storage.getInstance().storage.get(null);
-    return !!stored && Boolean(stored[this.name]);
-  }
+
+    return !!stored && Boolean(stored[STORAGE_NAME]);
+  };
 
   static async getEncryptedVault(): Promise<string | undefined> {
-    const stored = await Storage.getInstance().storage.get(this.name);
-    if (!stored || !stored[this.name]) return undefined;
-    return stored[this.name];
+    const stored = await Storage.getInstance().storage.get(STORAGE_NAME);
+    if (!stored || !stored[STORAGE_NAME]) return undefined;
+    return stored[STORAGE_NAME];
   }
 
   static fromData(
@@ -90,7 +110,7 @@ export default class Vault {
 
   static async set(data: Vault): Promise<void> {
     const encryptedData = await Auth.getInstance().encryptVault(data);
-    await Storage.getInstance().storage.set({ [this.name]: encryptedData });
+    await Storage.getInstance().storage.set({ [STORAGE_NAME]: encryptedData });
     this.instance = await Vault.getFromStorage();
   }
 

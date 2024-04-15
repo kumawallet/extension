@@ -1,4 +1,4 @@
-import { Button, InputErrorMessage, PageWrapper, TxInfo } from "@src/components/common";
+import { Button, InputErrorMessage, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import {
   AssetAmountInput,
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
+import { SwapTxSummary } from "./components/SwapTxSummary";
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
@@ -51,7 +52,7 @@ export const Swap = () => {
     tx,
     txInfo,
     onConfirmTx,
-    isPairValid
+    isPairValid,
   } = useSwap();
 
   const canSend =
@@ -64,29 +65,13 @@ export const Swap = () => {
     assetToBuy,
   ]);
 
-
   return (
-    <PageWrapper contentClassName="h-full flex-1">
+    <PageWrapper
+      contentClassName="h-full flex-1"
+      innerContentClassName="flex flex-col"
+    >
       {mustConfirmTx ? (
-        <TxInfo
-          addressFrom={tx.addressFrom}
-          addressBridge={tx.addressBridge}
-          addressTo={tx.addressTo}
-          amountFrom={tx.amountFrom}
-          amountBridge={tx.amountBridge}
-          amountTo={tx.amountTo}
-          assetFrom={tx.assetFrom}
-          assetBridge={tx.assetBridge}
-          assetTo={tx.assetTo}
-          chainFrom={tx.chainFrom}
-          chainBridge={tx.chainBridge}
-          chainTo={tx.chainTo}
-          fee={tx.fee}
-          isLoading={isLoading}
-          onConfirm={onConfirmTx}
-          onBack={onBack}
-        />
-        // <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
+        <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
       ) : (
         <>
           <div className="flex gap-3 items-center mb-2">
@@ -167,13 +152,11 @@ export const Swap = () => {
                       }
                     />
                   )}
-                  {
-                    !isPairValid && (
-                      <InputErrorMessage
-                        message={t("pair_not_supported") as string}
-                      />
-                    )
-                  }
+                  {!isPairValid && (
+                    <InputErrorMessage
+                      message={t("pair_not_supported") as string}
+                    />
+                  )}
                 </div>
 
                 <AssetAmountInput

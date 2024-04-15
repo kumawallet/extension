@@ -1,19 +1,16 @@
 import { Fragment, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-import {
-  useAccountContext,
-  useNetworkContext,
-} from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import Account from "@src/storage/entities/Account";
 import { Button } from "@src/components/common";
 import { GoChevronDown } from "react-icons/go";
 import { Wallet } from "./Wallet";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
-import { CgClose } from "react-icons/cg";
 import { AccountDetails } from "./AccountDetails";
-import { IconWallet } from "@src/components/icons/wallet"
+import { TfiClose } from "react-icons/tfi";
+import { IconWallet } from "@src/components/icons/wallet";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
@@ -21,20 +18,16 @@ export const AccountList = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [actionSelected, setActionSelected] = useState<'create' | 'import' | 'detail' | null>(null);
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
+  const [actionSelected, setActionSelected] = useState<
+    "create" | "import" | "detail" | null
+  >(null);
 
   const {
     state: { selectedAccount, accounts },
     setSelectedAccount,
-    getAllAccounts
+    getAllAccounts,
   } = useAccountContext();
 
-  const changeSelectedAccount = (account: Account) => {
-    setSelectedAccount(account);
-  };
   const [accountData, setAccountData] = useState<Account | null>(null);
 
   const filteredAccounts = useMemo(() => {
@@ -43,34 +36,34 @@ export const AccountList = () => {
     }));
 
     return acc;
-  }, [accounts, selectedChain?.name]);
+  }, [accounts]);
 
   const onFinshCreatingOrImporting = () => {
     setActionSelected(null);
     getAllAccounts();
-  }
-
+  };
 
   const onCloseModal = () => {
     setIsOpen(false);
     setTimeout(() => {
       setActionSelected(null);
-    }, 500)
-  }
+    }, 500);
+  };
 
   return (
-    <>
-      <button data-testid="account-button"
-        onClick={() => setIsOpen(!isOpen)}
-      >
+    <div className="flex gap-2 items-center">
+      <button data-testid="account-button" onClick={() => setIsOpen(!isOpen)}>
         <div className="flex items-center bg-[#212529] gap-1 hover:bg-gray-500 hover:bg-opacity-20 px-2 py-1 rounded-xl">
           <div className="p-1 bg-[#343A40] mr-[0.1rem]  rounded-full">
             <IconWallet size="18" />
           </div>
-          <p className="text-primary-default text-base">
+          <p
+            data-testid="selected-account"
+            className="text-primary-default text-base"
+          >
             {selectedAccount?.value?.name}
           </p>
-          <GoChevronDown size={18} />
+          <GoChevronDown size={14} />
         </div>
       </button>
 
@@ -100,94 +93,84 @@ export const AccountList = () => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-[357px] transform overflow-hidden rounded-b-2xl bg-[#171720]  p-4 text-left align-middle shadow-xl h-fit transition-all">
-
-
                   <div className="py-2 px-4">
-                    {
-                      !actionSelected ? (
-                        <>
+                    {!actionSelected ? (
+                      <>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-base md:text-xl">
+                            {t("accounts.accounts")}
+                          </p>
+                          <button onClick={onCloseModal}>
+                            <TfiClose className="text-sm" />
+                          </button>
+                        </div>
 
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-base md:text-xl">{t("accounts.accounts")}</p>
-                            <button onClick={onCloseModal}>
-                              <CgClose size={18} />
-                            </button>
-                          </div>
+                        <div
+                          data-testid="wallet-list"
+                          className="flex flex-col gap-5"
+                        >
+                          {filteredAccounts.map((account) => (
+                            <Wallet
+                              key={account?.key}
+                              address={account?.value?.address}
+                              name={account?.value?.name}
+                              type={account?.type}
+                              more={() => {
+                                setAccountData(account);
+                                setActionSelected("detail");
+                              }}
+                              onSelect={() => {
+                                setSelectedAccount(account as Account);
+                              }}
+                              isSelected={account?.key === selectedAccount?.key}
+                            />
+                          ))}
+                        </div>
 
-                          <div className="flex flex-col gap-5">
-                            {filteredAccounts.map((account) => (
-                              <Wallet
-                                key={account?.key}
-                                address={account?.value?.address}
-                                name={account?.value?.name}
-                                type={account?.type}
-                                more={() => {
-                                  setAccountData(account);
-                                  setActionSelected('detail')
-                                }}
-                                onSelect={() => changeSelectedAccount(account as Account)}
-                                isSelected={account?.key === selectedAccount?.key}
-                              />
-                            ))}
-                          </div>
+                        <div className="flex justify-between my-6">
+                          <Button
+                            data-testid="create-button"
+                            classname="!w-[48%] py-3"
+                            onClick={() => setActionSelected("create")}
+                          >
+                            {t("accounts.create")}
+                          </Button>
+                          <Button
+                            data-testid="import-button"
+                            classname="!w-[48%] py-3"
+                            onClick={() => setActionSelected("import")}
+                          >
+                            {t("accounts.import")}
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {actionSelected === "create" && (
+                          <CreateWalletFromInside
+                            onClose={onCloseModal}
+                            onBack={() => setActionSelected(null)}
+                            onFinish={onFinshCreatingOrImporting}
+                          />
+                        )}
 
-                          <div className="flex justify-between my-6">
-                            <Button
-                              classname="!w-[48%] py-3"
-                              onClick={() => setActionSelected('create')}
-                            >
-                              {t("accounts.create")}
-                            </Button>
-                            <Button
-                              classname="!w-[48%] py-3"
-                              onClick={() => setActionSelected('import')}
-                            >
-                              {t("accounts.import")}
-                            </Button>
-                          </div>
+                        {actionSelected === "import" && (
+                          <ImportWalletFromInside
+                            onClose={onCloseModal}
+                            onBack={() => setActionSelected(null)}
+                            onFinish={onFinshCreatingOrImporting}
+                          />
+                        )}
 
-                        </>
-                      ) : (
-                        <>
-                          {
-                            actionSelected === 'create' ? (
-                              <CreateWalletFromInside
-                                onClose={onCloseModal}
-                                onBack={() => setActionSelected(null)}
-                                onFinish={onFinshCreatingOrImporting}
-                              />
-                            ) : actionSelected === 'detail' ? (
-                              <>
-                                {accountData ? (
-                                  <AccountDetails
-                                    title={`${tAccount("title")}`}
-                                    onBack={() => setActionSelected(null)}
-                                    accountData={accountData}
-                                  />
-                                ) : setActionSelected(null)}
-
-                              </>
-                            ) :
-                              (
-                                <>
-
-                                  <ImportWalletFromInside
-                                    onClose={onCloseModal}
-                                    onBack={() => setActionSelected(null)}
-                                    onFinish={onFinshCreatingOrImporting}
-                                  />
-
-
-
-                                </>
-
-                              )
-                          }
-                        </>
-                      )
-                    }
-
-
+                        {actionSelected === "detail" && accountData && (
+                          <AccountDetails
+                            title={`${tAccount("title")}`}
+                            onBack={() => setActionSelected(null)}
+                            accountData={accountData}
+                          />
+                        )}
+                      </>
+                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
@@ -195,9 +178,6 @@ export const AccountList = () => {
           </div>
         </Dialog>
       </Transition>
-    </>
-
-
-
+    </div>
   );
 };

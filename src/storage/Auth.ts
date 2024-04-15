@@ -34,9 +34,7 @@ export default class Auth {
   }
 
   static async isSessionActive(): Promise<boolean> {
-    if (!Auth.isUnlocked) {
-      await Auth.loadFromCache();
-    }
+    await Auth.loadFromCache();
     return Auth.isUnlocked;
   }
 
@@ -58,7 +56,7 @@ export default class Auth {
   static async setAutoLock (time: number){
     try{
       CacheAuth.getInstance();
-      CacheAuth.unlock(time);
+      CacheAuth.lock(time);
     }
     catch(err){
       CacheAuth.clear();

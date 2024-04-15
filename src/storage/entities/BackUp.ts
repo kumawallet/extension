@@ -8,6 +8,10 @@ export default class BackUp extends BaseEntity {
     this.data = data;
   }
 
+  static getName() {
+    return "BackUp";
+  }
+
   static async init() {
     await BackUp.set(new BackUp(undefined));
   }

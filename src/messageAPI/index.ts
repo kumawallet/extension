@@ -1,8 +1,12 @@
 import { PORT_EXTENSION } from "@src/constants/env";
 import {
   MessageTypes,
+  MessageTypesWithNoSubscriptions,
+  MessageTypesWithNullRequest,
+  MessageTypesWithSubscriptions,
   RequestTypes,
   ResponseTypes,
+  SubscriptionMessageTypes,
 } from "@src/entries/background/handlers/request-types";
 import { getWebAPI } from "@src/utils/env";
 import { v4 as uuidv4 } from "uuid";
@@ -26,16 +30,34 @@ const webAPI = getWebAPI();
 const port = webAPI.runtime.connect({ name: PORT_EXTENSION });
 const handlers: Handlers = {};
 
-export const sendMessage = <TMessageType extends MessageTypes>(
+export function sendMessage<TMessageType extends MessageTypesWithNullRequest>(
+  message: TMessageType
+): Promise<ResponseTypes[TMessageType]>;
+export function sendMessage<
+  TMessageType extends MessageTypesWithNoSubscriptions
+>(
   message: TMessageType,
   request: RequestTypes[TMessageType]
-): Promise<ResponseTypes[TMessageType]> => {
+): Promise<ResponseTypes[TMessageType]>;
+export function sendMessage<TMessageType extends MessageTypesWithSubscriptions>(
+  message: TMessageType,
+  request: RequestTypes[TMessageType],
+  subscriber: (data: SubscriptionMessageTypes[TMessageType]) => void
+): Promise<ResponseTypes[TMessageType]>;
+
+export function sendMessage<TMessageType extends MessageTypes>(
+  message: TMessageType,
+  request?: RequestTypes[TMessageType],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  subscriber?: (data: unknown) => void
+): Promise<ResponseTypes[TMessageType]> {
   return new Promise((resolve, reject) => {
     const id = getId();
 
     handlers[id] = {
       resolve,
       reject,
+      subscriber,
     };
 
     const transportMessage = {
@@ -47,7 +69,7 @@ export const sendMessage = <TMessageType extends MessageTypes>(
 
     port.postMessage(transportMessage);
   });
-};
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 port.onMessage.addListener((data: any): void => {
@@ -59,15 +81,14 @@ port.onMessage.addListener((data: any): void => {
     return;
   }
 
-  // if (!handler.subscriber) {
-  //   delete handlers[data.id];
-  // }
+  if (!handler.subscriber) {
+    delete handlers[data.id];
+  }
 
-  // if (data.subscription) {
-  //   // eslint-disable-next-line @typescript-eslint/ban-types
-  //   (handler.subscriber as Function)(data.subscription);
-  // } else
-  if (data.error) {
+  if (data.subscription) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    (handler.subscriber as Function)(data.subscription);
+  } else if (data.error) {
     handler.reject(new Error(data.error));
   } else {
     handler.resolve(data.response);

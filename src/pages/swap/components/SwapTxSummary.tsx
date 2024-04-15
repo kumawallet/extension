@@ -19,29 +19,36 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
   onBack,
   onConfirm,
 }) => {
-  const { t } = useTranslation("send");
+  const { t } = useTranslation("swap");
+  const { t: tSend } = useTranslation("send")
 
   const {
     state: { selectedChain },
   } = useNetworkContext();
 
   const transaction = {
-    sender: cropAccount(tx.addressFrom, 12),
-    to: cropAccount(tx.addressTo, 12),
-    network: (
+    [tSend('sender')]: cropAccount(tx.addressFrom, 12),
+    [tSend('to')]: cropAccount(tx.addressBridge, 12),
+    [tSend('network')]: (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-1 h-full">
-          <img src={selectedChain!.logo} width={12} />
+          <img src={selectedChain!.logo} width={12} className="rounded-full" />
           <RxChevronRight size={12} />
-          <img src={selectedChain!.logo} width={12} />
+          <img src={selectedChain!.logo} width={12} className="rounded-full" />
         </div>
       </div>
     ),
-    amount: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
-    estimated_fee: `${formatFees(
+    [tSend('amount')]: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
+    [tSend('estimated_fee')]: `${formatFees(
       tx.fee.estimatedFee,
       selectedChain?.decimals || 1
     )} ${tx.assetFrom.symbol}`,
+    [t('tx_confirm_info')]: t("tx_confirm_info_message", {
+      address_to_transfer: tx.addressBridge,
+      address_to_receive: tx.addressTo,
+      receive_amount: tx.amountTo,
+      receive_asset: tx.assetTo.symbol
+    })
   };
 
   return (
@@ -50,7 +57,9 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
         <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
         <p className="text-lg">{t("send_title")}</p>
       </div>
-      <TxSummary tx={transaction} />
+      <div className="flex flex-1">
+        <TxSummary tx={transaction} />
+      </div>
       <Button
         classname={`font-medium text-base capitalize w-full py-2 mt-7 !mx-0`}
         onClick={onConfirm}

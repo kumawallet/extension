@@ -86,8 +86,8 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
         <>
           <div
             className={`${title === "Recovery phrase" || title === "Accounts"
-                ? "mt-3"
-                : "mt-10"
+              ? "mt-3"
+              : "mt-10"
               }`}
           >
             <p className="text-xl font-bold">
@@ -114,6 +114,7 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
           ) : null}
           {!hideOption1 && (
             <Button
+              data-testid="option1-button"
               variant="contained-black"
               onClick={() => _onSelecteOption(1)}
               classname="w-full py-5"
@@ -129,6 +130,7 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
           )}
           {!hideOption2 && (
             <Button
+              data-testid="option2-button"
               variant="contained-black"
               onClick={() => _onSelecteOption(2)}
               classname="w-full py-5"

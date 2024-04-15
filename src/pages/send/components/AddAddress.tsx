@@ -5,7 +5,7 @@ import { AddAddressModal } from "@src/components/common/AddAddressModal";
 import { useToast } from "@src/hooks";
 import { messageAPI } from "@src/messageAPI/api";
 import Contact from "@src/storage/entities/registry/Contact";
-import { AddressBookForm } from "@src/types";
+import { AddressForm } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { FC, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -49,7 +49,7 @@ export const AddAddress: FC<AddAddressProps> = ({ onSaveContact }) => {
       .required(t("required") as string),
   }).required();
 
-  const methods = useForm<AddressBookForm>({
+  const methods = useForm<AddressForm>({
     defaultValues: {
       name: "",
       address: "",
@@ -61,7 +61,7 @@ export const AddAddress: FC<AddAddressProps> = ({ onSaveContact }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const saveContact = handleSubmit(async (form: AddressBookForm) => {
+  const saveContact = handleSubmit(async (form: AddressForm) => {
     try {
       const { name, address } = form;
       const contact = new Contact(name, address);

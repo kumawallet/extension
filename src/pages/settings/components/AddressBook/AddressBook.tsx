@@ -19,10 +19,10 @@ import { topbarText, topbarIcon, topbarContainer } from "../../style/style";
 import "../../style/input.css";
 import { CiSearch } from "react-icons/ci";
 import { PiGhost } from "react-icons/pi";
-import { AddressBookForm } from "@src/types";
+import { AddressForm } from "@src/types";
 
 export const AddressBook = () => {
-    const { t } = useTranslation("adressBook");
+    const { t } = useTranslation("address_book");
     const { t: tCommon } = useTranslation("common");
     const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ export const AddressBook = () => {
             .required(t("required") as string),
     }).required();
 
-    const methods = useForm<AddressBookForm>({
+    const methods = useForm<AddressForm>({
         defaultValues: {
             name: "",
             address: "",
@@ -86,7 +86,7 @@ export const AddressBook = () => {
         }
     };
 
-    const saveContact = handleSubmit(async (form: AddressBookForm) => {
+    const saveContact = handleSubmit(async (form: AddressForm) => {
         try {
             const { name, address } = form;
             const contact = new Contact(name, address);
@@ -185,7 +185,7 @@ export const AddressBook = () => {
                     <CiSearch className="absolute top-1/2 left-2 transform font-mediums -translate-y-1/2 text-white" />
                 </div>
 
-                <p className="text-sm font-medium mt-8">My Contacts</p>
+                <p className="text-sm font-medium mt-8">{t("my_contacts")}</p>
                 <div className="flex flex-col gap-1 mt-5">
                     {contacts.length === 0 && (
                         <div className="grid place-items-center mt-5 opacity-50 ">

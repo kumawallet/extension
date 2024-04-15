@@ -6,7 +6,7 @@ import { sendMessage } from ".";
 
 export const activityMessages = {
   getActivity: () => {
-    return sendMessage("pri(activity.getActivity)", null);
+    return sendMessage("pri(activity.getActivity)");
   },
   addActivity: (params: RequestAddActivity) => {
     return sendMessage("pri(activity.addActivity)", params);
@@ -15,6 +15,6 @@ export const activityMessages = {
     return sendMessage("pri(activity.updateActivity)", params);
   },
   getHistoricActivity: () => {
-    return sendMessage("pri(activity.getHistoricActivity)", null);
+    return sendMessage("pri(activity.getHistoricActivity)");
   },
 };

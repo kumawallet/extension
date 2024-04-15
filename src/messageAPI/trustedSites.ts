@@ -6,7 +6,7 @@ import { sendMessage } from ".";
 
 export const trustedSitesMessages = {
   getTrustedSites: () => {
-    return sendMessage("pri(trustedSites.getTrustedSites)", null);
+    return sendMessage("pri(trustedSites.getTrustedSites)");
   },
   addTrustedSite: (params: RequestAddTrustedSite) => {
     return sendMessage("pri(trustedSites.addTrustedSite)", params);

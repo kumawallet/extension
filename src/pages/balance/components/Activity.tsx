@@ -102,7 +102,7 @@ export const Activity = () => {
   const getLink = (chain: Chain, hash: string) => {
     const chainType = chain?.type;
     if (chainType === "wasm") {
-      return `${chain?.explorer}/extrinsic/${hash}`;
+      return `${selectedChain?.explorer}/extrinsic/${hash}`;
     } else {
       return `${selectedChain?.explorer}/tx/${hash}`;
     }
@@ -166,7 +166,7 @@ export const Activity = () => {
         />
         <CiSearch className={stylesActivity.iconSearch} />
       </div>
-      <div className={stylesActivity.containerTx}>
+      <div data-testid="activity-container" className={stylesActivity.containerTx}>
         {activity.length === 0 && (
           <div
             className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.containerEmptyActivity}`}
@@ -215,11 +215,11 @@ export const Activity = () => {
                 className={`${stylesActivity.flexItemsCenter} ${stylesActivity.containerButton}`}
               >
                 <div className={stylesActivity.flexItemsCenter}>
-                  <a
+                  <div
                     className={stylesActivity.explorer}
-                    href={getLink(selectedChain as Chain, hash)}
-                    target="_blank"
-                    rel="noreferrer"
+                  // href={getLink(selectedChain as Chain, hash)}
+                  // target="_blank"
+                  // rel="noreferrer"
                   >
                     {/* icon */}
                     <div className={`relative ${stylesActivity.circleIcon}`}>
@@ -247,7 +247,7 @@ export const Activity = () => {
                         )}
                       </div>
                     </div>
-                  </a>
+                  </div>
 
                   {/* title */}
                   <div className={stylesActivity.containerText}>

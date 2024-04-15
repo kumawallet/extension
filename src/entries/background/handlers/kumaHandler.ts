@@ -21,7 +21,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
   //   ? extension.handle(id, message, request, port)
   //   : tabs.handle(id, message, request, port, from);
 
-  const promise = extension.handle(id, message, request);
+  const promise = extension.handle(id, message, request, port);
 
   promise
     .then((response) => {

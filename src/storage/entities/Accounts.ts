@@ -10,6 +10,10 @@ export default class Accounts extends BaseEntity {
     this.data = {};
   }
 
+  static getName() {
+    return "Accounts";
+  }
+
   static async init() {
     await Accounts.set<Accounts>(new Accounts());
   }

@@ -177,7 +177,7 @@ export const getCurrencyInfo = () => {
 
 export const getWasmAssets = async (
   api: ApiPromise,
-  chainName: string,
+  chainId: string,
   address: string,
   dispatch: (
     assetId: string,
@@ -192,37 +192,34 @@ export const getWasmAssets = async (
   const assets: Asset[] = [];
   const unsubs: unknown[] = [];
   try {
-    let assetPallet = null;
     let balanceMethod:
       | (PromiseResult<GenericStorageEntryFunction> &
           StorageEntryBase<"promise", GenericStorageEntryFunction, AnyTuple> &
           StorageEntryPromiseOverloads)
       | null = null;
 
-    switch (chainName) {
-      case "Acala":
-      case "Mandala":
-        assetPallet = api.query.assetRegistry?.assetMetadatas;
+    switch (chainId) {
+      case "acala":
+      case "mandala":
         balanceMethod = api.query.tokens.accounts;
         break;
       default:
-        assetPallet = api.query.assets?.metadata;
         balanceMethod = api.query.assets?.account;
         break;
     }
 
-    if (!assetPallet || !balanceMethod)
+    if (!balanceMethod)
       return {
         assets,
         unsubs,
       };
 
-    const mappedAssets = SUBSTRATE_ASSETS_MAP[chainName] || [];
-
+    const mappedAssets = SUBSTRATE_ASSETS_MAP[chainId] || [];
     const assetBalances = await Promise.all(
-      mappedAssets.map((asset) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mappedAssets.map((asset: any) => {
         const params = [];
-        if (["acala", "mandala"].includes(chainName.toLowerCase())) {
+        if (["acala", "mandala"].includes(chainId.toLowerCase())) {
           params.push(address, asset.id);
         } else {
           params.push(asset.id, address);
@@ -247,7 +244,7 @@ export const getWasmAssets = async (
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
-        if (["acala", "mandala"].includes(chainName.toLowerCase())) {
+        if (["acala", "mandala"].includes(chainId.toLowerCase())) {
           params.push(address, JSON.parse(asset.id));
         } else {
           params.push(asset.id, address);

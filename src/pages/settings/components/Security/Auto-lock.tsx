@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react"
 import { ICON_SIZE } from "@src/constants/icons";
-import { useTranslation } from "react-i18next";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper, Button } from "@src/components/common";
@@ -16,7 +14,7 @@ import { useToast } from "@src/hooks";
 
 
 export const AutoLock = () => {
-  const { t } = useTranslation("security");
+  // const { t } = useTranslation("security");
   const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useToast();
   const timeLock = [
@@ -45,6 +43,18 @@ export const AutoLock = () => {
         value: 60
     },
   ]
+
+  const getDate = (minutes: number) => {
+    const date = new Date()
+    console.log(date, ")))))00000000")
+    const time = date.getTime();
+    console.log(time, "AAAAAAAAAAAAAAAAA")
+    console.log(new Date(time), "BBBBBBBBBBBB")
+    const timeout = new Date().getTime() + 1000 * 60 * minutes;
+    console.log(timeout, "este  = al este");
+    console.log(new Date(timeout),"CCCCCCCCCC");
+    return timeout
+  }
 
   
   const setAutolock = async(time: number) => {
@@ -80,6 +90,7 @@ export const AutoLock = () => {
                   key={opt.value}
                   variant="contained-black"
                  onClick={() => {
+                                  console.log(getDate(opt.value));
                                  setAutolock(opt.value)}}
                   classname={`${styleButtomNav} w-full justify-between `}
                 >

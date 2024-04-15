@@ -12,9 +12,9 @@ export const SendTxResume = () => {
   const { getValues } = useFormContext<SendTxForm>();
 
   const transaction = {
-    sender: cropAccount(getValues("senderAddress"), 12),
-    to: cropAccount(getValues("recipientAddress"), 12),
-    network: (
+    [t('sender')]: cropAccount(getValues("senderAddress"), 12),
+    [t('to')]: cropAccount(getValues("recipientAddress"), 12),
+    [t('network')]: (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-1 h-full">
           <img src={getValues("originNetwork").logo} width={12} />
@@ -26,14 +26,14 @@ export const SendTxResume = () => {
         )}
       </div>
     ),
-    amount: `${getValues("amount")} ${getValues("asset.symbol")}`,
-    estimated_fee: (
+    [t('amount')]: `${getValues("amount")} ${getValues("asset.symbol")}`,
+    [t('estimated_fee')]: (
       <div className="flex items-center">
         {formatFees(getValues("fee"), getValues("originNetwork.decimals"))}{" "}
         {getValues("originNetwork.symbol")}
       </div>
     ),
-    tip_review: `${getValues("tip")} ${getValues("originNetwork.symbol")}`,
+    [t('tip_review')]: `${getValues("tip")} ${getValues("originNetwork.symbol")}`,
   };
 
   return <TxSummary tx={transaction} />;

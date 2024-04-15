@@ -55,32 +55,33 @@ export const Wallet: FC<WalletProps> = ({
         />
         <div className="flex flex-col w-">
           <span className="text-start text-sm font-semibold">{name}</span>
-          <span className="overflow-hidden text-ellipsis text-xs font-inter font-light max-w-[30ch]">
+          <span className="overflow-hidden text-ellipsis text-[0.7rem] font-inter font-light max-w-[30ch]">
             {getHash(address)}
           </span>
         </div>
       </button>
 
-      <div className="w-[10%] flex items-center gap-1 justify-center">
-        {showCopyIcon && (
-          <div className="flex gap-3">
-            <button onClick={copyToClipboard}>
+      <div className="w-[10%] flex items-center gap-1 justify-center ml-4">
+        <div className="flex gap-3">
+          {showCopyIcon && (
+            <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>
               <Icon />
             </button>
-            {more && (
-              <button onClick={more}>
-                <More size="18" />
-              </button>
-            )}
-          </div>
-        )}
+          )}
+          {more && (
+            <button data-testid="details" onClick={more}>
+              <More size="18" />
+            </button>
+          )}
+        </div>
+
 
         {showSelectedIcon && (
           <button
             onClick={onSelect}
             className={`p-1 text-[6px] rounded-full border relative  ${isSelected
-                ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
-                : "border-gray-300"
+              ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
+              : "border-gray-300"
               }`}
           />
         )}

@@ -4,7 +4,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { AccountSelected } from "./AccountSelected";
 
-const renderCoponent = () => {
+const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
       <AccountSelected />
@@ -28,7 +28,7 @@ describe("AccountSelected", () => {
   });
 
   it("should render selectedAccount", async () => {
-    renderCoponent();
+    renderComponent();
     const account = screen.getByText(
       cropAccount("0x041fA537c4Fab3d7B91f67B358c126d37CBDa947", 8)
     );
@@ -44,7 +44,7 @@ describe("AccountSelected", () => {
       },
     } as any;
 
-    renderCoponent();
+    renderComponent();
     const button = screen.getByTestId("account-button");
 
     await act(() => {
