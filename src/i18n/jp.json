@@ -201,6 +201,7 @@
     "address": "アドレス",
     "save_contact": "連絡先を保存",
     "add_new_address": "新しいアドレスを追加",
+    "update_contact": "連絡先を編集する",
     "insert_name": "名前",
     "insert_address": "アドレス",
     "search": "検索",
@@ -355,7 +356,8 @@
     "pair_not_supported": "ペアがサポートされていません",
     "tx_confirm_info": "情報",
     "tx_confirm_info_message": "Stealthexプロトコルが提供する{{address_to_transfer}}に送金し、{{address_to_receive}}に{{receive_asset}} {{receive_amount}}を受け取ります。",
-    "send_title": "転送の確認"
+    "send_title": "転送の確認",
+    "proceed": "進む "
   },
   "change_password": {
     "title": "パスワードの変更",

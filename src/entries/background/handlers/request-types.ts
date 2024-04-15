@@ -105,7 +105,10 @@ export interface RequestSaveContact {
 export interface RequestRemoveContact {
   address: string;
 }
-
+export interface RequestUpdateContact{
+  name: string;
+  address: string;
+}
 export interface RequestAddActivity {
   txHash: string;
   record: Record;
@@ -208,6 +211,7 @@ export interface Request {
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];
+  "pri(contacts.updateContact)": [RequestUpdateContact,void]
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
   "pri(activity.getHistoricActivity)": [null, HistoricTransaction];

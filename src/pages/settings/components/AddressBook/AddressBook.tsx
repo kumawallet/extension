@@ -6,7 +6,7 @@ import Contact from "@src/storage/entities/registry/Contact";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import { Button, Loading, PageWrapper } from "@src/components/common";
-import { BsTrash } from "react-icons/bs";
+import { AiOutlineEdit } from "react-icons/ai";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -25,6 +25,9 @@ export const AddressBook = () => {
     const { t } = useTranslation("address_book");
     const { t: tCommon } = useTranslation("common");
     const navigate = useNavigate();
+    const [typeAction, setTypeAction] = useState<"create" | "update">("create");
+    const [name,setName] = useState("");
+    const [address, setAddress] = useState("")
 
     const schema = object({
         name: string().required(t("required") as string),
@@ -51,22 +54,35 @@ export const AddressBook = () => {
             )
             .required(t("required") as string),
     }).required();
+    
+    const getDefaultValue = () => {
+        const init = typeAction === "create" ? 
+            {
+                name: "",
+                address: "",
+            }
+            :
+            {
+                name: name,
+                address: address,
+            }
+            console.log(init);
+            return init;
+        }
 
     const methods = useForm<AddressForm>({
-        defaultValues: {
-            name: "",
-            address: "",
-        },
         resolver: yupResolver(schema),
+        values: getDefaultValue(),
     });
 
     const { handleSubmit, reset } = methods;
 
     const [isLoading, setIsLoading] = useState(true);
-    const [isCreateContact, setIsCreateContact] = useState(false);
+    const [isOpenModal, setIsOpenModal] = useState(false);
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
     const { showErrorToast } = useToast();
+    
 
     useEffect(() => {
         setIsLoading(true);
@@ -99,7 +115,7 @@ export const AddressBook = () => {
             captureError(error);
             showErrorToast(tCommon(error as string));
         } finally {
-            setIsCreateContact(false);
+            setIsOpenModal(false);
             reset();
         }
     });
@@ -110,17 +126,38 @@ export const AddressBook = () => {
                 address,
             });
             getContacts();
+            setIsOpenModal(false);
         } catch (error) {
             showErrorToast(tCommon(error as string));
         }
     };
+        const updateContact = handleSubmit(async (form: AddressForm) => {
+        try {
+            const { name, address } = form;
+            await messageAPI.updateContact({
+                name,
+                address,
+            });
+            setSearch("");
+            getContacts();
+        } catch (error) {
+            captureError(error);
+            showErrorToast(tCommon(error as string));
+        } finally {
+            setIsOpenModal(false);
+            reset();
+        }
+    }); 
 
     const toggleCreateContact = () => {
+        setTypeAction("create");
+        setName("");
+        setAddress("");
         reset({
             name: "",
             address: "",
         });
-        setIsCreateContact(!isCreateContact);
+        setIsOpenModal(!isOpenModal);
     };
 
     const groupedContacts = useMemo(() => {
@@ -169,9 +206,12 @@ export const AddressBook = () => {
                     </div>
                 </div>
                 <AddAddressModal
-                    isOpen={isCreateContact}
+                    isOpen={isOpenModal}
                     onClose={toggleCreateContact}
+                    type={typeAction}
                     onSaveContact={saveContact}
+                    onUpdateContact={updateContact}
+                    onDeleteContact={() => deleteContact(address)}
                 />
                 <div className="relative">
                     <input
@@ -212,14 +252,19 @@ export const AddressBook = () => {
                                         <p>{contact?.address}</p>
                                     </div>
                                     <div className="w-[20%] flex justify-end">
-                                        <BsTrash
-                                            className="text-lg hover:text-custom-red-bg"
-                                            onClick={() => deleteContact(contact.address)}
-                                        />
+                                        
+                                            <AiOutlineEdit  onClick={() => {
+                                                setName(contact?.name);
+                                                setAddress(contact.address);
+                                                setTypeAction("update");
+                                                setIsOpenModal(true);
+                                                }}
+                                            />
                                     </div>
                                 </div>
                             ))}
                         </section>
+                        
                     ))}
                 </div>
             </FormProvider>

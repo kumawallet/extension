@@ -74,10 +74,10 @@ export const Swap = () => {
         <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
       ) : (
         <>
-          <div className="flex gap-3 items-center mb-2">
+          <div className="flex gap-1 items-center mb-2">
             <FiChevronLeft
-              size={26}
-              className="cursor-pointer"
+              size={15}
+              className="cursor-pointer ml-[-0.3rem]"
               onClick={() => navigate(-1)}
             />
 

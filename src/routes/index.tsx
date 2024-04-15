@@ -81,7 +81,6 @@ export const Routes = () => {
 
   const [isInit, setIsInit] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
-
   const { isLoading, endLoading } = useLoading(true);
 
   useEffect(() => {

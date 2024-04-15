@@ -201,6 +201,7 @@
     "address": "Address",
     "save_contact": "Save contact",
     "add_new_address": "Add new address",
+    "update_contact": "Edit Contact",
     "insert_name": "Name",
     "insert_address": "Address",
     "search": "Search",
@@ -354,7 +355,8 @@
     "pair_not_supported": "Pair not supported",
     "tx_confirm_info": "Info",
     "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
-    "send_title": "Review Transfer"
+    "send_title": "Review Transfer",
+    "proceed": "Proceed"
   },
   "change_password": {
     "title": "Change your password",

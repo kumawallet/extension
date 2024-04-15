@@ -98,6 +98,7 @@ export const AddAddress: FC<AddAddressProps> = ({ onSaveContact }) => {
       <AddAddressModal
         isOpen={isModalOpen}
         onSaveContact={saveContact}
+        type="create"
         onClose={onToggleModal}
       />
     </FormProvider>

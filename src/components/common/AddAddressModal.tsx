@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC, Fragment} from "react";
 import { Transition, Dialog } from "@headlessui/react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -10,13 +10,20 @@ import { AddressForm } from "@src/types";
 interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSaveContact: () => void;
+  type: "create" | "update";
+  onSaveContact?: () => void;
+  onUpdateContact?: () => void;
+  onDeleteContact?: () => void; 
+
 }
 
 export const AddAddressModal: FC<AddAddressModalProps> = ({
   isOpen,
   onClose,
   onSaveContact,
+  type,
+  onDeleteContact,
+  onUpdateContact
 }) => {
   const { t } = useTranslation("address_book");
   const { t: tCommon } = useTranslation("common");
@@ -26,7 +33,6 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
     formState: { errors },
     watch,
   } = useFormContext<AddressForm>();
-
   const checkInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget as HTMLInputElement;
     if (input.value !== "") {
@@ -37,8 +43,15 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
   };
 
   const address = watch("address") as string;
-
   const { Icon, copyToClipboard } = useCopyToClipboard(address);
+
+  const getTitle = () => {
+    return type === "create" ? t("add_new_address") : t("update_contact");
+  }
+
+  const saveOrUpdate = () => {
+    type === "create" ? onSaveContact?.() : onUpdateContact?.();
+  } 
 
   return (
     <Transition show={isOpen} as={Fragment}>
@@ -51,7 +64,7 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
             <Dialog.Panel>
               <div className="fixed bottom-0 left-0 right-0 mx-auto bg-[#333343]/50 rounded-lg p-6 pt-2 max-w-[357px] w-full">
                 <div className="w-full flex justify-between items-center mb-5">
-                  <p className="text-base">{t("add_new_address")}</p>
+                  <p className="text-base">{getTitle()}</p>
                   <button
                     className="absolute text-xl top-2 text-white right-4"
                     onClick={onClose}
@@ -65,7 +78,7 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
                     id="name"
                     max={32}
                     min={1}
-                    className="input w-full mt-2 relative ml-6"
+                    className={`input  w-full mt-2 relative ml-6 ${type === "create" ? "" : "hasData"}`}
                     onInput={checkInput}
                     {...register("name")}
                   />
@@ -78,7 +91,7 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
                   <input
                     data-testid="address"
                     id="address"
-                    className="input w-full mt-2 relative ml-6"
+                    className={`input  w-full mt-2 relative ml-6 ${type === "create" ? "" : "hasData"}`}
                     onInput={checkInput}
                     {...register("address")}
                   />
@@ -99,13 +112,23 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
 
                   <InputErrorMessage message={errors.address?.message} />
                 </div>
-                <Button
-                  data-testid="save-button"
-                  classname={`text-sm w-full mt-4`}
-                  onClick={onSaveContact}
-                >
-                  {tCommon("save")}
-                </Button>
+                <div className="flex justify-between mt-2 gap-1 w-full ">
+                    <Button
+                      data-testid="save-button"
+                      classname={`text-sm py-1 w-full mt-4`}
+                      onClick={saveOrUpdate}
+                    >
+                      {tCommon("save")}
+                    </Button>
+                    <Button
+                          data-testid="confirm-delete-button"
+                          variant="countained-red"
+                          classname={`w-full py-1 text-sm  mt-4 ${type ==="create" ? "hidden" : "block"}`}
+                          onClick={onDeleteContact}
+                        >
+                          {t("delete")}
+                    </Button>
+                </div>
               </div>
             </Dialog.Panel>
           </div>

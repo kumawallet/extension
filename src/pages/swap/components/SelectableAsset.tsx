@@ -82,7 +82,7 @@ export const SelectableAsset = <T extends SwapAsset>({
             )}
 
             <Combobox.Input
-              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between ${open ? "border-[1.78px] border-[#E6007A]": "border-0"} hover:border-[1.78px] hover:border-[#E6007A] items-center bg-[#040404] rounded-xl py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-primary-default hover:outline-primary-default ${buttonClassName}`}
+              className={`!pl-10 min-w-[120px] h-full w-full text-sm flex justify-between ${open ? "border-[1.78px] border-[#E6007A]": "border-0"} hover:border-[1.78px] hover:border-[#E6007A] items-center bg-[#040404] rounded-lg py-2 px-2 md:px-6 cursor-default outline outline-transparent focus:outline-primary-default hover:outline-primary-default ${buttonClassName}`}
               displayValue={(asset: SwapAsset) =>
                 asset?.name?.toUpperCase() || ""
               }

@@ -18,7 +18,7 @@ export interface Asset {
 const Bg = () => (
   <svg width="739" height="868" viewBox="0 0 739 868" fill="none" xmlns="http://www.w3.org/2000/svg" className="bottom-0 left-0 w-full h-[62%] md:h-2/3 object-cover z-0 fixed">
     <g filter="url(#filter0_f_1173_150)">
-      <rect y="242" width="739" height="531" rx="28" fill="#6C387A" fillOpacity="0.57" />
+      <rect x="180" y="242" width="430" height="450" rx="40" fill="#6C387A" fillOpacity="1" />
       <rect x="0.5" y="242.5" width="738" height="530" rx="27.5" stroke="#FDF7F7" />
     </g>
     <defs>
