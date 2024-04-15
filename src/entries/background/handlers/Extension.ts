@@ -210,6 +210,9 @@ export default class Extension {
   private async setAutoLock ({ time }: RequestSetAutoLock){
     await Auth.setAutoLock(time);
   }
+  private async unlock(){
+    await Auth.unLock()
+  }
   private async validatePassword({
     password,
     key,
@@ -774,6 +777,8 @@ export default class Extension {
         return this.validatePassword(request as RequestValidatePassword);
       case "pri(auth.setAutoLock)":
         return this.setAutoLock(request as RequestSetAutoLock);
+      case "pri(auth.unlock)":
+        return this.unlock();
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

@@ -107,7 +107,7 @@ export const Routes = () => {
       setIsSignedUp(alreadySignedUp);
     })();
     getHomeRoute();
-    console.log("por aqui")
+    
   }, []);
 
   useEffect(() => {
@@ -171,6 +171,12 @@ export const Routes = () => {
   if (isLoading) {
     return <Loading />;
   }
+
+
+  setInterval(async() => {
+      await messageAPI.unlock();
+  }, 30000)
+
 
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>

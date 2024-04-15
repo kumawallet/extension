@@ -71,13 +71,6 @@ export const AddressBook = () => {
         }
 
     const methods = useForm<AddressForm>({
-<<<<<<< HEAD
-        defaultValues: {
-            name: "",
-            address: "",
-        },
-=======
->>>>>>> develop
         resolver: yupResolver(schema),
         values: getDefaultValue(),
     });

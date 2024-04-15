@@ -1,10 +1,7 @@
 import {
   RequestSignIn,
   RequestValidatePassword,
-<<<<<<< HEAD
   RequestSetAutoLock
-=======
->>>>>>> develop
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 
@@ -20,6 +17,9 @@ export const authMessages = {
   },
   validatePassword: (param: RequestValidatePassword) => {
     return sendMessage("pri(auth.validatePassword)", param);
+  },
+  unlock: () =>{
+    return sendMessage("pri(auth.unlock)")
   },
   setAutoLock : (param: RequestSetAutoLock) => { 
     return sendMessage("pri(auth.setAutoLock)", param)

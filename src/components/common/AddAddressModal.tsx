@@ -33,10 +33,6 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
     formState: { errors },
     watch,
   } = useFormContext<AddressForm>();
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
   const checkInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget as HTMLInputElement;
     if (input.value !== "") {
@@ -116,15 +112,6 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
 
                   <InputErrorMessage message={errors.address?.message} />
                 </div>
-<<<<<<< HEAD
-                <Button
-                  data-testid="save-button"
-                  classname={`text-sm w-full mt-4`}
-                  onClick={onSaveContact}
-                >
-                  {tCommon("save")}
-                </Button>
-=======
                 <div className="flex justify-between mt-2 gap-1 w-full ">
                     <Button
                       data-testid="save-button"
@@ -142,7 +129,6 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
                           {t("delete")}
                     </Button>
                 </div>
->>>>>>> develop
               </div>
             </Dialog.Panel>
           </div>

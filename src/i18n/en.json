@@ -355,12 +355,8 @@
     "pair_not_supported": "Pair not supported",
     "tx_confirm_info": "Info",
     "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
-<<<<<<< HEAD
-    "send_title": "Review Transfer"
-=======
     "send_title": "Review Transfer",
     "proceed": "Proceed"
->>>>>>> develop
   },
   "change_password": {
     "title": "Change your password",

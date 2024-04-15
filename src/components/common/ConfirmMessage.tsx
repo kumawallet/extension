@@ -1,4 +1,4 @@
-import { FC, Fragment, useState, useEffect, useRef } from "react";
+import { FC, Fragment } from "react";
 import { Transition, Dialog } from "@headlessui/react";
 import { Button } from "@src/components/common";
 import { IoCloseOutline } from "react-icons/io5";
@@ -19,10 +19,6 @@ interface ConfirmMessageProps {
 export const ConfirmMessage: FC<ConfirmMessageProps> = ({
   isOpen,
   onClose,
-<<<<<<< HEAD
-  name,
-=======
->>>>>>> develop
   address,
   confirmed,
   type

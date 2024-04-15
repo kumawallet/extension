@@ -185,7 +185,8 @@ export interface Request {
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
   "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
-  "pri(auth.setAutoLock)": [RequestSetAutoLock]
+  "pri(auth.setAutoLock)": [RequestSetAutoLock];
+  "pri(auth.unlock)": [null,void];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
