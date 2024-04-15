@@ -201,6 +201,10 @@
     "address": "Adres",
     "save_contact": "Kişiyi Kaydet",
     "add_new_address": "Yeni adres ekle",
+<<<<<<< HEAD
+=======
+    "update_contact": "Kişiyi Düzenle",
+>>>>>>> develop
     "insert_name": "Ad",
     "insert_address": "Adres",
     "search": "Ara",
@@ -355,7 +359,12 @@
     "pair_not_supported": "Çift desteklenmiyor",
     "tx_confirm_info": "Bilgi",
     "tx_confirm_info_message": "Stealthex protokolü tarafından sağlanan {{address_to_transfer}} adresine transfer yapmanız ve ardından {{address_to_receive}} adresine {{receive_asset}} {{receive_amount}} almanız gerekecek",
+<<<<<<< HEAD
     "send_title": "Transferi İncele"
+=======
+    "send_title": "Transferi İncele",
+    "proceed": "İlerlemek"
+>>>>>>> develop
   },
   "change_password": {
     "title": "Şifrenizi Değiştirin",

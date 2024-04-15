@@ -201,6 +201,10 @@
   "address": "Indirizzo",
   "save_contact": "Salva contatto",
   "add_new_address": "Aggiungi nuovo indirizzo",
+<<<<<<< HEAD
+=======
+  "update_contact" : "Modifica Contatto",
+>>>>>>> develop
   "insert_name": "Nome",
   "insert_address": "Indirizzo",
   "search": "Cerca",
@@ -355,7 +359,12 @@
   "pair_not_supported": "Coppia non supportata",
   "tx_confirm_info": "Informazioni",
   "tx_confirm_info_message": "Dovrai trasferire a {{address_to_transfer}} fornito dal protocollo Stealthex, poi riceverai {{receive_amount}} {{receive_asset}} all'indirizzo che hai fornito: {{address_to_receive}}",
+<<<<<<< HEAD
   "send_title": "Rivedi trasferimento"
+=======
+  "send_title": "Rivedi trasferimento",
+  "proceed": "Procedere"
+>>>>>>> develop
 },
 "change_password": {
   "title": "Cambia la tua password",

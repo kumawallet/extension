@@ -269,7 +269,7 @@ export const Activity = () => {
                   </div>
                 </div>
               </div>
-              <Status status={status as RecordStatus} />
+              <Status status={status as RecordStatus} classname="ml-2" />
               <div className={stylesActivity.containerDivEnd}>
                 <div className={stylesActivity.flexItemsCenter}>
                   <div

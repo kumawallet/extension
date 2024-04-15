@@ -19,7 +19,10 @@ interface ConfirmMessageProps {
 export const ConfirmMessage: FC<ConfirmMessageProps> = ({
   isOpen,
   onClose,
+<<<<<<< HEAD
   name,
+=======
+>>>>>>> develop
   address,
   confirmed,
   type

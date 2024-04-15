@@ -1,7 +1,10 @@
 import {
   RequestSignIn,
   RequestValidatePassword,
+<<<<<<< HEAD
   RequestSetAutoLock
+=======
+>>>>>>> develop
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 

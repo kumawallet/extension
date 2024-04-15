@@ -55,6 +55,7 @@ import {
   RequestValidatePassword,
   RequestSetAutoLock,
   ResponseType,
+  RequestUpdateContact
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -396,6 +397,10 @@ export default class Extension {
 
   private async removeContact({ address }: RequestRemoveContact) {
     await Registry.removeContact(address);
+  }
+
+  private async updateContact({address, name}:RequestUpdateContact){
+    await Registry.updateContact (address,name);
   }
 
   private async getHistoricActivity() {
@@ -804,6 +809,8 @@ export default class Extension {
         return this.getRegistryAddresses();
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
+      case "pri(contacts.updateContact)":
+        return this.updateContact(request as RequestUpdateContact)
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
