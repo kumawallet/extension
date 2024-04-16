@@ -34,6 +34,7 @@ describe("Storage", () => {
     vi.mock("./entities/CacheAuth", () => ({
       default: {
         init: vi.fn(),
+        lock: vi.fn()
       },
     }));
 
