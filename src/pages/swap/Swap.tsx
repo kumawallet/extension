@@ -67,8 +67,9 @@ export const Swap = () => {
 
   return (
     <PageWrapper
-      contentClassName="h-full flex-1"
-      innerContentClassName="flex flex-col"
+      contentClassName="h-full flex-1 "
+      innerContentClassName="flex flex-col !bg-[#212529]"
+      
     >
       {mustConfirmTx ? (
         <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
@@ -81,7 +82,7 @@ export const Swap = () => {
               onClick={() => navigate(-1)}
             />
 
-            <p className="text-lg">{t("title")}</p>
+            <p className="text-base font-medium">{t("title")}</p>
           </div>
 
           <div className="flex flex-col h-[inherit]">
@@ -111,7 +112,7 @@ export const Swap = () => {
                 />
               </div>
 
-              <div className="flex flex-col gap-5 mt-6">
+              <div className="flex flex-col gap-3 mt-6">
                 <div>
                   <AssetAmountInput
                     minSellAmount={minSellAmount}
@@ -193,7 +194,7 @@ export const Swap = () => {
                     showRecipientAddress ? assetToBuy.label?.toUpperCase() : ""
                   }
                   isOptional={false}
-                  containerClassName="mt-4 mb-2"
+                  containerClassName="mt-4"
                   address={recipient.address}
                   isNotOwnAddress={recipient.isNotOwnAddress}
                   isValidAddress={isValidWASMAddress}
@@ -217,7 +218,7 @@ export const Swap = () => {
                 isLoadingSellAsset ||
                 isCreatingSwap
               }
-              classname={`font-medium text-base capitalize w-full py-2 mt-7 !mx-0`}
+              classname={`font-medium text-base capitalize w-full py-2 mt-4 !mx-0`}
               onClick={swap}
             >
               {t("proceed")}

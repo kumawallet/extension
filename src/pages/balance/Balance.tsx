@@ -51,7 +51,7 @@ export const Balance = () => {
   return (
     <>
       <Header />
-      <PageWrapper contentClassName="flex-1 !px-0">
+      <PageWrapper contentClassName="flex-1 !px-0" innerContentClassName=" !bg-[#0C0C0C]">
         <Bg />
         <div className="flex flex-col pt-3 pb-16 relative">
           <div className="flex flex-col gap-6">
