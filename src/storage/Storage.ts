@@ -54,6 +54,7 @@ export default class Storage {
   }
 
   async resetWallet() {
+    await CacheAuth.lock();
     await this.#storage.clear();
   }
 }

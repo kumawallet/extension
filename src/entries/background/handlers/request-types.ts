@@ -58,6 +58,10 @@ export interface RequestValidatePassword {
   key: AccountKey;
   keyring: AccountType;
 }
+export interface RequestSetAutoLock {
+  time: number //in minutes
+}
+
 export interface RequestGetAccount {
   key: AccountKey;
 }
@@ -142,6 +146,10 @@ export interface RequestRemoveTrustedSite {
   site: string;
 }
 
+export interface getLock{
+  lock:number;
+}
+
 interface RequestSendTxBase {
   amount: string;
   asset: {
@@ -182,6 +190,9 @@ export interface Request {
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
   "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
+  "pri(auth.setAutoLock)": [RequestSetAutoLock];
+  "pri(auth.unlock)": [null,void];
+  "pri(auth.getLock)": [null,number]
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];

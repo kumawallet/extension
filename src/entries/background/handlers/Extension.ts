@@ -53,6 +53,7 @@ import {
   RequestUpdateActivity,
   RequestUpdateSetting,
   RequestValidatePassword,
+  RequestSetAutoLock,
   ResponseType,
   RequestUpdateContact
 } from "./request-types";
@@ -206,7 +207,16 @@ export default class Extension {
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
   }
-
+  private async setAutoLock ({ time }: RequestSetAutoLock){
+    await Auth.setAutoLock(time);
+  }
+  private async unlock(){
+    await Auth.unLock()
+  }
+  private async getLock() {
+    const lock = await Auth.getLock()
+    return lock;
+  }
   private async validatePassword({
     password,
     key,
@@ -769,6 +779,12 @@ export default class Extension {
         return this.signIn(request as RequestSignIn);
       case "pri(auth.validatePassword)":
         return this.validatePassword(request as RequestValidatePassword);
+      case "pri(auth.setAutoLock)":
+        return this.setAutoLock(request as RequestSetAutoLock);
+      case "pri(auth.unlock)":
+        return this.unlock();
+      case "pri(auth.getLock)":
+        return this.getLock();
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

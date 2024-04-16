@@ -15,6 +15,7 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
+  
 
 } from "@src/pages";
 import {
@@ -25,7 +26,9 @@ import {
   ManageNetworks,
   Security,
   Settings
+  
 } from "@src/pages/settings";
+import { AutoLock } from "@src/pages/settings/components/Security/Auto-lock"
 import {
   BALANCE,
   ACTIVITY_DETAIL,
@@ -48,6 +51,7 @@ import {
   SWAP,
   WELCOME,
   CHANGE_PASSWORD,
+  SETTINGS_AUTOLOCK
 
 } from "./paths";
 
@@ -98,9 +102,12 @@ export const Routes = () => {
         }
       }
 
+      
       setIsInit(true);
       setIsSignedUp(alreadySignedUp);
     })();
+    getHomeRoute();
+    
   }, []);
 
   useEffect(() => {
@@ -119,7 +126,6 @@ export const Routes = () => {
 
       const isSessionActive = await messageAPI.isSessionActive();
       const isAuthorized = await messageAPI.isAuthorized();
-
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
         endLoading();
@@ -165,6 +171,12 @@ export const Routes = () => {
     return <Loading />;
   }
 
+
+  setInterval(async() => {
+      await messageAPI.unlock(); // Timeout update(AutoLock)
+  }, 30000)
+
+
   return (
     <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
       <RRoutes>
@@ -187,6 +199,7 @@ export const Routes = () => {
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
         <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
+        <Route path={SETTINGS_AUTOLOCK} element={<AutoLock/>} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
