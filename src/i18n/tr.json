@@ -36,7 +36,8 @@
     "no_contacts_found": "Kişiler bulunamadı",
     "error": "Bir hata oluştu",
     "rpc_error": "Ağ hatası",
-    "copy_to_clipboard": "Panoya kopyala"
+    "copy_to_clipboard": "Panoya kopyala",
+    "success": "Başarılı işlem"
   },
   "welcome": {
     "welcome_message": "Kuma'ya hoş geldiniz",
@@ -163,6 +164,10 @@
     "contacts": "Kişiler",
     "address_book" : "Adres Defteri",
     "security": "Güvenlik",
+    "autolock": {
+      "title": "Otomatik kilit zamanını ayarla",
+      "minutes" : "dakika"
+      },
     "bug_report": "Hata Bildirimi",
     "about_us": "Hakkımızda",
     "sign_out": "Çıkış Yap",

@@ -36,7 +36,8 @@
     "no_contacts_found": "連絡先が存在しません",
     "error": "エラーが発生しました",
     "rpc_error": "ネットワークエラー",
-    "copy_to_clipboard": "クリップボードにコピー"
+    "copy_to_clipboard": "クリップボードにコピー",
+    "success": "成功した操作"
   },
   "welcome": {
     "welcome_message": "Kumaへようこそ",
@@ -163,6 +164,10 @@
     "contacts": "連絡先",
     "address_book": "アドレス帳",
     "security": "セキュリティ",
+    "autolock": {
+      "title": "自動ロック時間の設定",
+      "minutes" : "分"
+      },
     "bug_report": "バグ報告",
     "about_us": "私たちについて",
     "sign_out": "サインアウト",

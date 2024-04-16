@@ -36,7 +36,8 @@
     "no_contacts_found": "No contacts added yet",
     "error": "An error has occurred",
     "rpc_error": "Network error",
-    "copy_to_clipboard": "Copy to clipboard"
+    "copy_to_clipboard": "Copy to clipboard",
+    "success": "Successful operation"
   },
   "welcome": {
     "welcome_message": "Your friendly multichain wallet to explore blockchain",
@@ -163,10 +164,15 @@
     "contacts": "Contacts",
     "address_book" : "Address book",
     "security": "Security",
+    "autolock": {
+      "title": "Set auto-lock time",
+      "minutes" : "min"
+        },
     "bug_report": "Bug report",
     "about_us": "About us",
     "sign_out": "Sign out",
     "webside": "Webside"
+    
   },
   "general_settings": {
     "title": "General",
