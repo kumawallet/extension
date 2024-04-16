@@ -46,15 +46,12 @@ export const AutoLock = () => {
   const [lock, setLock] = useState<number>(0);
 
   useEffect(() => {
-    console.log("11111", lock)
     getLock();
-    console.log("22222",lock)
   },[])
 
   const getLock = async() => {
     try{
       const lock = await messageAPI.getLock();
-      console.log(lock, "dfghuirehgnh");
       setLock(lock);
     }
     catch(error){
@@ -95,7 +92,7 @@ export const AutoLock = () => {
                 <Button
                   key={opt.value}
                   variant="contained-black"
-                 onClick={() => {   console.log(lock, "AAAAAAAAA");
+                 onClick={() => {
                                     setLock(opt.value)
                                     setAutolock(opt.value)}}
                   classname={`${styleButtomNav} w-full justify-between `}
