@@ -25,6 +25,10 @@ export const authMessages = {
     return sendMessage("pri(auth.setAutoLock)", param)
   }
   ,
+  getLock : () =>{
+    return sendMessage("pri(auth.getLock)")
+  }
+  ,
   signOut: () => {
     return sendMessage("pri(auth.signOut)");
   },

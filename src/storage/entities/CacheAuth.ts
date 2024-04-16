@@ -18,6 +18,7 @@ export default class CacheAuth extends BaseEntity {
     return "Auth";
   }
 
+
   static async init() {
     await CacheAuth.get<CacheAuth>();
   }
@@ -31,6 +32,12 @@ export default class CacheAuth extends BaseEntity {
     });
     return entity as CacheAuth;
   }
+
+  static async getLock() {
+    const cache = CacheAuth.getInstance();
+    return cache.lock
+  }
+  
   static async lock(time: number = 30) {
     const cache = CacheAuth.getInstance();
     cache.lock = time;

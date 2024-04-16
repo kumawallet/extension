@@ -126,7 +126,6 @@ export const Routes = () => {
 
       const isSessionActive = await messageAPI.isSessionActive();
       const isAuthorized = await messageAPI.isAuthorized();
-      console.log(isSessionActive)
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
         endLoading();
@@ -174,7 +173,7 @@ export const Routes = () => {
 
 
   setInterval(async() => {
-      await messageAPI.unlock();
+      await messageAPI.unlock(); // Timeout update(AutoLock)
   }, 30000)
 
 

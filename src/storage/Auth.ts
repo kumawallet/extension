@@ -41,6 +41,10 @@ export default class Auth {
     CacheAuth.getInstance();
     CacheAuth.unlock();
   }
+  
+  static async getLock() {
+    return CacheAuth.getLock();
+  }
 
   static isAuthorized() {
     return Auth.password !== undefined;

@@ -111,6 +111,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
       localStorage.removeItem("color");
 
       const tab = await webAPI.tabs.getCurrent();
+      
 
       const isInPopup = !tab?.id;
 

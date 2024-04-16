@@ -213,6 +213,10 @@ export default class Extension {
   private async unlock(){
     await Auth.unLock()
   }
+  private async getLock() {
+    const lock = await Auth.getLock()
+    return lock;
+  }
   private async validatePassword({
     password,
     key,
@@ -779,6 +783,8 @@ export default class Extension {
         return this.setAutoLock(request as RequestSetAutoLock);
       case "pri(auth.unlock)":
         return this.unlock();
+      case "pri(auth.getLock)":
+        return this.getLock();
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":

@@ -2,7 +2,7 @@ import { ICON_SIZE } from "@src/constants/icons";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper, Button } from "@src/components/common";
-import { BsChevronRight } from "react-icons/bs";
+import { useState, useEffect } from "react";
 import {
   topbarIcon,
   topbarText,
@@ -43,20 +43,26 @@ export const AutoLock = () => {
         value: 60
     },
   ]
+  const [lock, setLock] = useState<number>(0);
 
-  const getDate = (minutes: number) => {
-    const date = new Date()
-    console.log(date, ")))))00000000")
-    const time = date.getTime();
-    console.log(time, "AAAAAAAAAAAAAAAAA")
-    console.log(new Date(time), "BBBBBBBBBBBB")
-    const timeout = new Date().getTime() + 1000 * 60 * minutes;
-    console.log(timeout, "este  = al este");
-    console.log(new Date(timeout),"CCCCCCCCCC");
-    return timeout
+  useEffect(() => {
+    console.log("11111", lock)
+    getLock();
+    console.log("22222",lock)
+  },[])
+
+  const getLock = async() => {
+    try{
+      const lock = await messageAPI.getLock();
+      console.log(lock, "dfghuirehgnh");
+      setLock(lock);
+    }
+    catch(error){
+      showErrorToast(`${error}`);
+        return false
+      }
+    
   }
-
-  
   const setAutolock = async(time: number) => {
     try{
       if(time > 0){
@@ -89,19 +95,22 @@ export const AutoLock = () => {
                 <Button
                   key={opt.value}
                   variant="contained-black"
-                 onClick={() => {
-                                  console.log(getDate(opt.value));
-                                 setAutolock(opt.value)}}
+                 onClick={() => {   console.log(lock, "AAAAAAAAA");
+                                    setLock(opt.value)
+                                    setAutolock(opt.value)}}
                   classname={`${styleButtomNav} w-full justify-between `}
                 >
                   <div className="flex items-center">
                     <p className="text-sm">{opt.title}</p>
                   </div>
-                  <BsChevronRight />
-                </Button>
+                  <div
+                    className={`p-1 text-[6px] rounded-full border relative ${lock === opt.value ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon" : "border-gray-300"} `}
+                  />
+                  </Button>
               ))
               } 
         </div>
     </PageWrapper>
   );
 };
+
