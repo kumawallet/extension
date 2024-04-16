@@ -2,11 +2,23 @@ body {
   width: 357px !important;
   min-width: 357px !important;
   height: 600px !important;
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: auto;
 }
 
 #__root {
   display: flex;
   flex-direction: column;
   height: auto !important;
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: auto;
+  
 }
 
+body, #__root ::-webkit-scrollbar{
+  display: nones;
+}
