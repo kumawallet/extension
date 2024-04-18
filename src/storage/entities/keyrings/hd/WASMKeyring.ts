@@ -16,11 +16,9 @@ export default class WASMKeyring extends HDKeyring {
     return mnemonicValidate(mnemonic);
   }
 
-  getAddress(path: string): string {
-    const wallet = PolkadotKeyring.addUri(
-      `${this.mnemonic}${path}`,
-      Auth.password
-    );
+  getAddress(seed: string, path: string): string {
+    console.log("getaddress polkadot", path);
+    const wallet = PolkadotKeyring.addUri(`${seed}/${path}`, Auth.password);
     return wallet?.json?.address;
   }
 
@@ -28,16 +26,17 @@ export default class WASMKeyring extends HDKeyring {
     if (!this.keyPairs[address]) {
       throw new Error("Key pair not found");
     }
-    const { path } = this.keyPairs[address] as HDKeyPair;
-    return `${this.mnemonic}${path}`;
+    const { key, path } = this.keyPairs[address] as HDKeyPair;
+    console.log("get wasm key:", key, path);
+    return `${key}${path}`;
   }
 
   static fromJSON(json: SupportedKeyring): WASMKeyring {
     const { mnemonic, keyPairs } = json as HDKeyring;
     const keyring = new WASMKeyring(mnemonic);
     Object.keys(keyPairs).forEach((address) => {
-      const { path } = keyPairs[address];
-      keyring.addKeyPair(address, { path });
+      const { path, key } = keyPairs[address];
+      keyring.addKeyPair(address, { path, key });
     });
     return keyring;
   }

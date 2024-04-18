@@ -59,7 +59,7 @@ export interface RequestValidatePassword {
   keyring: AccountType;
 }
 export interface RequestSetAutoLock {
-  time: number //in minutes
+  time: number; //in minutes
 }
 
 export interface RequestGetAccount {
@@ -73,6 +73,7 @@ export interface RequestGetAllAccounts {
 export interface RequestDeriveAccount {
   name: string;
   type: AccountType;
+  address: string;
 }
 
 export interface RequestSetNetwork {
@@ -109,7 +110,7 @@ export interface RequestSaveContact {
 export interface RequestRemoveContact {
   address: string;
 }
-export interface RequestUpdateContact{
+export interface RequestUpdateContact {
   name: string;
   address: string;
 }
@@ -146,8 +147,8 @@ export interface RequestRemoveTrustedSite {
   site: string;
 }
 
-export interface getLock{
-  lock:number;
+export interface getLock {
+  lock: number;
 }
 
 interface RequestSendTxBase {
@@ -191,8 +192,8 @@ export interface Request {
   "pri(auth.signIn)": [RequestSignIn, void];
   "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
   "pri(auth.setAutoLock)": [RequestSetAutoLock];
-  "pri(auth.unlock)": [null,void];
-  "pri(auth.getLock)": [null,number]
+  "pri(auth.unlock)": [null, void];
+  "pri(auth.getLock)": [null, number];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
@@ -222,7 +223,7 @@ export interface Request {
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];
-  "pri(contacts.updateContact)": [RequestUpdateContact,void]
+  "pri(contacts.updateContact)": [RequestUpdateContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
   "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
@@ -246,6 +247,7 @@ export interface Request {
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+  "pri(network.subscription)": [null, {}, {}];
 }
 
 export type MessageTypes = keyof Request;

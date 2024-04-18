@@ -55,11 +55,11 @@ import {
   RequestValidatePassword,
   RequestSetAutoLock,
   ResponseType,
-  RequestUpdateContact
+  RequestUpdateContact,
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import PolkadotKeyring from "@polkadot/ui-keyring";
+import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
@@ -100,7 +100,15 @@ export default class Extension {
       throw new Error("private_key_or_seed_invalid");
   }
 
-  private isAuthorized(): boolean {
+  private async isAuthorized(): Promise<boolean> {
+    const isAuthorized = Auth.isAuthorized();
+
+    console.log("isAuthorized", isAuthorized);
+
+    if (isAuthorized) {
+      await this.migrateAccouts();
+    }
+
     return Auth.isAuthorized();
   }
 
@@ -143,34 +151,47 @@ export default class Extension {
     password,
     isSignUp,
   }: RequestCreateAccount) {
-    if (isSignUp) {
-      await this.signUp({
-        password: password as string,
-        privateKeyOrSeed: seed,
+    try {
+      if (isSignUp) {
+        await this.signUp({
+          password: password as string,
+          privateKeyOrSeed: seed,
+        });
+      }
+
+      console.log("Extension.createAccounts", {
+        seed,
+        name,
+        password,
+        isSignUp,
       });
-    }
-    const wasmAccount = await AccountManager.addAccount(
-      AccountType.WASM,
-      seed,
-      name
-    );
-    const evmAccount = await AccountManager.addAccount(
-      AccountType.EVM,
-      seed,
-      name
-    );
 
-    const selectedAccount = await this.getSelectedAccount();
-
-    if (isSignUp) {
-      await this.setSelectedAccount(wasmAccount);
-    } else {
-      await this.setSelectedAccount(
-        selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
+      const wasmAccount = await AccountManager.addAccount(
+        AccountType.WASM,
+        seed,
+        name
       );
-    }
+      const evmAccount = await AccountManager.addAccount(
+        AccountType.EVM,
+        seed,
+        name
+      );
 
-    return true;
+      const selectedAccount = await this.getSelectedAccount();
+
+      if (isSignUp) {
+        await this.setSelectedAccount(wasmAccount);
+      } else {
+        await this.setSelectedAccount(
+          selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.log("createAccounts error", error);
+      throw error;
+    }
   }
 
   private async importAccount({
@@ -206,15 +227,17 @@ export default class Extension {
 
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
+    await this.migrateAccouts();
   }
-  private async setAutoLock ({ time }: RequestSetAutoLock){
+
+  private async setAutoLock({ time }: RequestSetAutoLock) {
     await Auth.setAutoLock(time);
   }
-  private async unlock(){
-    await Auth.unLock()
+  private async unlock() {
+    await Auth.unLock();
   }
   private async getLock() {
-    const lock = await Auth.getLock()
+    const lock = await Auth.getLock();
     return lock;
   }
   private async validatePassword({
@@ -288,9 +311,95 @@ export default class Extension {
     return AccountManager.getAccount(key);
   }
 
+  private migrateAccouts = async () => {
+    const vault = await Vault.getInstance();
+
+    const needToMigrated = Boolean(vault.keyrings["WASM"]?.mnemonic);
+
+    console.log("needToMigrated", needToMigrated, vault.keyrings["WASM"]);
+
+    if (!needToMigrated) return;
+
+    Object.keys(vault.keyrings).forEach(async (key: AccountType) => {
+      const _keyring = vault.keyrings[key];
+
+      console.log("keyring", _keyring);
+
+      const hasMnemonicInRoot = Boolean(_keyring?.mnemonic);
+
+      if (hasMnemonicInRoot && _keyring) {
+        console.log("migrations");
+        const mnemonic = _keyring.mnemonic;
+
+        const type = _keyring.type as AccountType;
+
+        let parentAddress = "";
+
+        if (type.toLowerCase().includes("wasm")) {
+          parentAddress =
+            Object.keys(_keyring.keyPairs).find((address) => {
+              return _keyring.keyPairs[address].path === "/0";
+            }) || "";
+        }
+
+        Object.keys(_keyring.keyPairs).forEach(async (address: string) => {
+          if (!_keyring.keyPairs[address].key && address === parentAddress) {
+            console.log("setting mnemonic for root address");
+            _keyring.keyPairs[address].key = mnemonic;
+          }
+
+          console.log("type", type.toLowerCase(), mnemonic);
+          // if (type.toLowerCase().includes("wasm")) {
+          //   const path = _keyring.keyPairs[address].path;
+
+          //   const isDerived = path !== "/0";
+
+          //   const suri = mnemonic + (isDerived ? path : "");
+
+          //   console.log("suri: ", suri);
+
+          //   const keypair = keyring.addUri(suri, password, {
+          //     name: "",
+          //     whenCreated: new Date().getTime(),
+          //     suri: isDerived ? path : undefined,
+          //     parentAddress: isDerived ? parentAddress : undefined,
+          //     type: "sr25519",
+          //   });
+
+          //   console.log("keypair", keypair);
+
+          //   // await AccountManager.addAccount(AccountType.EVM, mnemonic, address);
+          // }
+
+          // if (type.toLowerCase().includes("evm")) {
+          //   const path = (_keyring.keyPairs[address].path as string) || "";
+
+          //   const isDerived = path !== "m/44'/60'/0'/0/0";
+
+          //   const suri = mnemonic + (isDerived ? path : "");
+
+          //   const keypair = keyring.addUri(suri, password, {
+          //     name: "",
+          //     whenCreated: new Date().getTime(),
+          //     suri: isDerived ? `/${path.split("/").pop()}` : undefined,
+          //     parentAddress: isDerived ? parentAddress : undefined,
+          //     type: "ethereum",
+          //   });
+
+          //   console.log("keypair", keypair);
+          // }
+        });
+      }
+    });
+
+    vault.setKeyrings(vault.keyrings);
+  };
+
   private async getAllAccounts({
     type = null,
   }: RequestGetAllAccounts): Promise<Account[]> {
+    // migrations
+
     const accounts = await AccountManager.getAll(type);
     if (!accounts) return [];
     return accounts.getAll();
@@ -299,8 +408,9 @@ export default class Extension {
   private async deriveAccount({
     name,
     type,
+    address,
   }: RequestDeriveAccount): Promise<Account> {
-    const account = await AccountManager.derive(name, type);
+    const account = await AccountManager.derive(name, type, address);
     await this.setSelectedAccount(account);
     return account;
   }
@@ -406,8 +516,8 @@ export default class Extension {
     await Registry.removeContact(address);
   }
 
-  private async updateContact({address, name}:RequestUpdateContact){
-    await Registry.updateContact (address,name);
+  private async updateContact({ address, name }: RequestUpdateContact) {
+    await Registry.updateContact(address, name);
   }
 
   private async getHistoricActivity() {
@@ -515,7 +625,7 @@ export default class Extension {
     try {
       const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
       const seed = await this.showKey();
-      const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
+      const sender = keyring.keyring.addFromMnemonic(seed as string);
       const { block } = await provider.rpc.chain.getBlock();
 
       const unsub = await provider.tx(hexExtrinsic).signAndSend(
@@ -740,6 +850,11 @@ export default class Extension {
     });
   }
 
+  private async printVault() {
+    const vault = await Vault.getInstance();
+    console.log(vault);
+  }
+
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -748,6 +863,9 @@ export default class Extension {
     port: Port
   ): Promise<ResponseType<TMessageType>> {
     switch (type) {
+      case "pri(printVault)":
+        return this.printVault() as ResponseType<TMessageType>;
+
       case "pri(accounts.createAccounts)":
         return this.createAccounts(request as RequestCreateAccount);
       case "pri(accounts.importAccount)":
@@ -821,7 +939,7 @@ export default class Extension {
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
       case "pri(contacts.updateContact)":
-        return this.updateContact(request as RequestUpdateContact)
+        return this.updateContact(request as RequestUpdateContact);
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 

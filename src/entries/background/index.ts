@@ -3,6 +3,7 @@ import { PORT_CONTENT, PORT_EXTENSION } from "@src/constants/env";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import kumaHandler from "./handlers/kumaHandler";
 import { assert } from "@polkadot/util";
+import { AccountsStore } from "@polkadot/extension-base/stores";
 
 const getWebAPI = (): typeof chrome => {
   return navigator.userAgent.match(/chrome|chromium|crios/i)
@@ -35,6 +36,7 @@ cryptoWaitReady()
   .then((): void => {
     PolkadotKeyring.loadAll({
       type: "sr25519",
+      store: new AccountsStore(),
     });
     console.log("keyring loaded");
   })

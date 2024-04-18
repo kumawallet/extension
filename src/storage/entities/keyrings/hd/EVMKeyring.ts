@@ -14,8 +14,10 @@ export default class EVMKeyring extends HDKeyring {
     return ethers.utils.isValidMnemonic(mnemonic);
   }
 
-  getAddress(path: string): string {
-    return ethers.Wallet.fromMnemonic(this.mnemonic, path)?.address;
+  getAddress(seed: string, path: string): string {
+    console.log("getaddress evm", path);
+
+    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)?.address;
   }
 
   getKey(address: string): string {
@@ -23,7 +25,8 @@ export default class EVMKeyring extends HDKeyring {
     if (!keyPair) {
       throw new Error("Key pair not found");
     }
-    return ethers.Wallet.fromMnemonic(this.mnemonic, keyPair.path)?.privateKey;
+    console.log("get evm key:", keyPair.key, keyPair.path);
+    return ethers.Wallet.fromMnemonic(keyPair.key, keyPair.path)?.privateKey;
   }
 
   addKeyPair(address: string, keyPair: HDKeyPair): void {
@@ -34,8 +37,8 @@ export default class EVMKeyring extends HDKeyring {
     const { mnemonic, keyPairs } = json as HDKeyring;
     const keyring = new EVMKeyring(mnemonic);
     Object.keys(keyPairs).forEach((address) => {
-      const { path } = keyPairs[address];
-      keyring.addKeyPair(address, { path });
+      const { path, key } = keyPairs[address];
+      keyring.addKeyPair(address, { path, key });
     });
     return keyring;
   }

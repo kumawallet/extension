@@ -4,11 +4,11 @@ import { AccountFormInsideWrapper } from "./AccountFormInsideWrapper";
 import { RecoveryPhrase } from "@src/components/accountForm/RecoveryPhrase";
 import { FormProvider, useForm } from "react-hook-form";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
-// import { SelectAccountToDerive } from "./SelectAccountToDerive";
 import { Button } from "@src/components/common";
 import { useAccountContext } from "@src/providers";
 import { useLoading } from "@src/hooks";
 import Account from "@src/storage/entities/Account";
+import { SelectAccountToDerive } from "./SelectAccountToDerive";
 
 interface CreateWalletFromInsideProps {
   onBack: () => void
@@ -57,22 +57,23 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
     }
   }
 
-  // const onDerivate = async (data: CreateWalletFromInsideForm) => {
-  //   starLoading()
+  const onDerivate = async (data: CreateWalletFromInsideForm) => {
+    starLoading()
 
-  //   const result = await deriveAccount({
-  //     name: "",
-  //     accountType: data.account!.type
-  //   })
+    const result = await deriveAccount({
+      name: "",
+      accountType: data.account!.type,
+      address: data.account!.value.address as string
+    })
 
-  //   if (result) {
-  //     onFinish()
-  //   }
+    if (result) {
+      onFinish()
+    }
 
-  //   endLoading()
-  // }
+    endLoading()
+  }
 
-  // const account = watch("account")
+  const account = watch("account")
 
   return (
     <FormProvider {...methods}>
@@ -86,7 +87,6 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         option2Description={t("derive_description")}
         option1Text={t("create_with_new_seed_phrase")}
         option2Text={t("derive_from_existing_account")}
-        hideOption2
         Option1Component={
           <>
             <RecoveryPhrase />
@@ -95,10 +95,10 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
         }
         Option2Component={
           <>
-            {/* <SelectAccountToDerive
+            <SelectAccountToDerive
               onSelect={(account) => setValue("account", account)}
             />
-            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full mt-5 py-5 text-base" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button> */}
+            <Button variant="contained-black" isLoading={isLoading} isDisabled={!account} classname="w-full py-3 text-base mt-5" onClick={handleSubmit(onDerivate)}>{t("create_wallet")}</Button>
           </>
         }
       />

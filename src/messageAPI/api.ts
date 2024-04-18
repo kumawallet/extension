@@ -7,6 +7,7 @@ import { assetsMessages } from "./assets";
 import { settingsMessages } from "./settings";
 import { trustedSitesMessages } from "./trustedSites";
 import { sendMessages } from "./send";
+import { sendMessage } from ".";
 
 export const messageAPI = {
   ...accountMessages,
@@ -18,4 +19,10 @@ export const messageAPI = {
   ...settingsMessages,
   ...trustedSitesMessages,
   ...sendMessages,
+  printVautl: () => {
+    sendMessage("pri(printVault)");
+  },
+  networkSubscription: (cb: (network: {}) => void) => {
+    sendMessage("pri(network.subscription)", null, cb);
+  },
 };

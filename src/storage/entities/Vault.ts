@@ -19,6 +19,7 @@ export default class Vault {
     this.keyrings = {
       [AccountType.EVM]: undefined,
       [AccountType.WASM]: undefined,
+      [AccountType.MOVE]: undefined,
       [AccountType.IMPORTED_EVM]: new ImportedEVMKeyring(),
       [AccountType.IMPORTED_WASM]: new ImportedWASMKeyring(),
     };
@@ -49,9 +50,7 @@ export default class Vault {
     await Vault.set(new Vault());
   }
 
-  static alreadySignedUp = async () => {
-    // migration
-
+  static migrations = async () => {
     const Allstored = await Storage.getInstance().storage.get(null);
 
     if (Allstored) {
@@ -66,6 +65,11 @@ export default class Vault {
         await Storage.getInstance().storage.remove(foundOldVaultKey);
       }
     }
+  };
+
+  static alreadySignedUp = async () => {
+    // migration
+    await this.migrations();
 
     const stored = await Storage.getInstance().storage.get(null);
 
@@ -86,15 +90,15 @@ export default class Vault {
   ): void {
     Object.keys(keyrings).forEach((keyringType: string) => {
       const keyring = keyrings[keyringType as AccountType];
-      const mnemonic = (keyring as HDKeyring)?.mnemonic;
+      // const mnemonic = (keyring as HDKeyring)?.mnemonic;
       if (keyring) {
         switch (keyringType) {
           case AccountType.EVM:
-            if (!mnemonic) throw new Error("invalid_mnemonic");
+            // if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = EVMKeyring.fromJSON(keyring);
             break;
           case AccountType.WASM:
-            if (!mnemonic) throw new Error("invalid_mnemonic");
+            // if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = WASMKeyring.fromJSON(keyring);
             break;
           case AccountType.IMPORTED_EVM:

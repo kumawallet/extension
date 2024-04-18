@@ -213,7 +213,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const deriveAccount = useCallback(
-    async (account: { name: string; accountType: AccountType }) => {
+    async (account: { name: string; accountType: AccountType, address: string }) => {
       try {
         const isSessionActive = await messageAPI.isSessionActive();
         if (!isSessionActive) throw new Error("login_required");
@@ -221,6 +221,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         await messageAPI.deriveAccount({
           name: account.name,
           type: account.accountType,
+          address: account.address
         });
         await getSelectedAccount();
         return true;
