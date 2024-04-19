@@ -6,7 +6,6 @@ import EVMKeyring from "./keyrings/hd/EVMKeyring";
 import WASMKeyring from "./keyrings/hd/WASMKeyring";
 import ImportedEVMKeyring from "./keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "./keyrings/imported/ImportedWASMKeyring";
-import HDKeyring from "./keyrings/hd/HDKeyring";
 
 const STORAGE_NAME = "Vault";
 
@@ -19,7 +18,6 @@ export default class Vault {
     this.keyrings = {
       [AccountType.EVM]: undefined,
       [AccountType.WASM]: undefined,
-      [AccountType.MOVE]: undefined,
       [AccountType.IMPORTED_EVM]: new ImportedEVMKeyring(),
       [AccountType.IMPORTED_WASM]: new ImportedWASMKeyring(),
     };

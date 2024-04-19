@@ -5,7 +5,7 @@ import Account from "../storage/entities/Account";
 import Accounts from "../storage/entities/Accounts";
 import HDKeyring from "../storage/entities/keyrings/hd/HDKeyring";
 import { SupportedKeyring } from "../storage/entities/keyrings/types";
-import { AccountType, AccountKey } from "./types";
+import { AccountType, AccountKey, AccountValue } from "./types";
 import { getAccountType } from "../utils/account-utils";
 import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
@@ -31,18 +31,39 @@ export default class AccountManager {
     return name;
   }
 
-  static async createAccount(
-    name: string,
-    address: string,
-    type: AccountType,
-    keyring: SupportedKeyring
-  ): Promise<Account> {
+  static async createAccount({
+    address,
+    keyring,
+    name,
+    type,
+    path,
+    parentAddress,
+  }: {
+    name: string;
+    address: string;
+    type: AccountType;
+    parentAddress?: string;
+    path?: number;
+    keyring: SupportedKeyring;
+  }): Promise<Account> {
     const key = AccountManager.formatAddress(address, type);
     const _name = await AccountManager.getValidName(name);
-    const value = { name: _name, address, keyring: keyring.type };
+    const value = {
+      name: _name,
+      address,
+      keyring: keyring.type,
+    } as AccountValue;
+
+    if (parentAddress) {
+      value.parentAddress = parentAddress;
+      value.path = path;
+    }
+
     const account = new Account(key, value);
     await Accounts.save(account);
-    await Vault.saveKeyring(keyring);
+    if (!parentAddress) {
+      await Vault.saveKeyring(keyring);
+    }
     return account;
   }
 
@@ -52,15 +73,16 @@ export default class AccountManager {
     name: string,
     keyring?: HDKeyring
   ): Promise<Account> {
-    console.log("AccountManager.addAccount", type, seed, name, keyring);
-
     const _keyring =
       keyring || ((await Vault.getKeyring(type, seed)) as HDKeyring);
 
-    console.log("keyring", keyring);
-    const address = _keyring.deriveKeyPair(seed);
-    console.log("created address:", address);
-    return AccountManager.createAccount(name, address, type, _keyring);
+    const address = await _keyring.deriveKeyPair(seed);
+    return AccountManager.createAccount({
+      name,
+      address,
+      type,
+      keyring: _keyring as SupportedKeyring,
+    });
   }
 
   static async importAccount(
@@ -75,34 +97,38 @@ export default class AccountManager {
       privateKeyOrSeed
     );
     keyring.addKeyPair(address, keyPair);
-    return AccountManager.createAccount(name, address, type, keyring);
+    return AccountManager.createAccount({ name, address, type, keyring });
   }
 
-  static incrementPath = (path: string | undefined, type: AccountType) => {
-    if (type === AccountType.EVM) {
-      let _path = "1";
+  static async incrementPath(parentAddress: string, type: AccountType) {
+    let path = type.toLowerCase().includes("wasm") ? 0 : 1;
 
-      if (path) {
-        const pathArray = path.split("/");
-        const lastPath = pathArray.pop() as string;
-        _path = (parseInt(lastPath) + 1).toString();
-      }
+    const allAccounts = (await AccountManager.getAll())?.getAll() || [];
+    const derivedAccounts = allAccounts.filter(
+      (account) => account.value.parentAddress === parentAddress
+    );
 
-      return `m/44'/60'/0'/0/${_path}`;
+    let found = false;
+
+    if (derivedAccounts.length > 0) {
+      path++;
+
+      do {
+        const account = derivedAccounts.find(
+          (account) => account.value.path === path
+        );
+        if (!account) {
+          found = true;
+        } else {
+          path++;
+        }
+      } while (!found);
     }
 
-    if (type === AccountType.WASM) {
-      let _path = "1";
-
-      if (path) {
-        const pathArray = path.split("/");
-        const lastPath = pathArray.pop() as string;
-        _path = (parseInt(lastPath) + 1).toString();
-      }
-
-      return `/${_path}`;
-    }
-  };
+    return {
+      path,
+    };
+  }
 
   static async derive(
     name: string,
@@ -114,19 +140,18 @@ export default class AccountManager {
       throw new Error("failed_to_derive_from_empty_keyring");
 
     const seed = keyring.keyPairs[address].key;
-    const path = this.incrementPath(keyring.keyPairs[address].path, type);
+    const { path } = await this.incrementPath(address, type);
 
-    console.log("derive from:", address);
-    console.log("derived path", {
-      seed,
+    const _address = keyring.getAddress(seed, path);
+
+    return AccountManager.createAccount({
+      name,
+      address: _address,
+      type,
+      keyring,
+      parentAddress: address,
       path,
     });
-
-    const _address = keyring.getAddress(seed, path as string);
-    console.log("derived address", _address);
-    return AccountManager.createAccount(name, _address, type, keyring);
-
-    // return AccountManager.addAccount(type, seed + path, name, keyring);
   }
 
   static async getAccount(key: AccountKey): Promise<Account | undefined> {

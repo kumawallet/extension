@@ -22,7 +22,7 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import { AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
@@ -103,8 +103,6 @@ export default class Extension {
   private async isAuthorized(): Promise<boolean> {
     const isAuthorized = Auth.isAuthorized();
 
-    console.log("isAuthorized", isAuthorized);
-
     if (isAuthorized) {
       await this.migrateAccouts();
     }
@@ -151,47 +149,35 @@ export default class Extension {
     password,
     isSignUp,
   }: RequestCreateAccount) {
-    try {
-      if (isSignUp) {
-        await this.signUp({
-          password: password as string,
-          privateKeyOrSeed: seed,
-        });
-      }
-
-      console.log("Extension.createAccounts", {
-        seed,
-        name,
-        password,
-        isSignUp,
+    if (isSignUp) {
+      await this.signUp({
+        password: password as string,
+        privateKeyOrSeed: seed,
       });
-
-      const wasmAccount = await AccountManager.addAccount(
-        AccountType.WASM,
-        seed,
-        name
-      );
-      const evmAccount = await AccountManager.addAccount(
-        AccountType.EVM,
-        seed,
-        name
-      );
-
-      const selectedAccount = await this.getSelectedAccount();
-
-      if (isSignUp) {
-        await this.setSelectedAccount(wasmAccount);
-      } else {
-        await this.setSelectedAccount(
-          selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
-        );
-      }
-
-      return true;
-    } catch (error) {
-      console.log("createAccounts error", error);
-      throw error;
     }
+
+    const wasmAccount = await AccountManager.addAccount(
+      AccountType.WASM,
+      seed,
+      name
+    );
+    const evmAccount = await AccountManager.addAccount(
+      AccountType.EVM,
+      seed,
+      name
+    );
+
+    const selectedAccount = await this.getSelectedAccount();
+
+    if (isSignUp) {
+      await this.setSelectedAccount(wasmAccount);
+    } else {
+      await this.setSelectedAccount(
+        selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
+      );
+    }
+
+    return true;
   }
 
   private async importAccount({
@@ -314,85 +300,86 @@ export default class Extension {
   private migrateAccouts = async () => {
     const vault = await Vault.getInstance();
 
+    // @ts-expect-error --- migration
     const needToMigrated = Boolean(vault.keyrings["WASM"]?.mnemonic);
 
-    console.log("needToMigrated", needToMigrated, vault.keyrings["WASM"]);
-
     if (!needToMigrated) return;
+
+    const accounts = await AccountManager.getAll();
+
+    // @ts-expect-error --- migration
 
     Object.keys(vault.keyrings).forEach(async (key: AccountType) => {
       const _keyring = vault.keyrings[key];
 
-      console.log("keyring", _keyring);
+      // @ts-expect-error --- migration
 
       const hasMnemonicInRoot = Boolean(_keyring?.mnemonic);
 
       if (hasMnemonicInRoot && _keyring) {
-        console.log("migrations");
-        const mnemonic = _keyring.mnemonic;
+        // @ts-expect-error --- migration
 
-        const type = _keyring.type as AccountType;
+        const mnemonic = _keyring.mnemonic;
 
         let parentAddress = "";
 
-        if (type.toLowerCase().includes("wasm")) {
-          parentAddress =
-            Object.keys(_keyring.keyPairs).find((address) => {
-              return _keyring.keyPairs[address].path === "/0";
-            }) || "";
-        }
+        parentAddress =
+          Object.keys(_keyring.keyPairs).find((address) => {
+            return (
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "/0" ||
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "m/44'/60'/0'/0/0"
+            );
+          }) || "";
+
+        // @ts-expect-error --- migration
+
+        _keyring.mnemonic = "";
+
+        if (!parentAddress) return;
 
         Object.keys(_keyring.keyPairs).forEach(async (address: string) => {
           if (!_keyring.keyPairs[address].key && address === parentAddress) {
-            console.log("setting mnemonic for root address");
             _keyring.keyPairs[address].key = mnemonic;
+          } else {
+            // delete _keyring.keyPairs[address];
+
+            // @ts-expect-error --- migration
+
+            const keyFound = Object.keys(accounts?.data).find(
+              // @ts-expect-error --- migration
+
+              (_key: AccountKey) => _key === `${key}-${address}`
+            );
+
+            if (keyFound) {
+              // @ts-expect-error --- migration
+
+              accounts!.data[keyFound].value.parentAddress = parentAddress;
+            }
           }
-
-          console.log("type", type.toLowerCase(), mnemonic);
-          // if (type.toLowerCase().includes("wasm")) {
-          //   const path = _keyring.keyPairs[address].path;
-
-          //   const isDerived = path !== "/0";
-
-          //   const suri = mnemonic + (isDerived ? path : "");
-
-          //   console.log("suri: ", suri);
-
-          //   const keypair = keyring.addUri(suri, password, {
-          //     name: "",
-          //     whenCreated: new Date().getTime(),
-          //     suri: isDerived ? path : undefined,
-          //     parentAddress: isDerived ? parentAddress : undefined,
-          //     type: "sr25519",
-          //   });
-
-          //   console.log("keypair", keypair);
-
-          //   // await AccountManager.addAccount(AccountType.EVM, mnemonic, address);
-          // }
-
-          // if (type.toLowerCase().includes("evm")) {
-          //   const path = (_keyring.keyPairs[address].path as string) || "";
-
-          //   const isDerived = path !== "m/44'/60'/0'/0/0";
-
-          //   const suri = mnemonic + (isDerived ? path : "");
-
-          //   const keypair = keyring.addUri(suri, password, {
-          //     name: "",
-          //     whenCreated: new Date().getTime(),
-          //     suri: isDerived ? `/${path.split("/").pop()}` : undefined,
-          //     parentAddress: isDerived ? parentAddress : undefined,
-          //     type: "ethereum",
-          //   });
-
-          //   console.log("keypair", keypair);
-          // }
         });
       }
     });
 
+    await Accounts.updateAll(accounts!);
+
     vault.setKeyrings(vault.keyrings);
+  };
+
+  private getAccountsToDerive = async () => {
+    const accounts = (await AccountManager.getAll())?.getAll() || [];
+    if (!accounts) return [];
+
+    const accountWithoutParentAddress = accounts.filter(
+      ({ value, type }) =>
+        !value.parentAddress && type !== AccountType.IMPORTED_EVM
+    );
+
+    return accountWithoutParentAddress;
   };
 
   private async getAllAccounts({
@@ -850,11 +837,6 @@ export default class Extension {
     });
   }
 
-  private async printVault() {
-    const vault = await Vault.getInstance();
-    console.log(vault);
-  }
-
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -863,9 +845,8 @@ export default class Extension {
     port: Port
   ): Promise<ResponseType<TMessageType>> {
     switch (type) {
-      case "pri(printVault)":
-        return this.printVault() as ResponseType<TMessageType>;
-
+      case "pri(accounts.getAccountsToDerive)":
+        return this.getAccountsToDerive();
       case "pri(accounts.createAccounts)":
         return this.createAccounts(request as RequestCreateAccount);
       case "pri(accounts.importAccount)":

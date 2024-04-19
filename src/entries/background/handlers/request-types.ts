@@ -186,6 +186,7 @@ export interface Request {
   "pri(accounts.deriveAccount)": [RequestDeriveAccount, Account];
   "pri(accounts.setSelectedAccount)": [Account, void];
   "pri(accounts.getSelectedAccount)": [null, Account | undefined];
+  "pri(accounts.getAccountsToDerive)": [null, Account[]];
 
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
@@ -247,7 +248,6 @@ export interface Request {
 
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
-  "pri(network.subscription)": [null, {}, {}];
 }
 
 export type MessageTypes = keyof Request;

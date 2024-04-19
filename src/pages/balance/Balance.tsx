@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { Activity, Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext } from "@src/providers";
-import { messageAPI } from "@src/messageAPI/api";
 
 
 export interface Asset {
@@ -49,20 +48,11 @@ export const Balance = () => {
   }, [selectedChain?.name]);
 
 
-  const printVault = async () => {
-    try {
 
-      await messageAPI.printVautl()
-    } catch (error) {
-      console.log('error', error)
-    }
-  }
 
   return (
     <>
       <Header />
-      <button className="bg-red-400" onClick={printVault}>check</button>
-
       <PageWrapper contentClassName="flex-1 !px-0">
         <Bg />
         <div className="flex flex-col pt-3 pb-16 relative">

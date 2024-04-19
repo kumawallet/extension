@@ -14,6 +14,14 @@ export default class ImportedWASMKeyring extends ImportedKeyring {
     return { address, keyPair };
   }
 
+  getAddress(seed: string, path?: number): string {
+    // @ts-expect-error --- migration
+    const suri = seed + (path >= 0 ? `//${path}` : "");
+
+    const wallet = PolkadotKeyring.createFromUri(suri);
+    return wallet.address;
+  }
+
   static fromJSON(json: SupportedKeyring): ImportedWASMKeyring {
     const { keyPairs } = json as ImportedKeyring;
     const keyring = new ImportedWASMKeyring();

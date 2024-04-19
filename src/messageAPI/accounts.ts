@@ -45,4 +45,7 @@ export const accountMessages = {
   getSelectedAccount: () => {
     return sendMessage("pri(accounts.getSelectedAccount)");
   },
+  getAccountstToDerive: () => {
+    return sendMessage("pri(accounts.getAccountsToDerive)");
+  },
 };

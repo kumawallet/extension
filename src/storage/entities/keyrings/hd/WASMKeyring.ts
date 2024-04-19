@@ -1,4 +1,3 @@
-import Auth from "@src/storage/Auth";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import { mnemonicValidate } from "@polkadot/util-crypto";
 import HDKeyring from "./HDKeyring";
@@ -16,10 +15,13 @@ export default class WASMKeyring extends HDKeyring {
     return mnemonicValidate(mnemonic);
   }
 
-  getAddress(seed: string, path: string): string {
-    console.log("getaddress polkadot", path);
-    const wallet = PolkadotKeyring.addUri(`${seed}/${path}`, Auth.password);
-    return wallet?.json?.address;
+  getAddress(seed: string, path?: number): string {
+    // @ts-expect-error --- migration
+
+    const suri = seed + (path >= 0 ? `//${path}` : "");
+
+    const wallet = PolkadotKeyring.createFromUri(suri);
+    return wallet.address;
   }
 
   getKey(address: string): string {
@@ -27,7 +29,6 @@ export default class WASMKeyring extends HDKeyring {
       throw new Error("Key pair not found");
     }
     const { key, path } = this.keyPairs[address] as HDKeyPair;
-    console.log("get wasm key:", key, path);
     return `${key}${path}`;
   }
 

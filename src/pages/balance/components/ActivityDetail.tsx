@@ -113,11 +113,10 @@ export const ActivityDetail = () => {
       }
       : { value: address.slice(0, 12) + "..." + address.slice(-12) };
   };
- const statusTranslate = () => {
-  console.log(status);
-   return status === "" ?  "in_process" : status.toLowerCase()
-   
- }
+  const statusTranslate = () => {
+    return status === "" ? "in_process" : status.toLowerCase()
+
+  }
   const transaction = {
     [t("hash")]:
       <div className={styleAD.itemsValue}>
@@ -135,8 +134,8 @@ export const ActivityDetail = () => {
         </button>
       </div>
     ,
-   [t("type")]: type,
-   [t("status.name")]:
+    [t("type")]: type,
+    [t("status.name")]:
       <div className={styleAD.itemsValue}>
         <Status status={status} />
       </div>
@@ -164,7 +163,7 @@ export const ActivityDetail = () => {
       )}
     </>
     ,
-   [t("network")]: getXCM(originNetwork, targetNetwork) ? (
+    [t("network")]: getXCM(originNetwork, targetNetwork) ? (
       <div className={styleAD.containerNetworks}>
         <div className={styleAD.networks}>
           <NetworkIcon
