@@ -290,7 +290,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
   useEffect(() => {
-    if (selectedChain?.id) {
+    if (Object.keys(selectedChain).length > 0) {
       getSelectedAccount();
     }
   }, [selectedChain]);

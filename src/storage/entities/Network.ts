@@ -1,14 +1,16 @@
-import { Chain } from "@src/types";
+import { Chain, SelectedChain } from "@src/types";
 import BaseEntity from "./BaseEntity";
 
 export default class Network extends BaseEntity {
-  chain: Chain | null;
+  SelectedChain:  SelectedChain;
+  Chain : Chain | null;
 
   private static instance: Network;
 
   constructor() {
     super();
-    this.chain = null;
+    this.SelectedChain = {};
+    this.Chain = null;
   }
 
   static getName() {
@@ -28,7 +30,7 @@ export default class Network extends BaseEntity {
 
   static async getDefaultValue<Network>(): Promise<Network> {
     const defaultNetwork = Network.getInstance();
-    defaultNetwork.chain = null;
+    defaultNetwork.SelectedChain = {};
     return defaultNetwork as Network;
   }
 
@@ -39,10 +41,11 @@ export default class Network extends BaseEntity {
   }
 
   get() {
-    return this.chain;
+    return this.SelectedChain ;
   }
 
-  set(chain: Chain) {
-    this.chain = chain;
+
+  set(chains: SelectedChain) {
+    this.SelectedChain =  chains;
   }
 }

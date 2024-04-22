@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState , FC} from "react";
 import { Switch } from "@headlessui/react";
 import { messageAPI } from "@src/messageAPI/api";
 import { useNetworkContext } from "@src/providers";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { useTranslation } from "react-i18next";
 
-export const ShowTestnets = () => {
+interface ShowTestnetsProps {
+  validateSwitch: boolean;
+}
+
+
+export const ShowTestnets : FC<ShowTestnetsProps> = ({validateSwitch}) => {
   const { t } = useTranslation("general_settings");
 
   const [showTestnets, setShowTestnets] = useState(false);
   const {
-    state: { selectedChain },
+    // state: { selectedChain },
     refreshNetworks,
   } = useNetworkContext();
 
@@ -26,7 +31,7 @@ export const ShowTestnets = () => {
       setShowTestnets(showTestnets);
     })();
   }, []);
-
+ 
   const onToggle = async () => {
     setShowTestnets((value) => !value);
     await messageAPI.updateSetting({
@@ -46,8 +51,8 @@ export const ShowTestnets = () => {
           <div className="flex items-center">
             <Switch
               data-testid="show-testnets-switch"
-              disabled={selectedChain?.isTestnet}
-              aria-disabled={selectedChain?.isTestnet}
+              disabled={validateSwitch}
+              aria-disabled={validateSwitch}
               checked={showTestnets}
               onChange={onToggle}
               className={`${showTestnets ? `bg-primary-default` : "bg-custom-gray-bg"

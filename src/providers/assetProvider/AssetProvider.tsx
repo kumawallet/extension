@@ -28,7 +28,7 @@ import {
   PROOF_SIZE,
   REF_TIME,
 } from "@src/constants/assets";
-import { Action, Asset, AssetContext, InitialState, LoadAssetParams } from "./types";
+import { Action, Asset, AssetContext, InitialState, LoadAssetParams, SelectedChain } from "./types";
 import randomcolor from "randomcolor";
 import { API, Chain, IAsset } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
@@ -209,7 +209,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const getNativeAsset = async (
     api: API,
     account: AccountEntity,
-    selectedChain: Chain
+    selectedChain: SelectedChain
   ) => {
     const address = account.value.address;
 

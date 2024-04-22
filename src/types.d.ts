@@ -89,6 +89,19 @@ export interface TxToProcess {
   };
 }
 
+export type chain = {
+  isTestnet?: boolean;
+  type: "wasm" | "evm" | "move";
+}
+
+export interface SelectedChain {
+  [id: string]: chain
+}
+export interface paramChain {
+  id: string;
+  type: "wasm" | "evm" | "move";
+}
+
 export interface Chain {
   id: string;
   name: string;

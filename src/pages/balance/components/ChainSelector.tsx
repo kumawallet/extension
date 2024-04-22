@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useState } from "react";
+import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,7 @@ import { ShowTestnets } from "./ShowTestnets";
 import { ChainsState } from "@src/types";
 import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
+import { Network } from "../../../components/icons/Network"
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -28,9 +29,20 @@ export const ChainSelector = () => {
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
-    setSelectNetwork,
+    updateSelectNetwork,
   } = useNetworkContext();
 
+
+
+const validateTestnet = () =>{
+  const selected = Object.keys(selectedChain).filter((chain) => selectedChain[chain].isTestnet);
+  if(selected.length > 0){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
   return (
     <>
        { isOpen ? <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" onClick={() =>setIsOpen(false)} /> : null }
@@ -39,17 +51,12 @@ export const ChainSelector = () => {
       
         <Menu.Button
           data-testid="chain-button"
-          className="flex bg-[#212529] gap-2 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
           onClick={() => setIsOpen(true)}
         >
-          <img
-            src={selectedChain?.logo}
-            width={24}
-            height={24}
-            className="object-cover rounded-full"
-          />
+          <Network size="25"/>
           <p className="overflow-hidden text-ellipsis mr-1">
-            {selectedChain?.name}
+            {"Networks"}
           </p>
         </Menu.Button>
         
@@ -91,12 +98,14 @@ export const ChainSelector = () => {
                     <div className="flex flex-col gap-3">
                       {chainGroup.chains.map((chain) => (
                         <Fragment key={chain.id}>
+                          
                           <button
-                            className={`flex items-center justify-between border ${selectedChain?.id === chain.id
-                                ? "border-green-500"
-                                : "border-gray-600"
-                              } rounded-lg py-3 px-4`}
-                            onClick={() => setSelectNetwork(chain)}
+                            className={`flex items-center justify-between border ${selectedChain[chain.id] ? 
+                                                                                    "border-green-500"
+                                                                                    :
+                                                                                    "border-gray-600"} rounded-lg py-3 px-4`}
+                            disabled={Object.keys(selectedChain).length === 1 && Object.keys(selectedChain)[0] === chain.id}
+                            onClick={() => updateSelectNetwork(chain.id,chain.type,chain.isTestnet)}
                           >
                             <div className="flex items-center gap-3">
                               {chain.isCustom ? (
@@ -120,7 +129,7 @@ export const ChainSelector = () => {
                     </div>
 
                     {canShowTestnetToggle(chains, chainGroup) && (
-                      <ShowTestnets />
+                      <ShowTestnets validateSwitch={validateTestnet()} />
                     )}
                   </div>
                 ))}

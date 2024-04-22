@@ -55,7 +55,8 @@ import {
   RequestValidatePassword,
   RequestSetAutoLock,
   ResponseType,
-  RequestUpdateContact
+  RequestUpdateContact,
+  RequestDeleteSelectNetwork
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -63,10 +64,13 @@ import PolkadotKeyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { getChainHistoricHandler } from "@src/services/historic-transactions";
-import { Chain, Transaction } from "@src/types";
-import { transformAddress } from "@src/utils/account-utils";
+// import { getChainHistoricHandler } from "@src/services/historic-transactions";
+import { Chain, Transaction, SelectedChain } from "@src/types";
+// import { transformAddress } from "@src/utils/account-utils";
 import { Port } from "./types";
+import { BehaviorSubject } from "rxjs";
+import { createSubscription } from "./subscriptions";
+// import { SelectedChain } from "@src/providers/assetProvider/types";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -84,11 +88,14 @@ const getWebAPI = (): typeof chrome => {
 
 const WebAPI = getWebAPI();
 
+
 export default class Extension {
+
+  
   get version() {
     return version;
   }
-
+  
   private validatePasswordFormat(password: string) {
     if (!password) throw new Error("password_required");
     if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
@@ -304,12 +311,41 @@ export default class Extension {
     await this.setSelectedAccount(account);
     return account;
   }
+  private Chains = new BehaviorSubject({})
 
-  private async setNetwork({ chain }: RequestSetNetwork): Promise<boolean> {
+
+  private async setNetwork({isTestnet, id, type} : RequestSetNetwork): Promise<SelectedChain> {
+    const chains : SelectedChain = this.Chains.getValue();
+      chains[id] = {
+        isTestnet: isTestnet,
+        type: type
+      }
+    this.Chains.next(chains);
     const network = Network.getInstance();
-    network.set(chain);
+    network.set(chains);
     await Network.set<Network>(network);
-    return true;
+    return chains;
+  }
+
+  private async  deleteSelectNetwork ({ id } : RequestDeleteSelectNetwork ) {
+    const chains : SelectedChain = this.Chains.getValue();
+      delete chains[id];
+      this.Chains.next(chains);
+      //save Object
+      const network = Network.getInstance();
+      network.set(chains);
+      this.Chains.next(chains)
+      await Network.set<Network>(network);
+      return chains;
+  }
+  private networksSuscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(network.subscription)">(id,port)
+    const subscription = this.Chains.subscribe((data) => cb(data))
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+      subscription.unsubscribe()
+    });
+    return this.Chains
   }
 
   private async setSelectedAccount(account: Account) {
@@ -380,23 +416,23 @@ export default class Extension {
     return registry.getAllContacts();
   }
 
-  private async getRegistryAddresses() {
-    const registry = await Registry.get<Registry>();
-    if (!registry) throw new Error("failed_to_get_registry");
-    const { chain } = await Network.get<Network>();
-    if (!chain) throw new Error("failed_to_get_network");
-    const accounts = await AccountManager.getAll();
-    if (!accounts) throw new Error("failed_to_get_accounts");
-    return {
-      ownAccounts: accounts
-        .getAll()
-        .map(
-          (account) => new Contact(account.value.name, account.value.address)
-        ),
-      contacts: registry.getAllContacts(),
-      recent: registry.getRecentAddresses(chain.name),
-    };
-  }
+  // private async getRegistryAddresses() {
+  //   const registry = await Registry.get<Registry>();
+  //   if (!registry) throw new Error("failed_to_get_registry");
+  //   const Chains = await Network.get<Network>();
+  //   if (!Chains) throw new Error("failed_to_get_network");
+  //   const accounts = await AccountManager.getAll();
+  //   if (!accounts) throw new Error("failed_to_get_accounts");
+  //   return {
+  //     ownAccounts: accounts
+  //       .getAll()
+  //       .map(
+  //         (account) => new Contact(account.value.name, account.value.address)
+  //       ),
+  //     contacts: registry.getAllContacts(),
+  //     recent: registry.getRecentAddresses(Chains),
+  //   };
+  // }
 
   private async saveContact({ contact }: RequestSaveContact) {
     await Registry.addContact(contact);
@@ -410,21 +446,21 @@ export default class Extension {
     await Registry.updateContact (address,name);
   }
 
-  private async getHistoricActivity() {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    const selectedChain = await Network.get<Network>();
+  // private async getHistoricActivity() {
+  //   const selectedAccount = await SelectedAccount.get<SelectedAccount>();
+  //   const selectedChain = await Network.get<Network>();
 
-    const address = selectedAccount?.value.address;
-    const chainPrefix = selectedChain?.chain?.prefix;
+  //   const address = selectedAccount?.value.address;
+  //   const chainPrefix = selectedChain?.chain?.prefix;
 
-    // @ts-expect-error -- *
-    const formatedAddress = transformAddress(address, chainPrefix || 0);
+  //   // @ts-expect-error -- *
+  //   const formatedAddress = transformAddress(address, chainPrefix || 0);
 
-    return await getChainHistoricHandler({
-      chainId: selectedChain!.chain!.id,
-      address: formatedAddress,
-    });
-  }
+  //   return await getChainHistoricHandler({
+  //     chainId: selectedChain!.chain!.id,
+  //     address: formatedAddress,
+  //   });
+  // }
 
   private async getActivity(): Promise<Record[]> {
     return Activity.getRecords();
@@ -796,6 +832,8 @@ export default class Extension {
 
       case "pri(network.setNetwork)":
         return this.setNetwork(request as RequestSetNetwork);
+      case "pri(network.deleteSelectNetwork)": 
+        return this.deleteSelectNetwork(request as RequestDeleteSelectNetwork);
       case "pri(network.getNetwork)":
         return this.getNetwork();
       case "pri(network.saveCustomChain)":
@@ -804,7 +842,8 @@ export default class Extension {
         return this.removeCustomChain(request as RequestRemoveCustomChain);
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
-
+      case "pri(network.subscription)":
+        return this.networksSuscribe(id,port);
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
       case "pri(settings.getAdvancedSettings)":
@@ -816,8 +855,8 @@ export default class Extension {
 
       case "pri(contacts.getContacts)":
         return this.getContacts();
-      case "pri(contacts.getRegistryAddresses)":
-        return this.getRegistryAddresses();
+      // case "pri(contacts.getRegistryAddresses)":
+      //   return this.getRegistryAddresses();
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
       case "pri(contacts.updateContact)":
@@ -825,8 +864,8 @@ export default class Extension {
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
-      case "pri(activity.getHistoricActivity)":
-        return this.getHistoricActivity();
+      // case "pri(activity.getHistoricActivity)":
+      //   return this.getHistoricActivity();
       case "pri(activity.getActivity)":
         return this.getActivity();
       case "pri(activity.addActivity)":

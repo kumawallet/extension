@@ -10,7 +10,6 @@ export const AccountSelected = () => {
   const address = selectedAccount?.value?.address || "";
 
   const account = cropAccount(address, 8);
-
   const { Icon, copyToClipboard } = useCopyToClipboard(address);
 
   return (

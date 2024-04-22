@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { ethers } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "@src/hooks";
-import { Action, InitialState, NetworkContext } from "./types";
+import { Action, InitialState, NetworkContext} from "./types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
 import { Chain, ChainsState } from "@src/types";
@@ -18,14 +18,17 @@ import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { migrateOldCustomChains } from "@src/utils/chains";
 
+
 const initialState: InitialState = {
   chains: [],
-  selectedChain: null,
-  api: null,
+  selectedChain: {},
+  api: {},
   init: false,
 };
 
 const NetworkContext = createContext({} as NetworkContext);
+
+
 
 const getChains = async (): Promise<ChainsState> => {
   try {
@@ -87,13 +90,11 @@ const getChains = async (): Promise<ChainsState> => {
   }
 };
 
-export const getProvider = async (rpcs: string[], type: "wasm" | "evm") => {
-  if (type.toLowerCase() === "evm")
-    return new ethers.providers.JsonRpcProvider(rpcs[0] as string);
 
-  if (type.toLowerCase() === "wasm")
-    return ApiPromise.create({ provider: new WsProvider(rpcs) });
-};
+
+
+
+
 
 export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
@@ -117,14 +118,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     }
 
     case "select-network": {
-      const { selectedChain, api } = action.payload;
+      const { selectedChain } = action.payload;
 
-      if (selectedChain?.name === state.selectedChain?.name) return state;
-
+      if (selectedChain === state.selectedChain) return state;
       return {
         ...state,
         selectedChain,
-        api,
       };
     }
 
@@ -140,40 +139,120 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
   }
 };
 
+
+
+export const getProviderforNetworks = async(networks: Chain[], api :any) =>{
+
+  const provider : { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | null} = {};
+
+
+  const promises: Promise<any>[] = [];
+
+
+  if((Object.keys(api).length === 0) || !api){
+    networks.forEach((network) => {
+      if (network.type === "evm")
+        {
+          provider[network.id] = new ethers.providers.JsonRpcProvider(network.rpcs[0] as string);
+        }
+      if (network.type === "wasm")
+        {
+          console.log(network.id, network.type, "asp por aqui")
+          const promise= ApiPromise.create({ provider: new WsProvider(network.rpcs)})
+          promises.push(promise);
+          promise.then((api) => {
+            console.log(api,network.id, "si se resolvio pero algo esta pasando")
+          provider[network.id] = api}).catch((error) => console.log(error, "esto no furula"))
+  
+        }
+      })
+
+    await Promise.all(promises).then(() => console.log("SE resolvieron todas", provider)).catch((error) => console.log("No se resolvieron", error));
+    console.log(provider, "espero que se llene")
+    return provider
+  }
+  else{
+    networks.forEach((network : Chain) => {
+      
+      if(Object.keys(api).includes(network.id)){
+        provider[network.id] = api[network.id];
+        console.log(network.id, "ya existe en el api")
+      }
+      else {
+        console.log(network.id, "No existe en el api")
+        if (network.type === "evm")
+          {
+            provider[network.id] = new ethers.providers.JsonRpcProvider(network.rpcs[0] as string);
+          }
+        if (network.type === "wasm")
+          {
+            const promise= ApiPromise.create({ provider: new WsProvider(network.rpcs)})
+            promises.push(promise);
+            promise.then((api) => {provider[network.id] = api})
+    
+          }
+      }
+    })
+    
+    await Promise.all(promises).catch((error) => console.log("No se resolvieron", error));
+    console.log(provider, "espero que se llene")
+    return provider
+  }
+}
+
+
+
+
+
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
-
   const [state, dispatch] = useReducer(reducer, initialState);
 
+
+
+
   const initializeNetwork = async () => {
-    try {
+    try{
 
       const [chains, selectedChainFromStorage] = await Promise.all(
         [getChains(),
         messageAPI.getNetwork()
         ]);
 
+      let selectedChain = {}
+  
+
       const allChains = chains.map((chain) => chain.chains).flat();
 
       // TODO: migrate this to background
       // @ts-expect-error --- To handle old chain format
-      if (selectedChainFromStorage?.chain?.supportedAccounts) {
-        const newChainFormat = allChains.find((chain) =>
-          selectedChainFromStorage.chain?.name === chain.name
-        );
-
-        if (newChainFormat) {
-          await messageAPI.setNetwork({ chain: newChainFormat });
-        }
+     if(selectedChainFromStorage.Chain){
+        if (selectedChainFromStorage?.chain?.supportedAccounts) {
+          const newChainFormat = allChains.find((chain) => selectedChainFromStorage?.chain?.name  === chain.name);
+          if (newChainFormat) {
+            const id=newChainFormat.id;
+            const type= newChainFormat.type
+            const isTestnet = newChainFormat.isTestnet
+           selectedChain = await messageAPI.setNetwork({id,isTestnet,type})
+          }
+          else {
+            const id= allChains[0].id
+            const type = allChains[0].type
+            const isTestnet = allChains[0].isTestnet
+            selectedChain = await messageAPI.setNetwork({id,isTestnet,type})
+          }
       }
-
-      if (!selectedChainFromStorage?.chain?.id) {
-        await messageAPI.setNetwork({ chain: allChains[0] });
-      }
-
-      const selectedChain = selectedChainFromStorage?.chain?.id ? selectedChainFromStorage.chain as Chain : allChains[0];
-
+     }
+     if(Object.keys(selectedChainFromStorage.SelectedChain).length > 0){
+      selectedChain = selectedChainFromStorage.SelectedChain
+     }
+     else{
+      const id= allChains[0].id
+      const type = allChains[0].type
+      const isTestnet = allChains[0].isTestnet
+      selectedChain = await messageAPI.setNetwork({id,isTestnet,type});
+     }
       dispatch({
         type: "init",
         payload: {
@@ -181,33 +260,34 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
           selectedChain,
         },
       });
-    } catch (error) {
+     }catch (error) {
       captureError(error);
       showErrorToast(tCommon(error as string));
     }
-  };
+  }; 
 
-  const setSelectNetwork = async (chain: Chain) => {
+  const updateSelectNetwork = async (id: string, type: "wasm" | "evm" | "move",isTestnet?: boolean) => {
     try {
+      if(Object.prototype.hasOwnProperty.call(state.selectedChain, id)){
+        const chains = await messageAPI.deleteSelectChain({id});
+        console.log(chains, "Objeto modificado delete")
+        if (state.api[id] && "getBalance" in state.api[id]) {
+              (state.api[id] as ethers.providers.JsonRpcProvider).removeAllListeners("block");
+        }
+        if (state.api[id] && "disconnect" in state.api[id])
+              await (state.api[id] as ApiPromise).disconnect().then(() => console.log("se resolvio"))
 
-      await messageAPI.setNetwork({ chain });
-
-      if (state.api && "getBalance" in state.api) {
-        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners(
-          "block"
-        );
       }
-      if (state.api && "disconnect" in state.api)
-        await (state.api as ApiPromise).disconnect();
+      else{
+        const chains = await messageAPI.setNetwork({ id, isTestnet,type });
+        console.log(chains, "Objeto modificado set")
+        
+       
+      }
+     
+     
 
-
-      dispatch({
-        type: "select-network",
-        payload: {
-          selectedChain: chain,
-          api: null,
-        },
-      });
+     
     } catch (error) {
       captureError(error);
       showErrorToast(tCommon(error as string));
@@ -234,20 +314,30 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
         initializeNetwork();
       }
     })();
+
+
+    messageAPI.networkSubscribe(
+      (network)=>{
+        dispatch({
+          type: "select-network",
+          payload: {
+            selectedChain: network
+          },
+        });
+      }
+    )
   }, []);
 
   useEffect(() => {
-    if (!state.selectedChain) return
-
+    if (Object.keys(state.selectedChain).length === 0) return
+    console.log(state.chains, "REVISA")
+    const allChains = state.chains.map((chain) => chain.chains).flat();
     const setProvider = async () => {
       try {
-        const rpcs = state.selectedChain!.rpcs;
-        const type = state.selectedChain!.type;
+        const Chains = allChains.filter((chain) => Object.keys(state.selectedChain).includes(chain.id))
 
-        const provider = await getProvider(
-          rpcs,
-          type as "wasm" | "evm"
-        );
+        const provider = await getProviderforNetworks(Chains, state.api);
+        console.log(provider, "PROVIDER");
 
         dispatch({
           type: "set-api",
@@ -267,7 +357,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     <NetworkContext.Provider
       value={{
         state,
-        setSelectNetwork,
+        updateSelectNetwork,
         refreshNetworks,
         initializeNetwork,
       }}
