@@ -29,7 +29,6 @@ import {
   REF_TIME,
 } from "@src/constants/assets";
 import { Action, Asset, AssetContext, InitialState, LoadAssetParams } from "./types";
-import randomcolor from "randomcolor";
 import { API, Chain, IAsset } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
@@ -183,8 +182,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
         },
         ..._assets.map((asset) => ({
           ...asset,
-          // TODO: save this colors in storage
-          color: randomcolor(),
         })) as Asset[],
       ];
       dispatch({
