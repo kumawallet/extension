@@ -46,6 +46,8 @@ export default ({ mode }: { mode: string }) => {
       }),
     },
     test: {
+      fileParallelism: false,
+
       css: false,
       globals: true,
       environment: "jsdom",
