@@ -15,6 +15,8 @@ export class SubqueryHandler extends HistoricTransactionsService {
 
     const endpoint = SUBQUERY_CHAINS[chainId];
 
+    console.log("fetch", fetch);
+
     if (endpoint) {
       this.provider = new GraphQLClient(endpoint, {
         cache: "default",

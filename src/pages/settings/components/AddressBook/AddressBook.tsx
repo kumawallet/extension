@@ -26,7 +26,7 @@ export const AddressBook = () => {
     const { t: tCommon } = useTranslation("common");
     const navigate = useNavigate();
     const [typeAction, setTypeAction] = useState<"create" | "update">("create");
-    const [name,setName] = useState("");
+    const [name, setName] = useState("");
     const [address, setAddress] = useState("")
 
     const schema = object({
@@ -54,9 +54,9 @@ export const AddressBook = () => {
             )
             .required(t("required") as string),
     }).required();
-    
+
     const getDefaultValue = () => {
-        const init = typeAction === "create" ? 
+        const init = typeAction === "create" ?
             {
                 name: "",
                 address: "",
@@ -66,9 +66,8 @@ export const AddressBook = () => {
                 name: name,
                 address: address,
             }
-            console.log(init);
-            return init;
-        }
+        return init;
+    }
 
     const methods = useForm<AddressForm>({
         resolver: yupResolver(schema),
@@ -82,7 +81,7 @@ export const AddressBook = () => {
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
     const { showErrorToast } = useToast();
-    
+
 
     useEffect(() => {
         setIsLoading(true);
@@ -131,7 +130,7 @@ export const AddressBook = () => {
             showErrorToast(tCommon(error as string));
         }
     };
-        const updateContact = handleSubmit(async (form: AddressForm) => {
+    const updateContact = handleSubmit(async (form: AddressForm) => {
         try {
             const { name, address } = form;
             await messageAPI.updateContact({
@@ -147,7 +146,7 @@ export const AddressBook = () => {
             setIsOpenModal(false);
             reset();
         }
-    }); 
+    });
 
     const toggleCreateContact = () => {
         setTypeAction("create");
@@ -252,19 +251,19 @@ export const AddressBook = () => {
                                         <p>{contact?.address}</p>
                                     </div>
                                     <div className="w-[20%] flex justify-end">
-                                        
-                                            <AiOutlineEdit  onClick={() => {
-                                                setName(contact?.name);
-                                                setAddress(contact.address);
-                                                setTypeAction("update");
-                                                setIsOpenModal(true);
-                                                }}
-                                            />
+
+                                        <AiOutlineEdit onClick={() => {
+                                            setName(contact?.name);
+                                            setAddress(contact.address);
+                                            setTypeAction("update");
+                                            setIsOpenModal(true);
+                                        }}
+                                        />
                                     </div>
                                 </div>
                             ))}
                         </section>
-                        
+
                     ))}
                 </div>
             </FormProvider>
