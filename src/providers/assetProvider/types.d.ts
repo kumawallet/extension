@@ -1,5 +1,5 @@
 import AccountEntity from "@src/storage/entities/Account";
-import { API, Chain } from "@src/types";
+import { API } from "@src/types";
 
 export interface Asset {
   symbol: string;
@@ -35,7 +35,13 @@ export interface InitialState {
   isLoadingAssets: boolean;
 }
 
-export type SelectedChain = Chain | null;
+type SelectedChain = {
+  [id: string]: chain
+}
+type chain = {
+  isTestnet?: boolean;
+  type: "wasm" | "evm" | "move";
+}
 
 export interface LoadAssetParams {
   api: API;

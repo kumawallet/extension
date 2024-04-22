@@ -16,7 +16,7 @@ export type WasmFee = {
   estimatedTotal: BN;
 };
 
-export type API = ApiPromise | ethers.providers.JsonRpcProvider | nul;
+export type API = { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}};
 
 export type EVMFee = {
   gasLimit: BigNumber;

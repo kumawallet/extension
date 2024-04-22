@@ -157,18 +157,15 @@ export const getProviderforNetworks = async(networks: Chain[], api :any) =>{
         }
       if (network.type === "wasm")
         {
-          console.log(network.id, network.type, "asp por aqui")
           const promise= ApiPromise.create({ provider: new WsProvider(network.rpcs)})
           promises.push(promise);
           promise.then((api) => {
-            console.log(api,network.id, "si se resolvio pero algo esta pasando")
-          provider[network.id] = api}).catch((error) => console.log(error, "esto no furula"))
+          provider[network.id] = api})
   
         }
       })
 
-    await Promise.all(promises).then(() => console.log("SE resolvieron todas", provider)).catch((error) => console.log("No se resolvieron", error));
-    console.log(provider, "espero que se llene")
+    await Promise.all(promises)
     return provider
   }
   else{
@@ -176,10 +173,8 @@ export const getProviderforNetworks = async(networks: Chain[], api :any) =>{
       
       if(Object.keys(api).includes(network.id)){
         provider[network.id] = api[network.id];
-        console.log(network.id, "ya existe en el api")
       }
       else {
-        console.log(network.id, "No existe en el api")
         if (network.type === "evm")
           {
             provider[network.id] = new ethers.providers.JsonRpcProvider(network.rpcs[0] as string);
@@ -194,8 +189,7 @@ export const getProviderforNetworks = async(networks: Chain[], api :any) =>{
       }
     })
     
-    await Promise.all(promises).catch((error) => console.log("No se resolvieron", error));
-    console.log(provider, "espero que se llene")
+    await Promise.all(promises)
     return provider
   }
 }
@@ -269,20 +263,16 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const updateSelectNetwork = async (id: string, type: "wasm" | "evm" | "move",isTestnet?: boolean) => {
     try {
       if(Object.prototype.hasOwnProperty.call(state.selectedChain, id)){
-        const chains = await messageAPI.deleteSelectChain({id});
-        console.log(chains, "Objeto modificado delete")
+        await messageAPI.deleteSelectChain({id});
         if (state.api[id] && "getBalance" in state.api[id]) {
               (state.api[id] as ethers.providers.JsonRpcProvider).removeAllListeners("block");
         }
         if (state.api[id] && "disconnect" in state.api[id])
-              await (state.api[id] as ApiPromise).disconnect().then(() => console.log("se resolvio"))
+              await (state.api[id] as ApiPromise).disconnect()
 
       }
       else{
-        const chains = await messageAPI.setNetwork({ id, isTestnet,type });
-        console.log(chains, "Objeto modificado set")
-        
-       
+        await messageAPI.setNetwork({ id, isTestnet,type });
       }
      
      
@@ -330,14 +320,12 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     if (Object.keys(state.selectedChain).length === 0) return
-    console.log(state.chains, "REVISA")
     const allChains = state.chains.map((chain) => chain.chains).flat();
     const setProvider = async () => {
       try {
         const Chains = allChains.filter((chain) => Object.keys(state.selectedChain).includes(chain.id))
 
         const provider = await getProviderforNetworks(Chains, state.api);
-        console.log(provider, "PROVIDER");
 
         dispatch({
           type: "set-api",
