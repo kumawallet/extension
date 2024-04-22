@@ -111,8 +111,6 @@ export default class AccountManager {
     let found = false;
 
     if (derivedAccounts.length > 0) {
-      path++;
-
       do {
         const account = derivedAccounts.find(
           (account) => account.value.path === path

@@ -120,7 +120,9 @@ export const AccountList = () => {
                                 setActionSelected("detail");
                               }}
                               onSelect={() => {
+
                                 setSelectedAccount(account as Account);
+                                onCloseModal()
                               }}
                               isSelected={account?.key === selectedAccount?.key}
                             />
