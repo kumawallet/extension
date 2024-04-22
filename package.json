@@ -53,6 +53,7 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "lodash.debounce": "^4.0.8",
     "react": "^18.2.0",
+    "react-dnd": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.0",
     "react-i18next": "^14.1.0",
