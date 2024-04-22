@@ -262,7 +262,7 @@ export const AssetToSend = () => {
 
   return (
     <>
-      <div className="bg-[#1C1C27] flex flex-col mb-2 rounded-[10px] py-2">
+      <div className="bg-[#1C1C27] flex flex-col mb-2 rounded-sm py-2">
         {/* First row */}
         <div className={styles.row}>
           <div className="flex items-center gap-1" data-testid="asset-to-send">
@@ -341,7 +341,7 @@ export const AssetToSend = () => {
 
       <FiArrowDownCircle className="mx-auto -my-4" size={26} />
 
-      <div className="flex justify-around mt-1 py-3 px-2 bg-[#1C1C27] rounded-[10px]">
+      <div className="flex justify-around mt-1 py-3 px-2 bg-[#1C1C27] rounded-sm">
         <SelectItem<Chain>
           items={chainsToSend}
           onChangeValue={(chain) => {

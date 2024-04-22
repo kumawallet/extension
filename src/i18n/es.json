@@ -36,7 +36,8 @@
     "no_contacts_found": "No se encontraron contactos",
     "error": "Ha ocurrido un error",
     "rpc_error": "Error de red",
-    "copy_to_clipboard": "Copiado en el portapapeles"
+    "copy_to_clipboard": "Copiado en el portapapeles",
+    "success": "Operación exitosa"
   },
   "welcome": {
     "welcome_message": "Bienvenido a Kuma",
@@ -163,6 +164,10 @@
     "contacts": "Contactos",
     "address_book" : "Libro de direcciones",
     "security": "Seguridad",
+    "autolock": {
+      "title": "Establecer tiempo de bloqueo automático",
+      "minutes" : "min"
+      },
     "bug_report": "Reportar errores",
     "about_us": "Acerca de nosotros",
     "sign_out": "Cerrar sesión",

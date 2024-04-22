@@ -39,7 +39,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   }, [bridgeName]);
 
   return (
-    <div className="bg-[#343a40] border border-[#727e8b17] p-3 rounded-xl flex flex-col gap-2">
+    <div className="bg-[#343a40] border border-[#727e8b17] p-3 rounded-lg flex flex-col gap-2">
       {
         bridgeType && (
           <>

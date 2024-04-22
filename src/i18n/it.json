@@ -36,7 +36,8 @@
     "no_contacts_found": "Nessun contatto aggiunto ancora",
     "error": "Si è verificato un errore",
     "rpc_error": "Errore di rete",
-    "copy_to_clipboard": "Copia negli appunti"
+    "copy_to_clipboard": "Copia negli appunti",
+    "success": "Operazione riuscita"
  },
  "welcome": {
     "welcome_message": "Il tuo amichevole portafoglio multicatena per esplorare la blockchain",
@@ -163,6 +164,10 @@
   "contacts": "Contatti",
   "address_book": "Rubrica",
   "security": "Sicurezza",
+  "autolock": {
+    "title": "Imposta il tempo di blocco automatico",
+    "minutes" : "minuti"
+    },
   "bug_report": "Segnala un problema",
   "about_us": "Chi siamo",
   "sign_out": "Esci",

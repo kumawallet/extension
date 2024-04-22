@@ -11,35 +11,30 @@ import {
 } from "../../style/style";
 import { messageAPI } from "@src/messageAPI/api";
 import { useToast } from "@src/hooks";
-
+import { useTranslation } from "react-i18next";
 
 export const AutoLock = () => {
-  // const { t } = useTranslation("security");
+  const { t: tcommon } = useTranslation("common");
+  const { t } = useTranslation("settings");
   const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useToast();
   const timeLock = [
     {
-      title: "5 min",
       value: 5
     },
     {
-      title: "10 min",
       value: 10
     },
     {
-      title: "15 min",
       value: 15
     },
     {
-      title: "20 min",
       value: 20
     },
     {
-      title: "30 min",
       value: 30
     },
     {
-      title: "60 min",
       value: 60
     },
   ]
@@ -67,7 +62,7 @@ export const AutoLock = () => {
         await messageAPI?.setAutoLock({
           time
         })
-        showSuccessToast("success")
+        showSuccessToast(tcommon("success"))
       }
 
     }
@@ -85,7 +80,7 @@ export const AutoLock = () => {
           size={ICON_SIZE}
           onClick={() => navigate(-1)}
         />
-        <p className={topbarText}>Set auto-lock time</p>
+        <p className={topbarText}>{t("autolock.title")}</p>
       </div>
       <div className="flex flex-col gap-1">
         {timeLock.map((opt) => (
@@ -99,7 +94,7 @@ export const AutoLock = () => {
             classname={`${styleButtomNav} w-full justify-between `}
           >
             <div className="flex items-center">
-              <p className="text-sm">{opt.title}</p>
+              <p className="text-sm">{`${opt.value} ${t("autolock.minutes")}`}</p>
             </div>
             <div
               className={`p-1 text-[6px] rounded-full border relative ${lock === opt.value ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon" : "border-gray-300"} `}

@@ -195,8 +195,8 @@ export const Send = () => {
       innerContentClassName="flex flex-col"
     >
       <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
-        <p className="text-lg">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
+        <FiChevronLeft size={15} className="cursor-pointer" onClick={onBack} />
+        <p className="text-base font-medium">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
       </div>
 
       <FormProvider {...methods}>
@@ -216,7 +216,7 @@ export const Send = () => {
         <Button
           data-testid="send-button"
           isDisabled={isLoadingFees || !isValid || !haveSufficientBalance}
-          classname="w-full py-3"
+          classname="w-full py-4"
           onClick={handleSubmit(onSubmit)}
         >
           {t("send_title")}
