@@ -1,9 +1,8 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-
 import { HeaderBack } from "@src/components/common/HeaderBack";
-import { PageWrapper, Button } from "@src/components/common";
+import { PageWrapper, Button, TxSummary } from "@src/components/common";
 import { Footer } from "@src/pages/balance/components";
 import Contact from "@src/storage/entities/registry/Contact";
 import { NetworkIcon } from "./NetworkIcon";
@@ -100,7 +99,7 @@ export const ActivityDetail = () => {
     if (chainType === "wasm") {
       window.open(`${chain?.explorer}/extrinsic/${hash}`);
     } else {
-      window.open(`${selectedChain?.explorer}/tx/${hash}`);
+      window.open(`${chain?.explorer}/tx/${hash}`);
     }
   };
 
@@ -114,26 +113,100 @@ export const ActivityDetail = () => {
       }
       : { value: address.slice(0, 12) + "..." + address.slice(-12) };
   };
+  const statusTranslate = () => {
+    return status === "" ? "in_process" : status.toLowerCase()
 
+  }
   const transaction = {
-    Hash: getHash(hash),
-    Type: type,
-    Status: status,
-    Sender: getContactName(sender),
-    Recipient: getContactName(recipient),
-    Network: "hola",
-    Amount: getValue({
+    [t("hash")]:
+      <div className={styleAD.itemsValue}>
+        {getHash(hash)}
+        <button
+          onClick={copyToClipboard}
+          className={styleAD.copyButton}
+          data-testid="account-button"
+        >
+          <Icon
+            iconProps={{
+              className: styleAD.copyButton,
+            }}
+          />
+        </button>
+      </div>
+    ,
+    [t("type")]: type,
+    [t("status.name")]:
+      <div className={styleAD.itemsValue}>
+        <Status status={status} />
+      </div>
+    ,
+    [t("sender")]:
+      <>
+        {getContactName(sender).contact ? (
+          <div className="grid w-full">
+            <p className={styleAD.itemsValue}>{getContactName(sender).contact}</p>
+            <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+          </div>
+        ) : (
+          <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+        )}
+      </>
+    ,
+    [t("recipient")]: <>
+      {getContactName(recipient).contact ? (
+        <div className="grid w-full">
+          <p className={styleAD.itemsValue}>{getContactName(recipient).contact}</p>
+          <p className={styleAD.itemsValue}>{getContactName(recipient).value}</p>
+        </div>
+      ) : (
+        <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+      )}
+    </>
+    ,
+    [t("network")]: getXCM(originNetwork, targetNetwork) ? (
+      <div className={styleAD.containerNetworks}>
+        <div className={styleAD.networks}>
+          <NetworkIcon
+            networkName={originNetwork}
+            width={16}
+            chains={allChains}
+          />
+          <FaChevronRight size={12} />
+          <NetworkIcon
+            networkName={targetNetwork}
+            chains={allChains}
+            width={16}
+          />
+        </div>
+        <p className={styleAD.textNetwork}>{t("xcm")}</p>
+      </div>
+    ) : (
+      <div className={styleAD.networks}>
+        <NetworkIcon
+          networkName={originNetwork}
+          width={16}
+          chains={allChains}
+        />
+        <FaChevronRight size={12} className="font-ligth" />
+        <NetworkIcon
+          networkName={targetNetwork}
+          chains={allChains}
+          width={16}
+        />
+      </div>
+    ),
+    [t("amount")]: getValue({
       value: amount,
       symbol: asset,
     }),
-    "Estimeted fee": estimatedFee(
+    [t("estimeted_fee")]: estimatedFee(
       {
         fee,
         symbol: asset,
       },
       selectedChain?.decimals as number
     ),
-    Tip: getTip({
+    [t("tip")]: getTip({
       tip,
       symbol: asset,
     }),
@@ -143,81 +216,12 @@ export const ActivityDetail = () => {
     <PageWrapper contentClassName="mt-1/2 ">
       <div className="mt-1 m-3">
         <HeaderBack title={t("title")} navigate={navigate} />
-        <div className="grid gap-5">
-          {Object.entries(transaction).map(([key, value]) => (
-            <div key={key} className={styleAD.countendItems}>
-              <p className={styleAD.items}>{key}</p>
-              {key === "Hash" ? (
-                <div className={styleAD.itemsValue}>
-                  {value}
-                  <button
-                    onClick={copyToClipboard}
-                    className={styleAD.copyButton}
-                    data-testid="account-button"
-                  >
-                    <Icon
-                      iconProps={{
-                        className: styleAD.copyButton,
-                      }}
-                    />
-                  </button>
-                </div>
-              ) : key === "Sender" || key === "Recipient" ? (
-                <>
-                  {value.contact ? (
-                    <div className="grid w-full">
-                      <p className={styleAD.itemsValue}>{value.contact}</p>
-                      <p className={styleAD.itemsValue}>{value.value}</p>
-                    </div>
-                  ) : (
-                    <p className={styleAD.itemsValue}>{value.value}</p>
-                  )}
-                </>
-              ) : key === "Status" ? (
-                <div className={styleAD.itemsValue}>
-                  <Status status={value} />
-                </div>
-              ) : key === "Network" ? (
-                getXCM(originNetwork, targetNetwork) ? (
-                  <div className={styleAD.containerNetworks}>
-                    <div className={styleAD.networks}>
-                      <NetworkIcon
-                        networkName={originNetwork}
-                        width={16}
-                        chains={allChains}
-                      />
-                      <FaChevronRight size={12} />
-                      <NetworkIcon
-                        networkName={targetNetwork}
-                        chains={allChains}
-                        width={16}
-                      />
-                    </div>
-                    <p className={styleAD.textNetwork}>{t("xcm")}</p>
-                  </div>
-                ) : (
-                  <div className={styleAD.networks}>
-                    <NetworkIcon
-                      networkName={originNetwork}
-                      width={16}
-                      chains={allChains}
-                    />
-                    <FaChevronRight size={12} className="font-ligth" />
-                    <NetworkIcon
-                      networkName={targetNetwork}
-                      chains={allChains}
-                      width={16}
-                    />
-                  </div>
-                )
-              ) : (
-                <p className={styleAD.itemsValue}>{value}</p>
-              )}
-            </div >
-          ))}
-        </div >
+        <TxSummary
+          tx={transaction}
+        />
       </div >
       <Button
+        data-testid="explorer-button"
         classname={styleAD.button}
         onClick={() => getLink(selectedChain as Chain, hash)}
       >

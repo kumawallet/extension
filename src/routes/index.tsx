@@ -15,17 +15,16 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
-
 } from "@src/pages";
 import {
-  Advanced,
   BugReport,
   AddressBook,
   General,
   ManageNetworks,
   Security,
-  Settings
+  Settings,
 } from "@src/pages/settings";
+import { AutoLock } from "@src/pages/settings/components/Security/Auto-lock";
 import {
   BALANCE,
   ACTIVITY_DETAIL,
@@ -35,7 +34,6 @@ import {
   MANAGE_ASSETS,
   RECEIVE,
   SEND,
-  SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
@@ -48,7 +46,7 @@ import {
   SWAP,
   WELCOME,
   CHANGE_PASSWORD,
-
+  SETTINGS_AUTOLOCK,
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -81,7 +79,6 @@ export const Routes = () => {
 
   const [isInit, setIsInit] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
-
   const { isLoading, endLoading } = useLoading(true);
 
   useEffect(() => {
@@ -94,7 +91,7 @@ export const Routes = () => {
         if (!tab) {
           const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
           webAPI.tabs.create({ url });
-          window.close()
+          window.close();
           return;
         }
       }
@@ -102,6 +99,7 @@ export const Routes = () => {
       setIsInit(true);
       setIsSignedUp(alreadySignedUp);
     })();
+    getHomeRoute();
   }, []);
 
   useEffect(() => {
@@ -114,24 +112,33 @@ export const Routes = () => {
     try {
       if (!isSignedUp) {
         setHomeRoute(<Welcome />);
-        endLoading();
+        setTimeout(() => {
+          endLoading();
+        }, 100);
         return;
       }
 
       const isSessionActive = await messageAPI.isSessionActive();
       const isAuthorized = await messageAPI.isAuthorized();
-
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
-        endLoading();
+        setTimeout(() => {
+          endLoading();
+        }, 100);
         return;
       }
       setHomeRoute(<Balance />);
-      endLoading();
+      setTimeout(() => {
+        endLoading();
+      }, 100);
     } catch (error) {
       console.log("error", error);
     }
   };
+
+  setInterval(async () => {
+    await messageAPI.unlock(); // Timeout update(AutoLock)
+  }, 30000);
 
   if (location.search.includes("origin=kuma")) {
     return (
@@ -163,7 +170,12 @@ export const Routes = () => {
   }
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <Loading
+        containerClass="h-screen flex justify-center items-center"
+        iconClass="mr-0"
+      />
+    );
   }
 
   return (
@@ -185,10 +197,10 @@ export const Routes = () => {
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />
         <Route path={SETTINGS_GENERAL} element={<General />} />
-        <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
         <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
+        <Route path={SETTINGS_AUTOLOCK} element={<AutoLock />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}

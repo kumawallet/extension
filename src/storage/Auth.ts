@@ -34,10 +34,16 @@ export default class Auth {
   }
 
   static async isSessionActive(): Promise<boolean> {
-    if (!Auth.isUnlocked) {
-      await Auth.loadFromCache();
-    }
+    await Auth.loadFromCache();
     return Auth.isUnlocked;
+  }
+  static async unLock() {
+    CacheAuth.getInstance();
+    CacheAuth.unlock();
+  }
+  
+  static async getLock() {
+    return CacheAuth.getLock();
   }
 
   static isAuthorized() {
@@ -55,6 +61,16 @@ export default class Auth {
       throw new Error("failed_to_cache_password");
     }
   }
+  static async setAutoLock (time: number){
+    try{
+      CacheAuth.getInstance();
+      CacheAuth.lock(time);
+    }
+    catch(err){
+      CacheAuth.clear();
+      throw new Error("failed_to_set_auto_lock");
+    }
+  }   
 
   static async loadFromCache() {
     try {
@@ -91,7 +107,7 @@ export default class Auth {
     }
   }
 
-  static async signIn(password: string) {
+  static async signIn(password: string, ) {
     const auth = Auth.getInstance();
     try {
       await auth.validatePassword(password);

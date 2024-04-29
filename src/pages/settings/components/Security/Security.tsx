@@ -10,7 +10,7 @@ import {
   topbarContainer,
   styleButtomNav,
 } from "../../style/style";
-import { CHANGE_PASSWORD } from "@src/routes/paths";
+import { CHANGE_PASSWORD, SETTINGS_AUTOLOCK } from "@src/routes/paths";
 
 export const Security = () => {
   const { t } = useTranslation("security");
@@ -28,6 +28,7 @@ export const Security = () => {
       </div>
 
       <Button
+        data-testid="change-password"
         variant="contained-black"
         classname={`${styleButtomNav} w-full justify-between`}
         onClick={() => navigate(CHANGE_PASSWORD)}
@@ -35,13 +36,12 @@ export const Security = () => {
         <p className="text-sm">{t("restore_password")}</p>
         <BsChevronRight />
       </Button>
-      {/* 
-      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  >
+      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`} onClick={() => navigate(SETTINGS_AUTOLOCK)} >
         <p className="text-sm">{t('auto-lock')}</p>
         <BsChevronRight />
       </Button>
 
-      <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  >
+      {/* <Button variant="contained-black" classname={`${styleButtomNav} w-full justify-between`}  >
         <p className="text-sm ">{t("trusted_sites")}</p>
         <BsChevronRight />
       </Button> */}

@@ -8,7 +8,6 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { AccountFormType } from "@src/pages";
 import { useToast } from "@src/hooks";
 import { useNetworkContext } from "../networkProvider/NetworkProvider";
 import Account from "@src/storage/entities/Account";
@@ -214,7 +213,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const deriveAccount = useCallback(
-    async (account: { name: string; accountType: AccountType }) => {
+    async (account: { name: string; accountType: AccountType, address: string }) => {
       try {
         const isSessionActive = await messageAPI.isSessionActive();
         if (!isSessionActive) throw new Error("login_required");
@@ -222,6 +221,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         await messageAPI.deriveAccount({
           name: account.name,
           type: account.accountType,
+          address: account.address
         });
         await getSelectedAccount();
         return true;
@@ -234,7 +234,13 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     []
   );
 
-  const importAccount = useCallback(async (account: AccountFormType) => {
+  const importAccount = useCallback(async (account: {
+    name: string;
+    privateKeyOrSeed: string;
+    password: string;
+    accountType: AccountType;
+    isSignUp: boolean;
+  }) => {
     try {
       const isSessionActive = await messageAPI.isSessionActive();
 
@@ -260,7 +266,12 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, []);
 
-  const createAccount = useCallback(async (account: AccountFormType) => {
+  const createAccount = useCallback(async (account: {
+    name: string;
+    seed: string;
+    password: string;
+    isSignUp: boolean;
+  }) => {
     try {
       if (!account.seed) throw new Error("seed_required");
       await messageAPI.createAccounts({

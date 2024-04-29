@@ -1,19 +1,18 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
 import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Register from "@src/storage/entities/registry/Register";
-import { SwapData } from "@src/storage/entities/registry/Swap";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
   SettingKey,
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
-import { HistoricTransaction } from "@src/types";
+import { Chain, HistoricTransaction } from "@src/types";
 import { providers } from "ethers";
 
 export interface RequestSignUp {
@@ -59,6 +58,10 @@ export interface RequestValidatePassword {
   key: AccountKey;
   keyring: AccountType;
 }
+export interface RequestSetAutoLock {
+  time: number; //in minutes
+}
+
 export interface RequestGetAccount {
   key: AccountKey;
 }
@@ -70,6 +73,7 @@ export interface RequestGetAllAccounts {
 export interface RequestDeriveAccount {
   name: string;
   type: AccountType;
+  address: string;
 }
 
 export interface RequestSetNetwork {
@@ -106,7 +110,10 @@ export interface RequestSaveContact {
 export interface RequestRemoveContact {
   address: string;
 }
-
+export interface RequestUpdateContact {
+  name: string;
+  address: string;
+}
 export interface RequestAddActivity {
   txHash: string;
   record: Record;
@@ -140,13 +147,8 @@ export interface RequestRemoveTrustedSite {
   site: string;
 }
 
-export interface RequestSwapProtocol {
-  protocol: string;
-}
-
-export interface RequestAddSwap {
-  protocol: string;
-  swap: SwapData;
+export interface getLock {
+  lock: number;
 }
 
 interface RequestSendTxBase {
@@ -184,11 +186,15 @@ export interface Request {
   "pri(accounts.deriveAccount)": [RequestDeriveAccount, Account];
   "pri(accounts.setSelectedAccount)": [Account, void];
   "pri(accounts.getSelectedAccount)": [null, Account | undefined];
+  "pri(accounts.getAccountsToDerive)": [null, Account[]];
 
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
   "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
+  "pri(auth.setAutoLock)": [RequestSetAutoLock];
+  "pri(auth.unlock)": [null, void];
+  "pri(auth.getLock)": [null, number];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
@@ -218,6 +224,7 @@ export interface Request {
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];
+  "pri(contacts.updateContact)": [RequestUpdateContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
   "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
@@ -239,13 +246,8 @@ export interface Request {
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
   "pri(trustedSites.removeTrustedSite)": [RequestRemoveTrustedSite, void];
 
-  "pri(swap.getSwapsByProtocol)": [RequestSwapProtocol, SwapData[]];
-  "pri(swap.addSwap)": [RequestAddSwap, void];
-
   "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
   "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
-
-  "pri(ping)": [null, string];
 }
 
 export type MessageTypes = keyof Request;
@@ -263,3 +265,34 @@ export type ResponseTypes = {
 
 export type ResponseType<TMessageType extends keyof Request> =
   Request[TMessageType][1];
+
+type KeysWithDefinedValues<T> = {
+  [K in keyof T]: T[K] extends undefined ? never : K;
+}[keyof T];
+
+type NoUndefinedValues<T> = {
+  [K in KeysWithDefinedValues<T>]: T[K];
+};
+
+type IsNull<T, K extends keyof T> = {
+  [K1 in Exclude<keyof T, K>]: T[K1];
+} & T[K] extends null
+  ? K
+  : never;
+
+type NullKeys<T> = { [K in keyof T]: IsNull<T, K> }[keyof T];
+
+export type SubscriptionMessageTypes = NoUndefinedValues<{
+  [MessageType in keyof Request]: Request[MessageType][2];
+}>;
+
+export type MessageTypesWithSubscriptions = keyof SubscriptionMessageTypes;
+export type MessageTypesWithNoSubscriptions = Exclude<
+  MessageTypes,
+  keyof SubscriptionMessageTypes
+>;
+
+export declare type KnownSubscriptionDataTypes<T extends MessageTypes> =
+  Request[T][2];
+
+export type MessageTypesWithNullRequest = NullKeys<RequestTypes>;

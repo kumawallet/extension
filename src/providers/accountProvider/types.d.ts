@@ -16,6 +16,7 @@ interface AccountContext {
   deriveAccount: (account: {
     name: string;
     accountType: AccountType;
+    address: string;
   }) => Promise<boolean>;
   importAccount: (account: AccountFormType) => Promise<boolean>;
   createAccount: (account: AccountFormType) => Promise<boolean>;

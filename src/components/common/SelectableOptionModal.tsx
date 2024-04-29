@@ -56,7 +56,7 @@ export const SelectableOptionModal = <T,>({
           <div className="fixed inset-0 bg-black/25" />
         </Transition.Child>
 
-        <div className="fixed bottom-0 left-0 right-0 flex bg-[#333343bb] pt-6 rounded-t-2xl h-3/5">
+        <div className="fixed bottom-0 left-0 right-0 flex bg-[#333343bb] mx-auto max-w-[357px] pt-6 rounded-t-2xl h-[400px]">
           <Dialog.Panel className="w-full">
             <div
               className={`flex items-center  px-6 mb-3 ${title ? "justify-between" : "justify-end"
@@ -95,7 +95,7 @@ export const SelectableOptionModal = <T,>({
                           />
                         </div>
 
-                        <div className="flex flex-col gap-2">
+                        <div data-testid="filtered-items-container" className="flex flex-col gap-2">
                           {filteredItems.map((item, index) => (
                             <Item key={index} item={item} />
                           ))}

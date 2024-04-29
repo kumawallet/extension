@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import {
   useAccountContext,
-  useAssetContext,
   useNetworkContext,
 } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -70,10 +69,6 @@ export const Send = () => {
   const { showSuccessToast, showErrorToast } = useToast();
 
   const {
-    state: { assets },
-  } = useAssetContext();
-
-  const {
     state: { selectedChain },
   } = useNetworkContext();
 
@@ -86,11 +81,11 @@ export const Send = () => {
       recipientAddress: "",
       senderAddress: selectedAccount.value.address,
       asset: {
-        id: assets[0]?.id,
+        id: "-1",
         symbol: selectedChain?.symbol,
         decimals: selectedChain?.decimals || 1,
         balance: "0",
-        address: assets[0]?.address,
+        address: "",
       },
       originNetwork: selectedChain as Chain,
       targetNetwork: selectedChain as Chain,
@@ -200,8 +195,8 @@ export const Send = () => {
       innerContentClassName="flex flex-col"
     >
       <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
-        <p className="text-lg">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
+        <FiChevronLeft size={15} className="cursor-pointer" onClick={onBack} />
+        <p className="text-base font-medium">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
       </div>
 
       <FormProvider {...methods}>
@@ -219,11 +214,12 @@ export const Send = () => {
         </div>
 
         <Button
+          data-testid="send-button"
           isDisabled={isLoadingFees || !isValid || !haveSufficientBalance}
-          classname="w-full py-3"
+          classname="w-full py-4"
           onClick={handleSubmit(onSubmit)}
         >
-          {t("send")}
+          {t("send_title")}
         </Button>
       </FormProvider>
     </PageWrapper>

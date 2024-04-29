@@ -6,7 +6,7 @@ import Contact from "@src/storage/entities/registry/Contact";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
 import { Button, Loading, PageWrapper } from "@src/components/common";
-import { BsTrash } from "react-icons/bs";
+import { AiOutlineEdit } from "react-icons/ai";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,12 +19,15 @@ import { topbarText, topbarIcon, topbarContainer } from "../../style/style";
 import "../../style/input.css";
 import { CiSearch } from "react-icons/ci";
 import { PiGhost } from "react-icons/pi";
-import { AddressBookForm } from "@src/types";
+import { AddressForm } from "@src/types";
 
 export const AddressBook = () => {
-    const { t } = useTranslation("adressBook");
+    const { t } = useTranslation("address_book");
     const { t: tCommon } = useTranslation("common");
     const navigate = useNavigate();
+    const [typeAction, setTypeAction] = useState<"create" | "update">("create");
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("")
 
     const schema = object({
         name: string().required(t("required") as string),
@@ -52,21 +55,33 @@ export const AddressBook = () => {
             .required(t("required") as string),
     }).required();
 
-    const methods = useForm<AddressBookForm>({
-        defaultValues: {
-            name: "",
-            address: "",
-        },
+    const getDefaultValue = () => {
+        const init = typeAction === "create" ?
+            {
+                name: "",
+                address: "",
+            }
+            :
+            {
+                name: name,
+                address: address,
+            }
+        return init;
+    }
+
+    const methods = useForm<AddressForm>({
         resolver: yupResolver(schema),
+        values: getDefaultValue(),
     });
 
     const { handleSubmit, reset } = methods;
 
     const [isLoading, setIsLoading] = useState(true);
-    const [isCreateContact, setIsCreateContact] = useState(false);
+    const [isOpenModal, setIsOpenModal] = useState(false);
     const [contacts, setContacts] = useState([] as Contact[]);
     const [search, setSearch] = useState("" as string);
     const { showErrorToast } = useToast();
+
 
     useEffect(() => {
         setIsLoading(true);
@@ -86,7 +101,7 @@ export const AddressBook = () => {
         }
     };
 
-    const saveContact = handleSubmit(async (form: AddressBookForm) => {
+    const saveContact = handleSubmit(async (form: AddressForm) => {
         try {
             const { name, address } = form;
             const contact = new Contact(name, address);
@@ -99,7 +114,7 @@ export const AddressBook = () => {
             captureError(error);
             showErrorToast(tCommon(error as string));
         } finally {
-            setIsCreateContact(false);
+            setIsOpenModal(false);
             reset();
         }
     });
@@ -110,17 +125,38 @@ export const AddressBook = () => {
                 address,
             });
             getContacts();
+            setIsOpenModal(false);
         } catch (error) {
             showErrorToast(tCommon(error as string));
         }
     };
+    const updateContact = handleSubmit(async (form: AddressForm) => {
+        try {
+            const { name, address } = form;
+            await messageAPI.updateContact({
+                name,
+                address,
+            });
+            setSearch("");
+            getContacts();
+        } catch (error) {
+            captureError(error);
+            showErrorToast(tCommon(error as string));
+        } finally {
+            setIsOpenModal(false);
+            reset();
+        }
+    });
 
     const toggleCreateContact = () => {
+        setTypeAction("create");
+        setName("");
+        setAddress("");
         reset({
             name: "",
             address: "",
         });
-        setIsCreateContact(!isCreateContact);
+        setIsOpenModal(!isOpenModal);
     };
 
     const groupedContacts = useMemo(() => {
@@ -169,9 +205,12 @@ export const AddressBook = () => {
                     </div>
                 </div>
                 <AddAddressModal
-                    isOpen={isCreateContact}
+                    isOpen={isOpenModal}
                     onClose={toggleCreateContact}
+                    type={typeAction}
                     onSaveContact={saveContact}
+                    onUpdateContact={updateContact}
+                    onDeleteContact={() => deleteContact(address)}
                 />
                 <div className="relative">
                     <input
@@ -185,7 +224,7 @@ export const AddressBook = () => {
                     <CiSearch className="absolute top-1/2 left-2 transform font-mediums -translate-y-1/2 text-white" />
                 </div>
 
-                <p className="text-sm font-medium mt-8">My Contacts</p>
+                <p className="text-sm font-medium mt-8">{t("my_contacts")}</p>
                 <div className="flex flex-col gap-1 mt-5">
                     {contacts.length === 0 && (
                         <div className="grid place-items-center mt-5 opacity-50 ">
@@ -212,14 +251,19 @@ export const AddressBook = () => {
                                         <p>{contact?.address}</p>
                                     </div>
                                     <div className="w-[20%] flex justify-end">
-                                        <BsTrash
-                                            className="text-lg hover:text-custom-red-bg"
-                                            onClick={() => deleteContact(contact.address)}
+
+                                        <AiOutlineEdit onClick={() => {
+                                            setName(contact?.name);
+                                            setAddress(contact.address);
+                                            setTypeAction("update");
+                                            setIsOpenModal(true);
+                                        }}
                                         />
                                     </div>
                                 </div>
                             ))}
                         </section>
+
                     ))}
                 </div>
             </FormProvider>

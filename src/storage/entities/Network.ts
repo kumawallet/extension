@@ -1,5 +1,5 @@
+import { Chain } from "@src/types";
 import BaseEntity from "./BaseEntity";
-import { Chain } from "./Chains";
 
 export default class Network extends BaseEntity {
   chain: Chain | null;
@@ -9,6 +9,10 @@ export default class Network extends BaseEntity {
   constructor() {
     super();
     this.chain = null;
+  }
+
+  static getName() {
+    return "Network";
   }
 
   public static getInstance() {

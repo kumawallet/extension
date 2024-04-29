@@ -18,7 +18,7 @@ export interface Asset {
 const Bg = () => (
   <svg width="739" height="868" viewBox="0 0 739 868" fill="none" xmlns="http://www.w3.org/2000/svg" className="bottom-0 left-0 w-full h-[62%] md:h-2/3 object-cover z-0 fixed">
     <g filter="url(#filter0_f_1173_150)">
-      <rect y="242" width="739" height="531" rx="28" fill="#6C387A" fillOpacity="0.57" />
+      <rect x="180" y="242" width="430" height="450" rx="40" fill="#6C387A" fillOpacity="1" />
       <rect x="0.5" y="242.5" width="738" height="530" rx="27.5" stroke="#FDF7F7" />
     </g>
     <defs>
@@ -38,6 +38,7 @@ export const Balance = () => {
     state: { selectedChain },
   } = useNetworkContext();
 
+  // const [showBalance, setShowBalance] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const TABS = [t("assets"), t("activity")];
@@ -47,10 +48,12 @@ export const Balance = () => {
   }, [selectedChain?.name]);
 
 
+
+
   return (
     <>
       <Header />
-      <PageWrapper contentClassName="flex-1 !px-0">
+      <PageWrapper contentClassName="flex-1 !px-0" innerContentClassName=" !bg-[#0C0C0C]">
         <Bg />
         <div className="flex flex-col pt-3 pb-16 relative">
           <div className="flex flex-col gap-6">
@@ -90,6 +93,7 @@ export const Balance = () => {
                 <Activity />
               </Tab.Panel>
             </Tab.Panels>
+
           </Tab.Group>
         </div>
       </PageWrapper>

@@ -8,8 +8,7 @@ import { SendTxForm } from "../Send";
 
 type MOCK_WATCH_TYPE = keyof Partial<SendTxForm>;
 
-
-const WATCH_MOCK: Partial<SendTxForm> = {
+const WATCH_XCM_MOCK: Partial<SendTxForm> = {
   originNetwork: {
     id: "polkadot",
     symbol: "DOT",
@@ -19,9 +18,25 @@ const WATCH_MOCK: Partial<SendTxForm> = {
     id: "astar",
     symbol: "ASTR",
     decimals: 18,
-    // id: "polkadot",
-    // symbol: "DOT",
-    // decimals: 10,
+  } as SendTxForm["targetNetwork"],
+  asset: {
+    symbol: "DOT",
+    decimals: 10,
+    balance: "1",
+  } as SendTxForm["asset"],
+  isXcm: true,
+};
+
+const WATCH_MOCK: Partial<SendTxForm> = {
+  originNetwork: {
+    id: "polkadot",
+    symbol: "DOT",
+    decimals: 10,
+  } as SendTxForm["originNetwork"],
+  targetNetwork: {
+    id: "polkadot",
+    symbol: "DOT",
+    decimals: 10,
   } as SendTxForm["targetNetwork"],
   asset: {
     symbol: "DOT",
@@ -42,6 +57,10 @@ const renderComponent = () => {
     </I18nextProvider>
   );
 };
+
+const useFormContextMock = vi.hoisted(() => ({
+  watch: vi.fn((key: MOCK_WATCH_TYPE) => WATCH_XCM_MOCK[key]),
+}));
 
 describe("AssetToSend", () => {
   beforeAll(() => {
@@ -68,7 +87,7 @@ describe("AssetToSend", () => {
     vi.mock("react-hook-form", () => ({
       useFormContext: vi.fn(() => ({
         register: vi.fn(),
-        watch: vi.fn((key: MOCK_WATCH_TYPE) => WATCH_MOCK[key]),
+        watch: useFormContextMock.watch,
         setValue: functionMocks.setValue,
         getValues: vi.fn(),
       })),
@@ -106,7 +125,16 @@ describe("AssetToSend", () => {
   });
 
   describe("render", () => {
-    it("should render AssetToSend", () => {
+    it("should render with xcm assets", () => {
+      const { container } = renderComponent();
+      expect(container).toBeDefined();
+    });
+
+    it("should render with non-xcm assets", () => {
+      useFormContextMock.watch = vi.fn(
+        (key: MOCK_WATCH_TYPE) => WATCH_MOCK[key]
+      );
+
       const { container } = renderComponent();
       expect(container).toBeDefined();
     });
@@ -122,11 +150,35 @@ describe("AssetToSend", () => {
 
       act(() => {
         fireEvent.change(input, { target: { value: "10" } });
-      })
+      });
 
       await waitFor(() => {
         expect(functionMocks.setValue).toHaveBeenCalled();
       });
     });
   });
+
+  describe('select asset to send', () => {
+    it('should select new asset', async () => {
+      const { getByTestId } = renderComponent();
+
+      const assetToSendContainer = getByTestId('asset-to-send');
+
+      const assetToSendButton = assetToSendContainer.children[1]?.children[0]
+
+      act(() => {
+        fireEvent.click(assetToSendButton)
+      })
+
+      await waitFor(() => {
+        expect(getByTestId('filtered-items-container')).toBeDefined()
+      })
+
+      const filteredItems = getByTestId('filtered-items-container')
+
+      expect(filteredItems.children.length).toBeGreaterThan(0)
+
+
+    })
+  })
 });

@@ -1,30 +1,45 @@
-import { RequestSignIn, RequestValidatePassword } from "@src/entries/background/handlers/request-types";
+import {
+  RequestSignIn,
+  RequestValidatePassword,
+  RequestSetAutoLock
+} from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 
 export const authMessages = {
   isAuthorized: () => {
-    return sendMessage("pri(auth.isAuthorized)", null);
+    return sendMessage("pri(auth.isAuthorized)");
   },
   resetWallet: () => {
-    return sendMessage("pri(auth.resetWallet)", null);
+    return sendMessage("pri(auth.resetWallet)");
   },
   signIn: (params: RequestSignIn) => {
     return sendMessage("pri(auth.signIn)", params);
   },
   validatePassword: (param: RequestValidatePassword) => {
-    return sendMessage("pri(auth.validatePassword)", param)
+    return sendMessage("pri(auth.validatePassword)", param);
   },
+  unlock: () =>{
+    return sendMessage("pri(auth.unlock)")
+  },
+  setAutoLock : (param: RequestSetAutoLock) => { 
+    return sendMessage("pri(auth.setAutoLock)", param)
+  }
+  ,
+  getLock : () =>{
+    return sendMessage("pri(auth.getLock)")
+  }
+  ,
   signOut: () => {
-    return sendMessage("pri(auth.signOut)", null);
+    return sendMessage("pri(auth.signOut)");
   },
 
   alreadySignedUp: () => {
-    return sendMessage("pri(auth.alreadySignedUp)", null);
+    return sendMessage("pri(auth.alreadySignedUp)");
   },
   isSessionActive: () => {
-    return sendMessage("pri(auth.isSessionActive)", null);
+    return sendMessage("pri(auth.isSessionActive)");
   },
   showKey: () => {
-    return sendMessage("pri(auth.showKey)", null);
+    return sendMessage("pri(auth.showKey)");
   },
 };

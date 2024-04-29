@@ -17,6 +17,10 @@ export default class Assets extends BaseEntity {
     this.data = defaultAssetConfig;
   }
 
+  static getName() {
+    return "Assets";
+  }
+
   static async getDefaultValue<Assets>(): Promise<Assets> {
     return new Assets() as Assets;
   }

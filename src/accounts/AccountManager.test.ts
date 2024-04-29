@@ -141,6 +141,7 @@ describe("AccountManager", () => {
 
           return {
             data,
+            getAll: () => accountsMocks,
             get: (key: string) => accountsMocks.find((acc) => acc.key === key),
           };
         }),
@@ -168,14 +169,14 @@ describe("AccountManager", () => {
   });
 
   it("should create account", async () => {
-    const result = await AccountManager.createAccount(
-      selectedEVMAccountMock.value.name,
-      selectedEVMAccountMock.value.address,
-      AccountType.EVM,
-      {
+    const result = await AccountManager.createAccount({
+      address: selectedEVMAccountMock.value.address,
+      name: selectedEVMAccountMock.value.name,
+      type: AccountType.EVM,
+      keyring: {
         type: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
-      } as unknown as SupportedKeyring
-    );
+      } as unknown as SupportedKeyring,
+    });
     expect(result).toEqual(selectedEVMAccountMock);
   });
 
@@ -245,16 +246,25 @@ describe("AccountManager", () => {
     it("should return derived account", async () => {
       const Vault = (await import("@src/storage/entities/Vault")).default;
       Vault.getKeyring = vi.fn().mockReturnValue({
-        deriveKeyPair: () => "EVM-1234",
+        keyPairs: {
+          "0x12345": {
+            key: "0x1234",
+          },
+        },
+        getAddress: () => "0x12345",
       });
 
-      const result = await AccountManager.derive("Account", AccountType.EVM);
+      const result = await AccountManager.derive(
+        "",
+        AccountType.EVM,
+        "0x12345"
+      );
       expect(result).toMatchObject({
-        key: `${AccountType.EVM}-1234`,
+        key: `${AccountType.EVM}-0x12345`,
         type: AccountType.EVM,
         value: {
-          name: "Account",
-          address: "EVM-1234",
+          name: "Account 1",
+          address: "0x12345",
           keyring: undefined,
         },
       });
@@ -264,7 +274,7 @@ describe("AccountManager", () => {
       Vault.getKeyring = vi.fn().mockReturnValue(null);
 
       try {
-        await AccountManager.derive("Accoun", AccountType.EVM);
+        await AccountManager.derive("Accoun", AccountType.EVM, "0x12345");
       } catch (error) {
         expect(String(error)).toEqual(
           "Error: failed_to_derive_from_empty_keyring"

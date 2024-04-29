@@ -1,5 +1,5 @@
 import EVMKeyring from "./EVMKeyring";
-import { SupportedKeyring } from "../types";
+import { HDKeyPair, SupportedKeyring } from "../types";
 
 const mockMnemonic =
   "bag decide skirt parent embody rebuild parrot vapor bind dance assist say film swallow color";
@@ -14,7 +14,7 @@ describe("EVMKeyring", () => {
   it("should return address", () => {
     const evmKeyring = new EVMKeyring(mockMnemonic);
 
-    const address = evmKeyring.getAddress(evmKeyring.getNextAccountPath());
+    const address = evmKeyring.getAddress(mockMnemonic);
     expect(address).toBe("0x8792ae3fe19523E842888fE26a119d319a9A5Db5");
   });
 
@@ -26,11 +26,10 @@ describe("EVMKeyring", () => {
 
       evmKeyring.addKeyPair(addressMock, {
         path: "m/44'/60'/0'/0/0",
-      });
+        key: mockMnemonic,
+      } as HDKeyPair);
       const key = evmKeyring.getKey(addressMock);
-      expect(key).toBe(
-        "0x1d52e127c4c09cc6d398f2650d45e0a0cf68173763ace2dc6794bc23b7e2486e"
-      );
+      expect(key).toBe(mockMnemonic);
     });
 
     it("should throw error if key pair not found", () => {
@@ -67,7 +66,7 @@ describe("EVMKeyring", () => {
 
   it("should derive key pair", () => {
     const evmKeyring = new EVMKeyring(mockMnemonic);
-    const address = evmKeyring.deriveKeyPair();
+    const address = evmKeyring.deriveKeyPair(mockMnemonic, 0);
     expect(address).toBe("0x8792ae3fe19523E842888fE26a119d319a9A5Db5");
   });
 

@@ -8,10 +8,10 @@ import {
 } from "../../../tests/mocks/account-mocks";
 import { SettingType } from "../../../storage/entities/settings/types";
 import { SettingKey } from "../../../storage/entities/settings/types";
-import { CHAINS } from "../../../constants/chains";
 import Record from "../../../storage/entities/activity/Record";
 import { RecordStatus } from "../../../storage/entities/activity/types";
 import { selectedWASMChainMock } from "../../../tests/mocks/chain-mocks";
+import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 const accountManageMock = {
   saveBackup: vi.fn(),
@@ -248,8 +248,13 @@ describe("Extension", () => {
   });
 
   it("should be authorized", async () => {
+    const Vault = await import("../../../storage/entities/Vault");
+    Vault.default.getInstance = vi.fn().mockResolvedValue({
+      keyrings: {},
+    });
+
     const extension = new Extension();
-    const result = extension["isAuthorized"]();
+    const result = await extension["isAuthorized"]();
     expect(result).toBe(true);
   });
 
@@ -403,6 +408,11 @@ describe("Extension", () => {
   });
 
   it("signIn", async () => {
+    const Vault = await import("../../../storage/entities/Vault");
+    Vault.default.getInstance = vi.fn().mockResolvedValue({
+      keyrings: {},
+    });
+
     const extension = new Extension();
     const result = await extension["signIn"]({
       password: "Test.123",
@@ -461,6 +471,15 @@ describe("Extension", () => {
   });
 
   it("should session be active", async () => {
+    const Storage = await import("../../../storage/Storage");
+    Storage.default.getInstance = vi.fn().mockReturnValue({
+      storage: {
+        get: vi.fn(() => null),
+        set: vi.fn(),
+        remove: vi.fn(),
+      },
+    });
+
     const extension = new Extension();
     const result = await extension["isSessionActive"]();
     expect(result).toBe(true);
@@ -543,6 +562,7 @@ describe("Extension", () => {
     const result = await extension["deriveAccount"]({
       name: "derived-evm",
       type: AccountType.EVM,
+      address: "0x123",
     });
     expect(result).toMatchObject({
       key: "WASM-123",
@@ -573,23 +593,21 @@ describe("Extension", () => {
   });
 
   it("should return selected network", async () => {
+    const Storage = await import("../../../storage/Storage");
+    Storage.default.getInstance = vi.fn().mockReturnValue({
+      storage: {
+        get: vi.fn(() => null),
+        set: vi.fn(),
+        remove: vi.fn(),
+      },
+    });
+
     const _NetowrkMock = await import("../../../storage/entities/Network");
     _NetowrkMock.default.get = vi.fn().mockReturnValue(selectedEVMChainMock);
 
     const extension = new Extension();
     const result = await extension["getNetwork"]();
     expect(result).toMatchObject(selectedEVMChainMock);
-  });
-
-  it("should get network", async () => {
-    const _Network = (await import("../../../storage/entities/Network"))
-      .default;
-    const get = vi.fn();
-    _Network.get = get;
-
-    const extension = new Extension();
-    extension["getNetwork"]();
-    expect(get).toHaveBeenCalled();
   });
 
   describe("getGeneralSettings", () => {
@@ -926,37 +944,6 @@ describe("Extension", () => {
     expect(getRecords).toHaveBeenCalled();
   });
 
-  describe("getAllChains", () => {
-    it("should return all chains", async () => {
-      const _Chains = (await import("../../../storage/entities/Chains"))
-        .default;
-
-      const get = vi.fn().mockReturnValue(CHAINS);
-      _Chains.get = get;
-      _Chains.loadChains = vi.fn().mockReturnValue(undefined);
-
-      const extension = new Extension();
-      const result = await extension["getAllChains"]();
-      expect(result).toMatchObject(CHAINS);
-    });
-
-    it("should return error", async () => {
-      const _Chains = (await import("../../../storage/entities/Chains"))
-        .default;
-
-      const get = vi.fn().mockReturnValue(undefined);
-      _Chains.get = get;
-
-      try {
-        const extension = new Extension();
-        await extension["getAllChains"]();
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_chains");
-      }
-    });
-  });
-
   it("saveCustomChain", async () => {
     const _Chains = (await import("../../../storage/entities/Chains")).default;
 
@@ -964,7 +951,7 @@ describe("Extension", () => {
     _Chains.saveCustomChain = saveCustomChain;
 
     const extension = new Extension();
-    extension["saveCustomChain"]({ chain: CHAINS[0].chains[0] });
+    extension["saveCustomChain"]({ chain: SUBTRATE_CHAINS[0] });
     expect(saveCustomChain).toHaveBeenCalled();
   });
 
@@ -975,68 +962,8 @@ describe("Extension", () => {
     _Chains.removeCustomChain = removeCustomChain;
 
     const extension = new Extension();
-    extension["removeCustomChain"]({ chainName: CHAINS[0].chains[0].name });
+    extension["removeCustomChain"]({ chainName: SUBTRATE_CHAINS[0].name });
     expect(removeCustomChain).toHaveBeenCalled();
-  });
-
-  describe("getXCMChains", () => {
-    it("should return xcm chains", async () => {
-      const _Chains = (await import("../../../storage/entities/Chains"))
-        .default;
-
-      const getByName = vi.fn().mockReturnValue({ xcm: ["moonbeam"] });
-      const get = vi.fn().mockReturnValue({
-        getAll: () => ({
-          filter: vi.fn().mockReturnValue(CHAINS[0].chains),
-        }),
-      });
-      _Chains.getByName = getByName;
-      _Chains.get = get;
-
-      const extension = new Extension();
-      const result = await extension["getXCMChains"]({
-        chainName: CHAINS[0].chains[0].name,
-      });
-      expect(result).toMatchObject(CHAINS[0].chains);
-    });
-
-    it("should return chain error", async () => {
-      const _Chains = (await import("../../../storage/entities/Chains"))
-        .default;
-
-      const getByName = vi.fn().mockReturnValue({ xcm: undefined });
-      _Chains.getByName = getByName;
-
-      try {
-        const extension = new Extension();
-        await extension["getXCMChains"]({
-          chainName: CHAINS[0].chains[0].name,
-        });
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_chain");
-      }
-    });
-
-    it("should return chains error", async () => {
-      const _Chains = (await import("../../../storage/entities/Chains"))
-        .default;
-
-      const getByName = vi.fn().mockReturnValue({ xcm: [] });
-      const get = vi.fn().mockReturnValue(undefined);
-      _Chains.getByName = getByName;
-      _Chains.get = get;
-
-      try {
-        const extension = new Extension();
-        await extension["getXCMChains"]({
-          chainName: CHAINS[0].chains[0].name,
-        });
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_chains");
-      }
-    });
   });
 
   it("addActivity", async () => {
@@ -1079,7 +1006,7 @@ describe("Extension", () => {
 
     const extension = new Extension();
     await extension["addAsset"]({
-      chain: CHAINS[0].chains[0].name,
+      chain: SUBTRATE_CHAINS[0].name,
       asset: {} as unknown as {
         symbol: string;
         address: string;
@@ -1095,7 +1022,7 @@ describe("Extension", () => {
     _Assets.getByChain = getByChain;
 
     const extension = new Extension();
-    await extension["getAssetsByChain"]({ chain: CHAINS[0].chains[0].name });
+    await extension["getAssetsByChain"]({ chain: SUBTRATE_CHAINS[0].name });
     expect(getByChain).toHaveBeenCalled();
   });
 

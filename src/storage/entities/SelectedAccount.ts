@@ -4,9 +4,16 @@ import { AccountKey, AccountType, AccountValue } from "@src/accounts/types";
 import Account from "./Account";
 
 export default class SelectedAccount extends BaseEntity {
-
-  private constructor(public key: AccountKey, public value: AccountValue, public type: AccountType) {
+  private constructor(
+    public key: AccountKey,
+    public value: AccountValue,
+    public type: AccountType
+  ) {
     super();
+  }
+
+  static getName() {
+    return "SelectedAccount";
   }
 
   public static fromAccount(account: Account): SelectedAccount {

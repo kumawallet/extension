@@ -8,6 +8,10 @@ export default class TrustedSites extends BaseEntity {
     this.data = [];
   }
 
+  static getName() {
+    return "TrustedSites";
+  }
+
   static async getDefaultValue<TrustedSites>(): Promise<TrustedSites> {
     return new TrustedSites() as TrustedSites;
   }

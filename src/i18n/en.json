@@ -36,7 +36,8 @@
     "no_contacts_found": "No contacts added yet",
     "error": "An error has occurred",
     "rpc_error": "Network error",
-    "copy_to_clipboard": "Copy to clipboard"
+    "copy_to_clipboard": "Copy to clipboard",
+    "success": "Successful operation"
   },
   "welcome": {
     "welcome_message": "Your friendly multichain wallet to explore blockchain",
@@ -111,7 +112,7 @@
     "private_key_placeholder": "Enter private key"
   },
   "account": {
-    "title": "Account",
+    "title": "Account detail",
     "delete_message": "Are you sure you want to delete this account?",
     "account": "Account: ",
     "address": "Address",
@@ -119,7 +120,7 @@
     "seed_phrase": "Seed phrase",
     "private_alert": "Please note that anyone with your seed phrase can steal assets from your account",
     "cancel": "Cancel",
-    "continue": "Continue",
+    "delete": "Delete",
     "view_explorer": "View Explorer"
   },  
   "balance": {
@@ -134,13 +135,14 @@
       "mainnets": "Mainnets",
       "testnets": "Testnets",
       "custom": "Custom",
-      "search": "Search by name"
+      "search": "Search",
+      "title": "Networks",
+      "description": "Enable networks you wish to visualize your assets on"
     },
     "accounts": {
       "accounts": "Accounts",
       "import": "Import account",
       "create": "Create account"
-      
     },  
     "send": "Send",
     "swap": "Swap",
@@ -160,10 +162,17 @@
     "general": "General",
     "advanced": "Advanced",
     "contacts": "Contacts",
+    "address_book" : "Address book",
     "security": "Security",
+    "autolock": {
+      "title": "Set auto-lock time",
+      "minutes" : "min"
+        },
     "bug_report": "Bug report",
     "about_us": "About us",
-    "sign_out": "Sign out"
+    "sign_out": "Sign out",
+    "webside": "Webside"
+    
   },
   "general_settings": {
     "title": "General",
@@ -192,17 +201,19 @@
     "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
     "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
-  "adressBook": {
+  "address_book": {
     "title": "Address Book",
     "name": "Name",
     "address": "Address",
     "save_contact": "Save contact",
     "add_new_address": "Add new address",
+    "update_contact": "Edit Contact",
     "insert_name": "Name",
     "insert_address": "Address",
     "search": "Search",
     "new_contact": "Add Address",
-    "required": "Required"
+    "required": "Required",
+    "my_contacts" : "My Contacts"
   },
   "activity": {
     "title": "Activity",
@@ -215,8 +226,20 @@
   "activity_details":{
     "title": "Transaction detail",
     "xcm": "Transfer executed using XCM",
-    "explorer": "View on block explorer"
-
+    "explorer": "View on block explorer",
+    "hash" : "Hash",
+    "type" : "Type",
+    "status" :{ 
+      "name": "Status",
+      "complete": "Complete",
+      "failed": "Failed",
+      "in_process" : "In Process"},
+    "sender": "Sender",
+    "recipient" : "Recipient",
+    "network" : "Network",
+    "amount": "Amount",
+    "estimeted_fee" : "Estimated fee",
+    "tip" : "Tip"
   },
   "receive": {
     "title": "Share your address"
@@ -329,12 +352,17 @@
     "swapper_name": "Swapper name",
     "swapper_fee": "Swapper fee",
     "gas_fee": "Gas fee",
+    "estimated_fee": "Estimated fee",
     "destination_address": "Destination address",
     "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",
     "tx_send":"Transaction sent",
     "error_fetching_swaps": "Error fetching swaps",
     "error_setting_max_amount": "Error setting max amount",
-    "pair_not_supported": "Pair not supported"
+    "pair_not_supported": "Pair not supported",
+    "tx_confirm_info": "Info",
+    "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
+    "send_title": "Review Transfer",
+    "proceed": "Proceed"
   },
   "change_password": {
     "title": "Change your password",

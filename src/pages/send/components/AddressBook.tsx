@@ -5,6 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SendTxForm } from "../Send";
 import { LiaBookSolid } from "react-icons/lia";
+import { getHash } from "@src/pages/balance/components";
 
 interface AddressBookProps {
   contacts: Contact[];
@@ -45,7 +46,7 @@ export const AddressBook: FC<AddressBookProps> = ({ contacts, isLoading }) => {
             }}
           >
             <span>{item.name}</span>
-            <span>{item.address}</span>
+            <span>{getHash(item.address)}</span>
           </button>
         )}
       />

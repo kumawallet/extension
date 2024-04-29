@@ -16,6 +16,10 @@ export default class Registry extends BaseEntity {
     };
   }
 
+  static getName() {
+    return "Registry";
+  }
+
   static async getDefaultValue<Registry>(): Promise<Registry> {
     return new Registry() as Registry;
   }
@@ -37,12 +41,13 @@ export default class Registry extends BaseEntity {
     return registry.getContact(address);
   }
 
-  static async changeContactName(address: string, name: string) {
+  static async updateContact(address: string, name: string) {
     const registry = await Registry.get<Registry>();
     if (!registry) throw new Error("failed_to_update_contact");
     const contact = registry.getContact(address);
     if (!contact) throw new Error("contact_not_found");
     contact.name = name;
+    contact.address = address;
     await Registry.set<Registry>(registry);
   }
 

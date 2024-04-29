@@ -2,7 +2,6 @@ import {
   createContext,
   FC,
   PropsWithChildren,
-  useCallback,
   useContext,
   useEffect,
   useReducer,
@@ -124,70 +123,60 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const searchWasmTx = async (blockNumber: number, extHash: string) => {
-    let number = blockNumber;
-    let finish = false;
-    while (!finish) {
-      const _api = api as ApiPromise;
-      const hash = await _api.rpc.chain.getBlockHash(number);
-      const { block } = await _api.rpc.chain.getBlock(hash);
+    const _api = api as ApiPromise;
+    const hash = await _api.rpc.chain.getBlockHash(blockNumber);
+    const { block } = await _api.rpc.chain.getBlock(hash);
 
-      const apiAt = await _api.at(block.header.hash);
-      const allRecords = await apiAt.query.system.events();
+    const apiAt = await _api.at(block.header.hash);
+    const allRecords = await apiAt.query.system.events();
 
-      for (const [index, { hash }] of block.extrinsics.entries()) {
-        if (hash.toString() === extHash) {
-          Array.isArray(allRecords) &&
-            allRecords
-              .filter(
-                ({ phase }) =>
-                  phase.isApplyExtrinsic && phase.asApplyExtrinsic.eq(index)
-              )
-              .forEach(async ({ event }) => {
-                let status = RecordStatus.PENDING;
-                let error = undefined;
+    for (const [index, { hash }] of block.extrinsics.entries()) {
+      if (hash.toString() === extHash) {
+        Array.isArray(allRecords) &&
+          allRecords
+            .filter(
+              ({ phase }) =>
+                phase.isApplyExtrinsic && phase.asApplyExtrinsic.eq(index)
+            )
+            .forEach(async ({ event }) => {
+              let status = RecordStatus.PENDING;
+              let error = undefined;
 
-                if (api.events.system.ExtrinsicSuccess.is(event)) {
-                  status = RecordStatus.SUCCESS;
-                } else if (api.events.system.ExtrinsicFailed.is(event)) {
-                  const [dispatchError] = event.data;
+              if (api.events.system.ExtrinsicSuccess.is(event)) {
+                status = RecordStatus.SUCCESS;
+              } else if (api.events.system.ExtrinsicFailed.is(event)) {
+                const [dispatchError] = event.data;
 
-                  if (dispatchError.isModule) {
-                    const decoded = api.registry.findMetaError(
-                      dispatchError.asModule
-                    );
+                if (dispatchError.isModule) {
+                  const decoded = api.registry.findMetaError(
+                    dispatchError.asModule
+                  );
 
-                    error = `${decoded.section}.${decoded.name}`;
-                  } else {
-                    error = dispatchError.toString();
-                  }
-                  status = RecordStatus.FAIL;
+                  error = `${decoded.section}.${decoded.name}`;
+                } else {
+                  error = dispatchError.toString();
                 }
+                status = RecordStatus.FAIL;
+              }
 
-                const _hash = hash.toString();
+              const _hash = hash.toString();
 
-                await messageAPI.updateActivity({
-                  txHash: _hash,
+              await messageAPI.updateActivity({
+                txHash: _hash,
+                status,
+                error,
+              });
+
+              dispatch({
+                type: "update-activity-status",
+                payload: {
+                  hash: _hash,
                   status,
                   error,
-                });
-
-                dispatch({
-                  type: "update-activity-status",
-                  payload: {
-                    hash: _hash,
-                    status,
-                    error,
-                  },
-                });
+                },
               });
-          finish = true;
-          break;
-        }
-      }
-
-      number++;
-      if (number === blockNumber + 10) {
-        finish = true;
+            });
+        break;
       }
     }
   };
@@ -218,15 +207,16 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const processPendingTxs = async (activityArray: Record[]) => {
-    // for (const activity of activityArray) {
-    //   if (activity.status === RecordStatus.PENDING) {
-    //     if (activity.reference === "WASM") {
-    //       searchWasmTx(Number(activity?.fromBlock), activity.hash);
-    //     } else {
-    //       searchEvmTx(activity.hash);
-    //     }
-    //   }
-    // }
+    for (const activity of activityArray) {
+      if (activity.status === RecordStatus.PENDING) {
+        if (activity.reference === "WASM") {
+          // eslint-disable-next-line
+          searchWasmTx((activity as any)?.blockNumber, activity.hash);
+        } else {
+          searchEvmTx(activity.hash);
+        }
+      }
+    }
   };
 
   const activityListener = ({

@@ -24,7 +24,7 @@ export const Recipient: FC<RecipientProps> = ({ containerClassname = "" }) => {
           id="recipient"
           autoComplete="false"
           {...register("recipientAddress")}
-          className="border border-[#636669] bg-transparent text-white px-2 py-4  rounded-2xl"
+          className="border border-[#636669] bg-transparent text-white px-2 py-4  rounded-lg"
         />
       </div>
       <AddressBookOptions />

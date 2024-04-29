@@ -2,9 +2,9 @@ import i18n from "@src/utils/i18n";
 import { act, fireEvent, render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ManageAssets } from "./ManageAssets";
-import { CHAINS } from "@src/constants/chains";
 import { AccountType } from "@src/accounts/types";
 import { en } from "@src/i18n";
+import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 const renderComponent = () => {
   return render(
@@ -25,7 +25,7 @@ describe("ManageAssets", () => {
       }),
       useNetworkContext: () => ({
         state: {
-          selectedChain: CHAINS[0].chains[3],
+          selectedChain: EVM_CHAINS[0],
           type: AccountType.EVM,
           api: null
         },

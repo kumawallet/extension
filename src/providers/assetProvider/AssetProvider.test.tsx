@@ -7,13 +7,26 @@ import {
   reducer,
   useAssetContext,
 } from "./AssetProvider";
-import { selectedWASMChainMock } from "@src/tests/mocks/chain-mocks";
-import { AccountType } from "@src/accounts/types";
-import { stringToU8a } from "@polkadot/util";
 import { render, waitFor } from "@testing-library/react";
 import { BN0 } from "@src/constants/assets";
-import { NetworkProvider, useNetworkContext } from "@src/providers/networkProvider";
-import { AccountProvider, useAccountContext } from "@src/providers/accountProvider";
+import {
+  NetworkProvider,
+  useNetworkContext,
+} from "@src/providers/networkProvider";
+import {
+  AccountProvider,
+  useAccountContext,
+} from "@src/providers/accountProvider";
+import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { BigNumber } from "ethers";
+
+const networkProviderMock = vi.hoisted(() => ({
+  useNetworkContext: vi.fn(),
+}));
+
+const accountProviderMock = vi.hoisted(() => ({
+  useAccountContext: vi.fn()
+}))
 
 const testIds = {
   loadAssetsBtn: "load-assets-btn",
@@ -26,16 +39,25 @@ const TestComponent = () => {
     loadAssets,
   } = useAssetContext();
 
-  const { state: { api, selectedChain } } = useNetworkContext()
-  const { state: { selectedAccount } } = useAccountContext()
+  const {
+    state: { api, selectedChain },
+  } = useNetworkContext();
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
   return (
     <>
-      <button data-testid={testIds.loadAssetsBtn} onClick={() => loadAssets({
-        api,
-        selectedChain,
-        selectedAccount
-      })}>
+      <button
+        data-testid={testIds.loadAssetsBtn}
+        onClick={() =>
+          loadAssets({
+            api,
+            selectedChain,
+            selectedAccount,
+          })
+        }
+      >
         load assets
       </button>
       <div data-testid={testIds.assets}>{JSON.stringify(assets)}</div>
@@ -58,28 +80,7 @@ const renderComponent = () => {
 describe("AssetProvider", () => {
   beforeAll(() => {
     // mock useReducer
-    vi.mock("react", async () => {
-      const react = (await vi.importActual("react")) as typeof React;
-      return {
-        ...react,
-        useReducer: vi.fn().mockImplementation(() => {
-          return [
-            {
-              assets: [
-                {
-                  id: "-1",
-                  name: "DOT",
-                  symbol: "DOT",
-                  decimals: 10,
-                  balance: 100,
-                },
-              ],
-            },
-            vi.fn(),
-          ];
-        }),
-      };
-    });
+
 
     vi.mock("@src/messageAPI/api", async () => ({
       messageAPI: {
@@ -92,9 +93,8 @@ describe("AssetProvider", () => {
             address: "0x123",
           },
         ]),
-      }
-    }))
-
+      },
+    }));
 
     vi.mock("@polkadot/api-contract", () => {
       class ContractPromise {
@@ -117,103 +117,18 @@ describe("AssetProvider", () => {
     });
 
     vi.mock("@src/providers/networkProvider", () => ({
-      useNetworkContext: () => ({
-        state: {
-          selectedChain: selectedWASMChainMock,
-          rpc: "wss://rpc.testnet.near.org",
-          type: AccountType.WASM,
-          api: {
-            rpc: {
-              chain: {
-                subscribeNewHeads: (callback?: Function) => {
-                  callback?.();
-                },
-              },
-            },
-            registry: {
-              createType: () => "100_000_000_000",
-            },
-            query: {
-              system: {
-                account: (address: string, callback?: Function) => {
-                  address;
-
-                  const response = {
-                    data: {
-                      free: "100",
-                    },
-                  };
-
-                  if (callback) {
-                    callback(response);
-                  } else {
-                    return response;
-                  }
-                },
-              },
-              assets: {
-                metadata: {
-                  entries: () => [
-                    [
-                      {
-                        args: [1], // id = 1
-                      },
-                      {
-                        name: stringToU8a("Asset 1"),
-                        symbol: stringToU8a("USD"),
-                        decimals: 2,
-                      },
-                    ],
-                  ],
-                },
-                account: async (
-                  assetId: number,
-                  address: string,
-                  callback?: Function
-                ) => {
-                  const response = {
-                    toJSON: () => ({
-                      balance: new BN(100),
-                    }),
-                  };
-
-                  if (callback) {
-                    callback(response);
-                  } else {
-                    return Promise.resolve(response);
-                  }
-                },
-              },
-            },
-          },
-        },
-      }),
-
-
+      useNetworkContext: networkProviderMock.useNetworkContext,
       NetworkProvider: ({ children }: { children: React.ReactNode }) => {
         return <>{children}</>;
-      }
-
+      },
     }));
 
     vi.mock("@src/providers/accountProvider", () => ({
-      useAccountContext: () => ({
-        state: {
-          selectedAccount: {
-            key: "WASM-5FFNZWjJxsaBJr3P2hsfSZnw9PxB8yCwQW6EWjyyrQW1QYyF",
-            value: {
-              name: "asd",
-              keyring: "WASM-5FFNZWjJxsaBJr3P2hsfSZnw9PxB8yCwQW6EWjyyrQW1QYyF",
-              address: "1",
-            },
-            type: "WASM",
-          },
-        },
-      }),
+      useAccountContext: accountProviderMock.useAccountContext,
       AccountProvider: ({ children }: { children: React.ReactNode }) => {
         return <>{children}</>;
-      }
-    }))
+      },
+    }));
 
     vi.mock("@src/utils/assets", async () => {
       const assetUtils = (await vi.importActual("@src/utils/assets")) as Record<
@@ -229,7 +144,25 @@ describe("AssetProvider", () => {
       };
     });
 
+    vi.mock("ethers", async () => {
+      const actual = await vi.importActual("ethers");
+      return {
+        ...actual,
+        Contract: class {
+          constructor() { }
 
+          balanceOf() {
+            return Promise.resolve(BigNumber.from("100"));
+          }
+
+          removeAllListeners() { }
+
+          on(key: string, cb: () => {}) {
+            cb();
+          }
+        },
+      };
+    });
   });
 
   describe("reducer", () => {
@@ -454,12 +387,136 @@ describe("AssetProvider", () => {
   });
 
   describe("wasm assets", () => {
+    beforeAll(() => {
+      const astar = SUBTRATE_CHAINS[2];
+
+      accountProviderMock.useAccountContext.mockReturnValue({
+        state: {
+          selectedAccount: {
+            key: "WASM-5FFNZWjJxsaBJr3P2hsfSZnw9PxB8yCwQW6EWjyyrQW1QYyF",
+            value: {
+              name: "asd",
+              keyring: "WASM-5FFNZWjJxsaBJr3P2hsfSZnw9PxB8yCwQW6EWjyyrQW1QYyF",
+              address: "1",
+            },
+            type: "WASM",
+          },
+        },
+      })
+
+      networkProviderMock.useNetworkContext.mockReturnValue({
+        state: {
+          selectedChain: astar,
+          api: {
+            rpc: {
+              chain: {
+                subscribeNewHeads: (callback?: Function) => {
+                  callback?.();
+                },
+              },
+            },
+            registry: {
+              createType: () => "100_000_000_000",
+            },
+            query: {
+              system: {
+                account: (address: string, callback?: Function) => {
+                  address;
+
+                  const response = {
+                    data: {
+                      free: "100",
+                      reserved: "100",
+                      miscFrozen: "0",
+                      frozen: "0",
+                      feeFrozen: "0",
+                    },
+                  };
+
+                  if (callback) {
+                    callback(response);
+                  } else {
+                    return response;
+                  }
+                },
+              },
+              assets: {
+                account: async (
+                  assetId: number,
+                  address: string,
+                  callback?: Function
+                ) => {
+                  const response = {
+                    toJSON: () => ({
+                      balance: new BN(100),
+                    }),
+                  };
+
+                  if (callback) {
+                    callback(response);
+                  } else {
+                    return Promise.resolve(response);
+                  }
+                },
+              },
+            },
+          },
+        },
+      });
+    })
+
     it("should load assests", async () => {
+
+
       const { getByTestId } = renderComponent();
 
       await waitFor(() => {
         const assets = getByTestId(testIds.assets);
-        expect(assets.innerHTML).contain("DOT");
+        expect(assets.innerHTML).contain("ASTR");
+      });
+    });
+  });
+
+  describe("evm assets", () => {
+    beforeAll(() => {
+      const ethereum = EVM_CHAINS[0];
+
+      accountProviderMock.useAccountContext.mockReturnValue({
+        state: {
+          selectedAccount: {
+            key: "evm-0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+            value: {
+              name: "asd",
+              keyring: "evm-0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+              address: "1",
+            },
+            type: "evm",
+          },
+        },
+      })
+
+      networkProviderMock.useNetworkContext.mockReturnValue({
+        state: {
+          selectedChain: ethereum,
+          api: {
+            getBalance: vi.fn().mockResolvedValue(BigNumber.from("100")),
+            off: () => { },
+            on: (key: string, cb: () => {}) => {
+              cb();
+            },
+          },
+        },
+      });
+    })
+
+    it("should load assests", async () => {
+
+
+      const { getByTestId } = renderComponent();
+
+      await waitFor(() => {
+        const assets = getByTestId(testIds.assets);
+        expect(assets.innerHTML).contain("ETH");
       });
     });
   });

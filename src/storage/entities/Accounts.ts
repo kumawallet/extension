@@ -10,6 +10,10 @@ export default class Accounts extends BaseEntity {
     this.data = {};
   }
 
+  static getName() {
+    return "Accounts";
+  }
+
   static async init() {
     await Accounts.set<Accounts>(new Accounts());
   }
@@ -20,6 +24,10 @@ export default class Accounts extends BaseEntity {
     accounts.update(account.key, account.value);
     await Accounts.set<Accounts>(accounts);
     return account;
+  }
+
+  static async updateAll(accounts: Accounts) {
+    await Accounts.set<Accounts>(accounts);
   }
 
   static async removeAccount(key: AccountKey) {

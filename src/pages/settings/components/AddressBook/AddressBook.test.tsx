@@ -99,7 +99,7 @@ describe("AddressBook", () => {
       });
     });
 
-    const saveButton = getByTestId("save");
+    const saveButton = getByTestId("save-button");
     act(() => {
       fireEvent.click(saveButton);
     });

@@ -175,7 +175,7 @@ describe("assets", () => {
           },
         },
       } as unknown;
-      const CHAIN_NAME = "Astar";
+      const CHAIN_NAME = "astar";
       const ADDRESS = "Yk1P3zKpYzkx5Ppvfs9PmE1KoqdfVshvzE2f7GTeT6uEmg5";
       const dispatchMock = vi.fn();
 
@@ -187,7 +187,7 @@ describe("assets", () => {
       );
 
       expect(result.assets[0].symbol).toEqual(
-        SUBSTRATE_ASSETS_MAP["Astar"][0].symbol
+        SUBSTRATE_ASSETS_MAP["astar"][0].symbol
       );
     });
 
@@ -236,7 +236,7 @@ describe("assets", () => {
           },
         },
       } as unknown;
-      const CHAIN_NAME = "Acala";
+      const CHAIN_NAME = "acala";
       const ADDRESS = "23gJg1hLk1NPjNR9TLGGHGZ8ZEZ6wR2JsgzgjXUxxj5Le5WZ";
       const dispatchMock = vi.fn();
 
@@ -248,7 +248,7 @@ describe("assets", () => {
       );
 
       expect(result.assets[0].symbol).toMatchObject(
-        SUBSTRATE_ASSETS_MAP["Acala"][0].symbol
+        SUBSTRATE_ASSETS_MAP["acala"][0].symbol
       );
     });
   });

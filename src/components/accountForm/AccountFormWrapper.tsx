@@ -29,8 +29,8 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
 
   return (
     <PageWrapper
-      contentClassName="flex-1 !py-0 !px-0 md:px-0  md:pb-0 bg-[#1F1432] snap-none"
-      innerContentClassName="!static z-0 !max-w-[584px] !px-0"
+      contentClassName="flex-1 !py-0 !px-0 md:px-0  md:pb-0  snap-none !bg-[#1F1432]"
+      innerContentClassName="!static z-0 !max-w-[584px] !px-0 border-none !py-0 !bg-[#1F1432]"
     >
       <ColoredBackground
         bg1ClassName="z-[-1] h-[unset] w-[unset]"

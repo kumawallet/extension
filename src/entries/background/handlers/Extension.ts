@@ -18,18 +18,16 @@ import Registry from "@src/storage/entities/registry/Registry";
 import Contact from "@src/storage/entities/registry/Contact";
 import Record from "@src/storage/entities/activity/Record";
 import Activity from "@src/storage/entities/activity/Activity";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import Swap from "@src/storage/entities/registry/Swap";
-import { AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
   RequestAddActivity,
   RequestAddAsset,
-  RequestAddSwap,
   RequestAddTrustedSite,
   RequestChangeAccountName,
   RequestChangePassword,
@@ -39,7 +37,6 @@ import {
   RequestGetAllAccounts,
   RequestGetAssetsByChain,
   RequestGetSetting,
-  RequestGetXCMChains,
   RequestImportAccount,
   RequestRemoveAccout,
   RequestRemoveContact,
@@ -52,22 +49,24 @@ import {
   RequestSetNetwork,
   RequestSignIn,
   RequestSignUp,
-  RequestSwapProtocol,
   RequestTypes,
   RequestUpdateActivity,
   RequestUpdateSetting,
   RequestValidatePassword,
+  RequestSetAutoLock,
   ResponseType,
+  RequestUpdateContact,
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import PolkadotKeyring from "@polkadot/ui-keyring";
+import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
-import { Transaction } from "@src/types";
+import { Chain, Transaction } from "@src/types";
 import { transformAddress } from "@src/utils/account-utils";
+import { Port } from "./types";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -101,7 +100,13 @@ export default class Extension {
       throw new Error("private_key_or_seed_invalid");
   }
 
-  private isAuthorized(): boolean {
+  private async isAuthorized(): Promise<boolean> {
+    const isAuthorized = Auth.isAuthorized();
+
+    if (isAuthorized) {
+      await this.migrateAccouts();
+    }
+
     return Auth.isAuthorized();
   }
 
@@ -150,6 +155,7 @@ export default class Extension {
         privateKeyOrSeed: seed,
       });
     }
+
     const wasmAccount = await AccountManager.addAccount(
       AccountType.WASM,
       seed,
@@ -207,8 +213,19 @@ export default class Extension {
 
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
+    await this.migrateAccouts();
   }
 
+  private async setAutoLock({ time }: RequestSetAutoLock) {
+    await Auth.setAutoLock(time);
+  }
+  private async unlock() {
+    await Auth.unLock();
+  }
+  private async getLock() {
+    const lock = await Auth.getLock();
+    return lock;
+  }
   private async validatePassword({
     password,
     key,
@@ -240,6 +257,26 @@ export default class Extension {
   }
 
   private async isSessionActive() {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Auth") return false;
+        const object = Allstored[key];
+
+        if (object.timeout > -1) {
+          return true;
+        }
+      });
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Network"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     return Auth.isSessionActive();
   }
 
@@ -260,9 +297,96 @@ export default class Extension {
     return AccountManager.getAccount(key);
   }
 
+  private migrateAccouts = async () => {
+    const vault = await Vault.getInstance();
+
+    // @ts-expect-error --- migration
+    const needToMigrated = Boolean(vault.keyrings["WASM"]?.mnemonic);
+
+    if (!needToMigrated) return;
+
+    const accounts = await AccountManager.getAll();
+
+    // @ts-expect-error --- migration
+
+    Object.keys(vault.keyrings).forEach(async (key: AccountType) => {
+      const _keyring = vault.keyrings[key];
+
+      // @ts-expect-error --- migration
+
+      const hasMnemonicInRoot = Boolean(_keyring?.mnemonic);
+
+      if (hasMnemonicInRoot && _keyring) {
+        // @ts-expect-error --- migration
+
+        const mnemonic = _keyring.mnemonic;
+
+        let parentAddress = "";
+
+        parentAddress =
+          Object.keys(_keyring.keyPairs).find((address) => {
+            return (
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "/0" ||
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "m/44'/60'/0'/0/0"
+            );
+          }) || "";
+
+        // @ts-expect-error --- migration
+
+        _keyring.mnemonic = "";
+
+        if (!parentAddress) return;
+
+        Object.keys(_keyring.keyPairs).forEach(async (address: string) => {
+          if (!_keyring.keyPairs[address].key && address === parentAddress) {
+            _keyring.keyPairs[address].key = mnemonic;
+          } else {
+            // delete _keyring.keyPairs[address];
+
+            // @ts-expect-error --- migration
+
+            const keyFound = Object.keys(accounts?.data).find(
+              // @ts-expect-error --- migration
+
+              (_key: AccountKey) => _key === `${key}-${address}`
+            );
+
+            if (keyFound) {
+              // @ts-expect-error --- migration
+
+              accounts!.data[keyFound].value.parentAddress = parentAddress;
+            }
+          }
+        });
+      }
+    });
+
+    await Accounts.updateAll(accounts!);
+
+    vault.setKeyrings(vault.keyrings);
+  };
+
+  private getAccountsToDerive = async () => {
+    const accounts = (await AccountManager.getAll())?.getAll() || [];
+    if (!accounts) return [];
+
+    const accountWithoutParentAddress = accounts.filter(
+      ({ value, type }) =>
+        !value.parentAddress && type !== AccountType.IMPORTED_EVM
+    );
+
+    return accountWithoutParentAddress;
+  };
+
   private async getAllAccounts({
     type = null,
   }: RequestGetAllAccounts): Promise<Account[]> {
+    // migrations
+
     const accounts = await AccountManager.getAll(type);
     if (!accounts) return [];
     return accounts.getAll();
@@ -271,8 +395,9 @@ export default class Extension {
   private async deriveAccount({
     name,
     type,
+    address,
   }: RequestDeriveAccount): Promise<Account> {
-    const account = await AccountManager.derive(name, type);
+    const account = await AccountManager.derive(name, type, address);
     await this.setSelectedAccount(account);
     return account;
   }
@@ -295,6 +420,26 @@ export default class Extension {
   }
 
   private async getNetwork(): Promise<Network> {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Network") return false;
+        const object = Allstored[key];
+
+        if (object.chain) {
+          return true;
+        }
+      });
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Network"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     return Network.get<Network>();
   }
 
@@ -337,8 +482,7 @@ export default class Extension {
     if (!registry) throw new Error("failed_to_get_registry");
     const { chain } = await Network.get<Network>();
     if (!chain) throw new Error("failed_to_get_network");
-    const types = chain.supportedAccounts || [];
-    const accounts = await AccountManager.getAll(types);
+    const accounts = await AccountManager.getAll();
     if (!accounts) throw new Error("failed_to_get_accounts");
     return {
       ownAccounts: accounts
@@ -359,19 +503,21 @@ export default class Extension {
     await Registry.removeContact(address);
   }
 
+  private async updateContact({ address, name }: RequestUpdateContact) {
+    await Registry.updateContact(address, name);
+  }
+
   private async getHistoricActivity() {
     const selectedAccount = await SelectedAccount.get<SelectedAccount>();
     const selectedChain = await Network.get<Network>();
 
     const address = selectedAccount?.value.address;
-    // @ts-expect-error -- *
     const chainPrefix = selectedChain?.chain?.prefix;
 
     // @ts-expect-error -- *
     const formatedAddress = transformAddress(address, chainPrefix || 0);
 
     return await getChainHistoricHandler({
-      // @ts-expect-error -- *
       chainId: selectedChain!.chain!.id,
       address: formatedAddress,
     });
@@ -379,43 +525,6 @@ export default class Extension {
 
   private async getActivity(): Promise<Record[]> {
     return Activity.getRecords();
-  }
-
-  private async getAllChains(): Promise<Chains> {
-    const newChains = await Chains.loadChains();
-    const chains = await Chains.get<Chains>();
-    if (!chains) throw new Error("failed_to_get_chains");
-
-    if (newChains) {
-      const network = await Network.get<Network>();
-      const selectedNetwork = network.chain;
-      const selectedNetworkInMainnets = newChains.mainnets.find(
-        (chain) =>
-          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
-      );
-
-      const selectedNetworkInTestnets = newChains.testnets.find(
-        (chain) =>
-          chain.nativeCurrency.symbol === selectedNetwork?.nativeCurrency.symbol
-      );
-
-      let chainToUpdate = null;
-
-      if (selectedNetworkInMainnets) {
-        chainToUpdate = selectedNetworkInMainnets;
-      }
-
-      if (selectedNetworkInTestnets) {
-        chainToUpdate = selectedNetworkInTestnets;
-      }
-
-      if (chainToUpdate) {
-        network.chain = chainToUpdate;
-        await Network.set<Network>(network);
-      }
-    }
-
-    return chains;
   }
 
   private async saveCustomChain({ chain }: RequestSaveCustomChain) {
@@ -427,19 +536,28 @@ export default class Extension {
   }
 
   private async getCustomChains(): Promise<Chain[]> {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate chains
+      const foundOldVaultKey = Object.keys(Allstored).find((key) => {
+        if (key === "Chains") return false;
+        const object = Allstored[key];
+
+        if (object.custom) {
+          return true;
+        }
+      });
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ ["Chains"]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+
     const chains = await Chains.get<Chains>();
     if (!chains) throw new Error("failed_to_get_chains");
     return chains.custom;
-  }
-
-  private async getXCMChains({
-    chainName,
-  }: RequestGetXCMChains): Promise<Chain[]> {
-    const { xcm } = (await Chains.getByName(chainName)) || {};
-    if (!xcm) throw new Error("failed_to_get_chain");
-    const chains = await Chains.get<Chains>();
-    if (!chains) throw new Error("failed_to_get_chains");
-    return chains.getAll().filter((chain) => xcm.includes(chain.name));
   }
 
   private async addActivity({ txHash, record }: RequestAddActivity) {
@@ -479,14 +597,6 @@ export default class Extension {
     return TrustedSites.removeSite(site);
   }
 
-  private async getSwapsByProtocol({ protocol }: RequestSwapProtocol) {
-    return Swap.getSwapsByProtocol(protocol);
-  }
-
-  private async addSwap({ protocol, swap }: RequestAddSwap) {
-    return Swap.addSwap(protocol, swap);
-  }
-
   private async sendSubstrateTx({
     amount,
     asset,
@@ -502,7 +612,7 @@ export default class Extension {
     try {
       const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
       const seed = await this.showKey();
-      const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
+      const sender = keyring.keyring.addFromMnemonic(seed as string);
       const { block } = await provider.rpc.chain.getBlock();
 
       const unsub = await provider.tx(hexExtrinsic).signAndSend(
@@ -727,17 +837,16 @@ export default class Extension {
     });
   }
 
-  private ping() {
-    return "pong";
-  }
-
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
-    request: RequestTypes[TMessageType]
-    // port: Port
+    request: RequestTypes[TMessageType],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    port: Port
   ): Promise<ResponseType<TMessageType>> {
     switch (type) {
+      case "pri(accounts.getAccountsToDerive)":
+        return this.getAccountsToDerive();
       case "pri(accounts.createAccounts)":
         return this.createAccounts(request as RequestCreateAccount);
       case "pri(accounts.importAccount)":
@@ -769,6 +878,12 @@ export default class Extension {
         return this.signIn(request as RequestSignIn);
       case "pri(auth.validatePassword)":
         return this.validatePassword(request as RequestValidatePassword);
+      case "pri(auth.setAutoLock)":
+        return this.setAutoLock(request as RequestSetAutoLock);
+      case "pri(auth.unlock)":
+        return this.unlock();
+      case "pri(auth.getLock)":
+        return this.getLock();
       case "pri(auth.signOut)":
         return this.signOut();
       case "pri(auth.alreadySignedUp)":
@@ -782,16 +897,12 @@ export default class Extension {
         return this.setNetwork(request as RequestSetNetwork);
       case "pri(network.getNetwork)":
         return this.getNetwork();
-      case "pri(network.getAllChains)":
-        return this.getAllChains();
       case "pri(network.saveCustomChain)":
         return this.saveCustomChain(request as RequestSaveCustomChain);
       case "pri(network.removeCustomChain)":
         return this.removeCustomChain(request as RequestRemoveCustomChain);
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
-      case "pri(network.getXCMChains)":
-        return this.getXCMChains(request as RequestGetXCMChains);
 
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
@@ -808,6 +919,8 @@ export default class Extension {
         return this.getRegistryAddresses();
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
+      case "pri(contacts.updateContact)":
+        return this.updateContact(request as RequestUpdateContact);
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
@@ -832,18 +945,10 @@ export default class Extension {
       case "pri(trustedSites.removeTrustedSite)":
         return this.removeTrustedSite(request as RequestRemoveTrustedSite);
 
-      case "pri(swap.getSwapsByProtocol)":
-        return this.getSwapsByProtocol(request as RequestSwapProtocol);
-      case "pri(swap.addSwap)":
-        return this.addSwap(request as RequestAddSwap);
-
       case "pri(send.sendSubstrateTx)":
         return this.sendSubstrateTx(request as RequestSendSubstrateTx);
       case "pri(send.sendEvmTx)":
         return this.sendEvmTx(request as RequestSendEvmTx);
-
-      case "pri(ping)":
-        return this.ping();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

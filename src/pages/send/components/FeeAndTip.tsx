@@ -335,9 +335,9 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
 
         <div className="py-1">
 
-          <div className="flex items-center p-2 border border-[#636669] rounded-2xl">
+          <div className="flex items-center p-2 border border-[#636669] rounded-lg">
             <NumericFormat
-              className="bg-transparent text-[#9CA3AF] outline-none border-none px-1 text-lg w-[2ch]"
+              className="bg-transparent text-[#9CA3AF] outline-none border-none px-1 text-base w-[2ch]"
               onValueChange={({ value }) => {
                 setValue("tip", value);
               }}
@@ -348,8 +348,8 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
                   (e.currentTarget.value.length || 1) + 1 + "ch";
               }}
             />
-            <span className="text-[#FEFDFD]">{targetNetwork.symbol}</span>
-            in</div>
+            <span className="text-[#FEFDFD] text-base">{targetNetwork.symbol}</span>
+            </div>
         </div>
       )}
     </div>
