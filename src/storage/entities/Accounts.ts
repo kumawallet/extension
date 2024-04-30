@@ -26,6 +26,10 @@ export default class Accounts extends BaseEntity {
     return account;
   }
 
+  static async updateAll(accounts: Accounts) {
+    await Accounts.set<Accounts>(accounts);
+  }
+
   static async removeAccount(key: AccountKey) {
     const accounts = await Accounts.get<Accounts>();
     if (!accounts) throw new Error("failed_to_remove_account");

@@ -25,6 +25,8 @@ describe("SubqueryHandler", () => {
         },
       };
     });
+
+    global.fetch = vi.fn();
   });
 
   describe("instance", () => {

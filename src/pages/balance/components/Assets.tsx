@@ -1,10 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
 import {
   useAssetContext,
-  useNetworkContext
 } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
@@ -15,9 +14,6 @@ export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
-    state: { api, selectedChain },
-  } = useNetworkContext();
-  const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
 
@@ -25,42 +21,19 @@ export const Assets = () => {
   const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    let _assets = [...assets];
-
-    if (!showAllAssets) {
-      _assets = _assets.filter((asset) => {
-        if (asset.id === "-1") return true;
-
-        return asset.balance > 0;
-      });
+    if(Object.keys(assets).length !== 0){
+      return Object.values(assets).reduce(
+        (assts : any, allAssets : any) =>{
+          if (!showAllAssets) {
+            const filtered = allAssets.filter((asset: any) => asset.id === "-1");
+            return assts.concat(filtered);
+            }
+            else {
+              return assts.concat(allAssets);
+            }
+          })
     }
-
-    // order by balance, id === -1 should be first
-    _assets.sort((a, b) => {
-      if (a.id === "-1") return -1;
-      if (b.id === "-1") return 1;
-
-      return b.balance - a.balance;
-    });
-
-    return _assets;
-  }, [assets, showAllAssets]);
-
-  useEffect(() => {
-    if (!api) {
-      setShowManageAssets(false);
-      return;
-    }
-
-    if (selectedChain?.type === "evm") {
-      setShowManageAssets(true);
-    }
-
-    // if (selectedChain?.type === "substrate" && (api as ApiPromise).query.contracts) {
-    //   setShowManageAssets(true);
-    // }
-  }, [api]);
-
+      }, [JSON.stringify(assets),showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -88,7 +61,7 @@ export const Assets = () => {
 
       {isLoadingAssets && <Loading />}
 
-      {filteredAsset.map((asset, index) => (
+      {filteredAsset && filteredAsset?.length !==0 && filteredAsset.map((asset, index) => (
         <Asset asset={asset} key={index} />
       ))}
 

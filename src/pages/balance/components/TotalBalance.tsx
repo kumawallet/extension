@@ -5,7 +5,6 @@ import { formatAmountWithDecimals, getCurrencyInfo } from "@src/utils/assets";
 import {
   useAccountContext,
   useAssetContext,
-  useNetworkContext,
 } from "@src/providers";
 
 interface TotalBalanceProps {
@@ -31,10 +30,13 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
 
 
-  const totalBalance = assets.reduce(
-    (total, item) => total + (item.amount || 0),
-    0
-  );
+  const totalBalance = () => {
+   return Object.values(assets).reduce((total: number, network : any) => {
+        return total + network.reduce((subTotal: number, asset: any) => {
+            return subTotal + asset?.amount || 0;
+        }, 0);
+      },0) 
+  }
 
   const toggleBalance = () => setShowBalance(!showBalance);
 
@@ -65,7 +67,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           <p className="text-2xl">{currencyLogo}</p>
           <p className="text-5xl" data-testid="balance">
             {showBalance
-              ? formatAmountWithDecimals(totalBalance, 5) || "0"
+              ? totalBalance()|| "0"
               : "***"}
           </p>
         </div>

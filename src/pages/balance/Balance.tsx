@@ -48,6 +48,8 @@ export const Balance = () => {
   }, [selectedChain?.name]);
 
 
+
+
   return (
     <>
       <Header />
@@ -91,7 +93,7 @@ export const Balance = () => {
                 <Activity />
               </Tab.Panel>
             </Tab.Panels>
-            
+
           </Tab.Group>
         </div>
       </PageWrapper>

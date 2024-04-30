@@ -22,7 +22,7 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import { AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType } from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
@@ -56,11 +56,10 @@ import {
   RequestSetAutoLock,
   ResponseType,
   RequestUpdateContact,
-  RequestDeleteSelectNetwork
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import PolkadotKeyring from "@polkadot/ui-keyring";
+import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
@@ -107,7 +106,13 @@ export default class Extension {
       throw new Error("private_key_or_seed_invalid");
   }
 
-  private isAuthorized(): boolean {
+  private async isAuthorized(): Promise<boolean> {
+    const isAuthorized = Auth.isAuthorized();
+
+    if (isAuthorized) {
+      await this.migrateAccouts();
+    }
+
     return Auth.isAuthorized();
   }
 
@@ -156,6 +161,7 @@ export default class Extension {
         privateKeyOrSeed: seed,
       });
     }
+
     const wasmAccount = await AccountManager.addAccount(
       AccountType.WASM,
       seed,
@@ -213,15 +219,17 @@ export default class Extension {
 
   private async signIn({ password }: RequestSignIn) {
     await Auth.signIn(password);
+    await this.migrateAccouts();
   }
-  private async setAutoLock ({ time }: RequestSetAutoLock){
+
+  private async setAutoLock({ time }: RequestSetAutoLock) {
     await Auth.setAutoLock(time);
   }
-  private async unlock(){
-    await Auth.unLock()
+  private async unlock() {
+    await Auth.unLock();
   }
   private async getLock() {
-    const lock = await Auth.getLock()
+    const lock = await Auth.getLock();
     return lock;
   }
   private async validatePassword({
@@ -295,9 +303,96 @@ export default class Extension {
     return AccountManager.getAccount(key);
   }
 
+  private migrateAccouts = async () => {
+    const vault = await Vault.getInstance();
+
+    // @ts-expect-error --- migration
+    const needToMigrated = Boolean(vault.keyrings["WASM"]?.mnemonic);
+
+    if (!needToMigrated) return;
+
+    const accounts = await AccountManager.getAll();
+
+    // @ts-expect-error --- migration
+
+    Object.keys(vault.keyrings).forEach(async (key: AccountType) => {
+      const _keyring = vault.keyrings[key];
+
+      // @ts-expect-error --- migration
+
+      const hasMnemonicInRoot = Boolean(_keyring?.mnemonic);
+
+      if (hasMnemonicInRoot && _keyring) {
+        // @ts-expect-error --- migration
+
+        const mnemonic = _keyring.mnemonic;
+
+        let parentAddress = "";
+
+        parentAddress =
+          Object.keys(_keyring.keyPairs).find((address) => {
+            return (
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "/0" ||
+              // @ts-expect-error --- migration
+
+              _keyring.keyPairs[address].path === "m/44'/60'/0'/0/0"
+            );
+          }) || "";
+
+        // @ts-expect-error --- migration
+
+        _keyring.mnemonic = "";
+
+        if (!parentAddress) return;
+
+        Object.keys(_keyring.keyPairs).forEach(async (address: string) => {
+          if (!_keyring.keyPairs[address].key && address === parentAddress) {
+            _keyring.keyPairs[address].key = mnemonic;
+          } else {
+            // delete _keyring.keyPairs[address];
+
+            // @ts-expect-error --- migration
+
+            const keyFound = Object.keys(accounts?.data).find(
+              // @ts-expect-error --- migration
+
+              (_key: AccountKey) => _key === `${key}-${address}`
+            );
+
+            if (keyFound) {
+              // @ts-expect-error --- migration
+
+              accounts!.data[keyFound].value.parentAddress = parentAddress;
+            }
+          }
+        });
+      }
+    });
+
+    await Accounts.updateAll(accounts!);
+
+    vault.setKeyrings(vault.keyrings);
+  };
+
+  private getAccountsToDerive = async () => {
+    const accounts = (await AccountManager.getAll())?.getAll() || [];
+    if (!accounts) return [];
+
+    const accountWithoutParentAddress = accounts.filter(
+      ({ value, type }) =>
+        !value.parentAddress && type !== AccountType.IMPORTED_EVM
+    );
+
+    return accountWithoutParentAddress;
+  };
+
   private async getAllAccounts({
     type = null,
   }: RequestGetAllAccounts): Promise<Account[]> {
+    // migrations
+
     const accounts = await AccountManager.getAll(type);
     if (!accounts) return [];
     return accounts.getAll();
@@ -306,8 +401,9 @@ export default class Extension {
   private async deriveAccount({
     name,
     type,
+    address,
   }: RequestDeriveAccount): Promise<Account> {
-    const account = await AccountManager.derive(name, type);
+    const account = await AccountManager.derive(name, type, address);
     await this.setSelectedAccount(account);
     return account;
   }
@@ -442,8 +538,8 @@ export default class Extension {
     await Registry.removeContact(address);
   }
 
-  private async updateContact({address, name}:RequestUpdateContact){
-    await Registry.updateContact (address,name);
+  private async updateContact({ address, name }: RequestUpdateContact) {
+    await Registry.updateContact(address, name);
   }
 
   // private async getHistoricActivity() {
@@ -551,7 +647,7 @@ export default class Extension {
     try {
       const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
       const seed = await this.showKey();
-      const sender = PolkadotKeyring.keyring.addFromMnemonic(seed as string);
+      const sender = keyring.keyring.addFromMnemonic(seed as string);
       const { block } = await provider.rpc.chain.getBlock();
 
       const unsub = await provider.tx(hexExtrinsic).signAndSend(
@@ -784,6 +880,8 @@ export default class Extension {
     port: Port
   ): Promise<ResponseType<TMessageType>> {
     switch (type) {
+      case "pri(accounts.getAccountsToDerive)":
+        return this.getAccountsToDerive();
       case "pri(accounts.createAccounts)":
         return this.createAccounts(request as RequestCreateAccount);
       case "pri(accounts.importAccount)":
@@ -860,7 +958,7 @@ export default class Extension {
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
       case "pri(contacts.updateContact)":
-        return this.updateContact(request as RequestUpdateContact)
+        return this.updateContact(request as RequestUpdateContact);
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 

@@ -28,10 +28,11 @@ export interface Asset {
       }
     | null;
 }
-
+type assets = {
+  [id: string] : Asset[];
+}
 export interface InitialState {
-  network: string;
-  assets: Asset[];
+  assets: assets;
   isLoadingAssets: boolean;
 }
 
@@ -64,15 +65,13 @@ export type Action =
   | {
       type: "set-assets";
       payload: {
-        network: string;
-        assets: Asset[];
+        assets: assets;
       };
     }
   | {
       type: "update-assets";
       payload: {
-        network: string;
-        assets: Assset[];
+        assets: assets;
       };
     }
   | {
@@ -86,5 +85,13 @@ export type Action =
           reserved?: BN;
           frozen?: BN;
         };
+        networkId: string
+      };
+    }
+    | {
+      type: "update-one-network-assets";
+      payload: {
+        network: string;
+        assets: Asset[];
       };
     };

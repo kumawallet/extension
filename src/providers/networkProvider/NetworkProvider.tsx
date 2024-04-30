@@ -324,9 +324,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     const setProvider = async () => {
       try {
         const Chains = allChains.filter((chain) => Object.keys(state.selectedChain).includes(chain.id))
-
         const provider = await getProviderforNetworks(Chains, state.api);
-
         dispatch({
           type: "set-api",
           payload: { api: provider },

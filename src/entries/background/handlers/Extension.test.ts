@@ -248,8 +248,13 @@ describe("Extension", () => {
   });
 
   it("should be authorized", async () => {
+    const Vault = await import("../../../storage/entities/Vault");
+    Vault.default.getInstance = vi.fn().mockResolvedValue({
+      keyrings: {},
+    });
+
     const extension = new Extension();
-    const result = extension["isAuthorized"]();
+    const result = await extension["isAuthorized"]();
     expect(result).toBe(true);
   });
 
@@ -403,6 +408,11 @@ describe("Extension", () => {
   });
 
   it("signIn", async () => {
+    const Vault = await import("../../../storage/entities/Vault");
+    Vault.default.getInstance = vi.fn().mockResolvedValue({
+      keyrings: {},
+    });
+
     const extension = new Extension();
     const result = await extension["signIn"]({
       password: "Test.123",
@@ -552,6 +562,7 @@ describe("Extension", () => {
     const result = await extension["deriveAccount"]({
       name: "derived-evm",
       type: AccountType.EVM,
+      address: "0x123",
     });
     expect(result).toMatchObject({
       key: "WASM-123",

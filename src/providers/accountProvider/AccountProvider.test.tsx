@@ -79,6 +79,7 @@ const TestComponent = () => {
           deriveAccount({
             name: "",
             accountType: AccountType.EVM,
+            address: "mock_address",
           })
         }
       />

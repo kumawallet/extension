@@ -10,13 +10,29 @@ import {
   StorageEntryBase,
   StorageEntryPromiseOverloads,
 } from "@polkadot/api/types";
+import {
+  GraphQLClient,
+  RequestDocument,
+  Variables,
+  gql,
+} from "graphql-request";
 import { AnyTuple } from "@polkadot/types-codec/types";
 import { CURRENCIES } from "@utils/constants";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
+import AccountEntity from "@src/storage/entities/Account";
 
+const getType = (type: string) =>{
+  if(type === "imported_wasm"){
+    return type.slice(-4);
+  }
+  else if( type === "imported_evm"){
+    return type.slice(-3);
+  }
+}
 export const getNatitveAssetBalance = async (
   api: ApiPromise | ethers.providers.JsonRpcProvider | null,
-  accountAddress: string
+  accountAddress: string,
+  account : AccountEntity
 ) => {
   const _amounts = {
     balance: BN0,
@@ -24,8 +40,8 @@ export const getNatitveAssetBalance = async (
   try {
     if (!api) return _amounts;
 
-    if ("query" in api) {
-      const { data } = (await api.query.system?.account(
+    if ("query" in api && getType(account.type.toLowerCase()) === "wasm") {
+      const { data } = (await api.query.system.account(
         accountAddress
       )) as unknown as {
         data: {
@@ -39,32 +55,46 @@ export const getNatitveAssetBalance = async (
 
       return getSubtrateNativeBalance(data);
     }
-
-    if ("getBalance" in api) {
-      const amount = await api.getBalance(accountAddress);
+    else if ("getBalance" in api && getType(account.type.toLowerCase()) === "evm") {
+      const amount = await api.getBalance(accountAddress)
       return {
         balance: amount,
       };
     }
-
-    return _amounts;
+    else{
+      return _amounts;
+    }
   } catch (error) {
     captureError(error);
     return _amounts;
   }
 };
 
-export const getAssetUSDPrice = async (query: string) => {
-  const _query = query.toLowerCase();
-  const currency = localStorage.getItem("currency") || "usd";
+export const getAssetUSDPrice = async (query: string[]) => {
+  const _query = JSON.stringify(query.map(symbol => symbol))
+  const gqlQuery = `
+  query {
+    getTokenPrice(tokens: ${_query}) {
+      tokens {
+        usd,
+        symbol
+      }
+    }
+  }
+`;
   try {
-    const data = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${_query}&vs_currencies=${currency}`
-    );
-
-    const json = await data.json();
-
-    return json?.[_query]?.[currency] || 0;
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query: gqlQuery }),
+    });
+    const obj :any = {}
+    const data = await response.json();
+     const objPrice = data.data.getTokenPrice.tokens 
+     objPrice.forEach((item:any) =>  obj[item.symbol] = item.usd)
+    return obj || {};
   } catch (error) {
     captureError(error);
     return 0;
@@ -197,9 +227,10 @@ export const getWasmAssets = async (
           StorageEntryBase<"promise", GenericStorageEntryFunction, AnyTuple> &
           StorageEntryPromiseOverloads)
       | null = null;
-
     switch (chainId) {
       case "acala":
+        balanceMethod = api.query.tokens.accounts;
+        break;
       case "mandala":
         balanceMethod = api.query.tokens.accounts;
         break;
@@ -207,7 +238,6 @@ export const getWasmAssets = async (
         balanceMethod = api.query.assets?.account;
         break;
     }
-
     if (!balanceMethod)
       return {
         assets,
@@ -228,28 +258,25 @@ export const getWasmAssets = async (
         return balanceMethod?.(...params);
       })
     );
-
     assetBalances.forEach((data, index) => {
       const asset = mappedAssets[index];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const _data = getSubtrateNonNativeBalance(data as any);
-
       assets.push({
         ...asset,
-        id: typeof asset.id === "object" ? String(asset.id) : asset.id,
+        id: typeof asset.id === "object" ? JSON.stringify(asset.id) : asset.id,
         ..._data,
       });
     });
-
     await Promise.all(
       assets.map(async (asset) => {
+        
         const params = [];
         if (["acala", "mandala"].includes(chainId.toLowerCase())) {
           params.push(address, JSON.parse(asset.id));
         } else {
           params.push(asset.id, address);
         }
-
         const unsub = await balanceMethod?.(
           ...params,
           (data: {
@@ -261,11 +288,11 @@ export const getWasmAssets = async (
               frozen?: number;
             };
           }) => {
+            
             const _data = getSubtrateNonNativeBalance(data);
             dispatch(asset.id, _data);
           }
-        );
-
+        )
         unsubs.push(unsub);
       })
     );
@@ -306,11 +333,8 @@ export const getSubtrateNativeBalance = (
   const reserved = new BN(String(data?.reserved || 0));
   const miscFrozen = new BN(String(data?.miscFrozen || data?.frozen || 0));
   const feeFrozen = new BN(String(data?.feeFrozen || 0));
-
   const frozen = miscFrozen.add(feeFrozen);
-
   const transferable = free.sub(frozen).sub(reserved);
-
   return {
     balance: free,
     transferable,

@@ -1,4 +1,4 @@
-import { SupportedKeyring } from "../types";
+import { HDKeyPair, SupportedKeyring } from "../types";
 import WASMKeyring from "./WASMKeyring";
 
 const mockMnemonic =
@@ -13,10 +13,8 @@ describe("WASMKeyring", () => {
 
     vi.mock("@polkadot/ui-keyring", () => ({
       default: {
-        addUri: () => ({
-          json: {
-            address: "13oi66HJu6d8AnNWQ1U2WFtt6P8APaj6zHTNah3xLB8TpzHT",
-          },
+        createFromUri: () => ({
+          address: "13oi66HJu6d8AnNWQ1U2WFtt6P8APaj6zHTNah3xLB8TpzHT",
         }),
       },
     }));
@@ -32,7 +30,7 @@ describe("WASMKeyring", () => {
   it("should return address", () => {
     const wasmKeyring = new WASMKeyring(mockMnemonic);
 
-    const address = wasmKeyring.getAddress("/0");
+    const address = wasmKeyring.getAddress(mockMnemonic);
     expect(address).toEqual("13oi66HJu6d8AnNWQ1U2WFtt6P8APaj6zHTNah3xLB8TpzHT");
   });
 
@@ -44,7 +42,8 @@ describe("WASMKeyring", () => {
 
       wasmKeyring.addKeyPair(addressMock, {
         path: "/0",
-      });
+        key: mockMnemonic,
+      } as HDKeyPair);
       const key = wasmKeyring.getKey(addressMock);
       expect(key).toBe(`${mockMnemonic}/0`);
     });

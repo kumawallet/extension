@@ -46,7 +46,9 @@ export default ({ mode }: { mode: string }) => {
       }),
     },
     test: {
-      testTimeout: 10000,
+      fileParallelism: false,
+
+      css: false,
       globals: true,
       environment: "jsdom",
       setupFiles: "src/tests/setup.ts",

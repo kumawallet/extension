@@ -24,4 +24,5 @@ export interface KeyPair {
 
 export interface HDKeyPair {
   path: string;
+  key: string;
 }
