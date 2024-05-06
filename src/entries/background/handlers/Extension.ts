@@ -87,14 +87,11 @@ const getWebAPI = (): typeof chrome => {
 
 const WebAPI = getWebAPI();
 
-
 export default class Extension {
-
-  
   get version() {
     return version;
   }
-  
+
   private validatePasswordFormat(password: string) {
     if (!password) throw new Error("password_required");
     if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
@@ -291,7 +288,7 @@ export default class Extension {
     if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
     const { keyring: type } = selectedAccount.value;
 
-    const address = selectedAccount.key.split("-")[1];
+    const address = selectedAccount?.key.split("-")[1];
 
     const keyring = await Vault.getKeyring(type);
     return keyring.getKey(address);
@@ -407,15 +404,18 @@ export default class Extension {
     await this.setSelectedAccount(account);
     return account;
   }
-  private Chains = new BehaviorSubject({})
+  private Chains = new BehaviorSubject({});
 
-
-  private async setNetwork({isTestnet, id, type} : RequestSetNetwork): Promise<SelectedChain> {
-    const chains : SelectedChain = this.Chains.getValue();
-      chains[id] = {
-        isTestnet: isTestnet,
-        type: type
-      }
+  private async setNetwork({
+    isTestnet,
+    id,
+    type,
+  }: RequestSetNetwork): Promise<SelectedChain> {
+    const chains: SelectedChain = this.Chains.getValue();
+    chains[id] = {
+      isTestnet: isTestnet,
+      type: type,
+    };
     this.Chains.next(chains);
     const network = Network.getInstance();
     network.set(chains);
@@ -423,26 +423,26 @@ export default class Extension {
     return chains;
   }
 
-  private async  deleteSelectNetwork ({ id } : RequestDeleteSelectNetwork ) {
-    const chains : SelectedChain = this.Chains.getValue();
-      delete chains[id];
-      this.Chains.next(chains);
-      //save Object
-      const network = Network.getInstance();
-      network.set(chains);
-      this.Chains.next(chains)
-      await Network.set<Network>(network);
-      return chains;
+  private async deleteSelectNetwork({ id }: RequestDeleteSelectNetwork) {
+    const chains: SelectedChain = this.Chains.getValue();
+    delete chains[id];
+    this.Chains.next(chains);
+    //save Object
+    const network = Network.getInstance();
+    network.set(chains);
+    this.Chains.next(chains);
+    await Network.set<Network>(network);
+    return chains;
   }
   private networksSuscribe = (id: string, port: Port) => {
-    const cb = createSubscription<"pri(network.subscription)">(id,port)
-    const subscription = this.Chains.subscribe((data) => cb(data))
+    const cb = createSubscription<"pri(network.subscription)">(id, port);
+    const subscription = this.Chains.subscribe((data) => cb(data));
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
-      subscription.unsubscribe()
+      subscription.unsubscribe();
     });
-    return this.Chains
-  }
+    return this.Chains;
+  };
 
   private async setSelectedAccount(account: Account) {
     await SelectedAccount.set<SelectedAccount>(
@@ -930,7 +930,7 @@ export default class Extension {
 
       case "pri(network.setNetwork)":
         return this.setNetwork(request as RequestSetNetwork);
-      case "pri(network.deleteSelectNetwork)": 
+      case "pri(network.deleteSelectNetwork)":
         return this.deleteSelectNetwork(request as RequestDeleteSelectNetwork);
       case "pri(network.getNetwork)":
         return this.getNetwork();
@@ -941,7 +941,7 @@ export default class Extension {
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
       case "pri(network.subscription)":
-        return this.networksSuscribe(id,port);
+        return this.networksSuscribe(id, port);
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
       case "pri(settings.getAdvancedSettings)":

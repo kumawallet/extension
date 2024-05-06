@@ -19,7 +19,7 @@ import { messageAPI } from "@src/messageAPI/api";
 const initialState: InitialState = {
   accounts: [],
   isLoadingAccounts: true,
-  selectedAccount: {} as Account,
+  selectedAccount: {},
 };
 
 const AccountContext = createContext({} as AccountContext);
@@ -197,13 +197,13 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const setSelectedAccount = async (account: Account) => {
     try {
+      console.log("setSelectedAccount", account)
+
       await messageAPI.setSelectedAccount(account);
       dispatch({
         type: "set-selected-account",
         payload: {
-          selectedAccount: {
-            ...account,
-          },
+          selectedAccount: account ? account : null,
         },
       });
     } catch (error) {

@@ -12,6 +12,8 @@ export const AccountSelected = () => {
   const account = cropAccount(address, 8);
   const { Icon, copyToClipboard } = useCopyToClipboard(address);
 
+  if (!selectedAccount?.value) return null
+
   return (
     <>
       <button

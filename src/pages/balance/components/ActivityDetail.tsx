@@ -60,7 +60,7 @@ export const ActivityDetail = () => {
     if (selectedAccount) {
       Promise.all([getContacts()]);
     }
-  }, [selectedAccount.key]);
+  }, [selectedAccount?.key]);
 
   const allChains = chains.flatMap((c) => c.chains);
 

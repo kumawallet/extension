@@ -5,7 +5,7 @@ import Account from "@src/storage/entities/Account";
 interface InitialState {
   accounts: Account[];
   isLoadingAccounts: boolean;
-  selectedAccount: Account;
+  selectedAccount: Account | null;
 }
 
 interface AccountContext {
@@ -36,7 +36,7 @@ type Action =
   | {
       type: "set-selected-account";
       payload: {
-        selectedAccount: Account;
+        selectedAccount: Account | null;
       };
     }
   | {

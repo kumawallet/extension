@@ -59,7 +59,7 @@ export const Activity = () => {
     if (selectedAccount) {
       Promise.all([getContacts()]);
     }
-  }, [selectedAccount.key]);
+  }, [selectedAccount?.key]);
 
   const getContacts = async () => {
     try {

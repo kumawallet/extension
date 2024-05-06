@@ -11,6 +11,7 @@ import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { AccountDetails } from "./AccountDetails";
 import { TfiClose } from "react-icons/tfi";
 import { IconWallet } from "@src/components/icons/wallet";
+import { BiSolidWallet } from "react-icons/bi";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");
@@ -109,22 +110,38 @@ export const AccountList = () => {
                           data-testid="wallet-list"
                           className="flex flex-col gap-5"
                         >
+                          <button
+                            className={`flex items-center px-4 py-3 bg-[#1C1C27] rounded-lg ${!selectedAccount?.value
+                                ? "border border-[#2CEC84]"
+                                : ""
+                              }`}
+                            onClick={() => setSelectedAccount(null)}
+                          >
+                            <div className=" flex gap-2 items-center overflow-hidden text-ellipsis">
+                              <BiSolidWallet size={26} />
+                              <span>{t("all_accounts")}</span>
+                            </div>
+                          </button>
+
                           {filteredAccounts.map((account) => (
                             <Wallet
                               key={account?.key}
-                              address={account?.value?.address}
-                              name={account?.value?.name}
+                              address={account?.value!.address}
+                              name={account?.value!.name}
                               type={account?.type}
                               more={() => {
                                 setAccountData(account);
                                 setActionSelected("detail");
                               }}
                               onSelect={() => {
-
                                 setSelectedAccount(account as Account);
-                                onCloseModal()
+                                onCloseModal();
                               }}
-                              isSelected={account?.key === selectedAccount?.key}
+                              isSelected={
+                                selectedAccount
+                                  ? account?.key === selectedAccount?.key
+                                  : false
+                              }
                             />
                           ))}
                         </div>

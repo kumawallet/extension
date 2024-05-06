@@ -248,13 +248,13 @@ export const TxProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (selectedAccount.key && selectedChain?.name && api) {
+    if (selectedAccount?.key && selectedChain?.name && api) {
       (async () => {
         const records = await loadActivity();
         processPendingTxs(records);
       })();
     }
-  }, [selectedAccount.key, api, selectedChain?.name]);
+  }, [selectedAccount?.key, api, selectedChain?.name]);
 
   useEffect(() => {
     if (!api) return;

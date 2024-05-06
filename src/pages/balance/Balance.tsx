@@ -38,7 +38,6 @@ export const Balance = () => {
     state: { selectedChain },
   } = useNetworkContext();
 
-  // const [showBalance, setShowBalance] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const TABS = [t("assets"), t("activity")];
@@ -46,8 +45,6 @@ export const Balance = () => {
   useEffect(() => {
     setSelectedIndex(0);
   }, [selectedChain?.name]);
-
-
 
 
   return (

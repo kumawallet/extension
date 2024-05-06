@@ -3,8 +3,6 @@ import BaseEntity from "./BaseEntity";
 import { AccountKey, AccountType, AccountValue } from "@src/accounts/types";
 import Account from "./Account";
 
-
-
 export default class SelectedAccount extends BaseEntity {
   private constructor(
     public key: AccountKey,
@@ -18,7 +16,9 @@ export default class SelectedAccount extends BaseEntity {
     return "SelectedAccount";
   }
 
-  public static fromAccount(account: Account): SelectedAccount {
+  public static fromAccount(account: Account | null): SelectedAccount {
+    if (!account) return new SelectedAccount("ALL", null, AccountType.ALL);
+
     const { key, value } = account;
     const type = key.split("-")[0] as AccountType;
     return new SelectedAccount(key, value, type);
