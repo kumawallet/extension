@@ -9,6 +9,7 @@ import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
+import { formatAmountWithDecimals } from "@src/utils/assets";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -17,23 +18,25 @@ export const Assets = () => {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
 
-  const [showAllAssets, setShowAllAssets] = useState(false);
+  const [showAllAssets, setShowAllAssets] = useState(true);
   const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    if(Object.keys(assets).length !== 0){
-      return Object.values(assets).reduce(
-        (assts : any, allAssets : any) =>{
-          if (!showAllAssets) {
-            const filtered = allAssets.filter((asset: any) => asset.id === "-1");
-            return assts.concat(filtered);
-            }
-            else {
-              return assts.concat(allAssets);
-            }
-          })
+    console.log(assets, "AASSSSSSSSSSEEEEEYTTTTTTTTTSSSSSSSSSSSs")
+    const a = Object.values(assets).flatMap(asset => {
+      return Object.values(asset).flatMap(subasset => {
+        console.log("sub", subasset)
+        console.log(formatAmountWithDecimals(
+          Number(subasset.assets[0].balance),
+          6,
+          subasset.assets[0].decimals
+        ), "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo", subasset.assets[0],subasset.assets[0])
+        return subasset.assets
+      });
     }
-      }, [JSON.stringify(assets),showAllAssets]);
+    )
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", a, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+ return a} , [JSON.stringify(assets),showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -61,9 +64,13 @@ export const Assets = () => {
 
       {isLoadingAssets && <Loading />}
 
-      {filteredAsset && filteredAsset?.length !==0 && filteredAsset.map((asset, index) => (
+      {
+      filteredAsset && filteredAsset?.length !==0 && filteredAsset.map((asset, index) =>{
+        console.log("sgerf ewgfgvhfhwegfgehwfghfg", asset)
+        return (
+        
         <Asset asset={asset} key={index} />
-      ))}
+      )})}
 
       {showManageAssets && (
         <div className="flex justify-center mt-2">

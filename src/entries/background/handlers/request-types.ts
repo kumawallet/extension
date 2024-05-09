@@ -79,14 +79,14 @@ export interface RequestDeriveAccount {
 export interface RequestSetNetwork {
   id: string;
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "move"
+  type: "wasm" | "evm" | "ol"
 }
 export interface RequestDeleteSelectNetwork {
   id :string;
 }
 export interface RequestAddNetwork {
   id:string;
-  type: "wasm" | "evm" | "move";
+  type: "wasm" | "evm" | "ol";
 }
 export interface RequestSaveCustomChain {
   chain: Chain;
@@ -217,6 +217,8 @@ export interface Request {
   "pri(network.deleteSelectNetwork)": [RequestDeleteSelectNetwork, RequestSetNetwork],
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
   "pri(network.subscription)": [null,{},{}]
+
+  "pri(assestsBanlance.subscription)" : [null,{},{}]
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
   "pri(settings.getAdvancedSettings)": [null, Setting[]];

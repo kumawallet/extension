@@ -18,6 +18,7 @@ export type WasmFee = {
 
 export type API = { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}};
 
+
 export type EVMFee = {
   gasLimit: BigNumber;
   "max fee per gas": BigNumber;
@@ -91,7 +92,7 @@ export interface TxToProcess {
 
 export type chain = {
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "move";
+  type: "wasm" | "evm" | "ol";
 }
 
 export interface SelectedChain {
@@ -99,7 +100,7 @@ export interface SelectedChain {
 }
 export interface paramChain {
   id: string;
-  type: "wasm" | "evm" | "move";
+  type: "wasm" | "evm" | "ol";
 }
 
 export interface Chain {
@@ -113,7 +114,7 @@ export interface Chain {
   prefix?: number;
   isTestnet?: boolean;
   isCustom?: boolean;
-  type: "wasm" | "evm" | "move";
+  type: "wasm" | "evm" | "ol";
 }
 
 export type ChainsState = {

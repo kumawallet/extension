@@ -28,9 +28,14 @@ const getType = (type: string) =>{
   else if( type === "imported_evm"){
     return type.slice(-3);
   }
+  else{
+    return type;
+  }
 }
 export const getNatitveAssetBalance = async (
-  api: ApiPromise | ethers.providers.JsonRpcProvider | null,
+  api: {
+    provider :ApiPromise | ethers.providers.JsonRpcProvider | null
+    type: "wasm" | "evm" | "ol"},
   accountAddress: string,
   account : AccountEntity
 ) => {
@@ -38,10 +43,10 @@ export const getNatitveAssetBalance = async (
     balance: BN0,
   };
   try {
-    if (!api) return _amounts;
 
-    if ("query" in api && getType(account.type.toLowerCase()) === "wasm") {
-      const { data } = (await api.query.system.account(
+    if (!api) return _amounts;
+    if (api.type === "wasm" && getType(account.type.toLowerCase()) === "wasm") {
+      const { data } = (await (api.provider as ApiPromise).query.system.account(
         accountAddress
       )) as unknown as {
         data: {
@@ -52,11 +57,11 @@ export const getNatitveAssetBalance = async (
           feeFrozen?: string;
         };
       };
-
       return getSubtrateNativeBalance(data);
     }
-    else if ("getBalance" in api && getType(account.type.toLowerCase()) === "evm") {
-      const amount = await api.getBalance(accountAddress)
+    else if (api.type ===  "evm" && getType(account.type.toLowerCase()) === "evm") {
+      
+      const amount = await (api.provider as ethers.providers.JsonRpcProvider).getBalance(accountAddress)
       return {
         balance: amount,
       };
@@ -66,6 +71,7 @@ export const getNatitveAssetBalance = async (
     }
   } catch (error) {
     captureError(error);
+
     return _amounts;
   }
 };

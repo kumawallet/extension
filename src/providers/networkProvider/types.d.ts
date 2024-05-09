@@ -6,7 +6,7 @@ type SelectedChain = {
 }
 type chain = {
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "move";
+  type: "wasm" | "evm" | "ol";
 }
 type Api =  { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}}
 
@@ -19,7 +19,7 @@ export interface InitialState {
 
 export interface NetworkContext {
   state: InitialState;
-  updateSelectNetwork: (id : string,  type: "wasm" | "evm" | "move",isTestnet ?: boolean) => void;
+  updateSelectNetwork: (id : string,  type: "wasm" | "evm" | "ol",isTestnet ?: boolean) => void;
   refreshNetworks: (supportedAccounts?: AccountType[]) => void;
   initializeNetwork: () => void;
 }

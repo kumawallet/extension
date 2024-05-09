@@ -56,6 +56,7 @@ import {
   RequestSetAutoLock,
   ResponseType,
   RequestUpdateContact,
+  RequestDeleteSelectNetwork,
 } from "./request-types";
 import { Wallet, ethers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -70,6 +71,9 @@ import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
 // import { SelectedChain } from "@src/providers/assetProvider/types";
+import { Provider } from "@src/storage/entities/Provider";
+import AssetBalance from "@src/storage/entities/AssetBalance"
+import { init } from "i18next";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -88,10 +92,19 @@ const getWebAPI = (): typeof chrome => {
 const WebAPI = getWebAPI();
 
 export default class Extension {
+  private provider = new Provider()
+  private assetsBalance = new AssetBalance()
+  private Chains = new BehaviorSubject({});
+  constructor(){
+    this.subscriptionStatusProvider();
+
+  }
+
+
+
   get version() {
     return version;
   }
-
   private validatePasswordFormat(password: string) {
     if (!password) throw new Error("password_required");
     if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
@@ -182,7 +195,51 @@ export default class Extension {
 
     return true;
   }
+  private subscriptionStatusProvider = () =>{
+    this.provider.statusNetwork.subscribe(async(data) =>
+      {   
+          const [selectedAccount,allAccounts] = await Promise.all(
+            [
+              SelectedAccount.get(),
+              Accounts.get()
+            ])
+          const networksAssest = this.assetsBalance.getNetwork();
+          const newNetwork: any[] = Object.keys(data).filter((chain) => !networksAssest.includes(chain) && data[chain] === "connected");
+          const deleteNetwork = networksAssest.filter((network) => Object.keys(data).includes(network) && data[network] ==="disconnected");
+          const provider = this.provider.getProviders()
+          
+        if(newNetwork.length !== 0){
+          if((selectedAccount as Account).value){
+            await this.assetsBalance.loadAssets((selectedAccount as Account),provider,newNetwork )
+          }
+        else{
+          await Promise.all(
+            Object.keys((allAccounts as Accounts).data).map((accountKey) => {
+              return this.assetsBalance.loadAssets((allAccounts as Accounts).data[accountKey],provider,newNetwork)
+            })
+          )
+        }
 
+  }
+
+    if(deleteNetwork.length !== 0){
+      if((selectedAccount as Account).value){
+        this.assetsBalance.deleteAsset((selectedAccount as Account),provider,deleteNetwork)
+      }
+      else{
+          Object.keys((allAccounts as Accounts).data).forEach(
+            (accountKey) => {
+              return this.assetsBalance.deleteAsset((allAccounts as Accounts).data[accountKey],provider,deleteNetwork)
+            }
+          )
+        
+      }
+   }
+  })
+
+  } 
+  
+  
   private async importAccount({
     name,
     privateKeyOrSeed,
@@ -404,7 +461,7 @@ export default class Extension {
     await this.setSelectedAccount(account);
     return account;
   }
-  private Chains = new BehaviorSubject({});
+  
 
   private async setNetwork({
     isTestnet,
@@ -420,6 +477,7 @@ export default class Extension {
     const network = Network.getInstance();
     network.set(chains);
     await Network.set<Network>(network);
+    await this.provider.setProvider(id,type)
     return chains;
   }
 
@@ -432,9 +490,10 @@ export default class Extension {
     network.set(chains);
     this.Chains.next(chains);
     await Network.set<Network>(network);
+    await this.provider.disconnectChain(id)
     return chains;
   }
-  private networksSuscribe = (id: string, port: Port) => {
+  private networksSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(network.subscription)">(id, port);
     const subscription = this.Chains.subscribe((data) => cb(data));
     port.onDisconnect.addListener(() => {
@@ -443,11 +502,50 @@ export default class Extension {
     });
     return this.Chains;
   };
+  private assetsSubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(assestsBanlance.subscription)">(id, port);
+    const subscription = this.assetsBalance.assets.subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+      subscription.unsubscribe();
+    });
+    return this.assetsBalance.assets.getValue();
+  }
 
   private async setSelectedAccount(account: Account) {
+    const networkSelected = this.assetsBalance.getNetwork()
+    const allAccounts : any = await Accounts.get();
+    const provider = this.provider.getProviders()
+    const selectedAccount : any = await SelectedAccount.get()
+    if(!account && selectedAccount.value){
+      const filterAccount = Object.keys(allAccounts.data).filter((_account) => ![selectedAccount.key].includes(_account) )
+      await Promise.all(
+      filterAccount.map(
+          (accountKey) => {
+      return this.assetsBalance.loadAssets(allAccounts.data[accountKey],provider, networkSelected)
+          }
+        )
+      
+      )
+    }
+    else if(account && !selectedAccount.value){
+      const filterAccount = Object.keys(allAccounts.data).filter((_account) => _account !== account.key)
+      await Promise.all(
+        filterAccount.map((account) => {
+          this.assetsBalance.deleteAsset(allAccounts.data[account],provider,networkSelected, false)
+        })
+      )
+    }
+  else if(account && selectedAccount.value){
+    this.assetsBalance.deleteAsset(selectedAccount,provider,networkSelected,false)
+    await this.assetsBalance.loadAssets(account,provider,networkSelected);
+  }
     await SelectedAccount.set<SelectedAccount>(
       SelectedAccount.fromAccount(account)
     );
+    
+  
+    
   }
 
   private async getSelectedAccount(): Promise<Account | undefined> {
@@ -871,7 +969,7 @@ export default class Extension {
       type: "basic",
     });
   }
-
+  
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -941,7 +1039,9 @@ export default class Extension {
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
       case "pri(network.subscription)":
-        return this.networksSuscribe(id, port);
+        return this.networksSubscribe(id, port);
+      case "pri(assestsBanlance.subscription)":
+        return this.assetsSubscribe(id,port);
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
       case "pri(settings.getAdvancedSettings)":

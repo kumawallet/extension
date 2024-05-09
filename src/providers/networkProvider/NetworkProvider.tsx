@@ -260,7 +260,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }; 
 
-  const updateSelectNetwork = async (id: string, type: "wasm" | "evm" | "move",isTestnet?: boolean) => {
+  const updateSelectNetwork = async (id: string, type: "wasm" | "evm" | "ol",isTestnet?: boolean) => {
     try {
       if(Object.prototype.hasOwnProperty.call(state.selectedChain, id)){
         await messageAPI.deleteSelectChain({id});

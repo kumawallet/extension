@@ -33,4 +33,11 @@ export default class SelectedAccount extends BaseEntity {
     await SelectedAccount.set<SelectedAccount>(selected as SelectedAccount);
     return selected as SelectedAccount;
   }
+  public get(){
+    return {
+    key : this.key,
+    value: this.value,
+    type: this.type
+    }
+  }
 }

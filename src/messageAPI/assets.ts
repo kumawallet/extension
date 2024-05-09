@@ -11,4 +11,7 @@ export const assetsMessages = {
   getAssetsByChain: (params: RequestGetAssetsByChain) => {
     return sendMessage("pri(assets.getAssetsByChain)", params);
   },
+  getAssetsBalance: (cb: (asset: {}) => void ) => {
+    return sendMessage("pri(assestsBanlance.subscription)",null,cb)
+  }
 };
