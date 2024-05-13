@@ -19,7 +19,7 @@ const ICON_WIDTH = 18;
 type IconField<T> = keyof T;
 type LabelField<T> = keyof T;
 
-const SelectItem = <
+export const SelectItem = <
   T extends {
     symbol: string;
   }
@@ -169,20 +169,38 @@ export const AssetToSend = () => {
   const { t } = useTranslation("send");
 
   const {
-    state: { chains },
+    state: { chains, selectedChain },
   } = useNetworkContext();
   const {
     state: { assets },
   } = useAssetContext();
 
+
+
   const { setValue, getValues, watch } = useFormContext<SendTxForm>();
   const originNetwork = watch("originNetwork");
   const targetChain = watch("targetNetwork");
   const selectedAsset = watch("asset");
+  const senderAddress = watch("senderAddress")
   const isXCM = watch("isXcm");
 
+  const [chainsToSelectFrom, setChainsToSelectFrom] = useState<Chain[]>([]);
   const [chainsToSend, setChainsToSend] = useState<Chain[]>([targetChain]);
   const [amount, setAmount] = useState<string>(getValues("amount"));
+
+  useEffect(() => {
+    const activeChainIds = Object.keys(selectedChain);
+
+    const allChains = chains.map((chain) => chain.chains).flat();
+
+    const chainsToSend = allChains.filter((chain) =>
+      activeChainIds.includes(chain.id)
+    );
+
+    setChainsToSelectFrom(chainsToSend);
+
+    setValue("originNetwork", chainsToSend[0]);
+  }, [chains, selectedChain]);
 
   useEffect(() => {
     if (!originNetwork?.id) return;
@@ -197,6 +215,7 @@ export const AssetToSend = () => {
     } else {
       setChainsToSend([originNetwork]);
     }
+    setValue("targetNetwork", originNetwork);
   }, [originNetwork]);
 
   useEffect(() => {
@@ -204,19 +223,34 @@ export const AssetToSend = () => {
   }, [targetChain]);
 
   const assetsToSelect = useMemo(() => {
+
     if (!originNetwork || !targetChain) return [];
+
+
+    const keyIndex = Object.keys(assets).find((key) => key.toLowerCase().includes(senderAddress.toLowerCase()))
+
+
+    if (!keyIndex) return []
+
+    const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string]
+
+    if (!_assetFromChain) return []
+
+
+    const availableAssets = _assetFromChain.assets || []
+
 
     if (isXCM) {
       const xcmAssets =
         XCM_ASSETS_MAPPING[originNetwork?.id]?.[targetChain?.id] || [];
 
-      const filteredAssets = assets.filter(
+      const filteredAssets = availableAssets.filter(
         ({ symbol }, index, self) =>
           xcmAssets.includes(symbol) &&
           self.findIndex((s) => s.symbol === symbol) === index
       );
 
-      const _assets = filteredAssets.length > 0 ? filteredAssets : assets;
+      const _assets = filteredAssets.length > 0 ? filteredAssets : availableAssets;
 
       const defaultAsset = _assets[0];
 
@@ -236,13 +270,13 @@ export const AssetToSend = () => {
       }));
     } else {
       setValue("asset", {
-        id: assets[0]?.id || "",
+        id: availableAssets[0]?.id || "",
         symbol: originNetwork.symbol,
         decimals: originNetwork.decimals || 1,
-        balance: String(assets[0]?.balance || "0"),
-        address: assets[0]?.address || "",
+        balance: String(availableAssets[0]?.balance || "0"),
+        address: availableAssets[0]?.address || "",
       });
-      return assets.map(({ id, symbol, decimals, balance, address }) => ({
+      return availableAssets.map(({ id, symbol, decimals, balance, address }) => ({
         id,
         symbol,
         decimals,
@@ -250,7 +284,7 @@ export const AssetToSend = () => {
         address,
       }));
     }
-  }, [originNetwork, assets, isXCM]);
+  }, [originNetwork, assets, isXCM, senderAddress]);
 
   useDebounce(
     () => {
@@ -298,8 +332,11 @@ export const AssetToSend = () => {
           </div>
 
           <SelectItem<Chain>
-            items={[]}
-            onChangeValue={() => null}
+            items={chainsToSelectFrom}
+            onChangeValue={(network) => {
+              setValue("originNetwork", network);
+              setValue("targetNetwork", network)
+            }}
             value={originNetwork}
             labelField="name"
             iconField="logo"

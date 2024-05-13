@@ -197,8 +197,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const setSelectedAccount = async (account: Account) => {
     try {
-      console.log("setSelectedAccount", account)
-
       await messageAPI.setSelectedAccount(account);
       dispatch({
         type: "set-selected-account",

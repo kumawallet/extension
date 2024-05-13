@@ -57,8 +57,11 @@ import {
   ResponseType,
   RequestUpdateContact,
   RequestDeleteSelectNetwork,
+  RequestShowKey,
+  RequestGetProvider,
+  RequestUpdateTx,
 } from "./request-types";
-import { Wallet, ethers, utils } from "ethers";
+import { Wallet, ethers, providers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
@@ -72,8 +75,12 @@ import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
 // import { SelectedChain } from "@src/providers/assetProvider/types";
 import { Provider } from "@src/storage/entities/Provider";
-import AssetBalance from "@src/storage/entities/AssetBalance"
+import AssetBalance from "@src/storage/entities/AssetBalance";
 import { init } from "i18next";
+import {
+  Transaction as TransactionEntity,
+  Tx,
+} from "@src/storage/entities/Transaction";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -92,15 +99,14 @@ const getWebAPI = (): typeof chrome => {
 const WebAPI = getWebAPI();
 
 export default class Extension {
-  private provider = new Provider()
-  private assetsBalance = new AssetBalance()
+  private provider = new Provider();
+  private assetsBalance = new AssetBalance();
   private Chains = new BehaviorSubject({});
-  constructor(){
+  private tx = new TransactionEntity();
+
+  constructor() {
     this.subscriptionStatusProvider();
-
   }
-
-
 
   get version() {
     return version;
@@ -195,51 +201,64 @@ export default class Extension {
 
     return true;
   }
-  private subscriptionStatusProvider = () =>{
-    this.provider.statusNetwork.subscribe(async(data) =>
-      {   
-          const [selectedAccount,allAccounts] = await Promise.all(
-            [
-              SelectedAccount.get(),
-              Accounts.get()
-            ])
-          const networksAssest = this.assetsBalance.getNetwork();
-          const newNetwork: any[] = Object.keys(data).filter((chain) => !networksAssest.includes(chain) && data[chain] === "connected");
-          const deleteNetwork = networksAssest.filter((network) => Object.keys(data).includes(network) && data[network] ==="disconnected");
-          const provider = this.provider.getProviders()
-          
-        if(newNetwork.length !== 0){
-          if((selectedAccount as Account).value){
-            await this.assetsBalance.loadAssets((selectedAccount as Account),provider,newNetwork )
-          }
-        else{
+  private subscriptionStatusProvider = () => {
+    this.provider.statusNetwork.subscribe(async (data) => {
+      const [selectedAccount, allAccounts] = await Promise.all([
+        SelectedAccount.get(),
+        Accounts.get(),
+      ]);
+      const networksAssest = this.assetsBalance.getNetwork();
+      const newNetwork: any[] = Object.keys(data).filter(
+        (chain) =>
+          !networksAssest.includes(chain) && data[chain] === "connected"
+      );
+      const deleteNetwork = networksAssest.filter(
+        (network) =>
+          Object.keys(data).includes(network) &&
+          data[network] === "disconnected"
+      );
+      const provider = this.provider.getProviders();
+
+      if (newNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          await this.assetsBalance.loadAssets(
+            selectedAccount as Account,
+            provider,
+            newNetwork
+          );
+        } else {
           await Promise.all(
             Object.keys((allAccounts as Accounts).data).map((accountKey) => {
-              return this.assetsBalance.loadAssets((allAccounts as Accounts).data[accountKey],provider,newNetwork)
+              return this.assetsBalance.loadAssets(
+                (allAccounts as Accounts).data[accountKey],
+                provider,
+                newNetwork
+              );
             })
-          )
+          );
         }
-
-  }
-
-    if(deleteNetwork.length !== 0){
-      if((selectedAccount as Account).value){
-        this.assetsBalance.deleteAsset((selectedAccount as Account),provider,deleteNetwork)
       }
-      else{
-          Object.keys((allAccounts as Accounts).data).forEach(
-            (accountKey) => {
-              return this.assetsBalance.deleteAsset((allAccounts as Accounts).data[accountKey],provider,deleteNetwork)
-            }
-          )
-        
-      }
-   }
-  })
 
-  } 
-  
-  
+      if (deleteNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          this.assetsBalance.deleteAsset(
+            selectedAccount as Account,
+            provider,
+            deleteNetwork
+          );
+        } else {
+          Object.keys((allAccounts as Accounts).data).forEach((accountKey) => {
+            return this.assetsBalance.deleteAsset(
+              (allAccounts as Accounts).data[accountKey],
+              provider,
+              deleteNetwork
+            );
+          });
+        }
+      }
+    });
+  };
+
   private async importAccount({
     name,
     privateKeyOrSeed,
@@ -340,14 +359,18 @@ export default class Extension {
     return Auth.isSessionActive();
   }
 
-  private async showKey(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
-    const { keyring: type } = selectedAccount.value;
+  private async showKey({
+    address,
+  }: RequestShowKey): Promise<string | undefined> {
+    const accounts = (await AccountManager.getAll())?.getAll();
 
-    const address = selectedAccount?.key.split("-")[1];
+    if (!accounts) return undefined;
 
-    const keyring = await Vault.getKeyring(type);
+    const account = accounts.find(({ value }) => value.address === address);
+
+    if (!account) return undefined;
+
+    const keyring = await Vault.getKeyring(account.type);
     return keyring.getKey(address);
   }
 
@@ -461,7 +484,6 @@ export default class Extension {
     await this.setSelectedAccount(account);
     return account;
   }
-  
 
   private async setNetwork({
     isTestnet,
@@ -477,7 +499,7 @@ export default class Extension {
     const network = Network.getInstance();
     network.set(chains);
     await Network.set<Network>(network);
-    await this.provider.setProvider(id,type)
+    await this.provider.setProvider(id, type);
     return chains;
   }
 
@@ -490,7 +512,7 @@ export default class Extension {
     network.set(chains);
     this.Chains.next(chains);
     await Network.set<Network>(network);
-    await this.provider.disconnectChain(id)
+    await this.provider.disconnectChain(id);
     return chains;
   }
   private networksSubscribe = (id: string, port: Port) => {
@@ -503,49 +525,64 @@ export default class Extension {
     return this.Chains;
   };
   private assetsSubscribe = (id: string, port: Port) => {
-    const cb = createSubscription<"pri(assestsBanlance.subscription)">(id, port);
-    const subscription = this.assetsBalance.assets.subscribe((data) => cb(data));
+    const cb = createSubscription<"pri(assestsBanlance.subscription)">(
+      id,
+      port
+    );
+    const subscription = this.assetsBalance.assets.subscribe((data) =>
+      cb(data)
+    );
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
       subscription.unsubscribe();
     });
     return this.assetsBalance.assets.getValue();
-  }
+  };
 
   private async setSelectedAccount(account: Account) {
-    const networkSelected = this.assetsBalance.getNetwork()
-    const allAccounts : any = await Accounts.get();
-    const provider = this.provider.getProviders()
-    const selectedAccount : any = await SelectedAccount.get()
-    if(!account && selectedAccount.value){
-      const filterAccount = Object.keys(allAccounts.data).filter((_account) => ![selectedAccount.key].includes(_account) )
+    const networkSelected = this.assetsBalance.getNetwork();
+    const allAccounts: any = await Accounts.get();
+    const provider = this.provider.getProviders();
+    const selectedAccount: any = await SelectedAccount.get();
+    if (!account && selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => ![selectedAccount.key].includes(_account)
+      );
       await Promise.all(
-      filterAccount.map(
-          (accountKey) => {
-      return this.assetsBalance.loadAssets(allAccounts.data[accountKey],provider, networkSelected)
-          }
-        )
-      
-      )
-    }
-    else if(account && !selectedAccount.value){
-      const filterAccount = Object.keys(allAccounts.data).filter((_account) => _account !== account.key)
+        filterAccount.map((accountKey) => {
+          return this.assetsBalance.loadAssets(
+            allAccounts.data[accountKey],
+            provider,
+            networkSelected
+          );
+        })
+      );
+    } else if (account && !selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => _account !== account.key
+      );
       await Promise.all(
         filterAccount.map((account) => {
-          this.assetsBalance.deleteAsset(allAccounts.data[account],provider,networkSelected, false)
+          this.assetsBalance.deleteAsset(
+            allAccounts.data[account],
+            provider,
+            networkSelected,
+            false
+          );
         })
-      )
+      );
+    } else if (account && selectedAccount.value) {
+      this.assetsBalance.deleteAsset(
+        selectedAccount,
+        provider,
+        networkSelected,
+        false
+      );
+      await this.assetsBalance.loadAssets(account, provider, networkSelected);
     }
-  else if(account && selectedAccount.value){
-    this.assetsBalance.deleteAsset(selectedAccount,provider,networkSelected,false)
-    await this.assetsBalance.loadAssets(account,provider,networkSelected);
-  }
     await SelectedAccount.set<SelectedAccount>(
       SelectedAccount.fromAccount(account)
     );
-    
-  
-    
   }
 
   private async getSelectedAccount(): Promise<Account | undefined> {
@@ -730,26 +767,67 @@ export default class Extension {
     return TrustedSites.removeSite(site);
   }
 
-  private async sendSubstrateTx({
-    amount,
-    asset,
-    destinationAddress,
-    destinationNetwork,
-    hexExtrinsic,
-    networkName,
-    originAddress,
-    rpc,
-    isSwap,
-    tip,
-  }: RequestSendSubstrateTx) {
-    try {
-      const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
-      const seed = await this.showKey();
-      const sender = keyring.keyring.addFromMnemonic(seed as string);
-      const { block } = await provider.rpc.chain.getBlock();
+  private async updateTx({ tx }: RequestUpdateTx) {
+    const providers = this.provider.getProviders();
 
-      const unsub = await provider.tx(hexExtrinsic).signAndSend(
-        sender,
+    const seed = await this.showKey({
+      address: tx.senderAddress,
+    });
+
+    let signer;
+
+    const provider = providers[tx.originNetwork!.id];
+
+    if (tx.originNetwork?.type === "evm") {
+      signer = new Wallet(
+        seed as string,
+        provider.provider as unknown as providers.JsonRpcProvider
+      );
+    } else if (tx.originNetwork?.type === "wasm") {
+      signer = keyring.keyring.addFromMnemonic(seed as string);
+    }
+
+    this.tx.updateTx({
+      ...tx,
+      provider,
+      signer,
+    });
+  }
+
+  private getFeeSubscribe(id: string, port: Port) {
+    const cb = createSubscription<"pri(send.getFeeSubscribe)">(id, port);
+    const subscription = this.tx.tx.subscribe(async () =>
+      cb(await this.tx.getFee())
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+      this.tx.clear();
+    });
+  }
+
+  private async sendSubstrateTx() {
+    try {
+      const {
+        provider,
+        signer,
+        senderAddress,
+        amount,
+        asset,
+        destinationAddress,
+        originNetwork,
+        targetNetwork,
+      } = this.tx.tx.getValue();
+
+      const tip = this.tx.tip;
+      const tx = this.tx.substrateTx;
+      const isSwap = this.tx.isSwap;
+
+      const substateProvider = provider?.provider as unknown as ApiPromise;
+
+      const { block } = await substateProvider.rpc.chain.getBlock();
+
+      const unsub = await tx!.signAndSend(
+        signer,
         {
           tip: tip || undefined,
         },
@@ -777,13 +855,13 @@ export default class Extension {
             const transaction: Transaction = {
               id: hash,
               amount: amount,
-              asset: asset.symbol,
+              asset: asset!.symbol,
               blockNumber: Number(block.header.number.toString()),
               fee,
               hash,
-              originNetwork: networkName,
-              targetNetwork: destinationNetwork,
-              sender: originAddress,
+              originNetwork: originNetwork?.name as string,
+              targetNetwork: targetNetwork?.name as string,
+              sender: senderAddress,
               recipient: destinationAddress,
               status: RecordStatus.PENDING,
               tip,
@@ -801,7 +879,7 @@ export default class Extension {
           }
           if (status.isFinalized) {
             const failedEvents = events.filter(({ event }) =>
-              provider?.events.system.ExtrinsicFailed.is(event)
+              substateProvider?.events.system.ExtrinsicFailed.is(event)
             );
             let status = RecordStatus.PENDING;
             let error = undefined;
@@ -830,7 +908,7 @@ export default class Extension {
                   };
                 }) => {
                   if (_error.isModule) {
-                    const decoded = provider.registry.findMetaError(
+                    const decoded = substateProvider.registry.findMetaError(
                       _error.asModule as
                         | Uint8Array
                         | {
@@ -873,43 +951,37 @@ export default class Extension {
     }
   }
 
-  private async sendEvmTx({
-    amount,
-    asset,
-    destinationAddress,
-    destinationNetwork,
-    networkName,
-    originAddress,
-    rpc,
-    isSwap,
-    evmTx,
-  }: RequestSendEvmTx) {
-    if (!evmTx) {
-      return;
-    }
+  private async sendEvmTx() {
     try {
-      const api = (await getProvider(
-        rpc,
-        AccountType.EVM
-      )) as ethers.providers.JsonRpcProvider;
+      const {
+        signer,
+        senderAddress,
+        amount,
+        asset,
+        destinationAddress,
+        originNetwork,
+        targetNetwork,
+        provider,
+      } = this.tx.tx.getValue();
 
-      const seed = await this.showKey();
+      const evmTx = this.tx.substrateTx;
+      const isSwap = this.tx.isSwap;
+      const evmProvider =
+        provider?.provider as unknown as providers.JsonRpcProvider;
 
-      const singer = new Wallet(seed as string, api);
-
-      const tx = await singer.sendTransaction(evmTx);
+      const tx = await signer.sendTransaction(evmTx);
       const txHash = tx.hash;
 
       const transaction: Transaction = {
         id: txHash,
         amount: amount,
-        asset: asset.symbol,
+        asset: asset!.symbol,
         blockNumber: tx.blockNumber!,
         hash: txHash,
-        originNetwork: networkName,
+        originNetwork: originNetwork?.name as string,
         recipient: destinationAddress,
-        targetNetwork: destinationNetwork,
-        sender: originAddress,
+        targetNetwork: targetNetwork?.name as string,
+        sender: senderAddress,
         status: RecordStatus.PENDING,
         type: RecordType.TRANSFER,
         tip: "",
@@ -922,7 +994,7 @@ export default class Extension {
       await this.addActivity({ txHash, record: transaction as any });
       this.sendUpdateActivityMessage();
 
-      const txReceipt = await api.getTransaction(txHash);
+      const txReceipt = await evmProvider.getTransaction(txHash);
 
       const result = await txReceipt.wait();
 
@@ -940,11 +1012,15 @@ export default class Extension {
       return true;
     } catch (error) {
       this.sendTxNotification({ title: `tx failed`, message: "" });
-      // await this.updateActivity({
-      //   txHash,
-      //   status: RecordStatus.FAIL,
-      //   error: String(error),
-      // });
+    }
+  }
+
+  private async sendTx() {
+    const originNetwork = this.tx.tx.getValue().originNetwork;
+    if (originNetwork?.type === "evm") {
+      return this.sendEvmTx();
+    } else if (originNetwork?.type === "wasm") {
+      return this.sendSubstrateTx();
     }
   }
 
@@ -969,7 +1045,7 @@ export default class Extension {
       type: "basic",
     });
   }
-  
+
   async handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
@@ -1024,7 +1100,7 @@ export default class Extension {
       case "pri(auth.isSessionActive)":
         return this.isSessionActive();
       case "pri(auth.showKey)":
-        return this.showKey();
+        return this.showKey(request as RequestShowKey);
 
       case "pri(network.setNetwork)":
         return this.setNetwork(request as RequestSetNetwork);
@@ -1041,7 +1117,7 @@ export default class Extension {
       case "pri(network.subscription)":
         return this.networksSubscribe(id, port);
       case "pri(assestsBanlance.subscription)":
-        return this.assetsSubscribe(id,port);
+        return this.assetsSubscribe(id, port);
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
       case "pri(settings.getAdvancedSettings)":
@@ -1083,10 +1159,12 @@ export default class Extension {
       case "pri(trustedSites.removeTrustedSite)":
         return this.removeTrustedSite(request as RequestRemoveTrustedSite);
 
-      case "pri(send.sendSubstrateTx)":
-        return this.sendSubstrateTx(request as RequestSendSubstrateTx);
-      case "pri(send.sendEvmTx)":
-        return this.sendEvmTx(request as RequestSendEvmTx);
+      case "pri(send.updateTx)":
+        return this.updateTx(request as RequestUpdateTx);
+      case "pri(send.getFeeSubscribe)":
+        return this.getFeeSubscribe(id, port);
+      case "pri(send.sendTx)":
+        return this.sendTx();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

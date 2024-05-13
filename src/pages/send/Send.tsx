@@ -1,11 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import {
-  useAccountContext,
-  useNetworkContext,
-} from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 import { useToast } from "@src/hooks";
@@ -20,19 +17,24 @@ import { FeeAndTip } from "./components/FeeAndTip";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { useNavigate } from "react-router-dom";
 import { providers } from "ethers";
-import { ErrorMessage } from "./components/ErrorMessage";
 import { SendTxResume } from "./components/SendTxResume";
 import { transformAmountStringToBN } from "@src/utils/assets";
 import { validateRecipientAddress } from "@src/utils/transfer";
+import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SelectAccount } from "./components/SelectAccount";
+import { ErrorMessage } from "./components";
 
 const schema = object({
-  recipientAddress: string().when(["targetNetwork"], ([targetNetwork], schema) => {
-    return schema.test("recipientAddress", "invalid_address", (value) => {
-      if (value?.trim() === "") return true
-      if (!value || !targetNetwork) return false;
-      return validateRecipientAddress(value, targetNetwork.type);
-    })
-  }),
+  recipientAddress: string().when(
+    ["targetNetwork"],
+    ([targetNetwork], schema) => {
+      return schema.test("recipientAddress", "invalid_address", (value) => {
+        if (value?.trim() === "") return true;
+        if (!value || !targetNetwork) return false;
+        return validateRecipientAddress(value, targetNetwork.type);
+      });
+    }
+  ),
   asset: object({}).required("Required"),
   originNetwork: object({}).required("Required"),
   targetNetwork: object({}).required("Required"),
@@ -69,26 +71,22 @@ export const Send = () => {
   const { showSuccessToast, showErrorToast } = useToast();
 
   const {
-    state: { selectedChain },
-  } = useNetworkContext();
-
-  const {
     state: { selectedAccount },
   } = useAccountContext();
 
   const methods = useForm<SendTxForm>({
     defaultValues: {
       recipientAddress: "",
-      senderAddress: selectedAccount.value.address,
+      senderAddress: selectedAccount?.value?.address || "",
       asset: {
         id: "-1",
-        symbol: selectedChain?.symbol,
-        decimals: selectedChain?.decimals || 1,
+        symbol: SUBTRATE_CHAINS[0].symbol,
+        decimals: SUBTRATE_CHAINS[0].decimals || 1,
         balance: "0",
         address: "",
       },
-      originNetwork: selectedChain as Chain,
-      targetNetwork: selectedChain as Chain,
+      originNetwork: SUBTRATE_CHAINS[0] as Chain,
+      targetNetwork: SUBTRATE_CHAINS[0] as Chain,
       amount: "0",
       tip: "0",
       fee: "0",
@@ -98,12 +96,13 @@ export const Send = () => {
       haveSufficientBalance: false,
     },
     resolver: yupResolver(schema),
-    mode: "onBlur"
+    mode: "onBlur",
   });
 
   const {
     watch,
     handleSubmit,
+    setValue,
     formState: { isValid },
   } = methods;
 
@@ -120,57 +119,59 @@ export const Send = () => {
       if (!isConfirmingTx) return setIsConfirmingTx(true);
 
       try {
-        const {
-          amount,
-          asset,
-          recipientAddress: destinationAddress,
-          senderAddress: originAddress,
-          originNetwork,
-          targetNetwork,
-          extrinsicHash,
-          evmTx,
-          tip,
-        } = data;
+        await messageAPI.sendTx();
 
-        const txType = originNetwork.type;
+        // const {
+        //   amount,
+        //   asset,
+        //   recipientAddress: destinationAddress,
+        //   senderAddress: originAddress,
+        //   originNetwork,
+        //   targetNetwork,
+        //   extrinsicHash,
+        //   evmTx,
+        //   tip,
+        // } = data;
 
-        if (txType === "wasm") {
-          messageAPI.sendSubstrateTx({
-            amount: amount,
-            asset: {
-              id: asset.id,
-              symbol: asset.symbol,
-            },
-            destinationAddress,
-            originAddress,
-            destinationNetwork: targetNetwork.name,
-            networkName: originNetwork.name,
-            rpc: originNetwork.rpcs[0] as string,
-            isSwap: false,
-            hexExtrinsic: extrinsicHash as string,
-            tip: tip
-              ? transformAmountStringToBN(
-                tip,
-                originNetwork.decimals
-              )?.toString()
-              : undefined,
-          });
-        } else if (txType === "evm") {
-          messageAPI.sendEvmTx({
-            amount: amount,
-            asset: {
-              id: asset.id,
-              symbol: asset.symbol,
-            },
-            destinationAddress,
-            originAddress,
-            destinationNetwork: targetNetwork.name,
-            networkName: originNetwork.name,
-            rpc: originNetwork.rpcs[0] as string,
-            isSwap: false,
-            evmTx,
-          });
-        }
+        // const txType = originNetwork.type;
+
+        // if (txType === "wasm") {
+        //   messageAPI.sendSubstrateTx({
+        //     amount: amount,
+        //     asset: {
+        //       id: asset.id,
+        //       symbol: asset.symbol,
+        //     },
+        //     destinationAddress,
+        //     originAddress,
+        //     destinationNetwork: targetNetwork.name,
+        //     networkName: originNetwork.name,
+        //     rpc: originNetwork.rpcs[0] as string,
+        //     isSwap: false,
+        //     hexExtrinsic: extrinsicHash as string,
+        //     tip: tip
+        //       ? transformAmountStringToBN(
+        //         tip,
+        //         originNetwork.decimals
+        //       )?.toString()
+        //       : undefined,
+        //   });
+        // } else if (txType === "evm") {
+        //   messageAPI.sendEvmTx({
+        //     amount: amount,
+        //     asset: {
+        //       id: asset.id,
+        //       symbol: asset.symbol,
+        //     },
+        //     destinationAddress,
+        //     originAddress,
+        //     destinationNetwork: targetNetwork.name,
+        //     networkName: originNetwork.name,
+        //     rpc: originNetwork.rpcs[0] as string,
+        //     isSwap: false,
+        //     evmTx,
+        //   });
+        // }
 
         showSuccessToast(t("tx_send"));
         navigate(BALANCE, {
@@ -188,6 +189,58 @@ export const Send = () => {
 
   const isLoadingFees = watch("isLoadingFee");
   const haveSufficientBalance = watch("haveSufficientBalance");
+  const _selectedAccount = watch("senderAddress");
+
+  const originNetwork = watch("originNetwork");
+  const targetNetwork = watch("targetNetwork");
+  const recipientAddress = watch("recipientAddress");
+  const sender = watch("senderAddress");
+  const amount = watch("amount");
+  const asset = watch("asset");
+
+  useEffect(() => {
+    if (
+      !originNetwork ||
+      !targetNetwork ||
+      !recipientAddress ||
+      !sender ||
+      !asset
+    )
+      return;
+
+    if (
+      !validateRecipientAddress(
+        recipientAddress,
+        originNetwork.type as "evm" | "wasm"
+      )
+    ) {
+      return;
+    }
+
+    if (amount === "0") return;
+
+    (async () => {
+      try {
+
+        setValue('isLoadingFee', true);
+
+        await messageAPI.updateTx({
+          tx: {
+            amount,
+            senderAddress: sender,
+            destinationAddress: recipientAddress,
+            originNetwork,
+            targetNetwork,
+            asset: asset,
+          },
+        });
+      } catch (error) {
+        console.log("update Tx error:", error);
+      }
+
+
+    })();
+  }, [originNetwork, targetNetwork, recipientAddress, sender, amount, asset]);
 
   return (
     <PageWrapper
@@ -196,14 +249,22 @@ export const Send = () => {
     >
       <div className="flex gap-3 items-center mb-7">
         <FiChevronLeft size={15} className="cursor-pointer" onClick={onBack} />
-        <p className="text-base font-medium">{t(isConfirmingTx ? "review_transfer_title" : "send_title")}</p>
+        <p className="text-base font-medium">
+          {t(isConfirmingTx ? "review_transfer_title" : "send_title")}
+        </p>
       </div>
 
       <FormProvider {...methods}>
         <div className="flex-1">
           {!isConfirmingTx ? (
             <>
-              <Recipient containerClassname="mb-4" />
+              <SelectAccount
+                selectedAddress={_selectedAccount}
+                onChangeValue={(value) =>
+                  methods.setValue("senderAddress", value)
+                }
+              />
+              <Recipient containerClassname="my-4" />
               <AssetToSend />
               <FeeAndTip containerClassname="mt-4" />
               <ErrorMessage containerClassname="mt-2" />

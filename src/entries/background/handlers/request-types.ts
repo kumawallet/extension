@@ -2,6 +2,7 @@ import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
 import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
+import { Tx } from "@src/storage/entities/Transaction";
 import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
@@ -79,13 +80,13 @@ export interface RequestDeriveAccount {
 export interface RequestSetNetwork {
   id: string;
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "ol"
+  type: "wasm" | "evm" | "ol";
 }
 export interface RequestDeleteSelectNetwork {
-  id :string;
+  id: string;
 }
 export interface RequestAddNetwork {
-  id:string;
+  id: string;
   type: "wasm" | "evm" | "ol";
 }
 export interface RequestSaveCustomChain {
@@ -182,6 +183,27 @@ export interface RequestSendEvmTx extends RequestSendTxBase {
   evmTx?: providers.TransactionRequest;
 }
 
+export interface RequestShowKey {
+  address: string;
+}
+
+export interface RequestUpdateTx {
+  tx: {
+    amount: string;
+    senderAddress: string;
+    destinationAddress: string;
+    originNetwork: Chain;
+    targetNetwork: Chain;
+    asset: {
+      id: string;
+      symbol: string;
+      decimals: number;
+      balance: string;
+      address?: string | undefined;
+    };
+  };
+}
+
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
@@ -206,7 +228,7 @@ export interface Request {
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
-  "pri(auth.showKey)": [null, string | undefined];
+  "pri(auth.showKey)": [RequestShowKey, string | undefined];
 
   "pri(network.setNetwork)": [RequestSetNetwork, boolean];
   "pri(network.getNetwork)": [null, Network];
@@ -214,11 +236,14 @@ export interface Request {
   "pri(network.saveCustomChain)": [RequestSaveCustomChain, void];
   "pri(network.removeCustomChain)": [RequestRemoveCustomChain, void];
   "pri(network.getCustomChains)": [null, Chain[]];
-  "pri(network.deleteSelectNetwork)": [RequestDeleteSelectNetwork, RequestSetNetwork],
+  "pri(network.deleteSelectNetwork)": [
+    RequestDeleteSelectNetwork,
+    RequestSetNetwork
+  ];
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
-  "pri(network.subscription)": [null,{},{}]
+  "pri(network.subscription)": [null, {}, {}];
 
-  "pri(assestsBanlance.subscription)" : [null,{},{}]
+  "pri(assestsBanlance.subscription)": [null, {}, {}];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
   "pri(settings.getAdvancedSettings)": [null, Setting[]];
@@ -257,8 +282,9 @@ export interface Request {
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
   "pri(trustedSites.removeTrustedSite)": [RequestRemoveTrustedSite, void];
 
-  "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
-  "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+  "pri(send.updateTx)": [RequestUpdateTx, string];
+  "pri(send.getFeeSubscribe)": [null, void, string];
+  "pri(send.sendTx)": [null, boolean];
 }
 
 export type MessageTypes = keyof Request;

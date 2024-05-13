@@ -22,21 +22,22 @@ export const Assets = () => {
   const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    console.log(assets, "AASSSSSSSSSSEEEEEYTTTTTTTTTSSSSSSSSSSSs")
+    // console.log(assets, "AASSSSSSSSSSEEEEEYTTTTTTTTTSSSSSSSSSSSs")
     const a = Object.values(assets).flatMap(asset => {
       return Object.values(asset).flatMap(subasset => {
-        console.log("sub", subasset)
-        console.log(formatAmountWithDecimals(
-          Number(subasset.assets[0].balance),
-          6,
-          subasset.assets[0].decimals
-        ), "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo", subasset.assets[0],subasset.assets[0])
+        // console.log("sub", subasset)
+        // console.log(formatAmountWithDecimals(
+        //   Number(subasset.assets[0].balance),
+        //   6,
+        //   subasset.assets[0].decimals
+        // ), "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo", subasset.assets[0],subasset.assets[0])
         return subasset.assets
       });
     }
     )
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", a, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
- return a} , [JSON.stringify(assets),showAllAssets]);
+    // console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", a, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    return a
+  }, [JSON.stringify(assets), showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -65,12 +66,13 @@ export const Assets = () => {
       {isLoadingAssets && <Loading />}
 
       {
-      filteredAsset && filteredAsset?.length !==0 && filteredAsset.map((asset, index) =>{
-        console.log("sgerf ewgfgvhfhwegfgehwfghfg", asset)
-        return (
-        
-        <Asset asset={asset} key={index} />
-      )})}
+        filteredAsset && filteredAsset?.length !== 0 && filteredAsset.map((asset, index) => {
+          // console.log("sgerf ewgfgvhfhwegfgehwfghfg", asset)
+          return (
+
+            <Asset asset={asset} key={index} />
+          )
+        })}
 
       {showManageAssets && (
         <div className="flex justify-center mt-2">
