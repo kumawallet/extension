@@ -43,7 +43,9 @@ export const reducer = (state: InitialState, action: Action) => {
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  useEffect(() =>{
+    console.log(state.assets, "Estos son los assets del provider")
+  }, [JSON.stringify(state.assets)])
  useEffect(
   ()=>{
     messageAPI.getAssetsBalance(
@@ -60,6 +62,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
       type: "end-loading"
     });
       },[]
+      
 
  )
 

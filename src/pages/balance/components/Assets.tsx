@@ -3,11 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
 import {
+  useAccountContext,
   useAssetContext,
 } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { Asset } from "./Asset";
+import { AllAsset } from "./AllAssets"
 import { CgOptions } from "react-icons/cg";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 
@@ -17,27 +19,65 @@ export const Assets = () => {
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
+  const {state: {selectedAccount}} = useAccountContext();
 
   const [showAllAssets, setShowAllAssets] = useState(true);
   const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    // console.log(assets, "AASSSSSSSSSSEEEEEYTTTTTTTTTSSSSSSSSSSSs")
-    const a = Object.values(assets).flatMap(asset => {
-      return Object.values(asset).flatMap(subasset => {
-        // console.log("sub", subasset)
-        // console.log(formatAmountWithDecimals(
-        //   Number(subasset.assets[0].balance),
-        //   6,
-        //   subasset.assets[0].decimals
-        // ), "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo", subasset.assets[0],subasset.assets[0])
-        return subasset.assets
-      });
+    if(selectedAccount?.value){
+      const allAssets = Object.values(assets).flatMap(asset => {
+        return Object.values(asset).flatMap(subasset => {
+          return subasset.assets
+        });
+      }
+      )
+      if(showAllAssets){
+        return allAssets
+      }
+      else{
+        return allAssets.filter((asset) => asset.id === "-1")
+      }
     }
-    )
-    // console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", a, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    return a
-  }, [JSON.stringify(assets), showAllAssets]);
+    else{
+      const outputObject: any = {};
+      if(Object.keys(assets).length !== 0){
+        if(showAllAssets){
+          Object.keys(assets).forEach(address => {
+            const networks = assets[address];
+            Object.keys(networks).forEach((network : any) => {
+                const assets = networks[network].assets;
+                assets.forEach((asset: any) => {
+                    if (!outputObject[asset.symbol]) {
+                        outputObject[asset.symbol] = [];
+                    }
+                    outputObject[asset.symbol].push({ ...asset, address: address });
+                });
+            });
+          });
+        }
+        else{
+          Object.keys(assets).forEach(address => {
+            const networks = assets[address];
+            Object.keys(networks).forEach((network : any) => {
+                const assets = networks[network].assets;
+                assets.forEach((asset: any) => {
+                    if (!outputObject[asset.symbol]) {
+                        outputObject[asset.symbol] = [];
+                    }
+                    if(asset.id === "-1"){
+                    outputObject[asset.symbol].push({ ...asset, address: address });
+                  }
+                });
+            });
+          });
+        }
+    return outputObject
+      }
+      
+    
+    }
+} , [JSON.stringify(assets),showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -66,14 +106,13 @@ export const Assets = () => {
       {isLoadingAssets && <Loading />}
 
       {
-        filteredAsset && filteredAsset?.length !== 0 && filteredAsset.map((asset, index) => {
-          // console.log("sgerf ewgfgvhfhwegfgehwfghfg", asset)
-          return (
-
-            <Asset asset={asset} key={index} />
-          )
-        })}
-
+      selectedAccount?.value && filteredAsset && filteredAsset?.length !==0 ? Object.keys(filteredAsset).map((asset, index) =>{
+        return (<Asset asset={filteredAsset[asset]} key={index} />)
+    }) : Object.keys(filteredAsset).length !== 0 && Object.keys(filteredAsset).map((_assets: string) => {  
+      return (<AllAsset assets={filteredAsset[_assets]} symbol={_assets} />)
+    })
+      }
+      
       {showManageAssets && (
         <div className="flex justify-center mt-2">
           <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
