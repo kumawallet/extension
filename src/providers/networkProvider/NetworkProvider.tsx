@@ -134,7 +134,6 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     getChains().then((result) => {
-      console.log(result, "ESTAS SON LAS CHAINS")
       dispatch({
       type: "init-networks",
       payload: {

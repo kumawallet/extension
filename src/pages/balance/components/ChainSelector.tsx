@@ -34,7 +34,6 @@ export const ChainSelector = () => {
 
 
 const updateSelectNetwork = async(id:string, type?: "wasm"| "evm" | "ol", isTestnet?: boolean) =>{
-  console.log("SElectedChain", selectedChain)
   if(Object.keys(selectedChain).includes(id))
     {
       await messageAPI.deleteSelectChain({id})
