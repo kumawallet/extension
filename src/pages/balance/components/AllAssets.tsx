@@ -32,7 +32,7 @@ export const AllAsset: FC<AssetProps> = ({ assets, symbol}) => {
             <p className="tx-sm">{symbol}</p> 
          </div>
          <div className="text-xs text-gray-400 text-start">
-           { formatUSDAmount(assets.reduce((acc, _asset) => acc + JSON.parse(_asset.amount), 0))}
+           { formatUSDAmount(assets.reduce((acc, _asset) => acc + Number(_asset.amount) | 0, 0))}
          </div>
        </div>
      </div>

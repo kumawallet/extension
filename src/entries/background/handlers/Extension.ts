@@ -107,7 +107,7 @@ export default class Extension {
 
   constructor() {
     this.subscriptionStatusProvider();
-    this.InitNetworks();
+    this.initNetworks();
   }
 
   get version() {
@@ -154,9 +154,11 @@ export default class Extension {
       newPassword
     );
   }
-  private async InitNetworks() {
+  private async initNetworks() {
+    Network.getInstance()
     const network:any = await Network.get();
-    const allChains: Chain[] = [SUBTRATE_CHAINS,EVM_CHAINS].map((chain: any) => chain.chains).flat();
+    if(!network) return
+    const allChains: Chain[] = [SUBTRATE_CHAINS,EVM_CHAINS].flat();
     const chain = this.Chains.getValue()
     if(network && network?.Chain?.supportedAccounts){
             const newChainFormat = allChains.find((chain) => network?.Chain?.name  === chain.name);
@@ -189,6 +191,7 @@ export default class Extension {
       this.validatePasswordFormat(password);
       this.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
       await Storage.init(password, privateKeyOrSeed);
+      await this.initNetworks()
     } catch (error) {
       Storage.getInstance().resetWallet();
       Auth.signOut();

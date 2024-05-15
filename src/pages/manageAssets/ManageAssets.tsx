@@ -30,7 +30,7 @@ export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
   const { t: tCommon } = useTranslation("common");
   const {
-    state: { selectedChain, api },
+    state: { selectedChain },
   } = useNetworkContext();
   const { state: { selectedAccount } } = useAccountContext()
   const { loadAssets } = useAssetContext();

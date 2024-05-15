@@ -25,11 +25,6 @@ export class Provider {
       if(Object.keys(this.providers).includes(id) && Object.keys(this.providers).length !== 0){
         if(type === "wasm"){
           await (this.providers[id].provider as ApiPromise).connect()
-          const intervalWasm = setInterval(() => {
-            if((this.providers[id].provider as ApiPromise).isConnected) {
-              status[id]  = ChainStatus.CONNECTED
-              this.statusNetwork.next(status);
-              clearInterval(intervalWasm)
               this.intervals[id] = setInterval(async () => {
                 try {
                   if(!(this.providers[id].provider as ApiPromise).isConnected){
@@ -39,9 +34,6 @@ export class Provider {
                   throw new Error("failed_to_connected_provider");
                 }
               }, 20000); 
-            
-          }
-          }, 6000);
           
       }
         else{
@@ -84,6 +76,7 @@ export class Provider {
 
             this.intervals[id]  = setInterval(async() =>{
               const status = this.statusNetwork.getValue()
+             
               await (this.providers[id].provider as ethers.providers.JsonRpcProvider).ready.then(
                 () => {
                   if(status[id] === "connected") return

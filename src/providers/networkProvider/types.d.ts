@@ -12,7 +12,7 @@ type Api =  { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}}
 
 export interface InitialState {
   chains: ChainsState;
-  selectedChain: SelectedChain;
+                                    selectedChain: SelectedChain;
 }
 
 export interface NetworkContext {

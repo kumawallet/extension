@@ -31,19 +31,19 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
 
   const totalBalance = () => {
-    const a = Object.keys(assets).reduce((acc_, address) => {
-      const networks = assets[address];
-      return acc_ + Object.keys(networks).reduce((_acc, network : any) => { 
-          const assets = networks[network].assets;
-          return _acc + assets.reducer((acc, asset: any) => {
-              return acc + formatAmountWithDecimals(
-                Number(asset.balance),
-                6,
-                asset.decimals
-              );
-          });
-      });
-    });
+    // const a = Object.keys(assets).reduce((acc_, address) => {
+    //   const networks = assets[address];
+    //   return acc_ + Object.keys(networks).reduce((_acc, network : any) => { 
+    //       const assets = networks[network].assets;
+    //       return _acc + assets.reducer((acc, asset: any) => {
+    //           return acc + formatAmountWithDecimals(
+    //             Number(asset.balance),
+    //             6,
+    //             asset.decimals
+    //           );
+    //       });
+    //   });
+    // });
     return 0
   }
 
