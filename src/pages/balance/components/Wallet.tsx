@@ -26,13 +26,23 @@ export const Wallet: FC<WalletProps> = ({
   more,
 }) => {
   const iconURL = useMemo(() => {
-    if (type.toLowerCase().includes("wasm")) {
+    const parsedType = type.toLowerCase();
+
+
+
+    if (parsedType.includes("wasm")) {
       return ASSETS_ICONS["DOT"];
     }
 
-    if (type.toLowerCase().includes("evm")) {
+    if (parsedType.includes("evm")) {
       return ASSETS_ICONS["ETH"];
     }
+
+    if (parsedType.includes("ol")) {
+      return ASSETS_ICONS["OL"];
+    }
+
+
   }, [type]);
 
   const { Icon, copyToClipboard } = useCopyToClipboard(address);

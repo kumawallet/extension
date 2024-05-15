@@ -33,7 +33,7 @@ export const transformAddress = (
 ) => {
   if (!address) return "";
 
-  if (address.startsWith("0x")) return address;
+  if (address.startsWith("0x") || address.length === 64) return address;
 
   const publicKey = decodeAddress(address);
 

@@ -10,16 +10,11 @@ import {
   StorageEntryBase,
   StorageEntryPromiseOverloads,
 } from "@polkadot/api/types";
-import {
-  GraphQLClient,
-  RequestDocument,
-  Variables,
-  gql,
-} from "graphql-request";
 import { AnyTuple } from "@polkadot/types-codec/types";
 import { CURRENCIES } from "@utils/constants";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 import AccountEntity from "@src/storage/entities/Account";
+import { OlProvider } from "@src/services/ol/OlProvider";
 
 const getType = (type: string) =>{
   if(type === "imported_wasm"){
@@ -34,7 +29,7 @@ const getType = (type: string) =>{
 }
 export const getNatitveAssetBalance = async (
   api: {
-    provider :ApiPromise | ethers.providers.JsonRpcProvider | null
+    provider :ApiPromise | ethers.providers.JsonRpcProvider | OlProvider | null
     type: "wasm" | "evm" | "ol"},
   accountAddress: string,
   account : AccountEntity
@@ -59,6 +54,15 @@ export const getNatitveAssetBalance = async (
       };
       return getSubtrateNativeBalance(data);
     }
+
+
+    if (api.type === "ol") {
+      const balance = await (api.provider as OlProvider).getBalance(accountAddress);
+      return {
+        balance,
+      };
+    }
+
     else if (api.type ===  "evm" && getType(account.type.toLowerCase()) === "evm") {
       
       const amount = await (api.provider as ethers.providers.JsonRpcProvider).getBalance(accountAddress)
@@ -448,6 +452,7 @@ export const formatFees = (fees: string, decimals: number) => {
 
   const _decimals = formated.split(".")[1] || "";
   const threeFirstDecimals = _decimals.slice(0, 3);
+
   if (threeFirstDecimals === "000") {
     return formated;
   }

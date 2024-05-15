@@ -3,6 +3,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { PropsWithChildren } from "react";
+import { AccountType } from "@src/accounts/types";
 
 const functionMocks = {
   onBack: vi.fn(),
@@ -60,7 +61,8 @@ describe('ImportWalletFromInside', () => {
           watch: vi.fn(() => ({
             type: "seed",
             seedLength: 12,
-            privateKeyOrSeed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED"
+            privateKeyOrSeed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED",
+            accountTypesToImport: [AccountType.IMPORTED_EVM]
           })),
         }),
       };

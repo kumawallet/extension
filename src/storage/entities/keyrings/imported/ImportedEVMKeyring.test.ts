@@ -16,6 +16,7 @@ describe("ImportedEVMKeyring", () => {
       keyPair: {
         key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
       },
+      isDerivable: false,
     });
   });
 

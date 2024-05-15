@@ -6,7 +6,7 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import { Action, AssetContext, InitialState} from "./types";
+import { Action, AssetContext, InitialState } from "./types";
 import { messageAPI } from "@src/messageAPI/api";
 
 
@@ -38,30 +38,31 @@ export const reducer = (state: InitialState, action: Action) => {
         assets,
         isLoadingAssets: false,
       };
-    }}
+    }
   }
+}
 
 export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
- useEffect(
-  ()=>{
-    messageAPI.getAssetsBalance(
-      (assets) =>{
-        dispatch({
-          type: "set-assets",
-          payload: {
-            assets: assets
-          },
-        });
-      }
-    )
-    dispatch({
-      type: "end-loading"
-    });
-      },[]
-      
+  useEffect(
+    () => {
+      messageAPI.getAssetsBalance(
+        (assets) => {
+          dispatch({
+            type: "set-assets",
+            payload: {
+              assets: assets
+            },
+          });
+        }
+      )
+      dispatch({
+        type: "end-loading"
+      });
+    }, []
 
- )
+
+  )
 
   return (
     <AssetContext.Provider

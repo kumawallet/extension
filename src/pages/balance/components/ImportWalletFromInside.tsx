@@ -32,6 +32,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
       type: "",
       seedLength: 12,
       privateKeyOrSeed: "",
+      accountTypesToImport: []
     },
     reValidateMode: "onSubmit",
   });
@@ -42,6 +43,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
     type: string;
     seedLength: number;
     privateKeyOrSeed: string;
+    accountTypesToImport: AccountType[];
   }) => {
     starLoading();
 
@@ -50,7 +52,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
       privateKeyOrSeed: data.privateKeyOrSeed,
       isSignUp: false,
       password: null,
-      accountType: data.type === "seed" ? AccountType.WASM : AccountType.EVM,
+      accountTypesToImport: data.accountTypesToImport,
     });
 
     endLoading();
@@ -62,7 +64,7 @@ export const ImportWalletFromInside: FC<ImportWalletFromInsideProps> = ({
   const form = watch();
 
   const buttonIsDisabled = useMemo(() => {
-    return !form.privateKeyOrSeed.trim();
+    return !form.privateKeyOrSeed.trim() || !form.accountTypesToImport.length;
   }, [form]);
 
   const _onBack = () => {

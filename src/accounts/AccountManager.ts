@@ -9,13 +9,14 @@ import { AccountType, AccountKey, AccountValue } from "./types";
 import { getAccountType } from "../utils/account-utils";
 import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
+import ImporedOLKeying from "@src/storage/entities/keyrings/imported/ImportedOLKeyring";
 
 export default class AccountManager {
   private static formatAddress(address: string, type: AccountType): AccountKey {
     if (
       address.startsWith("WASM") ||
       address.startsWith("EVM") ||
-      address.startsWith("MOVE") ||
+      address.startsWith("OL") ||
       address.startsWith("IMPORTED")
     ) {
       return address as AccountKey;
@@ -38,10 +39,12 @@ export default class AccountManager {
     type,
     path,
     parentAddress,
+    isDerivable,
   }: {
     name: string;
     address: string;
     type: AccountType;
+    isDerivable?: boolean;
     parentAddress?: string;
     path?: number;
     keyring: SupportedKeyring;
@@ -52,6 +55,7 @@ export default class AccountManager {
       name: _name,
       address,
       keyring: keyring.type,
+      isDerivable,
     } as AccountValue;
 
     if (parentAddress) {
@@ -82,22 +86,35 @@ export default class AccountManager {
       address,
       type,
       keyring: _keyring as SupportedKeyring,
+      isDerivable: true,
     });
   }
 
   static async importAccount(
     name: string,
     privateKeyOrSeed: string,
-    type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM
+    type:
+      | AccountType.IMPORTED_EVM
+      | AccountType.IMPORTED_WASM
+      | AccountType.IMPORTED_OL
   ): Promise<Account> {
     const keyring = (await Vault.getKeyring(type)) as
       | ImportedEVMKeyring
-      | ImportedWASMKeyring;
-    const { address, keyPair } = await keyring.getImportedData(
+      | ImportedWASMKeyring
+      | ImporedOLKeying;
+    const { address, keyPair, isDerivable } = await keyring.getImportedData(
       privateKeyOrSeed
     );
+
     keyring.addKeyPair(address, keyPair);
-    return AccountManager.createAccount({ name, address, type, keyring });
+
+    return AccountManager.createAccount({
+      name,
+      address,
+      type,
+      keyring,
+      isDerivable,
+    });
   }
 
   static async incrementPath(parentAddress: string, type: AccountType) {
@@ -134,13 +151,16 @@ export default class AccountManager {
     address: string
   ): Promise<Account> {
     const keyring = (await Vault.getKeyring(type)) as HDKeyring;
+
+    console.log("keyring", keyring, address);
+
     if (!keyring || !keyring.keyPairs[address])
       throw new Error("failed_to_derive_from_empty_keyring");
 
     const seed = keyring.keyPairs[address].key;
     const { path } = await this.incrementPath(address, type);
 
-    const _address = keyring.getAddress(seed, path);
+    const _address = await keyring.getAddress(seed, path);
 
     return AccountManager.createAccount({
       name,

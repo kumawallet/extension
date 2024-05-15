@@ -9,6 +9,7 @@ import { MapResponseEVM, MapResponseXCM } from "@src/xcm/interfaces";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { BigNumberish, Contract, Wallet, providers } from "ethers";
 import erc20Abi from "@src/constants/erc20.abi.json";
+import { OlProvider } from "@src/services/ol/OlProvider";
 
 export interface Tx {
   amount: string;
@@ -262,6 +263,12 @@ export class Transaction {
     return estimatedFee;
   }
 
+  async handleOlTx() {
+    const provider = this.tx.getValue().provider!.provider as OlProvider;
+
+    return provider.getFees();
+  }
+
   async getFee() {
     const originNetwork = this.tx.getValue().originNetwork;
 
@@ -273,6 +280,11 @@ export class Transaction {
     } else if (originNetwork?.type === "evm") {
       return this.handleEvmTx().catch((error) => {
         console.error("handleEvmTx error:", error);
+        return "0";
+      });
+    } else if (originNetwork?.type === "ol") {
+      return this.handleWasmTx().catch((error) => {
+        console.error("getWasmFee error:", error);
         return "0";
       });
     }

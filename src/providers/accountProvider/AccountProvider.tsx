@@ -236,7 +236,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     name: string;
     privateKeyOrSeed: string;
     password: string;
-    accountType: AccountType;
+    accountTypesToImport: AccountType[];
     isSignUp: boolean;
   }) => {
     try {
@@ -246,13 +246,12 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw new Error("password_required");
       if (!account.privateKeyOrSeed)
         throw new Error("private_key_or_seed_required");
-      if (!account.accountType) throw new Error("account_type_required");
-      const type = getImportedType(account.accountType);
+
       await messageAPI.importAccount({
         name: account.name,
         privateKeyOrSeed: account.privateKeyOrSeed,
         password: account.password,
-        type,
+        accountTypesToImport: account.accountTypesToImport,
         isSignUp: account.isSignUp,
       });
       await getSelectedAccount();

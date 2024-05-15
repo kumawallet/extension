@@ -47,6 +47,8 @@ export const Balance = () => {
   }, [selectedChain?.name]);
 
 
+
+
   return (
     <>
       <Header />

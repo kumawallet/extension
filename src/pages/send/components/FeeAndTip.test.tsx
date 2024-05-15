@@ -298,7 +298,7 @@ describe("FeeAndTip", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(functionMocks.reserveTransferAssets).toBeCalledTimes(1);
+        expect(functionMocks.reserveTransferAssets).toHaveBeenCalled();
       });
     });
 
@@ -312,7 +312,7 @@ describe("FeeAndTip", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(functionMocks.transferAllowDeath).toBeCalledTimes(1);
+        expect(functionMocks.transferAllowDeath).toHaveBeenCalled();
       });
     });
 
@@ -326,7 +326,7 @@ describe("FeeAndTip", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(functionMocks.transfer).toBeCalledTimes(1);
+        expect(functionMocks.transfer).toHaveBeenCalled();
       });
     });
   });

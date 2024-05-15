@@ -103,9 +103,17 @@ export const Activity = () => {
     const chainType = chain?.type;
     if (chainType === "wasm") {
       return `${selectedChain?.explorer}/extrinsic/${hash}`;
-    } else {
+    }
+
+    if (chainType === "evm") {
       return `${selectedChain?.explorer}/tx/${hash}`;
     }
+
+    if (chainType === "ol") {
+      return `${selectedChain?.explorer}/transactions/${hash}`;
+    }
+
+    return ""
   };
 
   const allChains = chains.flatMap((c) => c.chains);
@@ -147,7 +155,6 @@ export const Activity = () => {
     };
   }, [isLoadingTxs, hasNextPage]);
 
-
   if (isLoading || isLoadingTxs) {
     return <Loading />;
   }
@@ -188,6 +195,7 @@ export const Activity = () => {
             targetNetwork,
             type,
             tip,
+            version
           }) => (
             <Button
               variant="contained-little-gray"
@@ -207,6 +215,7 @@ export const Activity = () => {
                     amount,
                     asset,
                     tip,
+                    version
                   },
                 })
               }

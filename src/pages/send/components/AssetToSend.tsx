@@ -424,7 +424,7 @@ export const AssetToSend = () => {
           buttonClassname="w-full flex justify-end items-center gap-24 pr-4"
           iconField="logo"
           iconWidth={24}
-          selectedLabelClassName="text-lg ml-16"
+          selectedLabelClassName="text-lg ml-16 text-nowrap"
           modalTitle={t("select_chain")}
         />
       </div>

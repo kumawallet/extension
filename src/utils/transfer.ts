@@ -19,9 +19,13 @@ export const isKnownEstimatedFeeError = (error: any): boolean => {
 
 export const validateRecipientAddress = (
   address: string,
-  type: "evm" | "wasm"
+  type: "evm" | "wasm" | "ol"
 ): boolean => {
   try {
+    if (type === "ol") {
+      return address.length === 64;
+    }
+
     if (type === "evm" && address.length === 42) {
       return utils.isAddress(address);
     }

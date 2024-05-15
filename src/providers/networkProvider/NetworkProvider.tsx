@@ -15,6 +15,8 @@ import { ChainsState } from "@src/types";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { migrateOldCustomChains } from "@src/utils/chains";
+import { OlProvider } from "@src/services/ol/OlProvider";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const initialState: InitialState = {
   chains: [],
@@ -41,6 +43,10 @@ const getChains = async (): Promise<ChainsState> => {
         title: "evm_based",
         chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
       },
+      {
+        title: "move",
+        chains: OL_CHAINS
+      }
     ];
 
     let customChains = await messageAPI.getCustomChains();
@@ -103,7 +109,7 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         chains,
       };
     }
-    case "init-networks" : {
+    case "init-networks": {
       const { chains } = action.payload;
       return {
         ...state,
@@ -135,16 +141,16 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     getChains().then((result) => {
       dispatch({
-      type: "init-networks",
-      payload: {
-        chains : result
-      },
-    });
+        type: "init-networks",
+        payload: {
+          chains: result
+        },
+      });
     })
-    
+
 
     messageAPI.networkSubscribe(
-      (network)=>{
+      (network) => {
         dispatch({
           type: "select-network",
           payload: {

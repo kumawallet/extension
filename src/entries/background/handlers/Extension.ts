@@ -44,8 +44,6 @@ import {
   RequestRemoveTrustedSite,
   RequestSaveContact,
   RequestSaveCustomChain,
-  RequestSendEvmTx,
-  RequestSendSubstrateTx,
   RequestSetNetwork,
   RequestSignIn,
   RequestSignUp,
@@ -58,7 +56,6 @@ import {
   RequestUpdateContact,
   RequestDeleteSelectNetwork,
   RequestShowKey,
-  RequestGetProvider,
   RequestUpdateTx,
 } from "./request-types";
 import { Wallet, ethers, providers, utils } from "ethers";
@@ -67,21 +64,15 @@ import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-// import { getChainHistoricHandler } from "@src/services/historic-transactions";
 import { Chain, Transaction, SelectedChain } from "@src/types";
-// import { transformAddress } from "@src/utils/account-utils";
 import { Port } from "./types";
-import { BehaviorSubject, filter } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
-// import { SelectedChain } from "@src/providers/assetProvider/types";
 import { Provider } from "@src/storage/entities/Provider";
-import AssetBalance from "@src/storage/entities/AssetBalance";
-import {
-  Transaction as TransactionEntity,
-  Tx,
-} from "@src/storage/entities/Transaction";
+import { Transaction as TransactionEntity } from "@src/storage/entities/Transaction";
 import AssetBalance from "@src/storage/entities/AssetBalance";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { OlProvider } from "@src/services/ol/OlProvider";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === "evm")
@@ -144,15 +135,16 @@ export default class Extension {
     this.validatePasswordFormat(currentPassword);
     this.validatePasswordFormat(newPassword);
 
-    const seed = await this.showKey();
+    // TODO: fix this
+    // const seed = await this.showKey();
 
-    if (!seed) throw new Error("failed_to_get_seed");
+    // if (!seed) throw new Error("failed_to_get_seed");
 
-    await AccountManager.changePassword(
-      seed as string,
-      currentPassword,
-      newPassword
-    );
+    // await AccountManager.changePassword(
+    //   seed as string,
+    //   currentPassword,
+    //   newPassword
+    // );
   }
   private async initNetworks() {
     Network.getInstance();
@@ -223,21 +215,11 @@ export default class Extension {
       seed,
       name
     );
-    const evmAccount = await AccountManager.addAccount(
-      AccountType.EVM,
-      seed,
-      name
-    );
+    await AccountManager.addAccount(AccountType.EVM, seed, name);
 
-    const selectedAccount = await this.getSelectedAccount();
+    await AccountManager.addAccount(AccountType.OL, seed, name);
 
-    if (isSignUp) {
-      await this.setSelectedAccount(wasmAccount);
-    } else {
-      await this.setSelectedAccount(
-        selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
-      );
-    }
+    await this.setSelectedAccount(wasmAccount);
 
     return true;
   }
@@ -310,18 +292,44 @@ export default class Extension {
     name,
     privateKeyOrSeed,
     password = "",
-    type,
+    accountTypesToImport,
     isSignUp = true,
   }: RequestImportAccount) {
     if (isSignUp) {
       await this.signUp({ password, privateKeyOrSeed });
     }
-    const account = await AccountManager.importAccount(
-      name,
-      privateKeyOrSeed,
-      type
-    );
-    this.setSelectedAccount(account);
+
+    let firstAccountCreated;
+
+    if (accountTypesToImport.includes(AccountType.WASM)) {
+      firstAccountCreated = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_WASM
+      );
+    }
+
+    if (accountTypesToImport.includes(AccountType.EVM)) {
+      firstAccountCreated = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_EVM
+      );
+    }
+
+    if (accountTypesToImport.includes(AccountType.OL)) {
+      const account = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_OL
+      );
+
+      if (!firstAccountCreated) {
+        firstAccountCreated = account;
+      }
+    }
+
+    this.setSelectedAccount(firstAccountCreated!);
   }
 
   private removeAccount({ key }: RequestRemoveAccout) {
@@ -505,8 +513,7 @@ export default class Extension {
     if (!accounts) return [];
 
     const accountWithoutParentAddress = accounts.filter(
-      ({ value, type }) =>
-        !value.parentAddress && type !== AccountType.IMPORTED_EVM
+      ({ value }) => !value.parentAddress || value.isDerivable
     );
 
     return accountWithoutParentAddress;
@@ -833,6 +840,8 @@ export default class Extension {
       );
     } else if (tx.originNetwork?.type === "wasm") {
       signer = keyring.keyring.addFromMnemonic(seed as string);
+    } else if (tx.originNetwork.type === "ol") {
+      signer = seed;
     }
 
     this.tx.updateTx({
@@ -1063,12 +1072,65 @@ export default class Extension {
     }
   }
 
+  private async sendOLTx() {
+    const {
+      provider,
+      signer,
+      senderAddress,
+      amount,
+      asset,
+      destinationAddress,
+      originNetwork,
+      targetNetwork,
+    } = this.tx.tx.getValue();
+
+    const olProvider = provider?.provider as unknown as OlProvider;
+
+    const tx = await olProvider.transfer({
+      pk: signer as string,
+      sender: senderAddress,
+      recipient: destinationAddress,
+      amount: amount,
+    });
+
+    const hash = tx.hash;
+    const status = tx.success ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+
+    const transaction: Transaction = {
+      id: tx?.hash,
+      amount: amount,
+      asset: asset!.symbol,
+      blockNumber: tx.blockNumber,
+      hash: tx?.hash as string,
+      originNetwork: originNetwork?.name as string,
+      recipient: destinationAddress,
+      targetNetwork: targetNetwork?.name as string,
+      sender: senderAddress,
+      status,
+      type: RecordType.TRANSFER,
+      tip: "",
+      timestamp: tx?.timestamp,
+      fee: tx?.fee || "",
+      isSwap: false,
+      version: tx?.version as string,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.addActivity({ txHash: hash, record: transaction as any });
+    this.sendUpdateActivityMessage();
+    this.sendTxNotification({ title: `tx ${status}`, message: hash });
+
+    return true;
+  }
+
   private async sendTx() {
     const originNetwork = this.tx.tx.getValue().originNetwork;
     if (originNetwork?.type === "evm") {
       return this.sendEvmTx();
     } else if (originNetwork?.type === "wasm") {
       return this.sendSubstrateTx();
+    } else if (originNetwork?.type === "ol") {
+      return this.sendOLTx();
     }
   }
 

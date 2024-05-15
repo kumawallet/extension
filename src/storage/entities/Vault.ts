@@ -6,6 +6,8 @@ import EVMKeyring from "./keyrings/hd/EVMKeyring";
 import WASMKeyring from "./keyrings/hd/WASMKeyring";
 import ImportedEVMKeyring from "./keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "./keyrings/imported/ImportedWASMKeyring";
+import OLKeyring from "./keyrings/hd/OLKeyring";
+import ImportedOLKeyring from "./keyrings/imported/ImportedOLKeyring";
 
 const STORAGE_NAME = "Vault";
 
@@ -18,8 +20,10 @@ export default class Vault {
     this.keyrings = {
       [AccountType.EVM]: undefined,
       [AccountType.WASM]: undefined,
+      [AccountType.OL]: undefined,
       [AccountType.IMPORTED_EVM]: new ImportedEVMKeyring(),
       [AccountType.IMPORTED_WASM]: new ImportedWASMKeyring(),
+      [AccountType.IMPORTED_OL]: new ImportedOLKeyring(),
     };
   }
 
@@ -92,18 +96,23 @@ export default class Vault {
       if (keyring) {
         switch (keyringType) {
           case AccountType.EVM:
-            // if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = EVMKeyring.fromJSON(keyring);
             break;
           case AccountType.WASM:
-            // if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = WASMKeyring.fromJSON(keyring);
+            break;
+          case AccountType.OL:
+            vault.keyrings[keyringType] = OLKeyring.fromJSON(keyring);
             break;
           case AccountType.IMPORTED_EVM:
             vault.keyrings[keyringType] = ImportedEVMKeyring.fromJSON(keyring);
             break;
           case AccountType.IMPORTED_WASM:
             vault.keyrings[keyringType] = ImportedWASMKeyring.fromJSON(keyring);
+            break;
+          case AccountType.IMPORTED_OL:
+            vault.keyrings[keyringType] = ImportedOLKeyring.fromJSON(keyring);
+
             break;
         }
       }
@@ -136,10 +145,22 @@ export default class Vault {
   }
 
   private static async addHDKeyring(type: AccountType, mnemonic: string) {
-    const keyring =
-      type === AccountType.EVM
-        ? new EVMKeyring(mnemonic)
-        : new WASMKeyring(mnemonic);
+    let keyring;
+
+    switch (type) {
+      case AccountType.EVM:
+        keyring = new EVMKeyring(mnemonic);
+        break;
+      case AccountType.WASM:
+        keyring = new WASMKeyring(mnemonic);
+        break;
+      case AccountType.OL:
+        keyring = new OLKeyring(mnemonic);
+        break;
+      default:
+        throw new Error("invalid_keyring_type");
+    }
+
     await this.saveKeyring(keyring);
     return keyring;
   }

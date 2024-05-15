@@ -32,7 +32,7 @@ export interface RequestImportAccount {
   name: string;
   privateKeyOrSeed: string;
   password: string | undefined;
-  type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
+  accountTypesToImport: AccountType[];
   isSignUp: boolean | undefined;
 }
 
@@ -160,7 +160,7 @@ export interface getLock {
   lock: number;
 }
 
-interface RequestSendTxBase {
+export interface RequestSendTxBase {
   amount: string;
   asset: {
     symbol: string;

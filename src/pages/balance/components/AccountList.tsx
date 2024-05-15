@@ -112,8 +112,8 @@ export const AccountList = () => {
                         >
                           <button
                             className={`flex items-center px-4 py-3 bg-[#1C1C27] rounded-lg ${!selectedAccount?.value
-                                ? "border border-[#2CEC84]"
-                                : ""
+                              ? "border border-[#2CEC84]"
+                              : ""
                               }`}
                             onClick={() => setSelectedAccount(null)}
                           >
@@ -135,7 +135,7 @@ export const AccountList = () => {
                               }}
                               onSelect={() => {
                                 setSelectedAccount(account as Account);
-                                onCloseModal();
+                                onCloseModal()
                               }}
                               isSelected={
                                 selectedAccount

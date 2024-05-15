@@ -3,6 +3,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { ImportWallet } from "./ImportWallet";
 import { act } from "react-dom/test-utils";
+import { AccountType } from "@src/accounts/types";
 
 const useCreateWalletMock = vi.hoisted(() => ({
   step: 1,
@@ -90,7 +91,8 @@ describe("ImportWallet", () => {
             privateKeyOrSeed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED",
             password: "Test.123",
             confirmPassword: "Test.123",
-            agreeWithTerms: true
+            agreeWithTerms: true,
+            accountTypesToImport: [AccountType.EVM, AccountType.IMPORTED_OL]
           })),
           getValues: useFormMock.getValues,
           clearErrors: vi.fn(),

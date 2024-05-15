@@ -53,6 +53,7 @@ export const ActivityDetail = () => {
     amount,
     asset,
     tip,
+    version
   } = location.state;
   const { Icon, copyToClipboard } = useCopyToClipboard(hash);
 
@@ -97,9 +98,15 @@ export const ActivityDetail = () => {
   const getLink = (chain: Chain, hash: string) => {
     const chainType = chain?.type;
     if (chainType === "wasm") {
-      window.open(`${chain?.explorer}/extrinsic/${hash}`);
-    } else {
-      window.open(`${chain?.explorer}/tx/${hash}`);
+      return window.open(`${chain?.explorer}/extrinsic/${hash}`);
+    }
+
+    if (chainType === "evm") {
+      return window.open(`${chain?.explorer}/tx/${hash}`);
+    }
+
+    if (chainType === "ol") {
+      return window.open(`${chain?.explorer}/transactions/${version}`);
     }
   };
 

@@ -300,7 +300,6 @@ describe("Extension", () => {
         "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
       const NAME = "created";
       const PASSWORD = "Test.123";
-      const type = AccountType.IMPORTED_WASM;
       const IS_SIGNUP = true;
       const extension = new Extension();
 
@@ -308,7 +307,7 @@ describe("Extension", () => {
         privateKeyOrSeed: SEED,
         name: NAME,
         password: PASSWORD,
-        type,
+        accountTypesToImport: [AccountType.WASM],
         isSignUp: IS_SIGNUP,
       });
       expect(result).toBe(undefined);
@@ -318,7 +317,6 @@ describe("Extension", () => {
         "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
       const NAME = "created";
       const PASSWORD = "Test.123";
-      const type = AccountType.IMPORTED_WASM;
       const IS_SIGNUP = false;
       const extension = new Extension();
 
@@ -326,7 +324,7 @@ describe("Extension", () => {
         privateKeyOrSeed: SEED,
         name: NAME,
         password: PASSWORD,
-        type,
+        accountTypesToImport: [AccountType.WASM],
         isSignUp: IS_SIGNUP,
       });
       expect(result).toBe(undefined);

@@ -3,12 +3,16 @@ import EVMKeyring from "./hd/EVMKeyring";
 import WASMKeyring from "./hd/WASMKeyring";
 import ImportedEVMKeyring from "./imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "./imported/ImportedWASMKeyring";
+import OLKeyring from "./hd/OLKeyring";
+import ImportedOLKeyring from "./imported/ImportedOLKeyring";
 
 export type SupportedKeyring =
   | EVMKeyring
   | WASMKeyring
+  | OLKeyring
   | ImportedEVMKeyring
-  | ImportedWASMKeyring;
+  | ImportedWASMKeyring
+  | ImportedOLKeyring;
 
 export type Keyrings = {
   [key in AccountType]: SupportedKeyring | undefined;

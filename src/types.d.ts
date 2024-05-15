@@ -165,6 +165,7 @@ export interface Transaction {
   timestamp: number;
   type: string;
   isSwap: boolean;
+  version?: string;
 }
 
 export type HistoricTransaction = {

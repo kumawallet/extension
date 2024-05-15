@@ -27,10 +27,10 @@ describe("WASMKeyring", () => {
     expect(path).toBe("/0");
   });
 
-  it("should return address", () => {
+  it("should return address", async () => {
     const wasmKeyring = new WASMKeyring(mockMnemonic);
 
-    const address = wasmKeyring.getAddress(mockMnemonic);
+    const address = await wasmKeyring.getAddress(mockMnemonic);
     expect(address).toEqual("13oi66HJu6d8AnNWQ1U2WFtt6P8APaj6zHTNah3xLB8TpzHT");
   });
 

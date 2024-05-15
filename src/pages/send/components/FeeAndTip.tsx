@@ -78,9 +78,9 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
               }}
             />
             <span className="text-[#FEFDFD] text-base">{targetNetwork?.symbol || ""}</span>
-          </div>
-        </div>
+          </div >
+        </div >
       )}
-    </div>
+    </div >
   );
 };

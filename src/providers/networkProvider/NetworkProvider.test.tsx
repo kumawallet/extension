@@ -13,6 +13,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { Chain, ChainsState } from "@src/types";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const initialState: InitialState = {
   chains: [],
@@ -38,6 +39,10 @@ const CHAINS_MOCK: ChainsState = [
     title: "evm_based",
     chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
   },
+  {
+    title: "move",
+    chains: OL_CHAINS
+  }
 ];
 
 const MOCK_WASM_SELECTED_CHAIN = SUBTRATE_CHAINS[0];
@@ -115,13 +120,20 @@ describe("NetworkProvider", () => {
         getNetwork: vi.fn().mockResolvedValue(() => MOCK_WASM_SELECTED_CHAIN),
       },
     }));
-    vi.mock("ethers", () => ({
-      ethers: {
+    vi.mock("ethers", async () => {
+      const actual = await vi.importActual("ethers");
+
+      return {
+        ...actual,
         providers: {
           JsonRpcProvider: vi.fn().mockResolvedValue({ getBalance: () => 0 }),
         },
-      },
-    }));
+      };
+
+
+
+
+    });
     vi.mock("@polkadot/api", () => ({
       ApiPromise: {
         create: vi.fn().mockResolvedValue({ query: () => 0 }),
