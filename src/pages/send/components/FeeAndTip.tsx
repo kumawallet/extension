@@ -40,8 +40,8 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
       <div className="w-full flex justify-between items-center">
         <p className="text-[#A3A3A3]">{t("estimated_fee")}</p>
         <p className={`text-[#FEFDFD] ${isLoadingFee ? "animate-pulse" : ""}`}>
-          {formatBN(fee, originNetwork.decimals || 1, 6)}{" "}
-          {originNetwork.symbol || ""}
+          {formatBN(fee, originNetwork?.decimals || 1, 6)}{" "}
+          {originNetwork?.symbol || ""}
         </p>
       </div>
       <div className="w-full flex justify-between items-center">
@@ -77,7 +77,7 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
                   (e.currentTarget.value.length || 1) + 1 + "ch";
               }}
             />
-            <span className="text-[#FEFDFD] text-base">{targetNetwork.symbol}</span>
+            <span className="text-[#FEFDFD] text-base">{targetNetwork?.symbol || ""}</span>
           </div>
         </div>
       )}

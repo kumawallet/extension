@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAssetContext, useNetworkContext } from "@src/providers";
+import {
+  useAccountContext,
+  useAssetContext,
+  useNetworkContext,
+} from "@src/providers";
 import { NumericFormat } from "react-number-format";
-import { useFormContext } from "react-hook-form";
+import { set, useFormContext } from "react-hook-form";
 import { SendTxForm } from "../Send";
 import { XCM } from "@src/constants/xcm";
 import { Chain, IAsset } from "@src/types";
@@ -13,11 +17,19 @@ import { formatBN } from "@src/utils/assets";
 import { useDebounce } from "react-use";
 import { AssetIcon, SelectableOptionModal } from "@src/components/common";
 import { GoCircle, GoCheckCircle } from "react-icons/go";
+import { formatAccount } from "@src/utils/account-utils";
 
 const ICON_WIDTH = 18;
 
 type IconField<T> = keyof T;
 type LabelField<T> = keyof T;
+
+const ItemPlaceHolder = () => (
+  <>
+    <div className="w-4 h-4 rounded-full bg-gray-500 animate-pulse" />
+    <div className="w-10 rounded-md h-3 bg-gray-500 animate-pulse" />
+  </>
+);
 
 export const SelectItem = <
   T extends {
@@ -66,34 +78,39 @@ export const SelectItem = <
       <div className={containerClassname}>
         <button
           onClick={openModal}
-          className={`flex items-center text-sm gap-1 ${value ? "" : "animate-spin"
-            } ${buttonClassname}`}
+          className={`flex items-center text-sm gap-1 ${buttonClassname}`}
         >
           <div
             className={`flex items-center gap-1 ${selectedItemContainerClassName}`}
           >
-            {iconField === "symbol" ? (
-              <AssetIcon
-                asset={
-                  {
-                    symbol: value?.[iconField] || "",
-                  } as IAsset
-                }
-                width={iconWidth}
-              />
+            {!value ? (
+              <ItemPlaceHolder />
             ) : (
-              <img
-                src={value?.[iconField] as string}
-                width={iconWidth}
-                className="rounded-full"
-              />
-            )}
+              <>
+                {iconField === "symbol" ? (
+                  <AssetIcon
+                    asset={
+                      {
+                        symbol: value?.[iconField] || "",
+                      } as IAsset
+                    }
+                    width={iconWidth}
+                  />
+                ) : (
+                  <img
+                    src={value?.[iconField] as string}
+                    width={iconWidth}
+                    className="rounded-full"
+                  />
+                )}
 
-            <span className={selectedLabelClassName}>
-              {/* 
+                <span className={selectedLabelClassName}>
+                  {/* 
 // @ts-expect-error -- * */}
-              {value?.[labelField]}
-            </span>
+                  {value?.[labelField]}
+                </span>
+              </>
+            )}
           </div>
           {hasMultipleItems && <HiMiniChevronDown size={18} />}
         </button>
@@ -174,21 +191,24 @@ export const AssetToSend = () => {
   const {
     state: { assets },
   } = useAssetContext();
-
-
+  const {
+    state: { accounts },
+  } = useAccountContext();
 
   const { setValue, getValues, watch } = useFormContext<SendTxForm>();
   const originNetwork = watch("originNetwork");
   const targetChain = watch("targetNetwork");
   const selectedAsset = watch("asset");
-  const senderAddress = watch("senderAddress")
+  const senderAddress = watch("senderAddress");
   const isXCM = watch("isXcm");
 
   const [chainsToSelectFrom, setChainsToSelectFrom] = useState<Chain[]>([]);
-  const [chainsToSend, setChainsToSend] = useState<Chain[]>([targetChain]);
+  const [chainsToSend, setChainsToSend] = useState<Chain[]>([]);
   const [amount, setAmount] = useState<string>(getValues("amount"));
 
   useEffect(() => {
+    if (!senderAddress) return;
+
     const activeChainIds = Object.keys(selectedChain);
 
     const allChains = chains.map((chain) => chain.chains).flat();
@@ -197,10 +217,22 @@ export const AssetToSend = () => {
       activeChainIds.includes(chain.id)
     );
 
-    setChainsToSelectFrom(chainsToSend);
+    const account = accounts.find(
+      (account) => account.value?.address === senderAddress
+    );
 
-    setValue("originNetwork", chainsToSend[0]);
-  }, [chains, selectedChain]);
+    if (!account) return;
+
+    const chainsByType = chainsToSend.filter(
+      (chain) =>
+        chain.type === formatAccount(account?.type)?.type?.toLowerCase()
+    );
+
+    setChainsToSelectFrom(chainsByType);
+    setValue("originNetwork", chainsByType[0]);
+
+    // setValue("originNetwork", chainsToSend[0]);
+  }, [chains, selectedChain, senderAddress, accounts]);
 
   useEffect(() => {
     if (!originNetwork?.id) return;
@@ -219,26 +251,23 @@ export const AssetToSend = () => {
   }, [originNetwork]);
 
   useEffect(() => {
-    setValue("isXcm", targetChain.id !== originNetwork.id);
+    setValue("isXcm", targetChain?.id !== originNetwork?.id);
   }, [targetChain]);
 
   const assetsToSelect = useMemo(() => {
+    if (!originNetwork || !targetChain || !senderAddress) return [];
 
-    if (!originNetwork || !targetChain) return [];
+    const keyIndex = Object.keys(assets).find((key) =>
+      key.toLowerCase().includes(senderAddress.toLowerCase())
+    );
 
+    if (!keyIndex) return [];
 
-    const keyIndex = Object.keys(assets).find((key) => key.toLowerCase().includes(senderAddress.toLowerCase()))
+    const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string];
 
+    if (!_assetFromChain) return [];
 
-    if (!keyIndex) return []
-
-    const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string]
-
-    if (!_assetFromChain) return []
-
-
-    const availableAssets = _assetFromChain.assets || []
-
+    const availableAssets = _assetFromChain.assets || [];
 
     if (isXCM) {
       const xcmAssets =
@@ -250,7 +279,8 @@ export const AssetToSend = () => {
           self.findIndex((s) => s.symbol === symbol) === index
       );
 
-      const _assets = filteredAssets.length > 0 ? filteredAssets : availableAssets;
+      const _assets =
+        filteredAssets.length > 0 ? filteredAssets : availableAssets;
 
       const defaultAsset = _assets[0];
 
@@ -261,6 +291,7 @@ export const AssetToSend = () => {
         balance: String(defaultAsset?.balance || "0"),
         address: defaultAsset?.address,
       });
+      // return []
       return _assets.map(({ id, symbol, decimals, balance, address }) => ({
         id,
         symbol,
@@ -271,20 +302,23 @@ export const AssetToSend = () => {
     } else {
       setValue("asset", {
         id: availableAssets[0]?.id || "",
-        symbol: originNetwork.symbol,
-        decimals: originNetwork.decimals || 1,
+        symbol: originNetwork?.symbol,
+        decimals: originNetwork?.decimals || 1,
         balance: String(availableAssets[0]?.balance || "0"),
         address: availableAssets[0]?.address || "",
       });
-      return availableAssets.map(({ id, symbol, decimals, balance, address }) => ({
-        id,
-        symbol,
-        decimals,
-        balance: String(balance),
-        address,
-      }));
+      // return []
+      return availableAssets.map(
+        ({ id, symbol, decimals, balance, address }) => ({
+          id,
+          symbol,
+          decimals,
+          balance: String(balance),
+          address,
+        })
+      );
     }
-  }, [originNetwork, assets, isXCM, senderAddress]);
+  }, [originNetwork, targetChain, assets, isXCM, senderAddress]);
 
   useDebounce(
     () => {
@@ -314,16 +348,7 @@ export const AssetToSend = () => {
                   address: asset.address,
                 });
               }}
-              // @ts-expect-error -- *
-              value={
-                selectedAsset || {
-                  symbol: originNetwork.symbol,
-                  decimals: originNetwork.decimals || 1,
-                  balance: "0",
-                  id: "-1",
-                  address: "",
-                }
-              }
+              value={selectedAsset}
               labelField="symbol"
               iconField="symbol"
               selectedLabelClassName="text-[#D0D0D0]"
@@ -335,7 +360,7 @@ export const AssetToSend = () => {
             items={chainsToSelectFrom}
             onChangeValue={(network) => {
               setValue("originNetwork", network);
-              setValue("targetNetwork", network)
+              setValue("targetNetwork", network);
             }}
             value={originNetwork}
             labelField="name"
@@ -358,15 +383,23 @@ export const AssetToSend = () => {
           <div className="flex items-center gap-1">
             <span className="text-[#9CA3AF]">{t("bal")}:</span>
             <span className="flex whitespace-nowrap items-center ml-1 text-[#F5F9FF]">
-              {formatBN(selectedAsset.balance, selectedAsset.decimals, 2)}{" "}
-              {selectedAsset.symbol}
+              {formatBN(
+                selectedAsset?.balance || "0",
+                selectedAsset?.decimals,
+                2
+              )}{" "}
+              {selectedAsset?.symbol || ""}
             </span>
             <button
               className="text-[#7C4DC4]"
               onClick={() => {
                 setValue(
                   "amount",
-                  formatBN(selectedAsset.balance, selectedAsset.decimals, null)
+                  formatBN(
+                    selectedAsset?.balance || "0",
+                    selectedAsset?.decimals,
+                    null
+                  )
                 );
               }}
             >
@@ -382,7 +415,7 @@ export const AssetToSend = () => {
         <SelectItem<Chain>
           items={chainsToSend}
           onChangeValue={(chain) => {
-            if (targetChain.id === chain.id) return;
+            if (targetChain?.id === chain.id) return;
             setValue("targetNetwork", chain);
           }}
           value={targetChain}
