@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 import { useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
-import { Chain } from "@src/types";
+import { Chain, SelectedChain } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
 import { Recipient } from "./components/Recipient";
@@ -18,11 +18,11 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { useNavigate } from "react-router-dom";
 import { providers } from "ethers";
 import { SendTxResume } from "./components/SendTxResume";
-import { transformAmountStringToBN } from "@src/utils/assets";
 import { validateRecipientAddress } from "@src/utils/transfer";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { SelectAccount } from "./components/SelectAccount";
 import { ErrorMessage } from "./components";
+import Account from "@src/storage/entities/Account";
+import { getAccountType } from "@src/utils/account-utils";
 
 const schema = object({
   recipientAddress: string().when(
@@ -42,6 +42,65 @@ const schema = object({
   tip: string(),
 });
 
+const getDefaultData = ({
+  selectedAccount,
+  chains,
+  selectedChain,
+}: {
+  selectedAccount: Account | null;
+  chains: Chain[];
+  selectedChain: SelectedChain;
+}): SendTxForm => {
+  const senderAddress = selectedAccount?.value?.address || "";
+
+  let originNetwork = null;
+  let targetNetwork = null;
+  let asset = null;
+
+
+  if (senderAddress) {
+    const accountType = getAccountType(selectedAccount!.type)?.toLowerCase();
+
+    const firstChainId = Object.keys(selectedChain).find((chainId) => {
+      return selectedChain[chainId].type === accountType;
+    });
+
+    if (firstChainId) {
+      const defaultChain = chains.find(
+        (chain) => chain.id === firstChainId
+      ) as Chain;
+
+      originNetwork = defaultChain || null;
+      targetNetwork = defaultChain || null;
+
+      if (!originNetwork || !targetNetwork) {
+        asset = {
+          id: "-1",
+          symbol: originNetwork.symbol,
+          decimals: originNetwork.decimals,
+          balance: "0",
+          address: "",
+        };
+      }
+    }
+  }
+
+  return {
+    recipientAddress: "",
+    senderAddress,
+    asset,
+    originNetwork: originNetwork,
+    targetNetwork: targetNetwork,
+    amount: "0",
+    tip: "0",
+    fee: "0",
+    isXcm: false,
+    isLoadingFee: false,
+    isTipEnabled: false,
+    haveSufficientBalance: false,
+  };
+};
+
 export interface SendTxForm {
   asset: {
     id: string;
@@ -49,17 +108,17 @@ export interface SendTxForm {
     decimals: number;
     balance: string;
     address?: string;
-  };
+  } | null;
   amount: string;
   evmTx?: providers.TransactionRequest;
   extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
   fee: string;
   isLoadingFee?: boolean;
   isXcm?: boolean;
-  originNetwork: Chain;
+  originNetwork: Chain | null;
   recipientAddress: string;
   senderAddress: string;
-  targetNetwork: Chain;
+  targetNetwork: Chain | null;
   tip?: string;
   isTipEnabled: boolean;
   haveSufficientBalance: boolean;
@@ -74,27 +133,16 @@ export const Send = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
+  const {
+    state: { chains, selectedChain },
+  } = useNetworkContext();
+
   const methods = useForm<SendTxForm>({
-    defaultValues: {
-      recipientAddress: "",
-      senderAddress: selectedAccount?.value?.address || "",
-      asset: {
-        id: "-1",
-        symbol: SUBTRATE_CHAINS[0].symbol,
-        decimals: SUBTRATE_CHAINS[0].decimals || 1,
-        balance: "0",
-        address: "",
-      },
-      originNetwork: SUBTRATE_CHAINS[0] as Chain,
-      targetNetwork: SUBTRATE_CHAINS[0] as Chain,
-      amount: "0",
-      tip: "0",
-      fee: "0",
-      isXcm: false,
-      isLoadingFee: false,
-      isTipEnabled: false,
-      haveSufficientBalance: false,
-    },
+    defaultValues: getDefaultData({
+      selectedAccount,
+      chains: chains.map((chain) => chain.chains).flat(),
+      selectedChain,
+    }),
     resolver: yupResolver(schema),
     mode: "onBlur",
   });
@@ -221,8 +269,7 @@ export const Send = () => {
 
     (async () => {
       try {
-
-        setValue('isLoadingFee', true);
+        setValue("isLoadingFee", true);
 
         await messageAPI.updateTx({
           tx: {
@@ -237,8 +284,6 @@ export const Send = () => {
       } catch (error) {
         console.log("update Tx error:", error);
       }
-
-
     })();
   }, [originNetwork, targetNetwork, recipientAddress, sender, amount, asset]);
 
