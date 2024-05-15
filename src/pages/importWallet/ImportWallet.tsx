@@ -21,7 +21,7 @@ export const ImportWallet = () => {
   const { isLoading, starLoading, endLoading } = useLoading()
   const { step, prevStep, nextStep, goToWelcome, setStep } = useCreateWallet();
   const { texts, setTexts } = useAccountFormTexts()
-  const { initializeNetwork } = useNetworkContext()
+  const { refreshNetworks } = useNetworkContext()
 
 
   const methods = useForm<ImportWalletFormValues>({
@@ -73,7 +73,7 @@ export const ImportWallet = () => {
 
       if (result) {
         setStep(4)
-        initializeNetwork()
+        refreshNetworks()
         getAllAccounts()
         nextStep();
       }

@@ -29,7 +29,7 @@ export const CreateWallet = () => {
   const { step, prevStep, nextStep, goToWelcome } = useCreateWallet();
   const { createAccount, getAllAccounts } = useAccountContext()
   const { texts, setTexts, } = useAccountFormTexts()
-  const { initializeNetwork } = useNetworkContext()
+  const { refreshNetworks } = useNetworkContext()
 
   const methods = useForm<CreateWalletFormValues>({
     defaultValues: {
@@ -106,7 +106,7 @@ export const CreateWallet = () => {
 
 
       if (result) {
-        initializeNetwork()
+        refreshNetworks()
         getAllAccounts()
         nextStep();
       }

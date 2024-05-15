@@ -80,7 +80,7 @@ import {
   Transaction as TransactionEntity,
   Tx,
 } from "@src/storage/entities/Transaction";
-import AssetBalance from "@src/storage/entities/AssetBalance"
+import AssetBalance from "@src/storage/entities/AssetBalance";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 
 export const getProvider = (rpc: string, type: string) => {
@@ -155,43 +155,49 @@ export default class Extension {
     );
   }
   private async initNetworks() {
-    Network.getInstance()
-    const network:any = await Network.get();
-    if(!network) return
-    const allChains: Chain[] = [SUBTRATE_CHAINS,EVM_CHAINS].flat();
-    const chain = this.Chains.getValue()
-    if(network && network?.Chain?.supportedAccounts){
-            const newChainFormat = allChains.find((chain) => network?.Chain?.name  === chain.name);
-            if (newChainFormat) {
-              const id=newChainFormat.id;
-              const type= newChainFormat.type
-              const isTestnet = newChainFormat.isTestnet
-               await this.setNetwork({isTestnet,id,type})
-            }
+    Network.getInstance();
+    const network: any = await Network.get();
+    if (!network) return;
+    const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS].flat();
+    const chain = this.Chains.getValue();
+    if (network && network?.Chain?.supportedAccounts) {
+      const newChainFormat = allChains.find(
+        (chain) => network?.Chain?.name === chain.name
+      );
+      if (newChainFormat) {
+        const id = newChainFormat.id;
+        const type = newChainFormat.type;
+        const isTestnet = newChainFormat.isTestnet;
+        await this.setNetwork({ isTestnet, id, type });
       }
-      if(network && Object.keys(network.SelectedChain).length === 0 ){
-            const id= allChains[0].id
-            const type = allChains[0].type
-            const isTestnet = allChains[0].isTestnet
-            await this.setNetwork({isTestnet,id,type})
-          }
-    
-    if(network && Object.keys(network.SelectedChain).length !== 0 &&  Object.keys(chain).length === 0){
+    }
+    if (network && Object.keys(network.SelectedChain).length === 0) {
+      const id = allChains[0].id;
+      const type = allChains[0].type;
+      const isTestnet = allChains[0].isTestnet;
+      await this.setNetwork({ isTestnet, id, type });
+    }
+
+    if (
+      network &&
+      Object.keys(network.SelectedChain).length !== 0 &&
+      Object.keys(chain).length === 0
+    ) {
       this.Chains.next(network.SelectedChain);
       await Promise.all(
-        Object.keys(network.SelectedChain).map((chain) => this.provider.setProvider(chain,network.SelectedChain[chain].type))
-      )
-      
-
-}
+        Object.keys(network.SelectedChain).map((chain) =>
+          this.provider.setProvider(chain, network.SelectedChain[chain].type)
+        )
+      );
     }
-    
+  }
+
   private async signUp({ password, privateKeyOrSeed }: RequestSignUp) {
     try {
       this.validatePasswordFormat(password);
       this.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
       await Storage.init(password, privateKeyOrSeed);
-      await this.initNetworks()
+      await this.initNetworks();
     } catch (error) {
       Storage.getInstance().resetWallet();
       Auth.signOut();
@@ -236,49 +242,67 @@ export default class Extension {
     return true;
   }
   private subscriptionStatusProvider = () => {
-    this.provider.statusNetwork.subscribe(async(data) =>
-      {   
-          const [selectedAccount,allAccounts] = await Promise.all(
-            [
-              SelectedAccount.get(),
-              Accounts.get()
-            ])
-          const networksAssest = this.assetsBalance.getNetwork();
-          const newNetwork: any[] = Object.keys(data).filter((chain) => !networksAssest.includes(chain) && data[chain] === "connected");
-          const deleteNetwork = networksAssest.filter((network) => Object.keys(data).includes(network) && data[network] ==="disconnected" && !Object.keys(this.Chains.getValue()).includes(network));
-          const provider = this.provider.getProviders()
-        if(newNetwork.length !== 0){
-          if((selectedAccount as Account).value){
-            await this.assetsBalance.loadAssets((selectedAccount as Account),provider,newNetwork )
-            this.assetsBalance.assets.next(this.assetsBalance._assets)
-          }
-        else{
+    this.provider.statusNetwork.subscribe(async (data) => {
+      const [selectedAccount, allAccounts] = await Promise.all([
+        SelectedAccount.get().catch(() => null),
+        Accounts.get(),
+      ]);
+
+      if (!selectedAccount) return;
+
+      const networksAssest = this.assetsBalance.getNetwork();
+      const newNetwork: any[] = Object.keys(data).filter(
+        (chain) =>
+          !networksAssest.includes(chain) && data[chain] === "connected"
+      );
+      const deleteNetwork = networksAssest.filter(
+        (network) =>
+          Object.keys(data).includes(network) &&
+          data[network] === "disconnected" &&
+          !Object.keys(this.Chains.getValue()).includes(network)
+      );
+      const provider = this.provider.getProviders();
+      if (newNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          await this.assetsBalance.loadAssets(
+            selectedAccount as Account,
+            provider,
+            newNetwork
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        } else {
           await Promise.all(
             Object.keys((allAccounts as Accounts).data).map((accountKey) => {
-              return this.assetsBalance.loadAssets((allAccounts as Accounts).data[accountKey],provider,newNetwork)
-
+              return this.assetsBalance.loadAssets(
+                (allAccounts as Accounts).data[accountKey],
+                provider,
+                newNetwork
+              );
             })
-          )
-            this.assetsBalance.assets.next(this.assetsBalance._assets)
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
         }
-
-  }
-
-    if(deleteNetwork.length !== 0){
-      if((selectedAccount as Account).value){
-        this.assetsBalance.deleteAsset((selectedAccount as Account),provider,deleteNetwork)
-        this.assetsBalance.assets.next(this.assetsBalance._assets)
       }
-      else{
-          Object.keys((allAccounts as Accounts).data).forEach(
-            (accountKey) => {
-              return this.assetsBalance.deleteAsset((allAccounts as Accounts).data[accountKey],provider,deleteNetwork)
-            }
-          )
-          this.assetsBalance.assets.next(this.assetsBalance._assets)
-        
+
+      if (deleteNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          this.assetsBalance.deleteAsset(
+            selectedAccount as Account,
+            provider,
+            deleteNetwork
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        } else {
+          Object.keys((allAccounts as Accounts).data).forEach((accountKey) => {
+            return this.assetsBalance.deleteAsset(
+              (allAccounts as Accounts).data[accountKey],
+              provider,
+              deleteNetwork
+            );
+          });
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        }
       }
-   }
     });
   };
 
@@ -543,9 +567,8 @@ export default class Extension {
     const subscription = this.Chains.subscribe((data) => cb(data));
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
-      subscription.unsubscribe();
     });
-    return this.Chains;
+    return this.Chains.getValue();
   };
   private assetsSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(assestsBanlance.subscription)">(
@@ -557,47 +580,57 @@ export default class Extension {
     );
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
-      subscription.unsubscribe();
     });
     return this.assetsBalance.assets.getValue();
   };
 
   private async setSelectedAccount(account: Account) {
-    const networkSelected = this.assetsBalance.getNetwork()
-    const allAccounts : any = await Accounts.get();
-    const provider = this.provider.getProviders()
-    const selectedAccount : any = await SelectedAccount.get()
-    if(!account && selectedAccount.value){
-      const filterAccount = Object.keys(allAccounts.data).filter((_account) => ![selectedAccount.key].includes(_account) )
+    const networkSelected = this.assetsBalance.getNetwork();
+    const allAccounts: any = await Accounts.get();
+    const provider = this.provider.getProviders();
+    const selectedAccount: any = await SelectedAccount.get();
+    if (!account && selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => ![selectedAccount.key].includes(_account)
+      );
       await Promise.all(
-      filterAccount.map(
-          (accountKey) => {
-      return this.assetsBalance.loadAssets(allAccounts.data[accountKey],provider, networkSelected)
-          }
-        )
-      
-      )
-      this.assetsBalance.assets.next(this.assetsBalance._assets)
-    }
-    else if(account && !selectedAccount.value){
-      const filterAccount = Object.keys(allAccounts.data).filter((_account) => _account !== account.key)
+        filterAccount.map((accountKey) => {
+          return this.assetsBalance.loadAssets(
+            allAccounts.data[accountKey],
+            provider,
+            networkSelected
+          );
+        })
+      );
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
+    } else if (account && !selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => _account !== account.key
+      );
       await Promise.all(
         filterAccount.map((account) => {
-          this.assetsBalance.deleteAsset(allAccounts.data[account],provider,networkSelected, false)
+          this.assetsBalance.deleteAsset(
+            allAccounts.data[account],
+            provider,
+            networkSelected,
+            false
+          );
         })
-      )
-      this.assetsBalance.assets.next(this.assetsBalance._assets)
+      );
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
+    } else if (account && selectedAccount.value) {
+      this.assetsBalance.deleteAsset(
+        selectedAccount,
+        provider,
+        networkSelected,
+        false
+      );
+      await this.assetsBalance.loadAssets(account, provider, networkSelected);
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
     }
-  else if(account && selectedAccount.value){
-    this.assetsBalance.deleteAsset(selectedAccount,provider,networkSelected,false)
-    await this.assetsBalance.loadAssets(account,provider,networkSelected);
-    this.assetsBalance.assets.next(this.assetsBalance._assets)
-  }
     await SelectedAccount.set<SelectedAccount>(
       SelectedAccount.fromAccount(account)
     );
-    
-  
   }
 
   private async getSelectedAccount(): Promise<Account | undefined> {
