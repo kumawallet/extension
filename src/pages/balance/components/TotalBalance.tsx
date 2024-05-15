@@ -31,11 +31,20 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
 
   const totalBalance = () => {
-   return Object.values(assets).reduce((total: number, network : any) => {
-        return total + network.reduce((subTotal: number, asset: any) => {
-            return subTotal + asset?.amount || 0;
-        }, 0);
-      },0) 
+    const a = Object.keys(assets).reduce((acc_, address) => {
+      const networks = assets[address];
+      return acc_ + Object.keys(networks).reduce((_acc, network : any) => { 
+          const assets = networks[network].assets;
+          return _acc + assets.reducer((acc, asset: any) => {
+              return acc + formatAmountWithDecimals(
+                Number(asset.balance),
+                6,
+                asset.decimals
+              );
+          });
+      });
+    });
+    return 0
   }
 
   const toggleBalance = () => setShowBalance(!showBalance);

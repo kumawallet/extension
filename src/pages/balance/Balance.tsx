@@ -55,8 +55,8 @@ export const Balance = () => {
         <div className="flex flex-col pt-3 pb-16 relative">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col">
-              {/* <TotalBalance />
-              <AccountSelected /> */}
+              <TotalBalance />
+              <AccountSelected />
             </div>
             <Actions />
           </div>
@@ -87,7 +87,7 @@ export const Balance = () => {
                 <Assets />
               </Tab.Panel>
               <Tab.Panel key={1}>
-                <Activity />
+                {/* <Activity /> */}
               </Tab.Panel>
             </Tab.Panels>
 

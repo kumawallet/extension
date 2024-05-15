@@ -10,9 +10,9 @@ export interface Asset {
   reserved?: BN;
   frozen?: BN;
   address?: string;
-  amount?: number;
+  amount?: any;
   name?: string;
-  price?: number;
+  price?: string;
   color?: string;
   aditionalData?:
     | {

@@ -7,6 +7,7 @@ import { ChainsState } from "@src/types";
 import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
 import { Network } from "../../../components/icons/Network"
+import { messageAPI } from "@src/messageAPI/api";
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -28,12 +29,20 @@ export const ChainSelector = () => {
   const [isOpen, setIsOpen] =  useState(false);
   const { t } = useTranslation("balance");
   const {
-    state: { chains, selectedChain },
-    updateSelectNetwork,
+    state: { chains, selectedChain }
   } = useNetworkContext();
 
 
-
+const updateSelectNetwork = async(id:string, type?: "wasm"| "evm" | "ol", isTestnet?: boolean) =>{
+  if(Object.keys(selectedChain).includes(id))
+    {
+      await messageAPI.deleteSelectChain({id})
+    }
+    else(
+      await messageAPI.setNetwork({id,isTestnet,type})
+    )
+  
+}
 const validateTestnet = () =>{
   const selected = Object.keys(selectedChain).filter((chain) => selectedChain[chain].isTestnet);
   if(selected.length > 0){
