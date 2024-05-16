@@ -115,7 +115,10 @@ export const AccountList = () => {
                               ? "border border-[#2CEC84]"
                               : ""
                               }`}
-                            onClick={() => setSelectedAccount(null)}
+                            onClick={() => {
+                              setSelectedAccount(null)
+                              onCloseModal()
+                            }}
                           >
                             <div className=" flex gap-2 items-center overflow-hidden text-ellipsis">
                               <BiSolidWallet size={26} />

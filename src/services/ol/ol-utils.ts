@@ -2,6 +2,7 @@ import { Account, Ed25519PrivateKey } from "@aptos-labs/ts-sdk";
 import { expand, extract } from "@noble/hashes/hkdf";
 import { pbkdf2Async } from "@noble/hashes/pbkdf2";
 import { sha3_256 } from "@noble/hashes/sha3";
+import { Buffer } from "buffer";
 
 export const MNEMONIC_SALT =
   "0L WALLET: UNREST, FIRES, AND VIOLENCE AS PROTESTS RAGE ACROSS US: mnemonic salt prefix$0L";
@@ -12,18 +13,11 @@ export const SALT2 =
 export const INFO =
   "0L WALLET: US DEATHS NEAR 100,000, AN INCALCULABLE LOSS: derived key$";
 
-const formatPath = (path: number): string => {
-  let _path = "";
+const formatPath = (path: number): Buffer => {
+  const leN = Buffer.allocUnsafe(8);
+  leN.writeUInt32LE(path, 0);
 
-  if (path === 0) {
-    _path = "0";
-  } else if (path < 10) {
-    _path = `x0${path}`;
-  } else {
-    _path = `x${path}`;
-  }
-
-  return `\`${_path}\0\0\0\0\0\0\0`;
+  return leN;
 };
 
 export const createOLAccountFromMnemonic = async (
@@ -39,7 +33,7 @@ export const createOLAccountFromMnemonic = async (
   const expanded = await expand(
     sha3_256,
     extracted,
-    INFO + formatPath(path || 0),
+    Buffer.concat([Buffer.from(INFO, "ascii"), formatPath(path || 0)]),
     32
   );
 

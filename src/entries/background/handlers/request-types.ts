@@ -13,7 +13,7 @@ import {
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
-import { Chain, HistoricTransaction } from "@src/types";
+import { Chain, ChainType, HistoricTransaction } from "@src/types";
 import { providers } from "ethers";
 
 export interface RequestSignUp {
@@ -80,14 +80,14 @@ export interface RequestDeriveAccount {
 export interface RequestSetNetwork {
   id: string;
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 }
 export interface RequestDeleteSelectNetwork {
   id: string;
 }
 export interface RequestAddNetwork {
   id: string;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 }
 export interface RequestSaveCustomChain {
   chain: Chain;

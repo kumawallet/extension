@@ -21,6 +21,14 @@ export const defaultAssetConfig = {
     },
   ],
 
+  sepolia: [
+    {
+      address: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+      symbol: "WETH",
+      decimals: 18,
+    },
+  ],
+
   "moonriver-evm": [
     {
       address: "0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080",

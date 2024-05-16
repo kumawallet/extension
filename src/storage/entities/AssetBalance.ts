@@ -4,10 +4,11 @@ import {
   getAssetUSDPrice,
   getNatitveAssetBalance,
   getSubtrateNativeBalance,
+  getType,
   getWasmAssets,
 } from "@src/utils/assets";
 import { BehaviorSubject } from "rxjs";
-import { Chain, IAsset } from "@src/types";
+import { Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
 import { ApiPromise } from "@polkadot/api";
 import { Contract, ethers } from "ethers";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
@@ -15,6 +16,8 @@ import { BN } from "@polkadot/util";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import AccountEntity from "@src/storage/entities/Account";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
+import { OlProvider } from "@src/services/ol/OlProvider";
 
 type network = {
   [chainId: string]: {
@@ -26,7 +29,8 @@ export default class AssetsBalance {
   public assets = new BehaviorSubject<{ [key: string]: network }>({});
   public _assets: { [key: string]: network } = {};
   networks: string[] = [];
-  chains = [SUBTRATE_CHAINS, EVM_CHAINS].flat();
+  chains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+
   public async init() {
     this.assets.next({});
   }
@@ -36,139 +40,66 @@ export default class AssetsBalance {
       chains.map((chain: string) => this.setAssets(account, api[chain], chain))
     );
   }
-  public async setAssets(account: AccountEntity, api: any, chain: string) {
+  public async setAssets(account: AccountEntity, api: any, chainId: string) {
     try {
-      const _chain = this.chains.find((_chain) => _chain.id === chain);
-      if (!this.networks.includes(chain)) this.networks.push(chain);
+      const chain = this.chains.find((_chain) => _chain.id === chainId);
+      if (!this.networks.includes(chainId)) this.networks.push(chainId);
 
-      if (_chain) {
-        if (
-          api.type === "evm" &&
-          this.getType(account.type.toLowerCase()) === "evm"
-        ) {
-          const [{ nativeAssets }, { _assets, _unsubs }] = await Promise.all([
-            this.getNativeAsset(api, account, _chain),
-            this.getOtherAssets(api, account, _chain),
+      if (chain) {
+        if (api.type !== getType(account.type.toLowerCase())) return;
+
+        const [{ nativeAsset, unsubs: nativeUnsubs }, { _assets, _unsubs }] =
+          await Promise.all([
+            this.getNativeAsset(api, account, chain),
+            this.getNonNativeAssets(api, account, chain),
           ]);
-          const subs = _unsubs || [];
-          this._assets[account.key] = {
-            ...this._assets[account.key],
-            [chain]: {
-              subs: [...subs],
-              assets: [
-                {
-                  id: "-1",
-                  symbol: _chain?.symbol,
-                  decimals: _chain?.decimals,
-                  balance: String(nativeAssets.balance),
-                },
-                ...(_assets.map((asset: any) => ({
-                  ...asset,
-                })) as Asset[]),
-              ],
-            },
-          };
-          if (!_chain.isTestnet) {
-            const price = await this.getAssetsUSDPrice(
-              this._assets[account.key][chain].assets
-            );
-            this._assets[account.key][chain].assets = this._assets[account.key][
-              chain
-            ].assets.map((asset) => {
-              asset.price = String(
-                price[asset.symbol] ? price[asset.symbol] : 0
-              );
-              asset.amount = price[asset.symbol]
-                ? Number(
-                    price[asset.symbol] *
-                      Number(
-                        formatAmountWithDecimals(
-                          Number(asset.balance),
-                          6,
-                          asset?.decimals
-                        )
+
+        const subs = [..._unsubs, ...nativeUnsubs] || [];
+
+        this._assets[account.key] = {
+          ...this._assets[account.key],
+          [chainId]: {
+            subs,
+            assets: [nativeAsset, ..._assets],
+          },
+        };
+
+        if (!chain.isTestnet) {
+          const price = await this.getAssetsUSDPrice(
+            this._assets[account.key][chainId].assets
+          );
+          this._assets[account.key][chainId].assets = this._assets[account.key][
+            chainId
+          ].assets.map((asset) => {
+            asset.price = String(price[asset.symbol] ? price[asset.symbol] : 0);
+            asset.amount = price[asset.symbol]
+              ? Number(
+                  price[asset.symbol] *
+                    Number(
+                      formatAmountWithDecimals(
+                        Number(asset.balance),
+                        6,
+                        asset?.decimals
                       )
-                  ).toFixed(2)
-                : "0";
-              return asset;
-            });
-          } else {
-            this._assets[account.key][chain].assets = this._assets[account.key][
-              chain
-            ].assets.map((asset) => {
-              asset.price = "0";
-              asset.amount = "0";
-              return asset;
-            });
-          }
-        } else if (
-          api.type === "wasm" &&
-          this.getType(account.type.toLowerCase()) === "wasm"
-        ) {
-          const [{ nativeAssets, unsubs }, { _assets, _unsubs }] =
-            await Promise.all([
-              this.getNativeAsset(api, account, _chain),
-              this.getOtherAssets(api, account, _chain),
-            ]);
-          const subs = _unsubs || [];
-          this._assets[account.key] = {
-            ...this._assets[account.key],
-            [chain]: {
-              subs: [unsubs, ...subs],
-              assets: [
-                {
-                  id: "-1",
-                  symbol: _chain?.symbol,
-                  decimals: _chain?.decimals,
-                  balance: String(nativeAssets.balance),
-                  reserved: nativeAssets.reserved,
-                  frozen: nativeAssets.frozen,
-                  transferable: nativeAssets.transferable,
-                },
-                ...(_assets.map((asset: any) => ({
-                  ...asset,
-                })) as Asset[]),
-              ],
-            },
-          };
-          if (!_chain.isTestnet) {
-            const price = await this.getAssetsUSDPrice(
-              this._assets[account.key][chain].assets
-            );
-            this._assets[account.key][chain].assets = this._assets[account.key][
-              chain
-            ].assets.map((asset) => {
-              asset.price = String(
-                price[asset.symbol] ? price[asset.symbol] : 0
-              );
-              asset.amount = price[asset.symbol]
-                ? Number(
-                    price[asset.symbol] *
-                      Number(
-                        formatAmountWithDecimals(
-                          Number(asset.balance),
-                          6,
-                          asset?.decimals
-                        )
-                      )
-                  ).toFixed(2)
-                : "0";
-              return asset;
-            });
-          } else {
-            this._assets[account.key][chain].assets = this._assets[account.key][
-              chain
-            ].assets.map((asset) => {
-              asset.price = "0";
-              asset.amount = "0";
-              return asset;
-            });
-          }
-          return;
+                    )
+                ).toFixed(2)
+              : "0";
+            return asset;
+          });
+        } else {
+          this._assets[account.key][chainId].assets = this._assets[account.key][
+            chainId
+          ].assets.map((asset) => {
+            asset.price = "0";
+            asset.amount = "0";
+            return asset;
+          });
         }
       }
     } catch (error) {
-      const newnetworks = this.networks.filter((network) => network !== chain);
+      const newnetworks = this.networks.filter(
+        (network) => network !== chainId
+      );
       this.networks = newnetworks;
       throw new Error("failed_to_add_asset");
     }
@@ -182,76 +113,75 @@ export default class AssetsBalance {
   public getNetwork() {
     return this.networks;
   }
-  private getType = (type: string) => {
-    if (type === "imported_wasm") {
-      return type.slice(-4);
-    } else if (type === "imported_evm") {
-      return type.slice(-3);
-    } else if (type === "evm" || type === "wasm") {
-      return type;
-    }
-  };
+
   private getNativeAsset = async (
     api: {
-      provider: ApiPromise | ethers.providers.JsonRpcProvider;
-      type: "evm" | "wasm" | "ol";
+      provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
+      type: ChainType;
     },
     account: AccountEntity,
     chain: Chain
   ) => {
     try {
-      let unsubs;
-      const nativeAssets: any = await getNatitveAssetBalance(
+      let unsubs: any[] = [];
+      const nativeAsset = await getNatitveAssetBalance(
         api,
         account.value.address,
         account
       );
-      if (
-        api.type === "wasm" &&
-        this.getType(account.type.toLowerCase()) === "wasm"
-      ) {
-        await (api.provider as ApiPromise).query.system
-          .account(
-            account.value.address,
-            ({
-              data,
-            }: {
-              data: {
-                free: string;
-                reserved: string;
-                miscFrozen?: string;
-                frozen?: string;
-                feeFrozen?: string;
-              };
-            }) => {
-              const { transferable, reserved, balance, frozen } =
-                getSubtrateNativeBalance(data);
-              this.updateOneAsset(
-                account.key,
-                { transferable, reserved, balance, frozen },
-                "-1",
-                chain.id
-              );
-            }
-          )
-          .then((result) => {
-            unsubs = result;
-          });
-        return { nativeAssets, unsubs };
-      } else if (
-        api.type === "evm" &&
-        this.getType(account.type.toLowerCase()) === "evm"
-      ) {
-        const _api = api.provider as ethers.providers.JsonRpcProvider;
-        _api.off("block");
-        _api.on("block", () => {
-          _api.getBalance(account.value.address).then((balance: any) => {
-            this.updateOneAsset(account.key, { balance }, "-1", chain.id);
-          });
-        });
-        return { nativeAssets };
+
+      const apiType = api.type;
+
+      switch (apiType) {
+        case ChainType.WASM:
+          {
+            const substrateProvider = api.provider as ApiPromise;
+            await substrateProvider.query.system
+              .account(account.value.address, ({ data }: SubstrateBalance) => {
+                const { transferable, balance } =
+                  getSubtrateNativeBalance(data);
+                this.updateOneAsset(
+                  account.key,
+                  { transferable, balance },
+                  "-1",
+                  chain.id
+                );
+              })
+              .then((result) => {
+                unsubs = [result];
+              });
+          }
+          break;
+        case ChainType.EVM:
+          {
+            const evmProvider =
+              api.provider as ethers.providers.JsonRpcProvider;
+
+            evmProvider.off("block");
+            evmProvider.on("block", () => {
+              evmProvider.getBalance(account.value.address).then((balance) => {
+                this.updateOneAsset(
+                  account.key,
+                  { balance: balance.toString() },
+                  "-1",
+                  chain.id
+                );
+              });
+            });
+          }
+          break;
       }
-      return { nativeAssets, unsubs };
+
+      return {
+        nativeAsset: {
+          id: "-1",
+          symbol: chain.symbol,
+          decimals: chain.decimals,
+          balance: nativeAsset.balance,
+          transferable: nativeAsset.transferable,
+        },
+        unsubs,
+      };
     } catch (error) {
       throw new Error("failed_to_get_nativeAsset");
     }
@@ -259,7 +189,12 @@ export default class AssetsBalance {
 
   private updateOneAsset(
     account: string,
-    data: any,
+    data: {
+      balance: string;
+      transferable?: string;
+    } = {
+      balance: "0",
+    },
     assetId: string,
     chain: string
   ) {
@@ -270,12 +205,11 @@ export default class AssetsBalance {
       const index = this._assets[account][chain].assets.findIndex((asset) => {
         return asset.id === assetId;
       });
-      if (
-        index > -1 &&
-        !data.balance?.eq(
-          Number(this._assets[account][chain].assets[index].balance)
-        )
-      ) {
+
+      const balanceChanged =
+        data.balance !== this._assets[account][chain].assets[index].balance;
+
+      if (index > -1 && balanceChanged) {
         const _balance = Number(
           formatAmountWithDecimals(
             Number(data.balance),
@@ -283,28 +217,17 @@ export default class AssetsBalance {
             this._assets[account][chain].assets[index]?.decimals
           )
         );
-        if (data?.frozen && data.reserved && data.transferable) {
-          const newAmount = Number(
-            Number(this._assets[account][chain].assets[index].price) * _balance
-          ).toFixed(2);
-          this._assets[account][chain].assets[index] = {
-            ...this._assets[account][chain].assets[index],
-            amount: newAmount ? newAmount : 0,
-            balance: String(data.balance),
-            frozen: data.frozen,
-            reserved: data.reserved,
-            transferable: data.transferable,
-          };
-        } else {
-          this._assets[account][chain].assets[index] = {
-            ...this._assets[account][chain].assets[index],
-            amount: Number(
-              Number(this._assets[account][chain].assets[index].price) *
-                _balance
-            ).toFixed(2),
-            balance: String(data.balance),
-          };
-        }
+
+        const amount = Number(
+          Number(this._assets[account][chain].assets[index].price) * _balance
+        ).toFixed(2);
+
+        this._assets[account][chain].assets[index] = {
+          ...this._assets[account][chain].assets[index],
+          amount,
+          balance: data.balance,
+          transferable: data.transferable || data.balance,
+        };
 
         this.assets.next(this._assets);
         return;
@@ -318,11 +241,12 @@ export default class AssetsBalance {
     unSelectedNetwork: boolean = true
   ) {
     if (account && chains.length > 0) {
-      if (this.getType(account.type.toLowerCase()) === "wasm") {
+      if (getType(account.type.toLowerCase()) === ChainType.WASM) {
         const _account: any = this._assets[account.key];
         const _chains = chains.filter(
           (chain) =>
-            this.chains.find((_chain) => _chain.id === chain)?.type === "wasm"
+            this.chains.find((_chain) => _chain.id === chain)?.type ===
+            ChainType.WASM
         );
         _chains.forEach((chain) => {
           const network: any[] = _account[chain].subs;
@@ -338,11 +262,12 @@ export default class AssetsBalance {
           );
           this.networks = newnetwork;
         }
-      } else if (this.getType(account.type.toLowerCase()) === "evm") {
+      } else if (getType(account.type.toLowerCase()) === ChainType.EVM) {
         const _account = this._assets[account.key];
         const _chains = chains.filter(
           (chain) =>
-            this.chains.find((_chain) => _chain.id === chain)?.type === "evm"
+            this.chains.find((_chain) => _chain.id === chain)?.type ===
+            ChainType.EVM
         );
         _chains.forEach((chain) => {
           const network: any[] = _account[chain].subs;
@@ -362,55 +287,56 @@ export default class AssetsBalance {
       }
     }
   }
-  private getOtherAssets = async (
-    _api: any,
+
+  private getNonNativeAssets = async (
+    api: any,
     account: AccountEntity,
     chain: Chain
   ) => {
-    let _assets: any[];
-    let _unsubs: any[];
-    if (
-      _api.type === "wasm" &&
-      this.getType(account.type.toLowerCase()) === "wasm"
-    ) {
-      const { assets, unsubs } = await getWasmAssets(
-        _api.provider,
-        chain.id,
-        account?.value?.address,
-        (
-          assetId,
-          amounts: {
-            balance: BN;
-            frozen: BN;
-            reserved: BN;
-            transferable: BN;
-          }
-        ) => {
-          this.updateOneAsset(account.key, amounts, assetId, chain.id);
+    let _assets: any[] = [];
+    let _unsubs: any[] = [];
+
+    const apiType = api.type;
+
+    switch (apiType) {
+      case ChainType.WASM:
+        {
+          const { assets, unsubs } = await getWasmAssets(
+            api.provider,
+            chain.id,
+            account?.value?.address,
+            (
+              assetId,
+              amounts: {
+                balance: string;
+                transferable: string;
+              }
+            ) => {
+              this.updateOneAsset(account.key, amounts, assetId, chain.id);
+            }
+          );
+
+          _assets = assets;
+          _unsubs = unsubs;
         }
-      );
-      _assets = assets;
-      _unsubs = unsubs;
-      return { _assets, _unsubs };
-    } else if (
-      _api.type === "evm" &&
-      this.getType(account.type.toLowerCase()) === "evm"
-    ) {
-      const { assets, unsubs } = await this.loadAssetsFromStorage(
-        chain,
-        account,
-        _api.provider
-      );
-      _assets = assets;
-      _unsubs = unsubs;
-      return { _assets, _unsubs };
-    } else {
-      _assets = [];
-      _unsubs = [];
-      return { _assets, _unsubs };
+        break;
+      case ChainType.EVM:
+        {
+          const { assets, unsubs } = await this.loadERC20Assets(
+            chain,
+            account,
+            api.provider
+          );
+          _assets = assets;
+          _unsubs = unsubs;
+        }
+        break;
     }
+
+    return { _assets, _unsubs };
   };
-  private loadAssetsFromStorage = async (
+
+  private loadERC20Assets = async (
     chain: Chain,
     account: AccountEntity,
     api: ethers.providers.JsonRpcProvider
@@ -418,47 +344,48 @@ export default class AssetsBalance {
     try {
       const assets: IAsset[] = [];
       const unsubs: any[] = [];
-      const assetsFromStorage = await Assets.getByChain(chain.id);
+      const erc20Tokens = await Assets.getByChain(chain.id);
 
-      if (assetsFromStorage.length > 0 && account?.value?.address) {
+      if (erc20Tokens.length > 0 && account?.value?.address) {
         const accountAddress = account.value.address;
 
         await Promise.all(
-          assetsFromStorage.map(async (asset, index) => {
+          erc20Tokens.map(async (asset, index) => {
             assets[index] = {
               address: asset.address,
               balance: "",
-              id: String(index),
+              id: asset.address,
               decimals: asset.decimals,
               symbol: asset.symbol,
             };
 
             try {
-              if (chain.type === "evm") {
-                const contract = new Contract(asset.address, erc20Abi, api);
-                unsubs.push(contract);
+              const contract = new Contract(asset.address, erc20Abi, api);
+              unsubs.push(contract);
 
-                const balance = await contract.balanceOf(accountAddress);
+              const balance = await contract.balanceOf(accountAddress);
 
-                assets[index].balance = String(balance);
+              assets[index].balance = String(balance);
 
-                contract.removeAllListeners("Transfer");
+              contract.removeAllListeners("Transfer");
 
-                contract.on("Transfer", async (from, to) => {
-                  const selfAddress = account?.value?.address;
-                  if (from === selfAddress || to === selfAddress) {
-                    const balance = await contract.balanceOf(accountAddress);
-                    this.updateOneAsset(
-                      account.key,
-                      { balance },
-                      chain.symbol,
-                      chain.id
-                    );
-                  }
-                });
-              }
+              contract.on("Transfer", async (from, to) => {
+                const selfAddress = account?.value?.address;
+                if (from === selfAddress || to === selfAddress) {
+                  const balance = await contract.balanceOf(accountAddress);
+                  this.updateOneAsset(
+                    account.key,
+                    {
+                      balance: balance.toString(),
+                      transferable: balance.toString(),
+                    },
+                    asset.address,
+                    chain.id
+                  );
+                }
+              });
             } catch (error) {
-              assets[index].balance = new BN("0");
+              assets[index].balance = "0";
             }
           })
         );
@@ -471,6 +398,7 @@ export default class AssetsBalance {
       return { assets, unsubs };
     }
   };
+
   private getAssetsUSDPrice = async (assets: Asset[]) => {
     try {
       const addresToQuery = assets.map((asset) => asset.symbol);

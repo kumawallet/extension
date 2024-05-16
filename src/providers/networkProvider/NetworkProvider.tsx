@@ -15,7 +15,6 @@ import { ChainsState } from "@src/types";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
 import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { migrateOldCustomChains } from "@src/utils/chains";
-import { OlProvider } from "@src/services/ol/OlProvider";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const initialState: InitialState = {

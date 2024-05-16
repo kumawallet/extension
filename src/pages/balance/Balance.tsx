@@ -2,18 +2,9 @@ import { useEffect, useState } from "react";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-import { Activity, Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
+import { Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext } from "@src/providers";
-
-
-export interface Asset {
-  name: string;
-  symbol: string;
-  decimals: number;
-  amount: number;
-  usdPrice: number;
-}
 
 const Bg = () => (
   <svg width="739" height="868" viewBox="0 0 739 868" fill="none" xmlns="http://www.w3.org/2000/svg" className="bottom-0 left-0 w-full h-[62%] md:h-2/3 object-cover z-0 fixed">

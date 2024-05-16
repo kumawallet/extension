@@ -11,7 +11,6 @@ import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfil
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
 import { isChrome, isProduction } from "./src/utils/env";
 import { loadEnv } from "vite";
-import inject from "@rollup/plugin-inject";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");

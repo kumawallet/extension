@@ -26,11 +26,11 @@ const RPC = "http://rpc.openlibra.blockcoders.io:8080/v1";
 export class OlProvider {
   private client: Aptos;
 
-  constructor() {
+  constructor(rpc: string = RPC) {
     const config = new AptosConfig({
       network: Network.CUSTOM,
-      indexer: RPC,
-      fullnode: RPC,
+      indexer: rpc,
+      fullnode: rpc,
       client: {
         async provider(requestOptions) {
           const { params, method, url, headers, body } = requestOptions;
@@ -198,7 +198,6 @@ export class OlProvider {
         },
       });
 
-      console.log("block", block);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const fee = Number(result.gas_used) * Number(result.gas_unit_price);
@@ -215,6 +214,18 @@ export class OlProvider {
       };
     } else {
       throw new Error(res.message);
+    }
+  }
+
+  async healthCheck() {
+    try {
+      const response = await fetch(`${RPC}/-/healthy`).then((res) =>
+        res.json()
+      );
+
+      return response?.message === "diem-node:ok";
+    } catch (error) {
+      return false;
     }
   }
 }

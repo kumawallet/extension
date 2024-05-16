@@ -15,73 +15,74 @@ import { CURRENCIES } from "@utils/constants";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 import AccountEntity from "@src/storage/entities/Account";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import { AssetBalance, ChainType, SubstrateBalance } from "@src/types";
 
-const getType = (type: string) =>{
-  if(type === "imported_wasm"){
-    return type.slice(-4);
+export const getType = (type: string) => {
+  if (type.includes("imported")) {
+    return type.split("_")[1];
   }
-  else if( type === "imported_evm"){
-    return type.slice(-3);
-  }
-  else{
-    return type;
-  }
-}
+
+  return type;
+};
+
 export const getNatitveAssetBalance = async (
   api: {
-    provider :ApiPromise | ethers.providers.JsonRpcProvider | OlProvider | null
-    type: "wasm" | "evm" | "ol"},
+    provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
+    type: ChainType;
+  },
   accountAddress: string,
-  account : AccountEntity
-) => {
-  const _amounts = {
-    balance: BN0,
+  account: AccountEntity
+): Promise<AssetBalance> => {
+  const defaultAmount = {
+    balance: BN0.toString(),
+    transferable: BN0.toString(),
   };
+
   try {
+    if (!api) return defaultAmount;
 
-    if (!api) return _amounts;
-    if (api.type === "wasm" && getType(account.type.toLowerCase()) === "wasm") {
-      const { data } = (await (api.provider as ApiPromise).query.system.account(
-        accountAddress
-      )) as unknown as {
-        data: {
-          free: string;
-          reserved: string;
-          miscFrozen?: string;
-          frozen?: string;
-          feeFrozen?: string;
+    const apiType = api.type;
+    const chainType = getType(account.type.toLowerCase());
+
+    if (apiType !== chainType) return defaultAmount;
+
+    switch (apiType) {
+      case ChainType.WASM: {
+        const { data } = (await (
+          api.provider as ApiPromise
+        ).query.system.account(accountAddress)) as unknown as SubstrateBalance;
+
+        return getSubtrateNativeBalance(data);
+      }
+
+      case ChainType.EVM: {
+        const amount = await (
+          api.provider as ethers.providers.JsonRpcProvider
+        ).getBalance(accountAddress);
+        return {
+          balance: amount.toString(),
+          transferable: amount.toString(),
         };
-      };
-      return getSubtrateNativeBalance(data);
-    }
+      }
 
-
-    if (api.type === "ol") {
-      const balance = await (api.provider as OlProvider).getBalance(accountAddress);
-      return {
-        balance,
-      };
-    }
-
-    else if (api.type ===  "evm" && getType(account.type.toLowerCase()) === "evm") {
-      
-      const amount = await (api.provider as ethers.providers.JsonRpcProvider).getBalance(accountAddress)
-      return {
-        balance: amount,
-      };
-    }
-    else{
-      return _amounts;
+      case ChainType.OL: {
+        const balance = await (api.provider as OlProvider).getBalance(
+          accountAddress
+        );
+        return {
+          balance: balance.toString(),
+          transferable: balance.toString(),
+        };
+      }
     }
   } catch (error) {
     captureError(error);
-
-    return _amounts;
+    return defaultAmount;
   }
 };
 
 export const getAssetUSDPrice = async (query: string[]) => {
-  const _query = JSON.stringify(query.map(symbol => symbol))
+  const _query = JSON.stringify(query.map((symbol) => symbol));
   const gqlQuery = `
   query {
     getTokenPrice(tokens: ${_query}) {
@@ -93,17 +94,20 @@ export const getAssetUSDPrice = async (query: string[]) => {
   }
 `;
   try {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/graphql`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query: gqlQuery }),
-    });
-    const obj :any = {}
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/graphql`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: gqlQuery }),
+      }
+    );
+    const obj: any = {};
     const data = await response.json();
-     const objPrice = data.data.getTokenPrice.tokens 
-     objPrice.forEach((item:any) =>  obj[item.symbol] = item.usd)
+    const objPrice = data.data.getTokenPrice.tokens;
+    objPrice.forEach((item: any) => (obj[item.symbol] = item.usd));
     return obj || {};
   } catch (error) {
     captureError(error);
@@ -222,10 +226,8 @@ export const getWasmAssets = async (
   dispatch: (
     assetId: string,
     amounts: {
-      balance: BN;
-      frozen: BN;
-      reserved: BN;
-      transferable: BN;
+      balance: string;
+      transferable: string;
     }
   ) => void
 ) => {
@@ -239,8 +241,6 @@ export const getWasmAssets = async (
       | null = null;
     switch (chainId) {
       case "acala":
-        balanceMethod = api.query.tokens.accounts;
-        break;
       case "mandala":
         balanceMethod = api.query.tokens.accounts;
         break;
@@ -271,16 +271,15 @@ export const getWasmAssets = async (
     assetBalances.forEach((data, index) => {
       const asset = mappedAssets[index];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const _data = getSubtrateNonNativeBalance(data as any);
+      const balance = getSubtrateNonNativeBalance(data as any);
       assets.push({
         ...asset,
         id: typeof asset.id === "object" ? JSON.stringify(asset.id) : asset.id,
-        ..._data,
+        ...balance,
       });
     });
     await Promise.all(
       assets.map(async (asset) => {
-        
         const params = [];
         if (["acala", "mandala"].includes(chainId.toLowerCase())) {
           params.push(address, JSON.parse(asset.id));
@@ -298,11 +297,10 @@ export const getWasmAssets = async (
               frozen?: number;
             };
           }) => {
-            
             const _data = getSubtrateNonNativeBalance(data);
             dispatch(asset.id, _data);
           }
-        )
+        );
         unsubs.push(unsub);
       })
     );
@@ -329,13 +327,14 @@ export const getSubtrateNativeBalance = (
         feeFrozen?: string;
       }
     | undefined
-) => {
+): {
+  balance: string;
+  transferable: string;
+} => {
   if (!data) {
     return {
-      balance: BN0,
-      frozen: BN0,
-      reserved: BN0,
-      transferable: BN0,
+      balance: BN0.toString(),
+      transferable: BN0.toString(),
     };
   }
 
@@ -345,11 +344,10 @@ export const getSubtrateNativeBalance = (
   const feeFrozen = new BN(String(data?.feeFrozen || 0));
   const frozen = miscFrozen.add(feeFrozen);
   const transferable = free.sub(frozen).sub(reserved);
+
   return {
-    balance: free,
-    transferable,
-    reserved,
-    frozen,
+    balance: free.toString(),
+    transferable: transferable.toString(),
   };
 };
 
@@ -368,10 +366,8 @@ export const getSubtrateNonNativeBalance = (
 ) => {
   if (!data) {
     return {
-      balance: BN0,
-      frozen: BN0,
-      reserved: BN0,
-      transferable: BN0,
+      balance: BN0.toString(),
+      transferable: BN0.toString(),
     };
   }
 
@@ -440,10 +436,8 @@ export const getSubtrateNonNativeBalance = (
   }
 
   return {
-    balance,
-    frozen,
-    reserved,
-    transferable: balance.sub(frozen).sub(reserved),
+    balance: balance.toString(),
+    transferable: balance.sub(frozen).sub(reserved).toString(),
   };
 };
 

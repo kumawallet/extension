@@ -16,8 +16,9 @@ export type WasmFee = {
   estimatedTotal: BN;
 };
 
-export type API = { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}};
-
+export type API = {
+  [id: string]: ApiPromise | ethers.providers.JsonRpcProvider | {};
+};
 
 export type EVMFee = {
   gasLimit: BigNumber;
@@ -46,9 +47,16 @@ export type Tx =
 
 export type confirmTx = ({ type, tx, fee }: Tx) => void;
 
+export interface Asset {
+  name: string;
+  symbol: string;
+  decimals: number;
+  amount: number;
+  usdPrice: number;
+}
+
 export type IAsset = Partial<Asset> & {
   id: string;
-  color?: string;
   contract?: ContractPromise;
   address?: string;
   balance: BN | string;
@@ -93,10 +101,10 @@ export interface TxToProcess {
 export type chain = {
   isTestnet?: boolean;
   type: "wasm" | "evm" | "ol";
-}
+};
 
 export interface SelectedChain {
-  [id: string]: chain
+  [id: string]: chain;
 }
 export interface paramChain {
   id: string;
@@ -176,4 +184,25 @@ export type HistoricTransaction = {
 export interface AddressForm {
   name: string;
   address: string;
+}
+
+export interface AssetBalance {
+  balance: string;
+  transferable: string;
+}
+
+export interface SubstrateBalance {
+  data: {
+    free: string;
+    reserved: string;
+    miscFrozen?: string;
+    frozen?: string;
+    feeFrozen?: string;
+  };
+}
+
+export enum ChainType {
+  EVM = "evm",
+  WASM = "wasm",
+  OL = "ol",
 }

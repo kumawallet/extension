@@ -64,7 +64,7 @@ import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { Chain, Transaction, SelectedChain } from "@src/types";
+import { Chain, Transaction, SelectedChain, ChainType } from "@src/types";
 import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
@@ -73,13 +73,16 @@ import { Transaction as TransactionEntity } from "@src/storage/entities/Transact
 import AssetBalance from "@src/storage/entities/AssetBalance";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 export const getProvider = (rpc: string, type: string) => {
-  if (type?.toLowerCase() === "evm")
+  if (type?.toLowerCase() === ChainType.EVM)
     return new ethers.providers.JsonRpcProvider(rpc as string);
 
-  if (type?.toLowerCase() === "wasm")
+  if (type?.toLowerCase() === ChainType.WASM)
     return ApiPromise.create({ provider: new WsProvider(rpc as string) });
+
+  if (type?.toLowerCase() === ChainType.OL) return new OlProvider();
 };
 
 const getWebAPI = (): typeof chrome => {
@@ -150,7 +153,7 @@ export default class Extension {
     Network.getInstance();
     const network: any = await Network.get();
     if (!network) return;
-    const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS].flat();
+    const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
     const chain = this.Chains.getValue();
     if (network && network?.Chain?.supportedAccounts) {
       const newChainFormat = allChains.find(
@@ -227,7 +230,7 @@ export default class Extension {
     this.provider.statusNetwork.subscribe(async (data) => {
       const [selectedAccount, allAccounts] = await Promise.all([
         SelectedAccount.get().catch(() => null),
-        Accounts.get(),
+        Accounts.get().catch(() => null),
       ]);
 
       if (!selectedAccount) return;
@@ -310,11 +313,15 @@ export default class Extension {
     }
 
     if (accountTypesToImport.includes(AccountType.EVM)) {
-      firstAccountCreated = await AccountManager.importAccount(
+      const account = await AccountManager.importAccount(
         name,
         privateKeyOrSeed,
         AccountType.IMPORTED_EVM
       );
+
+      if (!firstAccountCreated) {
+        firstAccountCreated = account;
+      }
     }
 
     if (accountTypesToImport.includes(AccountType.OL)) {

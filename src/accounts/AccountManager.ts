@@ -152,8 +152,6 @@ export default class AccountManager {
   ): Promise<Account> {
     const keyring = (await Vault.getKeyring(type)) as HDKeyring;
 
-    console.log("keyring", keyring, address);
-
     if (!keyring || !keyring.keyPairs[address])
       throw new Error("failed_to_derive_from_empty_keyring");
 
