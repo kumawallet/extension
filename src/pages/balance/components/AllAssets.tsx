@@ -21,12 +21,12 @@ export const AllAsset: FC<AssetProps> = ({ assets, symbol}) => {
          <div className="flex gap-1 items-center">
            <p className="font-bold text-xl">
              {
-                 assets.reduce((acc, _asset : any) =>{ 
+                assets.reduce((acc, _asset : any) =>{ 
                     return acc +  formatAmountWithDecimals(
                      Number(_asset.balance),
                      6,
                      _asset.decimals
-                   )}, 0) 
+                   )}, 0)
              }
            </p>
             <p className="tx-sm">{symbol}</p> 

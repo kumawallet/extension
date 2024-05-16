@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
@@ -45,7 +45,7 @@ export const Assets = () => {
         if(showAllAssets){
           Object.keys(assets).forEach(address => {
             const networks = assets[address];
-            Object.keys(networks).forEach((network : any) => {
+             Object.keys(networks).forEach((network : any) => {
                 const assets = networks[network].assets;
                 assets.forEach((asset: any) => {
                     if (!outputObject[asset.symbol]) {
@@ -59,7 +59,7 @@ export const Assets = () => {
         else{
           Object.keys(assets).forEach(address => {
             const networks = assets[address];
-            Object.keys(networks).forEach((network : any) => {
+             Object.keys(networks).forEach((network : any) => {
                 const assets = networks[network].assets;
                 assets.forEach((asset: any) => {
                     if (!outputObject[asset.symbol]) {
@@ -77,7 +77,8 @@ export const Assets = () => {
       
     
     }
-} , [JSON.stringify(assets),showAllAssets]);
+    
+} , [JSON.stringify(assets),showAllAssets],selectedAccount?.key);
 
   return (
     <div className="flex flex-col gap-2">
@@ -106,11 +107,11 @@ export const Assets = () => {
       {isLoadingAssets && <Loading />}
 
       {
-      selectedAccount?.value && filteredAsset && filteredAsset?.length !==0 ? Object.keys(filteredAsset).map((asset, index) =>{
-        return (<Asset asset={filteredAsset[asset]} key={index} />)
-    }) : Object.keys(filteredAsset).length !== 0 && Object.keys(filteredAsset).map((_assets: string) => {  
-      return (<AllAsset assets={filteredAsset[_assets]} symbol={_assets} />)
-    })
+       filteredAsset && Array.isArray(filteredAsset) && selectedAccount?.key === Object.keys(assets)[0] && filteredAsset?.length !==0 ? filteredAsset.map((asset, index) =>{
+        return (<Asset asset={asset} key={index} />)
+    }) : filteredAsset && !Array.isArray(filteredAsset) && Object.keys(assets).length > 1 && Object.keys(filteredAsset).length !== 0 ?  Object.keys(filteredAsset).map((_assets: string) => {  
+      return  <AllAsset assets={filteredAsset[_assets]} symbol={_assets}/>
+    }) : (<Loading />)
       }
       
       {showManageAssets && (

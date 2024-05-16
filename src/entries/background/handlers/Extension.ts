@@ -285,8 +285,9 @@ export default class Extension {
           this.assetsBalance.assets.next(this.assetsBalance._assets);
         }
       }
-    });
+   })
   };
+
 
   private async importAccount({
     name,
