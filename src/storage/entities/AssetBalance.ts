@@ -12,7 +12,6 @@ import { Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
 import { ApiPromise } from "@polkadot/api";
 import { Contract, ethers } from "ethers";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
-import { BN } from "@polkadot/util";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import AccountEntity from "@src/storage/entities/Account";
@@ -234,6 +233,7 @@ export default class AssetsBalance {
       }
     }
   }
+
   public deleteAsset(
     account: AccountEntity,
     api: any,
@@ -241,50 +241,117 @@ export default class AssetsBalance {
     unSelectedNetwork: boolean = true
   ) {
     if (account && chains.length > 0) {
-      if (getType(account.type.toLowerCase()) === ChainType.WASM) {
-        const _account: any = this._assets[account.key];
-        const _chains = chains.filter(
-          (chain) =>
-            this.chains.find((_chain) => _chain.id === chain)?.type ===
-            ChainType.WASM
-        );
-        _chains.forEach((chain) => {
-          const network: any[] = _account[chain].subs;
-          network.forEach((unsubs) => unsubs?.());
-          delete this._assets[account.key][chain];
-          if (Object.keys(this._assets[account.key]).length === 0) {
-            delete this._assets[account.key];
-          }
-        });
-        if (unSelectedNetwork) {
-          const newnetwork = this.networks.filter(
-            (network) => !chains.includes(network)
-          );
-          this.networks = newnetwork;
+      const _account = this._assets[account.key];
+
+      const accountType = getType(account.type.toLowerCase());
+      const chainType = accountType;
+      const chainsToUpdate = chains.filter(
+        (chain) =>
+          this.chains.find((_chain) => _chain.id === chain)?.type === chainType
+      );
+
+      chainsToUpdate.forEach((chainId) => {
+        const network: any[] = _account[chainId].subs;
+
+        // turn off the subscription
+        switch (accountType) {
+          case ChainType.WASM:
+            {
+              network.forEach((unsubs) => unsubs?.());
+            }
+            break;
+          case ChainType.EVM:
+            {
+              api[chainId].provider.off("block");
+              network.forEach((unsubs) => unsubs.off("Transfer"));
+            }
+            break;
         }
-      } else if (getType(account.type.toLowerCase()) === ChainType.EVM) {
-        const _account = this._assets[account.key];
-        const _chains = chains.filter(
-          (chain) =>
-            this.chains.find((_chain) => _chain.id === chain)?.type ===
-            ChainType.EVM
-        );
-        _chains.forEach((chain) => {
-          const network: any[] = _account[chain].subs;
-          api[chain].provider.off("block");
-          network.forEach((unsubs) => unsubs.off("Transfer"));
-          delete this._assets[account.key][chain];
-          if (Object.keys(this._assets[account.key]).length === 0) {
-            delete this._assets[account.key];
-          }
-        });
-        if (unSelectedNetwork) {
-          const newnetwork = this.networks.filter(
-            (network) => !chains.includes(network)
-          );
-          this.networks = newnetwork;
+
+        // delete chain form the account, if no chain left delete the account
+        delete this._assets[account.key][chainId];
+        if (Object.keys(this._assets[account.key]).length === 0) {
+          delete this._assets[account.key];
         }
+      });
+
+      if (unSelectedNetwork) {
+        const newnetwork = this.networks.filter(
+          (network) => !chains.includes(network)
+        );
+        this.networks = newnetwork;
       }
+
+      // switch (accountType) {
+      //   case ChainType.WASM:
+      //     {
+      //       chainsToUpdate.forEach((chainId) => {
+      //         const network: any[] = _account[chainId].subs;
+      //         network.forEach((unsubs) => unsubs?.());
+      //         delete this._assets[account.key][chainId];
+      //         if (Object.keys(this._assets[account.key]).length === 0) {
+      //           delete this._assets[account.key];
+      //         }
+      //       });
+      //     }
+      //     break;
+      //   case ChainType.EVM:
+      //     {
+      //       chainsToUpdate.forEach((chainId) => {
+      //         const network: any[] = _account[chainId].subs;
+      //         api[chainId].provider.off("block");
+      //         network.forEach((unsubs) => unsubs.off("Transfer"));
+      //         delete this._assets[account.key][chainId];
+      //         if (Object.keys(this._assets[account.key]).length === 0) {
+      //           delete this._assets[account.key];
+      //         }
+      //       });
+      //     }
+      //     break;
+      // }
+
+      // if (getType(account.type.toLowerCase()) === ChainType.WASM) {
+      //   const _chains = chains.filter(
+      //     (chain) =>
+      //       this.chains.find((_chain) => _chain.id === chain)?.type ===
+      //       ChainType.WASM
+      //   );
+      //   _chains.forEach((chain) => {
+      //     const network: any[] = _account[chain].subs;
+      //     network.forEach((unsubs) => unsubs?.());
+      //     delete this._assets[account.key][chain];
+      //     if (Object.keys(this._assets[account.key]).length === 0) {
+      //       delete this._assets[account.key];
+      //     }
+      //   });
+      //   if (unSelectedNetwork) {
+      //     const newnetwork = this.networks.filter(
+      //       (network) => !chains.includes(network)
+      //     );
+      //     this.networks = newnetwork;
+      //   }
+      // } else if (getType(account.type.toLowerCase()) === ChainType.EVM) {
+      //   const _chains = chains.filter(
+      //     (chain) =>
+      //       this.chains.find((_chain) => _chain.id === chain)?.type ===
+      //       ChainType.EVM
+      //   );
+      //   _chains.forEach((chain) => {
+      //     const network: any[] = _account[chain].subs;
+      //     api[chain].provider.off("block");
+      //     network.forEach((unsubs) => unsubs.off("Transfer"));
+      //     delete this._assets[account.key][chain];
+      //     if (Object.keys(this._assets[account.key]).length === 0) {
+      //       delete this._assets[account.key];
+      //     }
+      //   });
+      //   if (unSelectedNetwork) {
+      //     const newnetwork = this.networks.filter(
+      //       (network) => !chains.includes(network)
+      //     );
+      //     this.networks = newnetwork;
+      //   }
+      // }
     }
   }
 
