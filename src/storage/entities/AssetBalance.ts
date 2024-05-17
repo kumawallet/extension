@@ -169,6 +169,21 @@ export default class AssetsBalance {
             });
           }
           break;
+        case ChainType.OL:
+          {
+            const olProvider = api.provider as OlProvider;
+            olProvider.onNewBlock(() => {
+              olProvider.getBalance(account.value.address).then((balance) => {
+                this.updateOneAsset(
+                  account.key,
+                  { balance: balance.toString() },
+                  "-1",
+                  chain.id
+                );
+              });
+            });
+          }
+          break;
       }
 
       return {
@@ -266,6 +281,9 @@ export default class AssetsBalance {
               network.forEach((unsubs) => unsubs.off("Transfer"));
             }
             break;
+          case ChainType.OL: {
+            (api[chainId].provider as OlProvider).disconnect();
+          }
         }
 
         // delete chain form the account, if no chain left delete the account
@@ -281,77 +299,6 @@ export default class AssetsBalance {
         );
         this.networks = newnetwork;
       }
-
-      // switch (accountType) {
-      //   case ChainType.WASM:
-      //     {
-      //       chainsToUpdate.forEach((chainId) => {
-      //         const network: any[] = _account[chainId].subs;
-      //         network.forEach((unsubs) => unsubs?.());
-      //         delete this._assets[account.key][chainId];
-      //         if (Object.keys(this._assets[account.key]).length === 0) {
-      //           delete this._assets[account.key];
-      //         }
-      //       });
-      //     }
-      //     break;
-      //   case ChainType.EVM:
-      //     {
-      //       chainsToUpdate.forEach((chainId) => {
-      //         const network: any[] = _account[chainId].subs;
-      //         api[chainId].provider.off("block");
-      //         network.forEach((unsubs) => unsubs.off("Transfer"));
-      //         delete this._assets[account.key][chainId];
-      //         if (Object.keys(this._assets[account.key]).length === 0) {
-      //           delete this._assets[account.key];
-      //         }
-      //       });
-      //     }
-      //     break;
-      // }
-
-      // if (getType(account.type.toLowerCase()) === ChainType.WASM) {
-      //   const _chains = chains.filter(
-      //     (chain) =>
-      //       this.chains.find((_chain) => _chain.id === chain)?.type ===
-      //       ChainType.WASM
-      //   );
-      //   _chains.forEach((chain) => {
-      //     const network: any[] = _account[chain].subs;
-      //     network.forEach((unsubs) => unsubs?.());
-      //     delete this._assets[account.key][chain];
-      //     if (Object.keys(this._assets[account.key]).length === 0) {
-      //       delete this._assets[account.key];
-      //     }
-      //   });
-      //   if (unSelectedNetwork) {
-      //     const newnetwork = this.networks.filter(
-      //       (network) => !chains.includes(network)
-      //     );
-      //     this.networks = newnetwork;
-      //   }
-      // } else if (getType(account.type.toLowerCase()) === ChainType.EVM) {
-      //   const _chains = chains.filter(
-      //     (chain) =>
-      //       this.chains.find((_chain) => _chain.id === chain)?.type ===
-      //       ChainType.EVM
-      //   );
-      //   _chains.forEach((chain) => {
-      //     const network: any[] = _account[chain].subs;
-      //     api[chain].provider.off("block");
-      //     network.forEach((unsubs) => unsubs.off("Transfer"));
-      //     delete this._assets[account.key][chain];
-      //     if (Object.keys(this._assets[account.key]).length === 0) {
-      //       delete this._assets[account.key];
-      //     }
-      //   });
-      //   if (unSelectedNetwork) {
-      //     const newnetwork = this.networks.filter(
-      //       (network) => !chains.includes(network)
-      //     );
-      //     this.networks = newnetwork;
-      //   }
-      // }
     }
   }
 

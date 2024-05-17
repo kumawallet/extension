@@ -63,7 +63,6 @@ export class Provider {
           });
         }, RECONNECT_TIMEOUT);
       } else if (type === ChainType.OL) {
-        // TODO: Reconnect missing
         const isConnected = await (
           this.providers[id].provider as OlProvider
         ).healthCheck();

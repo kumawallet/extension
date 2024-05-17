@@ -21,12 +21,14 @@ const {
   Identifier,
 } = TxnBuilderTypes;
 
-const RPC = "http://rpc.openlibra.blockcoders.io:8080/v1";
-
 export class OlProvider {
   private client: Aptos;
+  private interval: NodeJS.Timeout | null = null;
+  private rpc: string;
 
-  constructor(rpc: string = RPC) {
+  constructor(rpc: string) {
+    this.rpc = rpc;
+
     const config = new AptosConfig({
       network: Network.CUSTOM,
       indexer: rpc,
@@ -171,7 +173,7 @@ export class OlProvider {
 
     const bcsTxn = BCS.bcsToBytes(signedTx);
 
-    const data = await fetch(`${RPC}/transactions`, {
+    const data = await fetch(`${this.rpc}/transactions`, {
       method: "POST",
       headers: {
         "content-type": "application/x.diem.signed_transaction+bcs",
@@ -219,7 +221,7 @@ export class OlProvider {
 
   async healthCheck() {
     try {
-      const response = await fetch(`${RPC}/-/healthy`).then((res) =>
+      const response = await fetch(`${this.rpc}/-/healthy`).then((res) =>
         res.json()
       );
 
@@ -227,5 +229,15 @@ export class OlProvider {
     } catch (error) {
       return false;
     }
+  }
+
+  async onNewBlock(callback: () => void) {
+    this.interval = setInterval(async () => {
+      callback();
+    }, 20000);
+  }
+
+  async disconnect() {
+    if (this.interval) clearInterval(this.interval);
   }
 }

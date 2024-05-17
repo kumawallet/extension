@@ -37,8 +37,6 @@ abstract class HandlerBase implements Handler {
 }
 
 export abstract class TabsHandler extends HandlerBase {
-  // TODO: abstract handle<TMessageType extends keyof RequestSignatures>
-
   abstract handle<TMessageType extends MessageTypes>(
     id: string,
     type: TMessageType,
