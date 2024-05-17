@@ -62,7 +62,7 @@ export const AccountList = () => {
             data-testid="selected-account"
             className="text-primary-default text-base"
           >
-            {selectedAccount?.value?.name}
+            {selectedAccount?.value?.name ? selectedAccount?.value?.name : t("accounts.accounts")}
           </p>
           <GoChevronDown size={14} />
         </div>
@@ -111,7 +111,7 @@ export const AccountList = () => {
                           className="flex flex-col gap-5"
                         >
                           <button
-                            className={`flex items-center px-4 py-3 bg-[#1C1C27] rounded-lg ${!selectedAccount?.value
+                            className={`flex items-center px-6 py-4 bg-[#1C1C27] rounded-lg ${!selectedAccount?.value
                               ? "border border-[#2CEC84]"
                               : ""
                               }`}
@@ -120,9 +120,9 @@ export const AccountList = () => {
                               onCloseModal()
                             }}
                           >
-                            <div className=" flex gap-2 items-center overflow-hidden text-ellipsis">
-                              <BiSolidWallet size={26} />
-                              <span>{t("all_accounts")}</span>
+                            <div className={` flex gap-4 items-center overflow-hidden text-ellipsis`}>
+                              <IconWallet size="15" />
+                              <span>{t("accounts.all_accounts")}</span>
                             </div>
                           </button>
 

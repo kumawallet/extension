@@ -142,7 +142,8 @@
     "accounts": {
       "accounts": "アカウント",
       "import": "アカウントをインポート",
-      "create": "アカウントを作成"
+      "create": "アカウントを作成",
+      "all_accounts": "すべてのアカウント"
     },
     "send": "送信",
     "swap": "スワップ",

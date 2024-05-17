@@ -142,7 +142,8 @@
     "accounts": {
       "accounts": "Cuentas",
       "import": "Importar cuenta",
-      "create": "Crear cuenta"
+      "create": "Crear cuenta",
+      "all_accounts": "Todas las Cuentas"
     },
     "send": "Enviar",
     "swap": "Intercambio",

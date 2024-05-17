@@ -1,32 +1,34 @@
 import { FC } from "react";
-import { AssetIcon } from "@src/components/common";
-import { Asset, Asset as IAsset } from "@src/providers/assetProvider/types";
-import { SEND } from "@src/routes/paths";
+import { AssetIcon, Button } from "@src/components/common";
+import { Asset as IAsset } from "@src/providers/assetProvider/types";
 import { formatAmountWithDecimals, formatUSDAmount } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa6";
+import { BALANCE_ACCOUNTS } from "@src/routes/paths";
+
 
 interface AssetProps {
-  assets: any;
+  assets: IAsset[];
   symbol?: string ;
 }
 
 export const AllAsset: FC<AssetProps> = ({ assets, symbol}) => {
   const navigate = useNavigate();
   return (
-     <div className="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between">
+     <Button classname="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between " variant="contained-black"
+     onClick={() => navigate(BALANCE_ACCOUNTS, { state : {assets}})}>
      <div className="flex gap-2 items-center">
      <AssetIcon asset={assets[0]} width={32} />
        <div className="flex flex-col">
          <div className="flex gap-1 items-center">
            <p className="font-bold text-xl">
              {
-                assets.reduce((acc, _asset : any) =>{ 
+                parseFloat(assets.reduce((acc, _asset : any) =>{ 
                     return acc +  formatAmountWithDecimals(
                      Number(_asset.balance),
                      6,
                      _asset.decimals
-                   )}, 0)
+                   )}, 0).toFixed(3))
              }
            </p>
             <p className="tx-sm">{symbol}</p> 
@@ -38,11 +40,11 @@ export const AllAsset: FC<AssetProps> = ({ assets, symbol}) => {
      </div>
 
      <div
-       className={`bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-primary-default rounded-full`}
+       className={`py-2 px-3 flex justify-center items-center rounded-full`}
      >
        <FaChevronRight size={21}  />
      </div>
-   </div>)
+   </Button>)
 
    
 };

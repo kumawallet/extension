@@ -32,6 +32,7 @@ import {
   CREATE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
+  BALANCE_ACCOUNTS,
   RECEIVE,
   SEND,
   SETTINGS_BUG,
@@ -54,6 +55,7 @@ import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 import { messageAPI } from "@src/messageAPI/api";
 import { useLoading } from "@src/hooks";
 import { getWebAPI } from "@src/utils/env";
+import { BalanceAccounts } from "@src/pages/balance/components/BalanceAccounts"
 
 const webAPI = getWebAPI();
 
@@ -193,6 +195,7 @@ export const Routes = () => {
         <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
         <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
+        <Route path={BALANCE_ACCOUNTS} element={<BalanceAccounts />} />
 
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />

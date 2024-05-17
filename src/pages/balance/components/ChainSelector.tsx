@@ -65,8 +65,10 @@ export const ChainSelector = () => {
           className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
           onClick={() => setIsOpen(true)}
         >
-          <Network size="25" />
-          <p className="overflow-hidden text-ellipsis mr-1">{"Networks"}</p>
+          <Network size="22" className="my-[0.15rem]"/>
+          <p className="overflow-hidden text-ellipsis mr-1">
+            {t("chain_selector.title")}
+          </p>
         </Menu.Button>
 
         <Transition

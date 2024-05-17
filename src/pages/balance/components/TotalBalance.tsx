@@ -6,6 +6,8 @@ import {
   useAccountContext,
   useAssetContext,
 } from "@src/providers";
+import { as } from "@aptos-labs/ts-sdk/dist/common/accountAddress-csDQ8Gnp";
+import { number } from "yup";
 
 interface TotalBalanceProps {
   balance?: number;
@@ -27,26 +29,22 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
 
   } = useAssetContext();
 
-
-
-
-  const totalBalance = () => {
-    // const a = Object.keys(assets).reduce((acc_, address) => {
-    //   const networks = assets[address];
-    //   return acc_ + Object.keys(networks).reduce((_acc, network : any) => { 
-    //       const assets = networks[network].assets;
-    //       return _acc + assets.reducer((acc, asset: any) => {
-    //           return acc + formatAmountWithDecimals(
-    //             Number(asset.balance),
-    //             6,
-    //             asset.decimals
-    //           );
-    //       });
-    //   });
-    // });
-    return 0
-  }
-
+useEffect(
+  ()=>{
+    
+  }, [JSON.stringify(assets)]
+)
+const totalBalance = () => {
+ return Object.keys(assets).reduce((acc,address) => {
+    const account = assets[address];
+     return acc + Object.keys(account).reduce((_acc, network: any) => {
+      const _network = account[network].assets
+        return _acc +  _network.reduce((__acc: number, asset: any) => {
+        return __acc + (Number(asset.amount) | 0)
+      },0)
+    },0)
+  },0)
+}
   const toggleBalance = () => setShowBalance(!showBalance);
 
   useEffect(() => {

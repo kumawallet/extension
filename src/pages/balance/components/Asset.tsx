@@ -12,8 +12,6 @@ interface AssetProps {
 
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
-
-
   return (
     <div className="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between">
       <div className="flex gap-2 items-center">

@@ -142,7 +142,8 @@
     "accounts": {
       "accounts": "Hesaplar",
       "import": "Hesap İçe Aktar",
-      "create": "Hesap Oluştur"
+      "create": "Hesap Oluştur",
+      "all_accounts": "Tüm Hesaplar"
     },  
     "send": "Gönder",
     "swap": "Değiştir",

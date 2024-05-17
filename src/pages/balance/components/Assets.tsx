@@ -40,22 +40,22 @@ export const Assets = () => {
       const outputObject: any = {};
       if (Object.keys(assets).length !== 0) {
         if (showAllAssets) {
-          Object.keys(assets).forEach((address) => {
-            const networks = assets[address];
+          Object.keys(assets).forEach((key) => {
+            const networks = assets[key];
             Object.keys(networks).forEach((network: any) => {
               const assets = networks[network].assets;
               assets.forEach((asset: any) => {
                 if (!outputObject[asset.symbol]) {
                   outputObject[asset.symbol] = [];
                 }
-                outputObject[asset.symbol].push({ ...asset, address: address });
+                outputObject[asset.symbol].push({ ...asset, accountKey: key });
               });
             });
           });
           return outputObject;
         } else {
-          Object.keys(assets).forEach((address) => {
-            const networks = assets[address];
+          Object.keys(assets).forEach((key) => {
+            const networks = assets[key];
             Object.keys(networks).forEach((network: any) => {
               const assets = networks[network].assets;
               assets.forEach((asset: any) => {
@@ -65,7 +65,7 @@ export const Assets = () => {
                   }
                   outputObject[asset.symbol].push({
                     ...asset,
-                    address: address,
+                    accountKey: key,
                   });
                 }
               });
