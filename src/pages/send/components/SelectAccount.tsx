@@ -17,6 +17,10 @@ const iconURL = (type: string) => {
     return ASSETS_ICONS["ETH"];
   }
 
+  if (type.toLowerCase().includes("ol")) {
+    return ASSETS_ICONS["OL"];
+  }
+
   return "";
 };
 

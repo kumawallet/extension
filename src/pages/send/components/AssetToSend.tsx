@@ -6,18 +6,17 @@ import {
   useNetworkContext,
 } from "@src/providers";
 import { NumericFormat } from "react-number-format";
-import { set, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { SendTxForm } from "../Send";
 import { XCM } from "@src/constants/xcm";
 import { Chain, IAsset } from "@src/types";
 import { HiMiniChevronDown } from "react-icons/hi2";
 import { XCM_ASSETS_MAPPING } from "@src/xcm/assets";
 import { FiArrowDownCircle } from "react-icons/fi";
-import { formatBN } from "@src/utils/assets";
+import { formatBN, getType } from "@src/utils/assets";
 import { useDebounce } from "react-use";
 import { AssetIcon, SelectableOptionModal } from "@src/components/common";
 import { GoCircle, GoCheckCircle } from "react-icons/go";
-import { formatAccount } from "@src/utils/account-utils";
 
 const ICON_WIDTH = 18;
 
@@ -211,7 +210,11 @@ export const AssetToSend = () => {
 
     const activeChainIds = Object.keys(selectedChain);
 
+
+
     const allChains = chains.map((chain) => chain.chains).flat();
+
+
 
     const chainsToSend = allChains.filter((chain) =>
       activeChainIds.includes(chain.id)
@@ -221,11 +224,13 @@ export const AssetToSend = () => {
       (account) => account.value?.address === senderAddress
     );
 
+
+
     if (!account) return;
 
     const chainsByType = chainsToSend.filter(
       (chain) =>
-        chain.type === formatAccount(account?.type)?.type?.toLowerCase()
+        chain.type === getType(account?.type.toLowerCase())
     );
 
     setChainsToSelectFrom(chainsByType);
@@ -256,6 +261,8 @@ export const AssetToSend = () => {
 
   const assetsToSelect = useMemo(() => {
     if (!originNetwork || !targetChain || !senderAddress) return [];
+
+
 
     const keyIndex = Object.keys(assets).find((key) =>
       key.toLowerCase().includes(senderAddress.toLowerCase())

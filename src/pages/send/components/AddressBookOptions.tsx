@@ -15,8 +15,6 @@ export const AddressBookOptions = () => {
     try {
       const { accounts } = await messageAPI.getRegistryAddresses();
 
-      console.log("accounts", accounts)
-
       setContacts(accounts);
     } catch (error) {
       console.log("error_loading_contacts");
