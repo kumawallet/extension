@@ -114,7 +114,7 @@ export const General = () => {
         />
         <p className={topbarText}>{t("title")}</p>
       </div>
-      <div className="flex flex-col h-full px-4 pt-2 gap-5">
+      <div className="flex flex-col px-4 pt-2 gap-5">
         {settings.map((setting, index) => {
           switch (setting.name) {
             case SettingKey.LANGUAGES:
