@@ -302,7 +302,8 @@
     "invalid_method": "無効なメソッド",
     "invalid_params": "無効なパラメータ",
     "invalid_abi": "無効なABI",
-    "contract_error": "契約でエラーが発生しました"
+    "contract_error": "契約でエラーが発生しました",
+    "select_account": "アカウントを選択"
   },
   "manage_assets": {
     "title": "資産の管理",

@@ -303,7 +303,8 @@
   "invalid_method": "Metodo non valido",
   "invalid_params": "Parametri non validi",
   "invalid_abi": "ABI non valida",
-  "contract_error": "Si è verificato un errore con il contratto"
+  "contract_error": "Si è verificato un errore con il contratto",
+  "select_account": "Seleziona account"
 },
 "manage_assets": {
   "title": "Gestisci asset",
