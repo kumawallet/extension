@@ -163,63 +163,13 @@ export const Send = () => {
   }, [isConfirmingTx]);
 
   const onSubmit: SubmitHandler<SendTxForm> = useCallback(
-    async (data) => {
+    async () => {
       if (!isConfirmingTx) return setIsConfirmingTx(true);
 
       try {
         await messageAPI.sendTx();
 
-        // const {
-        //   amount,
-        //   asset,
-        //   recipientAddress: destinationAddress,
-        //   senderAddress: originAddress,
-        //   originNetwork,
-        //   targetNetwork,
-        //   extrinsicHash,
-        //   evmTx,
-        //   tip,
-        // } = data;
 
-        // const txType = originNetwork.type;
-
-        // if (txType === "wasm") {
-        //   messageAPI.sendSubstrateTx({
-        //     amount: amount,
-        //     asset: {
-        //       id: asset.id,
-        //       symbol: asset.symbol,
-        //     },
-        //     destinationAddress,
-        //     originAddress,
-        //     destinationNetwork: targetNetwork.name,
-        //     networkName: originNetwork.name,
-        //     rpc: originNetwork.rpcs[0] as string,
-        //     isSwap: false,
-        //     hexExtrinsic: extrinsicHash as string,
-        //     tip: tip
-        //       ? transformAmountStringToBN(
-        //         tip,
-        //         originNetwork.decimals
-        //       )?.toString()
-        //       : undefined,
-        //   });
-        // } else if (txType === "evm") {
-        //   messageAPI.sendEvmTx({
-        //     amount: amount,
-        //     asset: {
-        //       id: asset.id,
-        //       symbol: asset.symbol,
-        //     },
-        //     destinationAddress,
-        //     originAddress,
-        //     destinationNetwork: targetNetwork.name,
-        //     networkName: originNetwork.name,
-        //     rpc: originNetwork.rpcs[0] as string,
-        //     isSwap: false,
-        //     evmTx,
-        //   });
-        // }
 
         showSuccessToast(t("tx_send"));
         navigate(BALANCE, {

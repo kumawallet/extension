@@ -254,9 +254,7 @@ export interface Request {
   "pri(contacts.getRegistryAddresses)": [
     null,
     {
-      ownAccounts: Contact[];
-      contacts: Contact[];
-      recent: Register[];
+      accounts: Contact[];
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AddressBook } from "./AddressBook";
 import { AddAddress } from "./AddAddress";
 import Contact from "@src/storage/entities/registry/Contact";
@@ -13,9 +13,11 @@ export const AddressBookOptions = () => {
   const loadContacts = async () => {
     starLoading();
     try {
-      const { contacts } = await messageAPI.getRegistryAddresses();
+      const { accounts } = await messageAPI.getRegistryAddresses();
 
-      setContacts(contacts);
+      console.log("accounts", accounts)
+
+      setContacts(accounts);
     } catch (error) {
       console.log("error_loading_contacts");
     }

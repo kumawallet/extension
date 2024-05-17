@@ -709,23 +709,24 @@ export default class Extension {
     return registry.getAllContacts();
   }
 
-  // private async getRegistryAddresses() {
-  //   const registry = await Registry.get<Registry>();
-  //   if (!registry) throw new Error("failed_to_get_registry");
-  //   const Chains = await Network.get<Network>();
-  //   if (!Chains) throw new Error("failed_to_get_network");
-  //   const accounts = await AccountManager.getAll();
-  //   if (!accounts) throw new Error("failed_to_get_accounts");
-  //   return {
-  //     ownAccounts: accounts
-  //       .getAll()
-  //       .map(
-  //         (account) => new Contact(account.value.name, account.value.address)
-  //       ),
-  //     contacts: registry.getAllContacts(),
-  //     recent: registry.getRecentAddresses(Chains),
-  //   };
-  // }
+  private async getRegistryAddresses() {
+    const registry = await Registry.get<Registry>();
+    if (!registry) throw new Error("failed_to_get_registry");
+    const Chains = await Network.get<Network>();
+    if (!Chains) throw new Error("failed_to_get_network");
+    const accounts = await AccountManager.getAll();
+    if (!accounts) throw new Error("failed_to_get_accounts");
+
+    const ownAccounts = accounts
+      .getAll()
+      .map((account) => new Contact(account.value.name, account.value.address));
+
+    const contacts = registry.getAllContacts();
+
+    return {
+      accounts: [ownAccounts, contacts].flat(),
+    };
+  }
 
   private async saveContact({ contact }: RequestSaveContact) {
     await Registry.addContact(contact);
@@ -1246,8 +1247,8 @@ export default class Extension {
 
       case "pri(contacts.getContacts)":
         return this.getContacts();
-      // case "pri(contacts.getRegistryAddresses)":
-      //   return this.getRegistryAddresses();
+      case "pri(contacts.getRegistryAddresses)":
+        return this.getRegistryAddresses();
       case "pri(contacts.saveContact)":
         return this.saveContact(request as RequestSaveContact);
       case "pri(contacts.updateContact)":
