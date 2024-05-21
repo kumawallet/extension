@@ -1,5 +1,6 @@
 import {
   RequestAddActivity,
+  RequestSetAccountToActivity,
   RequestUpdateActivity,
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
@@ -16,5 +17,11 @@ export const activityMessages = {
   },
   getHistoricActivity: () => {
     return sendMessage("pri(activity.getHistoricActivity)");
+  },
+  activitySubscribe: (cb: (value: any) => void) => {
+    return sendMessage("pri(activity.activitySubscribe)", null, cb);
+  },
+  setAccountToActivity: (params: RequestSetAccountToActivity) => {
+    return sendMessage("pri(activity.setAccountToActivity)", params);
   },
 };

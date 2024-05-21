@@ -11,7 +11,6 @@ import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { AccountDetails } from "./AccountDetails";
 import { TfiClose } from "react-icons/tfi";
 import { IconWallet } from "@src/components/icons/wallet";
-import { BiSolidWallet } from "react-icons/bi";
 
 export const AccountList = () => {
   const { t } = useTranslation("balance");

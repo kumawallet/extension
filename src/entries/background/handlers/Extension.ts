@@ -57,6 +57,7 @@ import {
   RequestDeleteSelectNetwork,
   RequestShowKey,
   RequestUpdateTx,
+  RequestSetAccountToActivity,
 } from "./request-types";
 import { Wallet, ethers, providers, utils } from "ethers";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -74,6 +75,7 @@ import AssetBalance from "@src/storage/entities/AssetBalance";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
+import TransactionHistory from "@src/storage/entities/TransactionHistory";
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === ChainType.EVM)
@@ -98,6 +100,7 @@ export default class Extension {
   private assetsBalance = new AssetBalance();
   private Chains = new BehaviorSubject({});
   private tx = new TransactionEntity();
+  private transactionHistory = new TransactionHistory();
 
   constructor() {
     this.subscriptionStatusProvider();
@@ -184,6 +187,11 @@ export default class Extension {
           this.provider.setProvider(chain, network.SelectedChain[chain].type)
         )
       );
+      await Promise.all(
+        Object.keys(network.SelectedChain).map((chain) =>
+          this.transactionHistory.addChain({ chainId: chain })
+        )
+      );
     }
   }
 
@@ -247,6 +255,7 @@ export default class Extension {
           !Object.keys(this.Chains.getValue()).includes(network)
       );
       const provider = this.provider.getProviders();
+
       if (newNetwork.length !== 0) {
         if ((selectedAccount as Account).value) {
           await this.assetsBalance.loadAssets(
@@ -255,17 +264,27 @@ export default class Extension {
             newNetwork
           );
           this.assetsBalance.assets.next(this.assetsBalance._assets);
+
+          await this.transactionHistory.addChain({
+            chainId: newNetwork[0],
+          });
         } else {
           await Promise.all(
             Object.keys((allAccounts as Accounts).data).map((accountKey) => {
+              this.transactionHistory.addChain({
+                chainId: newNetwork[0],
+              });
+
               return this.assetsBalance.loadAssets(
-                (allAccounts as Accounts).data[accountKey],
+                (allAccounts as Accounts).data[accountKey] as Account,
                 provider,
                 newNetwork
               );
             })
           );
           this.assetsBalance.assets.next(this.assetsBalance._assets);
+
+          //
         }
       }
 
@@ -424,6 +443,7 @@ export default class Extension {
   private async showKey({
     address,
   }: RequestShowKey): Promise<string | undefined> {
+    // TODO: update from derivated accounts
     const accounts = (await AccountManager.getAll())?.getAll();
 
     if (!accounts) return undefined;
@@ -561,6 +581,7 @@ export default class Extension {
     network.set(chains);
     await Network.set<Network>(network);
     await this.provider.setProvider(id, type);
+    await this.transactionHistory.addChain({ chainId: id });
     return chains;
   }
 
@@ -574,6 +595,7 @@ export default class Extension {
     this.Chains.next(chains);
     await Network.set<Network>(network);
     await this.provider.disconnectChain(id);
+    await this.transactionHistory.removeChains({ chainIds: [id] });
     return chains;
   }
   private networksSubscribe = (id: string, port: Port) => {
@@ -757,7 +779,32 @@ export default class Extension {
   // }
 
   private async getActivity(): Promise<Record[]> {
-    return Activity.getRecords();
+    // return Activity.getRecords();
+    return [];
+  }
+
+  private activitySubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(activity.activitySubscribe)">(id, port);
+    const subscription = this.transactionHistory.transactions.subscribe(() =>
+      cb(this.transactionHistory.getTransactions())
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+
+    return this.transactionHistory.getTransactions();
+  };
+
+  private async setAccountToActivity({ address }: RequestSetAccountToActivity) {
+    const allAccounts = await AccountManager.getAll();
+
+    const account = allAccounts
+      ?.getAll()
+      .find(({ value }) => value.address === address);
+
+    if (!account) return;
+
+    await this.transactionHistory.setAccount(account);
   }
 
   private async saveCustomChain({ chain }: RequestSaveCustomChain) {
@@ -1256,6 +1303,8 @@ export default class Extension {
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
+      case "pri(activity.activitySubscribe)":
+        return this.activitySubscribe(id, port);
       // case "pri(activity.getHistoricActivity)":
       //   return this.getHistoricActivity();
       case "pri(activity.getActivity)":
@@ -1264,6 +1313,10 @@ export default class Extension {
         return this.addActivity(request as RequestAddActivity);
       case "pri(activity.updateActivity)":
         return this.updateActivity(request as RequestUpdateActivity);
+      case "pri(activity.setAccountToActivity)":
+        return this.setAccountToActivity(
+          request as RequestSetAccountToActivity
+        );
 
       case "pri(assets.addAsset)":
         return this.addAsset(request as RequestAddAsset);

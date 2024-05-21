@@ -1,24 +1,22 @@
 import { FC, useMemo, useState } from "react";
 import { useAccountContext } from "@src/providers";
-import { RiWallet3Line } from "react-icons/ri";
-import { HiOutlineChevronDown } from "react-icons/hi";
-import { SelectableOptionModal } from "@src/components/common";
 import { useTranslation } from "react-i18next";
-import { GoCheckCircle, GoCircle } from "react-icons/go";
+import { HiOutlineChevronDown } from "react-icons/hi2";
+import { RiWallet3Line } from "react-icons/ri";
+import { SelectableOptionModal } from "@src/components/common";
 import { cropAccount, iconURL } from "@src/utils/account-utils";
-
-
+import { GoCheckCircle, GoCircle } from "react-icons/go";
 
 interface SelectAccountProps {
   selectedAddress: string | null;
   onChangeValue: (address: string) => void;
 }
 
-export const SelectAccount: FC<SelectAccountProps> = ({
+export const SelectAccountActivity: FC<SelectAccountProps> = ({
   onChangeValue,
   selectedAddress,
 }) => {
-  const { t } = useTranslation("send");
+  const { t } = useTranslation("activity");
   const {
     state: { selectedAccount, accounts },
   } = useAccountContext();
@@ -60,12 +58,13 @@ export const SelectAccount: FC<SelectAccountProps> = ({
             <span>{t("select_account")}</span>
           ) : (
             <div className="flex flex-col overflow-x-hidden">
-              <span className="text-xs inline-flex">{selectedAccont.value?.name}</span>
-              <span className="text-xs inline-flex">{cropAccount(selectedAccont.value?.address as string, 12)}</span>
+              <span className="text-xs inline-flex">
+                {selectedAccont.value?.name}
+              </span>
             </div>
           )}
         </div>
-        {!selectedAccont && <HiOutlineChevronDown size={18} />}
+        <HiOutlineChevronDown size={18} />
       </div>
 
       <SelectableOptionModal<{ address: string; symbol: string; name: string }>
@@ -87,8 +86,10 @@ export const SelectAccount: FC<SelectAccountProps> = ({
               <img src={item.symbol} width={18} className="rounded-full" />
 
               <div className="flex flex-col overflow-x-hidden">
-                <span className="inline-flex" >{item.name}</span>
-                <span className="inline-flex">{cropAccount(item.address, 12)}</span>
+                <span className="inline-flex">{item.name}</span>
+                <span className="inline-flex">
+                  {cropAccount(item.address, 12)}
+                </span>
               </div>
             </div>
             <div>

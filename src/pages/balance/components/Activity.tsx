@@ -1,19 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@src/hooks";
 import { Status } from "@src/components/common/TxStatus";
-import { Loading, Button } from "@src/components/common";
+import { Button, Loading } from "@src/components/common";
 import Contact from "@src/storage/entities/registry/Contact";
 import { ACTIVITY_DETAIL } from "@src/routes/paths";
-import {
-  useNetworkContext,
-  useTxContext,
-  useAccountContext,
-} from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
-import { Chain } from "@src/types";
-import { CiSearch } from "react-icons/ci";
 import { HiOutlineInboxArrowDown } from "react-icons/hi2";
 import { SendIcon } from "@src/components/icons/SendIcon";
 import { BsChevronRight } from "react-icons/bs";
@@ -22,7 +15,7 @@ import { SwapIcon } from "@src/components/icons/SwapIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import { transformAddress } from "@src/utils/account-utils";
 import { RecordStatus } from "@src/storage/entities/activity/types";
-import { formatFees } from "@src/utils/assets";
+import { SelectAccountActivity } from "./SelectAccountActivity";
 
 const isSameAddress = (address1: string, address2: string) => {
   return (
@@ -36,43 +29,29 @@ export const Activity = () => {
   const navigate = useNavigate();
 
   const {
-    state: { chains, selectedChain },
-  } = useNetworkContext();
-
-  const {
-    state: { selectedAccount },
+    state: { selectedAccount, accounts },
   } = useAccountContext();
-
-  const {
-    state: { activity, hasNextPage, isLoading: isLoadingTxs },
-    loadMoreActivity
-  } = useTxContext();
 
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("" as string);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
-  const { showErrorToast } = useToast();
+  const [transactions, setTransactions] = useState([] as any[]);
+  const [addressToSearch, setAddressToSearch] = useState("");
 
-  useEffect(() => {
-    if (selectedAccount) {
-      Promise.all([getContacts()]);
-    }
-  }, [selectedAccount?.key]);
 
   const getContacts = async () => {
-    try {
-      setIsLoading(true);
-      const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
-      setContacts(contacts);
-      setOwnAccounts(ownAccounts);
-    } catch (error) {
-      setContacts([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
+    // try {
+    //   setIsLoading(true);
+    //   const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
+    //   setContacts(contacts);
+    //   setOwnAccounts(ownAccounts);
+    // } catch (error) {
+    //   setContacts([]);
+    //   showErrorToast(tCommon(error as string));
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const getContactName = (address: string) => {
@@ -93,223 +72,216 @@ export const Activity = () => {
       if (million >= 1) {
         return `${million}M ${data.symbol}`;
       } else {
-        return `${value.toFixed(3)} ${data.symbol}`;
+        return `${value.toFixed(2)} ${data.symbol}`;
       }
     }
     return `${data.value} ${data.symbol}`;
   };
 
-  const getLink = (chain: Chain, hash: string) => {
-    const chainType = chain?.type;
-    if (chainType === "wasm") {
-      return `${selectedChain?.explorer}/extrinsic/${hash}`;
-    }
+  const onSelectAccount = async (address: string) => {
+    try {
+      setIsLoading(true);
 
-    if (chainType === "evm") {
-      return `${selectedChain?.explorer}/tx/${hash}`;
-    }
+      const account = accounts.find((a) => a.value.address === address);
+      if (!account) return;
 
-    if (chainType === "ol") {
-      return `${selectedChain?.explorer}/transactions/${hash}`;
-    }
+      setAddressToSearch(address);
 
-    return ""
+      await messageAPI.setAccountToActivity({
+        address: address,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const allChains = chains.flatMap((c) => c.chains);
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const { scrollTop, clientHeight, scrollHeight } =
+  //       document.documentElement;
+  //     if (
+  //       scrollTop + clientHeight >= scrollHeight - 20 &&
+  //       hasNextPage &&
+  //       !isLoadingTxs
+  //     ) {
+  //       loadMoreActivity();
+  //     }
+  //   };
 
-  const logo = (symbol: string) => {
-    const asset: Chain | undefined = allChains.find(
-      (obj) => obj.symbol === symbol
-    );
-    return !asset ? undefined : asset.logo.toString();
-  };
-
-  const filteredRecords = useMemo(() => {
-    const _search = search.trim().toLocaleLowerCase();
-    if (!_search) return activity;
-
-    return activity.filter(({ hash, sender }) => {
-      return (
-        hash?.toLowerCase().includes(_search) ||
-        sender?.toLowerCase().includes(_search)
-      );
-    });
-    // .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
-  }, [search, activity]);
-
-
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [isLoadingTxs, hasNextPage]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } =
-        document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - 20 && hasNextPage && !isLoadingTxs) {
-        loadMoreActivity();
-      }
-    };
+    if (selectedAccount) {
+      Promise.all([getContacts()]);
+    }
+  }, [selectedAccount?.key]);
 
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isLoadingTxs, hasNextPage]);
+  useEffect(() => {
+    setIsLoading(true);
 
-  if (isLoading || isLoadingTxs) {
-    return <Loading />;
-  }
+    messageAPI
+      .activitySubscribe((transactions) => {
+        setTransactions(transactions);
+        setIsLoading(false);
+      })
+      .then((transactions) => {
+        setTransactions(transactions);
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <>
       <div className={stylesActivity.containerGlobal}>
-        <input
-          data-testid="search-input"
-          id="search"
-          placeholder={t("search") as string}
-          className={stylesActivity.inputTxSearch}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
+        <SelectAccountActivity
+          selectedAddress={addressToSearch}
+          onChangeValue={onSelectAccount}
         />
-        <CiSearch className={stylesActivity.iconSearch} />
       </div>
-      <div data-testid="activity-container" className={stylesActivity.containerTx}>
-        {activity.length === 0 && (
-          <div
-            className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.containerEmptyActivity}`}
-          >
-            <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
-          </div>
-        )}
-        {filteredRecords.map(
-          ({
-            isSwap,
-            hash,
-            sender,
-            asset,
-            recipient,
-            status,
-            amount,
-            fee,
-            originNetwork,
-            targetNetwork,
-            type,
-            tip,
-            version
-          }) => (
-            <Button
-              variant="contained-little-gray"
-              key={hash}
-              classname={stylesActivity.TxButton}
-              onClick={() =>
-                navigate(ACTIVITY_DETAIL, {
-                  state: {
-                    hash,
-                    status,
-                    originNetwork,
-                    targetNetwork,
-                    sender,
-                    recipient,
-                    fee,
-                    type,
-                    amount,
-                    asset,
-                    tip,
-                    version
-                  },
-                })
-              }
+
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div
+          data-testid="activity-container"
+          className={stylesActivity.containerTx}
+        >
+          {transactions.length === 0 && (
+            <div
+              className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.containerEmptyActivity}`}
             >
-              <div
-                className={`${stylesActivity.flexItemsCenter} ${stylesActivity.containerButton}`}
+              <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
+            </div>
+          )}
+          {transactions.map(
+            ({
+              isSwap,
+              hash,
+              sender,
+              asset,
+              recipient,
+              status,
+              amount,
+              fee,
+              originNetwork,
+              targetNetwork,
+              type,
+              tip,
+              version,
+              chainLogo,
+              link,
+              isXcm,
+            }) => (
+              <Button
+                variant="contained-little-gray"
+                key={hash}
+                classname={stylesActivity.TxButton}
+                onClick={() =>
+                  navigate(ACTIVITY_DETAIL, {
+                    state: {
+                      hash,
+                      status,
+                      originNetwork,
+                      targetNetwork,
+                      sender,
+                      recipient,
+                      fee,
+                      type,
+                      amount,
+                      asset,
+                      tip,
+                      version,
+                      link,
+                      isXcm,
+                    },
+                  })
+                }
               >
-                <div className={stylesActivity.flexItemsCenter}>
-                  <div
-                    className={stylesActivity.explorer}
-                  // href={getLink(selectedChain as Chain, hash)}
-                  // target="_blank"
-                  // rel="noreferrer"
-                  >
-                    {/* icon */}
-                    <div className={`relative ${stylesActivity.circleIcon}`}>
-                      {isSwap ? (
-                        <SwapIcon size="18" />
-                      ) : isSameAddress(
-                        selectedAccount?.value?.address,
-                        sender
-                      ) ? (
-                        <SendIcon size="18" />
-                      ) : (
-                        <HiOutlineInboxArrowDown />
-                      )}
-                      <div className={stylesActivity.containerAssetIcon}>
-                        {!logo(asset) ? (
-                          <IoIosCloseCircle
-                            className={stylesActivity.faildIcon}
-                          />
+                <div
+                  className={`${stylesActivity.flexItemsCenter} ${stylesActivity.containerButton}`}
+                >
+                  <div className={stylesActivity.flexItemsCenter}>
+                    <div className={stylesActivity.explorer}>
+                      <div className={`relative ${stylesActivity.circleIcon}`}>
+                        {isSwap ? (
+                          <SwapIcon size="18" />
+                        ) : isSameAddress(
+                          addressToSearch,
+                          sender
+                        ) ? (
+                          <SendIcon size="18" />
                         ) : (
-                          <img
-                            src={logo(asset)}
-                            alt="Logo"
-                            className="object-cover rounded-full"
-                          />
+                          <HiOutlineInboxArrowDown />
                         )}
+                        <div className={stylesActivity.containerAssetIcon}>
+                          {!chainLogo ? (
+                            <IoIosCloseCircle
+                              className={stylesActivity.faildIcon}
+                            />
+                          ) : (
+                            <img
+                              src={chainLogo}
+                              alt="Logo"
+                              className="object-cover rounded-full"
+                            />
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* title */}
-                  <div className={stylesActivity.containerText}>
-                    {isSwap ? (
-                      <p className={stylesActivity.textTxType}>{t("swap")}</p>
-                    ) : !isSameAddress(
-                      selectedAccount?.value?.address,
-                      recipient
-                    ) ? (
-                      <p className={stylesActivity.textTxType}>{t("send")}</p>
-                    ) : (
-                      <p className={stylesActivity.textTxType}>
-                        {t("receive")}
+                    <div className={stylesActivity.containerText}>
+                      {isSwap ? (
+                        <p className={stylesActivity.textTxType}>{t("swap")}</p>
+                      ) : !isSameAddress(
+                        addressToSearch,
+                        recipient
+                      ) ? (
+                        <p className={stylesActivity.textTxType}>{t("send")}</p>
+                      ) : (
+                        <p className={stylesActivity.textTxType}>
+                          {t("receive")}
+                        </p>
+                      )}
+                      <p className={stylesActivity.textAddress}>
+                        {getContactName(recipient)}
                       </p>
-                    )}
-                    <p className={stylesActivity.textAddress}>
-                      {getContactName(recipient)}
-                    </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Status status={status as RecordStatus} classname="ml-2" />
-              <div className={stylesActivity.containerDivEnd}>
-                <div className={stylesActivity.flexItemsCenter}>
-                  <div
-                    className={`${stylesActivity.containerText}${stylesActivity.containerAmounts}`}
-                  >
-                    <p
-                      className={`${getAmount({
-                        value: amount,
-                        symbol: asset,
-                      }).length > 10
-                        ? "text-[px] "
-                        : "text-[10px]"
-                        } font-bold`}
+                <Status status={status as RecordStatus} classname="ml-2" />
+                <div className={stylesActivity.containerDivEnd}>
+                  <div className={stylesActivity.flexItemsCenter}>
+                    <div
+                      className={`${stylesActivity.containerText}${stylesActivity.containerAmounts}`}
                     >
-                      {getAmount({
-                        value: amount,
-                        symbol: asset,
-                      })}
-                    </p>
-                    <p className={stylesActivity.textFee}>
-                      {`${formatFees(fee, selectedChain?.decimals || 1)} ${selectedChain?.symbol || ""
-                        }`}
-                    </p>
+                      <p
+                        className={`${getAmount({
+                          value: amount,
+                          symbol: asset,
+                        }).length > 10
+                          ? "text-[px] "
+                          : "text-[10px]"
+                          } font-bold`}
+                      >
+                        {getAmount({
+                          value: amount,
+                          symbol: asset,
+                        })}
+                      </p>
+                      <p className={stylesActivity.textFee}>{fee}</p>
+                    </div>
+                    <BsChevronRight className={stylesActivity.iconArrow} />
                   </div>
-                  <BsChevronRight className={stylesActivity.iconArrow} />
                 </div>
-              </div>
-            </Button>
-          )
-        )}
-      </div>
+              </Button>
+            )
+          )}
+        </div>
+      )}
     </>
   );
 };

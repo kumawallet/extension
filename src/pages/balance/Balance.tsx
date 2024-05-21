@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { Tab } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-import { Assets, Header, Footer, TotalBalance, Actions, AccountSelected } from "./components";
+import { Assets, Header, Footer, TotalBalance, Actions, AccountSelected, Activity } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext } from "@src/providers";
 
@@ -80,7 +80,7 @@ export const Balance = () => {
                 <Assets />
               </Tab.Panel>
               <Tab.Panel key={1}>
-                {/* <Activity /> */}
+                <Activity />
               </Tab.Panel>
             </Tab.Panels>
 

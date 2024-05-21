@@ -1,4 +1,5 @@
 import { decodeAddress } from "@polkadot/util-crypto";
+import { Chain } from "@src/types";
 import { utils } from "ethers";
 
 const EVM_ERRORS = [
@@ -38,5 +39,20 @@ export const validateRecipientAddress = (
     return false;
   } catch (error) {
     return false;
+  }
+};
+
+export const getTxLink = (chain: Chain, transaction: any) => {
+  const chainType = chain?.type;
+  if (chainType === "wasm") {
+    return `${chain?.explorer}/extrinsic/${transaction.hash}`;
+  }
+
+  if (chainType === "evm") {
+    return `${chain?.explorer}/tx/${transaction.hash}`;
+  }
+
+  if (chainType === "ol") {
+    return `${chain?.explorer}/transactions/${transaction.version}`;
   }
 };

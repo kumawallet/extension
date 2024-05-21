@@ -6,7 +6,7 @@ export const stylesActivity = {
   containerTx: "flex flex-col my-5 overflow-y-auto h-full",
   containerEmptyActivity: "justify-center mt-5",
   containerAssetIcon:
-    "absolute w-[10px] h-[10px] bg-black rounded-full shadow-md bottom-0 right-0 -translate-x-2/7 translate-y-1/4 transform shadow-xl",
+    "absolute w-3 h-3 bg-black rounded-full shadow-md bottom-0 right-0 -translate-x-2/7 translate-y-1/4 transform shadow-xl",
   faildIcon: "mr-[4px] text-[9px]",
   textEmptyActivity: "text-lg font-medium",
   TxButton:

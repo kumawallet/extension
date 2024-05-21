@@ -204,6 +204,10 @@ export interface RequestUpdateTx {
   };
 }
 
+export interface RequestSetAccountToActivity {
+  address: string;
+}
+
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
@@ -265,6 +269,9 @@ export interface Request {
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];
+  "pri(activity.activitySubscribe)": [null, void, any[]];
+  "pri(activity.updateRecordStatus)": [string, void];
+  "pri(activity.setAccountToActivity)": [RequestSetAccountToActivity, void];
 
   "pri(assets.addAsset)": [RequestAddAsset, void];
   "pri(assets.getAssetsByChain)": [

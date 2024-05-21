@@ -1,5 +1,6 @@
 import { isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
+import { ASSETS_ICONS } from "@src/constants/assets-icons";
 
 export const cropAccount = (account: string, length = 4) => {
   if (!account) return "";
@@ -70,4 +71,20 @@ export const isValidAddress = (
   } catch (error) {
     return false;
   }
+};
+
+export const iconURL = (type: string) => {
+  if (type.toLowerCase().includes("wasm")) {
+    return ASSETS_ICONS["DOT"];
+  }
+
+  if (type.toLowerCase().includes("evm")) {
+    return ASSETS_ICONS["ETH"];
+  }
+
+  if (type.toLowerCase().includes("ol")) {
+    return ASSETS_ICONS["OL"];
+  }
+
+  return "";
 };
