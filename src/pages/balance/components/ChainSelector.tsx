@@ -8,6 +8,7 @@ import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
 import { Network } from "../../../components/icons/Network";
 import { messageAPI } from "@src/messageAPI/api";
+import { Switch } from "@headlessui/react";
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -65,7 +66,7 @@ export const ChainSelector = () => {
           className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
           onClick={() => setIsOpen(true)}
         >
-          <Network size="22" className="my-[0.15rem]"/>
+          <Network size="22" className="my-[0.15rem]" />
           <p className="overflow-hidden text-ellipsis mr-1">
             {t("chain_selector.title")}
           </p>
@@ -115,10 +116,11 @@ export const ChainSelector = () => {
                       {chainGroup.chains.map((chain) => (
                         <Fragment key={chain.id}>
                           <button
-                            className={`flex items-center justify-between border ${selectedChain[chain.id]
-                              ? "border-green-500"
-                              : "border-gray-600"
-                              } rounded-lg py-3 px-4`}
+                            className={`flex items-center justify-between border ${
+                              selectedChain[chain.id]
+                                ? "border-green-500"
+                                : "border-gray-600"
+                            } rounded-lg py-3 px-4`}
                             disabled={
                               Object.keys(selectedChain).length === 1 &&
                               Object.keys(selectedChain)[0] === chain.id
@@ -146,6 +148,35 @@ export const ChainSelector = () => {
                                 />
                               )}
                               <span className="text-base">{chain.name}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Switch
+                                checked={
+                                  Object.prototype.hasOwnProperty.call(
+                                    selectedChain,
+                                    chain.id
+                                  )
+                                    ? true
+                                    : false
+                                }
+                                className={`${
+                                  Object.prototype.hasOwnProperty.call(
+                                    selectedChain,
+                                    chain.id
+                                  )
+                                    ? `bg-green-500`
+                                    : "bg-custom-gray-bg"
+                                } relative inline-flex items-center h-2 rounded-full w-7 transition-colors duration-200`}
+                              >
+                                <span
+                                  className={`${
+                                    Object.prototype.hasOwnProperty.call(
+                                      selectedChain,
+                                      chain.id
+                                    ) && "translate-x-4"
+                                  } inline-block w-3 h-3 transform bg-white rounded-full transition-transform duration-200`}
+                                />
+                              </Switch>
                             </div>
                           </button>
                         </Fragment>
