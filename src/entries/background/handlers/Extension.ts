@@ -141,17 +141,9 @@ export default class Extension {
     this.validatePasswordFormat(currentPassword);
     this.validatePasswordFormat(newPassword);
 
-    // TODO: fix this
-    // const seed = await this.showKey();
-
-    // if (!seed) throw new Error("failed_to_get_seed");
-
-    // await AccountManager.changePassword(
-    //   seed as string,
-    //   currentPassword,
-    //   newPassword
-    // );
+    await AccountManager.changePassword(currentPassword, newPassword);
   }
+
   private async initNetworks() {
     Network.getInstance();
     const network: any = await Network.get();
