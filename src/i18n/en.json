@@ -307,6 +307,7 @@
   },
   "manage_assets": {
     "title": "Manage Assets",
+    "chain": "Chain",
     "address": "Address",
     "symbol": "Symbol",
     "decimals": "Decimals",

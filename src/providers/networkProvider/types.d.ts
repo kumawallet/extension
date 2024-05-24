@@ -2,17 +2,17 @@ import { AccountType } from "@src/accounts/types";
 import { ChainsState } from "@src/types";
 
 type SelectedChain = {
-  [id: string]: chain
-}
+  [id: string]: chain;
+};
 type chain = {
   isTestnet?: boolean;
   type: "wasm" | "evm" | "ol";
-}
-type Api =  { [id:string] :  ApiPromise | ethers.providers.JsonRpcProvider | {}}
+};
+type Api = { [id: string]: ApiPromise | ethers.providers.JsonRpcProvider | {} };
 
 export interface InitialState {
   chains: ChainsState;
-                                    selectedChain: SelectedChain;
+  selectedChain: SelectedChain;
 }
 
 export interface NetworkContext {
@@ -21,7 +21,7 @@ export interface NetworkContext {
 }
 
 export type Action =
-   {
+  | {
       type: "select-network";
       payload: {
         selectedChain: SelectedChain;
@@ -33,7 +33,7 @@ export type Action =
         chains: Chains;
       };
     }
-    |{
+  | {
       type: "init-networks";
       payload: {
         chains: Chains;

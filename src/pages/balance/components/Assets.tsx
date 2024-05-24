@@ -21,7 +21,7 @@ export const Assets = () => {
   } = useAccountContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
-  const [showManageAssets, setShowManageAssets] = useState(false);
+  const [showManageAssets, setShowManageAssets] = useState(true);
 
   const filteredAsset = useMemo(() => {
     let _assets = []
