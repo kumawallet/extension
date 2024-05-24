@@ -27,11 +27,14 @@ export default class TransactionHistory {
     if (!this.account) return;
 
     // get chain names based on this.networks
-    const chainNames = this.allChains
+    const chains = this.allChains
       .filter((chain) => chainId === chain.id)
-      .map((chain) => chain.name);
+      .map((chain) => ({
+        name: chain.name,
+        id: chain.id,
+      }));
 
-    this.loadTransactions({ chainNames });
+    this.loadTransactions({ chains });
   }
 
   removeChains({ chainIds }: { chainIds: string[] }) {
@@ -58,18 +61,22 @@ export default class TransactionHistory {
     this.transactions.next(transactions);
   }
 
-  async loadTransactions({ chainNames }: { chainNames: string[] }) {
+  async loadTransactions({
+    chains,
+  }: {
+    chains: { name: string; id: string }[];
+  }) {
     if (!this.account?.value) return;
 
     if (!this.networks.length) return;
 
     const chainIds = this.networks.filter((chainId) =>
-      chainNames.includes(chainId)
+      chains.some((chain) => chain.id === chainId)
     );
 
     const chainTransactionsFromStorage = (await Activity.getRecords({
       address: this.account.key,
-      networkNames: chainNames,
+      networkNames: chains.map(({ name }) => name),
     })) as unknown as Transaction[];
 
     const historicTransactions = await Promise.all(
@@ -80,9 +87,18 @@ export default class TransactionHistory {
             this.account?.value.address as string,
             this.allChains.find((chain) => chain.id === chainId)?.prefix || 0
           ),
-        }).then((transaction) => ({
-          [chainId]: transaction,
-        }))
+        })
+          .then((transaction) => ({
+            [chainId]: transaction,
+          }))
+          .catch((error) => {
+            return {
+              [chainId]: {
+                transactions: [],
+                hasNextPage: false,
+              },
+            };
+          })
       )
     );
 
@@ -169,12 +185,15 @@ export default class TransactionHistory {
   async setAccount(account: Account) {
     this.account = account;
 
-    const chainNames = this.allChains
+    const chains = this.allChains
       .filter((chain) => this.networks.includes(chain.id))
-      .map((chain) => chain.name);
+      .map((chain) => ({
+        name: chain.name,
+        id: chain.id,
+      }));
 
     await this.loadTransactions({
-      chainNames,
+      chains,
     });
   }
 }

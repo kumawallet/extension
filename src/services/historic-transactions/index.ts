@@ -23,6 +23,8 @@ export const getChainHistoricHandler = async ({
 }): Promise<HistoricTransaction> => {
   const chainConfig = CHAINS_CONFIG[chainId];
 
+  console.log("chainConfig", chainConfig);
+
   if (!chainConfig)
     return {
       transactions: [],
