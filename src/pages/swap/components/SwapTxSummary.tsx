@@ -1,12 +1,12 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Tx } from "../hooks";
 import { Button, TxSummary } from "@src/components/common";
 import { cropAccount } from "@src/utils/account-utils";
 import { formatFees } from "@src/utils/assets";
-import { useNetworkContext } from "@src/providers";
 import { RxChevronRight } from "react-icons/rx";
 import { FiChevronLeft } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { messageAPI } from "@src/messageAPI/api";
 
 interface SwapTxSummaryProps {
   tx: Tx;
@@ -21,10 +21,15 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
 }) => {
   const { t } = useTranslation("swap");
   const { t: tSend } = useTranslation("send")
+  const [fee, setFee] = useState("0");
 
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
+  useEffect(() => {
+    messageAPI.getFee((fee) => {
+      setFee(fee)
+    })
+
+  }, [])
+
 
   const transaction = {
     [tSend('sender')]: cropAccount(tx.addressFrom, 12),
@@ -32,17 +37,14 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
     [tSend('network')]: (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-1 h-full">
-          <img src={selectedChain!.logo} width={12} className="rounded-full" />
+          <img src={tx.chainFrom.image} width={12} className="rounded-full" />
           <RxChevronRight size={12} />
-          <img src={selectedChain!.logo} width={12} className="rounded-full" />
+          <img src={tx.chainFrom.image} width={12} className="rounded-full" />
         </div>
       </div>
     ),
     [tSend('amount')]: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
-    [tSend('estimated_fee')]: `${formatFees(
-      tx.fee.estimatedFee,
-      selectedChain?.decimals || 1
-    )} ${tx.assetFrom.symbol}`,
+    [tSend('estimated_fee')]: `${formatFees(fee, tx.assetFrom.decimals)} ${tx.assetFrom.symbol}`,
     [t('tx_confirm_info')]: t("tx_confirm_info_message", {
       address_to_transfer: tx.addressBridge,
       address_to_receive: tx.addressTo,

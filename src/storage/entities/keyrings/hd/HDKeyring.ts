@@ -22,6 +22,8 @@ export default abstract class HDKeyring extends Keyring {
 
   abstract getAddress(seed: string, path?: number): Promise<string>;
 
+  abstract getDerivedPath(seed: string, path: number): string;
+
   async deriveKeyPair(mnemonicOrSeed: string, path?: number): Promise<string> {
     const address = await this.getAddress(mnemonicOrSeed, path);
     this.addKeyPair(address, { key: mnemonicOrSeed });

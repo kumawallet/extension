@@ -394,8 +394,10 @@ export default class Extension {
     await Auth.validatePassword(password);
     if (!keyring || !password || !key) return undefined;
     const address = key.split("-")[1];
-    const newkeyring = await Vault.getKeyring(keyring);
-    return newkeyring.getKey(address);
+
+    return this.showKey({
+      address,
+    });
   }
 
   private alreadySignedUp() {
@@ -452,8 +454,19 @@ export default class Extension {
 
     if (!account) return undefined;
 
-    const keyring = await Vault.getKeyring(account.type);
-    return keyring.getKey(address);
+    if (account?.value.parentAddress) {
+      const keyring = await Vault.getKeyring(account.type);
+      // return keyring.getKey(address);
+
+      const seed = keyring.getKey(account?.value.parentAddress);
+
+      const derived = keyring.getDerivedPath(seed, account?.value.path);
+
+      return derived;
+    } else {
+      const keyring = await Vault.getKeyring(account.type);
+      return keyring.getKey(address);
+    }
   }
 
   private async getAccount({

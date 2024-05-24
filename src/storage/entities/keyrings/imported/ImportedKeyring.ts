@@ -10,6 +10,10 @@ export default abstract class ImportedKeyring extends Keyring {
     this.keyPairs = {};
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
+  }
+
   getKey(address: string): string {
     const keyPair = this.keyPairs[address] as KeyPair;
     if (!keyPair) {

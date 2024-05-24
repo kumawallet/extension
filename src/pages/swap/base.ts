@@ -27,9 +27,7 @@ export interface ActiveSwaps {
 }
 
 export interface InitProps {
-  chainId: string;
-  nativeCurrency: string;
-  api: ApiPromise | ethers.providers.JsonRpcProvider;
+  chainIds: string[];
 }
 
 export abstract class Swapper {

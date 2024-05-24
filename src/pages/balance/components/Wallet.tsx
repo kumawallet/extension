@@ -15,7 +15,7 @@ interface WalletProps {
   showCopyIcon?: boolean;
   more?: () => void;
   showBalanceforAsset?: boolean;
- _asset ?: any;
+  _asset?: any;
 }
 
 export const Wallet: FC<WalletProps> = ({
@@ -61,7 +61,7 @@ export const Wallet: FC<WalletProps> = ({
         className="w-[90%] flex gap-2 items-center overflow-hidden text-ellipsis"
         onClick={onSelect}
       >
-        {showBalanceforAsset ? (<AssetIcon asset={_asset} width={32} />): (<img
+        {showBalanceforAsset ? (<AssetIcon asset={_asset} width={32} />) : (<img
           src={iconURL}
           alt=""
           width={26}
@@ -76,37 +76,37 @@ export const Wallet: FC<WalletProps> = ({
         </div>
       </button>
 
-    { !showBalanceforAsset ? (<div className="w-[10%] flex items-center gap-1 justify-center ml-4">
-      <div className="flex gap-3">
-        {showCopyIcon && (
-          <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>
-            <Icon />
-          </button>
-        )}
-        {more && (
-          <button data-testid="details" onClick={more}>
-            <More size="18" />
-          </button>
-        )}
-      </div>
+      {!showBalanceforAsset ? (<div className="w-[10%] flex items-center gap-1 justify-center ml-4">
+        <div className="flex gap-3">
+          {showCopyIcon && (
+            <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>
+              <Icon />
+            </button>
+          )}
+          {more && (
+            <button data-testid="details" onClick={more}>
+              <More size="18" />
+            </button>
+          )}
+        </div>
 
 
-      {showSelectedIcon && (
-        <button
-          onClick={onSelect}
-          className={`p-1 text-[6px] rounded-full border relative  ${isSelected
-            ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
-            : "border-gray-300"
-            }`}
-        />
-      )}
+        {showSelectedIcon && (
+          <button
+            onClick={onSelect}
+            className={`p-1 text-[6px] rounded-full border relative  ${isSelected
+              ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
+              : "border-gray-300"
+              }`}
+          />
+        )}
       </div>) : <div className="flex gap-1 font-semibold text-xs"><p>
-      {formatAmountWithDecimals(
-                Number(_asset && _asset.balance),
-                3,
-                _asset && _asset.decimals
-              )}</p>
-      <p >{_asset && _asset.symbol}</p>
+        {formatAmountWithDecimals(
+          Number(_asset && _asset.balance),
+          3,
+          _asset && _asset.decimals
+        )}</p>
+        <p >{_asset && _asset.symbol}</p>
       </div>}
     </div>
   );

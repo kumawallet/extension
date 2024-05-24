@@ -23,6 +23,11 @@ export default class EVMKeyring extends HDKeyring {
     return keyPair.key;
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)
+      ?.privateKey;
+  }
+
   addKeyPair(address: string, keyPair: HDKeyPair): void {
     this.keyPairs[address] = keyPair;
   }

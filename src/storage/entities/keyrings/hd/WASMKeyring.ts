@@ -19,6 +19,10 @@ export default class WASMKeyring extends HDKeyring {
     return wallet.address;
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
+  }
+
   getKey(address: string): string {
     if (!this.keyPairs[address]) {
       throw new Error("Key pair not found");

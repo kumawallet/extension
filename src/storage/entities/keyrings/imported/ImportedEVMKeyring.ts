@@ -12,6 +12,11 @@ export default class ImportedEVMKeyring extends ImportedKeyring {
       ?.address;
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)
+      ?.privateKey;
+  }
+
   async getImportedData(pkOrSeed: string) {
     const isMnemonic = isValidMnemonic(pkOrSeed);
 
