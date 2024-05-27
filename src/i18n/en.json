@@ -222,7 +222,8 @@
     "search": "Search",
     "send": "Send",
     "swap": "Swap",
-    "receive": "Receive"
+    "receive": "Receive",
+    "select_account":"Select Account"
   },
   "activity_details":{
     "title": "Transaction detail",

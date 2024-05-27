@@ -138,7 +138,7 @@ export default class AssetsBalance {
       let unsubs: Subcription[] = [];
       const nativeAsset = await getNatitveAssetBalance(
         api,
-        account.value.address,
+        account.value!.address,
         account
       );
 
@@ -149,7 +149,7 @@ export default class AssetsBalance {
           {
             const substrateProvider = api.provider as ApiPromise;
             await substrateProvider.query.system
-              .account(account.value.address, ({ data }: SubstrateBalance) => {
+              .account(account.value!.address, ({ data }: SubstrateBalance) => {
                 const { transferable, balance } =
                   getSubtrateNativeBalance(data);
                 this.updateOneAsset(

@@ -88,6 +88,7 @@ export default class Extension {
   constructor() {
     this.subscriptionStatusProvider();
     this.initNetworks();
+    this.initTransactionHistory();
   }
 
   get version() {
@@ -117,9 +118,17 @@ export default class Extension {
     await AccountManager.changePassword(currentPassword, newPassword);
   }
 
+  private async initTransactionHistory() {
+    const selectedAccount = await this.getSelectedAccount().catch(() => null);
+
+    this.transactionHistory.setAccount(
+      selectedAccount?.value ? selectedAccount : null
+    );
+  }
+
   private async initNetworks() {
-    const network = Network.getInstance();
-    // const network = await Network.get().catch(() => null);
+    Network.getInstance();
+    const network = (await Network.get().catch(() => null)) as Network | null;
     if (!network) return;
     const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
     const chain = this.chains.getValue();
@@ -565,6 +574,7 @@ export default class Extension {
     await Network.set<Network>(network);
     await this.provider.setProvider(id, type);
     await this.transactionHistory.addChain({ chainId: id });
+
     return chains;
   }
 
@@ -603,7 +613,11 @@ export default class Extension {
     return this.assetsBalance.assets.getValue();
   };
 
-  private async setSelectedAccount(account: Account) {
+  /**
+   *
+   * @param account if account is nullm that means that all account are selected
+   */
+  private async setSelectedAccount(account: Account | null) {
     const networkSelected = this.assetsBalance.getNetwork();
     const allAccounts = (await Accounts.get()) as Accounts;
     const provider = this.provider.getProviders();
@@ -648,6 +662,8 @@ export default class Extension {
       await this.assetsBalance.loadAssets(account, provider, networkSelected);
       this.assetsBalance.assets.next(this.assetsBalance._assets);
     }
+    this.transactionHistory.setAccount(account);
+
     await SelectedAccount.set<SelectedAccount>(
       SelectedAccount.fromAccount(account)
     );
@@ -955,7 +971,12 @@ export default class Extension {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               record: transaction as unknown as any,
             });
-            this.sendUpdateActivityMessage();
+            this.transactionHistory.addTransactionToChain({
+              chainId: originNetwork?.id as string,
+              transaction,
+              originNetwork: originNetwork as Chain,
+              targetNetwork: targetNetwork as Chain,
+            });
           }
           if (status.isFinalized) {
             const failedEvents = events.filter(({ event }) =>
@@ -1010,13 +1031,16 @@ export default class Extension {
               status = RecordStatus.FAIL;
             } else {
               status = RecordStatus.SUCCESS;
-
-              // swap && (await Extension.addSwap(swap.protocol, { id: swap.id }));
             }
             const hash = txHash.toString();
             await this.updateActivity({ txHash: hash, status, error });
             this.sendTxNotification({ title: `tx ${status}`, message: hash });
-            this.sendUpdateActivityMessage();
+            this.transactionHistory.updateTransaction({
+              chainId: originNetwork?.id as string,
+              id: hash,
+              status,
+            });
+
             unsub();
           }
         }
@@ -1072,7 +1096,12 @@ export default class Extension {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await this.addActivity({ txHash, record: transaction as any });
-      this.sendUpdateActivityMessage();
+      this.transactionHistory.addTransactionToChain({
+        chainId: originNetwork?.id as string,
+        transaction,
+        originNetwork: originNetwork as Chain,
+        targetNetwork: targetNetwork as Chain,
+      });
 
       const txReceipt = await evmProvider.getTransaction(txHash);
 
@@ -1088,7 +1117,11 @@ export default class Extension {
       const error = "";
       await this.updateActivity({ txHash, status, error, fee });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
-      this.sendUpdateActivityMessage();
+      this.transactionHistory.updateTransaction({
+        chainId: originNetwork?.id as string,
+        id: txHash,
+        status,
+      });
       return true;
     } catch (error) {
       this.sendTxNotification({ title: `tx failed`, message: "" });
@@ -1140,7 +1173,12 @@ export default class Extension {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.addActivity({ txHash: hash, record: transaction as any });
-    this.sendUpdateActivityMessage();
+    this.transactionHistory.addTransactionToChain({
+      chainId: originNetwork?.id as string,
+      transaction,
+      originNetwork: originNetwork as Chain,
+      targetNetwork: targetNetwork as Chain,
+    });
     this.sendTxNotification({ title: `tx ${status}`, message: hash });
 
     return true;
@@ -1155,13 +1193,6 @@ export default class Extension {
     } else if (originNetwork?.type === "ol") {
       return this.sendOLTx();
     }
-  }
-
-  private sendUpdateActivityMessage() {
-    Browser.runtime.sendMessage({
-      origin: "kuma",
-      method: "update_activity",
-    });
   }
 
   private sendTxNotification({

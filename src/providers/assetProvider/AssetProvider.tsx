@@ -48,6 +48,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
     () => {
       messageAPI.getAssetsBalance(
         (assets) => {
+
           dispatch({
             type: "set-assets",
             payload: {

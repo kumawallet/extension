@@ -82,7 +82,7 @@ export const Activity = () => {
     try {
       setIsLoading(true);
 
-      const account = accounts.find((a) => a.value.address === address);
+      const account = accounts.find((a) => a.value?.address === address);
       if (!account) return;
 
       setAddressToSearch(address);

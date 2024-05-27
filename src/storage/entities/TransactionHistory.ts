@@ -7,7 +7,7 @@ import { formatFees } from "@src/utils/assets";
 import { getTxLink } from "@src/utils/transfer";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
 import { transformAddress } from "@src/utils/account-utils";
-import { Transaction } from "@src/types";
+import { Chain, Transaction } from "@src/types";
 
 type ChainId = string;
 
@@ -52,13 +52,50 @@ export default class TransactionHistory {
   addTransactionToChain({
     chainId,
     transaction,
+    originNetwork,
+    targetNetwork,
   }: {
     chainId: string;
     transaction: Transaction;
+    originNetwork: Chain;
+    targetNetwork: Chain;
   }) {
     const transactions = this.transactions.getValue();
-    transactions[chainId].push(transaction);
+    transactions[chainId].push({
+      ...transaction,
+      // @ts-expect-error --- *
+      chainLogo: originNetwork.logo,
+      fee: `${formatFees(transaction.fee, originNetwork.decimals)} ${
+        originNetwork.symbol
+      }`,
+      link: getTxLink(originNetwork, transaction),
+      isXcm: originNetwork.id !== targetNetwork.id,
+    });
     this.transactions.next(transactions);
+  }
+
+  updateTransaction({
+    chainId,
+    id,
+    status,
+  }: {
+    chainId: string;
+    id: string;
+    status: string;
+  }) {
+    const transactions = this.transactions.getValue();
+
+    this.transactions.next({
+      ...transactions,
+      [chainId]: transactions[chainId].map((tx) => {
+        if (tx.id === id) {
+          tx.status = status;
+          return tx;
+        }
+
+        return tx;
+      }),
+    });
   }
 
   async loadTransactions({
@@ -84,7 +121,7 @@ export default class TransactionHistory {
         getChainHistoricHandler({
           chainId,
           address: transformAddress(
-            this.account?.value.address as string,
+            this.account?.value!.address as string,
             this.allChains.find((chain) => chain.id === chainId)?.prefix || 0
           ),
         })
@@ -147,7 +184,6 @@ export default class TransactionHistory {
     historicTransactions.forEach((transaction) => {
       const chainId = Object.keys(transaction)[0];
       const chainTransaction = transaction[chainId].transactions;
-
       if (!transactionsByChainId[chainId]) {
         transactionsByChainId[chainId] = [];
       }
@@ -182,8 +218,13 @@ export default class TransactionHistory {
     });
   }
 
-  async setAccount(account: Account) {
+  public async setAccount(account: Account | null) {
     this.account = account;
+
+    if (!account) {
+      this.transactions.next({});
+      return;
+    }
 
     const chains = this.allChains
       .filter((chain) => this.networks.includes(chain.id))

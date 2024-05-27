@@ -9,7 +9,6 @@ import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 
-
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export const Assets = () => {
   const [showManageAssets, setShowManageAssets] = useState(true);
 
   const filteredAsset = useMemo(() => {
-    let _assets = []
+    let _assets = [];
 
     const outputObject: any = {};
     if (Object.keys(assets).length !== 0) {
@@ -44,8 +43,7 @@ export const Assets = () => {
       _assets = Object.keys(outputObject).map((key) => {
         const asset = outputObject[key];
 
-        const accountKeysInfo = {}
-
+        const accountKeysInfo = {};
 
         asset.forEach((a) => {
           if (!accountKeysInfo[a.accountKey]) {
@@ -55,24 +53,20 @@ export const Assets = () => {
               symbol: a.symbol,
               decimals: a.decimals,
               id: a.id,
-            }
+            };
           }
 
-          accountKeysInfo[a.accountKey].balance += Number(a.balance)
-          accountKeysInfo[a.accountKey].amount += Number(a.amount)
-        })
-
+          accountKeysInfo[a.accountKey].balance += Number(a.balance);
+          accountKeysInfo[a.accountKey].amount += Number(a.amount);
+        });
 
         const balance = Object.values(accountKeysInfo).reduce((acc, _asset) => {
-          return acc + Number(_asset.balance || 0)
-        }, 0)
-
-
+          return acc + Number(_asset.balance || 0);
+        }, 0);
 
         const amount = Object.values(accountKeysInfo).reduce((acc, _asset) => {
-          return acc + Number(_asset.amount || 0)
-        }, 0)
-
+          return acc + Number(_asset.amount || 0);
+        }, 0);
 
         return {
           symbol: key,
@@ -80,23 +74,18 @@ export const Assets = () => {
           amount,
           decimals: asset[0].decimals,
           accounts: accountKeysInfo,
-          id: asset[0].id
-        }
-
+          id: asset[0].id,
+        };
       });
     }
 
-
     _assets = _assets.sort((a, b) => {
       return b.balance - a.balance;
-    })
+    });
 
+    if (showAllAssets) return _assets;
 
-    if (showAllAssets) return _assets
-
-
-
-    return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0)
+    return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0);
   }, [JSON.stringify(assets), showAllAssets, selectedAccount?.key]);
 
 
@@ -127,12 +116,9 @@ export const Assets = () => {
 
       {isLoadingAssets && <Loading />}
 
-      {
-        filteredAsset.map((asset, index) => {
-          return <Asset asset={asset} key={index} />;
-        })
-      }
-
+      {filteredAsset.map((asset, index) => {
+        return <Asset asset={asset} key={index} />;
+      })}
 
       {showManageAssets && (
         <div className="flex justify-center mt-2">
