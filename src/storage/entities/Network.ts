@@ -6,6 +6,7 @@ export default class Network extends BaseEntity {
   Chain: Chain | null;
 
   private static instance: Network;
+
   constructor() {
     super();
     this.Chain = null;
@@ -25,12 +26,11 @@ export default class Network extends BaseEntity {
 
   static async init() {
     await Network.set<Network>(Network.getInstance());
-    return Network.getInstance()
   }
 
-  static async get<Network>(): Promise<Network | null> {
+  static async get<Network>(): Promise<Network> {
     const network = await super.get<Network>();
-    if (!network) return null
+    if (!network) throw new Error("network_not_found");
     return network;
   }
 

@@ -8,7 +8,7 @@ import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const RECONNECT_TIMEOUT = 20000;
 
-type api = {
+export type api = {
   provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
   type: ChainType;
 };
@@ -254,5 +254,19 @@ export class Provider {
       api.disconnect();
       api.connect();
     });
+  }
+
+  public async reset() {
+    const chainIds = Object.keys(this.providers);
+
+    await Promise.all(
+      chainIds.map(async (chain) => {
+        await this.disconnectChain(chain);
+      })
+    );
+
+    this.providers = {};
+    this.statusNetwork = new BehaviorSubject<Record<string, string>>({});
+    this.intervals = {};
   }
 }

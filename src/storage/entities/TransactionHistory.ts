@@ -91,7 +91,7 @@ export default class TransactionHistory {
           .then((transaction) => ({
             [chainId]: transaction,
           }))
-          .catch((error) => {
+          .catch(() => {
             return {
               [chainId]: {
                 transactions: [],
@@ -159,7 +159,7 @@ export default class TransactionHistory {
           ...tx,
           chainLogo: chain!.logo,
           fee: `${formatFees(tx.fee, chain!.decimals)} ${chain!.symbol}`,
-          link: getTxLink(chain!, transaction),
+          link: getTxLink(chain!, tx),
           isXcm: tx.originNetwork !== tx.targetNetwork,
         }))
       );

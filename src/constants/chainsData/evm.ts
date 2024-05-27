@@ -1,4 +1,4 @@
-import { Chain } from "@src/types";
+import { Chain, ChainType } from "@src/types";
 import { ASSETS_ICONS } from "../assets-icons";
 import ZETA_LOGO from "/images/zeta.png";
 
@@ -17,7 +17,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ETH"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "acala-evm",
@@ -32,7 +32,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ACA"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "astar-evm",
@@ -48,7 +48,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ASTR"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "moonbeam-evm",
@@ -64,7 +64,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["GLMR"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "polygon",
@@ -80,7 +80,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["MATIC"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "binance",
@@ -97,7 +97,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["BNB"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "moonriver-evm",
@@ -113,7 +113,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["MOVR"],
     isTestnet: false,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
 
   // TESTNETS ========================================
@@ -128,7 +128,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ETH"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "sepolia",
@@ -140,7 +140,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ETH"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "moonbase-alpha",
@@ -155,7 +155,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["GLMR"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "mumbai",
@@ -171,7 +171,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["MATIC"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "bnb-testnet",
@@ -183,7 +183,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["BNB"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "shibuya-evm",
@@ -195,7 +195,7 @@ export const EVM_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ASTR"],
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
   {
     id: "zeta-chain",
@@ -207,6 +207,6 @@ export const EVM_CHAINS: Chain[] = [
     logo: ZETA_LOGO,
     isTestnet: true,
     isCustom: false,
-    type: "evm",
+    type: ChainType.EVM,
   },
 ];

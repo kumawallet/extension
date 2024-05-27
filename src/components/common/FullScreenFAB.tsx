@@ -1,12 +1,11 @@
-import { getWebAPI } from "@src/utils/env";
 import { isInPopup } from "@src/utils/utils";
 import { Maximize } from "@src/components/icons/Maximize"
+import { Browser } from "@src/utils/constants";
 
 export const FullScreenFAB = () => {
   const openTab = () => {
-    const API = getWebAPI()
-    const url = API.runtime.getURL("src/entries/newtab/index.html");
-    API.tabs.create({ url });
+    const url = Browser.runtime.getURL("src/entries/newtab/index.html");
+    Browser.tabs.create({ url });
   };
 
   if (!isInPopup()) return null

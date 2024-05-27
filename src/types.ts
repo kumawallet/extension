@@ -2,12 +2,11 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
 import { utils, providers, Wallet, BigNumber } from "ethers";
 import { AccountType } from "./accounts/types";
-import { Asset } from "./pages";
 import { ContractPromise } from "@polkadot/api-contract";
+import { ApiPromise } from "@polkadot/api";
+import { OlProvider } from "./services/ol/OlProvider";
 
-export type polkadotExtrinsic =
-  | SubmittableExtrinsic<"promise">
-  | ContractTx<"promise">;
+export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
 
 export type evmTx = utils.Deferrable<providers.TransactionRequest>;
 
@@ -16,8 +15,10 @@ export type WasmFee = {
   estimatedTotal: BN;
 };
 
+export type Provider = providers.JsonRpcProvider | ApiPromise | OlProvider;
+
 export type API = {
-  [id: string]: ApiPromise | ethers.providers.JsonRpcProvider | {};
+  [id: string]: Provider;
 };
 
 export type EVMFee = {
@@ -75,7 +76,6 @@ export interface TxToProcess {
   amount: number | string;
   originAddress: string;
   destinationAddress: string;
-  rpc: string;
   originNetwork: string;
   destinationNetwork: string;
   networkInfo: Chain;
@@ -100,7 +100,7 @@ export interface TxToProcess {
 
 export type chain = {
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 };
 
 export interface SelectedChain {
@@ -108,7 +108,7 @@ export interface SelectedChain {
 }
 export interface paramChain {
   id: string;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 }
 
 export interface Chain {
@@ -122,7 +122,7 @@ export interface Chain {
   prefix?: number;
   isTestnet?: boolean;
   isCustom?: boolean;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 }
 
 export type ChainsState = {

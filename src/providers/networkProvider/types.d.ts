@@ -1,14 +1,14 @@
 import { AccountType } from "@src/accounts/types";
-import { ChainsState } from "@src/types";
+import { ChainType, ChainsState, Provider } from "@src/types";
 
 type SelectedChain = {
   [id: string]: chain;
 };
 type chain = {
   isTestnet?: boolean;
-  type: "wasm" | "evm" | "ol";
+  type: ChainType;
 };
-type Api = { [id: string]: ApiPromise | ethers.providers.JsonRpcProvider | {} };
+type Api = { [id: string]: Provider };
 
 export interface InitialState {
   chains: ChainsState;

@@ -4,6 +4,7 @@ import {
   RequestUpdateActivity,
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
+import { Transaction } from "@src/types";
 
 export const activityMessages = {
   getActivity: () => {
@@ -18,7 +19,7 @@ export const activityMessages = {
   getHistoricActivity: () => {
     return sendMessage("pri(activity.getHistoricActivity)");
   },
-  activitySubscribe: (cb: (value: any) => void) => {
+  activitySubscribe: (cb: (value: Transaction[]) => void) => {
     return sendMessage("pri(activity.activitySubscribe)", null, cb);
   },
   setAccountToActivity: (params: RequestSetAccountToActivity) => {

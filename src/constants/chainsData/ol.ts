@@ -1,4 +1,4 @@
-import { Chain } from "@src/types";
+import { Chain, ChainType } from "@src/types";
 import { ASSETS_ICONS } from "../assets-icons";
 
 export const OL_CHAINS: Chain[] = [
@@ -12,6 +12,6 @@ export const OL_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["OL"],
     isTestnet: false,
     isCustom: false,
-    type: "ol",
+    type: ChainType.OL,
   },
 ];

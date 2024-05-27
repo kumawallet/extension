@@ -104,14 +104,18 @@ export const getAssetUSDPrice = async (query: string[]) => {
         body: JSON.stringify({ query: gqlQuery }),
       }
     );
-    const obj: any = {};
+    const obj: {
+      [key: string]: number;
+    } = {};
     const data = await response.json();
     const objPrice = data.data.getTokenPrice.tokens;
-    objPrice.forEach((item: any) => (obj[item.symbol] = item.usd));
+    objPrice.forEach(
+      (item: { usd: number; symbol: string }) => (obj[item.symbol] = item.usd)
+    );
     return obj || {};
   } catch (error) {
     captureError(error);
-    return 0;
+    return {};
   }
 };
 

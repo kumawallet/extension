@@ -5,9 +5,13 @@ export enum AccountType {
   IMPORTED_EVM = "IMPORTED_EVM",
   IMPORTED_WASM = "IMPORTED_WASM",
   IMPORTED_OL = "IMPORTED_OL",
+  ALL = "ALL",
 }
 
+export type AccountTypes = `${AccountType}-${string}`;
+
 export type AccountKey = `${AccountType}-${string}` | "ALL";
+
 export type AccountValue = {
   name: string;
   address: string;
@@ -15,4 +19,4 @@ export type AccountValue = {
   isDerivable?: boolean;
   parentAddress?: string;
   path?: number;
-};
+} | null;

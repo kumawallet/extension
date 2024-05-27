@@ -1,6 +1,3 @@
-import { ApiPromise } from "@polkadot/api";
-import { ethers, providers } from "ethers";
-
 export interface SwapAsset {
   symbol: string;
   label: string;
@@ -79,19 +76,19 @@ export abstract class Swapper {
     id: string;
   }>;
 
-  abstract confirmTx(props: {
-    assetToTransfer: {
-      id: string;
-      decimals: number;
-      address: string;
-    };
-    amount: string;
-    destinationAccount: string;
-  }): Promise<{
-    extrinsicHash?: string;
-    evmTx?: providers.TransactionRequest | null;
-    type: string;
-  }>;
+  // abstract confirmTx(props: {
+  //   assetToTransfer: {
+  //     id: string;
+  //     decimals: number;
+  //     address: string;
+  //   };
+  //   amount: string;
+  //   destinationAccount: string;
+  // }): Promise<{
+  //   extrinsicHash?: string;
+  //   evmTx?: providers.TransactionRequest | null;
+  //   type: string;
+  // }>;
 
   // abstract getPairs(asset: string): Promise<SwapAsset[]>;
 

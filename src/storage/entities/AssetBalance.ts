@@ -10,22 +10,31 @@ import {
 import { BehaviorSubject } from "rxjs";
 import { Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
 import { ApiPromise } from "@polkadot/api";
-import { Contract, ethers } from "ethers";
+import { Contract, ethers, providers } from "ethers";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import AccountEntity from "@src/storage/entities/Account";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import { api } from "./Provider";
+import { Codec } from "@polkadot/types-codec/types";
+
+type Subcription = Codec | { off: (event: string) => void } | Contract;
 
 type network = {
   [chainId: string]: {
-    subs: any[];
+    subs: Subcription[];
     assets: Asset[];
   };
 };
+
+export interface AssetBalance {
+  [key: string]: network;
+}
+
 export default class AssetsBalance {
-  public assets = new BehaviorSubject<{ [key: string]: network }>({});
+  public assets = new BehaviorSubject<AssetBalance>({});
   public _assets: { [key: string]: network } = {};
   networks: string[] = [];
   chains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
@@ -34,12 +43,16 @@ export default class AssetsBalance {
     this.assets.next({});
   }
 
-  public async loadAssets(account: AccountEntity, api: any, chains: string[]) {
+  public async loadAssets(
+    account: AccountEntity,
+    api: Record<string, api>,
+    chains: string[]
+  ) {
     await Promise.all(
       chains.map((chain: string) => this.setAssets(account, api[chain], chain))
     );
   }
-  public async setAssets(account: AccountEntity, api: any, chainId: string) {
+  public async setAssets(account: AccountEntity, api: api, chainId: string) {
     try {
       const chain = this.chains.find((_chain) => _chain.id === chainId);
       if (!this.networks.includes(chainId)) this.networks.push(chainId);
@@ -122,7 +135,7 @@ export default class AssetsBalance {
     chain: Chain
   ) => {
     try {
-      let unsubs: any[] = [];
+      let unsubs: Subcription[] = [];
       const nativeAsset = await getNatitveAssetBalance(
         api,
         account.value.address,
@@ -251,7 +264,7 @@ export default class AssetsBalance {
 
   public deleteAsset(
     account: AccountEntity,
-    api: any,
+    api: Record<string, api>,
     chains: string[],
     unSelectedNetwork: boolean = true
   ) {
@@ -266,18 +279,20 @@ export default class AssetsBalance {
       );
 
       chainsToUpdate.forEach((chainId) => {
-        const network: any[] = _account[chainId].subs;
+        const network = _account[chainId].subs;
 
         // turn off the subscription
         switch (accountType) {
           case ChainType.WASM:
             {
+              // @ts-expect-error --- off is a function
               network.forEach((unsubs) => unsubs?.());
             }
             break;
           case ChainType.EVM:
             {
-              api[chainId].provider.off("block");
+              (api[chainId].provider as providers.JsonRpcProvider).off("block");
+              // @ts-expect-error --- off is a function
               network.forEach((unsubs) => unsubs.off("Transfer"));
             }
             break;
@@ -303,12 +318,12 @@ export default class AssetsBalance {
   }
 
   private getNonNativeAssets = async (
-    api: any,
+    api: api,
     account: AccountEntity,
     chain: Chain
   ) => {
-    let _assets: any[] = [];
-    let _unsubs: any[] = [];
+    let _assets: Asset[] = [];
+    let _unsubs: Subcription[] = [];
 
     const apiType = api.type;
 
@@ -316,7 +331,7 @@ export default class AssetsBalance {
       case ChainType.WASM:
         {
           const { assets, unsubs } = await getWasmAssets(
-            api.provider,
+            api.provider as ApiPromise,
             chain.id,
             account?.value?.address,
             (
@@ -331,7 +346,7 @@ export default class AssetsBalance {
           );
 
           _assets = assets;
-          _unsubs = unsubs;
+          _unsubs = unsubs as Subcription[];
         }
         break;
       case ChainType.EVM:
@@ -339,9 +354,9 @@ export default class AssetsBalance {
           const { assets, unsubs } = await this.loadERC20Assets(
             chain,
             account,
-            api.provider
+            api.provider as providers.JsonRpcProvider
           );
-          _assets = assets;
+          _assets = assets as Asset[];
           _unsubs = unsubs;
         }
         break;
@@ -357,7 +372,7 @@ export default class AssetsBalance {
   ) => {
     try {
       const assets: IAsset[] = [];
-      const unsubs: any[] = [];
+      const unsubs: Subcription[] = [];
       const erc20Tokens = await Assets.getByChain(chain.id);
 
       if (erc20Tokens.length > 0 && account?.value?.address) {
@@ -408,7 +423,7 @@ export default class AssetsBalance {
       return { assets, unsubs };
     } catch (error) {
       const assets: IAsset[] = [];
-      const unsubs: any[] = [];
+      const unsubs: Subcription[] = [];
       return { assets, unsubs };
     }
   };
@@ -416,10 +431,34 @@ export default class AssetsBalance {
   private getAssetsUSDPrice = async (assets: Asset[]) => {
     try {
       const addresToQuery = assets.map((asset) => asset.symbol);
-      const price = await getAssetUSDPrice(addresToQuery).catch(() => 0);
+      const price = await getAssetUSDPrice(addresToQuery);
       return price;
     } catch (error) {
-      throw new Error("failed_to_get_Asset_USDPrice");
+      return {};
     }
   };
+
+  public async reset() {
+    const allAssets = this.assets.getValue();
+
+    for (const account in allAssets) {
+      for (const network in allAssets[account]) {
+        const { subs } = allAssets[account][network];
+
+        for (const unsub of subs) {
+          if ("off" in unsub) {
+            // @ts-expect-error --- off is a function
+            unsub.off("Transfer");
+          } else {
+            // @ts-expect-error --- off is a function
+            unsub?.();
+          }
+        }
+      }
+    }
+
+    this.assets.next({});
+    this._assets = {};
+    this.networks = [];
+  }
 }

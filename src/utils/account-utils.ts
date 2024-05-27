@@ -1,6 +1,7 @@
 import { isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { ASSETS_ICONS } from "@src/constants/assets-icons";
+import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./constants";
 
 export const cropAccount = (account: string, length = 4) => {
   if (!account) return "";
@@ -87,4 +88,15 @@ export const iconURL = (type: string) => {
   }
 
   return "";
+};
+
+export const validatePasswordFormat = (password: string) => {
+  if (!password) throw new Error("password_required");
+  if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
+};
+
+export const validatePrivateKeyOrSeedFormat = (privateKeyOrSeed: string) => {
+  if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
+  if (!PRIVATE_KEY_OR_SEED_REGEX.test(privateKeyOrSeed))
+    throw new Error("private_key_or_seed_invalid");
 };

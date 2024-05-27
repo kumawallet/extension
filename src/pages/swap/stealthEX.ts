@@ -1,7 +1,4 @@
-import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { BigNumber, BigNumberish, ethers } from "ethers";
-import { Keyring } from "@polkadot/keyring";
 import {
   GraphQLClient,
   RequestDocument,
@@ -9,9 +6,7 @@ import {
   gql,
 } from "graphql-request";
 import { ActiveSwaps, InitProps, SwapAsset, Swapper } from "./base";
-import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
-import { AccountType } from "@src/accounts/types";
-import { messageAPI } from "@src/messageAPI/api";
+
 import { transformAddress } from "@src/utils/account-utils";
 
 interface StealthExToken {
@@ -300,8 +295,6 @@ export class StealthEX implements Swapper {
     amountFrom,
     currencyFrom,
     currencyTo,
-    currencyDecimals,
-    assetToSell,
     nativeAsset,
   }: {
     addressFrom: string;
@@ -371,106 +364,9 @@ export class StealthEX implements Swapper {
     };
   }
 
-  async confirmTx({
-    amount,
-    assetToTransfer,
-    destinationAccount,
-  }: {
-    assetToTransfer: {
-      id: string;
-      decimals: number;
-      address: string;
-    };
-    amount: string;
-    destinationAccount: string;
-  }) {
-    let extrinsicHash = "";
-    let evmTx = null;
-    let type = "";
-
-    const isNativeAsset = assetToTransfer?.id === "-1";
-
-    // if (this.api instanceof ApiPromise) {
-    //   type = AccountType.WASM;
-
-    //   const bnAmount = transformAmountStringToBN(
-    //     amount,
-    //     assetToTransfer.decimals
-    //   );
-
-    //   if (isNativeAsset) {
-    //     const extrinsic = this.api.tx.balances.transferKeepAlive(
-    //       destinationAccount,
-    //       bnAmount
-    //     );
-
-    //     extrinsicHash = extrinsic.toHex();
-    //   } else {
-    //     const extrinsic = this.api.tx.assets.transfer(
-    //       assetToTransfer.id,
-    //       destinationAccount,
-    //       bnAmount
-    //     );
-
-    //     extrinsicHash = extrinsic.toHex();
-    //   }
-    // } else if (this.api instanceof ethers.providers.JsonRpcProvider) {
-    //   const pk = await messageAPI.showKey();
-    //   // const pk = await Extension.showKey();
-    //   const wallet = new ethers.Wallet(pk as string, this.api);
-
-    //   type = AccountType.EVM;
-
-    //   const tx = {
-    //     from: wallet.address,
-    //     to: destinationAccount,
-    //     value: transformAmountStringToBN(
-    //       amount,
-    //       assetToTransfer.decimals
-    //     ).toString(),
-    //   };
-
-    //   if (isNativeAsset) {
-    //     const [feeData, gasLimit] = await Promise.all([
-    //       this.api.getFeeData(),
-    //       this.api.estimateGas(tx),
-    //     ]);
-
-    //     evmTx = {
-    //       ...tx,
-    //       gasLimit,
-    //       maxFeePerGas: feeData.maxFeePerGas as BigNumber,
-    //       maxPriorityFeePerGas: feeData.maxPriorityFeePerGas as BigNumber,
-    //       type: 2,
-    //     };
-    //   } else {
-    //     const contract = new ethers.Contract(
-    //       assetToTransfer.address,
-    //       [
-    //         "function transfer(address to, uint256 value) public returns (bool)",
-    //       ],
-    //       wallet
-    //     );
-    //     const feeData = await this.api.getFeeData();
-    //     const gasLimit = await contract.estimateGas
-    //       .transfer(destinationAccount, tx.value)
-    //       .catch(() => BigNumber.from("21000"));
-
-    //     evmTx = await contract.populateTransaction.transfer(tx.to, tx.value, {
-    //       gasLimit,
-    //       maxFeePerGas: feeData.maxFeePerGas as unknown as BigNumberish,
-    //       maxPriorityFeePerGas:
-    //         feeData.maxPriorityFeePerGas as unknown as BigNumberish,
-    //     });
-    //   }
-    // }
-
-    return {
-      extrinsicHash,
-      evmTx,
-      type,
-    };
-  }
+  // async confirmTx() {
+  //   //
+  // }
 
   async getActiveSwaps(): Promise<ActiveSwaps[]> {
     return [];

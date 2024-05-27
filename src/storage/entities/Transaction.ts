@@ -25,7 +25,7 @@ export interface Tx {
     address?: string | undefined;
   } | null;
   provider: api | null;
-  signer: any;
+  signer: unknown;
   // evmTx?: providers.TransactionRequest;
   // extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
 }

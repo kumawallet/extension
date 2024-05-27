@@ -9,16 +9,13 @@ import { BN } from "@polkadot/util";
 import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { useLoading, useToast } from "@src/hooks";
 import { captureError } from "@src/utils/error-handling";
-import { ApiPromise } from "@polkadot/api";
-import { ethers } from "ethers";
 import { StealthEX } from "../stealthEX";
-import { ActiveSwaps, SwapAsset, Swapper } from "../base";
+import { SwapAsset, Swapper } from "../base";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
-import { AccountType } from "@src/accounts/types";
 import { messageAPI } from "@src/messageAPI/api";
-import { getAccountType, transformAddress } from "@src/utils/account-utils";
+import { getAccountType } from "@src/utils/account-utils";
 import Account from "@src/storage/entities/Account";
 import { Chain } from "@src/types";
 
@@ -159,10 +156,12 @@ export const useSwap = () => {
     assetBridge: {
       symbol: "",
       image: "",
+      decimals: 0,
     },
     assetFrom: {
       symbol: "",
       image: "",
+      decimals: 0,
     },
     assetTo: {
       symbol: "",

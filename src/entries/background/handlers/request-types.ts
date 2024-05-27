@@ -1,19 +1,24 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
+import { AssetBalance } from "@src/storage/entities/AssetBalance";
 import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
-import { Tx } from "@src/storage/entities/Transaction";
 import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
-import Register from "@src/storage/entities/registry/Register";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
   SettingKey,
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
-import { Chain, ChainType, HistoricTransaction } from "@src/types";
+import {
+  Chain,
+  ChainType,
+  HistoricTransaction,
+  SelectedChain,
+  Transaction,
+} from "@src/types";
 import { providers } from "ethers";
 
 export interface RequestSignUp {
@@ -245,9 +250,9 @@ export interface Request {
     RequestSetNetwork
   ];
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
-  "pri(network.subscription)": [null, {}, {}];
+  "pri(network.subscription)": [null, SelectedChain, SelectedChain];
 
-  "pri(assestsBanlance.subscription)": [null, {}, {}];
+  "pri(assestsBanlance.subscription)": [null, AssetBalance, AssetBalance];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
   "pri(settings.getAdvancedSettings)": [null, Setting[]];
@@ -269,7 +274,7 @@ export interface Request {
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];
-  "pri(activity.activitySubscribe)": [null, void, any[]];
+  "pri(activity.activitySubscribe)": [null, Transaction[], Transaction[]];
   "pri(activity.updateRecordStatus)": [string, void];
   "pri(activity.setAccountToActivity)": [RequestSetAccountToActivity, void];
 

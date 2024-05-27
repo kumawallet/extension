@@ -54,7 +54,7 @@ export const Assets = () => {
               amount: 0,
               symbol: a.symbol,
               decimals: a.decimals,
-
+              id: a.id,
             }
           }
 
@@ -80,6 +80,7 @@ export const Assets = () => {
           amount,
           decimals: asset[0].decimals,
           accounts: accountKeysInfo,
+          id: asset[0].id
         }
 
       });
@@ -90,9 +91,12 @@ export const Assets = () => {
       return b.balance - a.balance;
     })
 
+
     if (showAllAssets) return _assets
 
-    return _assets.filter((asset) => asset.balance !== 0)
+
+
+    return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0)
   }, [JSON.stringify(assets), showAllAssets, selectedAccount?.key]);
 
 

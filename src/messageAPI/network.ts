@@ -3,22 +3,23 @@ import {
   RequestRemoveCustomChain,
   RequestSaveCustomChain,
   RequestSetNetwork,
-  RequestDeleteSelectNetwork
+  RequestDeleteSelectNetwork,
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
+import { SelectedChain } from "@src/types";
 
 export const networkMessages = {
   setNetwork: (params: RequestSetNetwork) => {
     return sendMessage("pri(network.setNetwork)", params);
   },
-  deleteSelectChain : (params : RequestDeleteSelectNetwork) =>{
+  deleteSelectChain: (params: RequestDeleteSelectNetwork) => {
     return sendMessage("pri(network.deleteSelectNetwork)", params);
   },
   getNetwork: () => {
     return sendMessage("pri(network.getNetwork)");
   },
-  networkSubscribe: (cb: (network: {})=> void) => {
-    return sendMessage("pri(network.subscription)",null,cb)
+  networkSubscribe: (cb: (network: SelectedChain) => void) => {
+    return sendMessage("pri(network.subscription)", null, cb);
   },
   getAllChains: () => {
     return sendMessage("pri(network.getAllChains)");

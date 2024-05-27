@@ -10,7 +10,7 @@ export interface Asset {
   reserved?: BN;
   frozen?: BN;
   address?: string;
-  amount?: any;
+  amount?: string;
   name?: string;
   price?: string;
   color?: string;
@@ -29,20 +29,20 @@ export interface Asset {
     | null;
 }
 type assets = {
-  [id: string] : Asset[];
-}
+  [id: string]: Asset[];
+};
 export interface InitialState {
   assets: assets;
   isLoadingAssets: boolean;
 }
 
 type SelectedChain = {
-  [id: string]: chain
-}
+  [id: string]: chain;
+};
 type chain = {
   isTestnet?: boolean;
   type: "wasm" | "evm" | "ol";
-}
+};
 
 export interface LoadAssetParams {
   api: API;
@@ -67,31 +67,30 @@ export type Action =
       payload: {
         assets: assets;
       };
-    }
-  // | {
-  //     type: "update-assets";
-  //     payload: {
-  //       assets: assets;
-  //     };
-  //   }
-  // | {
-  //     type: "update-one-asset";
-  //     payload: {
-  //       asset: {
-  //         updatedBy: "id" | "address" | "name";
-  //         updatedByValue: string;
-  //         balance: BN;
-  //         transferable?: BN;
-  //         reserved?: BN;
-  //         frozen?: BN;
-  //       };
-  //       networkId: string
-  //     };
-  // //   }
-  //   | {
-  //     type: "update-one-network-assets";
-  //     payload: {
-  //       network: string;
-  //       assets: Asset[];
-  //     };
-
+    };
+// | {
+//     type: "update-assets";
+//     payload: {
+//       assets: assets;
+//     };
+//   }
+// | {
+//     type: "update-one-asset";
+//     payload: {
+//       asset: {
+//         updatedBy: "id" | "address" | "name";
+//         updatedByValue: string;
+//         balance: BN;
+//         transferable?: BN;
+//         reserved?: BN;
+//         frozen?: BN;
+//       };
+//       networkId: string
+//     };
+// //   }
+//   | {
+//     type: "update-one-network-assets";
+//     payload: {
+//       network: string;
+//       assets: Asset[];
+//     };

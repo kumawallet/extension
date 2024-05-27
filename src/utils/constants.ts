@@ -35,3 +35,5 @@ export enum issuesLinks {
   github = env.VITE_ISSUES_GITHUB || "#",
   discord = env.VITE_ISSUES_DISCORD || "#",
 }
+
+export const Browser = chrome || window.browser;
