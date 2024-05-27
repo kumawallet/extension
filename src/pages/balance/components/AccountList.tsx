@@ -61,7 +61,7 @@ export const AccountList = () => {
             data-testid="selected-account"
             className="text-primary-default text-base"
           >
-            {selectedAccount?.value?.name}
+            {selectedAccount?.value?.name ? selectedAccount?.value?.name : t("accounts.accounts")}
           </p>
           <GoChevronDown size={14} />
         </div>
@@ -109,11 +109,27 @@ export const AccountList = () => {
                           data-testid="wallet-list"
                           className="flex flex-col gap-5"
                         >
+                          <button
+                            className={`flex items-center px-6 py-4 bg-[#1C1C27] rounded-lg ${!selectedAccount?.value
+                              ? "border border-[#2CEC84]"
+                              : ""
+                              }`}
+                            onClick={() => {
+                              setSelectedAccount(null)
+                              onCloseModal()
+                            }}
+                          >
+                            <div className={` flex gap-4 items-center overflow-hidden text-ellipsis`}>
+                              <IconWallet size="15" />
+                              <span>{t("accounts.all_accounts")}</span>
+                            </div>
+                          </button>
+
                           {filteredAccounts.map((account) => (
                             <Wallet
                               key={account?.key}
-                              address={account?.value?.address}
-                              name={account?.value?.name}
+                              address={account?.value!.address}
+                              name={account?.value!.name}
                               type={account?.type}
                               more={() => {
                                 setAccountData(account);
@@ -124,7 +140,11 @@ export const AccountList = () => {
                                 setSelectedAccount(account as Account);
                                 onCloseModal()
                               }}
-                              isSelected={account?.key === selectedAccount?.key}
+                              isSelected={
+                                selectedAccount
+                                  ? account?.key === selectedAccount?.key
+                                  : false
+                              }
                             />
                           ))}
                         </div>

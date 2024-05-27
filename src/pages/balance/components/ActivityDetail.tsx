@@ -10,11 +10,10 @@ import { Status } from "@src/components/common/TxStatus";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { Chain } from "@src/types";
 import { messageAPI } from "@src/messageAPI/api";
-import { useNetworkContext, useAccountContext } from "@src/providers";
+import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useToast } from "@src/hooks";
 import { XCM } from "@src/constants/xcm";
 import {
-  estimatedFee,
   getHash,
   getValue,
   getTip,
@@ -24,21 +23,17 @@ import { styleAD } from "./style/activityDetails";
 import { FaChevronRight } from "react-icons/fa";
 
 export const ActivityDetail = () => {
-  const { t: tCommon } = useTranslation("common");
   const { t } = useTranslation("activity_details");
   const navigate = useNavigate();
 
-  const { showErrorToast } = useToast();
   const {
     state: { selectedAccount },
   } = useAccountContext();
-  const {
-    state: { chains, selectedChain },
-  } = useNetworkContext();
+
+  const { state: { chains } } = useNetworkContext()
 
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const location = useLocation();
   const {
@@ -53,6 +48,8 @@ export const ActivityDetail = () => {
     amount,
     asset,
     tip,
+    link,
+    isXcm,
   } = location.state;
   const { Icon, copyToClipboard } = useCopyToClipboard(hash);
 
@@ -60,47 +57,22 @@ export const ActivityDetail = () => {
     if (selectedAccount) {
       Promise.all([getContacts()]);
     }
-  }, [selectedAccount.key]);
+  }, [selectedAccount?.key]);
 
   const allChains = chains.flatMap((c) => c.chains);
 
   const getContacts = async () => {
-    try {
-      setIsLoading(true);
-      const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
-      setContacts(contacts);
-      setOwnAccounts(ownAccounts);
-    } catch (error) {
-      setContacts([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getXCM = (network: string, recipientNetwork: string) => {
-    if (network !== recipientNetwork) {
-      const dataNetwork = allChains.find(
-        (chain) => chain.name === network
-      ) as Chain;
-      if (dataNetwork && dataNetwork.id) {
-        if (dataNetwork.id in XCM) {
-          return true;
-        }
-        return false;
-      }
-      return false;
-    }
-    return false;
-  };
-
-  const getLink = (chain: Chain, hash: string) => {
-    const chainType = chain?.type;
-    if (chainType === "wasm") {
-      window.open(`${chain?.explorer}/extrinsic/${hash}`);
-    } else {
-      window.open(`${chain?.explorer}/tx/${hash}`);
-    }
+    // try {
+    //   setIsLoading(true);
+    //   const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
+    //   setContacts(contacts);
+    //   setOwnAccounts(ownAccounts);
+    // } catch (error) {
+    //   setContacts([]);
+    //   showErrorToast(tCommon(error as string));
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const getContactName = (address: string) => {
@@ -113,12 +85,8 @@ export const ActivityDetail = () => {
       }
       : { value: address.slice(0, 12) + "..." + address.slice(-12) };
   };
-  const statusTranslate = () => {
-    return status === "" ? "in_process" : status.toLowerCase()
-
-  }
   const transaction = {
-    [t("hash")]:
+    [t("hash")]: (
       <div className={styleAD.itemsValue}>
         {getHash(hash)}
         <button
@@ -133,37 +101,44 @@ export const ActivityDetail = () => {
           />
         </button>
       </div>
-    ,
+    ),
     [t("type")]: type,
-    [t("status.name")]:
+    [t("status.name")]: (
       <div className={styleAD.itemsValue}>
         <Status status={status} />
       </div>
-    ,
-    [t("sender")]:
+    ),
+    [t("sender")]: (
       <>
         {getContactName(sender).contact ? (
           <div className="grid w-full">
-            <p className={styleAD.itemsValue}>{getContactName(sender).contact}</p>
+            <p className={styleAD.itemsValue}>
+              {getContactName(sender).contact}
+            </p>
             <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
           </div>
         ) : (
           <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
         )}
       </>
-    ,
-    [t("recipient")]: <>
-      {getContactName(recipient).contact ? (
-        <div className="grid w-full">
-          <p className={styleAD.itemsValue}>{getContactName(recipient).contact}</p>
-          <p className={styleAD.itemsValue}>{getContactName(recipient).value}</p>
-        </div>
-      ) : (
-        <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
-      )}
-    </>
-    ,
-    [t("network")]: getXCM(originNetwork, targetNetwork) ? (
+    ),
+    [t("recipient")]: (
+      <>
+        {getContactName(recipient).contact ? (
+          <div className="grid w-full">
+            <p className={styleAD.itemsValue}>
+              {getContactName(recipient).contact}
+            </p>
+            <p className={styleAD.itemsValue}>
+              {getContactName(recipient).value}
+            </p>
+          </div>
+        ) : (
+          <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+        )}
+      </>
+    ),
+    [t("network")]: isXcm ? (
       <div className={styleAD.containerNetworks}>
         <div className={styleAD.networks}>
           <NetworkIcon
@@ -199,13 +174,7 @@ export const ActivityDetail = () => {
       value: amount,
       symbol: asset,
     }),
-    [t("estimeted_fee")]: estimatedFee(
-      {
-        fee,
-        symbol: asset,
-      },
-      selectedChain?.decimals as number
-    ),
+    [t("estimeted_fee")]: fee,
     [t("tip")]: getTip({
       tip,
       symbol: asset,
@@ -216,18 +185,16 @@ export const ActivityDetail = () => {
     <PageWrapper contentClassName="mt-1/2 ">
       <div className="mt-1 m-3">
         <HeaderBack title={t("title")} navigate={navigate} />
-        <TxSummary
-          tx={transaction}
-        />
-      </div >
+        <TxSummary tx={transaction} />
+      </div>
       <Button
         data-testid="explorer-button"
         classname={styleAD.button}
-        onClick={() => getLink(selectedChain as Chain, hash)}
+        onClick={() => window.open(link)}
       >
         {t("explorer")}
       </Button>
       <Footer />
-    </PageWrapper >
+    </PageWrapper>
   );
 };

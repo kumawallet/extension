@@ -11,7 +11,6 @@ import { ImportWalletFormValues, validationSteps } from "./validations";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useLoading } from "@src/hooks";
-import { AccountType } from "@src/accounts/types";
 import { BALANCE } from "@src/routes/paths";
 
 export const ImportWallet = () => {
@@ -21,7 +20,7 @@ export const ImportWallet = () => {
   const { isLoading, starLoading, endLoading } = useLoading()
   const { step, prevStep, nextStep, goToWelcome, setStep } = useCreateWallet();
   const { texts, setTexts } = useAccountFormTexts()
-  const { initializeNetwork } = useNetworkContext()
+  const { refreshNetworks } = useNetworkContext()
 
 
   const methods = useForm<ImportWalletFormValues>({
@@ -31,7 +30,8 @@ export const ImportWallet = () => {
       privateKeyOrSeed: "",
       password: "",
       confirmPassword: "",
-      agreeWithTerms: false
+      agreeWithTerms: false,
+      accountTypesToImport: []
     },
     resolver: yupResolver(validationSteps[step - 1]),
     reValidateMode: "onSubmit"
@@ -65,7 +65,7 @@ export const ImportWallet = () => {
         privateKeyOrSeed: data.privateKeyOrSeed,
         isSignUp: true,
         password: data.password,
-        accountType: data.type === 'seed' ? AccountType.WASM : AccountType.EVM
+        accountTypesToImport: data.accountTypesToImport
       })
 
 
@@ -73,7 +73,7 @@ export const ImportWallet = () => {
 
       if (result) {
         setStep(4)
-        initializeNetwork()
+        refreshNetworks()
         getAllAccounts()
         nextStep();
       }
@@ -108,7 +108,7 @@ export const ImportWallet = () => {
           setTexts({
             title: t("import_from_private_key_title"),
             description: t("import_from_private_key_description"),
-            button: t("import_account")
+            button: t("import")
           })
         }
 
@@ -135,7 +135,7 @@ export const ImportWallet = () => {
 
   const buttonIsDisabled = useMemo(() => {
     if (step === 2) {
-      return !form.privateKeyOrSeed.trim()
+      return !form.privateKeyOrSeed.trim() || !form.accountTypesToImport.length
     }
 
     if (step === 3) {

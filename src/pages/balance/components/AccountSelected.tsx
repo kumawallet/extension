@@ -1,7 +1,6 @@
 import { useAccountContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
-
 export const AccountSelected = () => {
   const {
     state: { selectedAccount },
@@ -10,8 +9,9 @@ export const AccountSelected = () => {
   const address = selectedAccount?.value?.address || "";
 
   const account = cropAccount(address, 8);
-
   const { Icon, copyToClipboard } = useCopyToClipboard(address);
+
+  if (!selectedAccount?.value) return null
 
   return (
     <>

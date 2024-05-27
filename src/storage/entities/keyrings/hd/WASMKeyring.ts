@@ -1,5 +1,4 @@
 import PolkadotKeyring from "@polkadot/ui-keyring";
-import { mnemonicValidate } from "@polkadot/util-crypto";
 import HDKeyring from "./HDKeyring";
 import { AccountType } from "@src/accounts/types";
 import { HDKeyPair, SupportedKeyring } from "../types";
@@ -11,17 +10,17 @@ export default class WASMKeyring extends HDKeyring {
     return `/${this.getAccountIndex()}`;
   }
 
-  isMnemonicValid(mnemonic: string): boolean {
-    return mnemonicValidate(mnemonic);
-  }
-
-  getAddress(seed: string, path?: number): string {
+  async getAddress(seed: string, path?: number): Promise<string> {
     // @ts-expect-error --- migration
 
     const suri = seed + (path >= 0 ? `//${path}` : "");
 
     const wallet = PolkadotKeyring.createFromUri(suri);
     return wallet.address;
+  }
+
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
   }
 
   getKey(address: string): string {

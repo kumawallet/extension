@@ -142,7 +142,8 @@
     "accounts": {
       "accounts": "Accounts",
       "import": "Import account",
-      "create": "Create account"
+      "create": "Create account",
+      "all_accounts" : "All Accounts"
     },  
     "send": "Send",
     "swap": "Swap",
@@ -221,7 +222,8 @@
     "search": "Search",
     "send": "Send",
     "swap": "Swap",
-    "receive": "Receive"
+    "receive": "Receive",
+    "select_account":"Select Account"
   },
   "activity_details":{
     "title": "Transaction detail",
@@ -301,10 +303,12 @@
     "invalid_method": "Invalid method",
     "invalid_params": "Invalid params",
     "invalid_abi": "Invalid ABI",
-    "contract_error": "An error occurred with the contract"
+    "contract_error": "An error occurred with the contract",
+    "select_account" : "Select Account"
   },
   "manage_assets": {
     "title": "Manage Assets",
+    "chain": "Chain",
     "address": "Address",
     "symbol": "Symbol",
     "decimals": "Decimals",

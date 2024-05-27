@@ -5,10 +5,9 @@ import { HeaderBack } from "@src/components/common/HeaderBack";
 import { useNavigate } from "react-router-dom";
 import { useLoading, useToast } from "@src/hooks";
 import { messageAPI } from "@src/messageAPI/api";
-import { getWebAPI } from "@src/utils/env";
 import { styleForgotPass } from "./styles/ForgotPass";
+import { Browser } from "@src/utils/constants";
 
-const webAPI = getWebAPI();
 
 export const ForgotPass = () => {
   const navigate = useNavigate();
@@ -25,14 +24,14 @@ export const ForgotPass = () => {
       await messageAPI.resetWallet();
       localStorage.removeItem("color");
 
-      const tab = await webAPI.tabs.getCurrent();
+      const tab = await Browser.tabs.getCurrent();
 
       const isInPopup = !tab?.id;
 
       if (isInPopup) {
         // open in full screen
-        const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
-        webAPI.tabs.create({ url });
+        const url = Browser.runtime.getURL(`src/entries/newtab/index.html`);
+        Browser.tabs.create({ url });
         window.close();
       } else {
         window.location.reload();

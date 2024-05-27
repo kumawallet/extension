@@ -8,7 +8,7 @@ import {
   ResponseTypes,
   SubscriptionMessageTypes,
 } from "@src/entries/background/handlers/request-types";
-import { getWebAPI } from "@src/utils/env";
+import { Browser } from "@src/utils/constants";
 import { v4 as uuidv4 } from "uuid";
 
 const getId = () => {
@@ -25,9 +25,7 @@ interface Handler {
 
 type Handlers = Record<string, Handler>;
 
-const webAPI = getWebAPI();
-
-const port = webAPI.runtime.connect({ name: PORT_EXTENSION });
+const port = Browser.runtime.connect({ name: PORT_EXTENSION });
 const handlers: Handlers = {};
 
 export function sendMessage<TMessageType extends MessageTypesWithNullRequest>(

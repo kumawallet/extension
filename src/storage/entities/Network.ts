@@ -1,14 +1,16 @@
-import { Chain } from "@src/types";
+import { Chain, SelectedChain } from "@src/types";
 import BaseEntity from "./BaseEntity";
 
 export default class Network extends BaseEntity {
-  chain: Chain | null;
+  SelectedChain: SelectedChain;
+  Chain: Chain | null;
 
   private static instance: Network;
 
   constructor() {
     super();
-    this.chain = null;
+    this.Chain = null;
+    this.SelectedChain = {};
   }
 
   static getName() {
@@ -26,12 +28,6 @@ export default class Network extends BaseEntity {
     await Network.set<Network>(Network.getInstance());
   }
 
-  static async getDefaultValue<Network>(): Promise<Network> {
-    const defaultNetwork = Network.getInstance();
-    defaultNetwork.chain = null;
-    return defaultNetwork as Network;
-  }
-
   static async get<Network>(): Promise<Network> {
     const network = await super.get<Network>();
     if (!network) throw new Error("network_not_found");
@@ -39,10 +35,10 @@ export default class Network extends BaseEntity {
   }
 
   get() {
-    return this.chain;
+    return this.SelectedChain;
   }
 
-  set(chain: Chain) {
-    this.chain = chain;
+  set(chains: SelectedChain) {
+    this.SelectedChain = chains;
   }
 }

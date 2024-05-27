@@ -160,63 +160,6 @@ describe("Extension", () => {
     }));
   });
 
-  describe("validatePasswordFormat", () => {
-    it("should be valid", () => {
-      const extension = new Extension();
-      const result = extension["validatePasswordFormat"]("Test.123");
-      expect(result).toBe(undefined);
-    });
-
-    it("should return password_required error", () => {
-      try {
-        const extension = new Extension();
-        extension["validatePasswordFormat"]("");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: password_required");
-      }
-    });
-
-    it("should return password_invalid error", () => {
-      try {
-        const extension = new Extension();
-        extension["validatePasswordFormat"]("123456");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: password_invalid");
-      }
-    });
-  });
-
-  describe("validatePrivateKeyOrSeedFormat", () => {
-    it("should be valid", () => {
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const extension = new Extension();
-
-      const result = extension["validatePrivateKeyOrSeedFormat"](SEED);
-      expect(result).toBe(undefined);
-    });
-
-    it("should return private_key_or_seed_required error", () => {
-      const SEED = "";
-      try {
-        const extension = new Extension();
-        extension["validatePrivateKeyOrSeedFormat"](SEED);
-      } catch (error) {
-        expect(String(error)).toEqual("Error: private_key_or_seed_required");
-      }
-    });
-
-    it("should return private_key_or_seed_invalid error", () => {
-      const SEED = "123";
-      try {
-        const extension = new Extension();
-        extension["validatePrivateKeyOrSeedFormat"](SEED);
-      } catch (error) {
-        expect(String(error)).toEqual("Error: private_key_or_seed_invalid");
-      }
-    });
-  });
-
   describe("signUp", () => {
     it("should signUp", async () => {
       const PASSWORD = "Test.123";
@@ -300,7 +243,6 @@ describe("Extension", () => {
         "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
       const NAME = "created";
       const PASSWORD = "Test.123";
-      const type = AccountType.IMPORTED_WASM;
       const IS_SIGNUP = true;
       const extension = new Extension();
 
@@ -308,7 +250,7 @@ describe("Extension", () => {
         privateKeyOrSeed: SEED,
         name: NAME,
         password: PASSWORD,
-        type,
+        accountTypesToImport: [AccountType.WASM],
         isSignUp: IS_SIGNUP,
       });
       expect(result).toBe(undefined);
@@ -318,7 +260,6 @@ describe("Extension", () => {
         "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
       const NAME = "created";
       const PASSWORD = "Test.123";
-      const type = AccountType.IMPORTED_WASM;
       const IS_SIGNUP = false;
       const extension = new Extension();
 
@@ -326,7 +267,7 @@ describe("Extension", () => {
         privateKeyOrSeed: SEED,
         name: NAME,
         password: PASSWORD,
-        type,
+        accountTypesToImport: [AccountType.WASM],
         isSignUp: IS_SIGNUP,
       });
       expect(result).toBe(undefined);

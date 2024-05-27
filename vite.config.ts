@@ -90,6 +90,7 @@ export default ({ mode }: { mode: string }) => {
         "@styles": stylesDir,
         "@hooks": hookDir,
         "@utils": utilsDir,
+        buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
       },
     },
     plugins: [react(), makeManifest(), copyContentStyle()],
@@ -114,7 +115,14 @@ export default ({ mode }: { mode: string }) => {
         output: {
           entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,
         },
-        plugins: [rollupNodePolyFill()],
+        plugins: [
+          rollupNodePolyFill(),
+          // inject({
+          //   modules: {
+          //     Buffer: ["buffer", "Buffer"],
+          //   },
+          // }),
+        ],
       },
     },
     optimizeDeps: {

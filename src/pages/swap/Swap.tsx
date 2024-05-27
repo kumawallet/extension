@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
 import { SwapTxSummary } from "./components/SwapTxSummary";
+import { SelectAccount } from "../send/components/SelectAccount";
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
@@ -53,6 +54,7 @@ export const Swap = () => {
     txInfo,
     onConfirmTx,
     isPairValid,
+    setSenderAddress,
   } = useSwap();
 
   const canSend =
@@ -65,11 +67,12 @@ export const Swap = () => {
     assetToBuy,
   ]);
 
+
+
   return (
     <PageWrapper
       contentClassName="h-full flex-1 "
       innerContentClassName="flex flex-col !bg-[#212529]"
-      
     >
       {mustConfirmTx ? (
         <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
@@ -84,6 +87,11 @@ export const Swap = () => {
 
             <p className="text-base font-medium">{t("title")}</p>
           </div>
+
+          <SelectAccount
+            selectedAddress={tx.addressFrom}
+            onChangeValue={(value) => setSenderAddress(value)}
+          />
 
           <div className="flex flex-col h-[inherit]">
             <div className="flex-1 mt-4">

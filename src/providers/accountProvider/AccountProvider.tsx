@@ -19,7 +19,7 @@ import { messageAPI } from "@src/messageAPI/api";
 const initialState: InitialState = {
   accounts: [],
   isLoadingAccounts: true,
-  selectedAccount: {} as Account,
+  selectedAccount: null,
 };
 
 const AccountContext = createContext({} as AccountContext);
@@ -51,7 +51,7 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         selectedAccount: {
           ...state.selectedAccount,
           value: {
-            ...state.selectedAccount.value,
+            ...state.selectedAccount!.value,
             address,
           },
         },
@@ -60,10 +60,12 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
     case "update-account-name": {
       const { name, accountKey } = action.payload;
       const {
-        selectedAccount: { key, value },
+        selectedAccount,
       } = state;
 
-      const newName = accountKey === key ? name : value.name;
+      const { key, value } = selectedAccount || {};
+
+      const newName = accountKey === key ? name : value?.name;
       return {
         ...state,
         accounts: state.accounts.map((account) => {
@@ -81,8 +83,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         selectedAccount: {
           ...state.selectedAccount,
           value: {
-            ...state.selectedAccount.value,
-            name: newName,
+            ...state.selectedAccount!.value,
+            name: newName as string,
           },
         },
       };
@@ -112,11 +114,6 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const getImportedType = (type: AccountType) => {
-    if (type === AccountType.EVM) return AccountType.IMPORTED_EVM;
-    if (type === AccountType.WASM) return AccountType.IMPORTED_WASM;
-    return type;
-  };
 
   const getAllAccounts = async () => {
     try {
@@ -176,23 +173,19 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   const getSelectedAccount = async () => {
-    try {
-      const selectedAccount = await messageAPI.getSelectedAccount();
+    const selectedAccount = await messageAPI.getSelectedAccount();
 
-      if (!selectedAccount) return null;
+    if (!selectedAccount) return null;
 
-      dispatch({
-        type: "set-selected-account",
-        payload: {
-          selectedAccount: selectedAccount,
-        },
-      });
+    dispatch({
+      type: "set-selected-account",
+      payload: {
+        selectedAccount: selectedAccount,
+      },
+    });
 
-      return selectedAccount;
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon(error as string));
-    }
+    return selectedAccount;
+
   };
 
   const setSelectedAccount = async (account: Account) => {
@@ -201,9 +194,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
       dispatch({
         type: "set-selected-account",
         payload: {
-          selectedAccount: {
-            ...account,
-          },
+          selectedAccount: account ? account : null,
         },
       });
     } catch (error) {
@@ -238,7 +229,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     name: string;
     privateKeyOrSeed: string;
     password: string;
-    accountType: AccountType;
+    accountTypesToImport: AccountType[];
     isSignUp: boolean;
   }) => {
     try {
@@ -248,20 +239,19 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         throw new Error("password_required");
       if (!account.privateKeyOrSeed)
         throw new Error("private_key_or_seed_required");
-      if (!account.accountType) throw new Error("account_type_required");
-      const type = getImportedType(account.accountType);
+
       await messageAPI.importAccount({
         name: account.name,
         privateKeyOrSeed: account.privateKeyOrSeed,
         password: account.password,
-        type,
+        accountTypesToImport: account.accountTypesToImport,
         isSignUp: account.isSignUp,
       });
       await getSelectedAccount();
       return true;
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon("failed_to_import_account"));
+      showErrorToast(tCommon(error as string));
       return false;
     }
   }, []);
@@ -291,7 +281,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
   useEffect(() => {
-    if (selectedChain?.id) {
+    if (Object.keys(selectedChain).length > 0) {
       getSelectedAccount();
     }
   }, [selectedChain]);

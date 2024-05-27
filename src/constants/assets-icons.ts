@@ -33,6 +33,7 @@ const USDC = "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png";
 const ETH = "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
 const BUSD = "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png";
 const ENB = "https://s2.coinmarketcap.com/static/img/coins/64x64/7716.png";
+const OL = "/images/ol.png";
 
 export const ASSETS_ICONS: { [key: string]: string } = {
   BTC,
@@ -70,4 +71,5 @@ export const ASSETS_ICONS: { [key: string]: string } = {
   ETH,
   BUSD,
   ENB,
+  OL,
 };

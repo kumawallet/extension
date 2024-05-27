@@ -1,10 +1,4 @@
-const getWebAPI = (): typeof chrome => {
-  return navigator.userAgent.match(/chrome|chromium|crios/i)
-    ? chrome
-    : window.browser;
-};
-
-const WebAPI = getWebAPI();
+import { Browser } from "@src/utils/constants";
 
 function inject() {
   const file = chrome.runtime.getURL("src/entries/scripts/index.js");
@@ -21,7 +15,7 @@ inject();
 window.addEventListener("message", async function (e) {
   const data = e.data;
   if (data["origin"] === "kuma") {
-    const response = await WebAPI.runtime.sendMessage(data);
+    const response = await Browser.runtime.sendMessage(data);
     e.source?.postMessage(
       {
         response_method: data.method,
@@ -35,7 +29,7 @@ window.addEventListener("message", async function (e) {
   }
 });
 
-WebAPI.runtime.onMessage.addListener((request) => {
+Browser.runtime.onMessage.addListener((request) => {
   if (request.origin === "kuma") {
     if (request.method.endsWith("_response") && request.from === "bg") {
       window.postMessage({ ...request, from: "content" });

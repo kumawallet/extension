@@ -1,5 +1,5 @@
 import { ASSETS_ICONS } from "../assets-icons";
-import { Chain } from "@src/types";
+import { Chain, ChainType } from "@src/types";
 import ROCOCO_LOGO from "/images/rococo.png";
 import ASSETHUB_LOGO from "/images/assethub.png";
 import PASEO_LOGO from "/images/paseo.svg";
@@ -26,7 +26,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["DOT"],
     isTestnet: false,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "acala",
@@ -44,7 +44,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ACA"],
     isTestnet: false,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "astar",
@@ -62,7 +62,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ASTR"],
     isTestnet: false,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "kusama",
@@ -85,7 +85,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["KSM"],
     isTestnet: false,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "shiden",
@@ -98,7 +98,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["SDN"],
     isTestnet: false,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
 
   // TESTNETS ========================================
@@ -114,7 +114,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ROCOCO_LOGO,
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "rococo-asset-hub",
@@ -130,7 +130,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETHUB_LOGO,
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "mandala",
@@ -143,7 +143,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ACA"],
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "shibuya",
@@ -156,7 +156,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["ASTR"],
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "paseo",
@@ -169,7 +169,7 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: PASEO_LOGO,
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
   {
     id: "westend",
@@ -191,6 +191,6 @@ export const SUBTRATE_CHAINS: Chain[] = [
     logo: ASSETS_ICONS["KSM"],
     isTestnet: true,
     isCustom: false,
-    type: "wasm",
+    type: ChainType.WASM,
   },
 ];

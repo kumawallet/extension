@@ -1,8 +1,3 @@
-import {
-  PASSWORD_REGEX,
-  PRIVATE_KEY_OR_SEED_REGEX,
-} from "@src/utils/constants";
-
 import Storage from "@src/storage/Storage";
 import AccountManager from "@src/accounts/AccountManager";
 import Setting from "@src/storage/entities/settings/Setting";
@@ -22,7 +17,7 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import { AccountKey, AccountType } from "@src/accounts/types";
+import { AccountKey, AccountType, AccountTypes } from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
@@ -44,8 +39,6 @@ import {
   RequestRemoveTrustedSite,
   RequestSaveContact,
   RequestSaveCustomChain,
-  RequestSendEvmTx,
-  RequestSendSubstrateTx,
   RequestSetNetwork,
   RequestSignIn,
   RequestSignUp,
@@ -56,48 +49,50 @@ import {
   RequestSetAutoLock,
   ResponseType,
   RequestUpdateContact,
+  RequestDeleteSelectNetwork,
+  RequestShowKey,
+  RequestUpdateTx,
+  RequestSetAccountToActivity,
 } from "./request-types";
-import { Wallet, ethers, utils } from "ethers";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { Signer, Wallet, providers, utils } from "ethers";
+import { ApiPromise } from "@polkadot/api";
 import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { getChainHistoricHandler } from "@src/services/historic-transactions";
-import { Chain, Transaction } from "@src/types";
-import { transformAddress } from "@src/utils/account-utils";
+import { Chain, Transaction, SelectedChain } from "@src/types";
 import { Port } from "./types";
-
-export const getProvider = (rpc: string, type: string) => {
-  if (type?.toLowerCase() === "evm")
-    return new ethers.providers.JsonRpcProvider(rpc as string);
-
-  if (type?.toLowerCase() === "wasm")
-    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
-};
-
-const getWebAPI = (): typeof chrome => {
-  return navigator.userAgent.match(/chrome|chromium|crios/i)
-    ? chrome
-    : window.browser;
-};
-
-const WebAPI = getWebAPI();
+import { BehaviorSubject } from "rxjs";
+import { createSubscription } from "./subscriptions";
+import { Provider } from "@src/storage/entities/Provider";
+import { Transaction as TransactionEntity } from "@src/storage/entities/Transaction";
+import AssetBalance from "@src/storage/entities/AssetBalance";
+import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { OlProvider } from "@src/services/ol/OlProvider";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
+import TransactionHistory from "@src/storage/entities/TransactionHistory";
+import {
+  validatePasswordFormat,
+  validatePrivateKeyOrSeedFormat,
+} from "@src/utils/account-utils";
+import { AddressOrPair } from "@polkadot/api/types";
+import { Browser } from "@src/utils/constants";
 
 export default class Extension {
+  private provider = new Provider();
+  private assetsBalance = new AssetBalance();
+  private chains = new BehaviorSubject<SelectedChain>({});
+  private tx = new TransactionEntity();
+  private transactionHistory = new TransactionHistory();
+
+  constructor() {
+    this.subscriptionStatusProvider();
+    this.initNetworks();
+    this.initTransactionHistory();
+  }
+
   get version() {
     return version;
-  }
-
-  private validatePasswordFormat(password: string) {
-    if (!password) throw new Error("password_required");
-    if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
-  }
-
-  private validatePrivateKeyOrSeedFormat(privateKeyOrSeed: string) {
-    if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
-    if (!PRIVATE_KEY_OR_SEED_REGEX.test(privateKeyOrSeed))
-      throw new Error("private_key_or_seed_invalid");
   }
 
   private async isAuthorized(): Promise<boolean> {
@@ -117,25 +112,71 @@ export default class Extension {
     currentPassword: string;
     newPassword: string;
   }): Promise<void> {
-    this.validatePasswordFormat(currentPassword);
-    this.validatePasswordFormat(newPassword);
+    validatePasswordFormat(currentPassword);
+    validatePasswordFormat(newPassword);
 
-    const seed = await this.showKey();
+    await AccountManager.changePassword(currentPassword, newPassword);
+  }
 
-    if (!seed) throw new Error("failed_to_get_seed");
+  private async initTransactionHistory() {
+    const selectedAccount = await this.getSelectedAccount().catch(() => null);
 
-    await AccountManager.changePassword(
-      seed as string,
-      currentPassword,
-      newPassword
+    this.transactionHistory.setAccount(
+      selectedAccount?.value ? selectedAccount : null
     );
+  }
+
+  private async initNetworks() {
+    Network.getInstance();
+    const network = (await Network.get().catch(() => null)) as Network | null;
+    if (!network) return;
+    const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+    const chain = this.chains.getValue();
+
+    // @ts-expect-error --- migration
+    if (network && network?.Chain?.supportedAccounts) {
+      const newChainFormat = allChains.find(
+        (chain) => network?.Chain?.name === chain.name
+      );
+      if (newChainFormat) {
+        const id = newChainFormat.id;
+        const type = newChainFormat.type;
+        const isTestnet = newChainFormat.isTestnet;
+        await this.setNetwork({ isTestnet, id, type });
+      }
+    }
+    if (network && Object.keys(network.SelectedChain).length === 0) {
+      const id = allChains[0].id;
+      const type = allChains[0].type;
+      const isTestnet = allChains[0].isTestnet;
+      await this.setNetwork({ isTestnet, id, type });
+    }
+
+    if (
+      network &&
+      Object.keys(network.SelectedChain).length !== 0 &&
+      Object.keys(chain).length === 0
+    ) {
+      this.chains.next(network.SelectedChain);
+      await Promise.all(
+        Object.keys(network.SelectedChain).map((chain) =>
+          this.provider.setProvider(chain, network.SelectedChain[chain].type)
+        )
+      );
+      await Promise.all(
+        Object.keys(network.SelectedChain).map((chain) =>
+          this.transactionHistory.addChain({ chainId: chain })
+        )
+      );
+    }
   }
 
   private async signUp({ password, privateKeyOrSeed }: RequestSignUp) {
     try {
-      this.validatePasswordFormat(password);
-      this.validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
+      validatePasswordFormat(password);
+      validatePrivateKeyOrSeedFormat(privateKeyOrSeed);
       await Storage.init(password, privateKeyOrSeed);
+      await this.initNetworks();
     } catch (error) {
       Storage.getInstance().resetWallet();
       Auth.signOut();
@@ -161,41 +202,137 @@ export default class Extension {
       seed,
       name
     );
-    const evmAccount = await AccountManager.addAccount(
-      AccountType.EVM,
-      seed,
-      name
-    );
+    await AccountManager.addAccount(AccountType.EVM, seed, name);
 
-    const selectedAccount = await this.getSelectedAccount();
+    await AccountManager.addAccount(AccountType.OL, seed, name);
 
-    if (isSignUp) {
-      await this.setSelectedAccount(wasmAccount);
-    } else {
-      await this.setSelectedAccount(
-        selectedAccount?.type.includes("EVM") ? evmAccount : wasmAccount
-      );
-    }
+    await this.setSelectedAccount(wasmAccount);
 
     return true;
   }
+
+  private subscriptionStatusProvider = () => {
+    this.provider.statusNetwork.subscribe(async (data) => {
+      const [selectedAccount, allAccounts] = await Promise.all([
+        SelectedAccount.get().catch(() => null),
+        Accounts.get().catch(() => null),
+      ]);
+
+      if (!selectedAccount) return;
+
+      const networksAssest = this.assetsBalance.getNetwork();
+      const newNetwork = Object.keys(data).filter(
+        (chain) =>
+          !networksAssest.includes(chain) && data[chain] === "connected"
+      );
+      const deleteNetwork = networksAssest.filter(
+        (network) =>
+          Object.keys(data).includes(network) &&
+          data[network] === "disconnected" &&
+          !Object.keys(this.chains.getValue()).includes(network)
+      );
+      const provider = this.provider.getProviders();
+
+      if (newNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          await this.assetsBalance.loadAssets(
+            selectedAccount as Account,
+            provider,
+            newNetwork
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+
+          await this.transactionHistory.addChain({
+            chainId: newNetwork[0],
+          });
+        } else {
+          await Promise.all(
+            Object.keys((allAccounts as Accounts).data).map((accountKey) => {
+              this.transactionHistory.addChain({
+                chainId: newNetwork[0],
+              });
+
+              return this.assetsBalance.loadAssets(
+                (allAccounts as Accounts).data[
+                  accountKey as AccountTypes
+                ] as Account,
+                provider,
+                newNetwork
+              );
+            })
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        }
+      }
+
+      if (deleteNetwork.length !== 0) {
+        if ((selectedAccount as Account).value) {
+          this.assetsBalance.deleteAsset(
+            selectedAccount as Account,
+            provider,
+            deleteNetwork
+          );
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        } else {
+          Object.keys((allAccounts as Accounts).data).forEach((accountKey) => {
+            return this.assetsBalance.deleteAsset(
+              (allAccounts as Accounts).data[accountKey as AccountTypes],
+              provider,
+              deleteNetwork
+            );
+          });
+          this.assetsBalance.assets.next(this.assetsBalance._assets);
+        }
+      }
+    });
+  };
 
   private async importAccount({
     name,
     privateKeyOrSeed,
     password = "",
-    type,
+    accountTypesToImport,
     isSignUp = true,
   }: RequestImportAccount) {
     if (isSignUp) {
       await this.signUp({ password, privateKeyOrSeed });
     }
-    const account = await AccountManager.importAccount(
-      name,
-      privateKeyOrSeed,
-      type
-    );
-    this.setSelectedAccount(account);
+
+    let firstAccountCreated;
+
+    if (accountTypesToImport.includes(AccountType.WASM)) {
+      firstAccountCreated = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_WASM
+      );
+    }
+
+    if (accountTypesToImport.includes(AccountType.EVM)) {
+      const account = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_EVM
+      );
+
+      if (!firstAccountCreated) {
+        firstAccountCreated = account;
+      }
+    }
+
+    if (accountTypesToImport.includes(AccountType.OL)) {
+      const account = await AccountManager.importAccount(
+        name,
+        privateKeyOrSeed,
+        AccountType.IMPORTED_OL
+      );
+
+      if (!firstAccountCreated) {
+        firstAccountCreated = account;
+      }
+    }
+
+    this.setSelectedAccount(firstAccountCreated!);
   }
 
   private removeAccount({ key }: RequestRemoveAccout) {
@@ -204,11 +341,13 @@ export default class Extension {
 
   private async changeAccountName({ key, newName }: RequestChangeAccountName) {
     const account = await AccountManager.changeName(key, newName);
-    await SelectedAccount.set<SelectedAccount>(account);
+    await SelectedAccount.set<SelectedAccount>(account as SelectedAccount);
   }
 
   private async resetWallet() {
     await Storage.getInstance().resetWallet();
+    await this.provider.reset();
+    await this.assetsBalance.reset();
   }
 
   private async signIn({ password }: RequestSignIn) {
@@ -234,8 +373,10 @@ export default class Extension {
     await Auth.validatePassword(password);
     if (!keyring || !password || !key) return undefined;
     const address = key.split("-")[1];
-    const newkeyring = await Vault.getKeyring(keyring);
-    return newkeyring.getKey(address);
+
+    return this.showKey({
+      address,
+    });
   }
 
   private alreadySignedUp() {
@@ -280,15 +421,31 @@ export default class Extension {
     return Auth.isSessionActive();
   }
 
-  private async showKey(): Promise<string | undefined> {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    if (!selectedAccount || !selectedAccount?.value?.keyring) return undefined;
-    const { keyring: type } = selectedAccount.value;
+  private async showKey({
+    address,
+  }: RequestShowKey): Promise<string | undefined> {
+    // TODO: update from derivated accounts
+    const accounts = (await AccountManager.getAll())?.getAll();
 
-    const address = selectedAccount.key.split("-")[1];
+    if (!accounts) return undefined;
 
-    const keyring = await Vault.getKeyring(type);
-    return keyring.getKey(address);
+    const account = accounts.find(({ value }) => value.address === address);
+
+    if (!account) return undefined;
+
+    if (account?.value.parentAddress) {
+      const keyring = await Vault.getKeyring(account.type);
+      // return keyring.getKey(address);
+
+      const seed = keyring.getKey(account?.value.parentAddress);
+
+      const derived = keyring.getDerivedPath(seed, account?.value.path);
+
+      return derived;
+    } else {
+      const keyring = await Vault.getKeyring(account.type);
+      return keyring.getKey(address);
+    }
   }
 
   private async getAccount({
@@ -375,8 +532,7 @@ export default class Extension {
     if (!accounts) return [];
 
     const accountWithoutParentAddress = accounts.filter(
-      ({ value, type }) =>
-        !value.parentAddress && type !== AccountType.IMPORTED_EVM
+      ({ value }) => !value.parentAddress || value.isDerivable
     );
 
     return accountWithoutParentAddress;
@@ -402,14 +558,112 @@ export default class Extension {
     return account;
   }
 
-  private async setNetwork({ chain }: RequestSetNetwork): Promise<boolean> {
+  private async setNetwork({
+    isTestnet,
+    id,
+    type,
+  }: RequestSetNetwork): Promise<SelectedChain> {
+    const chains: SelectedChain = this.chains.getValue();
+    chains[id] = {
+      isTestnet: isTestnet,
+      type: type,
+    };
+    this.chains.next(chains);
     const network = Network.getInstance();
-    network.set(chain);
+    network.set(chains);
     await Network.set<Network>(network);
-    return true;
+    await this.provider.setProvider(id, type);
+    await this.transactionHistory.addChain({ chainId: id });
+
+    return chains;
   }
 
-  private async setSelectedAccount(account: Account) {
+  private async deleteSelectNetwork({ id }: RequestDeleteSelectNetwork) {
+    const chains: SelectedChain = this.chains.getValue();
+    delete chains[id];
+    this.chains.next(chains);
+    //save Object
+    const network = Network.getInstance();
+    network.set(chains);
+    this.chains.next(chains);
+    await Network.set<Network>(network);
+    await this.provider.disconnectChain(id);
+    await this.transactionHistory.removeChains({ chainIds: [id] });
+    return chains;
+  }
+  private networksSubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(network.subscription)">(id, port);
+    const subscription = this.chains.subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.chains.getValue();
+  };
+  private assetsSubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(assestsBanlance.subscription)">(
+      id,
+      port
+    );
+    const subscription = this.assetsBalance.assets.subscribe((data) =>
+      cb(data)
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.assetsBalance.assets.getValue();
+  };
+
+  /**
+   *
+   * @param account if account is nullm that means that all account are selected
+   */
+  private async setSelectedAccount(account: Account | null) {
+    const networkSelected = this.assetsBalance.getNetwork();
+    const allAccounts = (await Accounts.get()) as Accounts;
+    const provider = this.provider.getProviders();
+    const selectedAccount = (await SelectedAccount.get()) as SelectedAccount;
+
+    if (!account && selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => ![selectedAccount.key].includes(_account as AccountKey)
+      );
+      await Promise.all(
+        filterAccount.map((accountKey) => {
+          return this.assetsBalance.loadAssets(
+            allAccounts.data[accountKey as AccountTypes],
+            provider,
+            networkSelected
+          );
+        })
+      );
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
+    } else if (account && !selectedAccount.value) {
+      const filterAccount = Object.keys(allAccounts.data).filter(
+        (_account) => _account !== account.key
+      );
+      await Promise.all(
+        filterAccount.map((account) => {
+          this.assetsBalance.deleteAsset(
+            allAccounts.data[account as AccountTypes],
+            provider,
+            networkSelected,
+            false
+          );
+        })
+      );
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
+    } else if (account && selectedAccount.value) {
+      this.assetsBalance.deleteAsset(
+        selectedAccount,
+        provider,
+        networkSelected,
+        false
+      );
+      await this.assetsBalance.loadAssets(account, provider, networkSelected);
+      this.assetsBalance.assets.next(this.assetsBalance._assets);
+    }
+    this.transactionHistory.setAccount(account);
+
     await SelectedAccount.set<SelectedAccount>(
       SelectedAccount.fromAccount(account)
     );
@@ -480,18 +734,19 @@ export default class Extension {
   private async getRegistryAddresses() {
     const registry = await Registry.get<Registry>();
     if (!registry) throw new Error("failed_to_get_registry");
-    const { chain } = await Network.get<Network>();
-    if (!chain) throw new Error("failed_to_get_network");
+    const Chains = await Network.get<Network>();
+    if (!Chains) throw new Error("failed_to_get_network");
     const accounts = await AccountManager.getAll();
     if (!accounts) throw new Error("failed_to_get_accounts");
+
+    const ownAccounts = accounts
+      .getAll()
+      .map((account) => new Contact(account.value.name, account.value.address));
+
+    const contacts = registry.getAllContacts();
+
     return {
-      ownAccounts: accounts
-        .getAll()
-        .map(
-          (account) => new Contact(account.value.name, account.value.address)
-        ),
-      contacts: registry.getAllContacts(),
-      recent: registry.getRecentAddresses(chain.name),
+      accounts: [ownAccounts, contacts].flat(),
     };
   }
 
@@ -507,24 +762,33 @@ export default class Extension {
     await Registry.updateContact(address, name);
   }
 
-  private async getHistoricActivity() {
-    const selectedAccount = await SelectedAccount.get<SelectedAccount>();
-    const selectedChain = await Network.get<Network>();
-
-    const address = selectedAccount?.value.address;
-    const chainPrefix = selectedChain?.chain?.prefix;
-
-    // @ts-expect-error -- *
-    const formatedAddress = transformAddress(address, chainPrefix || 0);
-
-    return await getChainHistoricHandler({
-      chainId: selectedChain!.chain!.id,
-      address: formatedAddress,
-    });
+  private async getActivity(): Promise<Record[]> {
+    // return Activity.getRecords();
+    return [];
   }
 
-  private async getActivity(): Promise<Record[]> {
-    return Activity.getRecords();
+  private activitySubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(activity.activitySubscribe)">(id, port);
+    const subscription = this.transactionHistory.transactions.subscribe(() =>
+      cb(this.transactionHistory.getTransactions())
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+
+    return this.transactionHistory.getTransactions();
+  };
+
+  private async setAccountToActivity({ address }: RequestSetAccountToActivity) {
+    const allAccounts = await AccountManager.getAll();
+
+    const account = allAccounts
+      ?.getAll()
+      .find(({ value }) => value.address === address);
+
+    if (!account) return;
+
+    await this.transactionHistory.setAccount(account);
   }
 
   private async saveCustomChain({ chain }: RequestSaveCustomChain) {
@@ -597,26 +861,69 @@ export default class Extension {
     return TrustedSites.removeSite(site);
   }
 
-  private async sendSubstrateTx({
-    amount,
-    asset,
-    destinationAddress,
-    destinationNetwork,
-    hexExtrinsic,
-    networkName,
-    originAddress,
-    rpc,
-    isSwap,
-    tip,
-  }: RequestSendSubstrateTx) {
-    try {
-      const provider = (await getProvider(rpc, "wasm")) as ApiPromise;
-      const seed = await this.showKey();
-      const sender = keyring.keyring.addFromMnemonic(seed as string);
-      const { block } = await provider.rpc.chain.getBlock();
+  private async updateTx({ tx }: RequestUpdateTx) {
+    const providers = this.provider.getProviders();
 
-      const unsub = await provider.tx(hexExtrinsic).signAndSend(
-        sender,
+    const seed = await this.showKey({
+      address: tx.senderAddress,
+    });
+
+    let signer;
+
+    const provider = providers[tx.originNetwork!.id];
+
+    if (tx.originNetwork?.type === "evm") {
+      signer = new Wallet(
+        seed as string,
+        provider.provider as unknown as providers.JsonRpcProvider
+      );
+    } else if (tx.originNetwork?.type === "wasm") {
+      signer = keyring.keyring.addFromMnemonic(seed as string);
+    } else if (tx.originNetwork.type === "ol") {
+      signer = seed;
+    }
+
+    this.tx.updateTx({
+      ...tx,
+      provider,
+      signer,
+    });
+  }
+
+  private getFeeSubscribe(id: string, port: Port) {
+    const cb = createSubscription<"pri(send.getFeeSubscribe)">(id, port);
+    const subscription = this.tx.tx.subscribe(async () =>
+      cb(await this.tx.getFee())
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+      this.tx.clear();
+    });
+  }
+
+  private async sendSubstrateTx() {
+    try {
+      const {
+        provider,
+        signer,
+        senderAddress,
+        amount,
+        asset,
+        destinationAddress,
+        originNetwork,
+        targetNetwork,
+      } = this.tx.tx.getValue();
+
+      const tip = this.tx.tip;
+      const tx = this.tx.substrateTx;
+      const isSwap = this.tx.isSwap;
+
+      const substateProvider = provider?.provider as unknown as ApiPromise;
+
+      const { block } = await substateProvider.rpc.chain.getBlock();
+
+      const unsub = await tx!.signAndSend(
+        signer as AddressOrPair,
         {
           tip: tip || undefined,
         },
@@ -644,13 +951,13 @@ export default class Extension {
             const transaction: Transaction = {
               id: hash,
               amount: amount,
-              asset: asset.symbol,
+              asset: asset!.symbol,
               blockNumber: Number(block.header.number.toString()),
               fee,
               hash,
-              originNetwork: networkName,
-              targetNetwork: destinationNetwork,
-              sender: originAddress,
+              originNetwork: originNetwork?.name as string,
+              targetNetwork: targetNetwork?.name as string,
+              sender: senderAddress,
               recipient: destinationAddress,
               status: RecordStatus.PENDING,
               tip,
@@ -664,11 +971,16 @@ export default class Extension {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               record: transaction as unknown as any,
             });
-            this.sendUpdateActivityMessage();
+            this.transactionHistory.addTransactionToChain({
+              chainId: originNetwork?.id as string,
+              transaction,
+              originNetwork: originNetwork as Chain,
+              targetNetwork: targetNetwork as Chain,
+            });
           }
           if (status.isFinalized) {
             const failedEvents = events.filter(({ event }) =>
-              provider?.events.system.ExtrinsicFailed.is(event)
+              substateProvider?.events.system.ExtrinsicFailed.is(event)
             );
             let status = RecordStatus.PENDING;
             let error = undefined;
@@ -697,7 +1009,7 @@ export default class Extension {
                   };
                 }) => {
                   if (_error.isModule) {
-                    const decoded = provider.registry.findMetaError(
+                    const decoded = substateProvider.registry.findMetaError(
                       _error.asModule as
                         | Uint8Array
                         | {
@@ -719,13 +1031,16 @@ export default class Extension {
               status = RecordStatus.FAIL;
             } else {
               status = RecordStatus.SUCCESS;
-
-              // swap && (await Extension.addSwap(swap.protocol, { id: swap.id }));
             }
             const hash = txHash.toString();
             await this.updateActivity({ txHash: hash, status, error });
             this.sendTxNotification({ title: `tx ${status}`, message: hash });
-            this.sendUpdateActivityMessage();
+            this.transactionHistory.updateTransaction({
+              chainId: originNetwork?.id as string,
+              id: hash,
+              status,
+            });
+
             unsub();
           }
         }
@@ -740,43 +1055,37 @@ export default class Extension {
     }
   }
 
-  private async sendEvmTx({
-    amount,
-    asset,
-    destinationAddress,
-    destinationNetwork,
-    networkName,
-    originAddress,
-    rpc,
-    isSwap,
-    evmTx,
-  }: RequestSendEvmTx) {
-    if (!evmTx) {
-      return;
-    }
+  private async sendEvmTx() {
     try {
-      const api = (await getProvider(
-        rpc,
-        AccountType.EVM
-      )) as ethers.providers.JsonRpcProvider;
+      const {
+        signer,
+        senderAddress,
+        amount,
+        asset,
+        destinationAddress,
+        originNetwork,
+        targetNetwork,
+        provider,
+      } = this.tx.tx.getValue();
 
-      const seed = await this.showKey();
+      const evmTx = this.tx.evmTx as providers.TransactionRequest;
+      const isSwap = this.tx.isSwap;
+      const evmProvider =
+        provider?.provider as unknown as providers.JsonRpcProvider;
 
-      const singer = new Wallet(seed as string, api);
-
-      const tx = await singer.sendTransaction(evmTx);
+      const tx = await (signer as Signer).sendTransaction(evmTx);
       const txHash = tx.hash;
 
       const transaction: Transaction = {
         id: txHash,
         amount: amount,
-        asset: asset.symbol,
+        asset: asset!.symbol,
         blockNumber: tx.blockNumber!,
         hash: txHash,
-        originNetwork: networkName,
+        originNetwork: originNetwork?.name as string,
         recipient: destinationAddress,
-        targetNetwork: destinationNetwork,
-        sender: originAddress,
+        targetNetwork: targetNetwork?.name as string,
+        sender: senderAddress,
         status: RecordStatus.PENDING,
         type: RecordType.TRANSFER,
         tip: "",
@@ -787,9 +1096,14 @@ export default class Extension {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await this.addActivity({ txHash, record: transaction as any });
-      this.sendUpdateActivityMessage();
+      this.transactionHistory.addTransactionToChain({
+        chainId: originNetwork?.id as string,
+        transaction,
+        originNetwork: originNetwork as Chain,
+        targetNetwork: targetNetwork as Chain,
+      });
 
-      const txReceipt = await api.getTransaction(txHash);
+      const txReceipt = await evmProvider.getTransaction(txHash);
 
       const result = await txReceipt.wait();
 
@@ -803,23 +1117,82 @@ export default class Extension {
       const error = "";
       await this.updateActivity({ txHash, status, error, fee });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
-      this.sendUpdateActivityMessage();
+      this.transactionHistory.updateTransaction({
+        chainId: originNetwork?.id as string,
+        id: txHash,
+        status,
+      });
       return true;
     } catch (error) {
       this.sendTxNotification({ title: `tx failed`, message: "" });
-      // await this.updateActivity({
-      //   txHash,
-      //   status: RecordStatus.FAIL,
-      //   error: String(error),
-      // });
     }
   }
 
-  private sendUpdateActivityMessage() {
-    WebAPI.runtime.sendMessage({
-      origin: "kuma",
-      method: "update_activity",
+  private async sendOLTx() {
+    const {
+      provider,
+      signer,
+      senderAddress,
+      amount,
+      asset,
+      destinationAddress,
+      originNetwork,
+      targetNetwork,
+    } = this.tx.tx.getValue();
+
+    const olProvider = provider?.provider as unknown as OlProvider;
+
+    const tx = await olProvider.transfer({
+      pk: signer as string,
+      sender: senderAddress,
+      recipient: destinationAddress,
+      amount: amount,
     });
+
+    const hash = tx.hash;
+    const status = tx.success ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+
+    const transaction: Transaction = {
+      id: tx?.hash,
+      amount: amount,
+      asset: asset!.symbol,
+      blockNumber: tx.blockNumber,
+      hash: tx?.hash as string,
+      originNetwork: originNetwork?.name as string,
+      recipient: destinationAddress,
+      targetNetwork: targetNetwork?.name as string,
+      sender: senderAddress,
+      status,
+      type: RecordType.TRANSFER,
+      tip: "",
+      timestamp: tx?.timestamp,
+      fee: tx?.fee || "",
+      isSwap: false,
+      version: tx?.version as string,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await this.addActivity({ txHash: hash, record: transaction as any });
+    this.transactionHistory.addTransactionToChain({
+      chainId: originNetwork?.id as string,
+      transaction,
+      originNetwork: originNetwork as Chain,
+      targetNetwork: targetNetwork as Chain,
+    });
+    this.sendTxNotification({ title: `tx ${status}`, message: hash });
+
+    return true;
+  }
+
+  private async sendTx() {
+    const originNetwork = this.tx.tx.getValue().originNetwork;
+    if (originNetwork?.type === "evm") {
+      return this.sendEvmTx();
+    } else if (originNetwork?.type === "wasm") {
+      return this.sendSubstrateTx();
+    } else if (originNetwork?.type === "ol") {
+      return this.sendOLTx();
+    }
   }
 
   private sendTxNotification({
@@ -829,7 +1202,7 @@ export default class Extension {
     title: string;
     message: string;
   }) {
-    WebAPI.notifications.create("id", {
+    Browser.notifications.create("id", {
       title,
       message,
       iconUrl: notificationIcon,
@@ -891,10 +1264,12 @@ export default class Extension {
       case "pri(auth.isSessionActive)":
         return this.isSessionActive();
       case "pri(auth.showKey)":
-        return this.showKey();
+        return this.showKey(request as RequestShowKey);
 
       case "pri(network.setNetwork)":
         return this.setNetwork(request as RequestSetNetwork);
+      case "pri(network.deleteSelectNetwork)":
+        return this.deleteSelectNetwork(request as RequestDeleteSelectNetwork);
       case "pri(network.getNetwork)":
         return this.getNetwork();
       case "pri(network.saveCustomChain)":
@@ -903,7 +1278,10 @@ export default class Extension {
         return this.removeCustomChain(request as RequestRemoveCustomChain);
       case "pri(network.getCustomChains)":
         return this.getCustomChains();
-
+      case "pri(network.subscription)":
+        return this.networksSubscribe(id, port);
+      case "pri(assestsBanlance.subscription)":
+        return this.assetsSubscribe(id, port);
       case "pri(settings.getGeneralSettings)":
         return this.getGeneralSettings();
       case "pri(settings.getAdvancedSettings)":
@@ -924,14 +1302,20 @@ export default class Extension {
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
 
-      case "pri(activity.getHistoricActivity)":
-        return this.getHistoricActivity();
+      case "pri(activity.activitySubscribe)":
+        return this.activitySubscribe(id, port);
+      // case "pri(activity.getHistoricActivity)":
+      //   return this.getHistoricActivity();
       case "pri(activity.getActivity)":
         return this.getActivity();
       case "pri(activity.addActivity)":
         return this.addActivity(request as RequestAddActivity);
       case "pri(activity.updateActivity)":
         return this.updateActivity(request as RequestUpdateActivity);
+      case "pri(activity.setAccountToActivity)":
+        return this.setAccountToActivity(
+          request as RequestSetAccountToActivity
+        );
 
       case "pri(assets.addAsset)":
         return this.addAsset(request as RequestAddAsset);
@@ -945,10 +1329,12 @@ export default class Extension {
       case "pri(trustedSites.removeTrustedSite)":
         return this.removeTrustedSite(request as RequestRemoveTrustedSite);
 
-      case "pri(send.sendSubstrateTx)":
-        return this.sendSubstrateTx(request as RequestSendSubstrateTx);
-      case "pri(send.sendEvmTx)":
-        return this.sendEvmTx(request as RequestSendEvmTx);
+      case "pri(send.updateTx)":
+        return this.updateTx(request as RequestUpdateTx);
+      case "pri(send.getFeeSubscribe)":
+        return this.getFeeSubscribe(id, port);
+      case "pri(send.sendTx)":
+        return this.sendTx();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

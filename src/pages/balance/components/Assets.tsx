@@ -1,65 +1,93 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
-import {
-  useAssetContext,
-  useNetworkContext
-} from "@src/providers";
+import { useAccountContext, useAssetContext } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
+import { formatAmountWithDecimals } from "@src/utils/assets";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
-    state: { api, selectedChain },
-  } = useNetworkContext();
-  const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
+  const {
+    state: { selectedAccount },
+  } = useAccountContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
-  const [showManageAssets, setShowManageAssets] = useState(false);
+  const [showManageAssets, setShowManageAssets] = useState(true);
 
   const filteredAsset = useMemo(() => {
-    let _assets = [...assets];
+    let _assets = [];
 
-    if (!showAllAssets) {
-      _assets = _assets.filter((asset) => {
-        if (asset.id === "-1") return true;
+    const outputObject: any = {};
+    if (Object.keys(assets).length !== 0) {
+      Object.keys(assets).forEach((key) => {
+        const networks = assets[key];
+        Object.keys(networks).forEach((network: any) => {
+          const assets = networks[network].assets;
+          assets.forEach((asset: any) => {
+            if (!outputObject[asset.symbol]) {
+              outputObject[asset.symbol] = [];
+            }
+            outputObject[asset.symbol].push({ ...asset, accountKey: key });
+          });
+        });
+      });
 
-        return asset.balance > 0;
+      _assets = Object.keys(outputObject).map((key) => {
+        const asset = outputObject[key];
+
+        const accountKeysInfo = {};
+
+        asset.forEach((a) => {
+          if (!accountKeysInfo[a.accountKey]) {
+            accountKeysInfo[a.accountKey] = {
+              balance: 0,
+              amount: 0,
+              symbol: a.symbol,
+              decimals: a.decimals,
+              id: a.id,
+            };
+          }
+
+          accountKeysInfo[a.accountKey].balance += Number(a.balance);
+          accountKeysInfo[a.accountKey].amount += Number(a.amount);
+        });
+
+        const balance = Object.values(accountKeysInfo).reduce((acc, _asset) => {
+          return acc + Number(_asset.balance || 0);
+        }, 0);
+
+        const amount = Object.values(accountKeysInfo).reduce((acc, _asset) => {
+          return acc + Number(_asset.amount || 0);
+        }, 0);
+
+        return {
+          symbol: key,
+          balance: formatAmountWithDecimals(balance, 3, asset[0].decimals),
+          amount,
+          decimals: asset[0].decimals,
+          accounts: accountKeysInfo,
+          id: asset[0].id,
+        };
       });
     }
 
-    // order by balance, id === -1 should be first
-    _assets.sort((a, b) => {
-      if (a.id === "-1") return -1;
-      if (b.id === "-1") return 1;
-
+    _assets = _assets.sort((a, b) => {
       return b.balance - a.balance;
     });
 
-    return _assets;
-  }, [assets, showAllAssets]);
+    if (showAllAssets) return _assets;
 
-  useEffect(() => {
-    if (!api) {
-      setShowManageAssets(false);
-      return;
-    }
+    return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0);
+  }, [JSON.stringify(assets), showAllAssets, selectedAccount?.key]);
 
-    if (selectedChain?.type === "evm") {
-      setShowManageAssets(true);
-    }
-
-    // if (selectedChain?.type === "substrate" && (api as ApiPromise).query.contracts) {
-    //   setShowManageAssets(true);
-    // }
-  }, [api]);
 
 
   return (
@@ -88,9 +116,9 @@ export const Assets = () => {
 
       {isLoadingAssets && <Loading />}
 
-      {filteredAsset.map((asset, index) => (
-        <Asset asset={asset} key={index} />
-      ))}
+      {filteredAsset.map((asset, index) => {
+        return <Asset asset={asset} key={index} />;
+      })}
 
       {showManageAssets && (
         <div className="flex justify-center mt-2">

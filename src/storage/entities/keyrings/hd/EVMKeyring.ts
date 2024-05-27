@@ -10,11 +10,7 @@ export default class EVMKeyring extends HDKeyring {
     return `m/44'/60'/0'/0/${this.getAccountIndex()}`;
   }
 
-  isMnemonicValid(mnemonic: string): boolean {
-    return ethers.utils.isValidMnemonic(mnemonic);
-  }
-
-  getAddress(seed: string, path?: number): string {
+  async getAddress(seed: string, path?: number): Promise<string> {
     return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path || 0}`)
       ?.address;
   }
@@ -25,6 +21,11 @@ export default class EVMKeyring extends HDKeyring {
       throw new Error("Key pair not found");
     }
     return keyPair.key;
+  }
+
+  getDerivedPath(seed: string, path: number): string {
+    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)
+      ?.privateKey;
   }
 
   addKeyPair(address: string, keyPair: HDKeyPair): void {

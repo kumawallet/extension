@@ -2,29 +2,11 @@ import { useTranslation } from "react-i18next";
 import { Action } from "./Action";
 import { useNavigate } from "react-router-dom";
 import { SEND, SWAP } from "@src/routes/paths";
-import { useMemo } from "react";
-import { useNetworkContext } from "@src/providers";
-import { SUPPORTED_CHAINS_FOR_SWAP } from "@src/pages/swap/base";
 import { Buy, Send, Swap } from "@src/components/icons";
 
 export const Actions = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
-
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
-
-  const isSwapAvailable = useMemo(() => {
-    const chainId = selectedChain?.id;
-    const network = selectedChain?.isTestnet
-    if (!chainId) return false;
-    if (network) return false;
-
-    const chainType = selectedChain.type === "wasm" ? "wasm" : "evm"
-
-    return SUPPORTED_CHAINS_FOR_SWAP[chainType].includes(chainId);
-  }, [selectedChain]);
 
   return (
     <div data-testid="actions-container" className="flex gap-5 justify-center">
@@ -38,7 +20,6 @@ export const Actions = () => {
         Icon={Swap}
         title={t("swap")}
         onClick={() => navigate(SWAP)}
-        isDisabled={!isSwapAvailable}
       />
 
       <Action

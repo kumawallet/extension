@@ -1,18 +1,24 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
+import { AssetBalance } from "@src/storage/entities/AssetBalance";
 import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
 import Record from "@src/storage/entities/activity/Record";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
-import Register from "@src/storage/entities/registry/Register";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
   SettingKey,
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
-import { Chain, HistoricTransaction } from "@src/types";
+import {
+  Chain,
+  ChainType,
+  HistoricTransaction,
+  SelectedChain,
+  Transaction,
+} from "@src/types";
 import { providers } from "ethers";
 
 export interface RequestSignUp {
@@ -31,7 +37,7 @@ export interface RequestImportAccount {
   name: string;
   privateKeyOrSeed: string;
   password: string | undefined;
-  type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
+  accountTypesToImport: AccountType[];
   isSignUp: boolean | undefined;
 }
 
@@ -77,9 +83,17 @@ export interface RequestDeriveAccount {
 }
 
 export interface RequestSetNetwork {
-  chain: Chain;
+  id: string;
+  isTestnet?: boolean;
+  type: ChainType;
 }
-
+export interface RequestDeleteSelectNetwork {
+  id: string;
+}
+export interface RequestAddNetwork {
+  id: string;
+  type: ChainType;
+}
 export interface RequestSaveCustomChain {
   chain: Chain;
 }
@@ -151,7 +165,7 @@ export interface getLock {
   lock: number;
 }
 
-interface RequestSendTxBase {
+export interface RequestSendTxBase {
   amount: string;
   asset: {
     symbol: string;
@@ -172,6 +186,31 @@ export interface RequestSendSubstrateTx extends RequestSendTxBase {
 
 export interface RequestSendEvmTx extends RequestSendTxBase {
   evmTx?: providers.TransactionRequest;
+}
+
+export interface RequestShowKey {
+  address: string;
+}
+
+export interface RequestUpdateTx {
+  tx: {
+    amount: string;
+    senderAddress: string;
+    destinationAddress: string;
+    originNetwork: Chain;
+    targetNetwork: Chain;
+    asset: {
+      id: string;
+      symbol: string;
+      decimals: number;
+      balance: string;
+      address?: string | undefined;
+    };
+  };
+}
+
+export interface RequestSetAccountToActivity {
+  address: string;
 }
 
 export interface Request {
@@ -198,7 +237,7 @@ export interface Request {
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
-  "pri(auth.showKey)": [null, string | undefined];
+  "pri(auth.showKey)": [RequestShowKey, string | undefined];
 
   "pri(network.setNetwork)": [RequestSetNetwork, boolean];
   "pri(network.getNetwork)": [null, Network];
@@ -206,8 +245,14 @@ export interface Request {
   "pri(network.saveCustomChain)": [RequestSaveCustomChain, void];
   "pri(network.removeCustomChain)": [RequestRemoveCustomChain, void];
   "pri(network.getCustomChains)": [null, Chain[]];
-
+  "pri(network.deleteSelectNetwork)": [
+    RequestDeleteSelectNetwork,
+    RequestSetNetwork
+  ];
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
+  "pri(network.subscription)": [null, SelectedChain, SelectedChain];
+
+  "pri(assestsBanlance.subscription)": [null, AssetBalance, AssetBalance];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
   "pri(settings.getAdvancedSettings)": [null, Setting[]];
@@ -218,9 +263,7 @@ export interface Request {
   "pri(contacts.getRegistryAddresses)": [
     null,
     {
-      ownAccounts: Contact[];
-      contacts: Contact[];
-      recent: Register[];
+      accounts: Contact[];
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];
@@ -231,6 +274,9 @@ export interface Request {
   "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];
+  "pri(activity.activitySubscribe)": [null, Transaction[], Transaction[]];
+  "pri(activity.updateRecordStatus)": [string, void];
+  "pri(activity.setAccountToActivity)": [RequestSetAccountToActivity, void];
 
   "pri(assets.addAsset)": [RequestAddAsset, void];
   "pri(assets.getAssetsByChain)": [
@@ -246,8 +292,9 @@ export interface Request {
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
   "pri(trustedSites.removeTrustedSite)": [RequestRemoveTrustedSite, void];
 
-  "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
-  "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+  "pri(send.updateTx)": [RequestUpdateTx, string];
+  "pri(send.getFeeSubscribe)": [null, void, string];
+  "pri(send.sendTx)": [null, boolean];
 }
 
 export type MessageTypes = keyof Request;

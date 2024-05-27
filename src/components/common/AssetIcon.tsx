@@ -18,7 +18,6 @@ export const AssetIcon: FC<AssetIconProps> = ({ asset, width }) => {
   const assetSymbol = asset.symbol?.toUpperCase() || "";
 
   const icon = ASSETS_ICONS[assetSymbol] || null
-
   return (
     <>
       {icon ? (

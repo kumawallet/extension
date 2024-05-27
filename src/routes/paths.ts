@@ -8,6 +8,7 @@ export const FORGOT_PASS = "/forgot-pass";
 export const IMPORT_ACCOUNT = "/import-account";
 export const MANAGE_ASSETS = "/manage-assets";
 export const RECEIVE = "/receive";
+export const BALANCE_ACCOUNTS = "/balance-account";
 export const SEND = "/send";
 export const SETTINGS = "/settings";
 export const SETTINGS_ABOUT_US = "/settings-about-us";

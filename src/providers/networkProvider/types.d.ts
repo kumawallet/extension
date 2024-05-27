@@ -1,46 +1,40 @@
 import { AccountType } from "@src/accounts/types";
-import { Chain, ChainsState } from "@src/types";
+import { ChainType, ChainsState, Provider } from "@src/types";
 
-type SelectedChain = Chain | null;
-type Api = ApiPromise | ethers.providers.JsonRpcProvider | null;
+type SelectedChain = {
+  [id: string]: chain;
+};
+type chain = {
+  isTestnet?: boolean;
+  type: ChainType;
+};
+type Api = { [id: string]: Provider };
 
 export interface InitialState {
   chains: ChainsState;
   selectedChain: SelectedChain;
-  api: Api;
-  init: boolean;
 }
 
 export interface NetworkContext {
   state: InitialState;
-  setSelectNetwork: (network: Chain) => void;
   refreshNetworks: (supportedAccounts?: AccountType[]) => void;
-  initializeNetwork: () => void;
 }
 
 export type Action =
   | {
-      type: "init";
-      payload: {
-        chains: Chains;
-        selectedChain: SelectedChain;
-      };
-    }
-  | {
       type: "select-network";
       payload: {
         selectedChain: SelectedChain;
-        api?: Api;
-      };
-    }
-  | {
-      type: "set-api";
-      payload: {
-        api: Api;
       };
     }
   | {
       type: "refresh-networks";
+      payload: {
+        chains: Chains;
+      };
+    }
+  | {
+      type: "init-networks";
       payload: {
         chains: Chains;
       };

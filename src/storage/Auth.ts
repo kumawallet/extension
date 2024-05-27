@@ -41,7 +41,7 @@ export default class Auth {
     CacheAuth.getInstance();
     CacheAuth.unlock();
   }
-  
+
   static async getLock() {
     return CacheAuth.getLock();
   }
@@ -61,16 +61,15 @@ export default class Auth {
       throw new Error("failed_to_cache_password");
     }
   }
-  static async setAutoLock (time: number){
-    try{
+  static async setAutoLock(time: number) {
+    try {
       CacheAuth.getInstance();
       CacheAuth.lock(time);
-    }
-    catch(err){
+    } catch (err) {
       CacheAuth.clear();
       throw new Error("failed_to_set_auto_lock");
     }
-  }   
+  }
 
   static async loadFromCache() {
     try {
@@ -107,7 +106,7 @@ export default class Auth {
     }
   }
 
-  static async signIn(password: string, ) {
+  static async signIn(password: string) {
     const auth = Auth.getInstance();
     try {
       await auth.validatePassword(password);
@@ -152,21 +151,15 @@ export default class Auth {
     }
   }
 
-  static async restorePassword(
-    backup: string,
-    password: string,
-    newPassword: string,
-    privateKeyOrSeed: string
-  ) {
-    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
-    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
-    Auth.isUnlocked = true;
+  static async restorePassword(password: string, newPassword: string) {
     if (Auth.password !== password) {
       throw new Error("invalid_current_password");
     }
 
+    const auth = Auth.getInstance();
+    await auth.setAuth(newPassword);
+
     const vault = await Vault.getInstance();
-    Auth.password = newPassword;
     await Vault.set(vault);
   }
 }

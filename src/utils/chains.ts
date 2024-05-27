@@ -1,5 +1,8 @@
+import { ApiPromise, WsProvider } from "@polkadot/api";
 import { messageAPI } from "@src/messageAPI/api";
-import { Chain, OldChain } from "@src/types";
+import { OlProvider } from "@src/services/ol/OlProvider";
+import { Chain, ChainType, OldChain } from "@src/types";
+import { providers } from "ethers";
 
 export const migrateOldCustomChains = async (chains: Chain[]) => {
   const newChains: Chain[] = [];
@@ -21,7 +24,7 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
           explorer: _oldChain.explorer.wasm?.url || "",
           isTestnet: false,
           isCustom: true,
-          type: "wasm",
+          type: ChainType.WASM,
         });
       }
 
@@ -36,7 +39,7 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
           explorer: _oldChain.explorer.evm?.url || "",
           isTestnet: false,
           isCustom: true,
-          type: "evm",
+          type: ChainType.EVM,
         });
       }
     });
@@ -62,4 +65,14 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
   return {
     newChains,
   };
+};
+
+export const getProvider = (rpc: string, type: string) => {
+  if (type?.toLowerCase() === ChainType.EVM)
+    return new providers.JsonRpcProvider(rpc as string);
+
+  if (type?.toLowerCase() === ChainType.WASM)
+    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
+
+  if (type?.toLowerCase() === ChainType.OL) return new OlProvider(rpc);
 };

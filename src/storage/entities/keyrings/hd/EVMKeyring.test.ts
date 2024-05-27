@@ -11,10 +11,10 @@ describe("EVMKeyring", () => {
     expect(path).toBe("m/44'/60'/0'/0/0");
   });
 
-  it("should return address", () => {
+  it("should return address", async () => {
     const evmKeyring = new EVMKeyring(mockMnemonic);
 
-    const address = evmKeyring.getAddress(mockMnemonic);
+    const address = await evmKeyring.getAddress(mockMnemonic);
     expect(address).toBe("0x8792ae3fe19523E842888fE26a119d319a9A5Db5");
   });
 
@@ -64,9 +64,9 @@ describe("EVMKeyring", () => {
     }
   });
 
-  it("should derive key pair", () => {
+  it("should derive key pair", async () => {
     const evmKeyring = new EVMKeyring(mockMnemonic);
-    const address = evmKeyring.deriveKeyPair(mockMnemonic, 0);
+    const address = await evmKeyring.deriveKeyPair(mockMnemonic, 0);
     expect(address).toBe("0x8792ae3fe19523E842888fE26a119d319a9A5Db5");
   });
 

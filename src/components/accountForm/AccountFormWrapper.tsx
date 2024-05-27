@@ -45,7 +45,7 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
 
         {topMessage}
 
-        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 md:pb-0 pt-5 pb-10 flex flex-col flex-1">
+        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 md:pb-2 pt-5 pb-10 flex flex-col flex-1">
           {
             showBackButton && (
               <div className="py-1 mb-1">

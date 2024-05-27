@@ -1,5 +1,5 @@
 import AccountEntity from "@src/storage/entities/Account";
-import { API, Chain } from "@src/types";
+import { API } from "@src/types";
 
 export interface Asset {
   symbol: string;
@@ -10,9 +10,9 @@ export interface Asset {
   reserved?: BN;
   frozen?: BN;
   address?: string;
-  amount?: number;
+  amount?: string;
   name?: string;
-  price?: number;
+  price?: string;
   color?: string;
   aditionalData?:
     | {
@@ -28,14 +28,21 @@ export interface Asset {
       }
     | null;
 }
-
+type assets = {
+  [id: string]: Asset[];
+};
 export interface InitialState {
-  network: string;
-  assets: Asset[];
+  assets: assets;
   isLoadingAssets: boolean;
 }
 
-export type SelectedChain = Chain | null;
+type SelectedChain = {
+  [id: string]: chain;
+};
+type chain = {
+  isTestnet?: boolean;
+  type: "wasm" | "evm" | "ol";
+};
 
 export interface LoadAssetParams {
   api: API;
@@ -45,7 +52,7 @@ export interface LoadAssetParams {
 
 export interface AssetContext {
   state: InitialState;
-  loadAssets: (props: LoadAssetParams) => void;
+  // loadAssets: (props: LoadAssetParams) => void;
 }
 
 export type Action =
@@ -58,27 +65,32 @@ export type Action =
   | {
       type: "set-assets";
       payload: {
-        network: string;
-        assets: Asset[];
-      };
-    }
-  | {
-      type: "update-assets";
-      payload: {
-        network: string;
-        assets: Assset[];
-      };
-    }
-  | {
-      type: "update-one-asset";
-      payload: {
-        asset: {
-          updatedBy: "id" | "address" | "name";
-          updatedByValue: string;
-          balance: BN;
-          transferable?: BN;
-          reserved?: BN;
-          frozen?: BN;
-        };
+        assets: assets;
       };
     };
+// | {
+//     type: "update-assets";
+//     payload: {
+//       assets: assets;
+//     };
+//   }
+// | {
+//     type: "update-one-asset";
+//     payload: {
+//       asset: {
+//         updatedBy: "id" | "address" | "name";
+//         updatedByValue: string;
+//         balance: BN;
+//         transferable?: BN;
+//         reserved?: BN;
+//         frozen?: BN;
+//       };
+//       networkId: string
+//     };
+// //   }
+//   | {
+//     type: "update-one-network-assets";
+//     payload: {
+//       network: string;
+//       assets: Asset[];
+//     };

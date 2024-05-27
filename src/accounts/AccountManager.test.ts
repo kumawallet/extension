@@ -191,6 +191,7 @@ describe("AccountManager", () => {
           key: `${AccountType.EVM}-0x1234`,
           deriveKeyPair: () => "0x12345",
         },
+        isDerivable: true,
       };
 
       const result = await AccountManager.addAccount(
@@ -204,6 +205,7 @@ describe("AccountManager", () => {
         name: "Account 1",
         address: "0x12345",
         keyring: undefined,
+        isDerivable: true,
       });
     });
   });

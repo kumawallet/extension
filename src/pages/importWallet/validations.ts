@@ -4,7 +4,7 @@ import {
   passwordValidationScheme,
 } from "@src/components/accountForm/validations";
 import { Wallet } from "ethers";
-import { object, string } from "yup";
+import { array, object, string } from "yup";
 
 const privateKeyOrSeedValidation = object({
   type: string().required(),
@@ -35,6 +35,9 @@ const privateKeyOrSeedValidation = object({
       );
     }
   ),
+  accountTypesToImport: array().test("", "", (value) => {
+    return value && value?.length > 0;
+  }),
 });
 
 export const validationSteps = [
@@ -55,4 +58,5 @@ export type ImportWalletFormValues = {
   password: string;
   confirmPassword: string;
   agreeWithTerms: boolean;
+  accountTypesToImport: string[];
 };

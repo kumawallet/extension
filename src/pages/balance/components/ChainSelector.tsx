@@ -1,4 +1,4 @@
-import { Fragment, ReactElement, useState } from "react";
+import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,9 @@ import { ShowTestnets } from "./ShowTestnets";
 import { ChainsState } from "@src/types";
 import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
+import { Network } from "../../../components/icons/Network";
+import { messageAPI } from "@src/messageAPI/api";
+import { Switch } from "@headlessui/react";
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -15,7 +18,7 @@ const canShowTestnetToggle = (
 
   if (haveCustom && chainGroup.title === "custom") {
     return true;
-  } else if (chainGroup.title === "evm_based") {
+  } else if (chainGroup.title === "move") {
     return true;
   }
 
@@ -24,35 +27,51 @@ const canShowTestnetToggle = (
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
-  const [isOpen, setIsOpen] =  useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain },
-    setSelectNetwork,
   } = useNetworkContext();
 
+  const updateSelectNetwork = async (
+    id: string,
+    type: "wasm" | "evm" | "ol",
+    isTestnet?: boolean
+  ) => {
+    if (Object.keys(selectedChain).includes(id)) {
+      await messageAPI.deleteSelectChain({ id });
+    } else await messageAPI.setNetwork({ id, isTestnet, type });
+  };
+  const validateTestnet = () => {
+    const selected = Object.keys(selectedChain).filter(
+      (chain) => selectedChain[chain].isTestnet
+    );
+    if (selected.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
   return (
     <>
-       { isOpen ? <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" onClick={() =>setIsOpen(false)} /> : null }
+      {isOpen ? (
+        <div
+          className="fixed inset-0 bg-black/25 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      ) : null}
       <Menu>
-        
-      
         <Menu.Button
           data-testid="chain-button"
-          className="flex bg-[#212529] gap-2 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
           onClick={() => setIsOpen(true)}
         >
-          <img
-            src={selectedChain?.logo}
-            width={24}
-            height={24}
-            className="object-cover rounded-full"
-          />
+          <Network size="22" className="my-[0.15rem]" />
           <p className="overflow-hidden text-ellipsis mr-1">
-            {selectedChain?.name}
+            {t("chain_selector.title")}
           </p>
         </Menu.Button>
-        
+
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"
@@ -62,26 +81,31 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          
-          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh)] max-w-lg top-10 w-full bg-[#2C3137] outline-0 z-50">
-          
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-10 w-full bg-[#2C3137] outline-0 z-50">
             <div className=" px-8 py-2 pt-2 text-start">
-              
               <div className="relativeflex flex-col gap-1 py-2 mt-2 ">
-                <Menu.Button data-testid="chain-button" className="absolute top-6 right-6" onClick={()=>setIsOpen(false)}>
-                  <TfiClose  className="font-thin text-[0.7rem]" />
+                <Menu.Button
+                  data-testid="chain-button"
+                  className="absolute top-6 right-6"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <TfiClose className="font-thin text-[0.7rem]" />
                 </Menu.Button>
-                <p className="text-base font-light mb-2">{t("chain_selector.title")}</p>
-                <p className="text-xs opacity-80 mb-2 font-light">{t("chain_selector.description")}</p>
+                <p className="text-base font-light mb-2">
+                  {t("chain_selector.title")}
+                </p>
+                <p className="text-xs opacity-80 mb-2 font-light">
+                  {t("chain_selector.description")}
+                </p>
                 <div className="relative">
-                    <input
-                      type="text"
-                      placeholder={t("chain_selector.search") || "Search"}
-                      value={search}
-                      onChange={({ target }) => setSearch(target.value)}
-                      className="w-full bg-[#212529] border-[0.02rem] border-gray-300 rounded-lg placeholder:text-white placeholder:font-light placeholder:opacity-80 text-white pl-8 pr-5 py-3"
-                    />
-                    <CiSearch className="absolute text-base top-1/2 left-3 transform font-mediums -translate-y-1/2 text-white" />
+                  <input
+                    type="text"
+                    placeholder={t("chain_selector.search") || "Search"}
+                    value={search}
+                    onChange={({ target }) => setSearch(target.value)}
+                    className="w-full bg-[#212529] border-[0.02rem] border-gray-300 rounded-lg placeholder:text-white placeholder:font-light placeholder:opacity-80 text-white pl-8 pr-5 py-3"
+                  />
+                  <CiSearch className="absolute text-base top-1/2 left-3 transform font-mediums -translate-y-1/2 text-white" />
                 </div>
               </div>
               <div className="flex flex-col gap-4 mt-4">
@@ -92,11 +116,22 @@ export const ChainSelector = () => {
                       {chainGroup.chains.map((chain) => (
                         <Fragment key={chain.id}>
                           <button
-                            className={`flex items-center justify-between border ${selectedChain?.id === chain.id
+                            className={`flex items-center justify-between border ${
+                              selectedChain[chain.id]
                                 ? "border-green-500"
                                 : "border-gray-600"
-                              } rounded-lg py-3 px-4`}
-                            onClick={() => setSelectNetwork(chain)}
+                            } rounded-lg py-3 px-4`}
+                            disabled={
+                              Object.keys(selectedChain).length === 1 &&
+                              Object.keys(selectedChain)[0] === chain.id
+                            }
+                            onClick={() =>
+                              updateSelectNetwork(
+                                chain.id,
+                                chain.type,
+                                chain.isTestnet
+                              )
+                            }
                           >
                             <div className="flex items-center gap-3">
                               {chain.isCustom ? (
@@ -114,20 +149,48 @@ export const ChainSelector = () => {
                               )}
                               <span className="text-base">{chain.name}</span>
                             </div>
+                            <div className="flex items-center">
+                              <Switch
+                                checked={
+                                  Object.prototype.hasOwnProperty.call(
+                                    selectedChain,
+                                    chain.id
+                                  )
+                                    ? true
+                                    : false
+                                }
+                                className={`${
+                                  Object.prototype.hasOwnProperty.call(
+                                    selectedChain,
+                                    chain.id
+                                  )
+                                    ? `bg-green-500`
+                                    : "bg-custom-gray-bg"
+                                } relative inline-flex items-center h-2 rounded-full w-7 transition-colors duration-200`}
+                              >
+                                <span
+                                  className={`${
+                                    Object.prototype.hasOwnProperty.call(
+                                      selectedChain,
+                                      chain.id
+                                    ) && "translate-x-4"
+                                  } inline-block w-3 h-3 transform bg-white rounded-full transition-transform duration-200`}
+                                />
+                              </Switch>
+                            </div>
                           </button>
                         </Fragment>
                       ))}
                     </div>
 
                     {canShowTestnetToggle(chains, chainGroup) && (
-                      <ShowTestnets />
+                      <ShowTestnets validateSwitch={validateTestnet()} />
                     )}
                   </div>
                 ))}
               </div>
             </div>
-            </Menu.Items>
-            
+          </Menu.Items>
         </Transition>
       </Menu>
     </>

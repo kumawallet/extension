@@ -1,5 +1,7 @@
 import { isHex } from "@polkadot/util";
 import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
+import { ASSETS_ICONS } from "@src/constants/assets-icons";
+import { PASSWORD_REGEX, PRIVATE_KEY_OR_SEED_REGEX } from "./constants";
 
 export const cropAccount = (account: string, length = 4) => {
   if (!account) return "";
@@ -33,7 +35,7 @@ export const transformAddress = (
 ) => {
   if (!address) return "";
 
-  if (address.startsWith("0x")) return address;
+  if (address.startsWith("0x") || address.length === 64) return address;
 
   const publicKey = decodeAddress(address);
 
@@ -70,4 +72,31 @@ export const isValidAddress = (
   } catch (error) {
     return false;
   }
+};
+
+export const iconURL = (type: string) => {
+  if (type.toLowerCase().includes("wasm")) {
+    return ASSETS_ICONS["DOT"];
+  }
+
+  if (type.toLowerCase().includes("evm")) {
+    return ASSETS_ICONS["ETH"];
+  }
+
+  if (type.toLowerCase().includes("ol")) {
+    return ASSETS_ICONS["OL"];
+  }
+
+  return "";
+};
+
+export const validatePasswordFormat = (password: string) => {
+  if (!password) throw new Error("password_required");
+  if (!PASSWORD_REGEX.test(password)) throw new Error("password_invalid");
+};
+
+export const validatePrivateKeyOrSeedFormat = (privateKeyOrSeed: string) => {
+  if (!privateKeyOrSeed) throw new Error("private_key_or_seed_required");
+  if (!PRIVATE_KEY_OR_SEED_REGEX.test(privateKeyOrSeed))
+    throw new Error("private_key_or_seed_invalid");
 };

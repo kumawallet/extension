@@ -5,10 +5,8 @@ describe("ImportedWASMKeyring", () => {
   beforeAll(() => {
     vi.mock("@polkadot/ui-keyring", () => ({
       default: {
-        addUri: vi.fn().mockReturnValue({
-          pair: {
-            address: "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
-          },
+        createFromUri: vi.fn().mockReturnValue({
+          address: "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
         }),
       },
     }));
@@ -29,6 +27,7 @@ describe("ImportedWASMKeyring", () => {
       keyPair: {
         key: "seed",
       },
+      isDerivable: true,
     });
   });
 

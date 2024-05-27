@@ -1,9 +1,11 @@
 import { useState } from "react"
-import { SeedGrid } from "@src/components/accountForm"
+import { SeedGrid, SelectAccountType } from "@src/components/accountForm"
 import { useFormContext } from "react-hook-form"
 import { ImportWalletFormValues } from "../validations"
 import { PiEyeLight } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
+import { AccountType } from "@src/accounts/types";
+import { ASSETS_ICONS } from "@src/constants/assets-icons";
 
 const WordOption = ({
   text,
@@ -67,6 +69,31 @@ export const ImportFromSeed = () => {
         </p>
       </button>
       {errors.privateKeyOrSeed?.message && <p className="text-red-500 text-xs">{t(errors.privateKeyOrSeed?.message)}</p>}
+      <SelectAccountType
+        containerClassname="mt-2"
+        type="import"
+        options={[
+          {
+            label: "Polkadot",
+            value: AccountType.WASM,
+            logo: ASSETS_ICONS['DOT']
+          },
+          {
+            label: "Ethereum",
+            value: AccountType.EVM,
+            logo: ASSETS_ICONS['ETH']
+          },
+          {
+            label: "Open Libra",
+            value: AccountType.OL,
+            logo: ASSETS_ICONS['OL']
+
+          }
+        ]}
+        onChangeOptions={(values) => {
+          setValue("accountTypesToImport", values)
+        }}
+      />
     </>
   )
 }

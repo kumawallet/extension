@@ -8,9 +8,7 @@ import {
   Receive,
   SignIn,
   ForgotPass,
-  SignMessage,
   Welcome,
-  CallContract,
   Swap,
   CreateWallet,
   ImportWallet,
@@ -32,6 +30,7 @@ import {
   CREATE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
+  BALANCE_ACCOUNTS,
   RECEIVE,
   SEND,
   SETTINGS_BUG,
@@ -50,12 +49,11 @@ import {
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
-import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 import { messageAPI } from "@src/messageAPI/api";
 import { useLoading } from "@src/hooks";
-import { getWebAPI } from "@src/utils/env";
+import { BalanceAccounts } from "@src/pages/balance/components/BalanceAccounts"
+import { Browser } from "@src/utils/constants";
 
-const webAPI = getWebAPI();
 
 const getInitialEntry = (query: string) => {
   if (query.includes("sign_message")) {
@@ -86,11 +84,11 @@ export const Routes = () => {
       const alreadySignedUp = await messageAPI.alreadySignedUp();
 
       if (!alreadySignedUp) {
-        const tab = await webAPI.tabs.getCurrent();
+        const tab = await Browser.tabs.getCurrent();
 
         if (!tab) {
-          const url = webAPI.runtime.getURL(`src/entries/newtab/index.html`);
-          webAPI.tabs.create({ url });
+          const url = Browser.runtime.getURL(`src/entries/newtab/index.html`);
+          Browser.tabs.create({ url });
           window.close();
           return;
         }
@@ -140,34 +138,6 @@ export const Routes = () => {
     await messageAPI.unlock(); // Timeout update(AutoLock)
   }, 30000);
 
-  if (location.search.includes("origin=kuma")) {
-    return (
-      <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
-        <RRoutes>
-          {location.search.includes("sign_message") && (
-            <Route
-              path={SIGN_MESSAGE}
-              element={
-                <ValidationWrapper query={location.search}>
-                  <SignMessage />
-                </ValidationWrapper>
-              }
-            />
-          )}
-          {location.search.includes("call_contract") && (
-            <Route
-              path={CALL_CONTRACT}
-              element={
-                <ValidationWrapper query={location.search}>
-                  <CallContract />
-                </ValidationWrapper>
-              }
-            />
-          )}
-        </RRoutes>
-      </MemoryRouter>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -193,6 +163,7 @@ export const Routes = () => {
         <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
         <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
+        <Route path={BALANCE_ACCOUNTS} element={<BalanceAccounts />} />
 
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />

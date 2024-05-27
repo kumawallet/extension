@@ -1,7 +1,8 @@
 import {
   RequestSignIn,
   RequestValidatePassword,
-  RequestSetAutoLock
+  RequestSetAutoLock,
+  RequestShowKey,
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 
@@ -18,17 +19,15 @@ export const authMessages = {
   validatePassword: (param: RequestValidatePassword) => {
     return sendMessage("pri(auth.validatePassword)", param);
   },
-  unlock: () =>{
-    return sendMessage("pri(auth.unlock)")
+  unlock: () => {
+    return sendMessage("pri(auth.unlock)");
   },
-  setAutoLock : (param: RequestSetAutoLock) => { 
-    return sendMessage("pri(auth.setAutoLock)", param)
-  }
-  ,
-  getLock : () =>{
-    return sendMessage("pri(auth.getLock)")
-  }
-  ,
+  setAutoLock: (param: RequestSetAutoLock) => {
+    return sendMessage("pri(auth.setAutoLock)", param);
+  },
+  getLock: () => {
+    return sendMessage("pri(auth.getLock)");
+  },
   signOut: () => {
     return sendMessage("pri(auth.signOut)");
   },
@@ -39,7 +38,7 @@ export const authMessages = {
   isSessionActive: () => {
     return sendMessage("pri(auth.isSessionActive)");
   },
-  showKey: () => {
-    return sendMessage("pri(auth.showKey)");
+  showKey: (params: RequestShowKey) => {
+    return sendMessage("pri(auth.showKey)", params);
   },
 };

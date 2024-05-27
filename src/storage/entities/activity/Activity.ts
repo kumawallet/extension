@@ -1,6 +1,5 @@
 import { AccountKey } from "@src/accounts/types";
 import BaseEntity from "../BaseEntity";
-import Network from "../Network";
 import SelectedAccount from "../SelectedAccount";
 import Record from "./Record";
 import { RecordStatus } from "./types";
@@ -30,14 +29,21 @@ export default class Activity extends BaseEntity {
     await Activity.set<Activity>(activity);
   }
 
-  static async getRecords(): Promise<Record[]> {
-    const { key } = (await SelectedAccount.get<SelectedAccount>()) || {};
-    if (!key) throw new Error("failed_to_add_record");
+  static async getRecords({
+    address,
+    networkNames,
+  }: {
+    address: string;
+    networkNames: string[];
+  }): Promise<Record[]> {
     const activity = await Activity.get<Activity>();
-    if (!activity) throw new Error("failed_to_get_records");
-    const { chain } = (await Network.get<Network>()) || {};
-    if (!chain || !chain.name) throw new Error("failed_to_get_records");
-    return activity.getRecords(key, chain.name);
+    if (!activity) return [];
+
+    const records = Object.values(activity.data[address] || {});
+
+    return records.filter((r) =>
+      [r.originNetwork, r.targetNetwork].some((n) => networkNames.includes(n))
+    );
   }
 
   static async updateRecordStatus(
@@ -65,14 +71,14 @@ export default class Activity extends BaseEntity {
     };
   }
 
-  getRecords(key: AccountKey, network: string): Record[] {
-    const records = this.data[key] ? Object.values(this.data[key]) : [];
+  // getRecords(key: AccountKey, network: string): Record[] {
+  //   const records = this.data[key] ? Object.values(this.data[key]) : [];
 
-    return records
-      .filter((r) => {
-        // @ts-expect-error -- *
-        return r.originNetwork?.toLowerCase() === network?.toLowerCase();
-      })
-      .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));
-  }
+  //   return records
+  //     .filter((r) => {
+  //       // @ts-expect-error -- *
+  //       return r.originNetwork?.toLowerCase() === network?.toLowerCase();
+  //     })
+  //     .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));
+  // }
 }

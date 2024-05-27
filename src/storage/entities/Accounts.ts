@@ -1,9 +1,9 @@
-import { AccountKey, AccountValue } from "@src/accounts/types";
+import { AccountKey, AccountTypes, AccountValue } from "@src/accounts/types";
 import BaseEntity from "./BaseEntity";
 import Account from "./Account";
 
 export default class Accounts extends BaseEntity {
-  data: { [key: AccountKey]: Account };
+  data: { [key: AccountTypes]: Account };
 
   constructor() {
     super();
@@ -64,28 +64,28 @@ export default class Accounts extends BaseEntity {
   }
 
   add(account: Account) {
-    this.data[account.key] = account;
+    this.data[account.key as AccountTypes] = account;
   }
 
   remove(key: AccountKey) {
-    delete this.data[key];
+    delete this.data[key as AccountTypes];
   }
 
   get(key: AccountKey) {
-    if (!this.data[key]) return undefined;
-    return new Account(key, this.data[key].value);
+    if (!this.data[key as AccountTypes]) return undefined;
+    return new Account(key, this.data[key as AccountTypes].value);
   }
 
   getAll() {
-    return Object.keys(this.data).map((key) => this.data[key as AccountKey]);
+    return Object.keys(this.data).map((key) => this.data[key as AccountTypes]);
   }
 
   update(key: AccountKey, value: AccountValue) {
-    this.data[key].value = value;
+    this.data[key as AccountTypes].value = value;
   }
 
   alreadyExists(key: AccountKey) {
-    return this.data[key] !== undefined;
+    return this.data[key as AccountTypes] !== undefined;
   }
 
   first() {

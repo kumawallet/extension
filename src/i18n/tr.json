@@ -142,7 +142,8 @@
     "accounts": {
       "accounts": "Hesaplar",
       "import": "Hesap İçe Aktar",
-      "create": "Hesap Oluştur"
+      "create": "Hesap Oluştur",
+      "all_accounts": "Tüm Hesaplar"
     },  
     "send": "Gönder",
     "swap": "Değiştir",
@@ -301,7 +302,8 @@
     "invalid_method": "Geçersiz yöntem",
     "invalid_params": "Geçersiz parametreler",
     "invalid_abi": "Geçersiz ABI",
-    "contract_error": "Sözleşme ile bir hata oluştu"
+    "contract_error": "Sözleşme ile bir hata oluştu",
+    "select_account": "Hesap Seç"
   },
   "manage_assets": {
     "title": "Varlıkları Yönet",

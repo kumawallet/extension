@@ -14,4 +14,6 @@ export default abstract class Keyring {
   }
 
   abstract getKey(address: string): string;
+
+  abstract getDerivedPath(seed: string, path: number): string;
 }
