@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 import AccountManager from "./AccountManager";
-import { AccountValue } from "./types";
+import { AccountValue, KeyringType } from "./types";
 import { AccountKey, AccountType } from "@src/accounts/types";
 import {
   accountsMocks,
@@ -195,7 +195,7 @@ describe("AccountManager", () => {
       };
 
       const result = await AccountManager.addAccount(
-        newAccountForm.type,
+        newAccountForm.type as KeyringType,
         newAccountForm.seed,
         newAccountForm.name,
         newAccountForm.keyring as unknown as HDKeyring
@@ -405,11 +405,7 @@ describe("AccountManager", () => {
       const ethers = await import("ethers");
       ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
 
-      const MOCK_SEED =
-        "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match";
-
       const result = await AccountManager.changePassword(
-        MOCK_SEED,
         "Test.123",
         "Test.123"
       );
@@ -421,10 +417,7 @@ describe("AccountManager", () => {
       Backup.get = vi.fn().mockImplementation(() => null);
 
       try {
-        const MOCK_SEED =
-          "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match";
-
-        await AccountManager.changePassword(MOCK_SEED, "Test.123", "Test.123");
+        await AccountManager.changePassword("Test.123", "Test.123");
       } catch (error) {
         expect(String(error)).toEqual("Error: backup_not_found");
       }

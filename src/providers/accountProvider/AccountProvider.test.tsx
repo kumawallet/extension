@@ -158,7 +158,7 @@ describe("AccountProvider", () => {
           address: "0x1234",
         },
       });
-      expect(result.selectedAccount.value.address).toEqual("0x1234");
+      expect(result.selectedAccount?.value!.address).toEqual("0x1234");
     });
 
     it("should update account name", () => {
@@ -182,8 +182,8 @@ describe("AccountProvider", () => {
           accountKey: "key",
         },
       });
-      expect(result.accounts[0].value.name).toEqual("newName");
-      expect(result.selectedAccount.value.name).toEqual("newName");
+      expect(result.accounts[0].value!.name).toEqual("newName");
+      expect(result.selectedAccount?.value!.name).toEqual("newName");
     });
   });
 

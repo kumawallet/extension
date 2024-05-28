@@ -8,6 +8,8 @@ export enum AccountType {
   ALL = "ALL",
 }
 
+export type KeyringType = Exclude<AccountType, AccountType.ALL>;
+
 export type AccountTypes = `${AccountType}-${string}`;
 
 export type AccountKey = `${AccountType}-${string}` | "ALL";

@@ -17,7 +17,12 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import { AccountKey, AccountType, AccountTypes } from "@src/accounts/types";
+import {
+  AccountKey,
+  AccountType,
+  AccountTypes,
+  KeyringType,
+} from "@src/accounts/types";
 import { version } from "@src/utils/env";
 import {
   MessageTypes,
@@ -429,21 +434,21 @@ export default class Extension {
 
     if (!accounts) return undefined;
 
-    const account = accounts.find(({ value }) => value.address === address);
+    const account = accounts.find(({ value }) => value?.address === address);
 
     if (!account) return undefined;
 
-    if (account?.value.parentAddress) {
-      const keyring = await Vault.getKeyring(account.type);
+    if (account?.value?.parentAddress) {
+      const keyring = await Vault.getKeyring(account.type as KeyringType);
       // return keyring.getKey(address);
 
       const seed = keyring.getKey(account?.value.parentAddress);
 
-      const derived = keyring.getDerivedPath(seed, account?.value.path);
+      const derived = keyring.getDerivedPath(seed, account?.value?.path || 0);
 
       return derived;
     } else {
-      const keyring = await Vault.getKeyring(account.type);
+      const keyring = await Vault.getKeyring(account.type as KeyringType);
       return keyring.getKey(address);
     }
   }
@@ -466,7 +471,7 @@ export default class Extension {
 
     // @ts-expect-error --- migration
 
-    Object.keys(vault.keyrings).forEach(async (key: AccountType) => {
+    Object.keys(vault.keyrings).forEach(async (key: KeyringType) => {
       const _keyring = vault.keyrings[key];
 
       // @ts-expect-error --- migration
@@ -532,7 +537,7 @@ export default class Extension {
     if (!accounts) return [];
 
     const accountWithoutParentAddress = accounts.filter(
-      ({ value }) => !value.parentAddress || value.isDerivable
+      ({ value }) => !value?.parentAddress || value.isDerivable
     );
 
     return accountWithoutParentAddress;
@@ -553,7 +558,11 @@ export default class Extension {
     type,
     address,
   }: RequestDeriveAccount): Promise<Account> {
-    const account = await AccountManager.derive(name, type, address);
+    const account = await AccountManager.derive(
+      name,
+      type as KeyringType,
+      address
+    );
     await this.setSelectedAccount(account);
     return account;
   }
@@ -741,7 +750,9 @@ export default class Extension {
 
     const ownAccounts = accounts
       .getAll()
-      .map((account) => new Contact(account.value.name, account.value.address));
+      .map(
+        (account) => new Contact(account.value!.name, account.value!.address)
+      );
 
     const contacts = registry.getAllContacts();
 
@@ -784,7 +795,7 @@ export default class Extension {
 
     const account = allAccounts
       ?.getAll()
-      .find(({ value }) => value.address === address);
+      .find(({ value }) => value?.address === address);
 
     if (!account) return;
 

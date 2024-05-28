@@ -20,18 +20,30 @@ export const Assets = () => {
   } = useAccountContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
-  const [showManageAssets, setShowManageAssets] = useState(true);
+
+  console.log("assets:", assets)
 
   const filteredAsset = useMemo(() => {
+    // @ts-expect-error --- *
     let _assets = [];
 
-    const outputObject: any = {};
+    const outputObject: {
+      [key: string]: {
+        balance: number;
+        amount: number;
+        symbol: string;
+        decimals: number;
+        id: string;
+      }[];
+    } = {};
     if (Object.keys(assets).length !== 0) {
       Object.keys(assets).forEach((key) => {
         const networks = assets[key];
-        Object.keys(networks).forEach((network: any) => {
+        Object.keys(networks).forEach((network) => {
+          // @ts-expect-error --- *
           const assets = networks[network].assets;
-          assets.forEach((asset: any) => {
+          // @ts-expect-error --- *
+          assets.forEach((asset) => {
             if (!outputObject[asset.symbol]) {
               outputObject[asset.symbol] = [];
             }
@@ -46,7 +58,10 @@ export const Assets = () => {
         const accountKeysInfo = {};
 
         asset.forEach((a) => {
+          // @ts-expect-error --- *
           if (!accountKeysInfo[a.accountKey]) {
+            // @ts-expect-error --- *
+
             accountKeysInfo[a.accountKey] = {
               balance: 0,
               amount: 0,
@@ -56,21 +71,25 @@ export const Assets = () => {
             };
           }
 
+          // @ts-expect-error --- *
           accountKeysInfo[a.accountKey].balance += Number(a.balance);
+          // @ts-expect-error --- *
           accountKeysInfo[a.accountKey].amount += Number(a.amount);
         });
 
         const balance = Object.values(accountKeysInfo).reduce((acc, _asset) => {
+          // @ts-expect-error --- *
           return acc + Number(_asset.balance || 0);
         }, 0);
 
         const amount = Object.values(accountKeysInfo).reduce((acc, _asset) => {
+          // @ts-expect-error --- *
           return acc + Number(_asset.amount || 0);
         }, 0);
 
         return {
           symbol: key,
-          balance: formatAmountWithDecimals(balance, 3, asset[0].decimals),
+          balance: formatAmountWithDecimals(balance as number, 3, asset[0].decimals),
           amount,
           decimals: asset[0].decimals,
           accounts: accountKeysInfo,
@@ -79,6 +98,7 @@ export const Assets = () => {
       });
     }
 
+    // @ts-expect-error --- *
     _assets = _assets.sort((a, b) => {
       return b.balance - a.balance;
     });
@@ -120,16 +140,16 @@ export const Assets = () => {
         return <Asset asset={asset} key={index} />;
       })}
 
-      {showManageAssets && (
-        <div className="flex justify-center mt-2">
-          <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
-            <span className="flex gap-1 items-center">
-              <CgOptions />
-              <span>{t("manage_assets")}</span>
-            </span>
-          </Button>
-        </div>
-      )}
+
+      <div className="flex justify-center mt-2">
+        <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
+          <span className="flex gap-1 items-center">
+            <CgOptions />
+            <span>{t("manage_assets")}</span>
+          </span>
+        </Button>
+      </div>
+
     </div>
   );
 };

@@ -131,7 +131,10 @@ describe("Activity", () => {
       _SelectedAccount.get = get2;
 
       try {
-        await Activity.getRecords();
+        await Activity.getRecords({
+          address: "test",
+          networkNames: ["test"],
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_add_record");
       }
@@ -151,7 +154,10 @@ describe("Activity", () => {
       _BaseEntity.get = get;
 
       try {
-        await Activity.getRecords();
+        await Activity.getRecords({
+          address: "test",
+          networkNames: ["test"],
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_get_records");
       }
@@ -174,7 +180,10 @@ describe("Activity", () => {
       _Network.get = vi.fn().mockReturnValue({ chain: undefined });
 
       try {
-        await Activity.getRecords();
+        await Activity.getRecords({
+          address: "test",
+          networkNames: ["test"],
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_get_records");
       }

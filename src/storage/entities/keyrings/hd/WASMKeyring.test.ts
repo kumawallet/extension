@@ -30,7 +30,7 @@ describe("WASMKeyring", () => {
   it("should return address", async () => {
     const wasmKeyring = new WASMKeyring(mockMnemonic);
 
-    const address = await wasmKeyring.getAddress(mockMnemonic);
+    const address = await wasmKeyring.getAddress(mockMnemonic, 0);
     expect(address).toEqual("13oi66HJu6d8AnNWQ1U2WFtt6P8APaj6zHTNah3xLB8TpzHT");
   });
 

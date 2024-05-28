@@ -171,7 +171,7 @@ export default class AssetsBalance {
 
             evmProvider.off("block");
             evmProvider.on("block", () => {
-              evmProvider.getBalance(account.value.address).then((balance) => {
+              evmProvider.getBalance(account.value!.address).then((balance) => {
                 this.updateOneAsset(
                   account.key,
                   { balance: balance.toString() },
@@ -186,7 +186,7 @@ export default class AssetsBalance {
           {
             const olProvider = api.provider as OlProvider;
             olProvider.onNewBlock(() => {
-              olProvider.getBalance(account.value.address).then((balance) => {
+              olProvider.getBalance(account.value!.address).then((balance) => {
                 this.updateOneAsset(
                   account.key,
                   { balance: balance.toString() },
@@ -333,7 +333,7 @@ export default class AssetsBalance {
           const { assets, unsubs } = await getWasmAssets(
             api.provider as ApiPromise,
             chain.id,
-            account?.value?.address,
+            account?.value?.address || "",
             (
               assetId,
               amounts: {

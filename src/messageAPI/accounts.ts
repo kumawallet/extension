@@ -39,7 +39,7 @@ export const accountMessages = {
   deriveAccount: (params: RequestDeriveAccount) => {
     return sendMessage("pri(accounts.deriveAccount)", params);
   },
-  setSelectedAccount: (params: Account) => {
+  setSelectedAccount: (params: Account | null) => {
     return sendMessage("pri(accounts.setSelectedAccount)", params);
   },
   getSelectedAccount: () => {

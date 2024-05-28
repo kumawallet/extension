@@ -236,12 +236,7 @@ describe("Auth", () => {
         password: oldPassword,
       });
 
-      const password = await Auth.restorePassword(
-        "{backup}",
-        oldPassword,
-        fakePassword,
-        "recoveryPhrase"
-      );
+      const password = await Auth.restorePassword(oldPassword, fakePassword);
       expect(password).toEqual(undefined);
     });
 

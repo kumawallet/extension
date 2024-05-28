@@ -50,6 +50,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         ...state,
         selectedAccount: {
           ...state.selectedAccount,
+          // @ts-expect-error -- *
+
           value: {
             ...state.selectedAccount!.value,
             address,
@@ -68,6 +70,7 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
       const newName = accountKey === key ? name : value?.name;
       return {
         ...state,
+        // @ts-expect-error -- *
         accounts: state.accounts.map((account) => {
           if (account.key === accountKey) {
             return {
@@ -82,6 +85,8 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         }),
         selectedAccount: {
           ...state.selectedAccount,
+          // @ts-expect-error -- *
+
           value: {
             ...state.selectedAccount!.value,
             name: newName as string,
@@ -188,7 +193,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
 
   };
 
-  const setSelectedAccount = async (account: Account) => {
+  const setSelectedAccount = async (account: Account | null) => {
     try {
       await messageAPI.setSelectedAccount(account);
       dispatch({

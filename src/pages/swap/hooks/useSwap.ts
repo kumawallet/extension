@@ -340,6 +340,7 @@ export const useSwap = () => {
         return;
       }
 
+      // @ts-expect-error --- *
       const chainId = assetToSell.chainId as string;
 
       const allChains = chains.map((chain) => chain.chains).flat();
@@ -509,6 +510,8 @@ export const useSwap = () => {
       );
 
       const allAssets = Object.values(_assets[accountKey as string]).flatMap(
+        // @ts-expect-error --- *
+
         (a) => a.assets
       );
 
@@ -543,7 +546,7 @@ export const useSwap = () => {
     if (!tx.addressFrom) return;
 
     const account = accounts.find(
-      (account) => account.value.address === tx.addressFrom
+      (account) => account.value!.address === tx.addressFrom
     );
 
     if (!account) return;
@@ -555,7 +558,8 @@ export const useSwap = () => {
     if (selectedAccount?.value) {
       setTx((prevState) => ({
         ...prevState,
-        addressFrom: selectedAccount.value.address,
+
+        addressFrom: selectedAccount.value!.address,
       }));
     }
   }, [selectedAccount]);

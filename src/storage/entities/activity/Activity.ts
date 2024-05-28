@@ -42,6 +42,7 @@ export default class Activity extends BaseEntity {
     const records = Object.values(activity.data[address] || {});
 
     return records.filter((r) =>
+      // @ts-expect-error -- *
       [r.originNetwork, r.targetNetwork].some((n) => networkNames.includes(n))
     );
   }

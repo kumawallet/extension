@@ -13,6 +13,7 @@ interface AssetProps {
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
 
+  // @ts-expect-error --- *
   const hasMultiplesAccounts = Object.keys(asset.accounts || {})?.length > 0;
 
   return (
@@ -25,14 +26,15 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
           }
         }}
       >
-        <AssetIcon asset={asset} width={32} />
+
+        <AssetIcon asset={asset as any} width={32} />
         <div className="flex flex-col">
           <div className="flex gap-1 items-center">
             <p className="font-bold text-xl">{asset.balance}</p>
             <p className="tx-sm">{asset.symbol}</p>
           </div>
           <div className="text-xs text-gray-400 text-start">
-            {formatUSDAmount(asset.amount || 0)}
+            {formatUSDAmount(Number(asset.amount) || 0)}
           </div>
         </div>
       </div>

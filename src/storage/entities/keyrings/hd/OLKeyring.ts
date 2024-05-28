@@ -22,6 +22,10 @@ export default class OLKeyring extends HDKeyring {
     return `${key}${path}`;
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}/${path}`;
+  }
+
   static fromJSON(json: SupportedKeyring): OLKeyring {
     const { mnemonic, keyPairs } = json as HDKeyring;
     const keyring = new OLKeyring(mnemonic);

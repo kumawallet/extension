@@ -17,11 +17,11 @@ export const SendTxResume = () => {
     [t('network')]: (
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-1 h-full">
-          <img src={getValues("originNetwork").logo} width={12} />
+          <img src={getValues("originNetwork")?.logo} width={12} />
           <RxChevronRight size={12} />
-          <img src={getValues("targetNetwork").logo} width={12} />
+          <img src={getValues("targetNetwork")?.logo} width={12} />
         </div>
-        {getValues("originNetwork").id !== getValues("targetNetwork").id && (
+        {getValues("originNetwork")?.id !== getValues("targetNetwork")?.id && (
           <span className="text-xs">{t("transer_using_xcm")}</span>
         )}
       </div>

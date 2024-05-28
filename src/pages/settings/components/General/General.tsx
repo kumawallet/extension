@@ -10,11 +10,10 @@ import {
   Currency,
   Language,
   SettingKey,
-  SettingType,
 } from "@src/storage/entities/settings/types";
 import { Loading } from "@src/components/common";
 import { captureError } from "@src/utils/error-handling";
-import { useNetworkContext } from "@src/providers";
+// import { useNetworkContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
 import { topbarText, topbarIcon, topbarContainer } from '../../style/style'
 
@@ -26,9 +25,8 @@ export const General = () => {
   const [settings, setSettings] = useState([] as Setting[]);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState("");
-  const [showTestnets, setShowTestnets] = useState(false);
   const { showErrorToast } = useToast();
-  const { initializeNetwork } = useNetworkContext()
+  // const { initializeNetwork } = useNetworkContext()
 
   useEffect(() => {
     setIsLoading(true);
@@ -43,12 +41,8 @@ export const General = () => {
         ?.value as Language[];
       const currenciesSetting = getSettingByName(settings, SettingKey.CURRENCY)?.value as Currency[];
 
-      const showTestnetsSetting = getSettingByName(
-        settings,
-        SettingKey.SHOW_TESTNETS
-      )?.value as boolean;
+
       setSelectedLanguage(getSelectedLanguage(laguagesSetting));
-      setShowTestnets(showTestnetsSetting);
       setSelectedCurrency(getSelectedCurrency(currenciesSetting));
     } catch (error) {
       setSettings([]);

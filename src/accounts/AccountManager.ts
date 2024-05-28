@@ -5,7 +5,7 @@ import Account from "../storage/entities/Account";
 import Accounts from "../storage/entities/Accounts";
 import HDKeyring from "../storage/entities/keyrings/hd/HDKeyring";
 import { SupportedKeyring } from "../storage/entities/keyrings/types";
-import { AccountType, AccountKey, AccountValue } from "./types";
+import { AccountType, AccountKey, AccountValue, KeyringType } from "./types";
 import { getAccountType } from "../utils/account-utils";
 import ImportedEVMKeyring from "@src/storage/entities/keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "@src/storage/entities/keyrings/imported/ImportedWASMKeyring";
@@ -59,8 +59,8 @@ export default class AccountManager {
     } as AccountValue;
 
     if (parentAddress) {
-      value.parentAddress = parentAddress;
-      value.path = path;
+      value!.parentAddress = parentAddress;
+      value!.path = path;
     }
 
     const account = new Account(key, value);
@@ -72,7 +72,7 @@ export default class AccountManager {
   }
 
   static async addAccount(
-    type: AccountType,
+    type: KeyringType,
     seed: string,
     name: string,
     keyring?: HDKeyring
@@ -122,7 +122,7 @@ export default class AccountManager {
 
     const allAccounts = (await AccountManager.getAll())?.getAll() || [];
     const derivedAccounts = allAccounts.filter(
-      (account) => account.value.parentAddress === parentAddress
+      (account) => account.value?.parentAddress === parentAddress
     );
 
     let found = false;
@@ -130,7 +130,7 @@ export default class AccountManager {
     if (derivedAccounts.length > 0) {
       do {
         const account = derivedAccounts.find(
-          (account) => account.value.path === path
+          (account) => account.value?.path === path
         );
         if (!account) {
           found = true;
@@ -147,7 +147,7 @@ export default class AccountManager {
 
   static async derive(
     name: string,
-    type: AccountType,
+    type: KeyringType,
     address: string
   ): Promise<Account> {
     const keyring = (await Vault.getKeyring(type)) as HDKeyring;
@@ -177,7 +177,7 @@ export default class AccountManager {
   static async changeName(key: AccountKey, newName: string): Promise<Account> {
     const account = await AccountManager.getAccount(key);
     if (!account) throw new Error("account_not_found");
-    account.value.name = newName;
+    account.value!.name = newName;
     return Accounts.update(account);
   }
 

@@ -1,6 +1,6 @@
 import Storage from "../Storage";
 import Auth from "../Auth";
-import { AccountType } from "@src/accounts/types";
+import { AccountType, KeyringType } from "@src/accounts/types";
 import { Keyrings, SupportedKeyring } from "./keyrings/types";
 import EVMKeyring from "./keyrings/hd/EVMKeyring";
 import WASMKeyring from "./keyrings/hd/WASMKeyring";
@@ -87,12 +87,11 @@ export default class Vault {
   static fromData(
     vault: Vault,
     keyrings: {
-      [key in AccountType]: SupportedKeyring | undefined;
+      [key in KeyringType]: SupportedKeyring | undefined;
     }
   ): void {
     Object.keys(keyrings).forEach((keyringType: string) => {
-      const keyring = keyrings[keyringType as AccountType];
-      // const mnemonic = (keyring as HDKeyring)?.mnemonic;
+      const keyring = keyrings[keyringType as KeyringType];
       if (keyring) {
         switch (keyringType) {
           case AccountType.EVM:
@@ -112,7 +111,6 @@ export default class Vault {
             break;
           case AccountType.IMPORTED_OL:
             vault.keyrings[keyringType] = ImportedOLKeyring.fromJSON(keyring);
-
             break;
         }
       }
@@ -127,12 +125,12 @@ export default class Vault {
 
   static async saveKeyring(keyring: SupportedKeyring) {
     const vault = await Vault.getInstance();
-    vault.keyrings[keyring.type] = keyring;
+    vault.keyrings[keyring.type as KeyringType] = keyring;
     await Vault.set(vault);
   }
 
   static async getKeyring(
-    type: AccountType,
+    type: Exclude<AccountType, AccountType.ALL>,
     createWithMnemonic?: string
   ): Promise<SupportedKeyring> {
     const vault = await Vault.getInstance();
@@ -173,15 +171,15 @@ export default class Vault {
     return Object.values(this.keyrings).every((keyring) => !keyring);
   }
 
-  setKeyring(type: AccountType, keyring: SupportedKeyring) {
+  setKeyring(type: KeyringType, keyring: SupportedKeyring) {
     this.keyrings[type] = keyring;
   }
 
-  getKeyring(type: AccountType) {
+  getKeyring(type: KeyringType) {
     return this.keyrings[type];
   }
 
-  removeKeyring(type: AccountType) {
+  removeKeyring(type: KeyringType) {
     delete this.keyrings[type];
   }
 
@@ -189,7 +187,7 @@ export default class Vault {
     this.keyrings = keyrings;
   }
 
-  alreadyExists(type: AccountType) {
+  alreadyExists(type: KeyringType) {
     return this.keyrings[type] !== undefined;
   }
 }

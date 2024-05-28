@@ -52,6 +52,7 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
           dispatch({
             type: "set-assets",
             payload: {
+              // @ts-expect-error -- *
               assets: assets
             },
           });

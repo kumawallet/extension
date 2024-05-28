@@ -63,7 +63,7 @@ export const CreateWalletFromInside: FC<CreateWalletFromInsideProps> = ({
     const result = await deriveAccount({
       name: "",
       accountType: data.account!.type,
-      address: data.account!.value.address as string
+      address: data.account!.value!.address as string
     })
 
     if (result) {

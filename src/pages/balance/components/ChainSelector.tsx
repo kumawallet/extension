@@ -3,7 +3,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { ShowTestnets } from "./ShowTestnets";
-import { ChainsState } from "@src/types";
+import { ChainType, ChainsState } from "@src/types";
 import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
 import { Network } from "../../../components/icons/Network";
@@ -35,7 +35,7 @@ export const ChainSelector = () => {
 
   const updateSelectNetwork = async (
     id: string,
-    type: "wasm" | "evm" | "ol",
+    type: ChainType,
     isTestnet?: boolean
   ) => {
     if (Object.keys(selectedChain).includes(id)) {
@@ -116,11 +116,10 @@ export const ChainSelector = () => {
                       {chainGroup.chains.map((chain) => (
                         <Fragment key={chain.id}>
                           <button
-                            className={`flex items-center justify-between border ${
-                              selectedChain[chain.id]
+                            className={`flex items-center justify-between border ${selectedChain[chain.id]
                                 ? "border-green-500"
                                 : "border-gray-600"
-                            } rounded-lg py-3 px-4`}
+                              } rounded-lg py-3 px-4`}
                             disabled={
                               Object.keys(selectedChain).length === 1 &&
                               Object.keys(selectedChain)[0] === chain.id
@@ -159,22 +158,20 @@ export const ChainSelector = () => {
                                     ? true
                                     : false
                                 }
-                                className={`${
-                                  Object.prototype.hasOwnProperty.call(
-                                    selectedChain,
-                                    chain.id
-                                  )
+                                className={`${Object.prototype.hasOwnProperty.call(
+                                  selectedChain,
+                                  chain.id
+                                )
                                     ? `bg-green-500`
                                     : "bg-custom-gray-bg"
-                                } relative inline-flex items-center h-2 rounded-full w-7 transition-colors duration-200`}
+                                  } relative inline-flex items-center h-2 rounded-full w-7 transition-colors duration-200`}
                               >
                                 <span
-                                  className={`${
-                                    Object.prototype.hasOwnProperty.call(
-                                      selectedChain,
-                                      chain.id
-                                    ) && "translate-x-4"
-                                  } inline-block w-3 h-3 transform bg-white rounded-full transition-transform duration-200`}
+                                  className={`${Object.prototype.hasOwnProperty.call(
+                                    selectedChain,
+                                    chain.id
+                                  ) && "translate-x-4"
+                                    } inline-block w-3 h-3 transform bg-white rounded-full transition-transform duration-200`}
                                 />
                               </Switch>
                             </div>

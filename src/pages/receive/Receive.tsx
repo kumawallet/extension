@@ -15,7 +15,7 @@ export const Receive = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const account = cropAccount(selectedAccount?.value?.address);
+  const account = cropAccount(selectedAccount?.value?.address || "");
   const { Icon, copyToClipboard } = useCopyToClipboard(
     selectedAccount?.value?.address || ""
   );
@@ -33,7 +33,7 @@ export const Receive = () => {
 
       <div className="flex flex-col justify-center items-center mt-5">
         <div className="flex mt-5 justify-center items-center text-center text-lg font-medium">
-          {selectedAccount.value.name}
+          {selectedAccount?.value?.name}
         </div>
         <QRCode
           className="rounded-2xl p-2 mt-5 bg-white"

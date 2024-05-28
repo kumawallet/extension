@@ -1,5 +1,4 @@
 export * from "./balance";
-export * from "./callContract";
 export * from "./changePassword";
 export * from "./createWallet/components";
 export * from "./createWallet/hooks/useCreateWallet";
@@ -21,7 +20,6 @@ export * from "./settings";
 export * from "./settings/style/style";
 export * from "./signIn";
 export * from "./signIn/styles/SingIn";
-export * from "./signMessage";
 export * from "./style/general";
 export * from "./swap/components";
 export * from "./swap/hooks";

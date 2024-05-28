@@ -2,7 +2,6 @@ import { FC, useMemo } from "react";
 import { TxInfoState } from "../hooks";
 import { useTranslation } from "react-i18next";
 import { cropAccount } from "@src/utils/account-utils";
-import { useNetworkContext } from "@src/providers";
 
 type SwapInfoProps = TxInfoState;
 
@@ -12,12 +11,10 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   bridgeName,
   destinationAddress,
   gasFee,
-  bridgeType
+  bridgeType,
+
 }) => {
   const { t } = useTranslation("swap");
-  const {
-    state: { selectedChain },
-  } = useNetworkContext();
 
   const _bridgeName = useMemo(() => {
     if (bridgeName === "stealthex") {
@@ -59,7 +56,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
         <div className="flex justify-between items-center text-[#A3A3A3]">
           <p>{t("gas_fee")}:</p>
           <p>
-            {gasFee} {selectedChain?.symbol || ""}
+            {gasFee}
           </p>
         </div>
       )}

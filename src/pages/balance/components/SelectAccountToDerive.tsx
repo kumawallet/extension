@@ -31,8 +31,8 @@ export const SelectAccountToDerive: FC<SelectAccountToDeriveProps> = ({
       {accounts?.map((account) => (
         <Wallet
           key={account.key}
-          address={account.value.address}
-          name={account.value.name}
+          address={account.value!.address}
+          name={account.value!.name}
           type={account.type}
           onSelect={() => {
             onSelect(account);

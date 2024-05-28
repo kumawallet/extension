@@ -1,4 +1,4 @@
-import { AccountType } from "@src/accounts/types";
+import { KeyringType } from "@src/accounts/types";
 import EVMKeyring from "./hd/EVMKeyring";
 import WASMKeyring from "./hd/WASMKeyring";
 import ImportedEVMKeyring from "./imported/ImportedEVMKeyring";
@@ -15,7 +15,7 @@ export type SupportedKeyring =
   | ImportedOLKeyring;
 
 export type Keyrings = {
-  [key in AccountType]: SupportedKeyring | undefined;
+  [key in KeyringType]: SupportedKeyring | undefined;
 };
 
 export interface KeyringJSON {

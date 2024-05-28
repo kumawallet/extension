@@ -28,8 +28,8 @@ export const BalanceAccounts = () => {
             {accounstToShow.map((account) => (
               <>
                 <Wallet
-                  address={account.value.address}
-                  name={account.value.name}
+                  address={account.value!.address}
+                  name={account.value!.name}
                   type={account.type}
                   key={account.key}
                   _asset={asset.accounts?.[account.key]}

@@ -223,7 +223,7 @@ export interface Request {
   "pri(accounts.getAccount)": [RequestGetAccount, Account | undefined];
   "pri(accounts.getAllAccounts)": [RequestGetAllAccounts, Account[]];
   "pri(accounts.deriveAccount)": [RequestDeriveAccount, Account];
-  "pri(accounts.setSelectedAccount)": [Account, void];
+  "pri(accounts.setSelectedAccount)": [Account | null, void];
   "pri(accounts.getSelectedAccount)": [null, Account | undefined];
   "pri(accounts.getAccountsToDerive)": [null, Account[]];
 

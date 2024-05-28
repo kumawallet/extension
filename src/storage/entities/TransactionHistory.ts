@@ -162,7 +162,7 @@ export default class TransactionHistory {
         transactionsByChainId[targetChain.id] = [];
       }
 
-      const isSender = transaction.sender === this.account?.value.address;
+      const isSender = transaction.sender === this.account?.value?.address;
       const chain = isSender ? originChain : targetChain;
       const chainId = chain.id;
 

@@ -10,8 +10,8 @@ import { SettingType } from "../../../storage/entities/settings/types";
 import { SettingKey } from "../../../storage/entities/settings/types";
 import Record from "../../../storage/entities/activity/Record";
 import { RecordStatus } from "../../../storage/entities/activity/types";
-import { selectedWASMChainMock } from "../../../tests/mocks/chain-mocks";
 import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { ChainType } from "@src/types";
 
 const accountManageMock = {
   saveBackup: vi.fn(),
@@ -448,7 +448,9 @@ describe("Extension", () => {
       });
 
       const extension = new Extension();
-      const result = await extension["showKey"]();
+      const result = await extension["showKey"]({
+        address: "0x1234",
+      });
       expect(result).toBe("1234");
     });
 
@@ -459,7 +461,9 @@ describe("Extension", () => {
       SelectedAccount.get = vi.fn().mockReturnValue(undefined);
 
       const extension = new Extension();
-      const result = await extension["showKey"]();
+      const result = await extension["showKey"]({
+        address: "0x1234",
+      });
       expect(result).toBe(undefined);
     });
   });
@@ -515,7 +519,9 @@ describe("Extension", () => {
   it("should set network", async () => {
     const extension = new Extension();
     const result = await extension["setNetwork"]({
-      chain: selectedWASMChainMock,
+      id: "evm",
+      type: ChainType.EVM,
+      isTestnet: false,
     });
     expect(result).toBe(true);
   });
@@ -766,7 +772,7 @@ describe("Extension", () => {
       _AccountManage.getAll = getAll;
       const extension = new Extension();
       const result = await extension["getRegistryAddresses"]();
-      expect(result.contacts).toMatchObject(contactsMock);
+      expect(result.accounts).toMatchObject(contactsMock);
     });
 
     it("should return registry error", async () => {

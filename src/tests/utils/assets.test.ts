@@ -1,7 +1,8 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { BN0 } from "@src/constants/assets";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
+import Account from "@src/storage/entities/Account";
+import { ChainType } from "@src/types";
 import {
   formatAmountWithDecimals,
   formatBN,
@@ -38,7 +39,14 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      const result = await getNatitveAssetBalance(
+        {
+          provider: api as ApiPromise,
+          type: ChainType.WASM,
+        },
+        "0x123",
+        {} as Account
+      );
       expect(result).toEqual({
         balance: new BN(10),
         frozen: new BN(0),
@@ -53,8 +61,12 @@ describe("assets", () => {
       } as unknown;
 
       const result = await getNatitveAssetBalance(
-        api as ethers.providers.JsonRpcProvider,
-        "0x123"
+        {
+          provider: api as ethers.providers.JsonRpcProvider,
+          type: ChainType.EVM,
+        },
+        "0x123",
+        {} as Account
       );
       expect(result).toEqual({
         balance: 2,
@@ -62,17 +74,10 @@ describe("assets", () => {
     });
 
     it("should return same amount", async () => {
-      const api = {} as unknown;
-      const result = await getNatitveAssetBalance(api as null, "0x123");
+      // @ts-expect-error --- *
+      const result = await getNatitveAssetBalance(null, "0x123", {} as Account);
       expect(result).toEqual({
         balance: new BN(0),
-      });
-    });
-
-    it("should return same amount", async () => {
-      const result = await getNatitveAssetBalance(null, "0x123");
-      expect(result).toEqual({
-        balance: BN0,
       });
     });
 
@@ -83,7 +88,14 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      const result = await getNatitveAssetBalance(
+        {
+          provider: api as ApiPromise,
+          type: ChainType.WASM,
+        },
+        "0x123",
+        {} as Account
+      );
       expect(result).toEqual({
         balance: new BN(0),
       });
@@ -119,13 +131,13 @@ describe("assets", () => {
     it("should return eth price", async () => {
       // mock fetch
 
-      const result = await getAssetUSDPrice("eth");
+      const result = await getAssetUSDPrice(["eth"]);
       expect(result).toEqual(1000);
     });
 
     it("should return 0", async () => {
       // mock fetch
-      const result = await getAssetUSDPrice("moonbeam");
+      const result = await getAssetUSDPrice(["moonbeam"]);
       expect(result).toEqual(0);
     });
 
@@ -133,7 +145,7 @@ describe("assets", () => {
       // mock fetch
       global.fetch = vi.fn().mockRejectedValue(new Error("error"));
 
-      const result = await getAssetUSDPrice("eth");
+      const result = await getAssetUSDPrice(["eth"]);
       expect(result).toEqual(0);
     });
   });

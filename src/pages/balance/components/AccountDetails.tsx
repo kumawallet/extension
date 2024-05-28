@@ -42,7 +42,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
   title,
   accountData,
 }) => {
-  const [inputValue, setInputValue] = useState(accountData.value.name);
+  const [inputValue, setInputValue] = useState(accountData.value!.name);
   const { t: tCommon } = useTranslation("common");
   const { t: t } = useTranslation("account");
 
@@ -65,7 +65,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
   } = useNetworkContext();
 
   const { Icon, copyToClipboard } = useCopyToClipboard(
-    accountData.value.address
+    accountData.value!.address
   );
   const { showErrorToast } = useToast();
   const { starLoading: startLoadingReset, endLoading: endLoadingReset } =
@@ -138,20 +138,20 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
     }
   };
   const enableInput = () => {
-    setInputValue(accountData.value.name);
+    setInputValue(accountData.value!.name);
     setInputEnabled(true);
   };
 
   const getLink = () => {
-    const network = getAccountType(accountData.value.keyring).toLowerCase();
+    const network = getAccountType(accountData.value!.keyring).toLowerCase();
     const explore = selectedChain?.explorer;
 
     if (network === ChainType.EVM) {
-      return `${explore}/account/${accountData.value.address}`;
+      return `${explore}/account/${accountData.value!.address}`;
     } else if (network === ChainType.WASM) {
-      return `${explore}/address/${accountData.value.address}`;
+      return `${explore}/address/${accountData.value!.address}`;
     } else if (network === ChainType.OL) {
-      return `${explore}/accounts/${accountData.value.address}`;
+      return `${explore}/accounts/${accountData.value!.address}`;
     }
 
   };
@@ -159,7 +159,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
   const validatePassword = async () => {
     try {
       const key = accountData.key;
-      const keyring = accountData.value.keyring;
+      const keyring = accountData.value!.keyring;
       let privateKeyOrSeed: string | undefined =
         await messageAPI?.validatePassword({
           password,
@@ -211,8 +211,8 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
 
   const methods = useForm<AddressForm>({
     defaultValues: {
-      name: accountData.value.name,
-      address: getHash(accountData.value.address),
+      name: accountData.value!.name,
+      address: getHash(accountData.value!.address),
     },
     resolver: yupResolver(schema),
   });
@@ -267,22 +267,22 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
             isOpen={isOpen}
             onClose={() => setIsOpen(!isOpen)}
             type="delete"
-            name={accountData.value.name}
-            address={accountData.value.address}
+            name={accountData.value!.name}
+            address={accountData.value!.address}
             confirmed={deleteSelectedAccount}
           />
 
           <div>
             <p className="text-sm">{t("address")}</p>
             <div className="flex">
-              <p className="opacity-80">{getHash(accountData?.value.address)}</p>
+              <p className="opacity-80">{getHash(accountData?.value!.address)}</p>
               <button onClick={copyToClipboard} className="ml-5">
                 <Icon />
               </button>
             </div>
           </div>
           <div>
-            {accountData.value.keyring.toLowerCase().includes("evm") ? (
+            {accountData.value!.keyring.toLowerCase().includes("evm") ? (
               <p>{t("private_key")}</p>
             ) : (
               <p>{t("seed_phrase")}</p>
