@@ -14,7 +14,6 @@ interface FeeAndTipProps {
 export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
   const { t } = useTranslation("send");
 
-
   const { watch, setValue } = useFormContext<SendTxForm>();
   const originNetwork = watch("originNetwork");
   const targetNetwork = watch("targetNetwork");
@@ -23,11 +22,10 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
 
   useEffect(() => {
     messageAPI.getFee((fee) => {
-      setValue("fee", fee)
-      setValue('isLoadingFee', false);
-    })
-
-  }, [])
+      setValue("fee", fee);
+      setValue("isLoadingFee", false);
+    });
+  }, []);
 
   const isLoadingFee = watch("isLoadingFee");
   const isTipEnabled = watch("isTipEnabled");
@@ -60,10 +58,7 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
         </Switch>
       </div>
       {isTipEnabled && (
-
-
         <div className="py-1">
-
           <div className="flex items-center p-2 border border-[#636669] rounded-lg">
             <NumericFormat
               className="bg-transparent text-[#9CA3AF] outline-none border-none px-1 text-base w-[2ch]"
@@ -77,10 +72,12 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
                   (e.currentTarget.value.length || 1) + 1 + "ch";
               }}
             />
-            <span className="text-[#FEFDFD] text-base">{targetNetwork?.symbol || ""}</span>
-          </div >
-        </div >
+            <span className="text-[#FEFDFD] text-base">
+              {targetNetwork?.symbol || ""}
+            </span>
+          </div>
+        </div>
       )}
-    </div >
+    </div>
   );
 };

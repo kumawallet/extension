@@ -50,6 +50,7 @@ describe("Network", () => {
 
     expect(network).toMatchObject({
       chain: null,
+      selectedChain: {},
     });
   });
 
@@ -57,14 +58,6 @@ describe("Network", () => {
     const network = await Network.init();
 
     expect(network).toBe(undefined);
-  });
-
-  it("should return default value", async () => {
-    const network = await Network.getDefaultValue();
-
-    expect(network).toMatchObject({
-      chain: null,
-    });
   });
 
   it("should set new chain", async () => {
@@ -79,6 +72,6 @@ describe("Network", () => {
     network.set({ ethereum: selectedEVMChainMock });
     const savedNetwork = network.get();
 
-    expect(savedNetwork).toMatchObject(selectedEVMChainMock);
+    expect(savedNetwork).toMatchObject({ ethereum: selectedEVMChainMock });
   });
 });

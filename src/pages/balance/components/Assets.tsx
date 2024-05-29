@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
-import { useAccountContext, useAssetContext } from "@src/providers";
+import { useAssetContext } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
 import { Asset } from "./Asset";
@@ -15,13 +15,8 @@ export const Assets = () => {
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
-  const {
-    state: { selectedAccount },
-  } = useAccountContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
-
-  console.log("assets:", assets)
 
   const filteredAsset = useMemo(() => {
     // @ts-expect-error --- *
@@ -36,9 +31,10 @@ export const Assets = () => {
         id: string;
       }[];
     } = {};
+
     if (Object.keys(assets).length !== 0) {
-      Object.keys(assets).forEach((key) => {
-        const networks = assets[key];
+      Object.keys(assets).forEach((accountKey) => {
+        const networks = assets[accountKey];
         Object.keys(networks).forEach((network) => {
           // @ts-expect-error --- *
           const assets = networks[network].assets;
@@ -47,10 +43,11 @@ export const Assets = () => {
             if (!outputObject[asset.symbol]) {
               outputObject[asset.symbol] = [];
             }
-            outputObject[asset.symbol].push({ ...asset, accountKey: key });
+            outputObject[asset.symbol].push({ ...asset, accountKey });
           });
         });
       });
+
 
       _assets = Object.keys(outputObject).map((key) => {
         const asset = outputObject[key];
@@ -89,7 +86,11 @@ export const Assets = () => {
 
         return {
           symbol: key,
-          balance: formatAmountWithDecimals(balance as number, 3, asset[0].decimals),
+          balance: formatAmountWithDecimals(
+            balance as number,
+            3,
+            asset[0].decimals
+          ),
           amount,
           decimals: asset[0].decimals,
           accounts: accountKeysInfo,
@@ -106,9 +107,7 @@ export const Assets = () => {
     if (showAllAssets) return _assets;
 
     return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0);
-  }, [JSON.stringify(assets), showAllAssets, selectedAccount?.key]);
-
-
+  }, [JSON.stringify(assets), showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -140,7 +139,6 @@ export const Assets = () => {
         return <Asset asset={asset} key={index} />;
       })}
 
-
       <div className="flex justify-center mt-2">
         <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
           <span className="flex gap-1 items-center">
@@ -149,7 +147,6 @@ export const Assets = () => {
           </span>
         </Button>
       </div>
-
     </div>
   );
 };

@@ -37,39 +37,33 @@ describe("Assets", () => {
       }),
       useAssetContext: vi.fn().mockReturnValue({
         state: {
-          assets: [
-            {
-              id: "1",
-              name: "ASTR",
-              amount: 10,
-              symbol: "ASTR",
-              decimals: 18,
-              balance: 4.5,
-            },
-          ],
+          assets: {
+            "polkadot": {
+              "0x123": {
+                assets: [
+                  {
+                    id: "-1",
+                    name: "ASTR",
+                    amount: 10,
+                    symbol: "ASTR",
+                    decimals: 18,
+                    balance: 4.5,
+                  },
+                ]
+              }
+            }
+          },
           isLoadingAssets: false,
         },
       }),
-    }));
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
+      useAccountContext: vi.fn().mockReturnValue({
+        state: {
+          selectedAccount: {
+            key: "0x123"
+          },
         },
       }),
-    }))
+    }));
   });
   it("should render assets", () => {
     renderComponent();

@@ -2,15 +2,15 @@ import { Chain, SelectedChain } from "@src/types";
 import BaseEntity from "./BaseEntity";
 
 export default class Network extends BaseEntity {
-  SelectedChain: SelectedChain;
-  Chain: Chain | null;
+  selectedChain: SelectedChain;
+  chain: Chain | null;
 
   private static instance: Network;
 
   constructor() {
     super();
-    this.Chain = null;
-    this.SelectedChain = {};
+    this.chain = null;
+    this.selectedChain = {};
   }
 
   static getName() {
@@ -35,10 +35,10 @@ export default class Network extends BaseEntity {
   }
 
   get() {
-    return this.SelectedChain;
+    return this.selectedChain;
   }
 
   set(chains: SelectedChain) {
-    this.SelectedChain = chains;
+    this.selectedChain = chains;
   }
 }

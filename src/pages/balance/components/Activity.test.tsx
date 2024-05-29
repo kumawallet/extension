@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Activity } from "./Activity";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
-import { Transaction } from "@src/types";
 import { ACTIVITY_DETAIL } from "@src/routes/paths";
+import { ChainType } from "@src/types";
 
 const functionMocks = {
   navigate: vi.fn(),
@@ -82,21 +82,25 @@ describe("Actvity", () => {
       useAccountContext: vi.fn(() => ({
         state: {
           selectedAccount: {
+            type: ChainType.WASM,
+
             key: "0x1234567890",
             value: {
               address: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
             },
           },
+          accounts: [
+            {
+              type: ChainType.WASM,
+              key: "0x1234567890",
+              value: {
+                address: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+              },
+            }
+          ]
         },
       })),
-      useTxContext: vi.fn(() => ({
-        loadMoreActivity: vi.fn(),
-        state: {
-          activity: dataMocks.activity,
-          hasNextPage: false,
-          isLoading: false,
-        },
-      })),
+
     }));
 
     vi.mock("@src/messageAPI/api", () => ({
@@ -115,6 +119,40 @@ describe("Actvity", () => {
             },
           ],
         })),
+        activitySubscribe: vi.fn().mockResolvedValue([{
+          id: "1",
+          amount: "1",
+          asset: "DOT",
+          blockNumber: 1,
+          fee: "0.01",
+          hash: "0x1234567890",
+          originNetwork: "BNB",
+          targetNetwork: "BNB",
+          recipient: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+          sender: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+          status: "success",
+          tip: "0.1",
+          timestamp: 1,
+          type: "transfer",
+          isSwap: false,
+        },
+        {
+          id: "2",
+          amount: "2",
+          asset: "DOT",
+          blockNumber: 2,
+          fee: "0.0000001",
+          hash: "0x1234567891",
+          originNetwork: "BNB",
+          targetNetwork: "BNB",
+          recipient: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+          sender: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+          status: "success",
+          tip: "0.1",
+          timestamp: 1,
+          type: "transfer",
+          isSwap: false,
+        },]),
       },
     }));
   });

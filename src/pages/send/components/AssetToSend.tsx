@@ -201,20 +201,15 @@ export const AssetToSend = () => {
   const senderAddress = watch("senderAddress");
   const isXCM = watch("isXcm");
 
-  const [chainsToSelectFrom, setChainsToSelectFrom] = useState<Chain[]>([]);
   const [chainsToSend, setChainsToSend] = useState<Chain[]>([]);
   const [amount, setAmount] = useState<string>(getValues("amount"));
 
-  useEffect(() => {
-    if (!senderAddress) return;
+  const chainsToSelectFrom = useMemo(() => {
+    if (!senderAddress) return [];
 
     const activeChainIds = Object.keys(selectedChain);
 
-
-
     const allChains = chains.map((chain) => chain.chains).flat();
-
-
 
     const chainsToSend = allChains.filter((chain) =>
       activeChainIds.includes(chain.id)
@@ -224,19 +219,14 @@ export const AssetToSend = () => {
       (account) => account.value?.address === senderAddress
     );
 
-
-
     if (!account) return;
 
     const chainsByType = chainsToSend.filter(
-      (chain) =>
-        chain.type === getType(account?.type.toLowerCase())
+      (chain) => chain.type === getType(account?.type?.toLowerCase())
     );
 
-    setChainsToSelectFrom(chainsByType);
     setValue("originNetwork", chainsByType[0]);
-
-    // setValue("originNetwork", chainsToSend[0]);
+    return chainsByType;
   }, [chains, selectedChain, senderAddress, accounts]);
 
   useEffect(() => {
@@ -261,8 +251,6 @@ export const AssetToSend = () => {
 
   const assetsToSelect = useMemo(() => {
     if (!originNetwork || !targetChain || !senderAddress) return [];
-
-
 
     const keyIndex = Object.keys(assets).find((key) =>
       key.toLowerCase().includes(senderAddress.toLowerCase())

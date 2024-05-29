@@ -3,10 +3,10 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Send, SendTxForm } from "./Send";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { ChainType } from "@src/types";
 
 const functionMocks = {
-  sendSubstrateTx: vi.fn(),
-  sendEvmTx: vi.fn(),
+  sendTx: vi.fn(),
 };
 
 const useFormMock = vi.hoisted(() => ({
@@ -36,8 +36,7 @@ describe("Send", () => {
 
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
-        sendSubstrateTx: () => functionMocks.sendSubstrateTx(),
-        sendEvmTx: () => functionMocks.sendEvmTx(),
+        sendTx: () => functionMocks.sendTx(),
       },
     }));
 
@@ -72,15 +71,34 @@ describe("Send", () => {
             symbol: "DOT",
             decimals: 10,
           },
+          chains: [
+            {
+              title: "wasm_based",
+              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+            {
+              title: "evm_based",
+              chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+          ]
         },
       }),
       useAccountContext: () => ({
         state: {
           selectedAccount: {
+            type: ChainType.WASM,
             value: {
               address: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
             },
           },
+          accounts: [
+            {
+              type: ChainType.WASM,
+              value: {
+                address: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
+              },
+            }
+          ]
         },
       }),
     }));
@@ -116,7 +134,7 @@ describe("Send", () => {
     });
   });
 
-  describe("send substrate tx", () => {
+  describe("send tx", () => {
     it("should call sendSubstrateTx", async () => {
       useFormMock.handleSubmit.mockImplementation(
         (cb: (props: SendTxForm) => void) => () => {
@@ -154,55 +172,8 @@ describe("Send", () => {
       fireEvent.click(button);
 
       await waitFor(() => {
-        expect(functionMocks.sendSubstrateTx).toHaveBeenCalled();
+        expect(functionMocks.sendTx).toHaveBeenCalled();
       });
     });
   });
-
-  describe("send evm tx", () => {
-    it("should call sendEvmTx", async () => {
-      useFormMock.handleSubmit.mockImplementation(
-        (cb: (props: SendTxForm) => void) => () => {
-          cb({
-            recipientAddress:
-              "0x5GRjqTdQiyzoT7cmztRWPhLHdfdj1aLLM3bzqVQYL2EGXgNP",
-            senderAddress: "0x5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
-            amount: "1",
-            asset: {
-              id: "ETH",
-              symbol: "ETH",
-              decimals: 18,
-              balance: "100",
-            },
-            fee: "1000000000",
-            haveSufficientBalance: true,
-            isTipEnabled: false,
-            originNetwork: EVM_CHAINS[0],
-            targetNetwork: EVM_CHAINS[0],
-            evmTx: {
-              gasLimit: "100000",
-              gasPrice: "1000000000",
-              nonce: "0",
-            },
-          });
-        }
-      );
-
-      const { getByTestId } = renderComponent();
-
-      const button = getByTestId("send-button");
-
-      fireEvent.click(button);
-
-      await waitFor(() => {
-        expect(getByTestId("SendTxResume")).toBeDefined();
-      });
-
-      fireEvent.click(button);
-
-      await waitFor(() => {
-        expect(functionMocks.sendEvmTx).toHaveBeenCalled();
-      });
-    });
-  })
 });

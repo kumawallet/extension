@@ -4,7 +4,6 @@ import { Footer } from "./Footer";
 const functionMocks = {
   navigate: vi.fn(),
   signOut: vi.fn(),
-  createTab: vi.fn()
 };
 
 const renderComponent = () => {
@@ -28,24 +27,7 @@ describe("Footer", () => {
     }))
 
     vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          create: () => functionMocks.createTab(),
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
+      version: "1.0.0"
     }));
   });
 
@@ -73,11 +55,12 @@ describe("Footer", () => {
       const { getByTestId } = renderComponent();
       const signOutButton = getByTestId('full-screen')
 
+      const createTab = vi.spyOn(chrome.tabs, 'create')
 
       fireEvent.click(signOutButton)
 
       await waitFor(() => {
-        expect(functionMocks.createTab).toHaveBeenCalled()
+        expect(createTab).toHaveBeenCalled()
       })
     });
 

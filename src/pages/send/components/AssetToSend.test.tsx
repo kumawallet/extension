@@ -25,6 +25,7 @@ const WATCH_XCM_MOCK: Partial<SendTxForm> = {
     balance: "1",
   } as SendTxForm["asset"],
   isXcm: true,
+  senderAddress: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
 };
 
 const WATCH_MOCK: Partial<SendTxForm> = {
@@ -44,6 +45,7 @@ const WATCH_MOCK: Partial<SendTxForm> = {
     balance: "1",
   } as SendTxForm["asset"],
   isXcm: false,
+  senderAddress: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
 };
 
 const functionMocks = {
@@ -64,26 +66,6 @@ const useFormContextMock = vi.hoisted(() => ({
 
 describe("AssetToSend", () => {
   beforeAll(() => {
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }));
-
     vi.mock("react-hook-form", () => ({
       useFormContext: vi.fn(() => ({
         register: vi.fn(),
@@ -106,17 +88,40 @@ describe("AssetToSend", () => {
               chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
             },
           ],
+          selectedChain: {
+            polkadot: {
+              type: "wasm",
+            },
+          },
         },
       }),
       useAssetContext: () => ({
         state: {
-          assets: [
+          assets: {
+            [WATCH_XCM_MOCK.senderAddress as string]: {
+              "polkadot": {
+                assets: [
+                  {
+                    id: "-1",
+                    symbol: "DOT",
+                    decimals: 10,
+                    balance: new BN("1"),
+                    address: "",
+                  },
+                ]
+              }
+            }
+          },
+        },
+      }),
+      useAccountContext: () => ({
+        state: {
+          accounts: [
             {
-              id: "-1",
-              symbol: "DOT",
-              decimals: 10,
-              balance: new BN("1"),
-              address: "",
+              type: "wasm",
+              value: {
+                address: WATCH_MOCK.senderAddress,
+              },
             },
           ],
         },
@@ -158,27 +163,25 @@ describe("AssetToSend", () => {
     });
   });
 
-  describe('select asset to send', () => {
-    it('should select new asset', async () => {
+  describe("select asset to send", () => {
+    it("should select new asset", async () => {
       const { getByTestId } = renderComponent();
 
-      const assetToSendContainer = getByTestId('asset-to-send');
+      const assetToSendContainer = getByTestId("asset-to-send");
 
-      const assetToSendButton = assetToSendContainer.children[1]?.children[0]
+      const assetToSendButton = assetToSendContainer.children[1]?.children[0];
 
       act(() => {
-        fireEvent.click(assetToSendButton)
-      })
+        fireEvent.click(assetToSendButton);
+      });
 
       await waitFor(() => {
-        expect(getByTestId('filtered-items-container')).toBeDefined()
-      })
+        expect(getByTestId("filtered-items-container")).toBeDefined();
+      });
 
-      const filteredItems = getByTestId('filtered-items-container')
+      const filteredItems = getByTestId("filtered-items-container");
 
-      expect(filteredItems.children.length).toBeGreaterThan(0)
-
-
-    })
-  })
+      expect(filteredItems.children.length).toBeGreaterThan(0);
+    });
+  });
 });

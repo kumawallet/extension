@@ -24,3 +24,23 @@ const ResizeObserverMock = vi.fn(() => ({
 
 // Stub the global ResizeObserver
 vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+vi.stubGlobal("chrome", {
+  tabs: {
+    getCurrent: () =>
+      Promise.resolve({
+        id: "1",
+      }),
+    create: vi.fn(),
+  },
+  runtime: {
+    getURL: vi.fn(),
+    connect: vi.fn().mockReturnValue({
+      onMessage: {
+        addListener: vi.fn(),
+      },
+      onDisconnect: {
+        addListener: vi.fn(),
+      },
+    }),
+  },
+});

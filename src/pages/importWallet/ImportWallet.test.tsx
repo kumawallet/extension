@@ -57,7 +57,7 @@ describe("ImportWallet", () => {
         getAllAccounts: vi.fn(),
       })),
       useNetworkContext: vi.fn(() => ({
-        initializeNetwork: vi.fn(),
+        refreshNetworks: vi.fn(),
       })),
     }));
 

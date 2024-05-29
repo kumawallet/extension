@@ -8,7 +8,6 @@ import { getHash } from "./funtions/Txfunctions";
 import { Button } from "@src/components/common";
 import Account from "@src/storage/entities/Account";
 import { ConfirmMessage } from "@src/components/common/ConfirmMessage";
-
 import { IoAlert } from "react-icons/io5";
 import { Key } from "@src/components/icons/Key";
 import { ICON_SIZE } from "@src/constants/icons";
@@ -17,8 +16,6 @@ import { PiEyeClosedThin, PiEyeClosed } from "react-icons/pi";
 import { AiOutlineFileSearch, AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { BsEye } from "react-icons/bs";
-
-
 import { AddressForm, ChainType } from "@src/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
@@ -27,7 +24,6 @@ import { decodeAddress, encodeAddress, isAddress } from "@polkadot/util-crypto";
 import { FormProvider, useForm } from "react-hook-form";
 import { Browser } from "@src/utils/constants";
 import { getAccountType } from "@src/utils/account-utils";
-
 
 interface AccountDetailsProps {
   onBack: () => void;

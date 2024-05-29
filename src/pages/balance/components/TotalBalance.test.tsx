@@ -21,11 +21,17 @@ describe("TotalBalance", () => {
     vi.mock("@src/providers", () => ({
       useAssetContext: () => ({
         state: {
-          assets: [
-            {
-              amount: 100,
-            },
-          ],
+          assets: {
+            "0x123": {
+              "polkadot": {
+                assets: [
+                  {
+                    amount: "100",
+                  },
+                ]
+              }
+            }
+          },
         },
         loadAssets: vi.fn(),
       }),

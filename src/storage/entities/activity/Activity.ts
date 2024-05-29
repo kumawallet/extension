@@ -71,15 +71,4 @@ export default class Activity extends BaseEntity {
       [txHash?.toLowerCase()]: record,
     };
   }
-
-  // getRecords(key: AccountKey, network: string): Record[] {
-  //   const records = this.data[key] ? Object.values(this.data[key]) : [];
-
-  //   return records
-  //     .filter((r) => {
-  //       // @ts-expect-error -- *
-  //       return r.originNetwork?.toLowerCase() === network?.toLowerCase();
-  //     })
-  //     .sort((a, b) => (b.createdAt as number) - (a.createdAt as number));
-  // }
 }

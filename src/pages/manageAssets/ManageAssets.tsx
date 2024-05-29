@@ -1,22 +1,17 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { InputErrorMessage, Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
-import {
-  useAccountContext,
-  useAssetContext,
-  useNetworkContext,
-} from "@src/providers";
+import { useNetworkContext } from "@src/providers";
 import { number, object, string } from "yup";
-import { isHex, u8aToHex } from "@polkadot/util";
+import { isHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FiChevronLeft } from "react-icons/fi";
-import { decodeAddress } from "@polkadot/util-crypto";
 import { messageAPI } from "@src/messageAPI/api";
-import { Chain, ChainType } from "@src/types";
+import { ChainType } from "@src/types";
 
 interface AssetForm {
   chainId: string;
@@ -76,19 +71,12 @@ export const ManageAssets = () => {
     return allChains.filter((chain) => chainsKeys.includes(chain.id));
   }, []);
 
-  const onSubmit = handleSubmit(async ({
-    chainId, ...asset
-  }) => {
+  const onSubmit = handleSubmit(async ({ chainId, ...asset }) => {
     try {
       await messageAPI.addAsset({
         asset: asset,
         chain: chainId,
       });
-      // loadAssets({
-      //   api,
-      //   selectedChain: selectedChain as Chain,
-      //   selectedAccount,
-      // });
       navigate(BALANCE);
     } catch (error) {
       showErrorToast(error);
@@ -111,7 +99,11 @@ export const ManageAssets = () => {
             <label htmlFor="address" className="block text-sm font-medium mb-1">
               {t("chain")}
             </label>
-            <select id="" className="input-primary" {...register("chainId")}>
+            <select
+              data-testid="chain"
+              className="input-primary"
+              {...register("chainId")}
+            >
               {chainsToSelect.map((chain) => (
                 <option key={chain.id} value={chain.id}>
                   {chain.name}

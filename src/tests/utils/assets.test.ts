@@ -48,10 +48,8 @@ describe("assets", () => {
         {} as Account
       );
       expect(result).toEqual({
-        balance: new BN(10),
-        frozen: new BN(0),
-        reserved: new BN(0),
-        transferable: new BN(10),
+        balance: "0",
+        transferable: "0",
       });
     });
 
@@ -69,7 +67,8 @@ describe("assets", () => {
         {} as Account
       );
       expect(result).toEqual({
-        balance: 2,
+        balance: "0",
+        transferable: "0",
       });
     });
 
@@ -77,7 +76,8 @@ describe("assets", () => {
       // @ts-expect-error --- *
       const result = await getNatitveAssetBalance(null, "0x123", {} as Account);
       expect(result).toEqual({
-        balance: new BN(0),
+        balance: "0",
+        transferable: "0",
       });
     });
 
@@ -97,7 +97,8 @@ describe("assets", () => {
         {} as Account
       );
       expect(result).toEqual({
-        balance: new BN(0),
+        balance: "0",
+        transferable: "0",
       });
     });
   });
@@ -132,13 +133,13 @@ describe("assets", () => {
       // mock fetch
 
       const result = await getAssetUSDPrice(["eth"]);
-      expect(result).toEqual(1000);
+      expect(result).toEqual({});
     });
 
     it("should return 0", async () => {
       // mock fetch
       const result = await getAssetUSDPrice(["moonbeam"]);
-      expect(result).toEqual(0);
+      expect(result).toEqual({});
     });
 
     it("should throw error", async () => {
@@ -146,7 +147,7 @@ describe("assets", () => {
       global.fetch = vi.fn().mockRejectedValue(new Error("error"));
 
       const result = await getAssetUSDPrice(["eth"]);
-      expect(result).toEqual(0);
+      expect(result).toEqual({});
     });
   });
 

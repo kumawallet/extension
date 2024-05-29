@@ -39,7 +39,6 @@ export const Activity = () => {
   const [transactions, setTransactions] = useState([] as any[]);
   const [addressToSearch, setAddressToSearch] = useState("");
 
-
   const getContacts = async () => {
     // try {
     //   setIsLoading(true);
@@ -209,10 +208,7 @@ export const Activity = () => {
                       <div className={`relative ${stylesActivity.circleIcon}`}>
                         {isSwap ? (
                           <SwapIcon size="18" />
-                        ) : isSameAddress(
-                          addressToSearch,
-                          sender
-                        ) ? (
+                        ) : isSameAddress(addressToSearch, sender) ? (
                           <SendIcon size="18" />
                         ) : (
                           <HiOutlineInboxArrowDown />
@@ -236,10 +232,7 @@ export const Activity = () => {
                     <div className={stylesActivity.containerText}>
                       {isSwap ? (
                         <p className={stylesActivity.textTxType}>{t("swap")}</p>
-                      ) : !isSameAddress(
-                        addressToSearch,
-                        recipient
-                      ) ? (
+                      ) : !isSameAddress(addressToSearch, recipient) ? (
                         <p className={stylesActivity.textTxType}>{t("send")}</p>
                       ) : (
                         <p className={stylesActivity.textTxType}>
@@ -263,8 +256,8 @@ export const Activity = () => {
                           value: amount,
                           symbol: asset,
                         }).length > 10
-                          ? "text-[px] "
-                          : "text-[10px]"
+                            ? "text-[px] "
+                            : "text-[10px]"
                           } font-bold`}
                       >
                         {getAmount({

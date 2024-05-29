@@ -57,7 +57,6 @@ const getDefaultData = ({
   let targetNetwork = null;
   let asset = null;
 
-
   if (senderAddress) {
     const accountType = getAccountType(selectedAccount!.type)?.toLowerCase();
 
@@ -151,7 +150,7 @@ export const Send = () => {
     watch,
     handleSubmit,
     setValue,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = methods;
 
   const [isConfirmingTx, setIsConfirmingTx] = useState(false);
@@ -162,28 +161,22 @@ export const Send = () => {
     navigate(-1);
   }, [isConfirmingTx]);
 
-  const onSubmit: SubmitHandler<SendTxForm> = useCallback(
-    async () => {
-      if (!isConfirmingTx) return setIsConfirmingTx(true);
+  const onSubmit: SubmitHandler<SendTxForm> = useCallback(async () => {
+    if (!isConfirmingTx) return setIsConfirmingTx(true);
 
-      try {
-        await messageAPI.sendTx();
-
-
-
-        showSuccessToast(t("tx_send"));
-        navigate(BALANCE, {
-          state: {
-            tab: "activity",
-          },
-        });
-      } catch (error) {
-        captureError(error);
-        showErrorToast(error);
-      }
-    },
-    [isConfirmingTx]
-  );
+    try {
+      await messageAPI.sendTx();
+      showSuccessToast(t("tx_send"));
+      navigate(BALANCE, {
+        state: {
+          tab: "activity",
+        },
+      });
+    } catch (error) {
+      captureError(error);
+      showErrorToast(error);
+    }
+  }, [isConfirmingTx]);
 
   const isLoadingFees = watch("isLoadingFee");
   const haveSufficientBalance = watch("haveSufficientBalance");

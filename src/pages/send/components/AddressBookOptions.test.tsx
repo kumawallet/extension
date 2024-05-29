@@ -33,8 +33,9 @@ describe("AddressBookOptions", () => {
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
         getRegistryAddresses: () => ({
-          contacts: [
+          accounts: [
             {
+              name: "Test Contact",
               address: "0x1234567890123456789012345678901234567890",
             },
           ],

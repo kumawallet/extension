@@ -3,14 +3,7 @@ import {
   selectedWASMAccountMock,
 } from "@src/tests/mocks/account-mocks";
 import i18n from "@src/utils/i18n";
-import {
-
-  fireEvent,
-  getAllByTestId,
-  render,
-
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { AccountList } from "./AccountList";
 
@@ -55,26 +48,6 @@ describe("AccountList", () => {
     vi.mock("./AccountDetails", () => ({
       AccountDetails: () => <div data-testid="AccountDetails" />,
     }));
-
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }));
   });
 
   describe("render", () => {
@@ -94,7 +67,7 @@ describe("AccountList", () => {
 
       await waitFor(() => {
         const walletList = getByTestId("wallet-list");
-        expect(Array.from(walletList.children).length).toBe(2);
+        expect(Array.from(walletList.children).length).toBe(3);
       });
     });
 
@@ -107,7 +80,7 @@ describe("AccountList", () => {
 
       await waitFor(() => {
         const walletList = getByTestId("wallet-list");
-        expect(Array.from(walletList.children).length).toBe(2);
+        expect(Array.from(walletList.children).length).toBe(3);
       });
 
       const walletList = getByTestId("wallet-list");
@@ -128,7 +101,7 @@ describe("AccountList", () => {
 
       await waitFor(() => {
         const walletList = getByTestId("wallet-list");
-        expect(Array.from(walletList.children).length).toBe(2);
+        expect(Array.from(walletList.children).length).toBe(3);
       });
 
       const createButton = getByTestId("create-button");
@@ -149,7 +122,7 @@ describe("AccountList", () => {
 
       await waitFor(() => {
         const walletList = getByTestId("wallet-list");
-        expect(Array.from(walletList.children).length).toBe(2);
+        expect(Array.from(walletList.children).length).toBe(3);
       });
 
       const createButton = getByTestId("import-button");
@@ -162,7 +135,7 @@ describe("AccountList", () => {
     });
 
     it("should call details option", async () => {
-      const { getByTestId } = renderComponent();
+      const { getByTestId, getAllByTestId } = renderComponent();
 
       const accountButton = getByTestId("account-button");
 
@@ -170,14 +143,10 @@ describe("AccountList", () => {
 
       await waitFor(() => {
         const walletList = getByTestId("wallet-list");
-        expect(Array.from(walletList.children).length).toBe(2);
+        expect(Array.from(walletList.children).length).toBe(3);
       });
 
-      const walletList = getByTestId("wallet-list");
-      const button = walletList.children[0] as HTMLElement;
-
-      const detailsButton = getAllByTestId(button, "details");
-
+      const detailsButton = getAllByTestId("details");
 
       fireEvent.click(detailsButton[0]);
 

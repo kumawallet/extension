@@ -49,7 +49,7 @@ describe("CreateWallet", () => {
         getAllAccounts: vi.fn(),
       })),
       useNetworkContext: vi.fn(() => ({
-        initializeNetwork: vi.fn(),
+        refreshNetworks: vi.fn(),
       })),
     }));
 
