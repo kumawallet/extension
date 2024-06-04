@@ -1,4 +1,3 @@
-import { AccountType } from "@src/accounts/types";
 import { ChainType, ChainsState, Provider } from "@src/types";
 
 type SelectedChain = {
@@ -17,7 +16,7 @@ export interface InitialState {
 
 export interface NetworkContext {
   state: InitialState;
-  refreshNetworks: (supportedAccounts?: AccountType[]) => void;
+  refreshNetworks: () => void;
 }
 
 export type Action =

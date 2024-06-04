@@ -7,7 +7,7 @@ import { formatFees } from "@src/utils/assets";
 import { getTxLink } from "@src/utils/transfer";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
 import { transformAddress } from "@src/utils/account-utils";
-import { Chain, Transaction } from "@src/types";
+import { Chain, ChainType, Transaction } from "@src/types";
 
 type ChainId = string;
 
@@ -34,7 +34,7 @@ export default class TransactionHistory {
         id: chain.id,
       }));
 
-    this.loadTransactions({ chains });
+    return this.loadTransactions({ chains });
   }
 
   removeChains({ chainIds }: { chainIds: string[] }) {
@@ -167,7 +167,8 @@ export default class TransactionHistory {
       const chainId = chain.id;
 
       const isXcm =
-        (originChain.type === "wasm" || targetChain.type === "wasm") &&
+        (originChain.type === ChainType.WASM ||
+          targetChain.type === ChainType.WASM) &&
         originChain.id !== targetChain.id;
 
       const formatettedTx = {
@@ -183,7 +184,8 @@ export default class TransactionHistory {
 
     historicTransactions.forEach((transaction) => {
       const chainId = Object.keys(transaction)[0];
-      const chainTransaction = transaction[chainId].transactions;
+      const chainTransaction = transaction[chainId].transactions || [];
+
       if (!transactionsByChainId[chainId]) {
         transactionsByChainId[chainId] = [];
       }
@@ -201,12 +203,11 @@ export default class TransactionHistory {
       );
     });
 
-    const transactions = this.transactions.getValue();
+    // const transactions = this.transactions.getValue();
 
-    chainIds.forEach((chainId) => {
-      transactions[chainId] = transactionsByChainId[chainId];
-    });
-
+    // chainIds.forEach((chainId) => {
+    // transactions  [chainId] = transactionsByChainId[chainId];
+    // });
     this.transactions.next(transactionsByChainId);
   }
 

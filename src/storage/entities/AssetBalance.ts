@@ -1,4 +1,3 @@
-import { Asset } from "@src/providers/assetProvider/types";
 import {
   formatAmountWithDecimals,
   getAssetUSDPrice,
@@ -8,9 +7,9 @@ import {
   getWasmAssets,
 } from "@src/utils/assets";
 import { BehaviorSubject } from "rxjs";
-import { Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
+import { Asset, Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
 import { ApiPromise } from "@polkadot/api";
-import { Contract, ethers, providers } from "ethers";
+import { Contract, providers } from "ethers";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
@@ -58,7 +57,10 @@ export default class AssetsBalance {
       if (!this.networks.includes(chainId)) this.networks.push(chainId);
 
       if (chain) {
-        if (api.type !== getType(account.type.toLowerCase())) return;
+        const apiIsSameTypeAsAccount =
+          api.type === getType(account.type.toLowerCase());
+
+        if (!apiIsSameTypeAsAccount) return;
 
         const [{ nativeAsset, unsubs: nativeUnsubs }, { _assets, _unsubs }] =
           await Promise.all([
@@ -128,7 +130,7 @@ export default class AssetsBalance {
 
   private getNativeAsset = async (
     api: {
-      provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
+      provider: ApiPromise | providers.JsonRpcProvider | OlProvider;
       type: ChainType;
     },
     account: AccountEntity,
@@ -166,8 +168,7 @@ export default class AssetsBalance {
           break;
         case ChainType.EVM:
           {
-            const evmProvider =
-              api.provider as ethers.providers.JsonRpcProvider;
+            const evmProvider = api.provider as providers.JsonRpcProvider;
 
             evmProvider.off("block");
             evmProvider.on("block", () => {
@@ -210,6 +211,7 @@ export default class AssetsBalance {
         unsubs,
       };
     } catch (error) {
+      console.log("error", error);
       throw new Error("failed_to_get_nativeAsset");
     }
   };
@@ -235,6 +237,8 @@ export default class AssetsBalance {
 
       const balanceChanged =
         data.balance !== this._assets[account][chain].assets[index].balance;
+
+      console.log("index", balanceChanged);
 
       if (index > -1 && balanceChanged) {
         const _balance = Number(
@@ -368,7 +372,7 @@ export default class AssetsBalance {
   private loadERC20Assets = async (
     chain: Chain,
     account: AccountEntity,
-    api: ethers.providers.JsonRpcProvider
+    api: providers.JsonRpcProvider
   ) => {
     try {
       const assets: IAsset[] = [];

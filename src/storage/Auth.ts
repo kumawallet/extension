@@ -37,7 +37,7 @@ export default class Auth {
     await Auth.loadFromCache();
     return Auth.isUnlocked;
   }
-  static async unLock() {
+  static async unlock() {
     CacheAuth.getInstance();
     CacheAuth.unlock();
   }

@@ -107,7 +107,7 @@ export default class Extension {
       await this.migrateAccouts();
     }
 
-    return Auth.isAuthorized();
+    return isAuthorized;
   }
 
   private async changePassword({
@@ -137,11 +137,10 @@ export default class Extension {
     if (!network) return;
     const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
     const chain = this.chains.getValue();
-
     // @ts-expect-error --- migration
     if (network && network?.Chain?.supportedAccounts) {
       const newChainFormat = allChains.find(
-        (chain) => network?.Chain?.name === chain.name
+        (chain) => network?.chain?.name === chain.name
       );
       if (newChainFormat) {
         const id = newChainFormat.id;
@@ -150,26 +149,25 @@ export default class Extension {
         await this.setNetwork({ isTestnet, id, type });
       }
     }
-    if (network && Object.keys(network.SelectedChain).length === 0) {
+    if (network && Object.keys(network.selectedChain).length === 0) {
       const id = allChains[0].id;
       const type = allChains[0].type;
       const isTestnet = allChains[0].isTestnet;
       await this.setNetwork({ isTestnet, id, type });
     }
-
     if (
       network &&
-      Object.keys(network.SelectedChain).length !== 0 &&
+      Object.keys(network.selectedChain).length !== 0 &&
       Object.keys(chain).length === 0
     ) {
-      this.chains.next(network.SelectedChain);
+      this.chains.next(network.selectedChain);
       await Promise.all(
-        Object.keys(network.SelectedChain).map((chain) =>
-          this.provider.setProvider(chain, network.SelectedChain[chain].type)
+        Object.keys(network.selectedChain).map((chain) =>
+          this.provider.setProvider(chain, network.selectedChain[chain].type)
         )
       );
       await Promise.all(
-        Object.keys(network.SelectedChain).map((chain) =>
+        Object.keys(network.selectedChain).map((chain) =>
           this.transactionHistory.addChain({ chainId: chain })
         )
       );
@@ -222,9 +220,7 @@ export default class Extension {
         SelectedAccount.get().catch(() => null),
         Accounts.get().catch(() => null),
       ]);
-
       if (!selectedAccount) return;
-
       const networksAssest = this.assetsBalance.getNetwork();
       const newNetwork = Object.keys(data).filter(
         (chain) =>
@@ -237,7 +233,6 @@ export default class Extension {
           !Object.keys(this.chains.getValue()).includes(network)
       );
       const provider = this.provider.getProviders();
-
       if (newNetwork.length !== 0) {
         if ((selectedAccount as Account).value) {
           await this.assetsBalance.loadAssets(
@@ -246,7 +241,6 @@ export default class Extension {
             newNetwork
           );
           this.assetsBalance.assets.next(this.assetsBalance._assets);
-
           await this.transactionHistory.addChain({
             chainId: newNetwork[0],
           });
@@ -256,7 +250,6 @@ export default class Extension {
               this.transactionHistory.addChain({
                 chainId: newNetwork[0],
               });
-
               return this.assetsBalance.loadAssets(
                 (allAccounts as Accounts).data[
                   accountKey as AccountTypes
@@ -269,7 +262,6 @@ export default class Extension {
           this.assetsBalance.assets.next(this.assetsBalance._assets);
         }
       }
-
       if (deleteNetwork.length !== 0) {
         if ((selectedAccount as Account).value) {
           this.assetsBalance.deleteAsset(
@@ -364,7 +356,7 @@ export default class Extension {
     await Auth.setAutoLock(time);
   }
   private async unlock() {
-    await Auth.unLock();
+    await Auth.unlock();
   }
   private async getLock() {
     const lock = await Auth.getLock();
@@ -534,7 +526,6 @@ export default class Extension {
 
   private getAccountsToDerive = async () => {
     const accounts = (await AccountManager.getAll())?.getAll() || [];
-    if (!accounts) return [];
 
     const accountWithoutParentAddress = accounts.filter(
       ({ value }) => !value?.parentAddress || value.isDerivable
@@ -608,6 +599,7 @@ export default class Extension {
     });
     return this.chains.getValue();
   };
+
   private assetsSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(assestsBanlance.subscription)">(
       id,
@@ -624,7 +616,7 @@ export default class Extension {
 
   /**
    *
-   * @param account if account is nullm that means that all account are selected
+   * @param account if account is null that means that all account are selected
    */
   private async setSelectedAccount(account: Account | null) {
     const networkSelected = this.assetsBalance.getNetwork();

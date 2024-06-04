@@ -1,4 +1,4 @@
-import { useEffect, useState , FC} from "react";
+import { useEffect, useState, FC } from "react";
 import { Switch } from "@headlessui/react";
 import { messageAPI } from "@src/messageAPI/api";
 import { useNetworkContext } from "@src/providers";
@@ -9,15 +9,11 @@ interface ShowTestnetsProps {
   validateSwitch: boolean;
 }
 
-
-export const ShowTestnets : FC<ShowTestnetsProps> = ({validateSwitch}) => {
+export const ShowTestnets: FC<ShowTestnetsProps> = ({ validateSwitch }) => {
   const { t } = useTranslation("general_settings");
+  const { refreshNetworks } = useNetworkContext();
 
   const [showTestnets, setShowTestnets] = useState(false);
-  const {
-    // state: { selectedChain },
-    refreshNetworks,
-  } = useNetworkContext();
 
   useEffect(() => {
     (async () => {
@@ -31,7 +27,7 @@ export const ShowTestnets : FC<ShowTestnetsProps> = ({validateSwitch}) => {
       setShowTestnets(showTestnets);
     })();
   }, []);
- 
+
   const onToggle = async () => {
     setShowTestnets((value) => !value);
     await messageAPI.updateSetting({

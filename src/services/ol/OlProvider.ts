@@ -37,7 +37,6 @@ export class OlProvider {
         async provider(requestOptions) {
           const { params, method, url, headers, body } = requestOptions;
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           const customHeaders = {
             ...headers,
             customClient: true,
@@ -238,6 +237,9 @@ export class OlProvider {
   }
 
   async disconnect() {
-    if (this.interval) clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
   }
 }

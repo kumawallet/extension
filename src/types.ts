@@ -49,10 +49,14 @@ export type Tx =
 export type confirmTx = ({ type, tx, fee }: Tx) => void;
 
 export interface Asset {
-  name: string;
-  symbol: string;
-  decimals: number;
+  address?: string;
   amount: number;
+  balance: string;
+  decimals: number;
+  id: string;
+  price?: string;
+  symbol: string;
+  transferable?: string;
   usdPrice: number;
 }
 

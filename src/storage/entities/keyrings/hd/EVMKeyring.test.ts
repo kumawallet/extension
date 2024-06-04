@@ -3,6 +3,7 @@ import { HDKeyPair, SupportedKeyring } from "../types";
 
 const mockMnemonic =
   "bag decide skirt parent embody rebuild parrot vapor bind dance assist say film swallow color";
+
 describe("EVMKeyring", () => {
   it("should return next account path", () => {
     const evmKeyring = new EVMKeyring(mockMnemonic);

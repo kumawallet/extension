@@ -1,5 +1,5 @@
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { Chain } from "@src/types";
+import { Chain, ChainType } from "@src/types";
 import { BehaviorSubject } from "rxjs";
 import { api } from "./Provider";
 import { ApiPromise } from "@polkadot/api";
@@ -155,8 +155,6 @@ export class Transaction {
     const isXCM = originNetwork!.id !== targetNetwork!.id;
     const isNativeAsset = asset!.symbol === originNetwork!.symbol;
 
-    //
-
     const bnAmount = transformAmountStringToBN(amount, asset!.decimals);
     let estimatedFee = "0";
 
@@ -272,19 +270,19 @@ export class Transaction {
   async getFee() {
     const originNetwork = this.tx.getValue().originNetwork;
 
-    if (originNetwork?.type === "wasm") {
+    if (originNetwork?.type === ChainType.WASM) {
       return this.handleWasmTx().catch((error) => {
         console.error("getWasmFee error:", error);
         return "0";
       });
-    } else if (originNetwork?.type === "evm") {
+    } else if (originNetwork?.type === ChainType.EVM) {
       return this.handleEvmTx().catch((error) => {
         console.error("handleEvmTx error:", error);
         return "0";
       });
-    } else if (originNetwork?.type === "ol") {
-      return this.handleWasmTx().catch((error) => {
-        console.error("getWasmFee error:", error);
+    } else if (originNetwork?.type === ChainType.OL) {
+      return this.handleOlTx().catch((error) => {
+        console.error("ol error:", error);
         return "0";
       });
     }

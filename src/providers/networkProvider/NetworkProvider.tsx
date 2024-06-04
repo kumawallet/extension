@@ -19,7 +19,7 @@ import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const initialState: InitialState = {
   chains: [],
-  selectedChain: {}
+  selectedChain: {},
 };
 
 const NetworkContext = createContext({} as NetworkContext);
@@ -31,7 +31,7 @@ const getChains = async (): Promise<ChainsState> => {
       key: SettingKey.SHOW_TESTNETS,
     });
 
-    const showTesnets = setting?.value || (false as boolean);
+    const showTesnets = setting?.value || false;
 
     const chains: ChainsState = [
       {
@@ -44,8 +44,8 @@ const getChains = async (): Promise<ChainsState> => {
       },
       {
         title: "move",
-        chains: OL_CHAINS
-      }
+        chains: OL_CHAINS,
+      },
     ];
 
     let customChains = await messageAPI.getCustomChains();
@@ -108,6 +108,7 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         chains,
       };
     }
+
     case "init-networks": {
       const { chains } = action.payload;
       return {
@@ -138,26 +139,25 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    getChains().then((result) => {
+    (async () => {
+      const chains = await getChains();
+
       dispatch({
         type: "init-networks",
+        payload: { chains },
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    messageAPI.networkSubscribe((network) => {
+      dispatch({
+        type: "select-network",
         payload: {
-          chains: result
+          selectedChain: network,
         },
       });
-    })
-
-
-    messageAPI.networkSubscribe(
-      (network) => {
-        dispatch({
-          type: "select-network",
-          payload: {
-            selectedChain: network
-          },
-        });
-      }
-    )
+    });
   }, []);
 
   return (

@@ -1,15 +1,15 @@
 import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { ethers } from "ethers";
 import { BehaviorSubject } from "rxjs";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { ChainType } from "@src/types";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
+import { providers } from "ethers";
 
 const RECONNECT_TIMEOUT = 20000;
 
 export type api = {
-  provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
+  provider: ApiPromise | providers.JsonRpcProvider | OlProvider;
   type: ChainType;
 };
 
@@ -45,7 +45,7 @@ export class Provider {
         }, RECONNECT_TIMEOUT);
       } else if (type === ChainType.EVM) {
         await (
-          this.providers[id].provider as ethers.providers.JsonRpcProvider
+          this.providers[id].provider as providers.JsonRpcProvider
         ).ready.then(() => {
           status[id] = ChainStatus.CONNECTED;
           this.statusNetwork.next(status);
@@ -53,7 +53,7 @@ export class Provider {
         this.intervals[id] = setInterval(async () => {
           const status = this.statusNetwork.getValue();
           await (
-            this.providers[id].provider as ethers.providers.JsonRpcProvider
+            this.providers[id].provider as providers.JsonRpcProvider
           ).ready.then(() => {
             if (status[id] === ChainStatus.CONNECTED) return;
             else {
@@ -86,7 +86,7 @@ export class Provider {
       const _chain = allChains.find((chain) => chain.id === id);
       switch (type) {
         case ChainType.EVM: {
-          const api = new ethers.providers.JsonRpcProvider(
+          const api = new providers.JsonRpcProvider(
             _chain && (_chain.rpcs[0] as string)
           );
           this.providers[id] = {
@@ -96,7 +96,7 @@ export class Provider {
           status[id] = ChainStatus.CONNECTING;
           this.statusNetwork.next(status);
           await (
-            this.providers[id].provider as ethers.providers.JsonRpcProvider
+            this.providers[id].provider as providers.JsonRpcProvider
           ).ready.then(() => {
             if (status[id] !== ChainStatus.CONNECTED) {
               status[id] = ChainStatus.CONNECTED;
@@ -108,7 +108,7 @@ export class Provider {
             const status = this.statusNetwork.getValue();
 
             await (
-              this.providers[id].provider as ethers.providers.JsonRpcProvider
+              this.providers[id].provider as providers.JsonRpcProvider
             ).ready
               .then(() => {
                 if (status[id] === "connected") return;
@@ -118,7 +118,7 @@ export class Provider {
                 }
               })
               .catch(async () => {
-                const _api = new ethers.providers.JsonRpcProvider(
+                const _api = new providers.JsonRpcProvider(
                   (_chain && _chain.rpcs[1]
                     ? _chain.rpcs[1]
                     : _chain && _chain.rpcs[0]) as string
@@ -130,8 +130,7 @@ export class Provider {
                 status[id] = ChainStatus.CONNECTING;
                 this.statusNetwork.next(status);
                 await (
-                  this.providers[id]
-                    .provider as ethers.providers.JsonRpcProvider
+                  this.providers[id].provider as providers.JsonRpcProvider
                 ).ready.then(() => {
                   if (status[id] !== ChainStatus.CONNECTED) {
                     status[id] = ChainStatus.CONNECTED;
@@ -213,12 +212,15 @@ export class Provider {
         break;
     }
   }
+
   public getProviders() {
     return this.providers;
   }
+
   public getChainStatus() {
     return this.statusNetwork;
   }
+
   public getOneProviders(chain: string) {
     return this.providers[chain];
   }
@@ -227,6 +229,7 @@ export class Provider {
     const status = this.statusNetwork.getValue();
     return status[chain];
   }
+
   private activeListeners(api: ApiPromise, id: string) {
     const status = this.statusNetwork.getValue();
     api.on("ready", () => {

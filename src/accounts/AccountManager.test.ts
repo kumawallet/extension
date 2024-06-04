@@ -176,8 +176,9 @@ describe("AccountManager", () => {
       keyring: {
         type: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
       } as unknown as SupportedKeyring,
+      isDerivable: true,
     });
-    expect(result).toEqual(selectedEVMAccountMock);
+    expect(result).toMatchObject(selectedEVMAccountMock);
   });
 
   describe("addAccount", () => {
@@ -339,14 +340,14 @@ describe("AccountManager", () => {
   });
 
   describe("getAll", () => {
-    it("shoudl return all wasm accounts", async () => {
+    it("should return all wasm accounts", async () => {
       const result = await AccountManager["getAll"]([AccountType.WASM]);
       expect(result?.data).toEqual({
         [selectedWASMAccountMock.key]: selectedWASMAccountMock,
       });
     });
 
-    it("shoudl return undefined", async () => {
+    it("should return undefined", async () => {
       const Accounts = await import("@src/storage/entities/Accounts");
       Accounts.default.get = vi.fn().mockImplementation(() => undefined);
       const result = await AccountManager["getAll"]([AccountType.WASM]);

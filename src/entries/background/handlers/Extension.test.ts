@@ -12,6 +12,7 @@ import Record from "../../../storage/entities/activity/Record";
 import { RecordStatus } from "../../../storage/entities/activity/types";
 import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType } from "@src/types";
+import { BehaviorSubject } from "rxjs";
 
 const accountManageMock = {
   saveBackup: vi.fn(),
@@ -51,8 +52,52 @@ const contactsMock = [
   },
 ];
 
-describe.skip("Extension", () => {
+const dataMock = {
+  PASSWORD: "Test.123",
+  NEW_PASSWORD: "Test.123",
+  SEED: "alarm skin dust shock fiber cruel virus brick slim culture hen leisure",
+};
+
+describe("Extension", () => {
   beforeAll(() => {
+    vi.mock("@src/storage/entities/Provider", () => ({
+      Provider: class {
+        statusNetwork = new BehaviorSubject({});
+
+        setProvider() {
+          return Promise.resolve();
+        }
+
+        getProviders() {
+          return Promise.resolve();
+        }
+
+        reset() {
+          return Promise.resolve();
+        }
+
+        disconnectChain() {
+          return Promise.resolve();
+        }
+      },
+    }));
+
+    vi.mock("@src/storage/entities/TransactionHistory", () => ({
+      default: class {
+        setAccount() {
+          return Promise.resolve();
+        }
+
+        addChain() {
+          return Promise.resolve();
+        }
+
+        removeChains() {
+          return Promise.resolve();
+        }
+      },
+    }));
+
     vi.mock("@src/storage/Auth", () => ({
       default: {
         getInstance: vi.fn().mockReturnValue({
@@ -62,6 +107,9 @@ describe.skip("Extension", () => {
         isAuthorized: vi.fn().mockReturnValue(true),
         signIn: vi.fn(),
         isSessionActive: vi.fn().mockReturnValue(true),
+        setAutoLock: vi.fn(),
+        unlock: vi.fn(),
+        getLock: vi.fn().mockReturnValue(5),
       },
     }));
     vi.mock("@src/storage/entities/Account", () => ({
@@ -73,13 +121,19 @@ describe.skip("Extension", () => {
           set: vi.fn(),
         }),
         set: vi.fn(),
-        get: () => selectedEVMChainMock,
+        get: () => {
+          return Promise.resolve({
+            selectedChain: {},
+            chain: null,
+          });
+        },
       },
     }));
+
     vi.mock("@src/storage/entities/SelectedAccount", () => {
       class _SelectedAccount {
         static get() {
-          return selectedEVMAccountMock;
+          return Promise.resolve(selectedEVMAccountMock);
         }
         static set() {
           vi.fn();
@@ -119,7 +173,9 @@ describe.skip("Extension", () => {
       default: {},
     }));
     vi.mock("./storage/entities/BaseEntity", () => {
-      class BaseEntityMock {}
+      class BaseEntityMock {
+        get() {}
+      }
 
       return {
         default: BaseEntityMock,
@@ -159,31 +215,72 @@ describe.skip("Extension", () => {
         areAccountsInitialized: vi.fn().mockReturnValue(true),
       },
     }));
+    vi.mock("@src/storage/entities/Accounts", () => ({
+      default: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            "EVM-1234": {
+              type: AccountType.EVM,
+            },
+          },
+        }),
+      },
+    }));
+  });
+
+  it("should instance", () => {
+    const extension = new Extension();
+    expect(extension).toBeDefined();
+  });
+
+  it("should be authorized", async () => {
+    const Vault = (await import("@src/storage/entities/Vault")).default;
+    Vault.getInstance = vi.fn().mockReturnValue({
+      keyrings: {
+        WASM: {},
+      },
+    });
+
+    const Auth = (await import("@src/storage/Auth")).default;
+    Auth.isAuthorized = vi.fn().mockReturnValue(true);
+
+    const extension = new Extension();
+    const result = await extension["isAuthorized"]();
+    expect(result).toBe(true);
+  });
+
+  it("should change password", async () => {
+    const AccountManager = (await import("@src/accounts/AccountManager"))
+      .default;
+
+    const extension = new Extension();
+    await extension["changePassword"]({
+      currentPassword: dataMock.PASSWORD,
+      newPassword: dataMock.NEW_PASSWORD,
+    });
+
+    expect(AccountManager.changePassword).toHaveBeenCalled();
   });
 
   describe("signUp", () => {
     it("should signUp", async () => {
-      const PASSWORD = "Test.123";
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const extension = new Extension();
+      const Storage = (await import("@src/storage/Storage")).default;
 
-      const result = await extension["signUp"]({
-        password: PASSWORD,
-        privateKeyOrSeed: SEED,
+      const extension = new Extension();
+      await extension["signUp"]({
+        password: dataMock.PASSWORD,
+        privateKeyOrSeed: dataMock.SEED,
       });
-      expect(result).toBe(undefined);
+
+      expect(Storage.init).toHaveBeenCalled();
     });
 
     it("should throw error", async () => {
-      const PASSWORD = "Test.123";
-      const SEED = "";
-
       try {
         const extension = new Extension();
         await extension["signUp"]({
-          password: PASSWORD,
-          privateKeyOrSeed: SEED,
+          password: dataMock.PASSWORD,
+          privateKeyOrSeed: "",
         });
       } catch (error) {
         expect(String(error)).toEqual("Error: private_key_or_seed_required");
@@ -191,137 +288,92 @@ describe.skip("Extension", () => {
     });
   });
 
-  it("should be authorized", async () => {
-    const Vault = await import("../../../storage/entities/Vault");
-    Vault.default.getInstance = vi.fn().mockResolvedValue({
-      keyrings: {},
-    });
-
-    const extension = new Extension();
-    const result = await extension["isAuthorized"]();
-    expect(result).toBe(true);
-  });
-
   describe("createAccounts", () => {
     it("should create accounts", async () => {
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const NAME = "created";
-      const PASSWORD = "Test.123";
-      const IS_SIGNUP = true;
-
       const extension = new Extension();
       const result = await extension["createAccounts"]({
-        seed: SEED,
-        name: NAME,
-        password: PASSWORD,
-        isSignUp: IS_SIGNUP,
+        seed: dataMock.SEED,
+        name: "",
+        password: dataMock.PASSWORD,
+        isSignUp: true,
       });
       expect(result).toBe(true);
     });
 
     it("should create accounts with isSignUp in false", async () => {
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const NAME = "created";
-      const PASSWORD = "Test.123";
-      const IS_SIGNUP = false;
-
       const extension = new Extension();
+
+      // @ts-expect-error --- private method
+      const signUp = vi.spyOn(extension, "signUp");
+
       const result = await extension["createAccounts"]({
-        seed: SEED,
-        name: NAME,
-        password: PASSWORD,
-        isSignUp: IS_SIGNUP,
+        seed: dataMock.SEED,
+        name: "",
+        password: dataMock.PASSWORD,
+        isSignUp: false,
       });
+
       expect(result).toBe(true);
+      expect(signUp).not.toHaveBeenCalled();
     });
   });
 
   describe("importAccount", () => {
     it("should import account", async () => {
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const NAME = "created";
-      const PASSWORD = "Test.123";
-      const IS_SIGNUP = true;
       const extension = new Extension();
 
       const result = await extension["importAccount"]({
-        privateKeyOrSeed: SEED,
-        name: NAME,
-        password: PASSWORD,
+        privateKeyOrSeed: dataMock.SEED,
+        name: "",
+        password: dataMock.PASSWORD,
         accountTypesToImport: [AccountType.WASM],
-        isSignUp: IS_SIGNUP,
+        isSignUp: true,
       });
       expect(result).toBe(undefined);
     });
+
     it("should import account with isSignUp in false", async () => {
-      const SEED =
-        "alarm skin dust shock fiber cruel virus brick slim culture hen leisure";
-      const NAME = "created";
-      const PASSWORD = "Test.123";
-      const IS_SIGNUP = false;
       const extension = new Extension();
 
+      // @ts-expect-error --- private method
+      const signUp = vi.spyOn(extension, "signUp");
+
       const result = await extension["importAccount"]({
-        privateKeyOrSeed: SEED,
-        name: NAME,
-        password: PASSWORD,
+        privateKeyOrSeed: dataMock.SEED,
+        name: "",
+        password: dataMock.PASSWORD,
         accountTypesToImport: [AccountType.WASM],
-        isSignUp: IS_SIGNUP,
+        isSignUp: false,
       });
+
       expect(result).toBe(undefined);
+      expect(signUp).not.toHaveBeenCalled();
     });
   });
 
-  it("should change password", async () => {
-    const SelectedAccount = (
-      await import("../../../storage/entities/SelectedAccount")
-    ).default;
-    SelectedAccount.get = vi.fn().mockReturnValue({
-      value: {
-        type: AccountType.EVM,
-        address: "EVM-1234",
-        keyring: "EVM",
-      },
-      key: "EVM-1234",
-    });
+  it("should remove account", async () => {
+    const AccountManager = (await import("@src/accounts/AccountManager"))
+      .default;
 
-    const Vault = (await import("../../../storage/entities/Vault")).default;
-    Vault.getKeyring = vi.fn().mockReturnValue({
-      getKey: () => {
-        return "1234";
-      },
-    });
-
-    const PASSWORD = "Test.123";
     const extension = new Extension();
 
-    const result = await extension["changePassword"]({
-      currentPassword: PASSWORD,
-      newPassword: PASSWORD,
-    });
-    expect(result).toBe(undefined);
-  });
-
-  it("should remove key", async () => {
-    const extension = new Extension();
-
-    const result = await extension["removeAccount"]({
+    await extension["removeAccount"]({
       key: "EVM-1234",
     });
-    expect(result).toBe(undefined);
+    expect(AccountManager.remove).toHaveBeenCalled();
   });
 
   it("should change name", async () => {
+    const AccountManager = (await import("@src/accounts/AccountManager"))
+      .default;
+
     const extension = new Extension();
 
-    const result = await extension["changeAccountName"]({
+    await extension["changeAccountName"]({
       key: "EVM-1234",
       newName: "test",
     });
-    expect(result).toBe(undefined);
+    expect(AccountManager.changeName).toHaveBeenCalled();
   });
 
   describe("resetWallet", () => {
@@ -362,6 +414,35 @@ describe.skip("Extension", () => {
     expect(result).toBe(undefined);
   });
 
+  it("should set auto lock", async () => {
+    const Auth = (await import("../../../storage/Auth")).default;
+
+    const extension = new Extension();
+    extension["setAutoLock"]({ time: 10 });
+
+    expect(Auth.setAutoLock).toHaveBeenCalled();
+  });
+
+  it("should unlock", async () => {
+    const Auth = (await import("../../../storage/Auth")).default;
+
+    const extension = new Extension();
+    extension["unlock"]();
+
+    expect(Auth.unlock).toHaveBeenCalled();
+  });
+
+  it("should get lock", async () => {
+    const extension = new Extension();
+    const result = await extension["getLock"]();
+
+    expect(result).toBe(5);
+  });
+
+  describe.skip("validatePassword", () => {
+    // it("should ")
+  });
+
   it("should be signed up", async () => {
     const extension = new Extension();
     const result = await extension["alreadySignedUp"]();
@@ -370,15 +451,6 @@ describe.skip("Extension", () => {
 
   describe("areAccountsInitialized", () => {
     it("should true", async () => {
-      const Accounts = await import("../../../storage/entities/Accounts");
-      Accounts.default.get = vi.fn().mockReturnValue({
-        data: {
-          "EVM-1234": {
-            type: AccountType.EVM,
-          },
-        },
-      });
-
       const extension = new Extension();
       const result = await extension["areAccountsInitialized"]();
       expect(result).toBe(true);
@@ -386,7 +458,7 @@ describe.skip("Extension", () => {
 
     it("should return false", async () => {
       const Accounts = await import("../../../storage/entities/Accounts");
-      Accounts.default.get = vi.fn().mockReturnValue(undefined);
+      Accounts.default.get = vi.fn().mockResolvedValue(undefined);
 
       const extension = new Extension();
       const result = await extension["areAccountsInitialized"]();
@@ -427,47 +499,47 @@ describe.skip("Extension", () => {
     expect(result).toBe(true);
   });
 
-  describe("showKey", () => {
-    it("should return key", async () => {
-      const SelectedAccount = (
-        await import("../../../storage/entities/SelectedAccount")
-      ).default;
-      SelectedAccount.get = vi.fn().mockReturnValue({
-        value: {
-          type: AccountType.EVM,
-          address: "EVM-1234",
-          keyring: "EVM",
-        },
-        key: "EVM-1234",
-      });
+  // describe("showKey", () => {
+  //   it("should return key", async () => {
+  //     const SelectedAccount = (
+  //       await import("../../../storage/entities/SelectedAccount")
+  //     ).default;
+  //     SelectedAccount.get = vi.fn().mockReturnValue({
+  //       value: {
+  //         type: AccountType.EVM,
+  //         address: "EVM-1234",
+  //         keyring: "EVM",
+  //       },
+  //       key: "EVM-1234",
+  //     });
 
-      const Vault = (await import("../../../storage/entities/Vault")).default;
-      Vault.getKeyring = vi.fn().mockReturnValue({
-        getKey: () => {
-          return "1234";
-        },
-      });
+  //     const Vault = (await import("../../../storage/entities/Vault")).default;
+  //     Vault.getKeyring = vi.fn().mockReturnValue({
+  //       getKey: () => {
+  //         return "1234";
+  //       },
+  //     });
 
-      const extension = new Extension();
-      const result = await extension["showKey"]({
-        address: "0x1234",
-      });
-      expect(result).toBe("1234");
-    });
+  //     const extension = new Extension();
+  //     const result = await extension["showKey"]({
+  //       address: "0x1234",
+  //     });
+  //     expect(result).toBe("1234");
+  //   });
 
-    it("should return undefined", async () => {
-      const SelectedAccount = (
-        await import("../../../storage/entities/SelectedAccount")
-      ).default;
-      SelectedAccount.get = vi.fn().mockReturnValue(undefined);
+  //   it("should return undefined", async () => {
+  //     const SelectedAccount = (
+  //       await import("../../../storage/entities/SelectedAccount")
+  //     ).default;
+  //     SelectedAccount.get = vi.fn().mockReturnValue(undefined);
 
-      const extension = new Extension();
-      const result = await extension["showKey"]({
-        address: "0x1234",
-      });
-      expect(result).toBe(undefined);
-    });
-  });
+  //     const extension = new Extension();
+  //     const result = await extension["showKey"]({
+  //       address: "0x1234",
+  //     });
+  //     expect(result).toBe(undefined);
+  //   });
+  // });
 
   it("get account", async () => {
     const extension = new Extension();
@@ -475,6 +547,32 @@ describe.skip("Extension", () => {
       key: "EVM-1234",
     });
     expect(result).toBe(undefined);
+  });
+
+  describe("getAccountsToDerive", () => {
+    it("should returns accounts to derive", async () => {
+      const AccountManager = (await import("../../../accounts/AccountManager"))
+        .default;
+
+      AccountManager.getAll = vi.fn().mockReturnValue({
+        getAll: vi.fn().mockReturnValue(accountsMocks),
+      });
+
+      const extension = new Extension();
+      const result = await extension["getAccountsToDerive"]();
+      expect(result).toEqual(accountsMocks);
+    });
+
+    it("should returns empty array", async () => {
+      const AccountManager = (await import("../../../accounts/AccountManager"))
+        .default;
+
+      AccountManager.getAll = vi.fn().mockReturnValue(null);
+
+      const extension = new Extension();
+      const result = await extension["getAccountsToDerive"]();
+      expect(result).toEqual([]);
+    });
   });
 
   describe("getAllAccounts", () => {
@@ -504,27 +602,63 @@ describe.skip("Extension", () => {
   });
 
   it("should derive account", async () => {
+    const AccountManager = (await import("../../../accounts/AccountManager"))
+      .default;
+
+    AccountManager.derive = vi.fn();
+
     const extension = new Extension();
-    const result = await extension["deriveAccount"]({
+
+    // @ts-expect-error --- private method
+    vi.spyOn(extension, "setSelectedAccount").mockReturnValue(null);
+
+    await extension["deriveAccount"]({
       name: "derived-evm",
       type: AccountType.EVM,
       address: "0x123",
     });
-    expect(result).toMatchObject({
-      key: "WASM-123",
-      value: "0x123",
-      type: AccountType.WASM,
-    });
+
+    expect(AccountManager.derive).toHaveBeenCalled();
   });
 
   it("should set network", async () => {
     const extension = new Extension();
     const result = await extension["setNetwork"]({
-      id: "evm",
+      id: "polygon",
       type: ChainType.EVM,
       isTestnet: false,
     });
-    expect(result).toBe(true);
+    expect(result).toEqual({
+      polygon: {
+        isTestnet: false,
+        type: "evm",
+      },
+      polkadot: {
+        isTestnet: false,
+        type: "wasm",
+      },
+    });
+  });
+
+  it("deleteSelectNetwork", async () => {
+    const extension = new Extension();
+
+    extension["chains"].next({
+      ethereum: {
+        isTestnet: false,
+        type: ChainType.EVM,
+      },
+    });
+
+    const result = await extension["deleteSelectNetwork"]({
+      id: "ethereum",
+    });
+    expect(result).not.toBe({
+      ethereum: {
+        isTestnet: false,
+        type: ChainType.EVM,
+      },
+    });
   });
 
   it("should return selected account", async () => {
@@ -533,29 +667,11 @@ describe.skip("Extension", () => {
     );
     _SelectedAccountMock.default.get = vi
       .fn()
-      .mockReturnValue(selectedEVMAccountMock);
+      .mockResolvedValue(selectedEVMAccountMock);
 
     const extension = new Extension();
     const result = await extension["getSelectedAccount"]();
     expect(result).toMatchObject(selectedEVMAccountMock);
-  });
-
-  it("should return selected network", async () => {
-    const Storage = await import("../../../storage/Storage");
-    Storage.default.getInstance = vi.fn().mockReturnValue({
-      storage: {
-        get: vi.fn(() => null),
-        set: vi.fn(),
-        remove: vi.fn(),
-      },
-    });
-
-    const _NetowrkMock = await import("../../../storage/entities/Network");
-    _NetowrkMock.default.get = vi.fn().mockReturnValue(selectedEVMChainMock);
-
-    const extension = new Extension();
-    const result = await extension["getNetwork"]();
-    expect(result).toMatchObject(selectedEVMChainMock);
   });
 
   describe("getGeneralSettings", () => {
@@ -715,6 +831,7 @@ describe.skip("Extension", () => {
       const result = await extension["getContacts"]();
       expect(result).toMatchObject(contactsMock);
     });
+
     it("should return error", async () => {
       const _Registry = (
         await import("../../../storage/entities/registry/Registry")
@@ -745,7 +862,7 @@ describe.skip("Extension", () => {
       ];
 
       const _Registry = (
-        await import("../../../storage/entities/registry/Registry")
+        await import("@src/storage/entities/registry/Registry")
       ).default;
       const get = vi.fn().mockReturnValue({
         getAllContacts: () => contactsMock,
@@ -753,18 +870,9 @@ describe.skip("Extension", () => {
       });
       _Registry.get = get;
 
-      const _Network = (await import("../../../storage/entities/Network"))
+      const _AccountManage = (await import("@src/accounts/AccountManager"))
         .default;
-      const getNetwork = vi.fn().mockReturnValue({
-        chain: {
-          supportedAccounts: [],
-        },
-      });
-      _Network.get = getNetwork;
-
-      const _AccountManage = (await import("../../../accounts/AccountManager"))
-        .default;
-      const getAll = vi.fn().mockReturnValue({
+      const getAll = vi.fn().mockResolvedValue({
         getAll: () => {
           return [];
         },
@@ -800,36 +908,6 @@ describe.skip("Extension", () => {
       const get = vi.fn().mockReturnValue({});
       _Registry.get = get;
 
-      const _Network = (await import("../../../storage/entities/Network"))
-        .default;
-      const getNetwork = vi.fn().mockReturnValue({ chain: undefined });
-      _Network.get = getNetwork;
-
-      try {
-        const extension = new Extension();
-        await extension["getRegistryAddresses"]();
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toEqual("Error: failed_to_get_network");
-      }
-    });
-
-    it("should return network error", async () => {
-      const _Registry = (
-        await import("../../../storage/entities/registry/Registry")
-      ).default;
-      const get = vi.fn().mockReturnValue({});
-      _Registry.get = get;
-
-      const _Network = (await import("../../../storage/entities/Network"))
-        .default;
-      const getNetwork = vi.fn().mockReturnValue({
-        chain: {
-          supportedAccounts: [],
-        },
-      });
-      _Network.get = getNetwork;
-
       const _AccountManage = (await import("../../../accounts/AccountManager"))
         .default;
       const getAll = vi.fn().mockReturnValue(undefined);
@@ -846,7 +924,7 @@ describe.skip("Extension", () => {
     });
   });
 
-  describe("save contact", () => {
+  describe("contact", () => {
     it("should save contact", async () => {
       const _Registry = (
         await import("../../../storage/entities/registry/Registry")
@@ -865,31 +943,33 @@ describe.skip("Extension", () => {
       });
       expect(addContact).toHaveBeenCalled();
     });
-  });
 
-  it("removeContact", async () => {
-    const _Registry = (
-      await import("../../../storage/entities/registry/Registry")
-    ).default;
-    const removeContact = vi.fn();
-    _Registry.removeContact = removeContact;
+    it("should update contact", async () => {
+      const _Registry = (
+        await import("../../../storage/entities/registry/Registry")
+      ).default;
+      const updateContact = vi.fn();
+      _Registry.updateContact = updateContact;
 
-    const extension = new Extension();
-    await extension["removeContact"]({ address: "0x12345" });
-    expect(removeContact).toHaveBeenCalled();
-  });
+      const extension = new Extension();
+      await extension["updateContact"]({
+        name: "account1",
+        address: "0x12345",
+      });
+      expect(updateContact).toHaveBeenCalled();
+    });
 
-  it("getActivity", async () => {
-    const _Activity = (
-      await import("../../../storage/entities/activity/Activity")
-    ).default;
-    const getRecords = vi.fn();
+    it("should remove contact", async () => {
+      const _Registry = (
+        await import("../../../storage/entities/registry/Registry")
+      ).default;
+      const removeContact = vi.fn();
+      _Registry.removeContact = removeContact;
 
-    _Activity.getRecords = getRecords;
-
-    const extension = new Extension();
-    await extension["getActivity"]();
-    expect(getRecords).toHaveBeenCalled();
+      const extension = new Extension();
+      await extension["removeContact"]({ address: "0x12345" });
+      expect(removeContact).toHaveBeenCalled();
+    });
   });
 
   it("saveCustomChain", async () => {

@@ -10,13 +10,14 @@ export const BalanceAccounts = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
+    state: { asset },
+  } = useLocation();
+  const {
     state: { accounts },
   } = useAccountContext();
-  const location = useLocation();
-  const { asset } = location.state;
 
   const accounstToShow = accounts.filter(
-    (account) => asset.accounts?.[account.key]
+    (account) => asset.accounts[account.key]
   );
 
   return (
@@ -24,18 +25,16 @@ export const BalanceAccounts = () => {
       <PageWrapper contentClassName="!h-[90vh]">
         <div className="h-full flex flex-col overflow-auto settings-container">
           <HeaderBack title={t("accounts.accounts")} navigate={navigate} />
-          <div className="flex flex-col gap-2 h-full">
+          <div data-testid="wallets" className="flex flex-col gap-2 h-full">
             {accounstToShow.map((account) => (
-              <>
-                <Wallet
-                  address={account.value!.address}
-                  name={account.value!.name}
-                  type={account.type}
-                  key={account.key}
-                  _asset={asset.accounts?.[account.key]}
-                  showBalanceforAsset={true}
-                />
-              </>
+              <Wallet
+                address={account.value!.address}
+                name={account.value!.name}
+                type={account.type}
+                key={account.key}
+                _asset={asset.accounts?.[account.key]}
+                showBalanceforAsset={true}
+              />
             ))}
           </div>
         </div>
