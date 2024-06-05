@@ -22,7 +22,7 @@ import {
   Security,
   Settings,
 } from "@src/pages/settings";
-import { AutoLock } from "@src/pages/settings/components/Security/Auto-lock";
+import { AutoLock } from "@src/pages/settings/components/Security/AutoLock";
 import {
   BALANCE,
   ACTIVITY_DETAIL,

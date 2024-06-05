@@ -50,6 +50,7 @@ export const SelectAccount: FC<SelectAccountProps> = ({
   return (
     <>
       <div
+        data-testid="select-account"
         onClick={openModal}
         className="flex items-center text-sm gap-1 w-full bg-[#1C1C27] text-white px-2 py-4  rounded-lg"
       >

@@ -84,9 +84,10 @@ describe("Activity", () => {
       });
       _SelectedAccount.get = get2;
 
-      await Activity.addRecord("test", {} as Record);
+      await Activity.addRecord("WASM-0x123", "0x123", {} as Record);
       expect(set).toHaveBeenCalled();
     });
+
     it("should throw Activity.get error", async () => {
       const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
         .default;
@@ -94,27 +95,7 @@ describe("Activity", () => {
       _BaseEntity.get = get;
 
       try {
-        await Activity.addRecord("test", {} as Record);
-      } catch (error) {
-        expect(String(error)).toBe("Error: failed_to_add_record");
-      }
-    });
-
-    it("should throw SelectedAccount.get error", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      const get = vi.fn().mockReturnValue({});
-      _BaseEntity.get = get;
-
-      const _SelectedAccount = (
-        await import("@src/storage/entities/SelectedAccount")
-      ).default;
-
-      const get2 = vi.fn().mockReturnValue(undefined);
-      _SelectedAccount.get = get2;
-
-      try {
-        await Activity.addRecord("test", {} as Record);
+        await Activity.addRecord("WASM-0x123", "0x123", {} as Record);
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_add_record");
       }
@@ -135,7 +116,7 @@ describe("Activity", () => {
       const get = vi.fn().mockReturnValue({
         addRecord: vi.fn(),
         data: {
-          test: {
+          "WASM-0x123": {
             "0x1234": {
               status: RecordStatus.PENDING,
               error: "",
@@ -148,6 +129,7 @@ describe("Activity", () => {
       _BaseEntity.set = set;
 
       await Activity.updateRecordStatus(
+        "WASM-0x123",
         "0x1234",
         RecordStatus.PENDING,
         undefined
@@ -165,6 +147,7 @@ describe("Activity", () => {
 
       try {
         await Activity.updateRecordStatus(
+          "WASM-0x123",
           "0x1234",
           RecordStatus.PENDING,
           undefined
@@ -189,6 +172,7 @@ describe("Activity", () => {
 
       try {
         await Activity.updateRecordStatus(
+          "WASM-0x123",
           "0x1234",
           RecordStatus.PENDING,
           undefined
@@ -210,13 +194,14 @@ describe("Activity", () => {
         .default;
       const get = vi.fn().mockReturnValue({
         data: {
-          test: {},
+          "WASM-0x123": {},
         },
       });
       _BaseEntity.get = get;
 
       try {
         await Activity.updateRecordStatus(
+          "WASM-0x123",
           "0x1234",
           RecordStatus.PENDING,
           undefined
@@ -239,5 +224,36 @@ describe("Activity", () => {
         },
       },
     });
+  });
+
+  it("get records", async () => {
+    const BaseEntity = (await import("@src/storage/entities/BaseEntity"))
+      .default;
+    BaseEntity.get = vi.fn().mockReturnValue({
+      data: {
+        "EVM-0x123": {
+          "0x123": {
+            id: "1",
+            status: RecordStatus.PENDING,
+            originNetwork: "test",
+            targetNetwork: "test",
+          },
+        },
+      },
+    });
+
+    const records = await Activity.getRecords({
+      address: "EVM-0x123",
+      networkNames: ["test"],
+    });
+
+    expect(records).toEqual([
+      {
+        id: "1",
+        status: RecordStatus.PENDING,
+        originNetwork: "test",
+        targetNetwork: "test",
+      },
+    ]);
   });
 });

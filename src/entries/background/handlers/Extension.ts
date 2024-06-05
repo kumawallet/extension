@@ -827,21 +827,37 @@ export default class Extension {
     return chains.custom;
   }
 
-  private async addActivity({ txHash, record }: RequestAddActivity) {
-    await Activity.addRecord(txHash, record);
+  private async addActivity({
+    senderAddress,
+    txHash,
+    record,
+  }: RequestAddActivity) {
+    const allAccounts = (await AccountManager.getAll())?.getAll() || [];
+
+    const account = allAccounts.find(
+      ({ value }) => value?.address === senderAddress
+    );
+
+    await Activity.addRecord(account!.key, txHash, record);
     const { address, network } = record;
     const register = new Register(address, Date.now());
     await Registry.addRecentAddress(network, register);
   }
 
   private async updateActivity({
+    senderAddress,
     txHash,
     status,
     error,
     fee,
   }: RequestUpdateActivity) {
-    // @ts-expect-error -- *
-    await Activity.updateRecordStatus(txHash, status, error, fee);
+    const allAccounts = (await AccountManager.getAll())?.getAll() || [];
+
+    const account = allAccounts.find(
+      ({ value }) => value?.address === senderAddress
+    );
+
+    await Activity.updateRecordStatus(account!.key, txHash, status, error);
   }
 
   private async addAsset({ chain, asset }: RequestAddAsset) {
@@ -896,7 +912,7 @@ export default class Extension {
   private getFeeSubscribe(id: string, port: Port) {
     const cb = createSubscription<"pri(send.getFeeSubscribe)">(id, port);
     const subscription = this.tx.tx.subscribe(async () =>
-      cb(await this.tx.getFee())
+      cb((await this.tx.getFee()).toString())
     );
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
@@ -970,6 +986,7 @@ export default class Extension {
             };
 
             await this.addActivity({
+              senderAddress: senderAddress,
               txHash: hash,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               record: transaction as unknown as any,
@@ -1036,7 +1053,12 @@ export default class Extension {
               status = RecordStatus.SUCCESS;
             }
             const hash = txHash.toString();
-            await this.updateActivity({ txHash: hash, status, error });
+            await this.updateActivity({
+              senderAddress,
+              txHash: hash,
+              status,
+              error,
+            });
             this.sendTxNotification({ title: `tx ${status}`, message: hash });
             this.transactionHistory.updateTransaction({
               chainId: originNetwork?.id as string,
@@ -1098,7 +1120,11 @@ export default class Extension {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await this.addActivity({ txHash, record: transaction as any });
+      await this.addActivity({
+        senderAddress: senderAddress,
+        txHash,
+        record: transaction as unknown as Record,
+      });
       this.transactionHistory.addTransactionToChain({
         chainId: originNetwork?.id as string,
         transaction,
@@ -1118,7 +1144,13 @@ export default class Extension {
       const fee = utils.formatEther(gasUsed.mul(effectiveGasPrice).toString());
 
       const error = "";
-      await this.updateActivity({ txHash, status, error, fee });
+      await this.updateActivity({
+        senderAddress,
+        txHash,
+        status,
+        error,
+        fee,
+      });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
       this.transactionHistory.updateTransaction({
         chainId: originNetwork?.id as string,
@@ -1175,7 +1207,11 @@ export default class Extension {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await this.addActivity({ txHash: hash, record: transaction as any });
+    await this.addActivity({
+      senderAddress: senderAddress,
+      txHash: hash,
+      record: transaction as unknown as Record,
+    });
     this.transactionHistory.addTransactionToChain({
       chainId: originNetwork?.id as string,
       transaction,
@@ -1189,6 +1225,9 @@ export default class Extension {
 
   private async sendTx() {
     const originNetwork = this.tx.tx.getValue().originNetwork;
+
+    console.log("originNetwork", originNetwork?.type);
+
     if (originNetwork?.type === "evm") {
       return this.sendEvmTx();
     } else if (originNetwork?.type === "wasm") {
@@ -1307,14 +1346,8 @@ export default class Extension {
 
       case "pri(activity.activitySubscribe)":
         return this.activitySubscribe(id, port);
-      // case "pri(activity.getHistoricActivity)":
-      //   return this.getHistoricActivity();
       case "pri(activity.getActivity)":
         return this.getActivity();
-      case "pri(activity.addActivity)":
-        return this.addActivity(request as RequestAddActivity);
-      case "pri(activity.updateActivity)":
-        return this.updateActivity(request as RequestUpdateActivity);
       case "pri(activity.setAccountToActivity)":
         return this.setAccountToActivity(
           request as RequestSetAccountToActivity

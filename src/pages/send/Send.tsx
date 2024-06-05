@@ -161,7 +161,7 @@ export const Send = () => {
     navigate(-1);
   }, [isConfirmingTx]);
 
-  const onSubmit: SubmitHandler<SendTxForm> = useCallback(async () => {
+  const onSubmit: SubmitHandler<SendTxForm> = useCallback(async (data) => {
     if (!isConfirmingTx) return setIsConfirmingTx(true);
 
     try {
@@ -264,7 +264,7 @@ export const Send = () => {
 
         <Button
           data-testid="send-button"
-          isDisabled={isLoadingFees || !isValid || !haveSufficientBalance}
+          isDisabled={isLoadingFees || !haveSufficientBalance}
           classname="w-full py-4"
           onClick={handleSubmit(onSubmit)}
         >

@@ -114,7 +114,6 @@ export class Transaction {
           )
       );
     } else if (isNativeAsset) {
-      // native asset transfer
       extrinsic = (provider as ApiPromise).tx.balances.transferAllowDeath(
         recipient,
         bnAmount

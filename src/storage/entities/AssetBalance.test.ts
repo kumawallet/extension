@@ -5,7 +5,6 @@ import Account from "./Account";
 import { AccountType } from "@src/accounts/types";
 import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
-import { BN0 } from "@src/constants/assets";
 
 const BALANCE_MOCK = "1000000000000000000";
 
@@ -86,7 +85,7 @@ const NATIVE_WASM_ASSETS_MOCK: Asset[] = [
   {
     id: "-1",
     symbol: "ASTR",
-    amount: "0",
+    amount: "0.10",
     balance: BALANCE_MOCK,
     decimals: 18,
     transferable: "0",
@@ -98,11 +97,11 @@ const NON_NATIVE_WASM_ASSETS_MOCK: Asset[] = [
   {
     id: "-1",
     symbol: "USDT",
-    amount: "0",
+    amount: "0.10",
     balance: BALANCE_MOCK,
     decimals: 6,
     transferable: "0",
-    price: "0",
+    price: "0.1",
   },
 ];
 
@@ -152,7 +151,11 @@ describe("AssetsBalance", () => {
       return {
         ...actual,
         getNatitveAssetBalance: nativeAssetsHoisted.getNatitveAssetBalance,
-        getAssetUSDPrice: () => ({}),
+        getAssetUSDPrice: () => ({
+          DOT: 7.3,
+          ASTR: 0.1,
+          USDT: 1,
+        }),
         getWasmAssets: (
           _: ApiPromise,
           __: string,
@@ -216,7 +219,10 @@ describe("AssetsBalance", () => {
       );
       const assets =
         assetBalance._assets[POLKADOT_ACCOUNT_MOCK.key]["astar"].assets;
-      expect(assets[0]).toEqual(NATIVE_WASM_ASSETS_MOCK[0]);
+      expect(assets[0]).toEqual({
+        ...NATIVE_WASM_ASSETS_MOCK[0],
+        price: "0.1",
+      });
       expect(assets[1]).toEqual(NON_NATIVE_WASM_ASSETS_MOCK[0]);
     });
 
@@ -237,9 +243,11 @@ describe("AssetsBalance", () => {
       const assets =
         assetBalance._assets[EVM_ACCOUNT_MOCK.key]["ethereum"].assets;
 
-      expect(assets[0]).toEqual(NATIVE_EVM_ASSETS_MOCK[0]);
+      expect(assets[0]).toEqual({ ...NATIVE_EVM_ASSETS_MOCK[0] });
       expect(assets[1]).toMatchObject({
         ...NON_NATIVE_EVM_ASSETS_MOCK[0],
+        price: "1",
+        amount: "1000000000000.00",
       });
     });
 
@@ -333,7 +341,7 @@ describe("AssetsBalance", () => {
 
     const assets =
       assetBalance._assets[POLKADOT_ACCOUNT_MOCK.key]["astar"].assets;
-    expect(assets[0]).toEqual(NATIVE_WASM_ASSETS_MOCK[0]);
+    expect(assets[0]).toEqual({ ...NATIVE_WASM_ASSETS_MOCK[0], price: "0.1" });
     expect(assets[1]).toEqual(NON_NATIVE_WASM_ASSETS_MOCK[0]);
   });
 
@@ -375,5 +383,35 @@ describe("AssetsBalance", () => {
       balance: "2000000000000000000",
       transferable: "2000000000000000000",
     });
+  });
+
+  it("deleteAsset", async () => {
+    nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+      NATIVE_WASM_ASSETS_MOCK[0]
+    );
+    const assetBalance = new AssetsBalance();
+    await assetBalance.setAssets(
+      POLKADOT_ACCOUNT_MOCK,
+      {
+        provider: POLKADOT_PROVIDER_MOCK as unknown as ApiPromise,
+        type: ChainType.WASM,
+      },
+      "astar"
+    );
+
+    assetBalance["deleteAsset"](
+      POLKADOT_ACCOUNT_MOCK,
+      {
+        astar: {
+          provider: POLKADOT_PROVIDER_MOCK as unknown as ApiPromise,
+          type: ChainType.WASM,
+        },
+      },
+      ["astar"]
+    );
+
+    const assets = assetBalance.getAssets().getValue();
+
+    expect(Object.keys(assets).length).toEqual(0);
   });
 });

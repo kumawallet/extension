@@ -12,12 +12,14 @@ const PRIVATE_KEY =
 const functionMocks = {
   fetch: vi.fn((url: string) => {
     if (url.includes("healthy")) {
-      return {
-        message: "diem-node:ok",
-      };
+      return Promise.resolve({
+        json: async () => ({
+          message: "diem-node:ok",
+        }),
+      });
     }
 
-    return {
+    return Promise.resolve({
       json: async () => ({
         hash: "hash",
         version: 1,
@@ -27,14 +29,12 @@ const functionMocks = {
         timestamp: 1,
       }),
       status: 202,
-    };
+    });
   }),
 };
 
 describe("OlProvider", () => {
   beforeAll(() => {
-    global.fetch = functionMocks.fetch as unknown as typeof fetch;
-
     vi.mock("@aptos-labs/ts-sdk", async () => {
       const actual = await import("@aptos-labs/ts-sdk");
 
@@ -123,5 +123,27 @@ describe("OlProvider", () => {
 
     const interval = (olProvider as any).interval as NodeJS.Timeout;
     expect(interval).toBe(null);
+  });
+
+  describe("healthCheck", () => {
+    it("should call healthCheck", async () => {
+      const olProvider = new OlProvider("");
+      const healthCheck = await olProvider.healthCheck();
+      expect(healthCheck).toBe(true);
+    });
+
+    it("should return false", () => {
+      functionMocks.fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          json: async () => ({
+            message: "diem-node:fail",
+          }),
+        })
+      );
+
+      const olProvider = new OlProvider("");
+      const healthCheck = olProvider.healthCheck();
+      expect(healthCheck).resolves.toBe(false);
+    });
   });
 });

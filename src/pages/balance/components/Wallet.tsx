@@ -2,9 +2,10 @@ import { ASSETS_ICONS } from "@src/constants/assets-icons";
 import { FC, useMemo } from "react";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { More } from "@src/components/icons/more";
-import { getHash } from "./funtions/Txfunctions";
+import { getHash } from "@src/utils/transactions-utils";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { AssetIcon } from "@src/components/common";
+
 interface WalletProps {
   name: string;
   address: string;

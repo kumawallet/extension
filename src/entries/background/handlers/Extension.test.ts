@@ -1,6 +1,5 @@
 import { AccountType } from "../../../accounts/types";
 import Extension from "./Extension";
-import { selectedEVMChainMock } from "../../../tests/mocks/chain-mocks";
 import { expect } from "vitest";
 import {
   selectedEVMAccountMock,
@@ -1007,8 +1006,18 @@ describe("Extension", () => {
     const addRecent = vi.fn();
     _Registry.addRecentAddress = addRecent;
 
+    const AccountManager = (await import("../../../accounts/AccountManager"))
+      .default;
+    AccountManager.getAll = vi.fn().mockReturnValue({
+      getAll: vi.fn().mockReturnValue(accountsMocks),
+    });
+
     const extension = new Extension();
-    await extension["addActivity"]({ txHash: "0x1234", record: {} as Record });
+    await extension["addActivity"]({
+      senderAddress: accountsMocks[0].value.address,
+      txHash: "0x1234",
+      record: {} as Record,
+    });
     expect(addRecent).toHaveBeenCalled();
   });
 
@@ -1019,8 +1028,15 @@ describe("Extension", () => {
     const updateRecordStatus = vi.fn();
     _Activity.updateRecordStatus = updateRecordStatus;
 
+    const AccountManager = (await import("../../../accounts/AccountManager"))
+      .default;
+    AccountManager.getAll = vi.fn().mockReturnValue({
+      getAll: vi.fn().mockReturnValue(accountsMocks),
+    });
+
     const extension = new Extension();
     await extension["updateActivity"]({
+      senderAddress: accountsMocks[0].value.address,
       txHash: "0x1234",
       status: RecordStatus.SUCCESS,
     });

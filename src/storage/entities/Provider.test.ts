@@ -4,6 +4,8 @@ import { ApiPromise } from "@polkadot/api";
 import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
 
+const RECONNECT_TIMEOUT = 20000;
+
 describe("Provider", () => {
   beforeAll(() => {
     vi.mock("ethers", async () => {
@@ -44,7 +46,7 @@ describe("Provider", () => {
 
   describe("set providers", () => {
     describe("polkadot", () => {
-      it("should set polkadot provider", () => {
+      it("should set polkadot provider", async () => {
         const provider = new Provider();
         provider.setProvider("polkadot", ChainType.WASM);
 

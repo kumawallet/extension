@@ -51,6 +51,7 @@ export default class AssetsBalance {
       chains.map((chain: string) => this.setAssets(account, api[chain], chain))
     );
   }
+
   public async setAssets(account: AccountEntity, api: api, chainId: string) {
     try {
       const chain = this.chains.find((_chain) => _chain.id === chainId);
@@ -78,13 +79,17 @@ export default class AssetsBalance {
           },
         };
 
-        if (!chain.isTestnet) {
-          const price = await this.getAssetsUSDPrice(
-            this._assets[account.key][chainId].assets
-          );
-          this._assets[account.key][chainId].assets = this._assets[account.key][
-            chainId
-          ].assets.map((asset) => {
+        const price = await this.getAssetsUSDPrice(
+          this._assets[account.key][chainId].assets
+        );
+
+        this._assets[account.key][chainId].assets = this._assets[account.key][
+          chainId
+        ].assets.map((asset) => {
+          asset.price = "0";
+          asset.amount = "0";
+
+          if (!chain.isTestnet) {
             asset.price = String(price[asset.symbol] ? price[asset.symbol] : 0);
             asset.amount = price[asset.symbol]
               ? Number(
@@ -98,17 +103,10 @@ export default class AssetsBalance {
                     )
                 ).toFixed(2)
               : "0";
-            return asset;
-          });
-        } else {
-          this._assets[account.key][chainId].assets = this._assets[account.key][
-            chainId
-          ].assets.map((asset) => {
-            asset.price = "0";
-            asset.amount = "0";
-            return asset;
-          });
-        }
+          }
+
+          return asset;
+        });
       }
     } catch (error) {
       const newnetworks = this.networks.filter(
@@ -211,7 +209,6 @@ export default class AssetsBalance {
         unsubs,
       };
     } catch (error) {
-      console.log("error", error);
       throw new Error("failed_to_get_nativeAsset");
     }
   };
@@ -237,8 +234,6 @@ export default class AssetsBalance {
 
       const balanceChanged =
         data.balance !== this._assets[account][chain].assets[index].balance;
-
-      console.log("index", balanceChanged);
 
       if (index > -1 && balanceChanged) {
         const _balance = Number(

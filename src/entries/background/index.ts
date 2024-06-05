@@ -31,7 +31,6 @@ cryptoWaitReady()
       type: "sr25519",
       store: new AccountsStore(),
     });
-    console.log("keyring loaded");
   })
   .catch((error): void => {
     console.error("initialization failed", error);

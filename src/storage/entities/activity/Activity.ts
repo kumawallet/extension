@@ -20,12 +20,14 @@ export default class Activity extends BaseEntity {
     await Activity.set<Activity>(new Activity());
   }
 
-  static async addRecord(txHash: string, record: Record): Promise<void> {
+  static async addRecord(
+    accountKey: AccountKey,
+    txHash: string,
+    record: Record
+  ): Promise<void> {
     const activity = await Activity.get<Activity>();
     if (!activity) throw new Error("failed_to_add_record");
-    const { key } = (await SelectedAccount.get<SelectedAccount>()) || {};
-    if (!key) throw new Error("failed_to_add_record");
-    activity.addRecord(key, txHash, record);
+    activity.addRecord(accountKey, txHash, record);
     await Activity.set<Activity>(activity);
   }
 
@@ -48,12 +50,11 @@ export default class Activity extends BaseEntity {
   }
 
   static async updateRecordStatus(
+    key: AccountKey,
     txHash: string,
     status: RecordStatus,
     error: string | undefined
   ): Promise<void> {
-    const { key } = (await SelectedAccount.get<SelectedAccount>()) || {};
-    if (!key) throw new Error("failed_to_add_record");
     const activity = await Activity.get<Activity>();
     if (!activity) throw new Error("failed_to_update_record_status");
     const record = activity.data[key][txHash];

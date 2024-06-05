@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { SendTxForm } from "../Send";
 import { LiaBookSolid } from "react-icons/lia";
-import { getHash } from "@src/pages/balance/components";
+import { getHash } from "@src/utils/transactions-utils";
 
 interface AddressBookProps {
   contacts: Contact[];

@@ -8,16 +8,13 @@ import Contact from "@src/storage/entities/registry/Contact";
 import { NetworkIcon } from "./NetworkIcon";
 import { Status } from "@src/components/common/TxStatus";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
-import { Chain } from "@src/types";
-import { messageAPI } from "@src/messageAPI/api";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { useToast } from "@src/hooks";
-import { XCM } from "@src/constants/xcm";
+
 import {
   getHash,
   getValue,
   getTip,
-} from "@src/pages/balance/components/funtions/Txfunctions";
+} from "@src/utils/transactions-utils";
 
 import { styleAD } from "./style/activityDetails";
 import { FaChevronRight } from "react-icons/fa";

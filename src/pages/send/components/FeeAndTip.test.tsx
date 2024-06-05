@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { SendTxForm } from "../Send";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
@@ -24,7 +24,7 @@ const FORM_EVM_ERC20_TRANSFER_MOCK: Partial<SendTxForm> = {
   amount: "1",
   fee: "0.0001",
   tip: "0",
-  isTipEnabled: false,
+  isTipEnabled: true,
   asset: {
     address: "0x123",
     symbol: "USDT",
@@ -91,4 +91,23 @@ describe("FeeAndTip", () => {
       expect(setValueMock).toHaveBeenCalled();
     });
   });
+
+  it("should enabled tip", async () => {
+    const setValueMock = vi.fn();
+
+    reactHookFormMocks.useFormContext.mockReturnValue({
+      watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_EVM_ERC20_TRANSFER_MOCK[key]),
+      getValues: vi.fn(() => true), // only for isXcm value,
+      setValue: setValueMock,
+    });
+
+    const { getByTestId } = renderComponent();
+
+
+
+    await waitFor(() => {
+      expect(getByTestId("tip")).toBeDefined();
+    })
+
+  })
 });

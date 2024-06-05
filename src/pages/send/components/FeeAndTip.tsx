@@ -45,6 +45,7 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
       <div className="w-full flex justify-between items-center">
         <p className="text-[#A3A3A3]">{t("tip")}</p>
         <Switch
+          data-testid="tip-switch"
           checked={isTipEnabled}
           onChange={(value) => setValue("isTipEnabled", value)}
           className={`${isTipEnabled ? "bg-teal-400" : "bg-gray-400"
@@ -58,7 +59,9 @@ export const FeeAndTip: FC<FeeAndTipProps> = ({ containerClassname }) => {
         </Switch>
       </div>
       {isTipEnabled && (
-        <div className="py-1">
+        <div
+          data-testid="tip"
+          className="py-1">
           <div className="flex items-center p-2 border border-[#636669] rounded-lg">
             <NumericFormat
               className="bg-transparent text-[#9CA3AF] outline-none border-none px-1 text-base w-[2ch]"

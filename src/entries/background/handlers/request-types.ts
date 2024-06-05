@@ -129,11 +129,13 @@ export interface RequestUpdateContact {
   address: string;
 }
 export interface RequestAddActivity {
+  senderAddress: string;
   txHash: string;
   record: Record;
 }
 
 export interface RequestUpdateActivity {
+  senderAddress: string;
   txHash: string;
   status: RecordStatus;
   fee?: string;

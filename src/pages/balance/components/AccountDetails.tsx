@@ -4,7 +4,7 @@ import { useAccountContext, useNetworkContext } from "@src/providers";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { useLoading, useToast } from "@src/hooks";
 import { messageAPI } from "@src/messageAPI/api";
-import { getHash } from "./funtions/Txfunctions";
+import { getHash } from "@src/utils/transactions-utils";
 import { Button } from "@src/components/common";
 import Account from "@src/storage/entities/Account";
 import { ConfirmMessage } from "@src/components/common/ConfirmMessage";

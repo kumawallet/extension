@@ -61,7 +61,10 @@ export default class TransactionHistory {
     targetNetwork: Chain;
   }) {
     const transactions = this.transactions.getValue();
-    transactions[chainId].push({
+
+    if (!transactions[chainId]) transactions[chainId] = [];
+
+    transactions[chainId]?.push({
       ...transaction,
       // @ts-expect-error --- *
       chainLogo: originNetwork.logo,
