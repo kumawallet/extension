@@ -258,7 +258,6 @@ export const AssetToSend = () => {
 
     if (!keyIndex) return [];
 
-    // @ts-expect-error -- *
     const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string];
 
     if (!_assetFromChain) return [];
@@ -270,10 +269,8 @@ export const AssetToSend = () => {
         XCM_ASSETS_MAPPING[originNetwork?.id]?.[targetChain?.id] || [];
 
       const filteredAssets = availableAssets.filter(
-        // @ts-expect-error -- *
         ({ symbol }, index, self) =>
           xcmAssets.includes(symbol) &&
-          // @ts-expect-error -- *
           self.findIndex((s) => s.symbol === symbol) === index
       );
 
@@ -289,7 +286,6 @@ export const AssetToSend = () => {
         balance: String(defaultAsset?.balance || "0"),
         address: defaultAsset?.address,
       });
-      // @ts-expect-error -- *
       return _assets.map(({ id, symbol, decimals, balance, address }) => ({
         id,
         symbol,
@@ -305,9 +301,7 @@ export const AssetToSend = () => {
         balance: String(availableAssets[0]?.balance || "0"),
         address: availableAssets[0]?.address || "",
       });
-      // return []
       return availableAssets.map(
-        // @ts-expect-error -- *
         ({ id, symbol, decimals, balance, address }) => ({
           id,
           symbol,
@@ -347,7 +341,7 @@ export const AssetToSend = () => {
                   address: asset.address,
                 });
               }}
-              value={selectedAsset as any}
+              value={selectedAsset as AssetToSelect}
               labelField="symbol"
               iconField="symbol"
               selectedLabelClassName="text-[#D0D0D0]"
@@ -356,7 +350,7 @@ export const AssetToSend = () => {
           </div>
 
           <SelectItem<Chain>
-            items={chainsToSelectFrom}
+            items={chainsToSelectFrom || []}
             onChangeValue={(network) => {
               setValue("originNetwork", network);
               setValue("targetNetwork", network);

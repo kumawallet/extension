@@ -849,6 +849,7 @@ export default class Extension {
     txHash,
     status,
     error,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fee,
   }: RequestUpdateActivity) {
     const allAccounts = (await AccountManager.getAll())?.getAll() || [];

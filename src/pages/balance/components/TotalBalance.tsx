@@ -37,9 +37,8 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
     return Object.keys(assets).reduce((acc, address) => {
       const account = assets[address];
       return acc + Object.keys(account).reduce((_acc, network) => {
-        // @ts-expect-error --- *
         const _network = account[network].assets
-        // @ts-expect-error --- *
+
         return _acc + _network.reduce((__acc: number, asset) => {
           return __acc + (Number(asset.amount) | 0)
         }, 0)

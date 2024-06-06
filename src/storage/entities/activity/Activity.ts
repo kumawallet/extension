@@ -1,6 +1,5 @@
 import { AccountKey } from "@src/accounts/types";
 import BaseEntity from "../BaseEntity";
-import SelectedAccount from "../SelectedAccount";
 import Record from "./Record";
 import { RecordStatus } from "./types";
 

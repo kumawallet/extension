@@ -71,6 +71,7 @@ export default class AssetsBalance {
 
         const subs = [..._unsubs, ...nativeUnsubs] || [];
 
+        // @ts-expect-error --- *
         this._assets[account.key] = {
           ...this._assets[account.key],
           [chainId]: {

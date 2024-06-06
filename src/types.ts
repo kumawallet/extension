@@ -50,7 +50,7 @@ export type confirmTx = ({ type, tx, fee }: Tx) => void;
 
 export interface Asset {
   address?: string;
-  amount: number;
+  amount: number | string;
   balance: string;
   decimals: number;
   id: string;

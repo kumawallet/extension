@@ -1,8 +1,5 @@
 import { OlProvider } from "./OlProvider";
 
-const MNEMONIC =
-  "impose round lonely vast net able deer slice explain field service term ginger inside sheriff couch soul pelican alert luggage holiday nature hand nation";
-
 const ADDRESS =
   "FDC2EF2FB05959371332B5C136CC0ED0C674F9837051D02CA1A359ED59953160";
 
@@ -121,7 +118,7 @@ describe("OlProvider", () => {
 
     await olProvider.disconnect();
 
-    const interval = (olProvider as any).interval as NodeJS.Timeout;
+    const interval = (olProvider as OlProvider)["interval"] as NodeJS.Timeout;
     expect(interval).toBe(null);
   });
 

@@ -4,8 +4,6 @@ import { ApiPromise } from "@polkadot/api";
 import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
 
-const RECONNECT_TIMEOUT = 20000;
-
 describe("Provider", () => {
   beforeAll(() => {
     vi.mock("ethers", async () => {

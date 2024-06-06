@@ -510,8 +510,6 @@ export const useSwap = () => {
       );
 
       const allAssets = Object.values(_assets[accountKey as string]).flatMap(
-        // @ts-expect-error --- *
-
         (a) => a.assets
       );
 

@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { AssetIcon } from "@src/components/common";
-import { Asset as IAsset } from "@src/providers/assetProvider/types";
 import { BALANCE_ACCOUNTS, SEND } from "@src/routes/paths";
 import { formatUSDAmount } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa6";
+import { Asset as IAsset } from "@src/types";
 
 interface AssetProps {
   asset: IAsset;
@@ -13,7 +13,7 @@ interface AssetProps {
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
 
-  // @ts-expect-error --- *
+  // @ts-expect-error --- Add to type
   const hasMultiplesAccounts = Object.keys(asset.accounts || {})?.length > 0;
 
   return (
@@ -27,7 +27,7 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
         }}
       >
 
-        <AssetIcon asset={asset as any} width={32} />
+        <AssetIcon asset={asset} width={32} />
         <div className="flex flex-col">
           <div className="flex gap-1 items-center">
             <p className="font-bold text-xl">{asset.balance}</p>

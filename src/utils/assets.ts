@@ -3,7 +3,6 @@ import { BN, hexToBn } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
 import { BigNumber, ethers } from "ethers";
 import { captureError } from "./error-handling";
-import { Asset } from "@src/providers/assetProvider/types";
 import {
   GenericStorageEntryFunction,
   PromiseResult,
@@ -15,7 +14,7 @@ import { CURRENCIES } from "@utils/constants";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 import AccountEntity from "@src/storage/entities/Account";
 import { OlProvider } from "@src/services/ol/OlProvider";
-import { AssetBalance, ChainType, SubstrateBalance } from "@src/types";
+import { Asset, AssetBalance, ChainType, SubstrateBalance } from "@src/types";
 
 export const getType = (type: string) => {
   if (type.includes("imported")) {

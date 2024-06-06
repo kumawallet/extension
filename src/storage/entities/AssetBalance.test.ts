@@ -81,7 +81,7 @@ const OL_PROVIDER_MOCK = {
   },
 };
 
-const NATIVE_WASM_ASSETS_MOCK: Asset[] = [
+const NATIVE_WASM_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "-1",
     symbol: "ASTR",
@@ -93,7 +93,7 @@ const NATIVE_WASM_ASSETS_MOCK: Asset[] = [
   },
 ];
 
-const NON_NATIVE_WASM_ASSETS_MOCK: Asset[] = [
+const NON_NATIVE_WASM_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "-1",
     symbol: "USDT",
@@ -105,7 +105,7 @@ const NON_NATIVE_WASM_ASSETS_MOCK: Asset[] = [
   },
 ];
 
-const NATIVE_EVM_ASSETS_MOCK: Asset[] = [
+const NATIVE_EVM_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "-1",
     symbol: "ETH",
@@ -117,7 +117,7 @@ const NATIVE_EVM_ASSETS_MOCK: Asset[] = [
   },
 ];
 
-const NON_NATIVE_EVM_ASSETS_MOCK: Asset[] = [
+const NON_NATIVE_EVM_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     symbol: "USDT",
@@ -128,7 +128,7 @@ const NON_NATIVE_EVM_ASSETS_MOCK: Asset[] = [
   },
 ];
 
-const NATIVE_OL_ASSETS_MOCK: Asset[] = [
+const NATIVE_OL_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "-1",
     symbol: "OL",

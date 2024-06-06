@@ -29,6 +29,7 @@ export const Assets = () => {
         symbol: string;
         decimals: number;
         id: string;
+        accountKey: string;
       }[];
     } = {};
 
@@ -36,13 +37,12 @@ export const Assets = () => {
       Object.keys(assets).forEach((accountKey) => {
         const networks = assets[accountKey];
         Object.keys(networks).forEach((network) => {
-          // @ts-expect-error --- *
           const assets = networks[network].assets;
-          // @ts-expect-error --- *
           assets.forEach((asset) => {
             if (!outputObject[asset.symbol]) {
               outputObject[asset.symbol] = [];
             }
+            // @ts-expect-error --- *
             outputObject[asset.symbol].push({ ...asset, accountKey });
           });
         });
