@@ -5,6 +5,7 @@ import { AssetToSend } from "./AssetToSend";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { BN } from "@polkadot/util";
 import { SendTxForm } from "../Send";
+import { ChainStatus } from "@src/storage/entities/Provider";
 
 type MOCK_WATCH_TYPE = keyof Partial<SendTxForm>;
 
@@ -93,6 +94,10 @@ describe("AssetToSend", () => {
               type: "wasm",
             },
           },
+          chainStatus: {
+            polkadot: ChainStatus.CONNECTED,
+            ethereum: ChainStatus.CONNECTED,
+          }
         },
       }),
       useAssetContext: () => ({

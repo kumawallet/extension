@@ -340,7 +340,6 @@ export const useSwap = () => {
         return;
       }
 
-      // @ts-expect-error --- *
       const chainId = assetToSell.chainId as string;
 
       const allChains = chains.map((chain) => chain.chains).flat();

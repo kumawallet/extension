@@ -48,6 +48,14 @@ export type Tx =
 
 export type confirmTx = ({ type, tx, fee }: Tx) => void;
 
+export interface AssetAccount {
+  balance: number;
+  amount: number;
+  symbol: string;
+  decimals: number;
+  id: string;
+}
+
 export interface Asset {
   address?: string;
   amount: number | string;
@@ -58,6 +66,9 @@ export interface Asset {
   symbol: string;
   transferable?: string;
   usdPrice: number;
+  accounts?: {
+    [id: string]: AssetAccount;
+  };
 }
 
 export type IAsset = Partial<Asset> & {
@@ -178,6 +189,13 @@ export interface Transaction {
   type: string;
   isSwap: boolean;
   version?: string;
+  lastUpdated?: number;
+}
+
+export interface FormattedTransaction extends Transaction {
+  chainLogo: string;
+  link: string | undefined;
+  isXcm: boolean;
 }
 
 export type HistoricTransaction = {

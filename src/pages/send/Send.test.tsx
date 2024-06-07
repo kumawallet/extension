@@ -27,12 +27,17 @@ describe("Send", () => {
       useNavigate: () => vi.fn(),
     }));
 
-    vi.mock("@src/hooks", () => ({
-      useToast: () => ({
-        showSuccessToast: vi.fn(),
-        showErrorToast: vi.fn(),
-      }),
-    }));
+    vi.mock("@src/hooks", async () => {
+      const actual = await vi.importActual("@src/hooks");
+
+      return {
+        ...actual,
+        useToast: () => ({
+          showSuccessToast: vi.fn(),
+          showErrorToast: vi.fn(),
+        }),
+      }
+    });
 
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {

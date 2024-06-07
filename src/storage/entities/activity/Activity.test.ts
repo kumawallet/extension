@@ -1,5 +1,5 @@
+import { Transaction } from "@src/types";
 import Activity from "./Activity";
-import Record from "./Record";
 import { RecordStatus } from "./types";
 
 describe("Activity", () => {
@@ -84,7 +84,7 @@ describe("Activity", () => {
       });
       _SelectedAccount.get = get2;
 
-      await Activity.addRecord("WASM-0x123", "0x123", {} as Record);
+      await Activity.addRecord("WASM-0x123", "0x123", {} as Transaction);
       expect(set).toHaveBeenCalled();
     });
 
@@ -95,7 +95,7 @@ describe("Activity", () => {
       _BaseEntity.get = get;
 
       try {
-        await Activity.addRecord("WASM-0x123", "0x123", {} as Record);
+        await Activity.addRecord("WASM-0x123", "0x123", {} as Transaction);
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_add_record");
       }
@@ -128,12 +128,10 @@ describe("Activity", () => {
       _BaseEntity.get = get;
       _BaseEntity.set = set;
 
-      await Activity.updateRecordStatus(
-        "WASM-0x123",
-        "0x1234",
-        RecordStatus.PENDING,
-        undefined
-      );
+      await Activity.updateRecordStatus("WASM-0x123", "0x1234", {
+        status: RecordStatus.PENDING,
+        fee: "",
+      });
       expect(set).toHaveBeenCalled();
     });
 
@@ -146,12 +144,10 @@ describe("Activity", () => {
       _SelectedAccount.get = get2;
 
       try {
-        await Activity.updateRecordStatus(
-          "WASM-0x123",
-          "0x1234",
-          RecordStatus.PENDING,
-          undefined
-        );
+        await Activity.updateRecordStatus("WASM-0x123", "0x1234", {
+          status: RecordStatus.PENDING,
+          fee: "",
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_add_record");
       }
@@ -171,12 +167,10 @@ describe("Activity", () => {
       _BaseEntity.get = get;
 
       try {
-        await Activity.updateRecordStatus(
-          "WASM-0x123",
-          "0x1234",
-          RecordStatus.PENDING,
-          undefined
-        );
+        await Activity.updateRecordStatus("WASM-0x123", "0x1234", {
+          status: RecordStatus.PENDING,
+          fee: "",
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_update_record_status");
       }
@@ -200,12 +194,10 @@ describe("Activity", () => {
       _BaseEntity.get = get;
 
       try {
-        await Activity.updateRecordStatus(
-          "WASM-0x123",
-          "0x1234",
-          RecordStatus.PENDING,
-          undefined
-        );
+        await Activity.updateRecordStatus("WASM-0x123", "0x1234", {
+          fee: "",
+          status: RecordStatus.PENDING,
+        });
       } catch (error) {
         expect(String(error)).toBe("Error: failed_to_update_record_status");
       }
@@ -216,7 +208,7 @@ describe("Activity", () => {
     const activity = new Activity();
     activity.addRecord("EVM-0x123", "0x123", {
       status: RecordStatus.PENDING,
-    } as Record);
+    } as Transaction);
     expect(activity.data).toEqual({
       "EVM-0x123": {
         "0x123": {

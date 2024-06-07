@@ -5,7 +5,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
-import { useToast } from "@src/hooks";
+import { useLoading, useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
 import { FiChevronLeft } from "react-icons/fi";
 import { Chain, SelectedChain } from "@src/types";
@@ -127,11 +127,11 @@ export const Send = () => {
   const { t } = useTranslation("send");
   const navigate = useNavigate();
   const { showSuccessToast, showErrorToast } = useToast();
+  const { isLoading, starLoading, endLoading } = useLoading()
 
   const {
     state: { selectedAccount },
   } = useAccountContext();
-
   const {
     state: { chains, selectedChain },
   } = useNetworkContext();
@@ -150,7 +150,6 @@ export const Send = () => {
     watch,
     handleSubmit,
     setValue,
-    formState: { isValid, errors },
   } = methods;
 
   const [isConfirmingTx, setIsConfirmingTx] = useState(false);
@@ -161,9 +160,10 @@ export const Send = () => {
     navigate(-1);
   }, [isConfirmingTx]);
 
-  const onSubmit: SubmitHandler<SendTxForm> = useCallback(async (data) => {
+  const onSubmit: SubmitHandler<SendTxForm> = useCallback(async () => {
     if (!isConfirmingTx) return setIsConfirmingTx(true);
 
+    starLoading();
     try {
       await messageAPI.sendTx();
       showSuccessToast(t("tx_send"));
@@ -176,6 +176,7 @@ export const Send = () => {
       captureError(error);
       showErrorToast(error);
     }
+    endLoading();
   }, [isConfirmingTx]);
 
   const isLoadingFees = watch("isLoadingFee");
@@ -264,6 +265,7 @@ export const Send = () => {
 
         <Button
           data-testid="send-button"
+          isLoading={isLoading}
           isDisabled={isLoadingFees || !haveSufficientBalance}
           classname="w-full py-4"
           onClick={handleSubmit(onSubmit)}

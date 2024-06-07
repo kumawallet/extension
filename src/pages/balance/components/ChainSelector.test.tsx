@@ -4,6 +4,7 @@ import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
 import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { act } from "react-dom/test-utils";
+import { ChainStatus } from "@src/storage/entities/Provider";
 
 const renderComponent = () => {
   return render(
@@ -21,6 +22,9 @@ describe("ChainSelector", () => {
       useNetworkContext: vi.fn(() => ({
         state: {
           selectedChain: SUBTRATE_CHAINS[0],
+          chainStatus: {
+            polkadot: ChainStatus.CONNECTED
+          },
           chains: [
             {
               title: "wasm_based",
@@ -33,6 +37,7 @@ describe("ChainSelector", () => {
           ]
         },
         setSelectNetwork: () => setSelectNetwork(),
+
       }))
     }));
 
@@ -45,25 +50,6 @@ describe("ChainSelector", () => {
       }
     }))
 
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            }
-          }),
-        },
-      }),
-    }))
   });
 
   it("should render", async () => {

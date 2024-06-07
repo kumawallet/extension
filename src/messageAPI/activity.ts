@@ -3,9 +3,6 @@ import { sendMessage } from ".";
 import { Transaction } from "@src/types";
 
 export const activityMessages = {
-  getActivity: () => {
-    return sendMessage("pri(activity.getActivity)");
-  },
   getHistoricActivity: () => {
     return sendMessage("pri(activity.getHistoricActivity)");
   },

@@ -8,7 +8,8 @@ import { TfiClose } from "react-icons/tfi";
 import { CiSearch } from "react-icons/ci";
 import { Network } from "../../../components/icons/Network";
 import { messageAPI } from "@src/messageAPI/api";
-import { Switch } from "@headlessui/react";
+import { ChainOption } from "./ChainOption";
+import { ChainStatus } from "@src/storage/entities/Provider";
 
 const canShowTestnetToggle = (
   chains: ChainsState,
@@ -30,7 +31,7 @@ export const ChainSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation("balance");
   const {
-    state: { chains, selectedChain },
+    state: { chains, selectedChain, chainStatus },
   } = useNetworkContext();
 
   const updateSelectNetwork = async (
@@ -42,6 +43,7 @@ export const ChainSelector = () => {
       await messageAPI.deleteSelectChain({ id });
     } else await messageAPI.setNetwork({ id, isTestnet, type });
   };
+
   const validateTestnet = () => {
     const selected = Object.keys(selectedChain).filter(
       (chain) => selectedChain[chain].isTestnet
@@ -52,6 +54,8 @@ export const ChainSelector = () => {
       return false;
     }
   };
+
+
   return (
     <>
       {isOpen ? (
@@ -83,7 +87,7 @@ export const ChainSelector = () => {
         >
           <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-10 w-full bg-[#2C3137] outline-0 z-50">
             <div className=" px-8 py-2 pt-2 text-start">
-              <div className="relativeflex flex-col gap-1 py-2 mt-2 ">
+              <div className="flex flex-col gap-1 py-2 mt-2 ">
                 <Menu.Button
                   data-testid="chain-button"
                   className="absolute top-6 right-6"
@@ -110,73 +114,30 @@ export const ChainSelector = () => {
               </div>
               <div className="flex flex-col gap-4 mt-4">
                 {chains.map((chainGroup) => (
-                  <div key={chainGroup.title} className="flex flex-col gap-3">
+                  <div
+                    key={chainGroup.title}
+                    className="flex flex-col gap-3 relative"
+                  >
                     <p className="text-base">{t(chainGroup.title)}</p>
                     <div className="flex flex-col gap-3">
                       {chainGroup.chains.map((chain) => (
-                        <Fragment key={chain.id}>
-                          <button
-                            className={`flex items-center justify-between border ${selectedChain[chain.id]
-                                ? "border-green-500"
-                                : "border-gray-600"
-                              } rounded-lg py-3 px-4`}
-                            disabled={
-                              Object.keys(selectedChain).length === 1 &&
-                              Object.keys(selectedChain)[0] === chain.id
-                            }
-                            onClick={() =>
-                              updateSelectNetwork(
-                                chain.id,
-                                chain.type,
-                                chain.isTestnet
-                              )
-                            }
-                          >
-                            <div className="flex items-center gap-3">
-                              {chain.isCustom ? (
-                                <div className="w-6 h-6 bg-gray-400 flex items-center justify-center text-base rounded-full">
-                                  {chain.name[0]}
-                                </div>
-                              ) : (
-                                <img
-                                  src={chain.logo}
-                                  width={18}
-                                  height={18}
-                                  alt={chain.name}
-                                  className="object-cover rounded-full"
-                                />
-                              )}
-                              <span className="text-base">{chain.name}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <Switch
-                                checked={
-                                  Object.prototype.hasOwnProperty.call(
-                                    selectedChain,
-                                    chain.id
-                                  )
-                                    ? true
-                                    : false
-                                }
-                                className={`${Object.prototype.hasOwnProperty.call(
-                                  selectedChain,
-                                  chain.id
-                                )
-                                    ? `bg-green-500`
-                                    : "bg-custom-gray-bg"
-                                  } relative inline-flex items-center h-2 rounded-full w-7 transition-colors duration-200`}
-                              >
-                                <span
-                                  className={`${Object.prototype.hasOwnProperty.call(
-                                    selectedChain,
-                                    chain.id
-                                  ) && "translate-x-4"
-                                    } inline-block w-3 h-3 transform bg-white rounded-full transition-transform duration-200`}
-                                />
-                              </Switch>
-                            </div>
-                          </button>
-                        </Fragment>
+                        <ChainOption
+                          key={chain.id}
+                          chain={chain}
+                          status={chainStatus[chain.id] as ChainStatus}
+                          isSelected={Boolean(selectedChain[chain.id])}
+                          isDisabled={
+                            Object.keys(selectedChain).length === 1 &&
+                            Object.keys(selectedChain)[0] === chain.id
+                          }
+                          onClick={() =>
+                            updateSelectNetwork(
+                              chain.id,
+                              chain.type,
+                              chain.isTestnet
+                            )
+                          }
+                        />
                       ))}
                     </div>
 

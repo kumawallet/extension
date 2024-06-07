@@ -4,6 +4,7 @@ import i18n from "@src/utils/i18n";
 import { render, waitFor } from "@testing-library/react";
 import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType, SelectedChain } from "@src/types";
+import { ChainStatus, NetworkStatus } from "@src/storage/entities/Provider";
 
 const TestComponent = () => {
   const { refreshNetworks, state: {
@@ -46,6 +47,9 @@ describe("NetworkProvider", () => {
           polkadot: {
             type: ChainType.WASM
           }
+        }),
+        netwotkStatusSubscribe: (cb: (networkStatus: NetworkStatus) => void) => cb({
+          polkadot: ChainStatus.CONNECTED,
         }),
       }
     }))

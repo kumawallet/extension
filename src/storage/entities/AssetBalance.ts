@@ -1,7 +1,7 @@
 import {
   formatAmountWithDecimals,
   getAssetUSDPrice,
-  getNatitveAssetBalance,
+  getNativeAssetBalance,
   getSubtrateNativeBalance,
   getType,
   getWasmAssets,
@@ -137,7 +137,7 @@ export default class AssetsBalance {
   ) => {
     try {
       let unsubs: Subcription[] = [];
-      const nativeAsset = await getNatitveAssetBalance(
+      const nativeAsset = await getNativeAssetBalance(
         api,
         account.value!.address,
         account

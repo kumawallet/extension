@@ -141,7 +141,7 @@ const NATIVE_OL_ASSETS_MOCK: Partial<Asset>[] = [
 ];
 
 const nativeAssetsHoisted = vi.hoisted(() => ({
-  getNatitveAssetBalance: vi.fn(),
+  getNativeAssetBalance: vi.fn(),
 }));
 
 describe("AssetsBalance", () => {
@@ -150,7 +150,7 @@ describe("AssetsBalance", () => {
       const actual = await import("@src/utils/assets");
       return {
         ...actual,
-        getNatitveAssetBalance: nativeAssetsHoisted.getNatitveAssetBalance,
+        getNativeAssetBalance: nativeAssetsHoisted.getNativeAssetBalance,
         getAssetUSDPrice: () => ({
           DOT: 7.3,
           ASTR: 0.1,
@@ -205,7 +205,7 @@ describe("AssetsBalance", () => {
 
   describe("setAssets", () => {
     it("should load polkadot assets", async () => {
-      nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+      nativeAssetsHoisted.getNativeAssetBalance.mockReturnValue(
         NATIVE_WASM_ASSETS_MOCK[0]
       );
       const assetBalance = new AssetsBalance();
@@ -227,7 +227,7 @@ describe("AssetsBalance", () => {
     });
 
     it("should load evm assets", async () => {
-      nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+      nativeAssetsHoisted.getNativeAssetBalance.mockReturnValue(
         NATIVE_EVM_ASSETS_MOCK[0]
       );
       const assetBalance = new AssetsBalance();
@@ -252,7 +252,7 @@ describe("AssetsBalance", () => {
     });
 
     it("should load ol assets", async () => {
-      nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+      nativeAssetsHoisted.getNativeAssetBalance.mockReturnValue(
         NATIVE_OL_ASSETS_MOCK[0]
       );
 
@@ -354,7 +354,7 @@ describe("AssetsBalance", () => {
   });
 
   it("updateOneAsset", async () => {
-    nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+    nativeAssetsHoisted.getNativeAssetBalance.mockReturnValue(
       NATIVE_WASM_ASSETS_MOCK[0]
     );
     const assetBalance = new AssetsBalance();
@@ -386,7 +386,7 @@ describe("AssetsBalance", () => {
   });
 
   it("deleteAsset", async () => {
-    nativeAssetsHoisted.getNatitveAssetBalance.mockReturnValue(
+    nativeAssetsHoisted.getNativeAssetBalance.mockReturnValue(
       NATIVE_WASM_ASSETS_MOCK[0]
     );
     const assetBalance = new AssetsBalance();

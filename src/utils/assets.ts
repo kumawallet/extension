@@ -24,11 +24,11 @@ export const getType = (type: string) => {
   return type;
 };
 
-export const getNatitveAssetBalance = async (
+export const getNativeAssetBalance = async (
   api: {
     provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
     type: ChainType;
-  },
+  } | null,
   accountAddress: string,
   account: AccountEntity
 ): Promise<AssetBalance> => {

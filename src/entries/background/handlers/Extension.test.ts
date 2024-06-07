@@ -7,10 +7,9 @@ import {
 } from "../../../tests/mocks/account-mocks";
 import { SettingType } from "../../../storage/entities/settings/types";
 import { SettingKey } from "../../../storage/entities/settings/types";
-import Record from "../../../storage/entities/activity/Record";
 import { RecordStatus } from "../../../storage/entities/activity/types";
 import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
-import { ChainType } from "@src/types";
+import { ChainType, Transaction } from "@src/types";
 import { BehaviorSubject } from "rxjs";
 
 const accountManageMock = {
@@ -1016,7 +1015,7 @@ describe("Extension", () => {
     await extension["addActivity"]({
       senderAddress: accountsMocks[0].value.address,
       txHash: "0x1234",
-      record: {} as Record,
+      record: {} as unknown as Transaction,
     });
     expect(addRecent).toHaveBeenCalled();
   });

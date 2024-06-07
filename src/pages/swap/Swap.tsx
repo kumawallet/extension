@@ -68,7 +68,6 @@ export const Swap = () => {
   ]);
 
 
-
   return (
     <PageWrapper
       contentClassName="h-full flex-1 "
@@ -129,8 +128,8 @@ export const Swap = () => {
                     }
                     amount={amounts.sell}
                     balance={formatBN(
-                      assetToSell.balance?.toString() || "0",
-                      assetToSell.decimals,
+                      assetToSell?.balance?.toString() || "0",
+                      assetToSell?.decimals,
                       4
                     )}
                     hasMaxOption
@@ -172,8 +171,8 @@ export const Swap = () => {
                   isLoading={isLoading || isLoadingBuyAsset || isLoadingAssets}
                   amount={amounts.buy}
                   balance={formatBN(
-                    assetToBuy.balance?.toString() || "0",
-                    assetToBuy.decimals,
+                    assetToBuy?.balance?.toString() || "0",
+                    assetToBuy?.decimals,
                     4
                   )}
                   label={t("you_receive") as string}
@@ -199,7 +198,7 @@ export const Swap = () => {
               <div className="flex flex-col gap-2">
                 <RecipientAddress
                   recipentAddressFormat={
-                    showRecipientAddress ? assetToBuy.label?.toUpperCase() : ""
+                    showRecipientAddress ? assetToBuy?.label?.toUpperCase() : ""
                   }
                   isOptional={false}
                   containerClassName="mt-4"

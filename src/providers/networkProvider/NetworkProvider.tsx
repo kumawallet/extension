@@ -20,6 +20,7 @@ import { OL_CHAINS } from "@src/constants/chainsData/ol";
 const initialState: InitialState = {
   chains: [],
   selectedChain: {},
+  chainStatus: {}
 };
 
 const NetworkContext = createContext({} as NetworkContext);
@@ -116,10 +117,20 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         chains,
       };
     }
+
+    case "update-status": {
+      const { status } = action.payload;
+
+      return {
+        ...state,
+        chainStatus: status
+      };
+    }
     default:
       return state;
   }
 };
+
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
@@ -154,11 +165,24 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
       dispatch({
         type: "select-network",
         payload: {
-          selectedChain: network,
+          selectedChain: network as Omit<InitialState["selectedChain"], "status">
         },
       });
     });
   }, []);
+
+
+  useEffect(() => {
+    messageAPI.netwotkStatusSubscribe((networkStatus) => {
+      dispatch({
+        type: "update-status",
+        payload: {
+          status: networkStatus,
+        },
+      });
+    });
+  }, []);
+
 
   return (
     <NetworkContext.Provider

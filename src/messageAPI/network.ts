@@ -7,6 +7,7 @@ import {
 } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 import { SelectedChain } from "@src/types";
+import { NetworkStatus } from "@src/storage/entities/Provider";
 
 export const networkMessages = {
   setNetwork: (params: RequestSetNetwork) => {
@@ -20,6 +21,9 @@ export const networkMessages = {
   },
   networkSubscribe: (cb: (network: SelectedChain) => void) => {
     return sendMessage("pri(network.subscription)", null, cb);
+  },
+  netwotkStatusSubscribe: (cb: (status: NetworkStatus) => void) => {
+    return sendMessage("pri(network.statusSubscription)", null, cb);
   },
   getAllChains: () => {
     return sendMessage("pri(network.getAllChains)");

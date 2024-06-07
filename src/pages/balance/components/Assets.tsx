@@ -8,6 +8,7 @@ import { Switch } from "@headlessui/react";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
 import { formatAmountWithDecimals } from "@src/utils/assets";
+import { AssetAccount, Asset as IAsset } from "@src/types";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
@@ -19,8 +20,7 @@ export const Assets = () => {
   const [showAllAssets, setShowAllAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    // @ts-expect-error --- *
-    let _assets = [];
+    let _assets: IAsset[] = [];
 
     const outputObject: {
       [key: string]: {
@@ -42,8 +42,7 @@ export const Assets = () => {
             if (!outputObject[asset.symbol]) {
               outputObject[asset.symbol] = [];
             }
-            // @ts-expect-error --- *
-            outputObject[asset.symbol].push({ ...asset, accountKey });
+            outputObject[asset.symbol].push({ ...asset, balance: Number(asset.balance), amount: Number(asset.amount), accountKey });
           });
         });
       });
@@ -52,13 +51,12 @@ export const Assets = () => {
       _assets = Object.keys(outputObject).map((key) => {
         const asset = outputObject[key];
 
-        const accountKeysInfo = {};
+        const accountKeysInfo = {} as {
+          [key: string]: AssetAccount
+        };
 
         asset.forEach((a) => {
-          // @ts-expect-error --- *
           if (!accountKeysInfo[a.accountKey]) {
-            // @ts-expect-error --- *
-
             accountKeysInfo[a.accountKey] = {
               balance: 0,
               amount: 0,
@@ -68,19 +66,15 @@ export const Assets = () => {
             };
           }
 
-          // @ts-expect-error --- *
           accountKeysInfo[a.accountKey].balance += Number(a.balance);
-          // @ts-expect-error --- *
           accountKeysInfo[a.accountKey].amount += Number(a.amount);
         });
 
         const balance = Object.values(accountKeysInfo).reduce((acc, _asset) => {
-          // @ts-expect-error --- *
           return acc + Number(_asset.balance || 0);
         }, 0);
 
-        const amount = Object.values(accountKeysInfo).reduce((acc, _asset) => {
-          // @ts-expect-error --- *
+        const amount = Object.values(accountKeysInfo).reduce((acc: number, _asset) => {
           return acc + Number(_asset.amount || 0);
         }, 0);
 
@@ -96,17 +90,16 @@ export const Assets = () => {
           accounts: accountKeysInfo,
           id: asset[0].id,
         };
-      });
+      }) as unknown as IAsset[];
     }
 
-    // @ts-expect-error --- *
     _assets = _assets.sort((a, b) => {
-      return b.balance - a.balance;
+      return Number(b.balance) - Number(a.balance);
     });
 
     if (showAllAssets) return _assets;
 
-    return _assets.filter((asset) => asset.id === "-1" || asset.balance !== 0);
+    return _assets.filter((asset) => asset.id === "-1" || Number(asset.balance) !== 0);
   }, [JSON.stringify(assets), showAllAssets]);
 
   return (

@@ -13,7 +13,6 @@ interface AssetProps {
 export const Asset: FC<AssetProps> = ({ asset }) => {
   const navigate = useNavigate();
 
-  // @ts-expect-error --- Add to type
   const hasMultiplesAccounts = Object.keys(asset.accounts || {})?.length > 0;
 
   return (

@@ -14,7 +14,7 @@ interface SelectableAssetProps<T extends SwapAsset> {
   label?: string;
   onChange: (asset: T) => void;
   options: T[];
-  value: T;
+  value?: T;
   position: 'left' | 'right';
 }
 
@@ -72,7 +72,7 @@ export const SelectableAsset = <T extends SwapAsset>({
         {({ open }) => (
           <div className="relative h-full">
             <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-3">
-              {value.image && <OptImage image={value.image} />}
+              {value?.image && <OptImage image={value?.image} />}
             </Combobox.Label>
 
             {isLoading && (

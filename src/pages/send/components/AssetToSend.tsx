@@ -17,6 +17,7 @@ import { formatBN, getType } from "@src/utils/assets";
 import { useDebounce } from "react-use";
 import { AssetIcon, SelectableOptionModal } from "@src/components/common";
 import { GoCircle, GoCheckCircle } from "react-icons/go";
+import { ChainStatus } from "@src/storage/entities/Provider";
 
 const ICON_WIDTH = 18;
 
@@ -104,9 +105,7 @@ export const SelectItem = <
                 )}
 
                 <span className={selectedLabelClassName}>
-                  {/* 
-// @ts-expect-error -- * */}
-                  {value?.[labelField]}
+                  {value?.[labelField] as string}
                 </span>
               </>
             )}
@@ -142,17 +141,14 @@ export const SelectItem = <
                 />
               ) : (
                 <img
-                  // @ts-expect-error -- *
-                  src={item?.[iconField] || ""}
+                  src={item?.[iconField] as string || ""}
                   width={ICON_WIDTH}
                   className="rounded-full"
                 />
               )}
 
               <span className="ml-3 text-xl">
-                {/* 
-// @ts-expect-error -- * */}
-                {item[labelField]}
+                {item[labelField] as string}
               </span>
             </div>
             <div>
@@ -185,7 +181,7 @@ export const AssetToSend = () => {
   const { t } = useTranslation("send");
 
   const {
-    state: { chains, selectedChain },
+    state: { chains, selectedChain, chainStatus },
   } = useNetworkContext();
   const {
     state: { assets },
@@ -222,12 +218,12 @@ export const AssetToSend = () => {
     if (!account) return;
 
     const chainsByType = chainsToSend.filter(
-      (chain) => chain.type === getType(account?.type?.toLowerCase())
+      (chain) => chain.type === getType(account?.type?.toLowerCase()) && chainStatus[chain.id] === ChainStatus.CONNECTED
     );
 
     setValue("originNetwork", chainsByType[0]);
     return chainsByType;
-  }, [chains, selectedChain, senderAddress, accounts]);
+  }, [chains, selectedChain, senderAddress, accounts, chainStatus]);
 
   useEffect(() => {
     if (!originNetwork?.id) return;
@@ -414,10 +410,11 @@ export const AssetToSend = () => {
           value={targetChain}
           labelField="name"
           containerClassname="w-full"
-          buttonClassname="w-full flex justify-end items-center gap-24 pr-4"
+          buttonClassname="w-full flex items-center px-4"
           iconField="logo"
           iconWidth={24}
-          selectedLabelClassName="text-lg ml-16 text-nowrap"
+          selectedLabelClassName="text-lg !mx-auto text-nowrap"
+          selectedItemContainerClassName="flex-1"
           modalTitle={t("select_chain")}
         />
       </div>

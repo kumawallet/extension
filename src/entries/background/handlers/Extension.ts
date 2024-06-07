@@ -11,7 +11,6 @@ import Settings from "@src/storage/entities/settings/Settings";
 import { SettingType } from "@src/storage/entities/settings/types";
 import Registry from "@src/storage/entities/registry/Registry";
 import Contact from "@src/storage/entities/registry/Contact";
-import Record from "@src/storage/entities/activity/Record";
 import Activity from "@src/storage/entities/activity/Activity";
 import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
@@ -490,7 +489,6 @@ export default class Extension {
           }) || "";
 
         // @ts-expect-error --- migration
-
         _keyring.mnemonic = "";
 
         if (!parentAddress) return;
@@ -505,13 +503,11 @@ export default class Extension {
 
             const keyFound = Object.keys(accounts?.data).find(
               // @ts-expect-error --- migration
-
               (_key: AccountKey) => _key === `${key}-${address}`
             );
 
             if (keyFound) {
               // @ts-expect-error --- migration
-
               accounts!.data[keyFound].value.parentAddress = parentAddress;
             }
           }
@@ -591,9 +587,21 @@ export default class Extension {
     await this.transactionHistory.removeChains({ chainIds: [id] });
     return chains;
   }
+
   private networksSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(network.subscription)">(id, port);
     const subscription = this.chains.subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.chains.getValue();
+  };
+
+  private networksStatusSubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(network.statusSubscription)">(id, port);
+    const subscription = this.provider.statusNetwork.subscribe((data) =>
+      cb(data)
+    );
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
     });
@@ -765,11 +773,6 @@ export default class Extension {
     await Registry.updateContact(address, name);
   }
 
-  private async getActivity(): Promise<Record[]> {
-    // return Activity.getRecords();
-    return [];
-  }
-
   private activitySubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(activity.activitySubscribe)">(id, port);
     const subscription = this.transactionHistory.transactions.subscribe(() =>
@@ -839,17 +842,15 @@ export default class Extension {
     );
 
     await Activity.addRecord(account!.key, txHash, record);
-    const { address, network } = record;
-    const register = new Register(address, Date.now());
-    await Registry.addRecentAddress(network, register);
+    const { originNetwork, recipient } = record;
+    const register = new Register(recipient, Date.now());
+    await Registry.addRecentAddress(originNetwork, register);
   }
 
   private async updateActivity({
     senderAddress,
     txHash,
     status,
-    error,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fee,
   }: RequestUpdateActivity) {
     const allAccounts = (await AccountManager.getAll())?.getAll() || [];
@@ -858,7 +859,10 @@ export default class Extension {
       ({ value }) => value?.address === senderAddress
     );
 
-    await Activity.updateRecordStatus(account!.key, txHash, status, error);
+    await Activity.updateRecordStatus(account!.key, txHash, {
+      fee: fee || "",
+      status,
+    });
   }
 
   private async addAsset({ chain, asset }: RequestAddAsset) {
@@ -1124,7 +1128,7 @@ export default class Extension {
       await this.addActivity({
         senderAddress: senderAddress,
         txHash,
-        record: transaction as unknown as Record,
+        record: transaction,
       });
       this.transactionHistory.addTransactionToChain({
         chainId: originNetwork?.id as string,
@@ -1207,11 +1211,10 @@ export default class Extension {
       version: tx?.version as string,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await this.addActivity({
       senderAddress: senderAddress,
       txHash: hash,
-      record: transaction as unknown as Record,
+      record: transaction,
     });
     this.transactionHistory.addTransactionToChain({
       chainId: originNetwork?.id as string,
@@ -1226,8 +1229,6 @@ export default class Extension {
 
   private async sendTx() {
     const originNetwork = this.tx.tx.getValue().originNetwork;
-
-    console.log("originNetwork", originNetwork?.type);
 
     if (originNetwork?.type === "evm") {
       return this.sendEvmTx();
@@ -1323,6 +1324,9 @@ export default class Extension {
         return this.getCustomChains();
       case "pri(network.subscription)":
         return this.networksSubscribe(id, port);
+      case "pri(network.statusSubscription)":
+        return this.networksStatusSubscribe(id, port);
+
       case "pri(assestsBanlance.subscription)":
         return this.assetsSubscribe(id, port);
       case "pri(settings.getGeneralSettings)":
@@ -1347,8 +1351,6 @@ export default class Extension {
 
       case "pri(activity.activitySubscribe)":
         return this.activitySubscribe(id, port);
-      case "pri(activity.getActivity)":
-        return this.getActivity();
       case "pri(activity.setAccountToActivity)":
         return this.setAccountToActivity(
           request as RequestSetAccountToActivity

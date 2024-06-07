@@ -2,20 +2,21 @@ import { FC } from "react";
 import { Button } from "@src/components/common";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+
+import { SubmitHandler } from "react-hook-form";
 import { ImportWalletFormValues } from "../validations";
 
 interface SelectImportFromProps {
-  onContinue: (data: ImportWalletFormValues) => void;
+  onContinue: SubmitHandler<ImportWalletFormValues>;
 }
 
 export const SelectImportFrom: FC<SelectImportFromProps> = ({ onContinue }) => {
   const { t } = useTranslation("account_form");
 
-  const { handleSubmit, setValue } = useFormContext();
+  const { handleSubmit, setValue } = useFormContext<ImportWalletFormValues>();
 
   const onSelected = (type: "seed" | "privateKey") => {
     setValue("type", type);
-    // @ts-expect-error -- *
     handleSubmit(onContinue)();
   };
 

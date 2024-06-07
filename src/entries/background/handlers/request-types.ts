@@ -3,7 +3,7 @@ import Account from "@src/storage/entities/Account";
 import { AssetBalance } from "@src/storage/entities/AssetBalance";
 import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
-import Record from "@src/storage/entities/activity/Record";
+import { NetworkStatus } from "@src/storage/entities/Provider";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Setting from "@src/storage/entities/settings/Setting";
@@ -15,6 +15,7 @@ import {
 import {
   Chain,
   ChainType,
+  FormattedTransaction,
   HistoricTransaction,
   SelectedChain,
   Transaction,
@@ -131,7 +132,7 @@ export interface RequestUpdateContact {
 export interface RequestAddActivity {
   senderAddress: string;
   txHash: string;
-  record: Record;
+  record: Transaction;
 }
 
 export interface RequestUpdateActivity {
@@ -253,6 +254,7 @@ export interface Request {
   ];
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
   "pri(network.subscription)": [null, SelectedChain, SelectedChain];
+  "pri(network.statusSubscription)": [null, NetworkStatus, NetworkStatus];
 
   "pri(assestsBanlance.subscription)": [null, AssetBalance, AssetBalance];
 
@@ -273,10 +275,13 @@ export interface Request {
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
   "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
-  "pri(activity.getActivity)": [null, Record[]];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];
-  "pri(activity.activitySubscribe)": [null, Transaction[], Transaction[]];
+  "pri(activity.activitySubscribe)": [
+    null,
+    FormattedTransaction[],
+    FormattedTransaction[]
+  ];
   "pri(activity.updateRecordStatus)": [string, void];
   "pri(activity.setAccountToActivity)": [RequestSetAccountToActivity, void];
 

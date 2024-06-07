@@ -1,5 +1,4 @@
 import { FC, Fragment } from 'react';
-import { useTranslation } from "react-i18next";
 
 
 interface TxSummaryProps {

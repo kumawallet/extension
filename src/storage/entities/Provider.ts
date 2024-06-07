@@ -13,6 +13,8 @@ export type api = {
   type: ChainType;
 };
 
+export type NetworkStatus = Record<string, string>;
+
 export enum ChainStatus {
   CONNECTED = "connected",
   DISCONNECTED = "disconnected",
@@ -21,7 +23,7 @@ export enum ChainStatus {
 
 export class Provider {
   private providers: Record<string, api> = {};
-  public statusNetwork = new BehaviorSubject<Record<string, string>>({});
+  public statusNetwork = new BehaviorSubject<NetworkStatus>({});
   private intervals: {
     [key: string]: NodeJS.Timeout;
   } = {};

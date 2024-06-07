@@ -8,6 +8,7 @@ export interface SwapAsset {
   network: string;
   name: string;
   address?: string;
+  chainId: string;
 }
 
 export interface ActiveSwaps {

@@ -8,7 +8,7 @@ import {
   formatBN,
   formatUSDAmount,
   getAssetUSDPrice,
-  getNatitveAssetBalance,
+  getNativeAssetBalance,
   getWasmAssets,
 } from "@src/utils/assets";
 import { ethers } from "ethers";
@@ -25,7 +25,7 @@ describe("assets", () => {
     });
   });
 
-  describe("getNatitveAssetBalance", () => {
+  describe("getNativeAssetBalance", () => {
     it("should use polkadot api", async () => {
       const api = {
         query: {
@@ -39,7 +39,7 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(
+      const result = await getNativeAssetBalance(
         {
           provider: api as ApiPromise,
           type: ChainType.WASM,
@@ -58,7 +58,7 @@ describe("assets", () => {
         getBalance: vi.fn().mockReturnValue(2),
       } as unknown;
 
-      const result = await getNatitveAssetBalance(
+      const result = await getNativeAssetBalance(
         {
           provider: api as ethers.providers.JsonRpcProvider,
           type: ChainType.EVM,
@@ -73,8 +73,7 @@ describe("assets", () => {
     });
 
     it("should return same amount", async () => {
-      // @ts-expect-error --- *
-      const result = await getNatitveAssetBalance(null, "0x123", {} as Account);
+      const result = await getNativeAssetBalance(null, "0x123", {} as Account);
       expect(result).toEqual({
         balance: "0",
         transferable: "0",
@@ -88,7 +87,7 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(
+      const result = await getNativeAssetBalance(
         {
           provider: api as ApiPromise,
           type: ChainType.WASM,

@@ -7,12 +7,17 @@ import { formatFees } from "@src/utils/assets";
 import { getTxLink } from "@src/utils/transfer";
 import { getChainHistoricHandler } from "@src/services/historic-transactions";
 import { transformAddress } from "@src/utils/account-utils";
-import { Chain, ChainType, Transaction } from "@src/types";
+import {
+  Chain,
+  ChainType,
+  FormattedTransaction,
+  Transaction,
+} from "@src/types";
 
 type ChainId = string;
 
 interface Transactions {
-  [key: ChainId]: Transaction[];
+  [key: ChainId]: FormattedTransaction[];
 }
 
 export default class TransactionHistory {
@@ -66,7 +71,6 @@ export default class TransactionHistory {
 
     transactions[chainId]?.push({
       ...transaction,
-      // @ts-expect-error --- *
       chainLogo: originNetwork.logo,
       fee: `${formatFees(transaction.fee, originNetwork.decimals)} ${
         originNetwork.symbol
@@ -206,15 +210,10 @@ export default class TransactionHistory {
       );
     });
 
-    // const transactions = this.transactions.getValue();
-
-    // chainIds.forEach((chainId) => {
-    // transactions  [chainId] = transactionsByChainId[chainId];
-    // });
     this.transactions.next(transactionsByChainId);
   }
 
-  getTransactions() {
+  getTransactions(): FormattedTransaction[] {
     const transactions = Object.values(this.transactions.getValue());
 
     return transactions.flat().sort((a, b) => {
