@@ -4,6 +4,7 @@ import { I18nextProvider } from "react-i18next";
 import { ImportWalletFromInside } from "./ImportWalletFromInside";
 import { PropsWithChildren } from "react";
 import { AccountType } from "@src/accounts/types";
+import { POLKADOT_SEED_MOCK } from "@src/tests/mocks/account-mocks";
 
 const functionMocks = {
   onBack: vi.fn(),
@@ -54,14 +55,14 @@ describe('ImportWalletFromInside', () => {
             cb({
               type: "seed",
               seedLength: 12,
-              privateKeyOrSeed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED"
+              privateKeyOrSeed: POLKADOT_SEED_MOCK
             });
           }),
           setValue: vi.fn(),
           watch: vi.fn(() => ({
             type: "seed",
             seedLength: 12,
-            privateKeyOrSeed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED",
+            privateKeyOrSeed: POLKADOT_SEED_MOCK,
             accountTypesToImport: [AccountType.IMPORTED_EVM]
           })),
         }),

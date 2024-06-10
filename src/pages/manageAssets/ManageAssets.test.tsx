@@ -14,6 +14,7 @@ const renderComponent = () => {
   );
 };
 
+
 const showErrorToast = vi.fn();
 const addAsset = vi.fn();
 

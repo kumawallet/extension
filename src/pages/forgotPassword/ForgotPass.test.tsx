@@ -5,7 +5,7 @@ import { ForgotPass } from "./ForgotPass";
 
 const functionMocks = {
   resetWallet: vi.fn(),
-}
+};
 
 const renderComponent = () => {
   return render(
@@ -28,60 +28,36 @@ describe("ForgotPass", () => {
       useLoading: vi.fn(() => ({
         starLoading: vi.fn(),
         endLoading: vi.fn(),
-      }))
+      })),
     }));
 
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
         resetWallet: () => functionMocks.resetWallet(),
-      }
-    }))
-
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }))
+      },
+    }));
   });
 
   describe("render", () => {
-
     it("should render the component", () => {
       const { container } = renderComponent();
       expect(container).toBeDefined();
     });
-  })
+  });
 
-  describe('resetWallet', () => {
-    it('should call resetWallet', async () => {
+  describe("resetWallet", () => {
+    it("should call resetWallet", async () => {
       const { getByTestId } = renderComponent();
 
       act(() => {
         fireEvent.click(getByTestId("checkbox"));
-      })
+      });
 
       act(() => {
         fireEvent.click(getByTestId("reset-button"));
-      })
+      });
 
       expect(functionMocks.resetWallet).toHaveBeenCalled();
-
-    })
-
-  })
-
+    });
+  });
 });

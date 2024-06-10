@@ -2,14 +2,14 @@ import { vi } from "vitest";
 import AccountManager from "./AccountManager";
 import { AccountValue, KeyringType } from "./types";
 import { AccountKey, AccountType } from "@src/accounts/types";
-import {
-  accountsMocks,
-  selectedEVMAccountMock,
-  selectedWASMAccountMock,
-} from "@src/tests/mocks/account-mocks";
 import Accounts from "@src/storage/entities/Accounts";
 import { SupportedKeyring } from "@src/storage/entities/keyrings/types";
 import HDKeyring from "@src/storage/entities/keyrings/hd/HDKeyring";
+import {
+  ACCOUNTS_MOCKS,
+  EVM_ACCOUNT_MOCK,
+  POLKADOT_ACCOUNT_MOCK,
+} from "@src/tests/mocks/account-mocks";
 
 const wasmWalletResponseMock = {
   json: {
@@ -127,13 +127,13 @@ describe("AccountManager", () => {
         count: () => 0,
         add: vi.fn(),
         save: vi.fn(),
-        getAccount: vi.fn().mockImplementation(() => selectedEVMAccountMock),
+        getAccount: () => EVM_ACCOUNT_MOCK,
         update: vi.fn().mockImplementation((account) => account),
-        getAll: vi.fn().mockImplementation(() => accountsMocks),
+        getAll: () => ACCOUNTS_MOCKS,
         get: vi.fn().mockImplementation(() => {
           const data: { [key: string]: object } = {};
 
-          accountsMocks.forEach((acc) => {
+          ACCOUNTS_MOCKS.forEach((acc) => {
             data[acc.key] = {
               get: () => acc,
             };
@@ -141,8 +141,8 @@ describe("AccountManager", () => {
 
           return {
             data,
-            getAll: () => accountsMocks,
-            get: (key: string) => accountsMocks.find((acc) => acc.key === key),
+            getAll: () => ACCOUNTS_MOCKS,
+            get: (key: string) => ACCOUNTS_MOCKS.find((acc) => acc.key === key),
           };
         }),
       },
@@ -170,15 +170,17 @@ describe("AccountManager", () => {
 
   it("should create account", async () => {
     const result = await AccountManager.createAccount({
-      address: selectedEVMAccountMock.value.address,
-      name: selectedEVMAccountMock.value.name,
+      address: EVM_ACCOUNT_MOCK.value!.address,
+      name: EVM_ACCOUNT_MOCK.value!.name,
       type: AccountType.EVM,
       keyring: {
-        type: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
+        type: AccountType.EVM,
       } as unknown as SupportedKeyring,
+
       isDerivable: true,
     });
-    expect(result).toMatchObject(selectedEVMAccountMock);
+
+    expect(result).toMatchObject(EVM_ACCOUNT_MOCK);
   });
 
   describe("addAccount", () => {
@@ -289,9 +291,9 @@ describe("AccountManager", () => {
   describe("getAccount", () => {
     it("should return account by key", async () => {
       const result = await AccountManager.getAccount(
-        selectedEVMAccountMock.key as AccountKey
+        EVM_ACCOUNT_MOCK.key as AccountKey
       );
-      expect(result).toMatchObject(selectedEVMAccountMock);
+      expect(result).toMatchObject(EVM_ACCOUNT_MOCK);
     });
 
     it("should show error", async () => {
@@ -306,7 +308,7 @@ describe("AccountManager", () => {
 
   describe("changeName", () => {
     it("should change name", async () => {
-      const key = selectedEVMAccountMock.key;
+      const key = EVM_ACCOUNT_MOCK.key;
       const name = "new name";
 
       const result = await AccountManager["changeName"](
@@ -315,9 +317,9 @@ describe("AccountManager", () => {
       );
 
       expect(result).toMatchObject({
-        ...selectedEVMAccountMock,
+        ...EVM_ACCOUNT_MOCK,
         value: {
-          ...selectedEVMAccountMock.value,
+          ...EVM_ACCOUNT_MOCK.value,
           name,
         },
       });
@@ -328,7 +330,7 @@ describe("AccountManager", () => {
       Accounts.default.getAccount = vi.fn().mockImplementation(() => null);
 
       try {
-        const key = selectedEVMAccountMock.key;
+        const key = EVM_ACCOUNT_MOCK.key;
         const name = "new name";
 
         await AccountManager["changeName"](key as AccountKey, name);
@@ -343,7 +345,7 @@ describe("AccountManager", () => {
     it("should return all wasm accounts", async () => {
       const result = await AccountManager["getAll"]([AccountType.WASM]);
       expect(result?.data).toEqual({
-        [selectedWASMAccountMock.key]: selectedWASMAccountMock,
+        [POLKADOT_ACCOUNT_MOCK.key]: POLKADOT_ACCOUNT_MOCK,
       });
     });
 
@@ -358,7 +360,7 @@ describe("AccountManager", () => {
   describe("areAccountsInitialized", () => {
     it("should return true", async () => {
       const accounts = {
-        getAll: () => accountsMocks,
+        getAll: () => ACCOUNTS_MOCKS,
       };
 
       const result = await AccountManager["areAccountsInitialized"](

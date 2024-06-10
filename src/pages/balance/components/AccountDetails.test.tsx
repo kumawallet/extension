@@ -4,16 +4,10 @@ import { I18nextProvider } from "react-i18next";
 import { AccountDetails } from "./AccountDetails";
 import Account from "@src/storage/entities/Account";
 import { SUBQUERY_CHAINS } from "@src/services/historic-transactions/subquery/subquery-chains";
+import { POLKADOT_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const dataMocks = {
-  accountData: {
-    value: {
-      name: "Account 1",
-      address: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
-      keyring: "wasm-5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
-    },
-    key: "wasm",
-  },
+  accountData: POLKADOT_ACCOUNT_MOCK,
 };
 
 const functionMocks = {

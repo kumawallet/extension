@@ -1,10 +1,8 @@
+import {
+  OL_ACCOUNT_MOCK,
+  OL_PRIVATE_KEY_MOCK,
+} from "@src/tests/mocks/account-mocks";
 import { OlProvider } from "./OlProvider";
-
-const ADDRESS =
-  "FDC2EF2FB05959371332B5C136CC0ED0C674F9837051D02CA1A359ED59953160";
-
-const PRIVATE_KEY =
-  "becf9b2ff05ca7376a41b901c8376a5c9e1aa92043830b2ca680072bca3be01e";
 
 const functionMocks = {
   fetch: vi.fn((url: string) => {
@@ -103,9 +101,9 @@ describe("OlProvider", () => {
   it("transfer", async () => {
     const olProvider = new OlProvider("");
     const transfer = await olProvider.transfer({
-      pk: PRIVATE_KEY,
-      sender: ADDRESS,
-      recipient: ADDRESS,
+      pk: OL_PRIVATE_KEY_MOCK,
+      sender: OL_ACCOUNT_MOCK.value?.address as string,
+      recipient: OL_ACCOUNT_MOCK.value?.address as string,
       amount: "100",
     });
     expect(transfer).toBeDefined();

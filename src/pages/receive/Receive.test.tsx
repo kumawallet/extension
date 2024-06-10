@@ -1,8 +1,8 @@
-import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
 import { fireEvent, render } from "@testing-library/react";
 import { Receive } from "./Receive";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
+import { EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const copyToClipboard = vi.fn();
 
@@ -23,32 +23,11 @@ describe("Receive", () => {
     vi.mock("@src/providers", () => ({
       useAccountContext: () => ({
         state: {
-          selectedAccount: selectedEVMAccountMock,
+          selectedAccount: EVM_ACCOUNT_MOCK,
         },
       }),
     }));
 
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }))
-
-    // mock useCopyToClipboard
     vi.mock("@src/hooks", () => ({
       useCopyToClipboard: () => ({
         Icon: () => null,

@@ -6,13 +6,13 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { AccountProvider, useAccountContext, reducer } from "./AccountProvider";
-import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
 import Account from "@src/storage/entities/Account";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { InitialState } from "./types";
 import { AccountType } from "@src/accounts/types";
 import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const testIds = {
   createAccount: "create-account",
@@ -39,7 +39,7 @@ const TestComponent = () => {
     <>
       <button
         data-testid={testIds.setSelectedAccount}
-        onClick={() => setSelectedAccount(selectedEVMAccountMock as Account)}
+        onClick={() => setSelectedAccount(EVM_ACCOUNT_MOCK as Account)}
       />
       <button
         data-testid={testIds.getAllAccounts}
@@ -109,9 +109,8 @@ const changeAccountName = vi.fn();
 const setSelectedAccount = vi.fn();
 const getSelectedAccount = vi
   .fn()
-  .mockReturnValue(() => selectedEVMAccountMock);
-const getAllAccounts = vi.fn().mockReturnValue([selectedEVMAccountMock]);
-// const getNetwork = vi.fn();
+  .mockReturnValue(() => EVM_ACCOUNT_MOCK);
+const getAllAccounts = vi.fn().mockReturnValue([EVM_ACCOUNT_MOCK]);
 
 describe("AccountProvider", () => {
   beforeAll(() => {
@@ -218,7 +217,7 @@ describe("AccountProvider", () => {
   });
 
   it("should call get selected account", async () => {
-    const getSelectedAccount = vi.fn().mockReturnValue(selectedEVMAccountMock);
+    const getSelectedAccount = vi.fn().mockReturnValue(EVM_ACCOUNT_MOCK);
 
     const Default = await import("@src/messageAPI/api");
 

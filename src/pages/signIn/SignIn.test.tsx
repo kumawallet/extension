@@ -14,6 +14,7 @@ const renderComponent = () => {
 
 const navigate = vi.fn();
 const signIn = vi.fn();
+
 describe("SignIn", () => {
   beforeEach(() => {
     renderComponent();
@@ -26,9 +27,7 @@ describe("SignIn", () => {
       messageAPI: {
         signIn: () => signIn(),
       },
-
-    }))
-
+    }));
   });
 
   it("should render", () => {

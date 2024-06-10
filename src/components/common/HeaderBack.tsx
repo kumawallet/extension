@@ -1,12 +1,9 @@
-import {
-  CSSProperties,
-  FC,
-  HTMLAttributes,
-} from "react";
+import { CSSProperties, FC, HTMLAttributes } from "react";
 import { FiChevronLeft } from "react-icons/fi";
-import { iconBack, textHeaderBack } from '@src/pages/style/general'
-import { ICON_SIZE } from '@src/constants/icons';
-import { styleHeaderBack } from '@src/components/common/styles/HeaderBack'
+import { iconBack, textHeaderBack } from "@src/styles/general";
+import { ICON_SIZE } from "@src/constants/icons";
+import { styleHeaderBack } from "@src/components/common/styles/HeaderBack";
+
 interface HeaderProps {
   classname?: HTMLAttributes<HTMLButtonElement>["className"];
   style?: CSSProperties;
@@ -20,7 +17,6 @@ export const HeaderBack: FC<HeaderProps> = ({
   style,
   navigate,
 }) => {
-
   return (
     <div className={styleHeaderBack.container}>
       <FiChevronLeft
@@ -30,6 +26,6 @@ export const HeaderBack: FC<HeaderProps> = ({
         style={style}
       />
       <p className={textHeaderBack}>{title}</p>
-      <></>
-    </div>);
+    </div>
+  );
 };

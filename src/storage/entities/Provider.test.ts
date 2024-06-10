@@ -147,7 +147,7 @@ describe("Provider", () => {
     const provider = new Provider();
     provider.setProvider("polkadot", ChainType.WASM);
 
-    const polkadot = provider.getOneProviders("polkadot");
+    const polkadot = provider.getProviderByChainId("polkadot");
 
     expect(polkadot).toBeDefined();
   });

@@ -1,14 +1,14 @@
 import { vi } from "vitest";
 import Account from "./Account";
 import SelectedAccount from "./SelectedAccount";
-import { selectedEVMAccountMock } from "../../tests/mocks/account-mocks";
+import { EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 describe("SelectedAccount", () => {
   beforeAll(() => {
     vi.mock("./Accounts", () => ({
       default: {
         get: () => ({
-          first: () => selectedEVMAccountMock,
+          first: () => EVM_ACCOUNT_MOCK,
         }),
       },
     }));
@@ -59,6 +59,6 @@ describe("SelectedAccount", () => {
 
     const result = await SelectedAccount.getDefaultValue();
 
-    expect(result).toMatchObject(selectedEVMAccountMock);
+    expect(result).toMatchObject(EVM_ACCOUNT_MOCK);
   });
 });

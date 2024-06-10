@@ -3,6 +3,7 @@ import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { CreateWalletFromInside } from "./CreateWalletFromInside";
+import { POLKADOT_SEED_MOCK } from "@src/tests/mocks/account-mocks";
 
 const functionMocks = {
   onBack: vi.fn(),
@@ -43,7 +44,7 @@ describe("CreateWalletFromInside", () => {
         useForm: () => ({
           handleSubmit: vi.fn((cb: (props: { seed: string }) => void) => () => {
             cb({
-              seed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED",
+              seed: POLKADOT_SEED_MOCK,
             });
           }),
           setValue: vi.fn(),
@@ -51,26 +52,6 @@ describe("CreateWalletFromInside", () => {
         }),
       };
     });
-
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }));
   });
 
   describe("render", () => {

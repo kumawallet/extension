@@ -866,7 +866,7 @@ export default class Extension {
   }
 
   private async addAsset({ chain, asset }: RequestAddAsset) {
-    const { provider } = this.provider.getOneProviders(chain);
+    const { provider } = this.provider.getProviderByChainId(chain);
 
     await Assets.addAsset(chain, asset);
 

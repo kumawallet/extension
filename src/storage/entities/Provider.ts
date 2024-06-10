@@ -223,7 +223,7 @@ export class Provider {
     return this.statusNetwork;
   }
 
-  public getOneProviders(chain: string) {
+  public getProviderByChainId(chain: string) {
     return this.providers[chain];
   }
 

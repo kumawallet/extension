@@ -20,7 +20,6 @@ export * from "./settings";
 export * from "./settings/style/style";
 export * from "./signIn";
 export * from "./signIn/styles/SingIn";
-export * from "./style/general";
 export * from "./swap/components";
 export * from "./swap/hooks";
 export * from "./swap";

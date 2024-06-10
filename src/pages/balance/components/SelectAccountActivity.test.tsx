@@ -1,15 +1,15 @@
 import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
-import { ChainType } from "@src/types";
 import { SelectAccountActivity } from "./SelectAccountActivity";
+import { ACCOUNTS_MOCKS, EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const functionsMock = {
   onChangeValue: vi.fn(),
 }
 
 const dataMock = {
-  selectedAddress: "0x1234567890",
+  selectedAddress: EVM_ACCOUNT_MOCK.value?.address as string,
 }
 
 const renderComponent = () => {
@@ -30,10 +30,7 @@ describe("SelectAccountActivity", () => {
       useAccountContext: () => ({
         state: {
           selectedAccount: null,
-          accounts: [
-            { value: { name: "Account 1", address: "0x1234567890" }, type: ChainType.EVM },
-            { value: { name: "Account 2", address: "0x0987654321" }, type: ChainType.EVM },
-          ],
+          accounts: ACCOUNTS_MOCKS,
         }
       })
     }))
@@ -55,12 +52,12 @@ describe("SelectAccountActivity", () => {
       expect(getByTestId("filtered-items-container")).toBeDefined();
     });
 
-    const firstAccount = getByTestId("filtered-items-container").children[0];
+    const firstAccount = getByTestId("filtered-items-container").children[1];
 
     fireEvent.click(firstAccount);
 
     await waitFor(() => {
-      expect(functionsMock.onChangeValue).toHaveBeenCalledWith("0x1234567890");
+      expect(functionsMock.onChangeValue).toHaveBeenCalledWith(EVM_ACCOUNT_MOCK.value?.address as string);
     });
   });
 

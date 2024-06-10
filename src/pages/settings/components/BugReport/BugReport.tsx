@@ -26,7 +26,7 @@ export const BugReport = () => {
           <p className="text-white-500 mb-4">{t("collaborate_description")}</p>
           <a
             href={issuesLinks.github as unknown as string}
-            className="flex items-center text-blue-500 hover:underline  flex items-center gap-2"
+            className="flex items-center text-blue-500 hover:underline gap-2"
             target="_blank"
             rel="noreferrer"
           >

@@ -1,36 +1,33 @@
+import { OL_ACCOUNT_MOCK, OL_SEED_MOCK } from "@src/tests/mocks/account-mocks";
 import { SupportedKeyring } from "../types";
 import OLKeyring from "./OLKeyring";
 
-const MNEMONIC =
-  "impose round lonely vast net able deer slice explain field service term ginger inside sheriff couch soul pelican alert luggage holiday nature hand nation";
-
-const ADDRESS =
-  "FDC2EF2FB05959371332B5C136CC0ED0C674F9837051D02CA1A359ED59953160";
+const ADDRESS = OL_ACCOUNT_MOCK.value!.address;
 
 describe("OLKeyring", () => {
   it("should return address", async () => {
-    const olKeyring = new OLKeyring(MNEMONIC);
+    const olKeyring = new OLKeyring(OL_SEED_MOCK);
 
-    const address = await olKeyring.getAddress(MNEMONIC);
+    const address = await olKeyring.getAddress(OL_SEED_MOCK);
     expect(address).toBe(ADDRESS.toLocaleLowerCase());
   });
 
   describe("get key", () => {
     it("should return key", () => {
-      const olKeyring = new OLKeyring(MNEMONIC);
+      const olKeyring = new OLKeyring(OL_SEED_MOCK);
 
       const addressMock = ADDRESS.toLocaleLowerCase();
 
       olKeyring.addKeyPair(addressMock, {
         path: "0",
-        key: MNEMONIC,
+        key: OL_SEED_MOCK,
       });
       const key = olKeyring.getKey(addressMock);
-      expect(key).toBe(`${MNEMONIC}0`);
+      expect(key).toBe(`${OL_SEED_MOCK}0`);
     });
 
     it("should throw error if key pair not found", () => {
-      const olKeyring = new OLKeyring(MNEMONIC);
+      const olKeyring = new OLKeyring(OL_SEED_MOCK);
 
       const addressMock = ADDRESS.toLocaleLowerCase();
 
@@ -42,7 +39,7 @@ describe("OLKeyring", () => {
 
   it("should return json object", () => {
     const keyring = OLKeyring.fromJSON({
-      mnemonic: MNEMONIC,
+      mnemonic: OL_SEED_MOCK,
       keyPairs: {
         [ADDRESS.toLocaleLowerCase()]: {
           path: "0",
@@ -50,7 +47,7 @@ describe("OLKeyring", () => {
       },
     } as unknown as SupportedKeyring);
 
-    expect(keyring.mnemonic).toBe(MNEMONIC);
+    expect(keyring.mnemonic).toBe(OL_SEED_MOCK);
   });
 
   it("should throw error if mnemonic is invalid", () => {
@@ -62,11 +59,11 @@ describe("OLKeyring", () => {
   });
 
   it("should return json object", () => {
-    const olKeyring = new OLKeyring(MNEMONIC);
+    const olKeyring = new OLKeyring(OL_SEED_MOCK);
     const result = olKeyring.toJSON();
 
     expect(result).toEqual({
-      mnemonic: MNEMONIC,
+      mnemonic: OL_SEED_MOCK,
       keyPairs: {},
     });
   });

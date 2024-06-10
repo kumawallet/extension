@@ -2,8 +2,8 @@ import { AccountType } from "../../../accounts/types";
 import Extension from "./Extension";
 import { expect } from "vitest";
 import {
-  selectedEVMAccountMock,
-  accountsMocks,
+  EVM_ACCOUNT_MOCK,
+  ACCOUNTS_MOCKS,
 } from "../../../tests/mocks/account-mocks";
 import { SettingType } from "../../../storage/entities/settings/types";
 import { SettingKey } from "../../../storage/entities/settings/types";
@@ -77,6 +77,10 @@ describe("Extension", () => {
         disconnectChain() {
           return Promise.resolve();
         }
+
+        getProviderByChainId() {
+          return Promise.resolve();
+        }
       },
     }));
 
@@ -131,7 +135,7 @@ describe("Extension", () => {
     vi.mock("@src/storage/entities/SelectedAccount", () => {
       class _SelectedAccount {
         static get() {
-          return Promise.resolve(selectedEVMAccountMock);
+          return Promise.resolve(EVM_ACCOUNT_MOCK);
         }
         static set() {
           vi.fn();
@@ -497,48 +501,6 @@ describe("Extension", () => {
     expect(result).toBe(true);
   });
 
-  // describe("showKey", () => {
-  //   it("should return key", async () => {
-  //     const SelectedAccount = (
-  //       await import("../../../storage/entities/SelectedAccount")
-  //     ).default;
-  //     SelectedAccount.get = vi.fn().mockReturnValue({
-  //       value: {
-  //         type: AccountType.EVM,
-  //         address: "EVM-1234",
-  //         keyring: "EVM",
-  //       },
-  //       key: "EVM-1234",
-  //     });
-
-  //     const Vault = (await import("../../../storage/entities/Vault")).default;
-  //     Vault.getKeyring = vi.fn().mockReturnValue({
-  //       getKey: () => {
-  //         return "1234";
-  //       },
-  //     });
-
-  //     const extension = new Extension();
-  //     const result = await extension["showKey"]({
-  //       address: "0x1234",
-  //     });
-  //     expect(result).toBe("1234");
-  //   });
-
-  //   it("should return undefined", async () => {
-  //     const SelectedAccount = (
-  //       await import("../../../storage/entities/SelectedAccount")
-  //     ).default;
-  //     SelectedAccount.get = vi.fn().mockReturnValue(undefined);
-
-  //     const extension = new Extension();
-  //     const result = await extension["showKey"]({
-  //       address: "0x1234",
-  //     });
-  //     expect(result).toBe(undefined);
-  //   });
-  // });
-
   it("get account", async () => {
     const extension = new Extension();
     const result = await extension["getAccount"]({
@@ -553,12 +515,12 @@ describe("Extension", () => {
         .default;
 
       AccountManager.getAll = vi.fn().mockReturnValue({
-        getAll: vi.fn().mockReturnValue(accountsMocks),
+        getAll: vi.fn().mockReturnValue(ACCOUNTS_MOCKS),
       });
 
       const extension = new Extension();
       const result = await extension["getAccountsToDerive"]();
-      expect(result).toEqual(accountsMocks);
+      expect(result).toEqual(ACCOUNTS_MOCKS);
     });
 
     it("should returns empty array", async () => {
@@ -577,14 +539,14 @@ describe("Extension", () => {
     it("should return all accounts", async () => {
       const _AccountManager = await import("../../../accounts/AccountManager");
       _AccountManager.default.getAll = vi.fn().mockReturnValue({
-        getAll: vi.fn().mockReturnValue(accountsMocks),
+        getAll: vi.fn().mockReturnValue(ACCOUNTS_MOCKS),
       });
 
       const extension = new Extension();
       const result = await extension["getAllAccounts"]({
         type: null,
       });
-      expect(result).toEqual(accountsMocks);
+      expect(result).toEqual(ACCOUNTS_MOCKS);
     });
 
     it("should return empty array", async () => {
@@ -665,11 +627,11 @@ describe("Extension", () => {
     );
     _SelectedAccountMock.default.get = vi
       .fn()
-      .mockResolvedValue(selectedEVMAccountMock);
+      .mockResolvedValue(EVM_ACCOUNT_MOCK);
 
     const extension = new Extension();
     const result = await extension["getSelectedAccount"]();
-    expect(result).toMatchObject(selectedEVMAccountMock);
+    expect(result).toMatchObject(EVM_ACCOUNT_MOCK);
   });
 
   describe("getGeneralSettings", () => {
@@ -1008,12 +970,12 @@ describe("Extension", () => {
     const AccountManager = (await import("../../../accounts/AccountManager"))
       .default;
     AccountManager.getAll = vi.fn().mockReturnValue({
-      getAll: vi.fn().mockReturnValue(accountsMocks),
+      getAll: vi.fn().mockReturnValue(ACCOUNTS_MOCKS),
     });
 
     const extension = new Extension();
     await extension["addActivity"]({
-      senderAddress: accountsMocks[0].value.address,
+      senderAddress: ACCOUNTS_MOCKS[0].value!.address,
       txHash: "0x1234",
       record: {} as unknown as Transaction,
     });
@@ -1030,12 +992,12 @@ describe("Extension", () => {
     const AccountManager = (await import("../../../accounts/AccountManager"))
       .default;
     AccountManager.getAll = vi.fn().mockReturnValue({
-      getAll: vi.fn().mockReturnValue(accountsMocks),
+      getAll: vi.fn().mockReturnValue(ACCOUNTS_MOCKS),
     });
 
     const extension = new Extension();
     await extension["updateActivity"]({
-      senderAddress: accountsMocks[0].value.address,
+      senderAddress: ACCOUNTS_MOCKS[0].value!.address,
       txHash: "0x1234",
       status: RecordStatus.SUCCESS,
     });

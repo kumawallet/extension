@@ -1,16 +1,15 @@
 import i18n from "@src/utils/i18n";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ConfirmRecoveryPhrase } from "./ConfirmRecoveryPhrase";
+import { POLKADOT_SEED_MOCK } from "@src/tests/mocks/account-mocks";
 
-const dataMocks = {
-  seed: "SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED SEED",
-};
+
 
 const getValuesMock: {
-  [key: string]: any;
+  [key: string]: string;
 } = {
-  seed: dataMocks.seed,
+  seed: POLKADOT_SEED_MOCK,
 };
 
 const renderComponent = () => {

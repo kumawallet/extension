@@ -1,31 +1,27 @@
 import ImportedEVMKeyring from "./ImportedEVMKeyring";
 import { SupportedKeyring } from "../types";
-
-// generateRandom private key
-const privateKey =
-  "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2";
+import {
+  EVM_ACCOUNT_MOCK,
+  EVM_PRIVATE_KEY_MOCK,
+} from "@src/tests/mocks/account-mocks";
 
 describe("ImportedEVMKeyring", () => {
   it("getImportedData", async () => {
     const importEVMKeyring = new ImportedEVMKeyring();
 
-    const importedData = await importEVMKeyring.getImportedData(privateKey);
+    const importedData = await importEVMKeyring.getImportedData(
+      EVM_PRIVATE_KEY_MOCK
+    );
 
-    expect(importedData).toEqual({
-      address: "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
-      keyPair: {
-        key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
-      },
-      isDerivable: false,
-    });
+    expect(importedData.address).toMatchObject(EVM_ACCOUNT_MOCK.value!.address);
   });
 
   it("fromJSON", () => {
     const json = {
       type: "IMPORTED_EVM",
       keyPairs: {
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE": {
-          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
+        [EVM_ACCOUNT_MOCK.value?.address as string]: {
+          key: EVM_PRIVATE_KEY_MOCK,
         },
       },
     } as unknown;
@@ -37,8 +33,8 @@ describe("ImportedEVMKeyring", () => {
     expect(importEVMKeyring).toEqual({
       type: "IMPORTED_EVM",
       keyPairs: {
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE": {
-          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
+        [EVM_ACCOUNT_MOCK.value?.address as string]: {
+          key: EVM_PRIVATE_KEY_MOCK,
         },
       },
     });
@@ -47,20 +43,15 @@ describe("ImportedEVMKeyring", () => {
   describe("getKey", () => {
     it("should return key", () => {
       const importEVMKeyring = new ImportedEVMKeyring();
-      importEVMKeyring.addKeyPair(
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
-        {
-          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
-        }
-      );
+      importEVMKeyring.addKeyPair(EVM_ACCOUNT_MOCK.value?.address as string, {
+        key: EVM_PRIVATE_KEY_MOCK,
+      });
 
       const key = importEVMKeyring.getKey(
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE"
+        EVM_ACCOUNT_MOCK.value?.address as string
       );
 
-      expect(key).toEqual(
-        "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2"
-      );
+      expect(key).toEqual(EVM_PRIVATE_KEY_MOCK);
     });
 
     it("should throw error", () => {

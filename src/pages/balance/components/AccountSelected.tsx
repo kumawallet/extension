@@ -1,6 +1,8 @@
 import { useAccountContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
+
+
 export const AccountSelected = () => {
   const {
     state: { selectedAccount },

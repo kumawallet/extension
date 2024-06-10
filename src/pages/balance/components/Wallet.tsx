@@ -34,8 +34,6 @@ export const Wallet: FC<WalletProps> = ({
   const iconURL = useMemo(() => {
     const parsedType = type.toLowerCase();
 
-
-
     if (parsedType.includes("wasm")) {
       return ASSETS_ICONS["DOT"];
     }
@@ -47,8 +45,6 @@ export const Wallet: FC<WalletProps> = ({
     if (parsedType.includes("ol")) {
       return ASSETS_ICONS["OL"];
     }
-
-
   }, [type]);
 
   const { Icon, copyToClipboard } = useCopyToClipboard(address);
@@ -62,53 +58,70 @@ export const Wallet: FC<WalletProps> = ({
         className="w-[90%] flex gap-2 items-center overflow-hidden text-ellipsis"
         onClick={onSelect}
       >
-        {showBalanceforAsset ? (<AssetIcon asset={_asset} width={32} />) : (<img
-          src={iconURL}
-          alt=""
-          width={26}
-          height={26}
-          className="aspect-square rounded-full"
-        />)}
+        {showBalanceforAsset ? (
+          <AssetIcon asset={_asset} width={32} />
+        ) : (
+          <img
+            src={iconURL}
+            alt=""
+            width={26}
+            height={26}
+            className="aspect-square rounded-full"
+          />
+        )}
         <div className="flex flex-col w-">
-          <span className={`text-start ${!showBalanceforAsset ? "text-sm" : "text-[0.7rem]"} font-semibold `}>{name}</span>
-          <span className={`overflow-hidden text-ellipsis ${!showBalanceforAsset ? "text-[0.7rem]" : "text-[0.55rem]"} font-inter font-light max-w-[30ch]`}>
+          <span
+            className={`text-start ${!showBalanceforAsset ? "text-sm" : "text-[0.7rem]"
+              } font-semibold `}
+          >
+            {name}
+          </span>
+          <span
+            className={`overflow-hidden text-ellipsis ${!showBalanceforAsset ? "text-[0.7rem]" : "text-[0.55rem]"
+              } font-inter font-light max-w-[30ch]`}
+          >
             {getHash(address)}
           </span>
         </div>
       </button>
 
-      {!showBalanceforAsset ? (<div className="w-[10%] flex items-center gap-1 justify-center ml-4">
-        <div className="flex gap-3">
-          {showCopyIcon && (
-            <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>
-              <Icon />
-            </button>
-          )}
-          {more && (
-            <button data-testid="details" onClick={more}>
-              <More size="18" />
-            </button>
+      {!showBalanceforAsset ? (
+        <div className="w-[10%] flex items-center gap-1 justify-center ml-4">
+          <div className="flex gap-3">
+            {showCopyIcon && (
+              <button data-testid="copy-to-clipboard" onClick={copyToClipboard}>
+                <Icon />
+              </button>
+            )}
+            {more && (
+              <button data-testid="details" onClick={more}>
+                <More size="18" />
+              </button>
+            )}
+          </div>
+
+          {showSelectedIcon && (
+            <button
+              onClick={onSelect}
+              className={`p-1 text-[6px] rounded-full border relative  ${isSelected
+                  ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
+                  : "border-gray-300"
+                }`}
+            />
           )}
         </div>
-
-
-        {showSelectedIcon && (
-          <button
-            onClick={onSelect}
-            className={`p-1 text-[6px] rounded-full border relative  ${isSelected
-              ? "border-[#2CEC84] text-[#2CEC84] active-wallet-icon"
-              : "border-gray-300"
-              }`}
-          />
-        )}
-      </div>) : <div className="flex gap-1 font-semibold text-xs"><p>
-        {formatAmountWithDecimals(
-          Number(_asset && _asset.balance),
-          3,
-          _asset && _asset.decimals
-        )}</p>
-        <p >{_asset && _asset.symbol}</p>
-      </div>}
+      ) : (
+        <div className="flex gap-1 font-semibold text-xs">
+          <p>
+            {formatAmountWithDecimals(
+              Number(_asset && _asset.balance),
+              3,
+              _asset && _asset.decimals
+            )}
+          </p>
+          <p>{_asset && _asset.symbol}</p>
+        </div>
+      )}
     </div>
   );
 };

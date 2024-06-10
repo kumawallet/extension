@@ -27,7 +27,7 @@ export const SelectAccountToDerive: FC<SelectAccountToDeriveProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div data-testid="wallets-container" className="flex flex-col gap-2">
       {accounts?.map((account) => (
         <Wallet
           key={account.key}

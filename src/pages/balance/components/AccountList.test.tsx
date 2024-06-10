@@ -1,11 +1,8 @@
-import {
-  accountsMocks,
-  selectedWASMAccountMock,
-} from "@src/tests/mocks/account-mocks";
 import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { AccountList } from "./AccountList";
+import { ACCOUNTS_MOCKS, POLKADOT_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const functionsMocks = {
   getAllAccounts: vi.fn(),
@@ -27,8 +24,8 @@ describe("AccountList", () => {
         getAllAccounts: () => functionsMocks.getAllAccounts(),
         setSelectedAccount: () => functionsMocks.setSelectedAccount(),
         state: {
-          accounts: accountsMocks,
-          setSelectedAccount: selectedWASMAccountMock,
+          accounts: ACCOUNTS_MOCKS,
+          setSelectedAccount: POLKADOT_ACCOUNT_MOCK,
         },
       })),
     }));

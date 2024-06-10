@@ -25,10 +25,6 @@ describe("Footer", () => {
     vi.mock('@src/utils/utils', () => ({
       isInPopup: () => true
     }))
-
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0"
-    }));
   });
 
   describe("render", () => {

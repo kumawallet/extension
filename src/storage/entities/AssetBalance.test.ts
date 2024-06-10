@@ -1,42 +1,15 @@
 import { ApiPromise } from "@polkadot/api";
 import { Asset, ChainType, SubstrateBalance } from "@src/types";
 import AssetsBalance from "./AssetBalance";
-import Account from "./Account";
-import { AccountType } from "@src/accounts/types";
 import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import {
+  EVM_ACCOUNT_MOCK,
+  OL_ACCOUNT_MOCK,
+  POLKADOT_ACCOUNT_MOCK,
+} from "@src/tests/mocks/account-mocks";
 
 const BALANCE_MOCK = "1000000000000000000";
-
-const POLKADOT_ACCOUNT_MOCK: Account = {
-  key: "WASM-5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
-  type: AccountType.WASM,
-  value: {
-    address: "5EsQwm2F3KMejFMzSNR2N74jEm8WhHAxunitRQ4bn66wea6F",
-    keyring: AccountType.WASM,
-    name: "Wasm Account",
-  },
-};
-
-const EVM_ACCOUNT_MOCK: Account = {
-  key: "EVM-0x0",
-  type: AccountType.EVM,
-  value: {
-    address: "0x0",
-    keyring: AccountType.EVM,
-    name: "EVM Account",
-  },
-};
-
-const OL_ACCOUNT_MOCK: Account = {
-  key: "OL-0x0",
-  type: AccountType.OL,
-  value: {
-    address: "0x0",
-    keyring: AccountType.OL,
-    name: "OL Account",
-  },
-};
 
 const NATIVE_BALANCE_POLKADOT_MOCK = {
   data: {
