@@ -866,7 +866,17 @@ export default class Extension {
   }
 
   private async addAsset({ chain, asset }: RequestAddAsset) {
-    return Assets.addAsset(chain, asset);
+    const { provider } = this.provider.getOneProviders(chain);
+
+    await Assets.addAsset(chain, asset);
+
+    this.assetsBalance.addERC20Asset({
+      asset,
+      chainId: chain,
+      api: provider as unknown as providers.JsonRpcProvider,
+    });
+
+    return;
   }
 
   private async getAssetsByChain({ chain }: RequestGetAssetsByChain) {

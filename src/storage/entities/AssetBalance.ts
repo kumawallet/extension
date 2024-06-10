@@ -34,7 +34,7 @@ export interface AssetBalance {
 
 export default class AssetsBalance {
   public assets = new BehaviorSubject<AssetBalance>({});
-  public _assets: { [key: string]: network } = {};
+  public _assets: AssetBalance = {};
   networks: string[] = [];
   chains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
 
@@ -435,6 +435,71 @@ export default class AssetsBalance {
       return price;
     } catch (error) {
       return {};
+    }
+  };
+
+  public addERC20Asset = async ({
+    asset,
+    chainId,
+    api,
+  }: {
+    chainId: string;
+    asset: {
+      symbol: string;
+      address: string;
+      decimals: number;
+    };
+    api: providers.JsonRpcProvider;
+  }) => {
+    try {
+      const assets = this.assets.getValue();
+
+      const addresses = Object.keys(assets).filter((address) => {
+        return Object.keys(assets[address]).includes(chainId);
+      });
+
+      if (addresses.length === 0) return;
+
+      await Promise.all(
+        addresses.map(async (address) => {
+          const contract = new Contract(asset.address, erc20Abi, api);
+          const balance = await contract.balanceOf(address.split("-")[1]);
+
+          this._assets[address][chainId].subs.push(contract);
+          this._assets[address][chainId].assets.push({
+            address: asset.address,
+            balance: balance.toString(),
+            id: asset.address,
+            decimals: asset.decimals,
+            symbol: asset.symbol,
+            amount: "0",
+            price: "0",
+            usdPrice: 0,
+          });
+
+          contract.removeAllListeners("Transfer");
+
+          contract.on("Transfer", async (from, to) => {
+            const selfAddress = addresses;
+            if (from === selfAddress || to === selfAddress) {
+              const balance = await contract.balanceOf(addresses);
+              this.updateOneAsset(
+                address,
+                {
+                  balance: balance.toString(),
+                  transferable: balance.toString(),
+                },
+                asset.address,
+                chainId
+              );
+            }
+          });
+        })
+      );
+
+      this.assets.next(this._assets);
+    } catch (error) {
+      throw new Error("failed_to_add_asset");
     }
   };
 

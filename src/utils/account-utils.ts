@@ -26,6 +26,11 @@ export const formatAccount = (_account: string) => {
     type = "WASM";
   }
 
+  if (_account.includes("OL")) {
+    address = _account.slice(3);
+    type = "OL";
+  }
+
   return { address, type };
 };
 
