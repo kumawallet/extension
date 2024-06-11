@@ -4,7 +4,7 @@ import ROCOCO_LOGO from "/images/rococo.png";
 import ASSETHUB_LOGO from "/images/assethub.png";
 import PASEO_LOGO from "/images/paseo.svg";
 
-export const SUBTRATE_CHAINS: Chain[] = [
+export const SUBSTRATE_CHAINS: Chain[] = [
   {
     id: "polkadot",
     name: "Polkadot",

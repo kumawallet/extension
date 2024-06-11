@@ -8,7 +8,7 @@ import {
 import { SettingType } from "../../../storage/entities/settings/types";
 import { SettingKey } from "../../../storage/entities/settings/types";
 import { RecordStatus } from "../../../storage/entities/activity/types";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType, Transaction } from "@src/types";
 import { BehaviorSubject } from "rxjs";
 
@@ -939,7 +939,7 @@ describe("Extension", () => {
     _Chains.saveCustomChain = saveCustomChain;
 
     const extension = new Extension();
-    extension["saveCustomChain"]({ chain: SUBTRATE_CHAINS[0] });
+    extension["saveCustomChain"]({ chain: SUBSTRATE_CHAINS[0] });
     expect(saveCustomChain).toHaveBeenCalled();
   });
 
@@ -950,7 +950,7 @@ describe("Extension", () => {
     _Chains.removeCustomChain = removeCustomChain;
 
     const extension = new Extension();
-    extension["removeCustomChain"]({ chainName: SUBTRATE_CHAINS[0].name });
+    extension["removeCustomChain"]({ chainName: SUBSTRATE_CHAINS[0].name });
     expect(removeCustomChain).toHaveBeenCalled();
   });
 
@@ -1011,7 +1011,7 @@ describe("Extension", () => {
 
     const extension = new Extension();
     await extension["addAsset"]({
-      chain: SUBTRATE_CHAINS[0].name,
+      chain: SUBSTRATE_CHAINS[0].name,
       asset: {} as unknown as {
         symbol: string;
         address: string;
@@ -1027,7 +1027,7 @@ describe("Extension", () => {
     _Assets.getByChain = getByChain;
 
     const extension = new Extension();
-    await extension["getAssetsByChain"]({ chain: SUBTRATE_CHAINS[0].name });
+    await extension["getAssetsByChain"]({ chain: SUBSTRATE_CHAINS[0].name });
     expect(getByChain).toHaveBeenCalled();
   });
 

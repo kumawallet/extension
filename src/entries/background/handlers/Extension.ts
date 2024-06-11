@@ -71,7 +71,7 @@ import { createSubscription } from "./subscriptions";
 import { Provider } from "@src/storage/entities/Provider";
 import { Transaction as TransactionEntity } from "@src/storage/entities/Transaction";
 import AssetBalance from "@src/storage/entities/AssetBalance";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
 import TransactionHistory from "@src/storage/entities/TransactionHistory";
@@ -134,7 +134,7 @@ export default class Extension {
     Network.getInstance();
     const network = (await Network.get().catch(() => null)) as Network | null;
     if (!network) return;
-    const allChains: Chain[] = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+    const allChains: Chain[] = [SUBSTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
     const chain = this.chains.getValue();
     // @ts-expect-error --- migration
     if (network && network?.Chain?.supportedAccounts) {
@@ -196,6 +196,15 @@ export default class Extension {
       await this.signUp({
         password: password as string,
         privateKeyOrSeed: seed,
+      });
+
+      await this.setNetwork({
+        id: EVM_CHAINS[0].id,
+        type: EVM_CHAINS[0].type,
+      });
+      await this.setNetwork({
+        id: OL_CHAINS[0].id,
+        type: OL_CHAINS[0].type,
       });
     }
 
@@ -294,7 +303,7 @@ export default class Extension {
       await this.signUp({ password, privateKeyOrSeed });
     }
 
-    let firstAccountCreated;
+    let firstAccountCreated: Account | null = null;
 
     if (accountTypesToImport.includes(AccountType.WASM)) {
       firstAccountCreated = await AccountManager.importAccount(
@@ -325,6 +334,29 @@ export default class Extension {
 
       if (!firstAccountCreated) {
         firstAccountCreated = account;
+      }
+    }
+
+    if (isSignUp) {
+      switch (firstAccountCreated?.type) {
+        case AccountType.IMPORTED_WASM:
+          await this.setNetwork({
+            id: SUBSTRATE_CHAINS[0].id,
+            type: SUBSTRATE_CHAINS[0].type,
+          });
+          break;
+        case AccountType.IMPORTED_EVM:
+          await this.setNetwork({
+            id: EVM_CHAINS[0].id,
+            type: EVM_CHAINS[0].type,
+          });
+          break;
+        case AccountType.IMPORTED_OL:
+          await this.setNetwork({
+            id: OL_CHAINS[0].id,
+            type: OL_CHAINS[0].type,
+          });
+          break;
       }
     }
 

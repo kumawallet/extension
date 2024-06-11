@@ -37,7 +37,8 @@
     "error": "An error has occurred",
     "rpc_error": "Network error",
     "copy_to_clipboard": "Copy to clipboard",
-    "success": "Successful operation"
+    "success": "Successful operation",
+    "account_already_exists": "Account already exists"
   },
   "welcome": {
     "welcome_message": "Your friendly multichain wallet to explore blockchain",

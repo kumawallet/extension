@@ -2,7 +2,7 @@ import { AccountType } from "@src/accounts/types";
 import Account from "./Account";
 import TransactionHistory from "./TransactionHistory";
 import { Transaction } from "@src/types";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 
 const ACCOUNT: Account = {
   key: "WASM-5FFNZWjJxsaBJr3P2hsfSZnw9PxB8yCwQW6EWjyyrQW1QYyF",
@@ -179,8 +179,8 @@ describe("TransactionHistory", () => {
       transactionHistory.addTransactionToChain({
         chainId: "polkadot",
         transaction,
-        originNetwork: SUBTRATE_CHAINS[0],
-        targetNetwork: SUBTRATE_CHAINS[0],
+        originNetwork: SUBSTRATE_CHAINS[0],
+        targetNetwork: SUBSTRATE_CHAINS[0],
       });
 
       const transactions = transactionHistory.getTransactions();
@@ -216,8 +216,8 @@ describe("TransactionHistory", () => {
       transactionHistory.addTransactionToChain({
         chainId: "polkadot",
         transaction,
-        originNetwork: SUBTRATE_CHAINS[0],
-        targetNetwork: SUBTRATE_CHAINS[0],
+        originNetwork: SUBSTRATE_CHAINS[0],
+        targetNetwork: SUBSTRATE_CHAINS[0],
       });
 
       transactionHistory.updateTransaction({

@@ -2,7 +2,7 @@ import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { act } from "react-dom/test-utils";
 import { ChainStatus } from "@src/storage/entities/Provider";
 
@@ -21,14 +21,14 @@ describe("ChainSelector", () => {
     vi.mock("@src/providers", () => ({
       useNetworkContext: vi.fn(() => ({
         state: {
-          selectedChain: SUBTRATE_CHAINS[0],
+          selectedChain: SUBSTRATE_CHAINS[0],
           chainStatus: {
             polkadot: ChainStatus.CONNECTED
           },
           chains: [
             {
               title: "wasm_based",
-              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+              chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
             },
             {
               title: "evm_based",
@@ -62,7 +62,7 @@ describe("ChainSelector", () => {
     });
 
     await waitFor(() => {
-      const chain = getByAltText(SUBTRATE_CHAINS[0].name);
+      const chain = getByAltText(SUBSTRATE_CHAINS[0].name);
       expect(chain).toBeDefined();
     });
   });

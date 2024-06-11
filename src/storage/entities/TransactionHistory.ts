@@ -1,6 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import Account from "./Account";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
 import Activity from "./activity/Activity";
 import { formatFees } from "@src/utils/assets";
@@ -24,7 +24,7 @@ export default class TransactionHistory {
   public transactions = new BehaviorSubject<Transactions>({});
   public account: Account | null = null;
   private networks: string[] = [];
-  private allChains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+  private allChains = [SUBSTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
 
   async addChain({ chainId }: { chainId: string }) {
     if (!this.networks.includes(chainId)) this.networks.push(chainId);

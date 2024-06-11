@@ -2,7 +2,7 @@ import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Send, SendTxForm } from "./Send";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType } from "@src/types";
 
 const functionMocks = {
@@ -79,7 +79,7 @@ describe("Send", () => {
           chains: [
             {
               title: "wasm_based",
-              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+              chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
             },
             {
               title: "evm_based",
@@ -157,8 +157,8 @@ describe("Send", () => {
             fee: "1000000000",
             haveSufficientBalance: true,
             isTipEnabled: false,
-            originNetwork: SUBTRATE_CHAINS[0],
-            targetNetwork: SUBTRATE_CHAINS[0],
+            originNetwork: SUBSTRATE_CHAINS[0],
+            targetNetwork: SUBSTRATE_CHAINS[0],
             extrinsicHash: "0x123",
           });
         }

@@ -1,4 +1,4 @@
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { Transaction, Tx } from "./Transaction";
 import { ApiPromise } from "@polkadot/api";
 import { ChainType } from "@src/types";
@@ -39,8 +39,8 @@ const POLKADOT_PROVIDER = {
   },
 };
 
-const POLKADOT_CHAIN = SUBTRATE_CHAINS[0];
-const ASTAR_CHAIN = SUBTRATE_CHAINS[2];
+const POLKADOT_CHAIN = SUBSTRATE_CHAINS[0];
+const ASTAR_CHAIN = SUBSTRATE_CHAINS[2];
 
 const WASM_TX_XCM: Tx = {
   amount: "1000000000000",

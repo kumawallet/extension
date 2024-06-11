@@ -4,7 +4,7 @@ import { I18nextProvider } from "react-i18next";
 import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
 import { AccountType } from "@src/accounts/types";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 
 const renderComponent = () => {
   return render(
@@ -37,7 +37,7 @@ describe("TotalBalance", () => {
       }),
       useNetworkContext: () => ({
         state: {
-          selectedChain: SUBTRATE_CHAINS[0],
+          selectedChain: SUBSTRATE_CHAINS[0],
           type: AccountType.EVM,
           api: null
         },

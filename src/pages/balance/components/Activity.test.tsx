@@ -2,7 +2,7 @@ import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Activity } from "./Activity";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { ACTIVITY_DETAIL } from "@src/routes/paths";
 import { ChainType } from "@src/types";
 
@@ -69,14 +69,14 @@ describe("Actvity", () => {
           chains: [
             {
               title: "wasm_based",
-              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+              chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
             },
             {
               title: "evm_based",
               chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
             },
           ],
-          selectedChain: SUBTRATE_CHAINS[0],
+          selectedChain: SUBSTRATE_CHAINS[0],
         },
       })),
       useAccountContext: vi.fn(() => ({

@@ -10,7 +10,7 @@ import { BehaviorSubject } from "rxjs";
 import { Asset, Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
 import { ApiPromise } from "@polkadot/api";
 import { Contract, providers } from "ethers";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import AccountEntity from "@src/storage/entities/Account";
@@ -36,7 +36,7 @@ export default class AssetsBalance {
   public assets = new BehaviorSubject<AssetBalance>({});
   public _assets: AssetBalance = {};
   networks: string[] = [];
-  chains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+  chains = [SUBSTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
 
   public async init() {
     this.assets.next({});
@@ -279,7 +279,7 @@ export default class AssetsBalance {
       );
 
       chainsToUpdate.forEach((chainId) => {
-        const network = _account[chainId].subs;
+        const network = _account?.[chainId]?.subs || [];
 
         // turn off the subscription
         switch (accountType) {
@@ -302,8 +302,11 @@ export default class AssetsBalance {
         }
 
         // delete chain form the account, if no chain left delete the account
-        delete this._assets[account.key][chainId];
-        if (Object.keys(this._assets[account.key]).length === 0) {
+        delete this._assets[account.key]?.[chainId];
+        if (
+          this._assets?.[account.key] &&
+          Object.keys(this._assets?.[account.key]).length === 0
+        ) {
           delete this._assets[account.key];
         }
       });

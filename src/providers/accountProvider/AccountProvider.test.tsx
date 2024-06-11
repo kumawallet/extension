@@ -11,7 +11,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
 import { InitialState } from "./types";
 import { AccountType } from "@src/accounts/types";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
 const testIds = {
@@ -117,7 +117,7 @@ describe("AccountProvider", () => {
     vi.mock("../networkProvider/NetworkProvider", () => ({
       useNetworkContext: vi.fn(() => ({
         state: {
-          selectedChain: SUBTRATE_CHAINS[0],
+          selectedChain: SUBSTRATE_CHAINS[0],
         },
       })),
     }));

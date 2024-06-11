@@ -2,7 +2,7 @@ import i18n from "@src/utils/i18n";
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { AssetToSend } from "./AssetToSend";
-import { EVM_CHAINS, SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { BN } from "@polkadot/util";
 import { SendTxForm } from "../Send";
 import { ChainStatus } from "@src/storage/entities/Provider";
@@ -82,7 +82,7 @@ describe("AssetToSend", () => {
           chains: [
             {
               title: "wasm_based",
-              chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+              chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
             },
             {
               title: "evm_based",

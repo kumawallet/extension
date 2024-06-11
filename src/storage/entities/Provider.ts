@@ -1,4 +1,4 @@
-import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { BehaviorSubject } from "rxjs";
 import { OlProvider } from "@src/services/ol/OlProvider";
@@ -84,7 +84,7 @@ export class Provider {
         }, RECONNECT_TIMEOUT);
       }
     } else {
-      const allChains = [SUBTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
+      const allChains = [SUBSTRATE_CHAINS, EVM_CHAINS, OL_CHAINS].flat();
       const _chain = allChains.find((chain) => chain.id === id);
       switch (type) {
         case ChainType.EVM: {

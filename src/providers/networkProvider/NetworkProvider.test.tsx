@@ -2,7 +2,7 @@ import { I18nextProvider } from "react-i18next";
 import { NetworkProvider, useNetworkContext } from "./NetworkProvider";
 import i18n from "@src/utils/i18n";
 import { render, waitFor } from "@testing-library/react";
-import { SUBTRATE_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType, SelectedChain } from "@src/types";
 import { ChainStatus, NetworkStatus } from "@src/storage/entities/Provider";
 
@@ -59,7 +59,7 @@ describe("NetworkProvider", () => {
     const { getByTestId } = renderComponent();
 
     await waitFor(() => {
-      expect(getByTestId("chains").innerHTML).toContain(JSON.stringify(SUBTRATE_CHAINS[0]));
+      expect(getByTestId("chains").innerHTML).toContain(JSON.stringify(SUBSTRATE_CHAINS[0]));
     })
     expect(getByTestId("selected-chain").textContent).toBe(JSON.stringify({
       polkadot: {
@@ -75,7 +75,7 @@ describe("NetworkProvider", () => {
     refreshNetworkButton.click();
 
     await waitFor(() => {
-      expect(getByTestId("chains").innerHTML).toContain(JSON.stringify(SUBTRATE_CHAINS[0]));
+      expect(getByTestId("chains").innerHTML).toContain(JSON.stringify(SUBSTRATE_CHAINS[0]));
     });
   });
 });

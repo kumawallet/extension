@@ -13,7 +13,7 @@ import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
 import { ChainsState } from "@src/types";
 import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
-import { SUBTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
+import { SUBSTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
 import { migrateOldCustomChains } from "@src/utils/chains";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
@@ -37,7 +37,7 @@ const getChains = async (): Promise<ChainsState> => {
     const chains: ChainsState = [
       {
         title: "wasm_based",
-        chains: SUBTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+        chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
       },
       {
         title: "evm_based",
@@ -74,7 +74,7 @@ const getChains = async (): Promise<ChainsState> => {
         ...[
           {
             title: "wasm_based_testnets",
-            chains: SUBTRATE_CHAINS.filter((chain) => chain.isTestnet),
+            chains: SUBSTRATE_CHAINS.filter((chain) => chain.isTestnet),
           },
           {
             title: "EVM testnets",
