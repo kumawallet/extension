@@ -21,26 +21,6 @@ const renderComponent = () => {
 };
 describe("ConfirmRecoveryPhrase", () => {
   beforeAll(() => {
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-            onDisconnect: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }));
-
     vi.mock("react-hook-form", () => ({
       useFormContext: vi.fn(() => ({
         getValues: vi.fn((key: string) => getValuesMock[key]),
