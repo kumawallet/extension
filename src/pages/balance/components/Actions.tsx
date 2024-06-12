@@ -25,9 +25,7 @@ export const Actions = () => {
       <Action
         Icon={Buy}
         title={t("buy")}
-        onClick={() => navigate("")}
-        isDisabled={true}
-        isCoomingSoon={true}
+        onClick={() => navigate("buy")}
       />
     </div>
   );

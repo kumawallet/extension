@@ -21,4 +21,5 @@ export const SETTINGS_AUTOLOCK = "/settings-autolock"
 export const SIGN_MESSAGE = "/sign-message";
 export const SIGNIN = "/sign-in";
 export const SWAP = "/swap";
+export const BUY = "/buy";
 export const WELCOME = "/";
