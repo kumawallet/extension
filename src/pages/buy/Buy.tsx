@@ -66,7 +66,7 @@ export const Buy = () => {
 
   useEffect(() => {
     setValue(filterOptions()[0]);
-  }, [filterOptions]);
+  }, [selectedAccount?.key]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -91,7 +91,7 @@ export const Buy = () => {
         )}
         <div className="flex  flex-col w-full gap-2 ">
           <SelectableAssetBuy
-            defaulValue={filterOptions()[0]}
+            defaulValue={value}
             options={filterOptions()}
             label=""
             value={value}
