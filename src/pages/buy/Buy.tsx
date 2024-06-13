@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { SelectableAssetBuy } from "./components/SelectableAsset";
 import { LinkUrl } from "./components/LinkUrl";
 import { useBuyContext } from "../../providers/buyProvider/BuyProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { chain } from "@src/providers/buyProvider/types";
 import { useAccountContext } from "@src/providers";
 import { getType } from "../../utils/assets";
@@ -30,7 +30,7 @@ export const Buy = () => {
       : accounts[0].value?.address;
   };
   const [account, setAccount] = useState(initAccount());
-  const filterOptions = () => {
+  const filterOptions = useMemo(() => {
     if (selectedAccount?.value) {
       return chains.filter(
         (chain) => chain.type === getType(selectedAccount.type.toLowerCase())
@@ -42,9 +42,9 @@ export const Buy = () => {
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  };
+  }, [selectedAccount?.key]);
 
-  const [value, setValue] = useState(filterOptions()[0]);
+  const [value, setValue] = useState(filterOptions[0]);
 
   const handlerTransak = async (asset: chain) => {
     let url;
@@ -66,8 +66,8 @@ export const Buy = () => {
   };
 
   useEffect(() => {
-    setValue(filterOptions()[0]);
-  }, [String(selectedAccount?.value)]);
+    setValue(filterOptions[0]);
+  }, [filterOptions]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -92,8 +92,8 @@ export const Buy = () => {
         )}
         <div className="flex  flex-col w-full gap-2 ">
           <SelectableAssetBuy
-            defaulValue={value}
-            options={filterOptions()}
+            defaulValue={filterOptions[0]}
+            options={filterOptions}
             label=""
             value={value}
             onChange={(asset) => setValue(asset)}
