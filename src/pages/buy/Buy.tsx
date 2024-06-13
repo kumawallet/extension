@@ -30,7 +30,7 @@ export const Buy = () => {
       : accounts[0].value?.address;
   };
   const [account, setAccount] = useState(initAccount());
-  const filterOptions = useMemo(() => {
+  const filterOptions = () => {
     if (selectedAccount?.value) {
       return chains.filter(
         (chain) => chain.type === getType(selectedAccount.type.toLowerCase())
@@ -42,9 +42,10 @@ export const Buy = () => {
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  }, [selectedAccount?.key]);
+  }
+  //, [selectedAccount?.key]);= useMemo(
 
-  const [value, setValue] = useState(filterOptions[0]);
+  const [value, setValue] = useState(filterOptions()[0]);
 
   const handlerTransak = async (asset: chain) => {
     let url;
@@ -66,7 +67,7 @@ export const Buy = () => {
   };
 
   useEffect(() => {
-    setValue(filterOptions[0]);
+    setValue(filterOptions()[0]);
   }, [filterOptions]);
 
   const handleCheckboxChange = () => {
