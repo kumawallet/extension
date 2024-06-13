@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { SelectableAssetBuy } from "./components/SelectableAsset";
 import { LinkUrl } from "./components/LinkUrl";
 import { useBuyContext } from "../../providers/buyProvider/BuyProvider";
-import { useEffect, useMemo, useState } from "react";
-import { chain } from "@src/providers/buyProvider/types";
+import { useEffect, useState } from "react";
 import { useAccountContext } from "@src/providers";
 import { getType } from "../../utils/assets";
 import { SelectAccount } from "../send/components/SelectAccount";
@@ -43,21 +42,20 @@ export const Buy = () => {
       return chains.filter((chain) => chain.type === type);
     }
   }
-  //, [selectedAccount?.key]);= useMemo(
 
   const [value, setValue] = useState(filterOptions()[0]);
 
-  const handlerTransak = async (asset: chain) => {
+  const handlerTransak = async () => {
     let url;
     if (selectedAccount?.value) {
       url = await createOrder(
-        asset.symbol,
+        value.symbol,
         selectedAccount?.value?.address,
-        asset.network
+        value.network
       );
     } else {
       if(account){
-        url = await createOrder(asset.symbol, account, asset.network);
+        url = await createOrder(value.symbol, account, value.network);
       }
       else{
         console.log("Error[Buy]: ", "no registeed accounts")
@@ -93,8 +91,8 @@ export const Buy = () => {
         )}
         <div className="flex  flex-col w-full gap-2 ">
           <SelectableAssetBuy
-            defaulValue={filterOptions[0]}
-            options={filterOptions}
+            defaulValue={filterOptions()[0]}
+            options={filterOptions()}
             label=""
             value={value}
             onChange={(asset) => setValue(asset)}
@@ -152,7 +150,7 @@ export const Buy = () => {
         </div>
       </div>
       <Button
-        onClick={() => handlerTransak(value)}
+        onClick={handlerTransak}
         classname="w-full"
         isDisabled={!isChecked}
       >
