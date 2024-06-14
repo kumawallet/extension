@@ -36,4 +36,10 @@ export enum issuesLinks {
   discord = env.VITE_ISSUES_DISCORD || "#",
 }
 
+export enum transakLinks {
+  transak_terms = env.VITE_TRANSAK_URL_TERMS,
+  transak_policy = env.VITE_TRANSAK_URL_POLICY,
+  transak_support = env.VITE_TRANSAK_URL_SUPPORT
+}
+
 export const Browser = chrome || window.browser;

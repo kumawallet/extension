@@ -13,6 +13,7 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
+  Buy
 } from "@src/pages";
 import {
   BugReport,
@@ -46,6 +47,7 @@ import {
   WELCOME,
   CHANGE_PASSWORD,
   SETTINGS_AUTOLOCK,
+  BUY
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -160,6 +162,7 @@ export const Routes = () => {
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
         <Route path={SWAP} element={<Swap />} />
+        <Route path={BUY} element={<Buy />} />
         <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
         <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />

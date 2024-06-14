@@ -266,6 +266,15 @@
     "reset_wallet_warning": "Uyarı: Bu işlem uzantıdan tüm hesaplarınızı ve verilerinizi silecektir. Tüm varlıklarınız uzantıda SAKLANMADIĞI için güvendedir. Hesaplarınızı kurtarmak için tohum cümlesi kullanmanız gerekecektir.",
     "reset": "Sıfırla"
   },
+  "buy": {
+    "buy_title": "Satın Al",
+    "service": "Hizmet Transak tarafından sağlanmaktadır.",
+    "info": "Kuma Cüzdan'dan çıkıp Transak'a yönlendiriliyorsunuz. Transak'tan hizmet alarak, Transak'ın <term/> ve <policy/> okuduğunuzu ve kabul ettiğinizi beyan edersiniz. Transak'ın hizmetleriyle ilgili herhangi bir soru için lütfen <support/> sitesini ziyaret edin.",
+    "terms_of_service": "Hizmet Şartları",
+    "privacy_policy": "Gizlilik Politikası",
+    "support": "Transak'ın desteği",
+    "yes_i_understand": "Evet, anladım"
+  },
   "send": {
     "send_title": "Gönder",
     "review_transfer_title": "Transferi İncele",

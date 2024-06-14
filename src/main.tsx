@@ -5,11 +5,11 @@ import {
   AssetProvider,
   AccountProvider,
   NetworkProvider,
-
 } from "./providers";
 import { Routes } from "./routes";
 import { ToastContainer } from "react-toastify";
-import "./utils/i18n";
+import { I18nextProvider } from 'react-i18next';
+import i18n from"./utils/i18n";
 import "react-toastify/dist/ReactToastify.min.css";
 import * as Sentry from "@sentry/react";
 import { Error } from "./components/common";
@@ -23,14 +23,16 @@ Sentry.init({
 export const Main = () => {
   return (
     <Sentry.ErrorBoundary fallback={<Error />}>
-      <NetworkProvider>
-        <AccountProvider>
-          <AssetProvider>
-            <Routes />
-          </AssetProvider>
-          <ToastContainer theme="dark" />
-        </AccountProvider>
-      </NetworkProvider>
+      <I18nextProvider i18n={i18n}>
+        <NetworkProvider>
+          <AccountProvider>
+            <AssetProvider>
+                <Routes />
+            </AssetProvider>
+            <ToastContainer theme="dark" />
+          </AccountProvider>
+        </NetworkProvider>
+      </I18nextProvider>
     </Sentry.ErrorBoundary>
   );
 };
