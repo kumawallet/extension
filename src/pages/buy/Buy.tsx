@@ -4,31 +4,28 @@ import { useTranslation, Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SelectableAssetBuy } from "./components/SelectableAsset";
 import { LinkUrl } from "./components/LinkUrl";
-import { useBuyContext } from "../../providers/buyProvider/BuyProvider";
 import { useEffect, useState } from "react";
 import { useAccountContext } from "@src/providers";
 import { getType } from "../../utils/assets";
 import { SelectAccount } from "../send/components/SelectAccount";
 import { transakLinks } from "../../utils/constants";
+import useBuy from "./hook/useBuy"
 
 export const Buy = () => {
-  const {
-    state: { chains },
-    createOrder,
-  } = useBuyContext();
   const { t } = useTranslation("buy");
   const navigate = useNavigate();
   const {
     state: { selectedAccount, accounts },
   } = useAccountContext();
   const [isChecked, setIsChecked] = useState(false);
+  const { chains, createOrder} = useBuy();
 
   const initAccount = () => {
     return selectedAccount && selectedAccount.value
       ? selectedAccount.value.address
       : accounts[0].value?.address;
   };
-  const [account, setAccount] = useState(initAccount());
+  const [account, setAccount] = useState<string | undefined>(initAccount());
   const filterOptions = () => {
     if (selectedAccount?.value) {
       return chains.filter(
@@ -53,20 +50,17 @@ export const Buy = () => {
         selectedAccount?.value?.address,
         value.network
       );
-    } else {
-      if(account){
+    } 
+
+    if(!selectedAccount?.value && account){
         url = await createOrder(value.symbol, account, value.network);
-      }
-      else{
-        console.log("Error[Buy]: ", "no registeed accounts")
-      }
     }
     window.open(url, "_blank");
   };
 
   useEffect(() => {
     setValue(filterOptions()[0]);
-  }, [selectedAccount?.key]);
+  }, [selectedAccount?.key, account]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);

@@ -6,7 +6,6 @@ import {
   AccountProvider,
   NetworkProvider,
 } from "./providers";
-import { BuyProvider } from "./providers/buyProvider/BuyProvider"
 import { Routes } from "./routes";
 import { ToastContainer } from "react-toastify";
 import { I18nextProvider } from 'react-i18next';
@@ -28,9 +27,7 @@ export const Main = () => {
         <NetworkProvider>
           <AccountProvider>
             <AssetProvider>
-              <BuyProvider>
                 <Routes />
-              </BuyProvider>
             </AssetProvider>
             <ToastContainer theme="dark" />
           </AccountProvider>

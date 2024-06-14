@@ -13,8 +13,8 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
+  Buy
 } from "@src/pages";
-import {Buy} from "../pages/buy/Buy"
 import {
   BugReport,
   AddressBook,

@@ -2,7 +2,7 @@ import { Combobox } from "@headlessui/react";
 import { useState } from "react";
 import { GoChevronDown } from "react-icons/go";
 import { BsCoin } from "react-icons/bs";
-import { chain } from "../../../providers/buyProvider/types.d";
+import { chain } from "../types";
 
 interface SelectableAssetBuyProps<T extends chain> {
   buttonClassName?: string;
