@@ -110,4 +110,30 @@ describe("FeeAndTip", () => {
     })
 
   })
+
+  it('should set tip', async () => {
+    const setValueMock = vi.fn();
+
+    reactHookFormMocks.useFormContext.mockReturnValue({
+      watch: vi.fn((key: MOCK_WATCH_TYPE) => FORM_EVM_ERC20_TRANSFER_MOCK[key]),
+      getValues: vi.fn(() => true), // only for isXcm value,
+      setValue: setValueMock,
+    });
+
+    const { getByTestId } = renderComponent();
+
+    await waitFor(() => {
+      expect(getByTestId("tip-input")).toBeDefined();
+    })
+
+    const tipInput = getByTestId("tip-input");
+
+    fireEvent.change(tipInput, { target: { value: "0.0001" } });
+    // fireEvent.input(tipInput, { target: { value: "0.0001" } });
+
+    await waitFor(() => {
+      expect(setValueMock).toHaveBeenCalled();
+    })
+
+  })
 });

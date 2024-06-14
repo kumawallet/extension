@@ -11,7 +11,7 @@ export default class WASMKeyring extends HDKeyring {
   }
 
   async getAddress(seed: string, path: number): Promise<string> {
-    const suri = seed + (path >= 0 ? `//${path}` : "");
+    const suri = seed + `//${path}`;
     const wallet = PolkadotKeyring.createFromUri(suri);
     return wallet.address;
   }

@@ -18,6 +18,7 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
   return (
     <div className="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between">
       <div
+        data-testid="asset"
         className="flex gap-2 items-center"
         onClick={() => {
           if (hasMultiplesAccounts) {
@@ -39,9 +40,11 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
       </div>
 
       <div
+
         className={`bg-none outline-none py-2 px-3 flex justify-center items-center hover:bg-primary-default rounded-full`}
       >
         <FaChevronRight
+          data-testid="send"
           size={21}
           onClick={() =>
             navigate(SEND, {

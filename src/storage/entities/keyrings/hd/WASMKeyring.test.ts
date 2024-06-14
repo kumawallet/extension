@@ -29,11 +29,13 @@ describe("WASMKeyring", () => {
     expect(path).toBe("/0");
   });
 
-  it("should return address", async () => {
-    const wasmKeyring = new WASMKeyring(POLKADOT_SEED_MOCK);
+  describe("get address", () => {
+    it("should return address", async () => {
+      const wasmKeyring = new WASMKeyring(POLKADOT_SEED_MOCK);
 
-    const address = await wasmKeyring.getAddress(POLKADOT_SEED_MOCK, 0);
-    expect(address).toEqual(POLKADOT_ACCOUNT_MOCK.value!.address);
+      const address = await wasmKeyring.getAddress(POLKADOT_SEED_MOCK, 0);
+      expect(address).toEqual(POLKADOT_ACCOUNT_MOCK.value!.address);
+    });
   });
 
   describe("get key", () => {
@@ -72,5 +74,12 @@ describe("WASMKeyring", () => {
     } as unknown as SupportedKeyring);
 
     expect(keyring.mnemonic).toBe(POLKADOT_SEED_MOCK);
+  });
+
+  it("should return derived path", () => {
+    const wasmKeyring = new WASMKeyring(POLKADOT_SEED_MOCK);
+
+    const path = wasmKeyring.getDerivedPath(POLKADOT_SEED_MOCK, 0);
+    expect(path).toBe(`${POLKADOT_SEED_MOCK}//0`);
   });
 });

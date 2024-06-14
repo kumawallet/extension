@@ -13,9 +13,13 @@ export default class ImportedWASMKeyring extends ImportedKeyring {
   }
 
   getAddress(seed: string, path: number = 0): string {
-    const suri = seed + (path >= 0 ? `//${path}` : "");
+    const suri = seed + `//${path}`;
     const wallet = PolkadotKeyring.createFromUri(suri);
     return wallet.address;
+  }
+
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
   }
 
   static fromJSON(json: SupportedKeyring): ImportedWASMKeyring {

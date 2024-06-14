@@ -15,15 +15,16 @@ export const Receive = () => {
     state: { selectedAccount },
   } = useAccountContext();
 
-  const account = cropAccount(selectedAccount?.value?.address || "");
+  const account = cropAccount(selectedAccount?.value!.address as string);
   const { Icon, copyToClipboard } = useCopyToClipboard(
-    selectedAccount?.value?.address || ""
+    selectedAccount?.value!.address as string
   );
 
   return (
     <PageWrapper>
       <div className="flex gap-3 items-center mb-7">
         <FiChevronLeft
+          data-testid="back-button"
           size={26}
           className="cursor-pointer"
           onClick={() => navigate(-1)}
@@ -46,7 +47,7 @@ export const Receive = () => {
             onClick={copyToClipboard}
             data-testid="account-button"
           >
-            <p className={`text-primary-default`}>{account}</p>
+            <p data-testid="cropped-account" className={`text-primary-default`}>{account}</p>
             <Icon messageTopSeparation={20} messagePosition="right" />
           </button>
         </div>

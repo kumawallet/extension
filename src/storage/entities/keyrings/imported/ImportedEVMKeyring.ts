@@ -1,20 +1,18 @@
 import { AccountType } from "@src/accounts/types";
 import { SupportedKeyring } from "../types";
 import ImportedKeyring from "./ImportedKeyring";
-import { ethers } from "ethers";
+import { Wallet } from "ethers";
 import { isValidMnemonic } from "ethers/lib/utils";
 
 export default class ImportedEVMKeyring extends ImportedKeyring {
   type = AccountType.IMPORTED_EVM;
 
   getAddress(seed: string, path?: number): string {
-    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path || 0}`)
-      ?.address;
+    return Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path || 0}`)?.address;
   }
 
   getDerivedPath(seed: string, path: number): string {
-    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)
-      ?.privateKey;
+    return Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)?.privateKey;
   }
 
   async getImportedData(pkOrSeed: string) {
@@ -24,12 +22,9 @@ export default class ImportedEVMKeyring extends ImportedKeyring {
     const key = pkOrSeed;
 
     if (isMnemonic) {
-      address = ethers.Wallet.fromMnemonic(
-        pkOrSeed,
-        `m/44'/60'/0'/0/0`
-      )?.address;
+      address = Wallet.fromMnemonic(pkOrSeed, `m/44'/60'/0'/0/0`)?.address;
     } else {
-      const wallet = new ethers.Wallet(pkOrSeed);
+      const wallet = new Wallet(pkOrSeed);
 
       address = wallet.address;
     }

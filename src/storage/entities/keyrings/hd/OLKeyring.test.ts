@@ -12,6 +12,13 @@ describe("OLKeyring", () => {
     expect(address).toBe(ADDRESS.toLocaleLowerCase());
   });
 
+  it("should return next account path", () => {
+    const wasmKeyring = new OLKeyring(OL_SEED_MOCK);
+
+    const path = wasmKeyring.getNextAccountPath();
+    expect(path).toBe("/0");
+  });
+
   describe("get key", () => {
     it("should return key", () => {
       const olKeyring = new OLKeyring(OL_SEED_MOCK);
@@ -66,5 +73,12 @@ describe("OLKeyring", () => {
       mnemonic: OL_SEED_MOCK,
       keyPairs: {},
     });
+  });
+
+  it("should return derived path", () => {
+    const olKeyring = new OLKeyring(OL_SEED_MOCK);
+
+    const path = olKeyring.getDerivedPath(OL_SEED_MOCK, 0);
+    expect(path).toBe(`${OL_SEED_MOCK}/0`);
   });
 });

@@ -37,6 +37,10 @@ export default class ImportedOLKeyring extends ImportedKeyring {
     };
   }
 
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}/${path}`;
+  }
+
   static fromJSON(json: SupportedKeyring): ImportedOLKeyring {
     const { keyPairs } = json as ImportedKeyring;
     const keyring = new ImportedOLKeyring();

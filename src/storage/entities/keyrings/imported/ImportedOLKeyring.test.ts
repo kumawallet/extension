@@ -65,4 +65,20 @@ describe("ImportedOLKeyring", () => {
       expect(key).toEqual(OL_SEED_MOCK);
     });
   });
+
+  it("getAddress", async () => {
+    const importOLKeyring = new ImportedOLKeyring();
+
+    const address = await importOLKeyring.getAddress(OL_SEED_MOCK);
+
+    expect(address).toBe(ADDRESS.toLowerCase());
+  });
+
+  it("getDerivedPath", () => {
+    const importOLKeyring = new ImportedOLKeyring();
+
+    const derivedPath = importOLKeyring.getDerivedPath(OL_SEED_MOCK, 0);
+
+    expect(derivedPath).toBe(`${OL_SEED_MOCK}/0`);
+  });
 });
