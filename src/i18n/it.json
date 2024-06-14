@@ -267,6 +267,15 @@
   "reset_wallet_warning": "Avviso: Questa azione eliminerà tutti i tuoi account e dati dall'estensione. Tutti i tuoi asset sono al sicuro poiché NON sono archiviati sull'estensione. Dovrai ripristinare i tuoi account utilizzando la frase seed.",
   "reset": "Reset"
 },
+"buy": {
+    "buy_title": "Acquista",
+    "service": "Il servizio è fornito da Transak.",
+    "info": "Stai per lasciare Kuma Wallet per Transak. Procedendo e acquistando servizi da Transak, riconosci di aver letto e accettato i <term/> e la <policy/> di Transak. Per qualsiasi domanda relativa ai servizi di Transak, si prega di visitare il sito di <support/>.",
+    "terms_of_service": "Termini di Servizio",
+    "privacy_policy": "Informativa sulla Privacy",
+    "support": "supporto di Transak",
+    "yes_i_understand": "Sì, ho capito"
+},
 "send": {
   "send_title": "Invia",
   "review_transfer_title": "Rivedi trasferimento",

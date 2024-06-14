@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Action } from "./Action";
 import { useNavigate } from "react-router-dom";
-import { SEND, SWAP } from "@src/routes/paths";
+import { SEND, SWAP, BUY } from "@src/routes/paths";
 import { Buy, Send, Swap } from "@src/components/icons";
 
 export const Actions = () => {
@@ -25,9 +25,7 @@ export const Actions = () => {
       <Action
         Icon={Buy}
         title={t("buy")}
-        onClick={() => navigate("")}
-        isDisabled={true}
-        isCoomingSoon={true}
+        onClick={() => navigate(BUY)}
       />
     </div>
   );

@@ -266,6 +266,15 @@
     "reset_wallet_warning": "警告：この操作により、拡張機能からすべてのアカウントとデータが削除されます。アセットは拡張機能に保存されていないため、すべてのアセットは安全です。シードフレーズを使用してアカウントを復元する必要があります。",
     "reset": "リセット"
   },
+  "buy": {
+    "buy_title": "購入",
+    "service": "サービスはTransakによって提供されます。",
+    "info": "Kuma WalletからTransakに移動します。Transakのサービスを利用することにより、Transakの<term/>および<policy/>を読んで同意したことになります。Transakのサービスに関する質問は、<support/>サイトをご覧ください。",
+    "terms_of_service": "利用規約",
+    "privacy_policy": "プライバシーポリシー",
+    "support": "Transakのサポート",
+    "yes_i_understand": "はい、理解しました"
+  },
   "send": {
     "send_title": "送信",
     "review_transfer_title": "転送を確認",
