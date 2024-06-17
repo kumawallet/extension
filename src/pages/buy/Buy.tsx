@@ -4,12 +4,13 @@ import { useTranslation, Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SelectableAssetBuy } from "./components/SelectableAsset";
 import { LinkUrl } from "./components/LinkUrl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccountContext } from "@src/providers";
 import { getType } from "../../utils/assets";
 import { SelectAccount } from "../send/components/SelectAccount";
 import { transakLinks } from "../../utils/constants";
 import useBuy from "./hook/useBuy"
+import { Chain } from "./types";
 
 export const Buy = () => {
   const { t } = useTranslation("buy");
@@ -17,50 +18,36 @@ export const Buy = () => {
   const {
     state: { selectedAccount, accounts },
   } = useAccountContext();
-  const [isChecked, setIsChecked] = useState(false);
-  const { chains, createOrder} = useBuy();
+  const { chains, createOrder } = useBuy();
 
-  const initAccount = () => {
-    return selectedAccount && selectedAccount.value
-      ? selectedAccount.value.address
-      : accounts[0].value?.address;
+  const [isChecked, setIsChecked] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<string | undefined>(selectedAccount?.value?.address || accounts[0].value?.address);
+  const [value, setValue] = useState<Chain>();
+
+  const handlerTransak = async () => {
+    if (selectedAddress && value) {
+      const url = await createOrder(value.symbol, selectedAddress, value.network);
+      window.open(url, "_blank");
+    }
   };
-  const [account, setAccount] = useState<string | undefined>(initAccount());
-  const filterOptions = () => {
+
+  const options = useMemo(() => {
     if (selectedAccount?.value) {
       return chains.filter(
         (chain) => chain.type === getType(selectedAccount.type.toLowerCase())
       );
     } else {
       const _account = accounts.find(
-        (_account) => _account.value?.address === account
+        (_account) => _account.value?.address === selectedAddress
       );
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  }
-
-  const [value, setValue] = useState(filterOptions()[0]);
-
-  const handlerTransak = async () => {
-    let url;
-    if (selectedAccount?.value) {
-      url = await createOrder(
-        value.symbol,
-        selectedAccount?.value?.address,
-        value.network
-      );
-    } 
-
-    if(!selectedAccount?.value && account){
-        url = await createOrder(value.symbol, account, value.network);
-    }
-    window.open(url, "_blank");
-  };
+  }, [selectedAccount, chains, accounts])
 
   useEffect(() => {
-    setValue(filterOptions()[0]);
-  }, [selectedAccount?.key, account]);
+    setValue(options[0]);
+  }, [options]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -79,14 +66,14 @@ export const Buy = () => {
       <div className={`flex  flex-col w-full gap-[2rem]`}>
         {!selectedAccount?.value && (
           <SelectAccount
-            onChangeValue={(account) => setAccount(account)}
-            selectedAddress={account || null}
+            onChangeValue={(account) => setSelectedAddress(account)}
+            selectedAddress={selectedAddress || null}
           />
         )}
         <div className="flex  flex-col w-full gap-2 ">
           <SelectableAssetBuy
             defaulValue={value}
-            options={filterOptions()}
+            options={options}
             label=""
             value={value}
             onChange={(asset) => setValue(asset)}

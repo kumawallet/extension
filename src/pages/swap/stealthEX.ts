@@ -190,7 +190,7 @@ export class StealthEX implements Swapper {
           decimals: 0,
           network: token?.network || "",
           chainId: chainIds.find((chainId) =>
-            StealthEx_MAP_NATIVE_TOKENS[chainId].some(
+            StealthEx_MAP_NATIVE_TOKENS[chainId.toLowerCase()]?.some(
               (token) => token.stealthExName === ntoken.stealthExName
             )
           ),

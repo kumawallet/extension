@@ -1,8 +1,8 @@
-export interface chain  {
+export interface Chain {
   "network-name": string;
   network: string;
   logo: string;
   symbol: string;
-  prefix ?: number;
+  prefix?: number;
   type: string;
 }
