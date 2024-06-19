@@ -2,9 +2,9 @@ import { Combobox } from "@headlessui/react";
 import { useState } from "react";
 import { GoChevronDown } from "react-icons/go";
 import { BsCoin } from "react-icons/bs";
-import { chain } from "../types";
+import { Chain } from "../types";
 
-interface SelectableAssetBuyProps<T extends chain> {
+interface SelectableAssetBuyProps<T extends Chain> {
   buttonClassName?: string;
   containerClassName?: string;
   defaulValue: T;
@@ -32,7 +32,7 @@ const OptImage = ({ image }: { image: string }) => {
     />
   );
 };
-export const SelectableAssetBuy = <T extends chain>({
+export const SelectableAssetBuy = <T extends Chain>({
   buttonClassName,
   containerClassName,
   defaulValue,
@@ -46,7 +46,7 @@ export const SelectableAssetBuy = <T extends chain>({
   const filteredAsset =
     query === ""
       ? options
-      : options.filter((asset: chain) =>
+      : options.filter((asset: Chain) =>
           (asset?.network || "")
             ?.toLowerCase()
             .replace(/\s+/g, "")
@@ -72,7 +72,7 @@ export const SelectableAssetBuy = <T extends chain>({
               className={`!pl-10 min-w-[120px] h-[3rem] w-full text-sm flex justify-between ${
                 open ? "border-[#E6007A]" : ""
               } border-[1.78px] hover:border-[#E6007A] items-center bg-[#040404] rounded-lg py-3 px-2 cursor-default outline outline-transparent focus:outline-primary-default hover:outline-primary-default ${buttonClassName}`}
-              displayValue={(asset: chain) =>
+              displayValue={(asset: Chain) =>
                 asset?.symbol?.toUpperCase() || ""
               }
               onChange={(e) => setQuery(e.target.value)}

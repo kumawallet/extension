@@ -2,6 +2,7 @@ import EVMKeyring from "./EVMKeyring";
 import { HDKeyPair, SupportedKeyring } from "../types";
 import {
   EVM_ACCOUNT_MOCK,
+  EVM_PRIVATE_KEY_MOCK,
   EVM_SEED_MOCK,
 } from "@src/tests/mocks/account-mocks";
 
@@ -77,5 +78,11 @@ describe("EVMKeyring", () => {
     const result = evmKeyring.toJSON();
 
     expect(result.mnemonic).toBe(EVM_SEED_MOCK);
+  });
+
+  it("getDerivedPath", () => {
+    const evmKeyring = new EVMKeyring(EVM_SEED_MOCK);
+    const path = evmKeyring.getDerivedPath(EVM_SEED_MOCK, 0);
+    expect(path).toBe(EVM_PRIVATE_KEY_MOCK);
   });
 });

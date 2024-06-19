@@ -1,4 +1,4 @@
-export interface chain  {
+export interface Chain {
   "network-name": string;
   network: string;
   logo: string;

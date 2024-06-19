@@ -6,6 +6,7 @@ import { SelectableOptionModal } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { GoCheckCircle, GoCircle } from "react-icons/go";
 import { cropAccount, iconURL } from "@src/utils/account-utils";
+import { AccountType } from "@src/accounts/types";
 
 
 
@@ -23,7 +24,7 @@ export const SelectAccount: FC<SelectAccountProps> = ({
     state: { selectedAccount, accounts },
   } = useAccountContext();
 
-  const formattedAccounts = accounts.map((account) => ({
+  const formattedAccounts = accounts.filter(account => account.type !== AccountType.OL).map((account) => ({
     name: account.value?.name as string,
     address: account.value?.address as string,
     symbol: iconURL(account.type),

@@ -220,7 +220,8 @@ export const useSwap = () => {
         });
 
         setAssets(nativeAssets);
-        if (assetToSell.label === "") setAssetToSell(nativeAssets[0]);
+        setAssetToSell(nativeAssets[0]);
+        // if (assetToSell?.label === "") ;
         setAssetsToSell(nativeAssets);
         setAssetsToBuy(pairs);
         setAssetToBuy(pairs[1]);
@@ -497,36 +498,6 @@ export const useSwap = () => {
 
     return swapper.swap_info || "";
   }, [swapper]);
-
-  useEffect(() => {
-    (async () => {
-      if (amounts.sell !== "0") {
-        handleAmounts("sell", amounts.sell);
-      }
-
-      const accountKey = Object.keys(_assets).find((key) =>
-        key.toLowerCase().includes(tx.addressFrom.toLowerCase())
-      );
-
-      const allAssets = Object.values(_assets[accountKey as string]).flatMap(
-        (a) => a.assets
-      );
-
-      if (allAssets.length > 0) {
-        const selectedAsset = allAssets.find(
-          (asset) => asset.symbol === assetToSell.label
-        );
-
-        if (!selectedAsset) return;
-
-        setAssetToSell((prevState) => ({
-          ...prevState,
-          balance: selectedAsset?.balance,
-          decimals: selectedAsset?.decimals,
-        }));
-      }
-    })();
-  }, [assetToSell?.label, _assets, tx.addressFrom]);
 
   useEffect(() => {
     if (amounts.buy !== "0") {

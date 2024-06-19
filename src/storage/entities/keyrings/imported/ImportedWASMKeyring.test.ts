@@ -21,15 +21,18 @@ describe("ImportedWASMKeyring", () => {
       },
     }));
   });
+
   it("getImportedData", async () => {
     const importEVMKeyring = new ImportedWASMKeyring();
 
-    const importedData = await importEVMKeyring.getImportedData("seed");
+    const importedData = await importEVMKeyring.getImportedData(
+      POLKADOT_SEED_MOCK
+    );
 
     expect(importedData).toEqual({
       address: POLKADOT_ACCOUNT_MOCK.value!.address,
       keyPair: {
-        key: "seed",
+        key: POLKADOT_SEED_MOCK,
       },
       isDerivable: true,
     });
@@ -56,6 +59,29 @@ describe("ImportedWASMKeyring", () => {
           key: POLKADOT_SEED_MOCK,
         },
       },
+    });
+  });
+
+  describe("getAddress", () => {
+    it("getAddress with path", async () => {
+      const importEVMKeyring = new ImportedWASMKeyring();
+
+      const address = await importEVMKeyring.getAddress(POLKADOT_SEED_MOCK);
+
+      expect(address).toBe(POLKADOT_ACCOUNT_MOCK.value!.address);
+    });
+  });
+
+  describe("getDerivedPath", () => {
+    it("should return derived path", () => {
+      const importEVMKeyring = new ImportedWASMKeyring();
+
+      const derivedPath = importEVMKeyring.getDerivedPath(
+        POLKADOT_SEED_MOCK,
+        0
+      );
+
+      expect(derivedPath).toBe(`${POLKADOT_SEED_MOCK}//0`);
     });
   });
 });
