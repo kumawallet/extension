@@ -5,4 +5,5 @@ export interface chain  {
   symbol: string;
   prefix ?: number;
   type: string;
+  isSupportSell: boolean;
 }

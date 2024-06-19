@@ -48,12 +48,13 @@ export const Buy = () => {
       url = await createOrder(
         value.symbol,
         selectedAccount?.value?.address,
-        value.network
+        value.network,
+        value.isSupportSell
       );
     } 
 
     if(!selectedAccount?.value && account){
-        url = await createOrder(value.symbol, account, value.network);
+        url = await createOrder(value.symbol, account, value.network, value.isSupportSell);
     }
     window.open(url, "_blank");
   };

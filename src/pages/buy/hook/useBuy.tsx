@@ -8,7 +8,7 @@ import { transformAddress } from "@src/utils/account-utils";
 const useBuy = () => {
     const [chains, setChains] = useState<chain[]>(ASSETS_TRANSAK);
 
-    const createOrder = useCallback((symbol: string, address: string, network: string) => {
+    const createOrder = useCallback((symbol: string, address: string, network: string, isSupportSell: boolean) => {
         return new Promise<string>((resolve) => {
           const prefix = chains.find(
             (chain) => chain.symbol === symbol && chain.network === network
@@ -19,6 +19,8 @@ const useBuy = () => {
             networks: network,
             cryptoCurrencyList: symbol,
             walletAddress: transformAddress(address, prefix),
+            productsAvailed: isSupportSell ? "BUY,SELL" : "BUY",
+            disableWalletAddressForm: "true"
           };
           const query = new URLSearchParams(params).toString();
           resolve(`${import.meta.env.VITE_TRANSAK_URL}?${query}`);
