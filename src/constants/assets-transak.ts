@@ -55,7 +55,7 @@ export const ASSETS_TRANSAK = [
         logo: ASSETS_ICONS["USDC"],
         symbol: "USDC",
         type: ChainType.EVM,
-        isSupportSell: true
+        isSupportSell: false
     },
     {
         "network-name": "Polkadot",
@@ -64,7 +64,7 @@ export const ASSETS_TRANSAK = [
         symbol: "DOT",
         prefix: 0,
         type: ChainType.WASM,
-        isSupportSell: true
+        isSupportSell: false
     },
     {
         "network-name": "Ethereum",
@@ -105,7 +105,7 @@ export const ASSETS_TRANSAK = [
         symbol: "KSM",
         prefix: 2,
         type: ChainType.WASM,
-        isSupportSell: true
+        isSupportSell: false
     },
     {   "network-name": "Astar",
         network: "astar",
