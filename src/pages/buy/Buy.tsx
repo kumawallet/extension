@@ -43,7 +43,7 @@ export const Buy = () => {
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  }, [selectedAccount, chains, accounts])
+  }, [selectedAccount, chains, accounts,selectedAddress])
 
   useEffect(() => {
     setValue(options[0]);
