@@ -28,7 +28,6 @@ const canShowTestnetToggle = (
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation("balance");
   const {
     state: { chains, selectedChain, chainStatus },
@@ -58,17 +57,11 @@ export const ChainSelector = () => {
 
   return (
     <>
-      {isOpen ? (
-        <div
-          className="fixed inset-0 bg-black/25 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-        />
-      ) : null}
       <Menu>
         <Menu.Button
           data-testid="chain-button"
           className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
-          onClick={() => setIsOpen(true)}
+          
         >
           <Network size="22" className="my-[0.15rem]" />
           <p className="overflow-hidden text-ellipsis mr-1">
@@ -85,13 +78,15 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-10 w-full bg-[#2C3137] outline-0 z-50">
-            <div className=" px-8 py-2 pt-2 text-start">
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-0 w-full  outline-0 z-50">
+          <div
+          className="w-full h-[2.6rem]  inset-0 bg-black/25 backdrop-blur-sm"
+              />
+            <div className=" px-8 py-2 pt-2 text-start bg-[#2C3137]">
               <div className="flex flex-col gap-1 py-2 mt-2 ">
                 <Menu.Button
                   data-testid="chain-button"
-                  className="absolute top-6 right-6"
-                  onClick={() => setIsOpen(false)}
+                  className="absolute top-16 right-6"
                 >
                   <TfiClose className="font-thin text-[0.7rem]" />
                 </Menu.Button>
