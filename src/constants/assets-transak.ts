@@ -6,49 +6,56 @@ export const ASSETS_TRANSAK = [
         network: "ethereum",
         logo: ASSETS_ICONS["ETH"],
         symbol: "ETH",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Ethereum",
         network: "ethereum",
         logo: ASSETS_ICONS["USDC"],
         symbol: "USDC",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Ethereum",
         network: "ethereum",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Binance",
         network: "bsc",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: false
     },
     {
         "network-name": "Binance",
         network: "bsc",
         logo:  ASSETS_ICONS["BNB"],
         symbol: "BNB",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Binance",
         network: "bsc",
         logo: ASSETS_ICONS["USDC"],
         symbol: "USDC",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: false
     },
     {
         "network-name": "Polkadot",
@@ -56,35 +63,40 @@ export const ASSETS_TRANSAK = [
         logo: ASSETS_ICONS["DOT"],
         symbol: "DOT",
         prefix: 0,
-        type: ChainType.WASM
+        type: ChainType.WASM,
+        isSupportSell: false
     },
     {
         "network-name": "Ethereum",
         network: "ethereum",
         logo: ASSETS_ICONS["WBTC"],
         symbol: "WBTC",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: false
     },
     {
         "network-name": "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["WBTC"],
         symbol: "WBTC",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: false
     },
     {
         "network-name": "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["MATIC"],
         symbol: "MATIC",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: true
     },
     {
         "network-name": "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["DAI"],
         symbol: "DAI",
-        type: ChainType.EVM
+        type: ChainType.EVM,
+        isSupportSell: false
     },
     {
         "network-name": "Kusama",
@@ -92,20 +104,16 @@ export const ASSETS_TRANSAK = [
         logo: ASSETS_ICONS["KSM"],
         symbol: "KSM",
         prefix: 2,
-        type: ChainType.WASM
+        type: ChainType.WASM,
+        isSupportSell: false
     },
     {   "network-name": "Astar",
         network: "astar",
         logo: ASSETS_ICONS["ASTR"],
         symbol: "ASTR",
         prefix: 5,
-        type: ChainType.WASM
-    },
-    // {   "network-name": "Shiden",
-    //     network: "shiden",
-    //     logo : ASSETS_ICONS["SDN"],
-    //     symbol: "SDN",
-    //     prefix: 5,
-    //     type: ChainType.WASM
-    // }
+        type: ChainType.WASM,
+        isSupportSell: false
+
+    }
 ]

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   useAccountContext,
-  useAssetContext,
   useNetworkContext,
 } from "@src/providers";
 import { decodeAddress } from "@polkadot/util-crypto";
@@ -80,9 +79,7 @@ export const useSwap = () => {
     state: { accounts, selectedAccount },
   } = useAccountContext();
 
-  const {
-    state: { assets: _assets },
-  } = useAssetContext();
+
 
   const { isLoading, starLoading, endLoading } = useLoading();
   const {

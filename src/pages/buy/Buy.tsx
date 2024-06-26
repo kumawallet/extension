@@ -26,7 +26,7 @@ export const Buy = () => {
 
   const handlerTransak = async () => {
     if (selectedAddress && value) {
-      const url = await createOrder(value.symbol, selectedAddress, value.network);
+      const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
       window.open(url, "_blank");
     }
   };
@@ -43,7 +43,7 @@ export const Buy = () => {
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  }, [selectedAccount, chains, accounts])
+  }, [selectedAccount, chains, accounts,selectedAddress])
 
   useEffect(() => {
     setValue(options[0]);
@@ -71,13 +71,13 @@ export const Buy = () => {
           />
         )}
         <div className="flex  flex-col w-full gap-2 ">
-          <SelectableAssetBuy
+          {value && <SelectableAssetBuy
             defaulValue={value}
             options={options}
             label=""
             value={value}
             onChange={(asset) => setValue(asset)}
-          />
+          />}
           <div className="w-full gap-[0.7rem] flex items-center">
             <img
               src="https://assets.transak.com/images/website/transak.svg"
