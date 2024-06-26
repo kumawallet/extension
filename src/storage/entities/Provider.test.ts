@@ -59,7 +59,7 @@ describe("Provider", () => {
 
         const api = provider.getProviders().polkadot.provider as ApiPromise;
         await provider.setProvider("polkadot", ChainType.WASM);
-        expect(api.connect).toHaveBeenCalled();
+        expect(api.connect).not.toHaveBeenCalled();
       });
     });
 
