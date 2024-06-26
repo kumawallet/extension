@@ -2,9 +2,9 @@ import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { Transaction, Tx } from "./Transaction";
 import { ApiPromise } from "@polkadot/api";
 import { ChainType } from "@src/types";
-import { BigNumber, providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
+import { JsonRpcProvider } from "ethers";
 
 const POLKADOT_EXTRINSIC = {
   paymentInfo: () => ({
@@ -103,10 +103,10 @@ const ETHEREUM_CHAIN = EVM_CHAINS[0];
 
 const ETHERS_PROVIDER = {
   getFeeData: vi.fn().mockReturnValue({
-    maxFeePerGas: BigNumber.from("100000000000"),
-    maxPriorityFeePerGas: BigNumber.from("1000000000"),
+    maxFeePerGas: BigInt("100000000000"),
+    maxPriorityFeePerGas: BigInt("1000000000"),
   }),
-  estimateGas: vi.fn().mockReturnValue(BigNumber.from("21000")),
+  estimateGas: vi.fn().mockReturnValue(BigInt("21000")),
 };
 
 const EVM_TX_NATIVE: Tx = {
@@ -118,7 +118,7 @@ const EVM_TX_NATIVE: Tx = {
     symbol: "ETH",
   },
   provider: {
-    provider: ETHERS_PROVIDER as unknown as providers.JsonRpcProvider,
+    provider: ETHERS_PROVIDER as unknown as JsonRpcProvider,
     type: ChainType.EVM,
   },
   originNetwork: ETHEREUM_CHAIN,
@@ -138,7 +138,7 @@ const EVM_TX_ERC20: Tx = {
     address: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
   },
   provider: {
-    provider: ETHERS_PROVIDER as unknown as providers.JsonRpcProvider,
+    provider: ETHERS_PROVIDER as unknown as JsonRpcProvider,
     type: ChainType.EVM,
   },
   originNetwork: ETHEREUM_CHAIN,
@@ -159,7 +159,7 @@ const EVM_TX_XCM = {
     symbol: "GLMR",
   },
   provider: {
-    provider: ETHERS_PROVIDER as unknown as providers.JsonRpcProvider,
+    provider: ETHERS_PROVIDER as unknown as JsonRpcProvider,
     type: ChainType.EVM,
   },
   originNetwork: MOONBEAM,
@@ -179,7 +179,7 @@ const OL_TX: Tx = {
     balance: "1000000",
     decimals: 6,
     id: "-1",
-    symbol: "OL",
+    symbol: "$LIBRA",
   },
   provider: {
     provider: OLProvider as unknown as OlProvider,
@@ -210,12 +210,9 @@ describe("Transaction", () => {
         ...actual,
 
         Contract: class {
-          estimateGas = {
-            transfer: () => ETHERS_PROVIDER.estimateGas(),
-          };
-
-          populateTransaction = {
-            transfer: functionMocks.populateTransfer,
+          transfer = {
+            estimateGas: () => ETHERS_PROVIDER.estimateGas(),
+            populateTransaction: () => functionMocks.populateTransfer(),
           };
         },
       };

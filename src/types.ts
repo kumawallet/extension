@@ -1,6 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BN } from "@polkadot/util";
-import { utils, providers, Wallet, BigNumber } from "ethers";
+import { Wallet, JsonRpcProvider, TransactionRequest } from "ethers";
 import { AccountType } from "./accounts/types";
 import { ContractPromise } from "@polkadot/api-contract";
 import { ApiPromise } from "@polkadot/api";
@@ -8,26 +8,25 @@ import { OlProvider } from "./services/ol/OlProvider";
 
 export type polkadotExtrinsic = SubmittableExtrinsic<"promise">;
 
-export type evmTx = utils.Deferrable<providers.TransactionRequest>;
+export type evmTx = TransactionRequest;
 
 export type WasmFee = {
   estimatedFee: BN;
   estimatedTotal: BN;
 };
 
-export type Provider = providers.JsonRpcProvider | ApiPromise | OlProvider;
+export type Provider = JsonRpcProvider | ApiPromise | OlProvider;
 
 export type API = {
   [id: string]: Provider;
 };
 
 export type EVMFee = {
-  gasLimit: BigNumber;
-  "max fee per gas": BigNumber;
-  // "max base fee per gas": BigNumber;
-  "max priority fee per gas": BigNumber;
-  estimatedFee: BigNumber;
-  estimatedTotal: BigNumber;
+  gasLimit: bigint;
+  "max fee per gas": bigint;
+  "max priority fee per gas": bigint;
+  estimatedFee: bigint;
+  estimatedTotal: bigint;
 };
 
 export type Tx =

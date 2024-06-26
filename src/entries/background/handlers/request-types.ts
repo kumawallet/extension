@@ -20,7 +20,6 @@ import {
   SelectedChain,
   Transaction,
 } from "@src/types";
-import { providers } from "ethers";
 
 export interface RequestSignUp {
   password: string;
@@ -180,15 +179,6 @@ export interface RequestSendTxBase {
   networkName: string;
   rpc: string;
   isSwap?: boolean;
-}
-
-export interface RequestSendSubstrateTx extends RequestSendTxBase {
-  hexExtrinsic: string;
-  tip?: string;
-}
-
-export interface RequestSendEvmTx extends RequestSendTxBase {
-  evmTx?: providers.TransactionRequest;
 }
 
 export interface RequestShowKey {

@@ -7,9 +7,16 @@ import {
   getWasmAssets,
 } from "@src/utils/assets";
 import { BehaviorSubject } from "rxjs";
-import { Asset, Chain, ChainType, IAsset, SubstrateBalance } from "@src/types";
+import {
+  Asset,
+  Chain,
+  ChainType,
+  IAsset,
+  Provider,
+  SubstrateBalance,
+} from "@src/types";
 import { ApiPromise } from "@polkadot/api";
-import { Contract, providers } from "ethers";
+import { Contract, JsonRpcProvider } from "ethers";
 import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import Assets from "@src/storage/entities/Assets";
 import erc20Abi from "@src/constants/erc20.abi.json";
@@ -129,7 +136,7 @@ export default class AssetsBalance {
 
   private getNativeAsset = async (
     api: {
-      provider: ApiPromise | providers.JsonRpcProvider | OlProvider;
+      provider: Provider;
       type: ChainType;
     },
     account: AccountEntity,
@@ -167,7 +174,7 @@ export default class AssetsBalance {
           break;
         case ChainType.EVM:
           {
-            const evmProvider = api.provider as providers.JsonRpcProvider;
+            const evmProvider = api.provider as JsonRpcProvider;
 
             evmProvider.off("block");
             evmProvider.on("block", () => {
@@ -294,7 +301,7 @@ export default class AssetsBalance {
             break;
           case ChainType.EVM:
             {
-              (api[chainId].provider as providers.JsonRpcProvider).off("block");
+              (api[chainId].provider as JsonRpcProvider).off("block");
               // @ts-expect-error --- off is a function
               network.forEach((unsubs) => unsubs.off("Transfer"));
             }
@@ -360,7 +367,7 @@ export default class AssetsBalance {
           const { assets, unsubs } = await this.loadERC20Assets(
             chain,
             account,
-            api.provider as providers.JsonRpcProvider
+            api.provider as JsonRpcProvider
           );
           _assets = assets as Asset[];
           _unsubs = unsubs;
@@ -374,7 +381,7 @@ export default class AssetsBalance {
   private loadERC20Assets = async (
     chain: Chain,
     account: AccountEntity,
-    api: providers.JsonRpcProvider
+    api: JsonRpcProvider
   ) => {
     try {
       const assets: IAsset[] = [];
@@ -455,7 +462,7 @@ export default class AssetsBalance {
       address: string;
       decimals: number;
     };
-    api: providers.JsonRpcProvider;
+    api: JsonRpcProvider;
   }) => {
     try {
       const assets = this.assets.getValue();
@@ -518,7 +525,6 @@ export default class AssetsBalance {
 
         for (const unsub of subs) {
           if ("off" in unsub) {
-            // @ts-expect-error --- off is a function
             unsub.off("Transfer");
           } else {
             // @ts-expect-error --- off is a function

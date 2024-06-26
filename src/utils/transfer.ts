@@ -1,6 +1,6 @@
 import { decodeAddress } from "@polkadot/util-crypto";
 import { Chain, Transaction } from "@src/types";
-import { utils } from "ethers";
+import { isAddress, FeeData } from "ethers";
 
 const EVM_ERRORS = [
   "execution reverted: ERC20: transfer amount exceeds balance",
@@ -28,7 +28,7 @@ export const validateRecipientAddress = (
     }
 
     if (type === "evm" && address.length === 42) {
-      return utils.isAddress(address);
+      return isAddress(address);
     }
 
     if (type === "wasm") {
@@ -55,4 +55,17 @@ export const getTxLink = (chain: Chain, transaction: Transaction) => {
   if (chainType === "ol") {
     return `${chain?.explorer}/transactions/${transaction.version}`;
   }
+};
+
+export const getEVMFee = ({
+  feeData,
+  gasLimit,
+}: {
+  feeData: FeeData;
+  gasLimit: bigint;
+}) => {
+  return (
+    (feeData?.maxFeePerGas || BigInt(0)) * gasLimit +
+    (feeData?.maxPriorityFeePerGas || BigInt(0))
+  );
 };

@@ -133,6 +133,7 @@ export const Activity = () => {
       });
   }, []);
 
+
   return (
     <>
       <div className={stylesActivity.containerGlobal}>
@@ -256,8 +257,8 @@ export const Activity = () => {
                           value: amount,
                           symbol: asset,
                         }).length > 10
-                            ? "text-[px] "
-                            : "text-[10px]"
+                          ? "text-[px] "
+                          : "text-[10px]"
                           } font-bold`}
                       >
                         {getAmount({

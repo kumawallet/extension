@@ -4,12 +4,13 @@ import { BehaviorSubject } from "rxjs";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { ChainType } from "@src/types";
 import { OL_CHAINS } from "@src/constants/chainsData/ol";
-import { providers } from "ethers";
+import { Provider as IProvider } from "@src/types";
+import { JsonRpcProvider } from "ethers";
 
 const RECONNECT_TIMEOUT = 20000;
 
 export type api = {
-  provider: ApiPromise | providers.JsonRpcProvider | OlProvider;
+  provider: IProvider;
   type: ChainType;
 };
 
@@ -35,29 +36,31 @@ export class Provider {
       Object.keys(this.providers).length !== 0
     ) {
       if (type === ChainType.WASM) {
-        if (!(this.providers[id].provider as ApiPromise).isConnected)
-          await (this.providers[id].provider as ApiPromise).connect();
+        const polkadotProvider = this.providers[id].provider as ApiPromise;
+        if (!polkadotProvider.isConnected) await polkadotProvider.connect();
         this.intervals[id] = setInterval(async () => {
           try {
-            if (!(this.providers[id].provider as ApiPromise).isConnected) {
-              await (this.providers[id].provider as ApiPromise).connect();
+            if (!polkadotProvider.isConnected) {
+              await polkadotProvider.connect();
             }
           } catch (error) {
             throw new Error("failed_to_connected_provider");
           }
         }, RECONNECT_TIMEOUT);
       } else if (type === ChainType.EVM) {
-        await (
-          this.providers[id].provider as providers.JsonRpcProvider
-        ).ready.then(() => {
+        const evmProvider = this.providers[id].provider as JsonRpcProvider;
+
+        evmProvider._start();
+
+        await evmProvider._waitUntilReady().then(() => {
           status[id] = ChainStatus.CONNECTED;
           this.statusNetwork.next(status);
         });
+
         this.intervals[id] = setInterval(async () => {
           const status = this.statusNetwork.getValue();
-          await (
-            this.providers[id].provider as providers.JsonRpcProvider
-          ).ready.then(() => {
+          evmProvider._start();
+          await evmProvider._waitUntilReady().then(() => {
             if (status[id] === ChainStatus.CONNECTED) return;
             else {
               status[id] = ChainStatus.CONNECTED;
@@ -66,18 +69,15 @@ export class Provider {
           });
         }, RECONNECT_TIMEOUT);
       } else if (type === ChainType.OL) {
-        const isConnected = await (
-          this.providers[id].provider as OlProvider
-        ).healthCheck();
+        const olProvider = this.providers[id].provider as OlProvider;
+        const isConnected = await olProvider.healthCheck();
         if (isConnected) {
           status[id] = ChainStatus.CONNECTED;
           this.statusNetwork.next(status);
         }
 
         this.intervals[id] = setInterval(async () => {
-          const isConnected = await (
-            this.providers[id].provider as OlProvider
-          ).healthCheck();
+          const isConnected = await olProvider.healthCheck();
           if (isConnected) {
             status[id] = ChainStatus.CONNECTED;
             this.statusNetwork.next(status);
@@ -89,18 +89,16 @@ export class Provider {
       const _chain = allChains.find((chain) => chain.id === id);
       switch (type) {
         case ChainType.EVM: {
-          const api = new providers.JsonRpcProvider(
-            _chain && (_chain.rpcs[0] as string)
-          );
+          const api = new JsonRpcProvider(_chain && (_chain.rpcs[0] as string));
           this.providers[id] = {
             provider: api,
             type: type,
           };
           status[id] = ChainStatus.CONNECTING;
           this.statusNetwork.next(status);
-          await (
-            this.providers[id].provider as providers.JsonRpcProvider
-          ).ready.then(() => {
+          api._start();
+
+          await api._waitUntilReady().then(() => {
             if (status[id] !== ChainStatus.CONNECTED) {
               status[id] = ChainStatus.CONNECTED;
               this.statusNetwork.next(status);
@@ -110,31 +108,32 @@ export class Provider {
           this.intervals[id] = setInterval(async () => {
             const status = this.statusNetwork.getValue();
 
-            await (
-              this.providers[id].provider as providers.JsonRpcProvider
-            ).ready
+            api._start();
+            await api
+              ._waitUntilReady()
               .then(() => {
-                if (status[id] === "connected") return;
+                if (status[id] === ChainStatus.CONNECTED) return;
                 else {
                   status[id] = ChainStatus.CONNECTED;
                   this.statusNetwork.next(status);
                 }
               })
               .catch(async () => {
-                const _api = new providers.JsonRpcProvider(
+                const api = new JsonRpcProvider(
                   (_chain && _chain.rpcs[1]
                     ? _chain.rpcs[1]
                     : _chain && _chain.rpcs[0]) as string
                 );
                 this.providers[id] = {
-                  provider: _api,
+                  provider: api,
                   type: type,
                 };
                 status[id] = ChainStatus.CONNECTING;
                 this.statusNetwork.next(status);
-                await (
-                  this.providers[id].provider as providers.JsonRpcProvider
-                ).ready.then(() => {
+
+                api._start();
+
+                await api._waitUntilReady().then(() => {
                   if (status[id] !== ChainStatus.CONNECTED) {
                     status[id] = ChainStatus.CONNECTED;
                     this.statusNetwork.next(status);

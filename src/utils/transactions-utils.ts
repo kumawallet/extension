@@ -1,4 +1,4 @@
-import { utils } from "ethers";
+import { formatUnits } from "ethers";
 
 export const getHash = (hash: string) => {
   return hash.slice(0, 12) + "..." + hash.slice(-12);
@@ -32,7 +32,7 @@ export const estimatedFee = (
   chainDecimals: number
 ) => {
   if (data.fee) {
-    const fee = utils.formatUnits(data.fee, chainDecimals);
+    const fee = formatUnits(data.fee, chainDecimals);
     return `${Number(fee)} ${data.symbol}`;
   }
   return "";

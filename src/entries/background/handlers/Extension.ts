@@ -58,13 +58,13 @@ import {
   RequestUpdateTx,
   RequestSetAccountToActivity,
 } from "./request-types";
-import { Signer, Wallet, providers, utils } from "ethers";
+import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
 import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { Chain, Transaction, SelectedChain } from "@src/types";
+import { Chain, Transaction, SelectedChain, ChainType } from "@src/types";
 import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
@@ -224,8 +224,6 @@ export default class Extension {
 
   private subscriptionStatusProvider = () => {
     this.provider.statusNetwork.subscribe(async (data) => {
-      console.log("statusNetwork", data);
-
       if (Object.keys(data).length === 0) return;
 
       const [selectedAccount, allAccounts] = await Promise.all([
@@ -909,7 +907,7 @@ export default class Extension {
     this.assetsBalance.addERC20Asset({
       asset,
       chainId: chain,
-      api: provider as unknown as providers.JsonRpcProvider,
+      api: provider as unknown as JsonRpcProvider,
     });
 
     return;
@@ -942,14 +940,14 @@ export default class Extension {
 
     const provider = providers[tx.originNetwork!.id];
 
-    if (tx.originNetwork?.type === "evm") {
-      signer = new Wallet(
+    if (tx.originNetwork?.type === ChainType.EVM) {
+      signer = Wallet.fromPhrase(
         seed as string,
-        provider.provider as unknown as providers.JsonRpcProvider
+        provider.provider as JsonRpcProvider
       );
-    } else if (tx.originNetwork?.type === "wasm") {
+    } else if (tx.originNetwork?.type === ChainType.WASM) {
       signer = keyring.keyring.addFromMnemonic(seed as string);
-    } else if (tx.originNetwork.type === "ol") {
+    } else if (tx.originNetwork.type === ChainType.OL) {
       signer = seed;
     }
 
@@ -1144,13 +1142,14 @@ export default class Extension {
         provider,
       } = this.tx.tx.getValue();
 
-      const evmTx = this.tx.evmTx as providers.TransactionRequest;
+      const evmTx = this.tx.evmTx as TransactionRequest;
       const isSwap = this.tx.isSwap;
-      const evmProvider =
-        provider?.provider as unknown as providers.JsonRpcProvider;
+      const evmProvider = provider?.provider as unknown as JsonRpcProvider;
 
       const tx = await (signer as Signer).sendTransaction(evmTx);
       const txHash = tx.hash;
+
+      const timestamp = Math.round(new Date().getTime() / 1000);
 
       const transaction: Transaction = {
         id: txHash,
@@ -1165,12 +1164,11 @@ export default class Extension {
         status: RecordStatus.PENDING,
         type: RecordType.TRANSFER,
         tip: "",
-        timestamp: tx.timestamp!,
+        timestamp,
         fee: "",
         isSwap: isSwap || false,
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await this.addActivity({
         senderAddress: senderAddress,
         txHash,
@@ -1185,21 +1183,17 @@ export default class Extension {
 
       const txReceipt = await evmProvider.getTransaction(txHash);
 
-      const result = await txReceipt.wait();
+      const result = await txReceipt?.wait();
 
       const status =
-        result.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+        result?.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
 
-      const { gasUsed, effectiveGasPrice } = result;
+      const fee = result?.fee.toString() || "0";
 
-      const fee = utils.formatEther(gasUsed.mul(effectiveGasPrice).toString());
-
-      const error = "";
       await this.updateActivity({
         senderAddress,
         txHash,
         status,
-        error,
         fee,
       });
       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
@@ -1207,6 +1201,7 @@ export default class Extension {
         chainId: originNetwork?.id as string,
         id: txHash,
         status,
+        fee,
       });
       return true;
     } catch (error) {
@@ -1276,11 +1271,11 @@ export default class Extension {
   private async sendTx() {
     const originNetwork = this.tx.tx.getValue().originNetwork;
 
-    if (originNetwork?.type === "evm") {
+    if (originNetwork?.type === ChainType.EVM) {
       return this.sendEvmTx();
-    } else if (originNetwork?.type === "wasm") {
+    } else if (originNetwork?.type === ChainType.WASM) {
       return this.sendSubstrateTx();
-    } else if (originNetwork?.type === "ol") {
+    } else if (originNetwork?.type === ChainType.OL) {
       return this.sendOLTx();
     }
   }

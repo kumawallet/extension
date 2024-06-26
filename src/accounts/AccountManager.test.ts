@@ -56,9 +56,6 @@ describe("AccountManager", () => {
       return {
         ethers: {
           Wallet: WalletMock,
-          utils: {
-            isValidMnemonic: () => false,
-          },
         },
       };
     });
@@ -372,9 +369,6 @@ describe("AccountManager", () => {
 
   describe("saveBackup", () => {
     it("should save backup", async () => {
-      const ethers = await import("ethers");
-      ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
-
       const result = await AccountManager.saveBackup(
         "virus elephant skill pig fall enhance end grid tooth police invite early sketch ring match"
       );
@@ -404,9 +398,6 @@ describe("AccountManager", () => {
       Backup.get = vi.fn().mockReturnValue({
         data: {},
       });
-
-      const ethers = await import("ethers");
-      ethers.ethers.utils.isValidMnemonic = vi.fn().mockReturnValue(true);
 
       const result = await AccountManager.changePassword(
         "Test.123",

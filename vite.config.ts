@@ -47,10 +47,9 @@ export default ({ mode }: { mode: string }) => {
     },
     test: {
       fileParallelism: false,
-
       css: false,
       globals: true,
-      environment: "jsdom",
+      environment: "happy-dom",
       setupFiles: "src/tests/setup.ts",
       coverage: {
         reporter: ["text", "html", "lcov", "text-summary"],
@@ -114,14 +113,7 @@ export default ({ mode }: { mode: string }) => {
         output: {
           entryFileNames: (chunk) => `src/entries/${chunk.name}/index.js`,
         },
-        plugins: [
-          rollupNodePolyFill(),
-          // inject({
-          //   modules: {
-          //     Buffer: ["buffer", "Buffer"],
-          //   },
-          // }),
-        ],
+        plugins: [rollupNodePolyFill()],
       },
     },
     optimizeDeps: {

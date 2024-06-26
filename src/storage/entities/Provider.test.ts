@@ -1,8 +1,8 @@
 import { ChainType } from "@src/types";
 import { Provider } from "./Provider";
 import { ApiPromise } from "@polkadot/api";
-import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import { JsonRpcProvider } from "ethers";
 
 describe("Provider", () => {
   beforeAll(() => {
@@ -11,11 +11,10 @@ describe("Provider", () => {
 
       return {
         ...actual,
-        providers: {
-          ...actual.providers,
-          JsonRpcProvider: class {
-            ready = Promise.resolve(true);
-          },
+        JsonRpcProvider: class {
+          _start = () => {};
+          _waitUntilReady = () => Promise.resolve(true);
+          ready = true;
         },
       };
     });
@@ -77,7 +76,7 @@ describe("Provider", () => {
         await provider.setProvider("ethereum", ChainType.EVM);
 
         const api = provider.getProviders().ethereum
-          .provider as providers.JsonRpcProvider;
+          .provider as JsonRpcProvider;
         await provider.setProvider("ethereum", ChainType.EVM);
 
         const ready = await api.ready;

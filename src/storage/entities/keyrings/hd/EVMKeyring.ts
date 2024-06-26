@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { HDNodeWallet } from "ethers";
 import HDKeyring from "./HDKeyring";
 import { AccountType } from "@src/accounts/types";
 import { HDKeyPair, SupportedKeyring } from "../types";
@@ -11,8 +11,12 @@ export default class EVMKeyring extends HDKeyring {
   }
 
   async getAddress(seed: string, path?: number): Promise<string> {
-    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path || 0}`)
-      ?.address;
+    const wallet = HDNodeWallet.fromPhrase(
+      seed,
+      undefined,
+      `m/44'/60'/0'/0/${path || 0}`
+    );
+    return wallet.address;
   }
 
   getKey(address: string): string {
@@ -24,8 +28,12 @@ export default class EVMKeyring extends HDKeyring {
   }
 
   getDerivedPath(seed: string, path: number): string {
-    return ethers.Wallet.fromMnemonic(seed, `m/44'/60'/0'/0/${path}`)
-      ?.privateKey;
+    const wallet = HDNodeWallet.fromPhrase(
+      seed,
+      undefined,
+      `m/44'/60'/0'/0/${path || 0}`
+    );
+    return wallet.privateKey;
   }
 
   addKeyPair(address: string, keyPair: HDKeyPair): void {

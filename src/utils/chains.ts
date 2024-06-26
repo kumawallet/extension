@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { messageAPI } from "@src/messageAPI/api";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { Chain, ChainType, OldChain } from "@src/types";
-import { providers } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 export const migrateOldCustomChains = async (chains: Chain[]) => {
   const newChains: Chain[] = [];
@@ -69,7 +69,7 @@ export const migrateOldCustomChains = async (chains: Chain[]) => {
 
 export const getProvider = (rpc: string, type: string) => {
   if (type?.toLowerCase() === ChainType.EVM)
-    return new providers.JsonRpcProvider(rpc as string);
+    return new JsonRpcProvider(rpc as string);
 
   if (type?.toLowerCase() === ChainType.WASM)
     return ApiPromise.create({ provider: new WsProvider(rpc as string) });

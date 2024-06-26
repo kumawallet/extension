@@ -1,9 +1,9 @@
-import { isValidMnemonic } from "ethers/lib/utils";
 import { AccountType } from "../../../../accounts/types";
 import { SupportedKeyring } from "../types";
 import ImportedKeyring from "./ImportedKeyring";
 import { Account, Ed25519PrivateKey } from "@aptos-labs/ts-sdk";
 import { createOLAccountFromMnemonic } from "@src/services/ol/ol-utils";
+import { mnemonicValidate } from "@polkadot/util-crypto";
 
 export default class ImportedOLKeyring extends ImportedKeyring {
   type = AccountType.IMPORTED_OL;
@@ -13,12 +13,12 @@ export default class ImportedOLKeyring extends ImportedKeyring {
   }
 
   async getImportedData(pkOrSeed: string) {
-    const isMnemonic = isValidMnemonic(pkOrSeed);
+    const isValidMnemonic = mnemonicValidate(pkOrSeed);
 
     let address = "";
     const key = pkOrSeed;
 
-    if (isMnemonic) {
+    if (isValidMnemonic) {
       address = await createOLAccountFromMnemonic(pkOrSeed);
     } else {
       const pk = new Ed25519PrivateKey(pkOrSeed);
@@ -33,7 +33,7 @@ export default class ImportedOLKeyring extends ImportedKeyring {
     return {
       address,
       keyPair: { key },
-      isDerivable: isMnemonic,
+      isDerivable: isValidMnemonic,
     };
   }
 

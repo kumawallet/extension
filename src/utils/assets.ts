@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN, hexToBn } from "@polkadot/util";
 import { BN0 } from "@src/constants/assets";
-import { BigNumber, ethers } from "ethers";
+import { JsonRpcProvider } from "ethers";
 import { captureError } from "./error-handling";
 import {
   GenericStorageEntryFunction,
@@ -14,7 +14,13 @@ import { CURRENCIES } from "@utils/constants";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
 import AccountEntity from "@src/storage/entities/Account";
 import { OlProvider } from "@src/services/ol/OlProvider";
-import { Asset, AssetBalance, ChainType, SubstrateBalance } from "@src/types";
+import {
+  Asset,
+  AssetBalance,
+  ChainType,
+  Provider,
+  SubstrateBalance,
+} from "@src/types";
 
 export const getType = (type: string) => {
   if (type.includes("imported")) {
@@ -26,7 +32,7 @@ export const getType = (type: string) => {
 
 export const getNativeAssetBalance = async (
   api: {
-    provider: ApiPromise | ethers.providers.JsonRpcProvider | OlProvider;
+    provider: Provider;
     type: ChainType;
   } | null,
   accountAddress: string,
@@ -55,9 +61,9 @@ export const getNativeAssetBalance = async (
       }
 
       case ChainType.EVM: {
-        const amount = await (
-          api.provider as ethers.providers.JsonRpcProvider
-        ).getBalance(accountAddress);
+        const amount = await (api.provider as JsonRpcProvider).getBalance(
+          accountAddress
+        );
         return {
           balance: amount.toString(),
           transferable: amount.toString(),
@@ -207,10 +213,10 @@ export const transformAmountStringToBigNumber = (
       missingUnits
     )}`;
 
-    const amountBN = BigNumber.from(amountWithMissingUnits);
+    const amountBN = new BN(amountWithMissingUnits);
     return amountBN;
   } catch (error) {
-    return BigNumber.from("0");
+    return BN0;
   }
 };
 

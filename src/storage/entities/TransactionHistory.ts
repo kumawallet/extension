@@ -85,10 +85,12 @@ export default class TransactionHistory {
     chainId,
     id,
     status,
+    fee,
   }: {
     chainId: string;
     id: string;
     status: string;
+    fee?: string;
   }) {
     const transactions = this.transactions.getValue();
 
@@ -97,6 +99,7 @@ export default class TransactionHistory {
       [chainId]: transactions[chainId].map((tx) => {
         if (tx.id === id) {
           tx.status = status;
+          if (fee) tx.fee = fee;
           return tx;
         }
 

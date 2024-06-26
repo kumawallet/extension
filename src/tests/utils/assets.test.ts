@@ -11,7 +11,7 @@ import {
   getNativeAssetBalance,
   getWasmAssets,
 } from "@src/utils/assets";
-import { ethers } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 describe("assets", () => {
   beforeAll(() => {
@@ -60,7 +60,7 @@ describe("assets", () => {
 
       const result = await getNativeAssetBalance(
         {
-          provider: api as ethers.providers.JsonRpcProvider,
+          provider: api as JsonRpcProvider,
           type: ChainType.EVM,
         },
         "0x123",

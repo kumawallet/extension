@@ -9,7 +9,6 @@ import { NetworkIcon } from "./NetworkIcon";
 import { Status } from "@src/components/common/TxStatus";
 import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-
 import {
   getHash,
   getValue,
@@ -18,6 +17,7 @@ import {
 
 import { styleAD } from "./style/activityDetails";
 import { FaChevronRight } from "react-icons/fa";
+import { cropAccount } from "@src/utils/account-utils";
 
 export const ActivityDetail = () => {
   const { t } = useTranslation("activity_details");
@@ -72,6 +72,7 @@ export const ActivityDetail = () => {
     // }
   };
 
+
   const getContactName = (address: string) => {
     const contact = contacts.find((c) => c.address === address);
     const ownAccount = ownAccounts.find((c) => c.address === address);
@@ -112,10 +113,10 @@ export const ActivityDetail = () => {
             <p className={styleAD.itemsValue}>
               {getContactName(sender).contact}
             </p>
-            <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+            <p className={styleAD.itemsValue}>{cropAccount(sender, 12)}</p>
           </div>
         ) : (
-          <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+          <p className={styleAD.itemsValue}>{cropAccount(sender, 12)}</p>
         )}
       </>
     ),
@@ -127,11 +128,11 @@ export const ActivityDetail = () => {
               {getContactName(recipient).contact}
             </p>
             <p className={styleAD.itemsValue}>
-              {getContactName(recipient).value}
+              {cropAccount(recipient, 12)}
             </p>
           </div>
         ) : (
-          <p className={styleAD.itemsValue}>{getContactName(sender).value}</p>
+          <p className={styleAD.itemsValue}>{cropAccount(recipient, 12)}</p>
         )}
       </>
     ),

@@ -1,13 +1,13 @@
 import { ApiPromise } from "@polkadot/api";
 import { Asset, ChainType, SubstrateBalance } from "@src/types";
 import AssetsBalance from "./AssetBalance";
-import { providers } from "ethers";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import {
   EVM_ACCOUNT_MOCK,
   OL_ACCOUNT_MOCK,
   POLKADOT_ACCOUNT_MOCK,
 } from "@src/tests/mocks/account-mocks";
+import { JsonRpcProvider } from "ethers";
 
 const BALANCE_MOCK = "1000000000000000000";
 
@@ -104,7 +104,7 @@ const NON_NATIVE_EVM_ASSETS_MOCK: Partial<Asset>[] = [
 const NATIVE_OL_ASSETS_MOCK: Partial<Asset>[] = [
   {
     id: "-1",
-    symbol: "OL",
+    symbol: "$LIBRA",
     amount: "0",
     balance: BALANCE_MOCK,
     decimals: 6,
@@ -207,8 +207,7 @@ describe("AssetsBalance", () => {
       await assetBalance.setAssets(
         EVM_ACCOUNT_MOCK,
         {
-          provider:
-            ETHERS_PROVIDER_MOCK as unknown as providers.JsonRpcProvider,
+          provider: ETHERS_PROVIDER_MOCK as unknown as JsonRpcProvider,
           type: ChainType.EVM,
         },
         "ethereum"

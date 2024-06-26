@@ -16,13 +16,13 @@ import { AssetToSend } from "./components/AssetToSend";
 import { FeeAndTip } from "./components/FeeAndTip";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { useNavigate } from "react-router-dom";
-import { providers } from "ethers";
 import { SendTxResume } from "./components/SendTxResume";
 import { validateRecipientAddress } from "@src/utils/transfer";
 import { SelectAccount } from "./components/SelectAccount";
 import { ErrorMessage } from "./components";
 import Account from "@src/storage/entities/Account";
 import { getAccountType } from "@src/utils/account-utils";
+import { TransactionRequest } from "ethers";
 
 const schema = object({
   recipientAddress: string().when(
@@ -109,7 +109,7 @@ export interface SendTxForm {
     address?: string;
   } | null;
   amount: string;
-  evmTx?: providers.TransactionRequest;
+  evmTx?: TransactionRequest;
   extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
   fee: string;
   isLoadingFee?: boolean;
@@ -165,7 +165,7 @@ export const Send = () => {
 
     starLoading();
     try {
-      await messageAPI.sendTx();
+      messageAPI.sendTx();
       showSuccessToast(t("tx_send"));
       navigate(BALANCE, {
         state: {

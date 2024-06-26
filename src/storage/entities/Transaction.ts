@@ -7,9 +7,16 @@ import { XCM_MAPPING } from "@src/xcm/extrinsics";
 import { transformAmountStringToBN } from "@src/utils/assets";
 import { MapResponseEVM, MapResponseXCM } from "@src/xcm/interfaces";
 import { KeyringPair } from "@polkadot/keyring/types";
-import { BigNumberish, Contract, Wallet, providers } from "ethers";
+import {
+  BigNumberish,
+  Contract,
+  JsonRpcProvider,
+  TransactionRequest,
+  Wallet,
+} from "ethers";
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { OlProvider } from "@src/services/ol/OlProvider";
+import { getEVMFee } from "@src/utils/transfer";
 
 export interface Tx {
   amount: string;
@@ -45,7 +52,7 @@ export class Transaction {
 
   tip = "0";
   isSwap = false;
-  evmTx?: providers.TransactionRequest | null = null;
+  evmTx?: TransactionRequest | null = null;
   substrateTx?: SubmittableExtrinsic<"promise"> | null = null;
 
   updateTx(tx: Tx) {
@@ -148,8 +155,7 @@ export class Transaction {
       signer,
     } = this.tx.getValue();
 
-    const provider = this.tx.getValue().provider!
-      .provider as providers.JsonRpcProvider;
+    const provider = this.tx.getValue().provider!.provider as JsonRpcProvider;
 
     const isXCM = originNetwork!.id !== targetNetwork!.id;
     const isNativeAsset = asset!.symbol === originNetwork!.symbol;
@@ -181,7 +187,7 @@ export class Transaction {
 
       const [feeData, gasLimit] = await Promise.all([
         provider.getFeeData(),
-        contract.estimateGas?.[method](
+        contract[method]?.estimateGas(
           ...Object.keys(extrinsicValues).map(
             (key) =>
               extrinsicValues[
@@ -191,13 +197,12 @@ export class Transaction {
         ),
       ]);
 
-      estimatedFee =
-        feeData.maxFeePerGas
-          ?.mul(gasLimit)
-          .add(feeData.maxPriorityFeePerGas!)
-          ?.toString() || "0";
+      estimatedFee = getEVMFee({
+        feeData,
+        gasLimit,
+      }).toString();
 
-      const evmTx = await contract.populateTransaction?.[method](
+      const evmTx = await contract[method]?.populateTransaction?.(
         ...Object.keys(extrinsicValues).map(
           (key) =>
             extrinsicValues[
@@ -209,15 +214,14 @@ export class Transaction {
       this.evmTx = evmTx;
     } else if (isNativeAsset) {
       const [feeData, gasLimit] = await Promise.all([
-        (provider as providers.JsonRpcProvider).getFeeData(),
-        (provider as providers.JsonRpcProvider).estimateGas(partialTx),
+        (provider as JsonRpcProvider).getFeeData(),
+        (provider as JsonRpcProvider).estimateGas(partialTx),
       ]);
 
-      estimatedFee =
-        feeData.maxFeePerGas
-          ?.mul(gasLimit)
-          .add(feeData.maxPriorityFeePerGas!)
-          ?.toString() || "0";
+      estimatedFee = getEVMFee({
+        feeData,
+        gasLimit,
+      }).toString();
 
       const evmTx = {
         ...partialTx,
@@ -233,17 +237,16 @@ export class Transaction {
       const contract = new Contract(asset!.address, erc20Abi, signer as Wallet);
 
       const [feeData, gasLimit] = await Promise.all([
-        (provider as providers.JsonRpcProvider).getFeeData(),
-        contract.estimateGas.transfer(partialTx.to, partialTx.value),
+        (provider as JsonRpcProvider).getFeeData(),
+        contract.transfer.estimateGas(partialTx.to, partialTx.value),
       ]);
 
-      estimatedFee =
-        feeData.maxFeePerGas
-          ?.mul(gasLimit)
-          .add(feeData.maxPriorityFeePerGas!)
-          ?.toString() || "0";
+      estimatedFee = getEVMFee({
+        feeData,
+        gasLimit,
+      }).toString();
 
-      const evmTx = await contract.populateTransaction.transfer(
+      const evmTx = await contract.transfer.populateTransaction(
         partialTx.to,
         partialTx.value,
         {
