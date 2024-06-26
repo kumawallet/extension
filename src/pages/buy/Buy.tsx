@@ -22,14 +22,7 @@ export const Buy = () => {
 
   const [isChecked, setIsChecked] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | undefined>(selectedAccount?.value?.address || accounts[0].value?.address);
-  const [value, setValue] = useState<Chain>();
-
-  const handlerTransak = async () => {
-    if (selectedAddress && value) {
-      const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
-      window.open(url, "_blank");
-    }
-  };
+  
 
   const options = useMemo(() => {
     if (selectedAccount?.value) {
@@ -45,9 +38,18 @@ export const Buy = () => {
     }
   }, [selectedAccount, chains, accounts,selectedAddress])
 
+  const [value, setValue] = useState<Chain>(options[0]);
+
+  const handlerTransak = async () => {
+    if (selectedAddress && value) {
+      const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
+      window.open(url, "_blank");
+    }
+  };
+
   useEffect(() => {
     setValue(options[0]);
-  }, [options]);
+  }, [options,selectedAccount?.key]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
