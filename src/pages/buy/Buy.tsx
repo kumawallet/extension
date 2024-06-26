@@ -73,13 +73,13 @@ export const Buy = () => {
           />
         )}
         <div className="flex  flex-col w-full gap-2 ">
-          {value && <SelectableAssetBuy
+          <SelectableAssetBuy
             defaulValue={value}
             options={options}
             label=""
             value={value}
             onChange={(asset) => setValue(asset)}
-          />}
+          />
           <div className="w-full gap-[0.7rem] flex items-center">
             <img
               src="https://assets.transak.com/images/website/transak.svg"
@@ -119,15 +119,15 @@ export const Buy = () => {
             i18nKey={`info`}
           />
         </div>
-        <div className="w-full space-x-4">
+        <div className="flex items-center w-full space-x-4">
           <input
             data-testid="checkbox"
             type="checkbox"
             checked={isChecked}
             onChange={handleCheckboxChange}
-            className="w-3 h-3 border-[#636669] border-[2px] rounded-sm "
+            className="w-4 h-4 border-[#636669] border-[2px] rounded-sm "
           />
-          <span className="font-medium text-sm text-[#3D8FEF]">
+          <span className="font-medium text-sm text-[#3D8FEF]" onClick={handleCheckboxChange}>
             {t("yes_i_understand")}
           </span>
         </div>
