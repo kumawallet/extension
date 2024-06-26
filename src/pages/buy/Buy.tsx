@@ -22,7 +22,7 @@ export const Buy = () => {
 
   const [isChecked, setIsChecked] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | undefined>(selectedAccount?.value?.address || accounts[0].value?.address);
-  
+  const [value, setValue] = useState<Chain>();
 
   const options = useMemo(() => {
     if (selectedAccount?.value) {
@@ -38,10 +38,9 @@ export const Buy = () => {
     }
   }, [selectedAccount, chains, accounts,selectedAddress])
 
-  const [value, setValue] = useState<Chain>(options[0]);
 
   const handlerTransak = async () => {
-    if (selectedAddress) {
+    if (selectedAddress && value) {
       const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
       window.open(url, "_blank");
     }
@@ -73,13 +72,13 @@ export const Buy = () => {
           />
         )}
         <div className="flex  flex-col w-full gap-2 ">
-          <SelectableAssetBuy
-            defaulValue={value}
+          {value && <SelectableAssetBuy
+            defaulValue={value ||  {} }
             options={options}
             label=""
-            value={value}
+            value={value || {}}
             onChange={(asset) => setValue(asset)}
-          />
+          />}
           <div className="w-full gap-[0.7rem] flex items-center">
             <img
               src="https://assets.transak.com/images/website/transak.svg"
