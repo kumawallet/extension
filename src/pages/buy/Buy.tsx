@@ -41,7 +41,7 @@ export const Buy = () => {
   const [value, setValue] = useState<Chain>(options[0]);
 
   const handlerTransak = async () => {
-    if (selectedAddress && value) {
+    if (selectedAddress) {
       const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
       window.open(url, "_blank");
     }
