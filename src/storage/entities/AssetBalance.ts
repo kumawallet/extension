@@ -225,7 +225,10 @@ export default class AssetsBalance {
     assetId: string,
     chain: string
   ) {
-    if (Object.keys(this._assets).length === 0 || !this._assets[account][chain])
+    if (
+      Object.keys(this._assets).length === 0 ||
+      !this._assets[account]?.[chain]
+    )
       return;
 
     if (this._assets[account][chain]) {

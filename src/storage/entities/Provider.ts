@@ -35,7 +35,8 @@ export class Provider {
       Object.keys(this.providers).length !== 0
     ) {
       if (type === ChainType.WASM) {
-        await (this.providers[id].provider as ApiPromise).connect();
+        if (!(this.providers[id].provider as ApiPromise).isConnected)
+          await (this.providers[id].provider as ApiPromise).connect();
         this.intervals[id] = setInterval(async () => {
           try {
             if (!(this.providers[id].provider as ApiPromise).isConnected) {

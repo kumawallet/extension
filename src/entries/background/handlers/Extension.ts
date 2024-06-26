@@ -224,6 +224,10 @@ export default class Extension {
 
   private subscriptionStatusProvider = () => {
     this.provider.statusNetwork.subscribe(async (data) => {
+      console.log("statusNetwork", data);
+
+      if (Object.keys(data).length === 0) return;
+
       const [selectedAccount, allAccounts] = await Promise.all([
         SelectedAccount.get().catch(() => null),
         Accounts.get().catch(() => null),
@@ -343,19 +347,19 @@ export default class Extension {
           await this.setNetwork({
             id: SUBSTRATE_CHAINS[0].id,
             type: SUBSTRATE_CHAINS[0].type,
-          });
+          }).catch(null);
           break;
         case AccountType.IMPORTED_EVM:
           await this.setNetwork({
             id: EVM_CHAINS[0].id,
             type: EVM_CHAINS[0].type,
-          });
+          }).catch(null);
           break;
         case AccountType.IMPORTED_OL:
           await this.setNetwork({
             id: OL_CHAINS[0].id,
             type: OL_CHAINS[0].type,
-          });
+          }).catch(null);
           break;
       }
     }
