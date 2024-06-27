@@ -57,7 +57,7 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
     <>
       <div className="flex gap-3 items-center mb-7">
         <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
-        <p className="text-lg">{t("send_title")}</p>
+        <p className="text-lg" onClick={onBack}></p>
       </div>
       <div className="flex flex-1">
         <TxSummary tx={transaction} />

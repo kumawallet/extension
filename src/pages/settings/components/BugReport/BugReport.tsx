@@ -1,10 +1,9 @@
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { issuesLinks } from "@src/utils/constants";
 import { FaGithub, FaDiscord } from "react-icons/fa";
+import { HeaderBack } from "@src/components/common";
 
 export const BugReport = () => {
   const navigate = useNavigate();
@@ -12,14 +11,7 @@ export const BugReport = () => {
 
   return (
     <PageWrapper>
-      <div className="flex items-center mb-10">
-        <FiChevronLeft
-          className="cursor-pointer"
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className="font-medium text-base">{t("title")}</p>
-      </div>
+      <HeaderBack navigate={navigate} title={t("title")}/>
       <div className=" m-4">
         <div className="mb-10">
           <p className="text-base font-medium mb-4">{t("collaborate")}</p>

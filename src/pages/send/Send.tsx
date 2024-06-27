@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Button, PageWrapper } from "@src/components/common";
+import { Button, HeaderBack, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 import { useLoading, useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
-import { FiChevronLeft } from "react-icons/fi";
 import { Chain, SelectedChain } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
@@ -236,13 +235,7 @@ export const Send = () => {
       contentClassName="h-full flex-1"
       innerContentClassName="flex flex-col"
     >
-      <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={15} className="cursor-pointer" onClick={onBack} />
-        <p className="text-base font-medium">
-          {t(isConfirmingTx ? "review_transfer_title" : "send_title")}
-        </p>
-      </div>
-
+      <HeaderBack title={t(isConfirmingTx ? "review_transfer_title" : "send_title")} navigate={navigate} onBack={onBack}/>
       <FormProvider {...methods}>
         <div className="flex-1">
           {!isConfirmingTx ? (

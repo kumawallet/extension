@@ -1,4 +1,4 @@
-import { Button, InputErrorMessage, PageWrapper } from "@src/components/common";
+import { Button, HeaderBack, InputErrorMessage, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import {
   AssetAmountInput,
@@ -10,7 +10,6 @@ import { HiMiniArrowsRightLeft } from "react-icons/hi2";
 import { useAssetContext } from "@src/providers";
 import { useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import debounce from "lodash.debounce";
@@ -77,16 +76,7 @@ export const Swap = () => {
         <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
       ) : (
         <>
-          <div className="flex gap-1 items-center mb-2">
-            <FiChevronLeft
-              size={15}
-              className="cursor-pointer ml-[-0.3rem]"
-              onClick={() => navigate(-1)}
-            />
-
-            <p className="text-base font-medium">{t("title")}</p>
-          </div>
-
+         <HeaderBack navigate={navigate} title={t("title")} />
           <SelectAccount
             selectedAddress={tx.addressFrom}
             onChangeValue={(value) => setSenderAddress(value)}

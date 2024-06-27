@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { InputErrorMessage, Button, PageWrapper } from "@src/components/common";
+import { InputErrorMessage, Button, PageWrapper, HeaderBack } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
@@ -9,7 +9,6 @@ import { number, object, string } from "yup";
 import { isHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FiChevronLeft } from "react-icons/fi";
 import { messageAPI } from "@src/messageAPI/api";
 import { ChainType } from "@src/types";
 
@@ -26,6 +25,7 @@ const defaultValues: AssetForm = {
   symbol: "",
   decimals: 0,
 };
+
 
 export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
@@ -86,14 +86,7 @@ export const ManageAssets = () => {
   return (
     <>
       <PageWrapper>
-        <div className="flex gap-3 items-center mb-7">
-          <FiChevronLeft
-            size={26}
-            className="cursor-pointer"
-            onClick={() => navigate(-1)}
-          />
-          <p className="text-xl">{t("title")}</p>
-        </div>
+       <HeaderBack title={t("title")} navigate={navigate}/>
         <div className="flex flex-col gap-2">
           <div>
             <label htmlFor="address" className="block text-sm font-medium mb-1">

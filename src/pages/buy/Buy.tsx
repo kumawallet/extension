@@ -124,9 +124,9 @@ export const Buy = () => {
             type="checkbox"
             checked={isChecked}
             onChange={handleCheckboxChange}
-            className="w-4 h-4 border-[#636669] border-[2px] rounded-sm "
+            className="w-5 h-5 border-[#636669] border-[2px] rounded-sm "
           />
-          <span data-testid="checkbox-text" className="font-medium text-sm text-[#3D8FEF]" onClick={handleCheckboxChange}>
+          <span data-testid="checkbox-text" className="font-medium text-sm text-[#3D8FEF] cursor-pointer" onClick={handleCheckboxChange}>
             {t("yes_i_understand")}
           </span>
         </div>

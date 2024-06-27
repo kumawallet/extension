@@ -1,15 +1,8 @@
-import { ICON_SIZE } from "@src/constants/icons";
 import { useTranslation } from "react-i18next";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper, Button } from "@src/components/common";
+import { PageWrapper, Button, HeaderBack } from "@src/components/common";
 import { BsChevronRight } from "react-icons/bs";
-import {
-  topbarIcon,
-  topbarText,
-  topbarContainer,
-  styleButtomNav,
-} from "../../style/style";
+import {  styleButtomNav } from "../../style/style";
 import { CHANGE_PASSWORD, SETTINGS_AUTOLOCK } from "@src/routes/paths";
 
 export const Security = () => {
@@ -18,15 +11,7 @@ export const Security = () => {
 
   return (
     <PageWrapper>
-      <div className={topbarContainer}>
-        <FiChevronLeft
-          className={topbarIcon}
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className={topbarText}>{t("title")}</p>
-      </div>
-
+      <HeaderBack navigate={navigate} title={t("title")}/>
       <Button
         data-testid="change-password"
         variant="contained-black"

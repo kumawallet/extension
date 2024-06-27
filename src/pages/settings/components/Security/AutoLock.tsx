@@ -1,14 +1,7 @@
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { PageWrapper, Button } from "@src/components/common";
+import { PageWrapper, Button, HeaderBack } from "@src/components/common";
 import { useState, useEffect } from "react";
-import {
-  topbarIcon,
-  topbarText,
-  topbarContainer,
-  styleButtomNav,
-} from "../../style/style";
+import {  styleButtomNav } from "../../style/style";
 import { messageAPI } from "@src/messageAPI/api";
 import { useToast } from "@src/hooks";
 import { useTranslation } from "react-i18next";
@@ -72,15 +65,7 @@ export const AutoLock = () => {
 
   return (
     <PageWrapper>
-      <div className={topbarContainer}>
-        <FiChevronLeft
-          data-testid="back-button"
-          className={topbarIcon}
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className={topbarText}>{t("autolock.title")}</p>
-      </div>
+      <HeaderBack navigate={navigate} title={t("autolock.title")}/>
       <div data-testid="time-options" className="flex flex-col gap-1">
         {TIME_LOCK_OPTIONS.map((opt) => (
           <Button

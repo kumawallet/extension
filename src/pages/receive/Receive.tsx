@@ -1,9 +1,8 @@
-import { PageWrapper } from "@src/components/common";
+import { HeaderBack, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { QR_CODE_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useAccountContext } from "@src/providers";
 import { cropAccount } from "@src/utils/account-utils";
 import { useCopyToClipboard } from "@src/hooks";
@@ -22,16 +21,7 @@ export const Receive = () => {
 
   return (
     <PageWrapper>
-      <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft
-          data-testid="back-button"
-          size={26}
-          className="cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
-        <p className="text-xl">{t("title")}</p>
-      </div>
-
+      <HeaderBack title={t("title")} navigate={navigate}/>
       <div className="flex flex-col justify-center items-center mt-5">
         <div className="flex mt-5 justify-center items-center text-center text-lg font-medium">
           {selectedAccount?.value?.name}
