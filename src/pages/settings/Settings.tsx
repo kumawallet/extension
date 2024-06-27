@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FiChevronLeft } from "react-icons/fi";
 import { BsChevronRight } from "react-icons/bs";
 import { LuBook } from "react-icons/lu";
 import { IoShieldOutline } from "react-icons/io5";
@@ -12,10 +11,9 @@ import {
   SETTINGS_SECURITY,
   SETTINGS_BUG,
 } from "@src/routes/paths";
-import { PageWrapper, Button } from "@src/components/common";
+import { PageWrapper, Button, HeaderBack } from "@src/components/common";
 import { version } from "@src/utils/env";
-import { ICON_SIZE } from "@src/constants/icons";
-import { topbarIcon, topbarText, topbarContainer, styleButtomNav } from './style/style';
+import {  styleButtomNav } from './style/style';
 import { aboutUsLinks } from "../../utils/constants";
 import { FaRegKeyboard } from "react-icons/fa6";
 import { FaTwitter, FaDiscord, FaTelegramPlane } from "react-icons/fa";
@@ -81,14 +79,7 @@ export const Settings = () => {
       <div className="h-full flex flex-col overflow-auto settings-container">
         <div className="text-start px-4 pt-2 flex-1">
           <div>
-            <div className={topbarContainer}>
-              <FiChevronLeft
-                className={topbarIcon}
-                size={ICON_SIZE}
-                onClick={() => navigate(-1)}
-              />
-              <p className={topbarText}>{t("title")}</p>
-            </div>
+            <HeaderBack navigate={navigate} title={t("title")}/>
             <div className="flex flex-col gap-1">
               {OPTIONS.map((opt) => (
                 <Button

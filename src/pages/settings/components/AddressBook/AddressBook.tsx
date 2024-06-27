@@ -1,11 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Contact from "@src/storage/entities/registry/Contact";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@src/hooks";
-import { Button, Loading, PageWrapper } from "@src/components/common";
+import { Button, HeaderBack, Loading, PageWrapper } from "@src/components/common";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
@@ -15,7 +13,6 @@ import { isHex } from "@polkadot/util";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
 import { AddAddressModal } from "../../../../components/common/AddAddressModal";
-import { topbarText, topbarIcon, topbarContainer } from "../../style/style";
 import "../../style/input.css";
 import { CiSearch } from "react-icons/ci";
 import { PiGhost } from "react-icons/pi";
@@ -185,14 +182,7 @@ export const AddressBook = () => {
     return (
         <PageWrapper>
             <FormProvider {...methods}>
-                <div className={topbarContainer}>
-                    <FiChevronLeft
-                        className={topbarIcon}
-                        size={ICON_SIZE}
-                        onClick={() => navigate(-1)}
-                    />
-                    <p className={topbarText}>{t("title")}</p>
-                </div>
+                <HeaderBack navigate={navigate} title={t("title")}/>
                 <div className="flex-1 flex justify-star mb-4">
                     <div className="flex-1 flex justify-star">
                         <Button

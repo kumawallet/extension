@@ -1,6 +1,5 @@
 import { type FC, useMemo, useState } from "react";
-import { Button } from "@src/components/common";
-import { FiChevronLeft } from "react-icons/fi";
+import { Button, HeaderBack } from "@src/components/common";
 import { CgClose } from "react-icons/cg";
 import { ASteriskCircle, SendForeward } from "@src/components/icons";
 import { GoChevronRight } from "react-icons/go";
@@ -71,13 +70,7 @@ export const AccountFormInsideWrapper: FC<AccountFormInsideWrapperProps> = ({
   return (
     <>
       <div className="flex items-center justify-between mb-2">
-        <button
-          onClick={_onBack}
-          className="flex items-center text-base md:text-xl"
-        >
-          <FiChevronLeft size={18} />
-          <p>{title}</p>
-        </button>
+        <HeaderBack onBack={_onBack} title={title} classnameText=" md:text-xl"/>
         <button onClick={onClose}>
           <CgClose size={18} />
         </button>

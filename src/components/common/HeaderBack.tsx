@@ -6,9 +6,11 @@ import { styleHeaderBack } from "@src/components/common/styles/HeaderBack";
 interface HeaderProps {
   classname?: string;
   style?: CSSProperties;
-  navigate: (path: number) => void;
+  navigate?: (path: number) => void;
   title: string;
   classNameContainer?: string;
+  onBack?: () => void;
+  classnameText ?: string;
 }
 
 export const HeaderBack: FC<HeaderProps> = ({
@@ -17,16 +19,27 @@ export const HeaderBack: FC<HeaderProps> = ({
   style,
   navigate,
   classNameContainer,
+  onBack,
+  classnameText
 }) => {
+  const handlerClick = () =>{
+    if(typeof onBack === "function"){
+      onBack();
+    }
+    else{
+      navigate && navigate(-1)
+    }
+
+  }
   return (
     <div className={`${styleHeaderBack.container} ${classNameContainer} `}>
       <FiChevronLeft
         className={`${classname} ${iconBack}`}
         size={ICON_SIZE}
-        onClick={() => navigate(-1)}
+        onClick={() => handlerClick()}
         style={style}
       />
-      <p className={textHeaderBack}  onClick={() => navigate(-1)}>{title}</p>
+      <p className={`${textHeaderBack} ${classnameText}`}  onClick={() => handlerClick()}>{title}</p>
     </div>
   );
 };

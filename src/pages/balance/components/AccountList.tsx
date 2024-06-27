@@ -68,7 +68,7 @@ export const AccountList = () => {
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => null}>
+        <Dialog as="div" className="relative z-10" onClose={onCloseModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"

@@ -1,13 +1,6 @@
-import { Button, PageWrapper } from "@src/components/common";
-import {
-  topbarContainer,
-  topbarIcon,
-  topbarText,
-} from "../settings/style/style";
-import { ICON_SIZE } from "@src/constants/icons";
+import { Button, HeaderBack, PageWrapper } from "@src/components/common";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FiChevronLeft } from "react-icons/fi";
 import { object, ref, string } from "yup";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -88,14 +81,7 @@ export const ChangePassword = () => {
 
   return (
     <PageWrapper>
-      <div className={topbarContainer}>
-        <FiChevronLeft
-          className={topbarIcon}
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className={topbarText}>{t("title")}</p>
-      </div>
+      <HeaderBack title={t("title")} navigate={navigate}/>
       <FormProvider {...methods}>
         <div className="flex-1 flex flex-col justify-star mb-4">
           <div className="flex flex-col gap-3 flex-1">

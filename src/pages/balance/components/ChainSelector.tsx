@@ -1,5 +1,5 @@
-import { Fragment, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import { Fragment, useMemo, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
 import { ShowTestnets } from "./ShowTestnets";
@@ -27,6 +27,7 @@ const canShowTestnetToggle = (
 };
 
 export const ChainSelector = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { t } = useTranslation("balance");
   const {
@@ -54,42 +55,69 @@ export const ChainSelector = () => {
     }
   };
 
+  const filteredChains = useMemo(() => {
+    if (!search.trim()) return chains;
+
+    return chains.map((chain) => {
+      const chainGroup = chain.chains.filter((chain) =>
+        chain.name.toLowerCase().includes(search.toLowerCase().trim())
+      );
+
+      return {
+        title: chain.title,
+        chains: chainGroup,
+      };
+    });
+  }, [search, chains]);
+
 
   return (
     <>
-      <Menu>
-        <Menu.Button
+        <button
           data-testid="chain-button"
           className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
-          
+          onClick={() => setIsOpen(true)}
         >
           <Network size="22" className="my-[0.15rem]" />
           <p className="overflow-hidden text-ellipsis mr-1">
             {t("chain_selector.title")}
           </p>
-        </Menu.Button>
+        </button>
+        <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={() => setIsOpen(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+          </Transition.Child>
 
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-0 w-full  outline-0 z-50">
-          <div
-          className="w-full h-[2.6rem]  inset-0 bg-black/25 backdrop-blur-sm"
-              />
-            <div className=" px-8 py-2 pt-2 text-start bg-[#2C3137]">
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex justify-center min-h-full text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-[357px] transform overflow-hidden rounded-b-2xl bg-[#2C3137]  px-8 py-4 text-left align-middle shadow-xl h-fit transition-all mt-[2.7rem]">
+            <div className=" py-2 pt-2 text-start ">
               <div className="flex flex-col gap-1 py-2 mt-2 ">
-                <Menu.Button
+                <button
                   data-testid="chain-button"
-                  className="absolute top-16 right-6"
+                  className="absolute top-6 right-6"
+                  onClick={() => setIsOpen(false)}
                 >
                   <TfiClose className="font-thin text-[0.7rem]" />
-                </Menu.Button>
+                </button>
                 <p className="text-base font-light mb-2">
                   {t("chain_selector.title")}
                 </p>
@@ -108,12 +136,12 @@ export const ChainSelector = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-4 mt-4">
-                {chains.map((chainGroup) => (
+                {filteredChains.map((chainGroup) => (
                   <div
                     key={chainGroup.title}
                     className="flex flex-col gap-3 relative"
                   >
-                    <p className="text-base">{t(chainGroup.title)}</p>
+                    {chainGroup.chains.length > 0 && (<p className="text-base">{t(chainGroup.title)}</p>)}
                     <div className="flex flex-col gap-3">
                       {chainGroup.chains.map((chain) => (
                         <ChainOption
@@ -143,9 +171,12 @@ export const ChainSelector = () => {
                 ))}
               </div>
             </div>
-          </Menu.Items>
-        </Transition>
-      </Menu>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </>
   );
 };
