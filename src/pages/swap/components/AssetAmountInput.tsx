@@ -1,6 +1,5 @@
-import { Loading } from "@src/components/common";
-import { useThemeContext } from "@src/providers";
 import { FC } from "react";
+import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 
@@ -18,6 +17,7 @@ interface AssetAmountInputProps {
   onValueChange: (amount: string) => void;
   selectableAsset: JSX.Element;
   showBalance?: boolean
+  isPairValid?: boolean
 }
 
 export const AssetAmountInput: FC<AssetAmountInputProps> = ({
@@ -33,19 +33,19 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   onMax,
   onValueChange,
   selectableAsset,
-  showBalance = true
+  showBalance = true,
+  isPairValid
 }) => {
   const { t } = useTranslation("swap");
 
-  const { color } = useThemeContext();
 
   return (
     <div className={containerClassName}>
       <div className="flex justify-between mb-2">
-        <p className="font-inter font-bold md:text-lg">{label}</p>
+        <p className="font-inter font-medium md:text-lg">{label}</p>
         {
           showBalance && (
-            <p className="font-inter font-bold md:text-lg text-[#9CA3AF] capitalize">
+            <p className="font-inter font-medium md:text-lg text-[#9CA3AF] capitalize">
               {t("balance")}: {balance}
             </p>
           )
@@ -55,7 +55,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
       <div className="flex">
         <div className="flex-1 relative h-fit w-[60%]">
           <NumericFormat
-            className={`input-secondary py-3 rounded-xl pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-${color}-primary hover:outline-${color}-primary rounded-r-none`}
+            className={`input-secondary py-3 rounded-lg pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-r-none`}
             allowNegative={false}
             allowLeadingZeros={false}
             value={isLoading ? "" : amount}
@@ -85,7 +85,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
         {selectableAsset}
       </div>
-      {minSellAmount && (
+      {minSellAmount && isPairValid && (
         <p>
           {t("min_amount")}: {minSellAmount}
         </p>

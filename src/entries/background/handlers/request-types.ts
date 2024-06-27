@@ -1,18 +1,25 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
 import Account from "@src/storage/entities/Account";
-import Chains, { Chain } from "@src/storage/entities/Chains";
+import { AssetBalance } from "@src/storage/entities/AssetBalance";
+import Chains from "@src/storage/entities/Chains";
 import Network from "@src/storage/entities/Network";
-import Record from "@src/storage/entities/activity/Record";
+import { NetworkStatus } from "@src/storage/entities/Provider";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
-import Register from "@src/storage/entities/registry/Register";
-import { SwapData } from "@src/storage/entities/registry/Swap";
 import Setting from "@src/storage/entities/settings/Setting";
 import {
   SettingKey,
   SettingType,
   SettingValue,
 } from "@src/storage/entities/settings/types";
+import {
+  Chain,
+  ChainType,
+  FormattedTransaction,
+  HistoricTransaction,
+  SelectedChain,
+  Transaction,
+} from "@src/types";
 
 export interface RequestSignUp {
   password: string;
@@ -30,12 +37,12 @@ export interface RequestImportAccount {
   name: string;
   privateKeyOrSeed: string;
   password: string | undefined;
-  type: AccountType.IMPORTED_EVM | AccountType.IMPORTED_WASM;
+  accountTypesToImport: AccountType[];
   isSignUp: boolean | undefined;
 }
 
-export interface RequestRestorePassword {
-  privateKeyOrSeed: string;
+export interface RequestChangePassword {
+  currentPassword: string;
   newPassword: string;
 }
 
@@ -52,6 +59,15 @@ export interface RequestSignIn {
   password: string;
 }
 
+export interface RequestValidatePassword {
+  password: string;
+  key: AccountKey;
+  keyring: AccountType;
+}
+export interface RequestSetAutoLock {
+  time: number; //in minutes
+}
+
 export interface RequestGetAccount {
   key: AccountKey;
 }
@@ -63,12 +79,21 @@ export interface RequestGetAllAccounts {
 export interface RequestDeriveAccount {
   name: string;
   type: AccountType;
+  address: string;
 }
 
 export interface RequestSetNetwork {
-  chain: Chain;
+  id: string;
+  isTestnet?: boolean;
+  type: ChainType;
 }
-
+export interface RequestDeleteSelectNetwork {
+  id: string;
+}
+export interface RequestAddNetwork {
+  id: string;
+  type: ChainType;
+}
 export interface RequestSaveCustomChain {
   chain: Chain;
 }
@@ -99,15 +124,21 @@ export interface RequestSaveContact {
 export interface RequestRemoveContact {
   address: string;
 }
-
+export interface RequestUpdateContact {
+  name: string;
+  address: string;
+}
 export interface RequestAddActivity {
+  senderAddress: string;
   txHash: string;
-  record: Record;
+  record: Transaction;
 }
 
 export interface RequestUpdateActivity {
+  senderAddress: string;
   txHash: string;
   status: RecordStatus;
+  fee?: string;
   error?: string | undefined;
 }
 
@@ -132,16 +163,11 @@ export interface RequestRemoveTrustedSite {
   site: string;
 }
 
-export interface RequestSwapProtocol {
-  protocol: string;
+export interface getLock {
+  lock: number;
 }
 
-export interface RequestAddSwap {
-  protocol: string;
-  swap: SwapData;
-}
-
-interface RequestSendTxBase {
+export interface RequestSendTxBase {
   amount: string;
   asset: {
     symbol: string;
@@ -152,50 +178,75 @@ interface RequestSendTxBase {
   destinationNetwork: string;
   networkName: string;
   rpc: string;
+  isSwap?: boolean;
 }
 
-export interface RequestSendSubstrateTx extends RequestSendTxBase {
-  hexExtrinsic: string;
+export interface RequestShowKey {
+  address: string;
 }
 
-export interface RequestSendEvmTx extends RequestSendTxBase {
-  txHash: string;
-  fee: {
-    gasLimit: string;
-    maxFeePerGas: string;
-    maxPriorityFeePerGas: string;
-    type?: number;
+export interface RequestUpdateTx {
+  tx: {
+    amount: string;
+    senderAddress: string;
+    destinationAddress: string;
+    originNetwork: Chain;
+    targetNetwork: Chain;
+    asset: {
+      id: string;
+      symbol: string;
+      decimals: number;
+      balance: string;
+      address?: string | undefined;
+    };
   };
+}
+
+export interface RequestSetAccountToActivity {
+  address: string;
 }
 
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
-  "pri(accounts.restorePassword)": [RequestRestorePassword, void];
+  "pri(accounts.changePassword)": [RequestChangePassword, void];
   "pri(accounts.removeAccount)": [RequestRemoveAccout, void];
   "pri(accounts.changeAccountName)": [RequestChangeAccountName, void];
   "pri(accounts.areAccountsInitialized)": [null, boolean];
   "pri(accounts.getAccount)": [RequestGetAccount, Account | undefined];
   "pri(accounts.getAllAccounts)": [RequestGetAllAccounts, Account[]];
   "pri(accounts.deriveAccount)": [RequestDeriveAccount, Account];
-  "pri(accounts.setSelectedAccount)": [Account, void];
-
+  "pri(accounts.setSelectedAccount)": [Account | null, void];
   "pri(accounts.getSelectedAccount)": [null, Account | undefined];
+  "pri(accounts.getAccountsToDerive)": [null, Account[]];
 
   "pri(auth.isAuthorized)": [null, boolean];
   "pri(auth.resetWallet)": [null, void];
   "pri(auth.signIn)": [RequestSignIn, void];
+  "pri(auth.validatePassword)": [RequestValidatePassword, string | undefined];
+  "pri(auth.setAutoLock)": [RequestSetAutoLock];
+  "pri(auth.unlock)": [null, void];
+  "pri(auth.getLock)": [null, number];
   "pri(auth.signOut)": [null, void];
   "pri(auth.alreadySignedUp)": [null, boolean];
   "pri(auth.isSessionActive)": [null, boolean];
-  "pri(auth.showKey)": [null, string | undefined];
+  "pri(auth.showKey)": [RequestShowKey, string | undefined];
 
   "pri(network.setNetwork)": [RequestSetNetwork, boolean];
   "pri(network.getNetwork)": [null, Network];
   "pri(network.getAllChains)": [null, Chains];
   "pri(network.saveCustomChain)": [RequestSaveCustomChain, void];
   "pri(network.removeCustomChain)": [RequestRemoveCustomChain, void];
+  "pri(network.getCustomChains)": [null, Chain[]];
+  "pri(network.deleteSelectNetwork)": [
+    RequestDeleteSelectNetwork,
+    RequestSetNetwork
+  ];
   "pri(network.getXCMChains)": [RequestGetXCMChains, Chain[]];
+  "pri(network.subscription)": [null, SelectedChain, SelectedChain];
+  "pri(network.statusSubscription)": [null, NetworkStatus, NetworkStatus];
+
+  "pri(assestsBanlance.subscription)": [null, AssetBalance, AssetBalance];
 
   "pri(settings.getGeneralSettings)": [null, Setting[]];
   "pri(settings.getAdvancedSettings)": [null, Setting[]];
@@ -206,17 +257,23 @@ export interface Request {
   "pri(contacts.getRegistryAddresses)": [
     null,
     {
-      ownAccounts: Contact[];
-      contacts: Contact[];
-      recent: Register[];
+      accounts: Contact[];
     }
   ];
   "pri(contacts.saveContact)": [RequestSaveContact, void];
+  "pri(contacts.updateContact)": [RequestUpdateContact, void];
   "pri(contacts.removeContact)": [RequestRemoveContact, void];
 
-  "pri(activity.getActivity)": [null, Record[]];
+  "pri(activity.getHistoricActivity)": [null, HistoricTransaction];
   "pri(activity.addActivity)": [RequestAddActivity, void];
   "pri(activity.updateActivity)": [RequestUpdateActivity, void];
+  "pri(activity.activitySubscribe)": [
+    null,
+    FormattedTransaction[],
+    FormattedTransaction[]
+  ];
+  "pri(activity.updateRecordStatus)": [string, void];
+  "pri(activity.setAccountToActivity)": [RequestSetAccountToActivity, void];
 
   "pri(assets.addAsset)": [RequestAddAsset, void];
   "pri(assets.getAssetsByChain)": [
@@ -232,11 +289,9 @@ export interface Request {
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
   "pri(trustedSites.removeTrustedSite)": [RequestRemoveTrustedSite, void];
 
-  "pri(swap.getSwapsByProtocol)": [RequestSwapProtocol, SwapData[]];
-  "pri(swap.addSwap)": [RequestAddSwap, void];
-
-  "pri(send.sendSubstrateTx)": [RequestSendSubstrateTx, boolean];
-  "pri(send.sendEvmTx)": [RequestSendEvmTx, boolean];
+  "pri(send.updateTx)": [RequestUpdateTx, string];
+  "pri(send.getFeeSubscribe)": [null, void, string];
+  "pri(send.sendTx)": [null, boolean];
 }
 
 export type MessageTypes = keyof Request;
@@ -254,3 +309,34 @@ export type ResponseTypes = {
 
 export type ResponseType<TMessageType extends keyof Request> =
   Request[TMessageType][1];
+
+type KeysWithDefinedValues<T> = {
+  [K in keyof T]: T[K] extends undefined ? never : K;
+}[keyof T];
+
+type NoUndefinedValues<T> = {
+  [K in KeysWithDefinedValues<T>]: T[K];
+};
+
+type IsNull<T, K extends keyof T> = {
+  [K1 in Exclude<keyof T, K>]: T[K1];
+} & T[K] extends null
+  ? K
+  : never;
+
+type NullKeys<T> = { [K in keyof T]: IsNull<T, K> }[keyof T];
+
+export type SubscriptionMessageTypes = NoUndefinedValues<{
+  [MessageType in keyof Request]: Request[MessageType][2];
+}>;
+
+export type MessageTypesWithSubscriptions = keyof SubscriptionMessageTypes;
+export type MessageTypesWithNoSubscriptions = Exclude<
+  MessageTypes,
+  keyof SubscriptionMessageTypes
+>;
+
+export declare type KnownSubscriptionDataTypes<T extends MessageTypes> =
+  Request[T][2];
+
+export type MessageTypesWithNullRequest = NullKeys<RequestTypes>;

@@ -9,11 +9,7 @@ import {
 import { Map } from "../interfaces";
 
 export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
-  [POLKADOT_PARACHAINS.ASTAR.name]: ({
-    address,
-    amount,
-    xcmPalletVersion,
-  }) => ({
+  astar: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {
@@ -32,11 +28,7 @@ export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
       feeAssetItem: 0,
     },
   }),
-  [POLKADOT_PARACHAINS.MOONBEAM.name]: ({
-    address,
-    amount,
-    xcmPalletVersion,
-  }) => ({
+  "moonbeam-evm": ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {
@@ -57,11 +49,7 @@ export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
       weightLimit: "Unlimited",
     },
   }),
-  [POLKADOT_PARACHAINS.ACALA.name]: ({
-    address,
-    amount,
-    xcmPalletVersion,
-  }) => ({
+  acala: ({ address, amount, xcmPalletVersion }) => ({
     pallet: XCM.pallets.XCM_PALLET.NAME,
     method: XCM.pallets.XCM_PALLET.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
     extrinsicValues: {

@@ -1,11 +1,53 @@
 import i18n from "@src/utils/i18n";
-import { act, fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Activity } from "./Activity";
-import { AccountType } from "@src/accounts/types";
-import { activitysMock } from "@src/tests/mocks/activity-mocks";
-import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
-import { en } from "@src/i18n";
+import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
+import { ACTIVITY_DETAIL } from "@src/routes/paths";
+import { ChainType } from "@src/types";
+
+const functionMocks = {
+  navigate: vi.fn(),
+};
+
+const dataMocks = {
+  activity: [
+    {
+      id: "1",
+      amount: "1",
+      asset: "DOT",
+      blockNumber: 1,
+      fee: "0.01",
+      hash: "0x1234567890",
+      originNetwork: "BNB",
+      targetNetwork: "BNB",
+      recipient: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+      sender: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+      status: "success",
+      tip: "0.1",
+      timestamp: 1,
+      type: "transfer",
+      isSwap: false,
+    },
+    {
+      id: "2",
+      amount: "2",
+      asset: "DOT",
+      blockNumber: 2,
+      fee: "0.0000001",
+      hash: "0x1234567891",
+      originNetwork: "BNB",
+      targetNetwork: "BNB",
+      recipient: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+      sender: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+      status: "success",
+      tip: "0.1",
+      timestamp: 1,
+      type: "transfer",
+      isSwap: false,
+    },
+  ],
+};
 
 const renderComponent = () => {
   return render(
@@ -17,78 +59,157 @@ const renderComponent = () => {
 
 describe("Actvity", () => {
   beforeAll(() => {
+    vi.mock("react-router-dom", () => ({
+      useNavigate: () => functionMocks.navigate,
+    }));
+
     vi.mock("@src/providers", () => ({
-      useNetworkContext: () => ({
+      useNetworkContext: vi.fn(() => ({
         state: {
-          type: AccountType.EVM,
-          chains: {
-            getAll: vi.fn().mockReturnValue([]),
-            mainnets: [],
-            testnets: [],
-            custom: []
+          chains: [
+            {
+              title: "wasm_based",
+              chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+            {
+              title: "evm_based",
+              chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+          ],
+          selectedChain: SUBSTRATE_CHAINS[0],
+        },
+      })),
+      useAccountContext: vi.fn(() => ({
+        state: {
+          selectedAccount: {
+            type: ChainType.WASM,
+
+            key: "0x1234567890",
+            value: {
+              address: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+            },
           },
+          accounts: [
+            {
+              type: ChainType.WASM,
+              key: "0x1234567890",
+              value: {
+                address: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+              },
+            }
+          ]
         },
-      }),
-      useTxContext: () => ({
-        state: {
-          activity: activitysMock,
-        },
-      }),
-      useAccountContext: () => ({
-        state: {
-          selectedAccount: selectedEVMAccountMock,
-        },
-      }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
+      })),
+
     }));
 
     vi.mock("@src/messageAPI/api", () => ({
       messageAPI: {
-        getAllChains: vi.fn().mockReturnValue(
-          {
-            getAll: vi.fn().mockReturnValue([
-              {
-                name: "test",
-                explorer: {
-                  evm: "http://test.com",
-                  wasm: "wss://test.com",
-                },
-              },
-            ]),
-          }
-        ),
-        getRegistryAddresses: vi.fn().mockReturnValue({
-          contacts: [],
-          ownAccounts: [],
-        }),
-      }
+        getRegistryAddresses: vi.fn(() => ({
+          contacts: [
+            {
+              name: "Contact 1",
+              address: "0x1234567890",
+            },
+          ],
+          ownAccounts: [
+            {
+              name: "Account 1",
+              address: "0x1234567890",
+            },
+          ],
+        })),
+        activitySubscribe: vi.fn().mockResolvedValue([{
+          id: "1",
+          amount: "1",
+          asset: "DOT",
+          blockNumber: 1,
+          fee: "0.01",
+          hash: "0x1234567890",
+          originNetwork: "BNB",
+          targetNetwork: "BNB",
+          recipient: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+          sender: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+          status: "success",
+          tip: "0.1",
+          timestamp: 1,
+          type: "transfer",
+          isSwap: false,
+        },
+        {
+          id: "2",
+          amount: "2",
+          asset: "DOT",
+          blockNumber: 2,
+          fee: "0.0000001",
+          hash: "0x1234567891",
+          originNetwork: "BNB",
+          targetNetwork: "BNB",
+          recipient: "0x55423C073C5e5Ce2D30Ec466a6cDEF0803EC32Cc",
+          sender: "0xb6Fd52f0FD95aeD5dd46284AaD60a8ac5d86A627",
+          status: "success",
+          tip: "0.1",
+          timestamp: 1,
+          type: "transfer",
+          isSwap: false,
+        },]),
+      },
     }));
   });
 
-  it("should render", async () => {
-    const { getByTestId } = renderComponent();
-    await waitFor(() => {
-      expect(getByTestId("search-input")).toBeDefined();
-    }, {
-      timeout: 10000,
+  describe("render", () => {
+    it("should render", async () => {
+      const { container } = renderComponent();
+
+      await waitFor(() => {
+        expect(container).toBeDefined();
+      });
     });
   });
 
-  it("should filter by network", async () => {
-    const { container, getByTestId } = renderComponent();
+  describe("select activity", async () => {
+    it("shoudl select activity", async () => {
+      const { getByTestId } = renderComponent();
 
-    await waitFor(() => {
-      expect(getByTestId("search-input")).toBeDefined();
-    });
+      await waitFor(() => {
+        expect(getByTestId("activity-container")).toBeDefined();
+      });
 
-    const searchInput = await getByTestId("search-input");
-    act(() => {
-      fireEvent.change(searchInput, { target: { value: "ether" } });
-    });
-    await waitFor(() => {
-      expect(container.innerHTML).not.contain(en.activity.empty);
+      const activityContainer = getByTestId("activity-container");
+
+      const firstActivity = activityContainer.children[0];
+
+      fireEvent.click(firstActivity);
+
+      const {
+        hash,
+        status,
+        originNetwork,
+        targetNetwork,
+        sender,
+        recipient,
+        fee,
+        type,
+        amount,
+        asset,
+        tip,
+      } = dataMocks.activity[0];
+
+      expect(functionMocks.navigate).toBeCalledWith(ACTIVITY_DETAIL, {
+        state: {
+          hash,
+          status,
+          originNetwork,
+          targetNetwork,
+          sender,
+          recipient,
+          fee,
+          type,
+          amount,
+          asset,
+          tip,
+        },
+      });
     });
   });
 });

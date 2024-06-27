@@ -1,12 +1,15 @@
 import Storage from "../Storage";
 import Auth from "../Auth";
-import { AccountType } from "@src/accounts/types";
+import { AccountType, KeyringType } from "@src/accounts/types";
 import { Keyrings, SupportedKeyring } from "./keyrings/types";
 import EVMKeyring from "./keyrings/hd/EVMKeyring";
 import WASMKeyring from "./keyrings/hd/WASMKeyring";
 import ImportedEVMKeyring from "./keyrings/imported/ImportedEVMKeyring";
 import ImportedWASMKeyring from "./keyrings/imported/ImportedWASMKeyring";
-import HDKeyring from "./keyrings/hd/HDKeyring";
+import OLKeyring from "./keyrings/hd/OLKeyring";
+import ImportedOLKeyring from "./keyrings/imported/ImportedOLKeyring";
+
+const STORAGE_NAME = "Vault";
 
 export default class Vault {
   keyrings: Keyrings;
@@ -17,17 +20,19 @@ export default class Vault {
     this.keyrings = {
       [AccountType.EVM]: undefined,
       [AccountType.WASM]: undefined,
+      [AccountType.OL]: undefined,
       [AccountType.IMPORTED_EVM]: new ImportedEVMKeyring(),
       [AccountType.IMPORTED_WASM]: new ImportedWASMKeyring(),
+      [AccountType.IMPORTED_OL]: new ImportedOLKeyring(),
     };
   }
 
   private static async getFromStorage(): Promise<Vault> {
     const vault = new Vault();
-    const stored = await Storage.getInstance().storage.get(this.name);
-    if (!stored || !stored[this.name]) throw new Error("vault_not_found");
+    const stored = await Storage.getInstance().storage.get(STORAGE_NAME);
+    if (!stored || !stored[STORAGE_NAME]) throw new Error("vault_not_found");
     const data = (await Auth.getInstance().decryptVault(
-      stored[this.name]
+      stored[STORAGE_NAME]
     )) as Vault;
     if (!data) {
       throw new Error("vault_not_found");
@@ -47,41 +52,65 @@ export default class Vault {
     await Vault.set(new Vault());
   }
 
-  static async alreadySignedUp(): Promise<boolean> {
+  static migrations = async () => {
+    const Allstored = await Storage.getInstance().storage.get(null);
+
+    if (Allstored) {
+      // migrate vault
+      const foundOldVaultKey = Object.keys(Allstored).find(
+        (key) => typeof Allstored[key] === "string" && key !== STORAGE_NAME
+      );
+
+      if (foundOldVaultKey) {
+        const newVault = Allstored[foundOldVaultKey];
+        await Storage.getInstance().storage.set({ [STORAGE_NAME]: newVault });
+        await Storage.getInstance().storage.remove(foundOldVaultKey);
+      }
+    }
+  };
+
+  static alreadySignedUp = async () => {
+    // migration
+    await this.migrations();
+
     const stored = await Storage.getInstance().storage.get(null);
-    return !!stored && Boolean(stored[this.name]);
-  }
+
+    return !!stored && Boolean(stored[STORAGE_NAME]);
+  };
 
   static async getEncryptedVault(): Promise<string | undefined> {
-    const stored = await Storage.getInstance().storage.get(this.name);
-    if (!stored || !stored[this.name]) return undefined;
-    return stored[this.name];
+    const stored = await Storage.getInstance().storage.get(STORAGE_NAME);
+    if (!stored || !stored[STORAGE_NAME]) return undefined;
+    return stored[STORAGE_NAME];
   }
 
   static fromData(
     vault: Vault,
     keyrings: {
-      [key in AccountType]: SupportedKeyring | undefined;
+      [key in KeyringType]: SupportedKeyring | undefined;
     }
   ): void {
     Object.keys(keyrings).forEach((keyringType: string) => {
-      const keyring = keyrings[keyringType as AccountType];
-      const mnemonic = (keyring as HDKeyring)?.mnemonic;
+      const keyring = keyrings[keyringType as KeyringType];
       if (keyring) {
         switch (keyringType) {
           case AccountType.EVM:
-            if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = EVMKeyring.fromJSON(keyring);
             break;
           case AccountType.WASM:
-            if (!mnemonic) throw new Error("invalid_mnemonic");
             vault.keyrings[keyringType] = WASMKeyring.fromJSON(keyring);
+            break;
+          case AccountType.OL:
+            vault.keyrings[keyringType] = OLKeyring.fromJSON(keyring);
             break;
           case AccountType.IMPORTED_EVM:
             vault.keyrings[keyringType] = ImportedEVMKeyring.fromJSON(keyring);
             break;
           case AccountType.IMPORTED_WASM:
             vault.keyrings[keyringType] = ImportedWASMKeyring.fromJSON(keyring);
+            break;
+          case AccountType.IMPORTED_OL:
+            vault.keyrings[keyringType] = ImportedOLKeyring.fromJSON(keyring);
             break;
         }
       }
@@ -90,18 +119,18 @@ export default class Vault {
 
   static async set(data: Vault): Promise<void> {
     const encryptedData = await Auth.getInstance().encryptVault(data);
-    await Storage.getInstance().storage.set({ [this.name]: encryptedData });
+    await Storage.getInstance().storage.set({ [STORAGE_NAME]: encryptedData });
     this.instance = await Vault.getFromStorage();
   }
 
   static async saveKeyring(keyring: SupportedKeyring) {
     const vault = await Vault.getInstance();
-    vault.keyrings[keyring.type] = keyring;
+    vault.keyrings[keyring.type as KeyringType] = keyring;
     await Vault.set(vault);
   }
 
   static async getKeyring(
-    type: AccountType,
+    type: Exclude<AccountType, AccountType.ALL>,
     createWithMnemonic?: string
   ): Promise<SupportedKeyring> {
     const vault = await Vault.getInstance();
@@ -114,10 +143,22 @@ export default class Vault {
   }
 
   private static async addHDKeyring(type: AccountType, mnemonic: string) {
-    const keyring =
-      type === AccountType.EVM
-        ? new EVMKeyring(mnemonic)
-        : new WASMKeyring(mnemonic);
+    let keyring;
+
+    switch (type) {
+      case AccountType.EVM:
+        keyring = new EVMKeyring(mnemonic);
+        break;
+      case AccountType.WASM:
+        keyring = new WASMKeyring(mnemonic);
+        break;
+      case AccountType.OL:
+        keyring = new OLKeyring(mnemonic);
+        break;
+      default:
+        throw new Error("invalid_keyring_type");
+    }
+
     await this.saveKeyring(keyring);
     return keyring;
   }
@@ -130,15 +171,15 @@ export default class Vault {
     return Object.values(this.keyrings).every((keyring) => !keyring);
   }
 
-  setKeyring(type: AccountType, keyring: SupportedKeyring) {
+  setKeyring(type: KeyringType, keyring: SupportedKeyring) {
     this.keyrings[type] = keyring;
   }
 
-  getKeyring(type: AccountType) {
+  getKeyring(type: KeyringType) {
     return this.keyrings[type];
   }
 
-  removeKeyring(type: AccountType) {
+  removeKeyring(type: KeyringType) {
     delete this.keyrings[type];
   }
 
@@ -146,7 +187,7 @@ export default class Vault {
     this.keyrings = keyrings;
   }
 
-  alreadyExists(type: AccountType) {
+  alreadyExists(type: KeyringType) {
     return this.keyrings[type] !== undefined;
   }
 }

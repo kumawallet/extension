@@ -1,38 +1,7 @@
-import { AccountType } from "@src/accounts/types";
-import { MAINNETS, TESTNETS } from "@src/constants/chains";
 import BaseEntity from "./BaseEntity";
-import { version } from "@src/utils/env";
-
-export type Chain = {
-  name: string;
-  addressPrefix?: number;
-  rpc: {
-    wasm?: string;
-    evm?: string;
-  };
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-  explorer: {
-    evm?: {
-      name: string;
-      url: string;
-    };
-    wasm?: {
-      name: string;
-      url: string;
-    };
-  };
-  logo: string;
-  supportedAccounts: AccountType[];
-  xcm?: string[];
-};
+import { Chain } from "@src/types";
 
 export default class Chains extends BaseEntity {
-  mainnets: Chain[];
-  testnets: Chain[];
   custom: Chain[];
   version: string = "";
 
@@ -40,9 +9,12 @@ export default class Chains extends BaseEntity {
 
   private constructor() {
     super();
-    this.mainnets = MAINNETS;
-    this.testnets = TESTNETS;
+
     this.custom = [];
+  }
+
+  static getName() {
+    return "Chains";
   }
 
   public static getInstance() {
@@ -58,8 +30,6 @@ export default class Chains extends BaseEntity {
 
   static async getDefaultValue<Chains>(): Promise<Chains> {
     const defaultChains = Chains.getInstance();
-    defaultChains.mainnets = MAINNETS;
-    defaultChains.testnets = TESTNETS;
     return defaultChains as Chains;
   }
 
@@ -73,18 +43,6 @@ export default class Chains extends BaseEntity {
     const stored = await Chains.get<Chains>();
     if (!stored) throw new Error("failed_to_load_chains");
     const chains = Chains.getInstance();
-    if (stored.version !== version) {
-      chains.mainnets = MAINNETS;
-      chains.testnets = TESTNETS;
-      chains.version = version;
-      await Chains.set<Chains>(chains);
-      return {
-        mainnets: MAINNETS,
-        testnets: TESTNETS,
-      };
-    }
-    chains.mainnets = stored.mainnets;
-    chains.testnets = stored.testnets;
     chains.custom = stored.custom;
     return undefined;
   }
@@ -104,27 +62,7 @@ export default class Chains extends BaseEntity {
     await Chains.set<Chains>(chains);
   }
 
-  static async getByName(chainName: string): Promise<Chain | undefined> {
-    const chains = await Chains.get<Chains>();
-    if (!chains) throw new Error("failed_to_get_chain_by_name");
-    const chain = chains.mainnets.find((c) => c.name === chainName);
-    if (chain) return chain;
-    const testnet = chains.testnets.find((c) => c.name === chainName);
-    if (testnet) return testnet;
-    const custom = chains.custom.find((c) => c.name === chainName);
-    if (custom) return custom;
-    return undefined;
-  }
-
-  getAll() {
-    return [...this.mainnets, ...this.testnets, ...this.custom];
-  }
-
   isAlreadyAdded(chain: Chain) {
-    return (
-      this.mainnets.some((c) => c.name === chain.name) ||
-      this.testnets.some((c) => c.name === chain.name) ||
-      this.custom.some((c) => c.name === chain.name)
-    );
+    return this.custom.some((c) => c.name === chain.name);
   }
 }

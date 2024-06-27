@@ -1,5 +1,5 @@
-import { MAINNETS, TESTNETS } from "@src/constants/chains";
-import Chains, { Chain } from "./Chains";
+import Chains from "./Chains";
+import { Chain } from "@src/types";
 
 describe("Chains", () => {
   beforeAll(() => {
@@ -53,16 +53,12 @@ describe("Chains", () => {
       const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
         .default;
       _BaseEntity.get = vi.fn().mockReturnValue({
-        mainnets: [],
-        testnets: [],
         custom: [],
       });
 
       await Chains.loadChains();
 
       const chains = Chains.getInstance();
-      expect(chains.mainnets).toEqual(MAINNETS);
-      expect(chains.testnets).toEqual(TESTNETS);
       expect(chains.custom).toEqual([]);
     });
 
@@ -156,85 +152,24 @@ describe("Chains", () => {
     });
   });
 
-  describe("get by chain", () => {
-    it("should return in mainnets", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      _BaseEntity.get = vi.fn().mockReturnValue({
-        mainnets: [{ name: "test" } as Chain],
-        testnets: [],
-        custom: [],
-      });
-
-      const chain = await Chains.getByName("test");
-      expect(chain).toEqual({ name: "test" });
-    });
-
-    it("should return in testnets", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      _BaseEntity.get = vi.fn().mockReturnValue({
-        mainnets: [],
-        testnets: [{ name: "test" } as Chain],
-        custom: [],
-      });
-
-      const chain = await Chains.getByName("test");
-      expect(chain).toEqual({ name: "test" });
-    });
-
-    it("should return in custom", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      _BaseEntity.get = vi.fn().mockReturnValue({
-        mainnets: [],
-        testnets: [],
-        custom: [{ name: "test" } as Chain],
-      });
-
-      const chain = await Chains.getByName("test");
-      expect(chain).toEqual({ name: "test" });
-    });
-
-    it("should return undefined", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      _BaseEntity.get = vi.fn().mockReturnValue({
-        mainnets: [],
-        testnets: [],
-        custom: [],
-      });
-      expect(Chains.getByName("test")).resolves.toBeUndefined();
-    });
-
-    it("should throw failed_to_get_chain_by_name", async () => {
-      const _BaseEntity = (await import("@src/storage/entities/BaseEntity"))
-        .default;
-      _BaseEntity.get = vi.fn().mockReturnValue(undefined);
-
-      try {
-        await Chains.getByName("test");
-        throw new Error("bad test");
-      } catch (error) {
-        expect(String(error)).toBe("Error: failed_to_get_chain_by_name");
-      }
-    });
-  });
-
   it("should get all", () => {
     const chains = Chains.getInstance();
-    chains.mainnets = [{ name: "test" } as Chain];
-    chains.testnets = [];
-    chains.custom = [];
+    chains.custom = [
+      {
+        name: "test",
+      } as Chain,
+    ];
 
-    expect(chains.getAll()).toEqual([{ name: "test" } as Chain]);
+    expect(chains.custom).toEqual([{ name: "test" } as Chain]);
   });
 
-  it("should already addes", () => {
+  it("should already added", () => {
     const chains = Chains.getInstance();
-    chains.mainnets = [{ name: "test" } as Chain];
-    chains.testnets = [];
-    chains.custom = [];
+    chains.custom = [
+      {
+        name: "test",
+      } as Chain,
+    ];
 
     expect(chains.isAlreadyAdded({ name: "test" } as Chain)).toBeTruthy();
   });

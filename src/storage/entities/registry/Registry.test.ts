@@ -103,7 +103,7 @@ describe("Registry", () => {
       _BaseEntity.get = get;
       _BaseEntity.set = set;
 
-      await Registry.changeContactName("test", "test");
+      await Registry.updateContact("test", "test");
       expect(set).toHaveBeenCalled();
     });
 
@@ -114,7 +114,7 @@ describe("Registry", () => {
       const get = vi.fn().mockReturnValue(undefined);
       _BaseEntity.get = get;
 
-      expect(Registry.changeContactName("test", "test")).rejects.toThrowError(
+      expect(Registry.updateContact("test", "test")).rejects.toThrowError(
         "failed_to_update_contact"
       );
     });
@@ -129,7 +129,7 @@ describe("Registry", () => {
       });
       _BaseEntity.get = get;
 
-      expect(Registry.changeContactName("test", "test")).rejects.toThrowError(
+      expect(Registry.updateContact("test", "test")).rejects.toThrowError(
         "contact_not_found"
       );
     });

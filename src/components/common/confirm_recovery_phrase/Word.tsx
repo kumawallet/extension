@@ -28,7 +28,7 @@ export const Word: FC<WordProps> = memo(function Word({
   return (
     <div
       ref={drag}
-      className={`${bg} p-2 border border-default-primary rounded-md text-center cursor-pointer`}
+      className={`${bg} p-2 border border-default-primary rounded-md text-center cursor-pointer font-poppins text-base text-gray-200`}
       style={{ opacity }}
       data-testid="box"
     >

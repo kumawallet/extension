@@ -20,14 +20,17 @@ export default class Settings extends BaseEntity {
     };
   }
 
+  static getName() {
+    return "Settings";
+  }
+
   static async init() {
     const settings = new Settings();
     settings.addToGeneral(
       SettingKey.LANGUAGES,
       LanguageSetting.getSupportedLanguages()
     );
-    settings.addToGeneral(SettingKey.CURRENCY,
-        CurrencySetting.getCurrencies());
+    settings.addToGeneral(SettingKey.CURRENCY, CurrencySetting.getCurrencies());
     // this setting does not have a value (the true is just a placeholder)
     settings.addToGeneral(SettingKey.MANAGE_NETWORKS, true);
     settings.addToGeneral(SettingKey.SHOW_TESTNETS, false);

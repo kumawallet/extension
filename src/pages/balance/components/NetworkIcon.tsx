@@ -1,6 +1,6 @@
+import { Chain } from "@src/types";
 import { FC } from "react";
 
-import { Chain } from "@src/storage/entities/Chains";
 
 interface NetworkIconProps {
   networkName: string;

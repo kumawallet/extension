@@ -5,19 +5,25 @@ import Account from "@src/storage/entities/Account";
 interface InitialState {
   accounts: Account[];
   isLoadingAccounts: boolean;
-  selectedAccount: Account;
+  selectedAccount: Account | null;
 }
 
 interface AccountContext {
   state: InitialState;
   getAllAccounts: (type?: AccountType[] | null) => Promise<Account[]>;
   getSelectedAccount: () => Promise<Account | undefined | null>;
-  setSelectedAccount: (account: Account, changeRpc?: boolean) => void;
-  deriveAccount: (account: AccountFormType) => Promise<boolean>;
+  setSelectedAccount: (account: Account | null, changeRpc?: boolean) => void;
+  deriveAccount: (account: {
+    name: string;
+    accountType: AccountType;
+    address: string;
+  }) => Promise<boolean>;
   importAccount: (account: AccountFormType) => Promise<boolean>;
   createAccount: (account: AccountFormType) => Promise<boolean>;
   updateAccountName: (accountKey: AccountKey, name: string) => Promise<void>;
-  restorePassword: (account: AccountFormType) => Promise<boolean>;
+  deleteAccount: (
+    accountKey: AccountKey
+  ) => Promise<"successful" | null | undefined>;
 }
 
 type Action =
@@ -30,7 +36,7 @@ type Action =
   | {
       type: "set-selected-account";
       payload: {
-        selectedAccount: Account;
+        selectedAccount: Account | null;
       };
     }
   | {
@@ -43,5 +49,12 @@ type Action =
       type: "update-account-name";
       payload: {
         name: string;
+        accountKey?: string;
+      };
+    }
+  | {
+      type: "delete-account";
+      payload: {
+        key: string;
       };
     };

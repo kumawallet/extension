@@ -7,85 +7,123 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { ethers } from "ethers";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import { useToast } from "@src/hooks";
-import { getAccountType } from "@src/utils/account-utils";
 import { Action, InitialState, NetworkContext } from "./types";
-import Chains, { Chain } from "@src/storage/entities/Chains";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { ChainsState } from "@src/types";
+import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
+import { SUBSTRATE_CHAINS, EVM_CHAINS } from "@src/constants/chainsData";
+import { migrateOldCustomChains } from "@src/utils/chains";
+import { OL_CHAINS } from "@src/constants/chainsData/ol";
 
 const initialState: InitialState = {
-  chains: {
-    mainnets: Chains.getInstance().mainnets,
-    testnets: Chains.getInstance().testnets,
-    custom: Chains.getInstance().custom,
-  },
-  selectedChain: null,
-  api: null,
-  rpc: "",
-  init: false,
-  type: "",
+  chains: [],
+  selectedChain: {},
+  chainStatus: {}
 };
 
 const NetworkContext = createContext({} as NetworkContext);
 
-export const getProvider = async (rpc: string, type: string) => {
-  if (type.toLowerCase() === "evm")
-    return new ethers.providers.JsonRpcProvider(rpc as string);
+const getChains = async (): Promise<ChainsState> => {
+  try {
+    const setting = await messageAPI.getSetting({
+      type: SettingType.GENERAL,
+      key: SettingKey.SHOW_TESTNETS,
+    });
 
-  if (type.toLowerCase() === "wasm")
-    return ApiPromise.create({ provider: new WsProvider(rpc as string) });
+    const showTesnets = setting?.value || false;
+
+    const chains: ChainsState = [
+      {
+        title: "wasm_based",
+        chains: SUBSTRATE_CHAINS.filter((chain) => !chain.isTestnet),
+      },
+      {
+        title: "evm_based",
+        chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+      },
+      {
+        title: "move",
+        chains: OL_CHAINS,
+      },
+    ];
+
+    let customChains = await messageAPI.getCustomChains();
+
+    if (customChains.length > 0) {
+      const customChainsToMigrate = customChains.filter((chain) => !chain.id);
+
+      if (customChainsToMigrate.length > 0) {
+        const { newChains } = await migrateOldCustomChains(
+          customChainsToMigrate
+        );
+        if (newChains.length > 0) {
+          customChains = newChains;
+        }
+      }
+
+      chains.push({
+        title: "custom",
+        chains: customChains,
+      });
+    }
+
+    if (showTesnets) {
+      chains.push(
+        ...[
+          {
+            title: "wasm_based_testnets",
+            chains: SUBSTRATE_CHAINS.filter((chain) => chain.isTestnet),
+          },
+          {
+            title: "EVM testnets",
+            chains: EVM_CHAINS.filter((chain) => chain.isTestnet),
+          },
+        ]
+      );
+    }
+
+    return chains;
+  } catch (error) {
+    return [];
+  }
 };
 
 export const reducer = (state: InitialState, action: Action): InitialState => {
   switch (action.type) {
-    case "init": {
-      const { selectedChain, rpc, type, chains } = action.payload;
-
-      return {
-        ...state,
-        chains,
-        selectedChain,
-        rpc,
-        init: true,
-        type,
-      };
-    }
     case "select-network": {
-      const { selectedChain, rpc, type, api } = action.payload;
+      const { selectedChain } = action.payload;
 
-      if (selectedChain?.name === state.selectedChain?.name) return state
-
+      if (selectedChain === state.selectedChain) return state;
       return {
         ...state,
         selectedChain,
-        rpc: rpc || state.rpc,
-        type: type || state.type,
-        api,
       };
     }
-    case "set-api": {
-      const { api, type, rpc } = action.payload;
 
-      if (rpc !== state.rpc) return state
-
-      return {
-        ...state,
-        api: api,
-        type: type || state.type,
-      };
-    }
     case "refresh-networks": {
       const { chains } = action.payload;
       return {
         ...state,
-        chains: {
-          mainnets: chains.mainnets,
-          testnets: chains.testnets,
-          custom: chains.custom,
-        } as unknown as Chains,
+        chains,
+      };
+    }
+
+    case "init-networks": {
+      const { chains } = action.payload;
+      return {
+        ...state,
+        chains,
+      };
+    }
+
+    case "update-status": {
+      const { status } = action.payload;
+
+      return {
+        ...state,
+        chainStatus: status
       };
     }
     default:
@@ -96,129 +134,11 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
 export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
-
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const chains = await messageAPI.getAllChains();
-        const selectedNetwork = await messageAPI.getNetwork();
-        let selectedChain = null;
-        let rpc = "";
-        let type = "";
-
-        if (selectedNetwork?.chain?.name) {
-          const account = await messageAPI.getSelectedAccount();
-          selectedChain = selectedNetwork?.chain;
-          type = getAccountType(account?.type);
-          rpc = selectedChain.rpc[type.toLowerCase() as "evm" | "wasm"] || "";
-        }
-
-        dispatch({
-          type: "init",
-          payload: {
-            chains: {
-              mainnets: chains.mainnets,
-              testnets: chains.testnets,
-              custom: chains.custom,
-            } as unknown as Chains,
-            selectedChain,
-            rpc,
-            type: type.toUpperCase(),
-          },
-        });
-      } catch (error) {
-        captureError(error);
-        showErrorToast(tCommon(error as string));
-      }
-    })();
-  }, []);
-
-  const setSelectNetwork = async (network: Chain) => {
-    try {
-      if (!network) return;
-      await messageAPI.setNetwork({ chain: network });
-      const account = await messageAPI.getSelectedAccount();
-      const accountType = getAccountType(account?.type)?.toLowerCase();
-      const rpc =
-        network.rpc[accountType.toLowerCase() as "evm" | "wasm"] || "";
-
-      if (state.api && "getBalance" in state.api) {
-        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners(
-          "block"
-        );
-      }
-
-      if (state.api && "disconnect" in state.api) await (state.api as ApiPromise).disconnect()
-
-      dispatch({
-        type: "select-network",
-        payload: {
-          selectedChain: network,
-          rpc,
-          type: accountType.toUpperCase(),
-          api: null,
-        },
-      });
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon(error as string));
-    }
-  };
-
-  const getSelectedNetwork = async () => {
-    try {
-      const { chain: selectedNetwork } = await messageAPI.getNetwork();
-
-      if (selectedNetwork) {
-        dispatch({
-          type: "select-network",
-          payload: { selectedChain: selectedNetwork },
-        });
-      }
-
-      return selectedNetwork;
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon(error as string));
-    }
-  };
-
-
-  //  only for chain with multi support (WASM and EVM)
-  const setNewRpc = async (type: string) => {
-    try {
-      const _type = getAccountType(type);
-
-      if (!_type) return;
-
-      const newRpc =
-        state.selectedChain?.rpc[_type.toLowerCase() as "wasm" | "evm"] || "";
-
-      if (state.api && "getBalance" in state.api) {
-        (state.api as ethers.providers.JsonRpcProvider).removeAllListeners();
-      }
-
-      const rpcAlreadyInUse = newRpc === state.rpc;
-      if (rpcAlreadyInUse || !newRpc) return;
-
-      if (state.api && "disconnect" in state.api) (state.api as ApiPromise).disconnect()
-
-
-      dispatch({
-        type: "set-api",
-        payload: { api: null, rpc: newRpc, type: _type },
-      });
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon(error as string));
-    }
-  };
 
   const refreshNetworks = async () => {
     try {
-      const chains = await messageAPI.getAllChains();
+      const chains = await getChains();
       dispatch({
         type: "refresh-networks",
         payload: { chains },
@@ -230,30 +150,44 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (state.rpc && state.type && !state.api) {
-      (async () => {
+    (async () => {
+      const chains = await getChains();
 
-        const api = await getProvider(state.rpc as string, state.type);
+      dispatch({
+        type: "init-networks",
+        payload: { chains },
+      });
+    })();
+  }, []);
 
-        dispatch({
-          type: "set-api",
-          payload: {
-            api,
-            type: state.type,
-            rpc: state.rpc as string,
-          },
-        });
-      })();
-    }
-  }, [state.rpc, state.type, state.api]);
+  useEffect(() => {
+    messageAPI.networkSubscribe((network) => {
+      dispatch({
+        type: "select-network",
+        payload: {
+          selectedChain: network as Omit<InitialState["selectedChain"], "status">
+        },
+      });
+    });
+  }, []);
+
+
+  useEffect(() => {
+    messageAPI.netwotkStatusSubscribe((networkStatus) => {
+      dispatch({
+        type: "update-status",
+        payload: {
+          status: networkStatus,
+        },
+      });
+    });
+  }, []);
+
 
   return (
     <NetworkContext.Provider
       value={{
         state,
-        setSelectNetwork,
-        getSelectedNetwork,
-        setNewRpc,
         refreshNetworks,
       }}
     >

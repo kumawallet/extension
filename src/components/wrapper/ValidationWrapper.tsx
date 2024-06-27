@@ -1,6 +1,6 @@
 import { useLoading } from "@src/hooks";
 import { SignIn } from "@src/pages";
-import { useAccountContext, useNetworkContext } from "@src/providers";
+import { useAccountContext } from "@src/providers";
 import {
   FC,
   PropsWithChildren,
@@ -29,9 +29,7 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
   const [trustedSites, setTrustedSites] = useState<string[]>([]);
   const [isSessionActive, setIsSessionActive] = useState(false);
 
-  const {
-    state: { api },
-  } = useNetworkContext();
+
   const {
     state: { selectedAccount },
   } = useAccountContext();
@@ -80,11 +78,11 @@ export const ValidationWrapper: FC<ValidationWrapperProps> = ({
 
   useEffect(() => {
     (async () => {
-      if (selectedAccount?.value?.address && api) {
+      if (selectedAccount?.value?.address) {
         load();
       }
     })();
-  }, [api, selectedAccount]);
+  }, [selectedAccount]);
 
   if (isLoading) {
     return null;

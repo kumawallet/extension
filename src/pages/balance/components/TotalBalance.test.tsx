@@ -3,8 +3,8 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
-import { CHAINS } from "@src/constants/chains";
 import { AccountType } from "@src/accounts/types";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 
 const renderComponent = () => {
   return render(
@@ -21,17 +21,23 @@ describe("TotalBalance", () => {
     vi.mock("@src/providers", () => ({
       useAssetContext: () => ({
         state: {
-          assets: [
-            {
-              amount: 100,
-            },
-          ],
+          assets: {
+            "0x123": {
+              "polkadot": {
+                assets: [
+                  {
+                    amount: "100",
+                  },
+                ]
+              }
+            }
+          },
         },
         loadAssets: vi.fn(),
       }),
       useNetworkContext: () => ({
         state: {
-          selectedChain: CHAINS[0].chains[3],
+          selectedChain: SUBSTRATE_CHAINS[0],
           type: AccountType.EVM,
           api: null
         },
@@ -41,9 +47,6 @@ describe("TotalBalance", () => {
           selectedAccount: {},
         },
         updateAccountName: () => updateAccountName(),
-      }),
-      useThemeContext: () => ({
-        color: "red",
       }),
     }));
 

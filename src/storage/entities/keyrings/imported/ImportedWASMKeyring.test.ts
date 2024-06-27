@@ -1,3 +1,7 @@
+import {
+  POLKADOT_ACCOUNT_MOCK,
+  POLKADOT_SEED_MOCK,
+} from "@src/tests/mocks/account-mocks";
 import { SupportedKeyring } from "../types";
 import ImportedWASMKeyring from "./ImportedWASMKeyring";
 
@@ -5,10 +9,8 @@ describe("ImportedWASMKeyring", () => {
   beforeAll(() => {
     vi.mock("@polkadot/ui-keyring", () => ({
       default: {
-        addUri: vi.fn().mockReturnValue({
-          pair: {
-            address: "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
-          },
+        createFromUri: vi.fn().mockReturnValue({
+          address: POLKADOT_ACCOUNT_MOCK.value!.address,
         }),
       },
     }));
@@ -19,16 +21,20 @@ describe("ImportedWASMKeyring", () => {
       },
     }));
   });
+
   it("getImportedData", async () => {
     const importEVMKeyring = new ImportedWASMKeyring();
 
-    const importedData = await importEVMKeyring.getImportedData("seed");
+    const importedData = await importEVMKeyring.getImportedData(
+      POLKADOT_SEED_MOCK
+    );
 
     expect(importedData).toEqual({
-      address: "0x6BdD86284810AddBAA184f74B35d568087bB04eE",
+      address: POLKADOT_ACCOUNT_MOCK.value!.address,
       keyPair: {
-        key: "seed",
+        key: POLKADOT_SEED_MOCK,
       },
+      isDerivable: true,
     });
   });
 
@@ -36,8 +42,8 @@ describe("ImportedWASMKeyring", () => {
     const json = {
       type: "IMPORTED_EVM",
       keyPairs: {
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE": {
-          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
+        [POLKADOT_ACCOUNT_MOCK.value!.address as string]: {
+          key: POLKADOT_SEED_MOCK,
         },
       },
     } as unknown;
@@ -49,10 +55,33 @@ describe("ImportedWASMKeyring", () => {
     expect(importEVMKeyring).toEqual({
       type: "IMPORTED_WASM",
       keyPairs: {
-        "0x6BdD86284810AddBAA184f74B35d568087bB04eE": {
-          key: "678a8622ff4f22f720c818fbda888006ccad760dbdf0d6b39b07110f332959a2",
+        [POLKADOT_ACCOUNT_MOCK.value!.address as string]: {
+          key: POLKADOT_SEED_MOCK,
         },
       },
+    });
+  });
+
+  describe("getAddress", () => {
+    it("getAddress with path", async () => {
+      const importEVMKeyring = new ImportedWASMKeyring();
+
+      const address = await importEVMKeyring.getAddress(POLKADOT_SEED_MOCK);
+
+      expect(address).toBe(POLKADOT_ACCOUNT_MOCK.value!.address);
+    });
+  });
+
+  describe("getDerivedPath", () => {
+    it("should return derived path", () => {
+      const importEVMKeyring = new ImportedWASMKeyring();
+
+      const derivedPath = importEVMKeyring.getDerivedPath(
+        POLKADOT_SEED_MOCK,
+        0
+      );
+
+      expect(derivedPath).toBe(`${POLKADOT_SEED_MOCK}//0`);
     });
   });
 });

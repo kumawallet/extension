@@ -34,10 +34,16 @@ export default class Auth {
   }
 
   static async isSessionActive(): Promise<boolean> {
-    if (!Auth.isUnlocked) {
-      await Auth.loadFromCache();
-    }
+    await Auth.loadFromCache();
     return Auth.isUnlocked;
+  }
+  static async unlock() {
+    CacheAuth.getInstance();
+    CacheAuth.unlock();
+  }
+
+  static async getLock() {
+    return CacheAuth.getLock();
   }
 
   static isAuthorized() {
@@ -53,6 +59,15 @@ export default class Auth {
     } catch (error) {
       CacheAuth.clear();
       throw new Error("failed_to_cache_password");
+    }
+  }
+  static async setAutoLock(time: number) {
+    try {
+      CacheAuth.getInstance();
+      CacheAuth.lock(time);
+    } catch (err) {
+      CacheAuth.clear();
+      throw new Error("failed_to_set_auto_lock");
     }
   }
 
@@ -101,6 +116,10 @@ export default class Auth {
       throw error;
     }
   }
+  static async validatePassword(password: string) {
+    const auth = Auth.getInstance();
+    await auth.validatePassword(password);
+  }
 
   async setAuth(password: string) {
     this.password = password;
@@ -132,17 +151,15 @@ export default class Auth {
     }
   }
 
-  static async restorePassword(
-    backup: string,
-    password: string,
-    privateKeyOrSeed: string
-  ) {
-    const decryptedBackup = await Auth.decryptBackup(backup, privateKeyOrSeed);
-    if (!decryptedBackup) throw new Error("invalid_recovery_phrase");
-    Auth.isUnlocked = true;
-    Auth.password = decryptedBackup as string;
+  static async restorePassword(password: string, newPassword: string) {
+    if (Auth.password !== password) {
+      throw new Error("invalid_current_password");
+    }
+
+    const auth = Auth.getInstance();
+    await auth.setAuth(newPassword);
+
     const vault = await Vault.getInstance();
-    Auth.password = password;
     await Vault.set(vault);
   }
 }

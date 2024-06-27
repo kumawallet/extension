@@ -1,21 +1,18 @@
-import { FooterIcon } from "@src/pages/balance/components/FooterIcon";
-import { getWebAPI } from "@src/utils/env";
 import { isInPopup } from "@src/utils/utils";
-import { BiExpandAlt } from "react-icons/bi";
+import { Maximize } from "@src/components/icons/Maximize"
+import { Browser } from "@src/utils/constants";
 
 export const FullScreenFAB = () => {
   const openTab = () => {
-    const API = getWebAPI()
-    const url = API.runtime.getURL("src/entries/newtab/index.html");
-    API.tabs.create({ url });
+    const url = Browser.runtime.getURL("src/entries/newtab/index.html");
+    Browser.tabs.create({ url });
   };
 
   if (!isInPopup()) return null
 
   return (
-    <FooterIcon
-      icon={BiExpandAlt}
-      onClick={openTab}
-    />
+    <button data-testid="full-screen" onClick={openTab} className="hover:bg-gray-500 p-2">
+      <Maximize size="50" color="#B0B0CE" />
+    </button>
   );
 };

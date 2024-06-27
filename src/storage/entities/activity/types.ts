@@ -25,6 +25,7 @@ export type CallData = {
   gas: string;
   gasPrice: string;
   data: string;
+  fee: string
 };
 
 export type TransferData = {
@@ -35,6 +36,7 @@ export type TransferData = {
   value: string;
   gas: string;
   gasPrice: string;
+  fee: string;
 };
 
 export type XCM = {

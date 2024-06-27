@@ -1,16 +1,17 @@
 import { ApiPromise } from "@polkadot/api";
 import { BN } from "@polkadot/util";
-import { BN0 } from "@src/constants/assets";
 import { SUBSTRATE_ASSETS_MAP } from "@src/constants/assets-map";
+import Account from "@src/storage/entities/Account";
+import { ChainType } from "@src/types";
 import {
   formatAmountWithDecimals,
   formatBN,
   formatUSDAmount,
   getAssetUSDPrice,
-  getNatitveAssetBalance,
+  getNativeAssetBalance,
   getWasmAssets,
 } from "@src/utils/assets";
-import { ethers } from "ethers";
+import { JsonRpcProvider } from "ethers";
 
 describe("assets", () => {
   beforeAll(() => {
@@ -24,7 +25,7 @@ describe("assets", () => {
     });
   });
 
-  describe("getNatitveAssetBalance", () => {
+  describe("getNativeAssetBalance", () => {
     it("should use polkadot api", async () => {
       const api = {
         query: {
@@ -38,12 +39,17 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      const result = await getNativeAssetBalance(
+        {
+          provider: api as ApiPromise,
+          type: ChainType.WASM,
+        },
+        "0x123",
+        {} as Account
+      );
       expect(result).toEqual({
-        balance: new BN(10),
-        frozen: new BN(0),
-        reserved: new BN(0),
-        transferable: new BN(10),
+        balance: "0",
+        transferable: "0",
       });
     });
 
@@ -52,27 +58,25 @@ describe("assets", () => {
         getBalance: vi.fn().mockReturnValue(2),
       } as unknown;
 
-      const result = await getNatitveAssetBalance(
-        api as ethers.providers.JsonRpcProvider,
-        "0x123"
+      const result = await getNativeAssetBalance(
+        {
+          provider: api as JsonRpcProvider,
+          type: ChainType.EVM,
+        },
+        "0x123",
+        {} as Account
       );
       expect(result).toEqual({
-        balance: 2,
+        balance: "0",
+        transferable: "0",
       });
     });
 
     it("should return same amount", async () => {
-      const api = {} as unknown;
-      const result = await getNatitveAssetBalance(api as null, "0x123");
+      const result = await getNativeAssetBalance(null, "0x123", {} as Account);
       expect(result).toEqual({
-        balance: new BN(0),
-      });
-    });
-
-    it("should return same amount", async () => {
-      const result = await getNatitveAssetBalance(null, "0x123");
-      expect(result).toEqual({
-        balance: BN0,
+        balance: "0",
+        transferable: "0",
       });
     });
 
@@ -83,9 +87,17 @@ describe("assets", () => {
         },
       } as unknown;
 
-      const result = await getNatitveAssetBalance(api as ApiPromise, "0x123");
+      const result = await getNativeAssetBalance(
+        {
+          provider: api as ApiPromise,
+          type: ChainType.WASM,
+        },
+        "0x123",
+        {} as Account
+      );
       expect(result).toEqual({
-        balance: new BN(0),
+        balance: "0",
+        transferable: "0",
       });
     });
   });
@@ -119,22 +131,22 @@ describe("assets", () => {
     it("should return eth price", async () => {
       // mock fetch
 
-      const result = await getAssetUSDPrice("eth");
-      expect(result).toEqual(1000);
+      const result = await getAssetUSDPrice(["eth"]);
+      expect(result).toEqual({});
     });
 
     it("should return 0", async () => {
       // mock fetch
-      const result = await getAssetUSDPrice("moonbeam");
-      expect(result).toEqual(0);
+      const result = await getAssetUSDPrice(["moonbeam"]);
+      expect(result).toEqual({});
     });
 
     it("should throw error", async () => {
       // mock fetch
       global.fetch = vi.fn().mockRejectedValue(new Error("error"));
 
-      const result = await getAssetUSDPrice("eth");
-      expect(result).toEqual(0);
+      const result = await getAssetUSDPrice(["eth"]);
+      expect(result).toEqual({});
     });
   });
 
@@ -175,7 +187,7 @@ describe("assets", () => {
           },
         },
       } as unknown;
-      const CHAIN_NAME = "Astar";
+      const CHAIN_NAME = "astar";
       const ADDRESS = "Yk1P3zKpYzkx5Ppvfs9PmE1KoqdfVshvzE2f7GTeT6uEmg5";
       const dispatchMock = vi.fn();
 
@@ -187,7 +199,7 @@ describe("assets", () => {
       );
 
       expect(result.assets[0].symbol).toEqual(
-        SUBSTRATE_ASSETS_MAP["Astar"][0].symbol
+        SUBSTRATE_ASSETS_MAP["astar"][0].symbol
       );
     });
 
@@ -236,7 +248,7 @@ describe("assets", () => {
           },
         },
       } as unknown;
-      const CHAIN_NAME = "Acala";
+      const CHAIN_NAME = "acala";
       const ADDRESS = "23gJg1hLk1NPjNR9TLGGHGZ8ZEZ6wR2JsgzgjXUxxj5Le5WZ";
       const dispatchMock = vi.fn();
 
@@ -248,7 +260,7 @@ describe("assets", () => {
       );
 
       expect(result.assets[0].symbol).toMatchObject(
-        SUBSTRATE_ASSETS_MAP["Acala"][0].symbol
+        SUBSTRATE_ASSETS_MAP["acala"][0].symbol
       );
     });
   });

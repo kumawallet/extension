@@ -1,10 +1,14 @@
-import { selectedEVMAccountMock } from "@src/tests/mocks/account-mocks";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { Receive } from "./Receive";
 import { I18nextProvider } from "react-i18next";
 import i18n from "@src/utils/i18n";
+import { EVM_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
+import { cropAccount } from "@src/utils/account-utils";
 
-const copyToClipboard = vi.fn();
+const functionMock = {
+  navigate: vi.fn(),
+  copyToClipboard: vi.fn(),
+};
 
 const renderComponent = () => {
   return render(
@@ -17,50 +21,34 @@ const renderComponent = () => {
 describe("Receive", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
-      useNavigate: () => vi.fn(),
+      useNavigate: () => functionMock.navigate,
     }));
 
     vi.mock("@src/providers", () => ({
       useAccountContext: () => ({
         state: {
-          selectedAccount: selectedEVMAccountMock,
+          selectedAccount: EVM_ACCOUNT_MOCK,
         },
-      }),
-      useThemeContext: () => ({
-        color: "red",
       }),
     }));
 
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-          create: () => vi.fn(),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }))
-
-    // mock useCopyToClipboard
     vi.mock("@src/hooks", () => ({
       useCopyToClipboard: () => ({
         Icon: () => null,
-        copyToClipboard: () => copyToClipboard(),
+        copyToClipboard: () => functionMock.copyToClipboard(),
       }),
     }));
   });
 
-  it("should render", () => {
+  it("should render", async () => {
     const { getByTestId } = renderComponent();
     expect(getByTestId("account-button")).toBeDefined();
+
+    await waitFor(() => {
+      expect(getByTestId("cropped-account").innerHTML).toBe(
+        cropAccount(EVM_ACCOUNT_MOCK.value!.address)
+      );
+    });
   });
 
   it("should copy to clipboard", () => {
@@ -69,6 +57,15 @@ describe("Receive", () => {
 
     fireEvent.click(accountButton);
 
-    expect(copyToClipboard).toHaveBeenCalled();
+    expect(functionMock.copyToClipboard).toHaveBeenCalled();
+  });
+
+  it("should navigate back", () => {
+    const { getByTestId } = renderComponent();
+    const backButton = getByTestId("back-button");
+
+    fireEvent.click(backButton);
+
+    expect(functionMock.navigate).toHaveBeenCalledWith(-1);
   });
 });

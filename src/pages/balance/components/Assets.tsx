@@ -1,68 +1,106 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
-import {
-  useAssetContext,
-  useNetworkContext,
-  useThemeContext,
-} from "@src/providers";
+import { useAssetContext } from "@src/providers";
 import { Loading, Button } from "@src/components/common";
 import { Switch } from "@headlessui/react";
-import { ApiPromise } from "@polkadot/api";
 import { Asset } from "./Asset";
 import { CgOptions } from "react-icons/cg";
+import { formatAmountWithDecimals } from "@src/utils/assets";
+import { AssetAccount, Asset as IAsset } from "@src/types";
 
 export const Assets = () => {
   const { t } = useTranslation("balance");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
-  const {
-    state: { type, api },
-  } = useNetworkContext();
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
 
   const [showAllAssets, setShowAllAssets] = useState(false);
-  const [showManageAssets, setShowManageAssets] = useState(false);
 
   const filteredAsset = useMemo(() => {
-    let _assets = [...assets];
+    let _assets: IAsset[] = [];
 
-    if (!showAllAssets) {
-      _assets = _assets.filter((asset) => {
-        if (asset.id === "-1") return true;
+    const outputObject: {
+      [key: string]: {
+        balance: number;
+        amount: number;
+        symbol: string;
+        decimals: number;
+        id: string;
+        accountKey: string;
+      }[];
+    } = {};
 
-        return asset.balance > 0;
+    if (Object.keys(assets).length !== 0) {
+      Object.keys(assets).forEach((accountKey) => {
+        const networks = assets[accountKey];
+        Object.keys(networks).forEach((network) => {
+          const assets = networks[network].assets;
+          assets.forEach((asset) => {
+            if (!outputObject[asset.symbol]) {
+              outputObject[asset.symbol] = [];
+            }
+            outputObject[asset.symbol].push({ ...asset, balance: Number(asset.balance), amount: Number(asset.amount), accountKey });
+          });
+        });
       });
+
+
+      _assets = Object.keys(outputObject).map((key) => {
+        const asset = outputObject[key];
+
+        const accountKeysInfo = {} as {
+          [key: string]: AssetAccount
+        };
+
+        asset.forEach((a) => {
+          if (!accountKeysInfo[a.accountKey]) {
+            accountKeysInfo[a.accountKey] = {
+              balance: 0,
+              amount: 0,
+              symbol: a.symbol,
+              decimals: a.decimals,
+              id: a.id,
+            };
+          }
+
+          accountKeysInfo[a.accountKey].balance += Number(a.balance);
+          accountKeysInfo[a.accountKey].amount += Number(a.amount);
+        });
+
+        const balance = Object.values(accountKeysInfo).reduce((acc, _asset) => {
+          return acc + Number(_asset.balance || 0);
+        }, 0);
+
+        const amount = Object.values(accountKeysInfo).reduce((acc: number, _asset) => {
+          return acc + Number(_asset.amount || 0);
+        }, 0);
+
+        return {
+          symbol: key,
+          balance: formatAmountWithDecimals(
+            balance as number,
+            3,
+            asset[0].decimals
+          ),
+          amount,
+          decimals: asset[0].decimals,
+          accounts: accountKeysInfo,
+          id: asset[0].id,
+        };
+      }) as unknown as IAsset[];
     }
 
-    // order by balance, id === -1 should be first
-    _assets.sort((a, b) => {
-      if (a.id === "-1") return -1;
-      if (b.id === "-1") return 1;
-
-      return b.balance - a.balance;
+    _assets = _assets.sort((a, b) => {
+      return Number(b.balance) - Number(a.balance);
     });
 
-    return _assets;
-  }, [assets, showAllAssets]);
+    if (showAllAssets) return _assets;
 
-  useEffect(() => {
-    if (!type || !api) {
-      setShowManageAssets(false);
-      return;
-    }
-
-    if (type === "EVM") {
-      setShowManageAssets(true);
-    }
-
-    if (type === "WASM" && (api as ApiPromise).query.contracts) {
-      setShowManageAssets(true);
-    }
-  }, [type, api]);
+    return _assets.filter((asset) => asset.id === "-1" || Number(asset.balance) !== 0);
+  }, [JSON.stringify(assets), showAllAssets]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -75,7 +113,7 @@ export const Assets = () => {
             <Switch
               checked={showAllAssets}
               onChange={() => setShowAllAssets(!showAllAssets)}
-              className={`${showAllAssets ? `bg-${color}-primary` : "bg-custom-gray-bg"
+              className={`${showAllAssets ? `bg-primary-default` : "bg-custom-gray-bg"
                 } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
             >
               <span className="sr-only">{t("show_all_assets")}</span>
@@ -90,20 +128,18 @@ export const Assets = () => {
 
       {isLoadingAssets && <Loading />}
 
-      {filteredAsset.map((asset, index) => (
-        <Asset asset={asset} key={index} />
-      ))}
+      {filteredAsset.map((asset, index) => {
+        return <Asset asset={asset} key={index} />;
+      })}
 
-      {showManageAssets && (
-        <div className="flex justify-center mt-2">
-          <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
-            <span className="flex gap-1 items-center">
-              <CgOptions />
-              <span>{t("manage_assets")}</span>
-            </span>
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-center mt-2">
+        <Button onClick={() => navigate(MANAGE_ASSETS)} variant="text">
+          <span className="flex gap-1 items-center">
+            <CgOptions />
+            <span>{t("manage_assets")}</span>
+          </span>
+        </Button>
+      </div>
     </div>
   );
 };

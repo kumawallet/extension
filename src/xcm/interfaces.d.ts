@@ -11,6 +11,7 @@ export interface MapResponseXCM {
   pallet: string;
   method: string;
   extrinsicValues: {
+    asset?: unknown;
     dest?: unknown;
     beneficiary?: unknown;
     assets?: unknown;

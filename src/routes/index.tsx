@@ -1,60 +1,61 @@
 import { useEffect, useState } from "react";
 import { MemoryRouter, Route, Routes as RRoutes } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-
 import {
-  AccountForm,
   Balance,
+  ActivityDetail,
   ManageAssets,
   Send,
   Receive,
   SignIn,
-  SignMessage,
+  ForgotPass,
   Welcome,
-  CallContract,
   Swap,
+  CreateWallet,
+  ImportWallet,
+  ChangePassword,
+  Buy
 } from "@src/pages";
 import {
-  Advanced,
   BugReport,
-  Contacts,
+  AddressBook,
   General,
   ManageNetworks,
   Security,
-  AboutUs,
+  Settings,
 } from "@src/pages/settings";
+import { AutoLock } from "@src/pages/settings/components/Security/AutoLock";
 import {
-  useAccountContext,
-
-  useNetworkContext,
-} from "@src/providers";
-import {
-
   BALANCE,
+  ACTIVITY_DETAIL,
   CALL_CONTRACT,
   CREATE_ACCOUNT,
-  DERIVE_ACCOUNT,
   IMPORT_ACCOUNT,
   MANAGE_ASSETS,
+  BALANCE_ACCOUNTS,
   RECEIVE,
-  RESTORE_PASSWORD,
   SEND,
-  SETTINGS_ABOUT_US,
-  SETTINGS_ADVANCED,
   SETTINGS_BUG,
   SETTINGS_CONTACTS,
   SETTINGS_GENERAL,
   SETTINGS_MANAGE_NETWORKS,
   SETTINGS_SECURITY,
+  SETTINGS,
   SIGNIN,
+  FORGOT_PASS,
   SIGN_MESSAGE,
   SWAP,
   WELCOME,
+  CHANGE_PASSWORD,
+  SETTINGS_AUTOLOCK,
+  BUY
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
-import { ValidationWrapper } from "@src/components/wrapper/ValidationWrapper";
 import { messageAPI } from "@src/messageAPI/api";
+import { useLoading } from "@src/hooks";
+import { BalanceAccounts } from "@src/pages/balance/components/BalanceAccounts"
+import { Browser } from "@src/utils/constants";
+
 
 const getInitialEntry = (query: string) => {
   if (query.includes("sign_message")) {
@@ -74,82 +75,78 @@ const getInitialEntry = (query: string) => {
 };
 
 export const Routes = () => {
-  const { t } = useTranslation("account_form");
-
-
-  const {
-    state: { init },
-  } = useNetworkContext();
-
-  const { deriveAccount, createAccount, importAccount, restorePassword } = useAccountContext();
-
   const [homeRoute, setHomeRoute] = useState(<Loading />);
-  const [canDerive, setCanDerive] = useState(false);
-  const [importIsSignUp, setImportIsSignUp] = useState(true);
 
-  const getWalletStatus = async () => {
-    const [candDerive, alreadySignedUp] = await Promise.all([
-      messageAPI.areAccountsInitialized(),
-      messageAPI.alreadySignedUp(),
-    ]);
-    setCanDerive(candDerive);
-    setImportIsSignUp(!alreadySignedUp);
-  };
+  const [isInit, setIsInit] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false);
+  const { isLoading, endLoading } = useLoading(true);
 
   useEffect(() => {
+    (async () => {
+      const alreadySignedUp = await messageAPI.alreadySignedUp();
+
+      if (!alreadySignedUp) {
+        const tab = await Browser.tabs.getCurrent();
+
+        if (!tab) {
+          const url = Browser.runtime.getURL(`src/entries/newtab/index.html`);
+          Browser.tabs.create({ url });
+          window.close();
+          return;
+        }
+      }
+
+      setIsInit(true);
+      setIsSignedUp(alreadySignedUp);
+    })();
     getHomeRoute();
-    getWalletStatus();
-  }, [init]);
+  }, []);
+
+  useEffect(() => {
+    if (isInit) {
+      getHomeRoute();
+    }
+  }, [isInit]);
 
   const getHomeRoute = async () => {
-    if (!init) return
-
     try {
-      const alreadySignedUp = await messageAPI.alreadySignedUp();
-      if (!alreadySignedUp) {
+      if (!isSignedUp) {
         setHomeRoute(<Welcome />);
+        setTimeout(() => {
+          endLoading();
+        }, 100);
         return;
       }
 
       const isSessionActive = await messageAPI.isSessionActive();
       const isAuthorized = await messageAPI.isAuthorized();
-
       if (!isSessionActive || !isAuthorized) {
         setHomeRoute(<SignIn />);
+        setTimeout(() => {
+          endLoading();
+        }, 100);
         return;
       }
       setHomeRoute(<Balance />);
+      setTimeout(() => {
+        endLoading();
+      }, 100);
     } catch (error) {
-      console.log('error', error)
+      console.log("error", error);
     }
   };
 
-  if (location.search.includes("origin=kuma")) {
+  setInterval(async () => {
+    await messageAPI.unlock(); // Timeout update(AutoLock)
+  }, 30000);
+
+
+  if (isLoading) {
     return (
-      <MemoryRouter initialEntries={[getInitialEntry(location.search)]}>
-        <RRoutes>
-          {location.search.includes("sign_message") && (
-            <Route
-              path={SIGN_MESSAGE}
-              element={
-                <ValidationWrapper query={location.search}>
-                  <SignMessage />
-                </ValidationWrapper>
-              }
-            />
-          )}
-          {location.search.includes("call_contract") && (
-            <Route
-              path={CALL_CONTRACT}
-              element={
-                <ValidationWrapper query={location.search}>
-                  <CallContract />
-                </ValidationWrapper>
-              }
-            />
-          )}
-        </RRoutes>
-      </MemoryRouter>
+      <Loading
+        containerClass="h-screen flex justify-center items-center"
+        iconClass="mr-0"
+      />
     );
   }
 
@@ -158,92 +155,27 @@ export const Routes = () => {
       <RRoutes>
         <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
+        <Route path={ACTIVITY_DETAIL} element={<ActivityDetail />} />
         <Route path={SIGNIN} element={<SignIn />} />
+        <Route path={FORGOT_PASS} element={<ForgotPass />} />
         <Route path={SEND} element={<Send />} />
         <Route path={RECEIVE} element={<Receive />} />
         <Route path={MANAGE_ASSETS} element={<ManageAssets />} />
         <Route path={SWAP} element={<Swap />} />
-
-        <Route
-          path={IMPORT_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("import.title")}
-              onSubmitFn={importAccount}
-              buttonText={t("import.button_text")}
-              signUp={importIsSignUp}
-              fields={{
-                privateKeyOrSeed: true,
-                accountType: true,
-              }}
-              afterSubmitMessage={t("import.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              callback={getWalletStatus}
-            />
-          }
-        />
-        <Route
-          path={CREATE_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("create_or_derivate.title")}
-              onSubmitFn={createAccount}
-              buttonText={t("create_or_derivate.button_text")}
-              signUp={true}
-              afterSubmitMessage={t("create_or_derivate.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              generateSeed
-              callback={getWalletStatus}
-            />
-          }
-        />
-        <Route
-          path={RESTORE_PASSWORD}
-          element={
-            <AccountForm
-              title={t("restore.title")}
-              onSubmitFn={restorePassword}
-              buttonText={t("restore.button_text")}
-              resetPassword={true}
-              signUp={false}
-              fields={{
-                privateKeyOrSeed: true,
-              }}
-              afterSubmitMessage={t("restore.submit_message")}
-              goAfterSubmit={SIGNIN}
-              backButton
-              callback={getWalletStatus}
-            />
-          }
-        />
-        <Route
-          path={DERIVE_ACCOUNT}
-          element={
-            <AccountForm
-              title={t("create_or_derivate.title")}
-              onSubmitFn={!canDerive ? createAccount : deriveAccount}
-              signUp={false}
-              buttonText={t("create_or_derivate.button_text")}
-              fields={!canDerive ? {} : { accountType: true }}
-              afterSubmitMessage={t("create_or_derivate.submit_message")}
-              goAfterSubmit={BALANCE}
-              backButton
-              generateSeed={!canDerive}
-              callback={!canDerive ? getWalletStatus : () => null}
-            />
-          }
-        />
+        <Route path={BUY} element={<Buy />} />
+        <Route path={IMPORT_ACCOUNT} element={<ImportWallet />} />
+        <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
+        <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
+        <Route path={BALANCE_ACCOUNTS} element={<BalanceAccounts />} />
 
         {/* setting views */}
+        <Route path={SETTINGS} element={<Settings />} />
         <Route path={SETTINGS_GENERAL} element={<General />} />
-        <Route path={SETTINGS_ADVANCED} element={<Advanced />} />
         <Route path={SETTINGS_MANAGE_NETWORKS} element={<ManageNetworks />} />
-        <Route path={SETTINGS_CONTACTS} element={<Contacts />} />
+        <Route path={SETTINGS_CONTACTS} element={<AddressBook />} />
         <Route path={SETTINGS_SECURITY} element={<Security />} />
+        <Route path={SETTINGS_AUTOLOCK} element={<AutoLock />} />
         <Route path={SETTINGS_BUG} element={<BugReport />} />
-        <Route path={SETTINGS_ABOUT_US} element={<AboutUs />} />
 
         {/* {!isProduction && <Route path="/decrypt" element={<Decrypt />} />} */}
       </RRoutes>

@@ -50,6 +50,7 @@ describe("Network", () => {
 
     expect(network).toMatchObject({
       chain: null,
+      selectedChain: {},
     });
   });
 
@@ -59,16 +60,8 @@ describe("Network", () => {
     expect(network).toBe(undefined);
   });
 
-  it("should return default value", async () => {
-    const network = await Network.getDefaultValue();
-
-    expect(network).toMatchObject({
-      chain: null,
-    });
-  });
-
   it("should set new chain", async () => {
-    Network.getInstance().set(selectedEVMChainMock);
+    Network.getInstance().set({ ethereum: selectedEVMChainMock });
     const network = await Network.get();
 
     expect(network).toMatchObject(selectedEVMChainMock);
@@ -76,9 +69,9 @@ describe("Network", () => {
 
   it("should set new chain without static methods", async () => {
     const network = new Network();
-    network.set(selectedEVMChainMock);
+    network.set({ ethereum: selectedEVMChainMock });
     const savedNetwork = network.get();
 
-    expect(savedNetwork).toMatchObject(selectedEVMChainMock);
+    expect(savedNetwork).toMatchObject({ ethereum: selectedEVMChainMock });
   });
 });

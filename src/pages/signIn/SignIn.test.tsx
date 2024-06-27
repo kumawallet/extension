@@ -14,15 +14,11 @@ const renderComponent = () => {
 
 const navigate = vi.fn();
 const signIn = vi.fn();
+
 describe("SignIn", () => {
   beforeEach(() => {
     renderComponent();
 
-    vi.mock("@src/providers", () => ({
-      useThemeContext: () => ({
-        color: "red",
-      }),
-    }));
     vi.mock("react-router-dom", () => ({
       useNavigate: () => () => navigate(),
     }));
@@ -31,9 +27,7 @@ describe("SignIn", () => {
       messageAPI: {
         signIn: () => signIn(),
       },
-
-    }))
-
+    }));
   });
 
   it("should render", () => {

@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { Popover, Switch } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-import { useThemeContext } from "@src/providers";
 import { MdInfoOutline } from "react-icons/md";
 
 interface RecipientAddressProps {
@@ -54,7 +53,6 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
   infoTooltipMessage
 }) => {
   const { t } = useTranslation("swap");
-  const { color } = useThemeContext();
 
   return (
     <div className={containerClassName}>
@@ -68,7 +66,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
               <Switch
                 checked={isNotOwnAddress}
                 onChange={onTogleRecipient}
-                className={`${isNotOwnAddress ? `bg-${color}-primary` : "bg-custom-gray-bg"
+                className={`${isNotOwnAddress ? `bg-primary-default` : "bg-custom-gray-bg"
                   } relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200`}
               >
                 <span className="sr-only">{t("recipent_address")}</span>
@@ -89,7 +87,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
       <input
         type="text"
         disabled={isOptional && !isNotOwnAddress}
-        className="w-full bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold disabled:cursor-not-allowed disabled:opacity-50 rounded-xl py-3 px-4 outline-none focus:outline-none "
+        className="w-full bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold disabled:cursor-not-allowed disabled:opacity-50 rounded-lg py-3 px-4 outline-none focus:outline-none "
         value={address}
         onChange={(e) => onAddressChange(e.target.value)}
       />

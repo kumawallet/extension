@@ -1,17 +1,15 @@
-import {
-  RequestAddActivity,
-  RequestUpdateActivity,
-} from "@src/entries/background/handlers/request-types";
+import { RequestSetAccountToActivity } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
+import { Transaction } from "@src/types";
 
 export const activityMessages = {
-  getActivity: () => {
-    return sendMessage("pri(activity.getActivity)", null);
+  getHistoricActivity: () => {
+    return sendMessage("pri(activity.getHistoricActivity)");
   },
-  addActivity: (params: RequestAddActivity) => {
-    return sendMessage("pri(activity.addActivity)", params);
+  activitySubscribe: (cb: (value: Transaction[]) => void) => {
+    return sendMessage("pri(activity.activitySubscribe)", null, cb);
   },
-  updateActivity: (params: RequestUpdateActivity) => {
-    return sendMessage("pri(activity.updateActivity)", params);
+  setAccountToActivity: (params: RequestSetAccountToActivity) => {
+    return sendMessage("pri(activity.setAccountToActivity)", params);
   },
 };

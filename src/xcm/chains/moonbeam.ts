@@ -1,15 +1,11 @@
 import { numberToHex, u8aToHex } from "@polkadot/util";
 import { decodeAddress } from "@polkadot/util-crypto";
-import {
-  PARACHAINS,
-  POLKADOT_PARACHAINS,
-  RELAY_CHAINS,
-} from "@src/constants/chains";
+import { POLKADOT_PARACHAINS } from "@src/constants/chains";
 import xTokensAbi from "@src/abi/xtokens_moonbeam_abi.json";
 import { Map } from "../interfaces";
 
 export const MOONBEAM_EXTRINSICS: { [key: string]: Map } = {
-  [RELAY_CHAINS.POLKADOT]: ({ address, amount }) => {
+  polkadot: ({ address, amount }) => {
     const _address =
       "0x01" + u8aToHex(decodeAddress(address), undefined, false) + "00";
 
@@ -26,7 +22,7 @@ export const MOONBEAM_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.ASTAR]: ({ address, amount, assetSymbol }) => {
+  astar: ({ address, amount, assetSymbol }) => {
     const addressIsHex = address.startsWith("0x");
 
     const _address = addressIsHex
@@ -69,7 +65,7 @@ export const MOONBEAM_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  [PARACHAINS.ACALA]: ({ address, amount, assetSymbol }) => {
+  acala: ({ address, amount, assetSymbol }) => {
     const addressIsHex = address.startsWith("0x");
 
     const _address = addressIsHex
@@ -121,7 +117,7 @@ enum MOONBEAM_ASSETS {
 }
 
 export const MOONBEAM_ASSETS_MAPPING = {
-  [RELAY_CHAINS.POLKADOT]: [MOONBEAM_ASSETS.xcDOT],
-  [PARACHAINS.ASTAR]: [MOONBEAM_ASSETS.GLMR, MOONBEAM_ASSETS.xcASTR],
-  [PARACHAINS.ACALA]: [MOONBEAM_ASSETS.GLMR, MOONBEAM_ASSETS.xcACA],
+  polkadot: [MOONBEAM_ASSETS.xcDOT],
+  astar: [MOONBEAM_ASSETS.GLMR, MOONBEAM_ASSETS.xcASTR],
+  acala: [MOONBEAM_ASSETS.GLMR, MOONBEAM_ASSETS.xcACA],
 };

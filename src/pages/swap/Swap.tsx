@@ -1,11 +1,4 @@
-import {
-  Button,
-  InputErrorMessage,
-  // Loading,
-  PageWrapper,
-  ReEnterPassword,
-  TxInfo,
-} from "@src/components/common";
+import { Button, InputErrorMessage, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import {
   AssetAmountInput,
@@ -14,40 +7,26 @@ import {
   SwapInfo,
 } from "./components";
 import { HiMiniArrowsRightLeft } from "react-icons/hi2";
-import { useAssetContext, useThemeContext } from "@src/providers";
+import { useAssetContext } from "@src/providers";
 import { useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
 import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-// import { Tab } from "@headlessui/react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import debounce from "lodash.debounce";
 import { SwapAsset } from "./base";
-// import { TbExternalLink } from "react-icons/tb";
-
-// waiting, confirming, exchanging, sending, finished, failed, refunded, verifying
-// const chipColor: { [key: string]: string } = {
-//   ["failed"]: "bg-red-600",
-//   ["refunded"]: "bg-red-600",
-//   ["finished"]: "bg-green-600",
-//   ["waiting"]: "bg-yellow-600",
-// };
+import { SwapTxSummary } from "./components/SwapTxSummary";
+import { SelectAccount } from "../send/components/SelectAccount";
 
 export const Swap = () => {
   const { t } = useTranslation("swap");
-  const { color } = useThemeContext();
   const navigate = useNavigate();
 
   const {
     state: { isLoadingAssets },
   } = useAssetContext();
 
-  // const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // const TABS = [t("exchange"), t("my_exchanges")];
-
   const {
-    // activeSwaps,
     amounts,
     assetsToBuy,
     assetsToSell,
@@ -59,15 +38,12 @@ export const Swap = () => {
     handleRecipientChange,
     isCreatingSwap,
     isLoading,
-    // isLoadingActiveSwaps,
     isLoadingBuyAsset,
     isLoadingSellAsset,
-    isLoadingSellPairs,
     isValidWASMAddress,
     minSellAmount,
     mustConfirmTx,
     onBack,
-    onConfirmTx,
     recipient,
     sellBalanceError,
     setMaxAmout,
@@ -76,6 +52,9 @@ export const Swap = () => {
     swapInfoMessage,
     tx,
     txInfo,
+    onConfirmTx,
+    isPairValid,
+    setSenderAddress,
   } = useSwap();
 
   const canSend =
@@ -90,45 +69,34 @@ export const Swap = () => {
 
 
   return (
-    <PageWrapper contentClassName="h-full flex-1">
-      <ReEnterPassword />
-
+    <PageWrapper
+      contentClassName="h-full flex-1 "
+      innerContentClassName="flex flex-col !bg-[#212529]"
+    >
       {mustConfirmTx ? (
-        <TxInfo
-          addressFrom={tx.addressFrom}
-          addressBridge={tx.addressBridge}
-          addressTo={tx.addressTo}
-          amountFrom={tx.amountFrom}
-          amountBridge={tx.amountBridge}
-          amountTo={tx.amountTo}
-          assetFrom={tx.assetFrom}
-          assetBridge={tx.assetBridge}
-          assetTo={tx.assetTo}
-          chainFrom={tx.chainFrom}
-          chainBridge={tx.chainBridge}
-          chainTo={tx.chainTo}
-          fee={tx.fee}
-          isLoading={isLoading}
-          onConfirm={onConfirmTx}
-          onBack={onBack}
-        />
+        <SwapTxSummary tx={tx} onBack={onBack} onConfirm={onConfirmTx} />
       ) : (
         <>
-          <div className="flex gap-3 items-center mb-2">
+          <div className="flex gap-1 items-center mb-2">
             <FiChevronLeft
-              size={26}
-              className="cursor-pointer"
+              size={15}
+              className="cursor-pointer ml-[-0.3rem]"
               onClick={() => navigate(-1)}
             />
 
-            <p className="text-lg">{t("title")}</p>
+            <p className="text-base font-medium">{t("title")}</p>
           </div>
+
+          <SelectAccount
+            selectedAddress={tx.addressFrom}
+            onChangeValue={(value) => setSenderAddress(value)}
+          />
 
           <div className="flex flex-col h-[inherit]">
             <div className="flex-1 mt-4">
               <div className="flex justify-center items-center gap-3 pt-5">
                 <SelectableAsset
-                  buttonClassName={`border-${color}-primary`}
+                  buttonClassName={`border-prrimary-default`}
                   value={assetToSell as SwapAsset}
                   options={assetsToSell}
                   onChange={(asset) => handleAssetChange("sell", asset)}
@@ -145,15 +113,13 @@ export const Swap = () => {
                   onChange={(asset) => handleAssetChange("buy", asset)}
                   defaulValue={assetToBuy as SwapAsset}
                   label={t("transfer_to") as string}
-                  isLoading={
-                    isLoading || isLoadingSellPairs || isLoadingAssets
-                  }
+                  isLoading={isLoading || isLoadingAssets}
                   position="right"
                   isReadOnly={isCreatingSwap}
                 />
               </div>
 
-              <div className="flex flex-col gap-5 mt-6">
+              <div className="flex flex-col gap-3 mt-6">
                 <div>
                   <AssetAmountInput
                     minSellAmount={minSellAmount}
@@ -162,25 +128,22 @@ export const Swap = () => {
                     }
                     amount={amounts.sell}
                     balance={formatBN(
-                      assetToSell.balance?.toString() || "0",
-                      assetToSell.decimals,
+                      assetToSell?.balance?.toString() || "0",
+                      assetToSell?.decimals,
                       4
                     )}
                     hasMaxOption
                     label={t("you_send") as string}
                     onMax={setMaxAmout}
-                    onValueChange={(val) =>
-                      debouncedHandleAmount("sell", val)
-                    }
+                    onValueChange={(val) => debouncedHandleAmount("sell", val)}
                     isReadOnly={isCreatingSwap}
                     showBalance
+                    isPairValid={isPairValid}
                     selectableAsset={
                       <SelectableAsset
                         value={assetToSell as SwapAsset}
                         options={assetsToSell}
-                        onChange={(asset) =>
-                          handleAssetChange("sell", asset)
-                        }
+                        onChange={(asset) => handleAssetChange("sell", asset)}
                         isLoading={isLoading || isLoadingAssets}
                         defaulValue={assetToSell as SwapAsset}
                         containerClassName="flex-none w-[40%]"
@@ -190,43 +153,38 @@ export const Swap = () => {
                       />
                     }
                   />
-                  {!balanceIsSufficient && (
+                  {!balanceIsSufficient && isPairValid && (
                     <InputErrorMessage
                       message={
-                        sellBalanceError
-                          ? (t(sellBalanceError) as string)
-                          : ""
+                        sellBalanceError ? (t(sellBalanceError) as string) : ""
                       }
+                    />
+                  )}
+                  {!isPairValid && (
+                    <InputErrorMessage
+                      message={t("pair_not_supported") as string}
                     />
                   )}
                 </div>
 
                 <AssetAmountInput
-                  isLoading={
-                    isLoading || isLoadingBuyAsset || isLoadingAssets
-                  }
+                  isLoading={isLoading || isLoadingBuyAsset || isLoadingAssets}
                   amount={amounts.buy}
                   balance={formatBN(
-                    assetToBuy.balance?.toString() || "0",
-                    assetToBuy.decimals,
+                    assetToBuy?.balance?.toString() || "0",
+                    assetToBuy?.decimals,
                     4
                   )}
                   label={t("you_receive") as string}
-                  onValueChange={(asset) =>
-                    debouncedHandleAmount("buy", asset)
-                  }
+                  onValueChange={(asset) => debouncedHandleAmount("buy", asset)}
                   isReadOnly={isCreatingSwap}
                   showBalance={false}
                   selectableAsset={
                     <SelectableAsset
                       value={assetToBuy as SwapAsset}
                       options={assetsToBuy}
-                      isLoading={
-                        isLoading || isLoadingSellPairs || isLoadingAssets
-                      }
-                      onChange={(asset) =>
-                        handleAssetChange("buy", asset)
-                      }
+                      isLoading={isLoading || isLoadingAssets}
+                      onChange={(asset) => handleAssetChange("buy", asset)}
                       defaulValue={assetToBuy as SwapAsset}
                       containerClassName="flex-none w-[40%]"
                       buttonClassName="rounded-l-none bg-[#343a40] border-none border-l-[0.1px] border-l-[#727e8b17]"
@@ -240,12 +198,10 @@ export const Swap = () => {
               <div className="flex flex-col gap-2">
                 <RecipientAddress
                   recipentAddressFormat={
-                    showRecipientAddress
-                      ? assetToBuy.label?.toUpperCase()
-                      : ""
+                    showRecipientAddress ? assetToBuy?.label?.toUpperCase() : ""
                   }
                   isOptional={false}
-                  containerClassName="mt-4 mb-2"
+                  containerClassName="mt-4"
                   address={recipient.address}
                   isNotOwnAddress={recipient.isNotOwnAddress}
                   isValidAddress={isValidWASMAddress}
@@ -269,100 +225,11 @@ export const Swap = () => {
                 isLoadingSellAsset ||
                 isCreatingSwap
               }
-              classname={`font-medium text-base capitalize w-full py-2 bg-[#212529] hover:bg-${color}-primary mt-7 !mx-0`}
+              classname={`font-medium text-base capitalize w-full py-2 mt-4 !mx-0`}
               onClick={swap}
             >
               {t("proceed")}
             </Button>
-            {/* <Tab.Group
-              selectedIndex={selectedIndex}
-              onChange={setSelectedIndex}
-            >
-              <Tab.List className={`flex space-x-1 p-1 mt-3`}>
-                {TABS.map((tab) => (
-                  <Tab
-                    key={tab}
-                    className={({ selected }) =>
-                      `px-4 text-base md:text-xl py-1 focus:outline-none relative w-full ${selected
-                        ? `text-${color}-primary active-tab after:bg-${color}-fill`
-                        : "text-white"
-                      }`
-                    }
-                  >
-                    {tab}
-                  </Tab>
-                ))}
-              </Tab.List>
-              <Tab.Panels className="mt-5 px-4">
-                <Tab.Panel key={0}>
-
-                </Tab.Panel>
-                <Tab.Panel key={1}>
-                  {isLoadingActiveSwaps ? (
-                    <Loading />
-                  ) : (
-                    <div className="flex flex-col gap-3">
-                      {activeSwaps.map((swap) => (
-                        <div
-                          key={swap.id}
-                          className="p-2 rounded-xl bg-[#727e8b17]"
-                        >
-                          <div className="flex justify-center gap-2">
-                            <div className="flex items-center gap-1">
-                              <div className="flex flex-col gap-1 items-center">
-                                <img
-                                  src={swap.iconFrom || ""}
-                                  className="w-8 h-8"
-                                />
-                                <p>
-                                  {`${swap.amountFrom
-                                    } ${swap?.currencyFrom?.toUpperCase()}`}
-                                </p>
-                              </div>
-                              <HiMiniArrowRight size={20} />
-                              <div className="flex flex-col gap-1 items-center">
-                                <img
-                                  src={swap.iconTo || ""}
-                                  className="w-8 h-8"
-                                />
-                                <p>
-                                  {`${swap.amountTo
-                                    } ${swap?.currencyTo?.toUpperCase()}`}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="mb-3 flex flex-col gap-3">
-                            <p>
-                              id:
-                              <a
-                                className="hover:bg-slate-400/20 rounded-xl p-1 inline-flex gap-1 items-center"
-                                href={`https://stealthex.io/exchange/?id=${swap.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {swap.id}
-                                <TbExternalLink />
-                              </a>
-                            </p>
-                            <p className="flex items-center gap-2">
-                              status:
-                              <span
-                                className={`rounded-xl p-1 ${chipColor[swap.status] || "bg-yellow-600"
-                                  }`}
-                              >
-                                {swap.status}
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Tab.Panel>
-              </Tab.Panels>
-            </Tab.Group> */}
           </div>
         </>
       )}

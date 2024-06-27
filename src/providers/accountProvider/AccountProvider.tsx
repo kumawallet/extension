@@ -8,11 +8,8 @@ import {
   useReducer,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { AccountFormType } from "@src/pages";
 import { useToast } from "@src/hooks";
 import { useNetworkContext } from "../networkProvider/NetworkProvider";
-import { transformAddress } from "@src/utils/account-utils";
-import { DEFAULT_WASM_CHAIN, DEFAULT_EVM_CHAIN } from "@src/constants/chains";
 import Account from "@src/storage/entities/Account";
 import { AccountKey, AccountType } from "@src/accounts/types";
 import { Action, AccountContext, InitialState } from "./types";
@@ -22,7 +19,7 @@ import { messageAPI } from "@src/messageAPI/api";
 const initialState: InitialState = {
   accounts: [],
   isLoadingAccounts: true,
-  selectedAccount: {} as Account,
+  selectedAccount: null,
 };
 
 const AccountContext = createContext({} as AccountContext);
@@ -53,22 +50,29 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         ...state,
         selectedAccount: {
           ...state.selectedAccount,
+          // @ts-expect-error -- *
+
           value: {
-            ...state.selectedAccount.value,
+            ...state.selectedAccount!.value,
             address,
           },
         },
       };
     }
     case "update-account-name": {
-      const { name } = action.payload;
+      const { name, accountKey } = action.payload;
       const {
-        selectedAccount: { key },
+        selectedAccount,
       } = state;
+
+      const { key, value } = selectedAccount || {};
+
+      const newName = accountKey === key ? name : value?.name;
       return {
         ...state,
+        // @ts-expect-error -- *
         accounts: state.accounts.map((account) => {
-          if (account.key === key) {
+          if (account.key === accountKey) {
             return {
               ...account,
               value: {
@@ -81,11 +85,24 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
         }),
         selectedAccount: {
           ...state.selectedAccount,
+          // @ts-expect-error -- *
+
           value: {
-            ...state.selectedAccount.value,
-            name,
+            ...state.selectedAccount!.value,
+            name: newName as string,
           },
         },
+      };
+    }
+    case "delete-account": {
+      const { key } = action.payload;
+      const allAccounts = state.accounts;
+
+      const resultAccounts = allAccounts.filter((account) => account.key !== key)
+      return {
+        ...state,
+        accounts: resultAccounts,
+        selectedAccount: resultAccounts[0]
       };
     }
     default:
@@ -94,28 +111,20 @@ export const reducer = (state: InitialState, action: Action): InitialState => {
 };
 
 export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
-
-
   const {
-    state: { selectedChain, rpc },
-    setNewRpc,
-    setSelectNetwork,
+    state: { selectedChain },
   } = useNetworkContext();
   const { t: tCommon } = useTranslation("common");
   const { showErrorToast } = useToast();
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const getImportedType = (type: AccountType) => {
-    if (type === AccountType.EVM) return AccountType.IMPORTED_EVM;
-    if (type === AccountType.WASM) return AccountType.IMPORTED_WASM;
-    return type;
-  };
 
-  const getAllAccounts = async (type: AccountType[] | null = null) => {
+  const getAllAccounts = async () => {
     try {
-      const _type = type || selectedChain?.supportedAccounts;
-      const accounts = await messageAPI.getAllAccounts(_type);
+      const accounts = await messageAPI.getAllAccounts({
+        type: null,
+      });
       dispatch({
         type: "set-accounts",
         payload: {
@@ -137,6 +146,7 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         type: "update-account-name",
         payload: {
           name,
+          accountKey
         },
       });
     } catch (error) {
@@ -145,63 +155,51 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const getSelectedAccount = async () => {
+  const deleteAccount = async (key: AccountKey) => {
     try {
-
-      const selectedAccount = await messageAPI.getSelectedAccount();
-
-      if (!selectedAccount) return null;
-
-      const { chain: selectedChain } = await messageAPI.getNetwork();
-
-      // for first time when there is no default chain selected
-      if (!selectedChain) {
-        const selectedAccountIsWasm = selectedAccount?.key.includes("WASM");
-        setSelectNetwork(
-          selectedAccountIsWasm ? DEFAULT_WASM_CHAIN : DEFAULT_EVM_CHAIN
-        );
-      }
-
-      dispatch({
-        type: "set-selected-account",
-        payload: {
-          selectedAccount: {
-            ...selectedAccount,
-            value: {
-              ...selectedAccount?.value,
-              address: transformAddress(
-                selectedAccount?.value?.address as string,
-                selectedChain?.addressPrefix
-              ),
-            },
+      await messageAPI.removeAccount({ key: key });
+      const allAccounts = state.accounts;
+      if (allAccounts.length > 1) {
+        dispatch({
+          type: "delete-account",
+          payload: {
+            key,
           },
-        },
-      });
-
-      return selectedAccount;
+        });
+        return "successful";
+      }
+      else {
+        return null;
+      }
     } catch (error) {
       captureError(error);
-      showErrorToast(tCommon(error as string));
+      showErrorToast(tCommon("failed_to_update_account"));
     }
   };
 
-  const setSelectedAccount = async (account: Account, changeRpc = true) => {
+  const getSelectedAccount = async () => {
+    const selectedAccount = await messageAPI.getSelectedAccount();
+
+    if (!selectedAccount) return null;
+
+    dispatch({
+      type: "set-selected-account",
+      payload: {
+        selectedAccount: selectedAccount,
+      },
+    });
+
+    return selectedAccount;
+
+  };
+
+  const setSelectedAccount = async (account: Account | null) => {
     try {
       await messageAPI.setSelectedAccount(account);
-      changeRpc && (await setNewRpc(account.type));
       dispatch({
         type: "set-selected-account",
         payload: {
-          selectedAccount: {
-            ...account,
-            value: {
-              ...account?.value,
-              address: transformAddress(
-                account?.value?.address as string,
-                selectedChain?.addressPrefix
-              ),
-            },
-          },
+          selectedAccount: account ? account : null,
         },
       });
     } catch (error) {
@@ -210,49 +208,65 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  const deriveAccount = useCallback(async (account: AccountFormType) => {
-    try {
-      const isSessionActive = await messageAPI.isSessionActive();
-      if (!isSessionActive) throw new Error("login_required");
-      if (!account.accountType) throw new Error("account_type_required");
-      await messageAPI.deriveAccount({
-        name: account.name,
-        type: account.accountType,
-      });
-      await getSelectedAccount();
-      return true;
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon("failed_to_derive_account"));
-      return false;
-    }
-  }, []);
+  const deriveAccount = useCallback(
+    async (account: { name: string; accountType: AccountType, address: string }) => {
+      try {
+        const isSessionActive = await messageAPI.isSessionActive();
+        if (!isSessionActive) throw new Error("login_required");
+        if (!account.accountType) throw new Error("account_type_required");
+        await messageAPI.deriveAccount({
+          name: account.name,
+          type: account.accountType,
+          address: account.address
+        });
+        await getSelectedAccount();
+        return true;
+      } catch (error) {
+        captureError(error);
+        showErrorToast(tCommon("failed_to_derive_account"));
+        return false;
+      }
+    },
+    []
+  );
 
-  const importAccount = useCallback(async (account: AccountFormType) => {
+  const importAccount = useCallback(async (account: {
+    name: string;
+    privateKeyOrSeed: string;
+    password: string;
+    accountTypesToImport: AccountType[];
+    isSignUp: boolean;
+  }) => {
     try {
       const isSessionActive = await messageAPI.isSessionActive();
-      if (!account.password && !isSessionActive) throw new Error("password_required");
-      if (!account.privateKeyOrSeed) throw new Error("private_key_or_seed_required");
-      if (!account.accountType) throw new Error("account_type_required");
-      const type = getImportedType(account.accountType);
+
+      if (!isSessionActive && !account.password)
+        throw new Error("password_required");
+      if (!account.privateKeyOrSeed)
+        throw new Error("private_key_or_seed_required");
+
       await messageAPI.importAccount({
         name: account.name,
         privateKeyOrSeed: account.privateKeyOrSeed,
         password: account.password,
-        type,
+        accountTypesToImport: account.accountTypesToImport,
         isSignUp: account.isSignUp,
       });
       await getSelectedAccount();
       return true;
     } catch (error) {
-      console.error("import account error")
       captureError(error);
-      showErrorToast(tCommon("failed_to_import_account"));
-      return false
+      showErrorToast(tCommon(error as string));
+      return false;
     }
   }, []);
 
-  const createAccount = useCallback(async (account: AccountFormType) => {
+  const createAccount = useCallback(async (account: {
+    name: string;
+    seed: string;
+    password: string;
+    isSignUp: boolean;
+  }) => {
     try {
       if (!account.seed) throw new Error("seed_required");
       await messageAPI.createAccounts({
@@ -271,30 +285,15 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
 
-  const restorePassword = useCallback(async ({
-    privateKeyOrSeed,
-    password: newPassword,
-  }: AccountFormType) => {
-    try {
-      if (!privateKeyOrSeed) throw new Error("recovery_phrase_required");
-      if (!newPassword) throw new Error("password_required");
-      await messageAPI.restorePassword({
-        privateKeyOrSeed,
-        newPassword
-      });
-      return true;
-    } catch (error) {
-      captureError(error);
-      showErrorToast(tCommon("failed_to_restore_password"));
-      return false;
-    }
-  }, []);
-
   useEffect(() => {
-    if (rpc) {
+    if (Object.keys(selectedChain).length > 0) {
       getSelectedAccount();
     }
-  }, [rpc]);
+  }, [selectedChain]);
+
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
 
   return (
     <AccountContext.Provider
@@ -307,7 +306,8 @@ export const AccountProvider: FC<PropsWithChildren> = ({ children }) => {
         importAccount,
         createAccount,
         updateAccountName,
-        restorePassword,
+        deleteAccount,
+
       }}
     >
       {children}

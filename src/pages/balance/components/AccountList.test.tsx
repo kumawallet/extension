@@ -1,16 +1,15 @@
-import { accountsMocks } from "@src/tests/mocks/account-mocks";
 import i18n from "@src/utils/i18n";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { AccountList } from "./AccountList";
+import { ACCOUNTS_MOCKS, POLKADOT_ACCOUNT_MOCK } from "@src/tests/mocks/account-mocks";
 
-const renderCoponent = () => {
+const functionsMocks = {
+  getAllAccounts: vi.fn(),
+  setSelectedAccount: vi.fn(),
+};
+
+const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
       <AccountList />
@@ -20,108 +19,137 @@ const renderCoponent = () => {
 
 describe("AccountList", () => {
   beforeAll(() => {
-    vi.mock("ethers", () => ({
-      ethers: {
-        providers: {
-          JsonRpcProvider: vi.fn().mockResolvedValue({ getBalance: () => 0 }),
-        },
-      },
-      BigNumber: {
-        from: vi.fn().mockReturnValue(0),
-      },
-    }));
-    vi.mock("@polkadot/api", () => ({
-      ApiPromise: {
-        create: vi.fn().mockResolvedValue({ query: () => 0 }),
-      },
-      WsProvider: vi.fn(),
-    }));
     vi.mock("@src/providers", () => ({
-      useAccountContext: vi.fn().mockReturnValue({
+      useAccountContext: vi.fn(() => ({
+        getAllAccounts: () => functionsMocks.getAllAccounts(),
+        setSelectedAccount: () => functionsMocks.setSelectedAccount(),
         state: {
-          selectedAccount: {
-            value: {
-              address: "0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
-            },
-          },
-          accounts: [
-            {
-              key: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
-              value: {
-                address: "0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
-                keyring: "EVM-0x041fA537c4Fab3d7B91f67B358c126d37CBDa947",
-                name: "asd",
-              },
-              type: "EVM",
-            },
-          ],
+          accounts: ACCOUNTS_MOCKS,
+          setSelectedAccount: POLKADOT_ACCOUNT_MOCK,
         },
-        getSelectedAccount: vi.fn(),
-        getAllAccounts: vi.fn(),
-      }),
-      useNetworkContext: vi.fn().mockReturnValue({
-        state: {
-          rpc: "ws://1234",
-          selectedChain: {
-            name: "Ehetereum",
-          },
-          type: "wasm",
-          api: {
-            query: {},
-          },
-        },
-      }),
-      useThemeContext: () => ({
-        color: "red",
-      }),
+      })),
     }));
 
-    vi.mock("@src/hooks", () => ({
-      useToast: vi.fn().mockReturnValue({
-        showErrorToast: vi.fn(),
-      }),
+    vi.mock("./CreateWalletFromInside", () => ({
+      CreateWalletFromInside: () => (
+        <div data-testid="CreateWalletFromInside" />
+      ),
     }));
 
-    vi.mock("@src/utils/assets", async () => ({
-      formatAmountWithDecimals: vi.fn().mockReturnValue(0),
-      getNatitveAssetBalance: vi.fn().mockReturnValue(10),
-      getAssetUSDPrice: vi.fn().mockReturnValue(8.9),
+    vi.mock("./ImportWalletFromInside", () => ({
+      ImportWalletFromInside: () => (
+        <div data-testid="ImportWalletFromInside" />
+      ),
     }));
 
-    vi.mock("react-router-dom", () => ({
-      useNavigate: () => vi.fn(),
+    vi.mock("./AccountDetails", () => ({
+      AccountDetails: () => <div data-testid="AccountDetails" />,
     }));
-
-    vi.mock("@src/utils/env", () => ({
-      version: "1.0.0",
-      getWebAPI: () => ({
-        tabs: {
-          getCurrent: () => Promise.resolve(undefined),
-          create: () => vi.fn(),
-        },
-        runtime: {
-          getURL: vi.fn(),
-          connect: vi.fn().mockReturnValue({
-            onMessage: {
-              addListener: vi.fn(),
-            },
-          }),
-        },
-      }),
-    }))
   });
 
-  it("should render accounts", async () => {
-    renderCoponent();
-
-    const button = screen.getByTestId("account-button");
-
-    await act(() => {
-      fireEvent.click(button);
+  describe("render", () => {
+    it("should render", () => {
+      const { container } = renderComponent();
+      expect(container).toBeDefined();
     });
-    waitFor(() => {
-      const account = screen.getByText(accountsMocks[0].value.name);
-      expect(account).toBeDefined();
+  });
+
+  describe("account list", () => {
+    it("should open all accounts", async () => {
+      const { getByTestId } = renderComponent();
+
+      const accountButton = getByTestId("account-button");
+
+      fireEvent.click(accountButton);
+
+      await waitFor(() => {
+        const walletList = getByTestId("wallet-list");
+        expect(Array.from(walletList.children).length).toBe(3);
+      });
+    });
+
+    it("should set new account", async () => {
+      const { getByTestId } = renderComponent();
+
+      const accountButton = getByTestId("account-button");
+
+      fireEvent.click(accountButton);
+
+      await waitFor(() => {
+        const walletList = getByTestId("wallet-list");
+        expect(Array.from(walletList.children).length).toBe(3);
+      });
+
+      const walletList = getByTestId("wallet-list");
+
+      fireEvent.click(walletList.children[0].children[0]);
+
+      expect(functionsMocks.setSelectedAccount).toHaveBeenCalled();
+    });
+  });
+
+  describe("action select", () => {
+    it("should call create option", async () => {
+      const { getByTestId } = renderComponent();
+
+      const accountButton = getByTestId("account-button");
+
+      fireEvent.click(accountButton);
+
+      await waitFor(() => {
+        const walletList = getByTestId("wallet-list");
+        expect(Array.from(walletList.children).length).toBe(3);
+      });
+
+      const createButton = getByTestId("create-button");
+
+      fireEvent.click(createButton);
+
+      await waitFor(() => {
+        expect(getByTestId("CreateWalletFromInside")).toBeDefined();
+      });
+    });
+
+    it("should call import option", async () => {
+      const { getByTestId } = renderComponent();
+
+      const accountButton = getByTestId("account-button");
+
+      fireEvent.click(accountButton);
+
+      await waitFor(() => {
+        const walletList = getByTestId("wallet-list");
+        expect(Array.from(walletList.children).length).toBe(3);
+      });
+
+      const createButton = getByTestId("import-button");
+
+      fireEvent.click(createButton);
+
+      await waitFor(() => {
+        expect(getByTestId("ImportWalletFromInside")).toBeDefined();
+      });
+    });
+
+    it("should call details option", async () => {
+      const { getByTestId, getAllByTestId } = renderComponent();
+
+      const accountButton = getByTestId("account-button");
+
+      fireEvent.click(accountButton);
+
+      await waitFor(() => {
+        const walletList = getByTestId("wallet-list");
+        expect(Array.from(walletList.children).length).toBe(3);
+      });
+
+      const detailsButton = getAllByTestId("details");
+
+      fireEvent.click(detailsButton[0]);
+
+      await waitFor(() => {
+        expect(getByTestId("AccountDetails")).toBeDefined();
+      });
     });
   });
 });

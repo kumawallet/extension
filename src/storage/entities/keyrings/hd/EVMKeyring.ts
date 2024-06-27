@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { HDNodeWallet } from "ethers";
 import HDKeyring from "./HDKeyring";
 import { AccountType } from "@src/accounts/types";
 import { HDKeyPair, SupportedKeyring } from "../types";
@@ -10,12 +10,13 @@ export default class EVMKeyring extends HDKeyring {
     return `m/44'/60'/0'/0/${this.getAccountIndex()}`;
   }
 
-  isMnemonicValid(mnemonic: string): boolean {
-    return ethers.utils.isValidMnemonic(mnemonic);
-  }
-
-  getAddress(path: string): string {
-    return ethers.Wallet.fromMnemonic(this.mnemonic, path)?.address;
+  async getAddress(seed: string, path?: number): Promise<string> {
+    const wallet = HDNodeWallet.fromPhrase(
+      seed,
+      undefined,
+      `m/44'/60'/0'/0/${path || 0}`
+    );
+    return wallet.address;
   }
 
   getKey(address: string): string {
@@ -23,7 +24,16 @@ export default class EVMKeyring extends HDKeyring {
     if (!keyPair) {
       throw new Error("Key pair not found");
     }
-    return ethers.Wallet.fromMnemonic(this.mnemonic, keyPair.path)?.privateKey;
+    return keyPair.key;
+  }
+
+  getDerivedPath(seed: string, path: number): string {
+    const wallet = HDNodeWallet.fromPhrase(
+      seed,
+      undefined,
+      `m/44'/60'/0'/0/${path || 0}`
+    );
+    return wallet.privateKey;
   }
 
   addKeyPair(address: string, keyPair: HDKeyPair): void {
@@ -34,8 +44,8 @@ export default class EVMKeyring extends HDKeyring {
     const { mnemonic, keyPairs } = json as HDKeyring;
     const keyring = new EVMKeyring(mnemonic);
     Object.keys(keyPairs).forEach((address) => {
-      const { path } = keyPairs[address];
-      keyring.addKeyPair(address, { path });
+      const { path, key } = keyPairs[address];
+      keyring.addKeyPair(address, { path, key });
     });
     return keyring;
   }

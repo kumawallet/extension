@@ -1,4 +1,4 @@
-import { getWebAPI } from "./env";
+import { Browser } from "./constants";
 
 export const formatDate = (date: number) => {
   const d = new Date(date);
@@ -52,9 +52,7 @@ export const makeQuerys = (params: Record<string, string>) => {
 };
 
 export const isInPopup = function () {
-  const API = getWebAPI();
-
-  return API != undefined && API.extension
-    ? API.extension.getViews({ type: "popup" }).length > 0
+  return Browser != undefined && Browser.extension
+    ? Browser.extension.getViews({ type: "popup" }).length > 0
     : null;
 };

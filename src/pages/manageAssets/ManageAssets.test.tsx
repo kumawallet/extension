@@ -2,9 +2,9 @@ import i18n from "@src/utils/i18n";
 import { act, fireEvent, render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ManageAssets } from "./ManageAssets";
-import { CHAINS } from "@src/constants/chains";
 import { AccountType } from "@src/accounts/types";
 import { en } from "@src/i18n";
+import { EVM_CHAINS } from "@src/constants/chainsData";
 
 const renderComponent = () => {
   return render(
@@ -13,6 +13,7 @@ const renderComponent = () => {
     </I18nextProvider>
   );
 };
+
 
 const showErrorToast = vi.fn();
 const addAsset = vi.fn();
@@ -25,13 +26,16 @@ describe("ManageAssets", () => {
       }),
       useNetworkContext: () => ({
         state: {
-          selectedChain: CHAINS[0].chains[3],
+          selectedChain: { "ethereum": EVM_CHAINS[0] },
           type: AccountType.EVM,
-          api: null
+          api: null,
+          chains: [
+            {
+              title: "evm_based",
+              chains: EVM_CHAINS.filter((chain) => !chain.isTestnet),
+            },
+          ]
         },
-      }),
-      useThemeContext: () => ({
-        color: "red",
       }),
       useAccountContext: () => ({
         state: {
@@ -50,7 +54,6 @@ describe("ManageAssets", () => {
       }
     }))
 
-    vi.mock("@src/Extension");
 
     vi.mock("@src/hooks", () => ({
       useToast: vi.fn().mockReturnValue({
@@ -67,6 +70,7 @@ describe("ManageAssets", () => {
   it("should fill the form and submit", async () => {
     const { getByText, getByTestId } = renderComponent();
 
+    const chainInput = getByTestId("chain");
     const addressInput = getByTestId("address");
     const symbolInput = getByTestId("symbol");
     const decimalsInput = getByTestId("decimals");
@@ -79,6 +83,7 @@ describe("ManageAssets", () => {
     expect(submitButton).toBeDefined();
 
     await act(() => {
+      fireEvent.change(chainInput, { target: { value: "ethereum" } });
       fireEvent.change(addressInput, {
         target: { value: "0xdac17f958d2ee523a2206206994597c13d831ec7" },
       });
@@ -99,6 +104,7 @@ describe("ManageAssets", () => {
     Default.messageAPI.addAsset = vi.fn().mockRejectedValue(new Error("error"));
     const { getByText, getByTestId } = renderComponent();
 
+    const chainInput = getByTestId("chain");
     const addressInput = getByTestId("address");
     const symbolInput = getByTestId("symbol");
     const decimalsInput = getByTestId("decimals");
@@ -111,6 +117,7 @@ describe("ManageAssets", () => {
     expect(submitButton).toBeDefined();
 
     await act(() => {
+      fireEvent.change(chainInput, { target: { value: "ethereum" } });
       fireEvent.change(addressInput, {
         target: { value: "0xdac17f958d2ee523a2206206994597c13d831ec7" },
       });

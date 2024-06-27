@@ -10,6 +10,8 @@ export default abstract class ImportedKeyring extends Keyring {
     this.keyPairs = {};
   }
 
+  abstract getDerivedPath(seed: string, path: number): string;
+
   getKey(address: string): string {
     const keyPair = this.keyPairs[address] as KeyPair;
     if (!keyPair) {
@@ -21,5 +23,5 @@ export default abstract class ImportedKeyring extends Keyring {
   abstract getImportedData(
     key: string,
     type: AccountType
-  ): Promise<{ address: string; keyPair: KeyPair }>;
+  ): Promise<{ address: string; keyPair: KeyPair; isDerivable: boolean }>;
 }

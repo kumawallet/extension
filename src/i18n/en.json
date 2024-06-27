@@ -33,61 +33,97 @@
     "accounts_not_found": "Accounts not found",
     "network_not_found": "Network not found",
     "contact_not_found": "Contact not found",
-    "no_contacts_found": "No contacts found",
+    "no_contacts_found": "No contacts added yet",
     "error": "An error has occurred",
-    "rpc_error": "Network error"
+    "rpc_error": "Network error",
+    "copy_to_clipboard": "Copy to clipboard",
+    "success": "Successful operation",
+    "account_already_exists": "Account already exists"
   },
   "welcome": {
-    "welcome_message": "Welcome to Kuma",
-    "description": "Let's set you up!",
-    "button_text": "Get started",
+    "welcome_message": "Your friendly multichain wallet to explore blockchain",
+    "description": "Choose how you want to set up your wallet",
     "import_wallet": "Import wallet",
     "create_wallet": "Create wallet"
   },
   "sign_in": {
-    "welcome": "Welcome back",
-    "description": "to your friendly crypto wallet",
-    "password_placeholder": "Type your password",
+    "welcome": "Welcome back!",
+    "description": "Explore the cryptoverse.",
+    "password_placeholder": "Enter password",
     "signin_button_text": "Unlock",
-    "forgot_password": "Forgot password?"
+    "forgot_password": "Whoops! Forgot your password?"
+  },
+  "forgot_pass" : {
+    "title": "Forgot password",
+    "paragraph_1" : "Kuma does not keep a copy of your password. If you’re having trouble unlocking your account, you will need to reset your wallet. ",
+    "paragraph_2" : "This action will delete your current wallet and Secret Recovery Phrase from this device, along with the list of accounts you’ve curated. After resetting with a Secret Recovery Phrase, you’ll see a list of accounts based on the Secret Recovery Phrase you use to reset. This new list will automatically include accounts that have a balance.",
+    "paragraph_3" : "If you have any doubts you can find more information on our ",
+    "docs" : "docs",
+    "confirmation": "Yes,I understand",
+    "reset": "Reset wallet" 
   },
   "account_form": {
-    "import": {
-      "title": "Import Account",
-      "button_text": "Import",
-      "submit_message": "Account imported"
-    },
-    "create_or_derivate": {
-      "title": "Create Account",
-      "button_text": "Create",
-      "submit_message": "Account created"
-    },
     "restore": {
       "title": "Reset Password",
       "button_text": "Restore",
       "submit_message": "Password restored"
     },
-    "form": {
-      "continue_button_text": "Continue",
-      "recovery_phrase_warning": "This is the key to your account and the only way to regain access to it in case you forgot your password. Make sure to save it in a safe place as you won't be able to see it again.",
-      "account_type": "Account type",
-      "private_key": "Private key",
-      "private_key_validation": "Invalid Private Key",
-      "seed_phrase": "Seed Phrase",
-      "seed_phrase_validation": "Invalid Seed Phrase",
-      "recovery_phrase": "Recovery Phrase",
-      "account_name": "Account Name (optional)",
-      "account_name_placeholder": "Max 32 characters",
-      "password": "Password",
-      "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
-      "confirm_password": "Confirm password",
-      "confirm_password_requirements": "Passwords don't match.",
-      "required": "Required",
-      "confirm_recovery_phrase": "Confirm recovery phrase",
-      "confirm_recovery_phrase_description": "Please confirm your recovery phrase by dragging the words in the correct order.",
-      "next": "Next"
-    }
+    "create_password_title": "Create password",
+    "create_password_description": "Enter your password to create a seed for your recovery phrase.",
+    "enter_password": "Enter password",
+    "re_enter_password": "Re-enter password",
+    "i_agree": "I agree to the",
+    "terms_of_service": "Terms of Service",
+    "recovery_phrase_title": "Recovery phrase",
+    "recovery_phrase_description": "Your secret recovery phrase is used to recover your crypto. \n\nSave these 12 words in a secure location, such as a password manager, and never share them with anyone.",
+    "confirm_recovery_phrase_title": "You saved it, right ?",
+    "confirm_recovery_phrase_description": "Verify that you saved your secret recovery phrase by completing the missing words in the right order.",
+    "import_account_title": "Import Account",
+    "import_account_description": "Choose your preferred way to import an account.",
+    "import_account_warning": "Please note that substrate based accounts only can be imported from seed phrases.",
+    "import_from_seed_phrase": "Import from seed phrase",
+    "import_from_private_key": "Import by private key",
+    "import_from_recovery_phrase_title": "Paste recovery phrase",
+    "import_from_recovery_phrase_description": "Type your recovery phrase below",
+    "import_from_private_key_title": "Paste private key",
+    "import_from_private_key_description": "Enter your private key to import an existing wallett.",
+    "12_words": "12 words",
+    "24_words": "24 words",
+    "show_recovery_phrase": "Show recovery phrase",
+    "congrats_title": "Congrats!",
+    "congrats_description": "Your wallet is ready. GO!",
+    "continue": "Continue",
+    "create_wallet": "Create wallet",
+    "finish": "Finish",
+    "exit": "Exit",
+    "import": "Import",
+    "home": "Home",
+    "invalid_seed": "Invalid seed phrase",
+    "invalid_private_key": "Invalid private key",
+    "confirm_password_requirements": "Passwords do not match",
+    "password_requirements": "The password must contain at least eight characters, at least one number, both lower and uppercase letters and special characters.",
+    "password_requirements_error": "the password does not meet the requirements",
+    "private_key": "Private key",
+    "back": "Back",
+    "create_new_account": "Create new account",
+    "create_with_new_seed_phrase": "Create with a new seed phrase",
+    "derive_from_existing_account": "Derive from an existing account",
+    "accounts": "Accounts",
+    "derive_description": "Choose an account to derive from",
+    "private_key_placeholder": "Enter private key"
   },
+  "account": {
+    "title": "Account detail",
+    "delete_message": "Are you sure you want to delete this account?",
+    "account": "Account: ",
+    "address": "Address",
+    "private_key": "Private key",
+    "seed_phrase": "Seed phrase",
+    "private_alert": "Please note that anyone with your seed phrase can steal assets from your account",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "view_explorer": "View Explorer"
+  },  
   "balance": {
     "chain_selector": {
       "connected": "connected",
@@ -100,13 +136,16 @@
       "mainnets": "Mainnets",
       "testnets": "Testnets",
       "custom": "Custom",
-      "search": "Search by name"
+      "search": "Search",
+      "title": "Networks",
+      "description": "Enable networks you wish to visualize your assets on"
     },
     "accounts": {
       "accounts": "Accounts",
-      "import": "Import",
-      "create": "Create"
-    },
+      "import": "Import account",
+      "create": "Create account",
+      "all_accounts" : "All Accounts"
+    },  
     "send": "Send",
     "swap": "Swap",
     "buy": "Buy",
@@ -114,17 +153,28 @@
     "assets": "Assets",
     "activity": "Activity",
     "show_all_assets": "Show all assets",
-    "manage_assets": "Manage assets"
+    "manage_assets": "Manage assets",
+    "wasm_based": "Substrate based",
+    "evm_based": "EVM",
+    "wasm_based_testnets": "Substrate based testnets",
+    "evm_based_testnets": "EVM testnets"
   },
   "settings": {
     "title": "Settings",
     "general": "General",
     "advanced": "Advanced",
     "contacts": "Contacts",
+    "address_book" : "Address book",
     "security": "Security",
+    "autolock": {
+      "title": "Set auto-lock time",
+      "minutes" : "min"
+        },
     "bug_report": "Bug report",
     "about_us": "About us",
-    "sign_out": "Sign out"
+    "sign_out": "Sign out",
+    "webside": "Webside"
+    
   },
   "general_settings": {
     "title": "General",
@@ -153,21 +203,46 @@
     "explorer_evm_placeholder": "i.e. https://etherscan.io/tx/",
     "explorer_wasm_placeholder": "i.e. https://polkascan.io/pre/kusama/transaction/"
   },
-  "contacts": {
-    "title": "Contacts",
+  "address_book": {
+    "title": "Address Book",
     "name": "Name",
     "address": "Address",
     "save_contact": "Save contact",
-    "insert_name": "Insert contact name",
-    "insert_address": "Insert address",
-    "search": "Search contacts by name or address",
-    "new_contact": "New contact",
-    "required": "Required"
+    "add_new_address": "Add new address",
+    "update_contact": "Edit Contact",
+    "insert_name": "Name",
+    "insert_address": "Address",
+    "search": "Search",
+    "new_contact": "Add Address",
+    "required": "Required",
+    "my_contacts" : "My Contacts"
   },
   "activity": {
     "title": "Activity",
     "empty": "No activity yet",
-    "search": "Search by transaction hash or address"
+    "search": "Search",
+    "send": "Send",
+    "swap": "Swap",
+    "receive": "Receive",
+    "select_account":"Select Account"
+  },
+  "activity_details":{
+    "title": "Transaction detail",
+    "xcm": "Transfer executed using XCM",
+    "explorer": "View on block explorer",
+    "hash" : "Hash",
+    "type" : "Type",
+    "status" :{ 
+      "name": "Status",
+      "complete": "Complete",
+      "failed": "Failed",
+      "in_process" : "In Process"},
+    "sender": "Sender",
+    "recipient" : "Recipient",
+    "network" : "Network",
+    "amount": "Amount",
+    "estimeted_fee" : "Estimated fee",
+    "tip" : "Tip"
   },
   "receive": {
     "title": "Share your address"
@@ -185,31 +260,53 @@
     "no_trusted_sites": "No trusted sites",
     "search": "Search sites by URL",
     "credentials": "Credentials",
-    "restore_password": "Restore password",
+    "restore_password": "Change wallet password",
+    "auto-lock": "Config auto-lock",
     "show_account_keys": "Show account keys",
     "account_keys_description": "Warning: Keep this password confidential. Sharing your private keys could lead to theft of assets from your account.",
     "reset_wallet": "Reset Kuma Wallet",
     "reset_wallet_warning": "Warning: This action will delete all your accounts and data from the extension. All your assets are safe as they are NOT stored on the extension. You will need to restore your accounts using the seed phrase.",
     "reset": "Reset"
   },
+  "buy" : {
+    "buy_title": "Buy",
+    "service": "Service are provided by Transak.",
+    "info": "You are now leaving Kuma Wallet for Transak. By proceeding and procuring services from Transak, you acknowledge that you have read and agreed to Transak's <term/> and <policy/> . For any question related to Transak's services please visit <support/> site.",
+    "terms_of_service": "Terms of Service",
+    "privacy_policy": "Privacy Policy", 
+    "support": "Transak's support",
+    "yes_i_understand": "Yes, I understand"
+    
+  },
   "send": {
-    "title": "Send token",
+    "send_title": "Send",
+    "review_transfer_title": "Review transfer",
     "from": "From",
     "to": "To",
-    "destination_account": "Destination account",
+    "asset": "Asset",
+    "bal": "Bal",
+    "max": "MAX",
+    "recipient_address": "Recipient address",
+    "add_address":"Add address",
     "amount": "Amount",
     "total": "Total",
     "available": "Available",
-    "gas_limit": "Gas limit",
+    "no_contacts": "No contacts added yet",
     "estimated_fee": "Estimated fee",
-    "estimated_total": "Estimated total",
     "tip": "Tip (optional)",
     "transfer": "Transfer",
     "chains": "Chains",
     "assets": "Assets",
     "details": "Details",
     "confirm": "Confirm",
+    "select_asset": "Select asset",
+    "select_chain": "Select chain",
     "tx_send": "Transaction sent",
+    "sender": "Sender",
+    "network": "Network",
+    "tip_review": "Tip",
+    "address_book": "Address book",
+    "transer_using_xcm": "Transfer executed using XCM",
     "insufficient_balance": "Insufficient balance",
     "continue": "Continue",
     "invalid_address": "Invalid address",
@@ -218,10 +315,11 @@
     "invalid_params": "Invalid params",
     "invalid_abi": "Invalid ABI",
     "contract_error": "An error occurred with the contract",
-    "xcm_alert_message": "Make sure to transfer enough tokens to pay the fee with this token on the other chain."
+    "select_account" : "Select Account"
   },
   "manage_assets": {
     "title": "Manage Assets",
+    "chain": "Chain",
     "address": "Address",
     "symbol": "Symbol",
     "decimals": "Decimals",
@@ -241,12 +339,12 @@
   },
   "bug_report": {
     "title": "Bug report",
-    "collaborate": "Collaborate with us",
+    "collaborate": "Let's collab",
     "collaborate_description": "Kuma Wallet is an open source project. If you want to collaborate with us, please visit our GitHub repository. You can follow the instructions on how to submit a pull request at the README.md file.",
     "collaborate_link": "Github repository",
     "report_an_issue": "Report an issue",
     "report_an_issue_description": "If you want to report an issue, please visit our Discord channel and follow the instructions on how to submit a bug report.",
-    "report_an_issue_link": "Support channel"
+    "report_an_issue_link": "Discord support channe"
   },
   "swap": {
     "title": "Swap",
@@ -269,10 +367,26 @@
     "swapper_name": "Swapper name",
     "swapper_fee": "Swapper fee",
     "gas_fee": "Gas fee",
+    "estimated_fee": "Estimated fee",
     "destination_address": "Destination address",
     "stealthex_swap_message": "After proceed you will have to transfer to an address provided by StealthEX. The transaction will be processed automatically and you will receive your tokens in your recipient address.",
     "tx_send":"Transaction sent",
     "error_fetching_swaps": "Error fetching swaps",
-    "error_setting_max_amount": "Error setting max amount"
+    "error_setting_max_amount": "Error setting max amount",
+    "pair_not_supported": "Pair not supported",
+    "tx_confirm_info": "Info",
+    "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
+    "send_title": "Review Transfer",
+    "proceed": "Proceed"
+  },
+  "change_password": {
+    "title": "Change your password",
+    "current_password": "Current password",
+    "new_password": "New password",
+    "confirm_password": "Confirm password",
+    "password_tip": "Use letters, numbers and characters to add extra security.",
+    "yes_i_understand": "Yes, I understand",
+    "password_changed": "Password changed",
+    "save": "Save"
   }
 }

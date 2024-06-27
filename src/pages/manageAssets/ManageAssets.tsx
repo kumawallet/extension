@@ -1,25 +1,27 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { InputErrorMessage, Button, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
-import { useAccountContext, useAssetContext, useNetworkContext } from "@src/providers";
+import { useNetworkContext } from "@src/providers";
 import { number, object, string } from "yup";
-import { isHex, u8aToHex } from "@polkadot/util";
+import { isHex } from "@polkadot/util";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FiChevronLeft } from "react-icons/fi";
-import { decodeAddress } from "@polkadot/util-crypto";
 import { messageAPI } from "@src/messageAPI/api";
+import { ChainType } from "@src/types";
 
 interface AssetForm {
+  chainId: string;
   address: string;
   decimals: number;
   symbol: string;
 }
 
 const defaultValues: AssetForm = {
+  chainId: "",
   address: "",
   symbol: "",
   decimals: 0,
@@ -29,68 +31,57 @@ export const ManageAssets = () => {
   const { t } = useTranslation("manage_assets");
   const { t: tCommon } = useTranslation("common");
   const {
-    state: { selectedChain, type, api },
+    state: { selectedChain, chains },
   } = useNetworkContext();
-  const { state: { selectedAccount } } = useAccountContext()
-  const { loadAssets } = useAssetContext();
 
   const navigate = useNavigate();
   const { showErrorToast } = useToast();
 
   const schema = useMemo(() => {
     return object({
+      chainId: string().required(t("required") as string),
       address: string().test(
         "adress validation",
         tCommon("invalid_address") as string,
-        (val) => {
-          try {
-            return type === "EVM"
-              ? isHex(val)
-              : !!u8aToHex(decodeAddress(val as string));
-          } catch (error) {
-            return false;
-          }
-        }
+        (val) => isHex(val)
       ),
       decimals: number()
         .typeError(t("invalid_number") as string)
         .required(t("required") as string),
       symbol: string().required(t("required") as string),
     });
-  }, [t, type]);
+  }, []);
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AssetForm>({
     defaultValues,
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = handleSubmit(async (data) => {
+  const chainsToSelect = useMemo(() => {
+    const chainsKeys = Object.keys(selectedChain).filter(
+      (key) => selectedChain[key].type === ChainType.EVM
+    );
+
+    const allChains = chains.map((chain) => chain.chains).flat();
+
+    return allChains.filter((chain) => chainsKeys.includes(chain.id));
+  }, []);
+
+  const onSubmit = handleSubmit(async ({ chainId, ...asset }) => {
     try {
       await messageAPI.addAsset({
-        asset: data,
-        chain: selectedChain.name,
-      });
-      loadAssets({
-        api,
-        selectedChain,
-        selectedAccount
+        asset: asset,
+        chain: chainId,
       });
       navigate(BALANCE);
     } catch (error) {
       showErrorToast(error);
     }
   });
-
-  useEffect(() => {
-    if (type === "WASM" && selectedChain) {
-      setValue("decimals", selectedChain?.nativeCurrency?.decimals);
-    }
-  }, [selectedChain, type]);
 
   return (
     <>
@@ -104,6 +95,23 @@ export const ManageAssets = () => {
           <p className="text-xl">{t("title")}</p>
         </div>
         <div className="flex flex-col gap-2">
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium mb-1">
+              {t("chain")}
+            </label>
+            <select
+              data-testid="chain"
+              className="input-primary"
+              {...register("chainId")}
+            >
+              {chainsToSelect.map((chain) => (
+                <option key={chain.id} value={chain.id}>
+                  {chain.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label htmlFor="address" className="block text-sm font-medium mb-1">
               {t("address")}
@@ -139,7 +147,6 @@ export const ManageAssets = () => {
             </label>
             <input
               data-testid="decimals"
-              disabled={type === "WASM"}
               id="decimals"
               {...register("decimals")}
               className="input-primary disabled:opacity-60"

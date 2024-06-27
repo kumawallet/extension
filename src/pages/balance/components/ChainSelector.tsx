@@ -1,141 +1,74 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { BsChevronDown } from "react-icons/bs";
-import {
-  useAccountContext,
-  useNetworkContext,
-  useThemeContext,
-} from "@src/providers";
-import { ConfirmChainChangeModal } from "./ConfirmChainChangeModal";
+import { useNetworkContext } from "@src/providers";
 import { useTranslation } from "react-i18next";
-import { getAccountType } from "@src/utils/account-utils";
-import { useNavigate } from "react-router-dom";
-import { CREATE_ACCOUNT } from "@src/routes/paths";
-import { AccountType } from "@src/accounts/types";
-import { Chain } from "@src/storage/entities/Chains";
-import { SettingKey, SettingType } from "@src/storage/entities/settings/types";
-import { captureError } from "@src/utils/error-handling";
+import { ShowTestnets } from "./ShowTestnets";
+import { ChainType, ChainsState } from "@src/types";
+import { TfiClose } from "react-icons/tfi";
+import { CiSearch } from "react-icons/ci";
+import { Network } from "../../../components/icons/Network";
 import { messageAPI } from "@src/messageAPI/api";
+import { ChainOption } from "./ChainOption";
+import { ChainStatus } from "@src/storage/entities/Provider";
+
+const canShowTestnetToggle = (
+  chains: ChainsState,
+  chainGroup: { title: string }
+) => {
+  const haveCustom = chains.some((chain) => chain.title === "custom");
+
+  if (haveCustom && chainGroup.title === "custom") {
+    return true;
+  } else if (chainGroup.title === "move") {
+    return true;
+  }
+
+  return false;
+};
 
 export const ChainSelector = () => {
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
   const { t } = useTranslation("balance");
   const {
-    state: { chains, selectedChain },
-    setSelectNetwork,
+    state: { chains, selectedChain, chainStatus },
   } = useNetworkContext();
-  const {
-    state: { selectedAccount },
-    getAllAccounts,
-    setSelectedAccount,
-  } = useAccountContext();
-  const { color } = useThemeContext()
 
-  const [chainToChange, setChainToChange] = useState<Chain | null>(null);
-  const [openModal, setopenModal] = useState(false);
-  const [needToCreateAccount, setNeedToCreateAccount] = useState(false);
-  const [showTestnets, setShowTestnets] = useState(false);
-
-  useEffect(() => {
-    getSettings();
-  }, []);
-
-  const getSettings = async () => {
-    try {
-      const showTestnets = (
-        await messageAPI.getSetting(
-          {
-            type: SettingType.GENERAL,
-            key: SettingKey.SHOW_TESTNETS,
-          }
-        )
-
-      )?.value as boolean;
-      setShowTestnets(showTestnets);
-    } catch (error) {
-      captureError(error);
-    }
+  const updateSelectNetwork = async (
+    id: string,
+    type: ChainType,
+    isTestnet?: boolean
+  ) => {
+    if (Object.keys(selectedChain).includes(id)) {
+      await messageAPI.deleteSelectChain({ id });
+    } else await messageAPI.setNetwork({ id, isTestnet, type });
   };
 
-  const selecteNetwork = async (chain: Chain, close: () => void) => {
-    let chainTypeIsSupportedBySelectedAccount = false;
-    let thereIsAccountToSupport = false;
-
-    const newChainSupportedTypeAccounts = chain.supportedAccounts;
-    const accountType = getAccountType(selectedAccount.type) as AccountType;
-
-    // verify is curreny account support the new chain type
-    chainTypeIsSupportedBySelectedAccount =
-      newChainSupportedTypeAccounts.includes(accountType);
-
-    if (!chainTypeIsSupportedBySelectedAccount) {
-      // verify is any account support the new chain type
-      const accounts = await messageAPI.getAllAccounts({
-        type: newChainSupportedTypeAccounts,
-      });
-      thereIsAccountToSupport = accounts.some((acc) => {
-        const accountType = getAccountType(acc.type) as AccountType;
-        return newChainSupportedTypeAccounts.includes(accountType);
-      });
-    }
-
-    if (!thereIsAccountToSupport && !chainTypeIsSupportedBySelectedAccount) {
-      setopenModal(true);
-      setNeedToCreateAccount(true);
-      setChainToChange(chain);
+  const validateTestnet = () => {
+    const selected = Object.keys(selectedChain).filter(
+      (chain) => selectedChain[chain].isTestnet
+    );
+    if (selected.length > 0) {
+      return true;
     } else {
-      if (chainTypeIsSupportedBySelectedAccount) {
-        changeChain(chain);
-      } else {
-        const accounts = await getAllAccounts(chain.supportedAccounts);
-        changeChain(chain);
-        await setSelectedAccount(accounts[0], false);
-      }
+      return false;
     }
-
-    close?.();
   };
 
-  const changeChain = (chain?: Chain) => {
-    setSelectNetwork(chain || (chainToChange as Chain));
-    onClose();
-  };
-
-  const onClose = () => {
-    setopenModal(false);
-
-    setTimeout(() => {
-      setChainToChange(null);
-      setNeedToCreateAccount(false);
-    }, 500);
-  };
-
-  const isCustomChain = (chain: Chain) => {
-    return filteredChains.custom.some((c) => c.name === chain.name);
-  }
-
-  const filteredChains = {
-    ...chains,
-    testnets: showTestnets ? chains.testnets : [],
-  };
 
   return (
     <>
       <Menu>
         <Menu.Button
           data-testid="chain-button"
-          className="flex gap-2 items-center rounded-full bg-black bg-opacity-20 px-4 py-2 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          className="flex bg-[#212529] gap-1 items-center rounded-xl  px-2 py-1 text-sm font-medium text-white hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 max-w-[165px] md:max-w-none whitespace-nowrap"
+          
         >
-          <img
-            src={selectedChain.logo}
-            width={24}
-            height={24}
-            className="object-cover rounded-full"
-          />
-          <p className="overflow-hidden text-ellipsis">{selectedChain?.name}</p>
-          <BsChevronDown />
+          <Network size="22" className="my-[0.15rem]" />
+          <p className="overflow-hidden text-ellipsis mr-1">
+            {t("chain_selector.title")}
+          </p>
         </Menu.Button>
+
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"
@@ -145,73 +78,67 @@ export const ChainSelector = () => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-99px)] max-w-lg top-12 w-full bg-[#29323C] rounded-xl outline-0 z-50">
-            <div className="px-6 py-2 pt-2 text-start">
-              <div className="flex flex-col gap-1 py-2">
-                <input
-                  type="text"
-                  placeholder={t("chain_selector.search") || "Search"}
-                  value={search}
-                  onChange={({ target }) => setSearch(target.value)}
-                  className="input-primary"
-                />
+          <Menu.Items className="left-0 overflow-auto settings-container absolute origin-top-left h-[calc(100vh-2.5rem)] max-w-lg top-0 w-full  outline-0 z-50">
+          <div
+          className="w-full h-[2.6rem]  inset-0 bg-black/25 backdrop-blur-sm"
+              />
+            <div className=" px-8 py-2 pt-2 text-start bg-[#2C3137]">
+              <div className="flex flex-col gap-1 py-2 mt-2 ">
+                <Menu.Button
+                  data-testid="chain-button"
+                  className="absolute top-16 right-6"
+                >
+                  <TfiClose className="font-thin text-[0.7rem]" />
+                </Menu.Button>
+                <p className="text-base font-light mb-2">
+                  {t("chain_selector.title")}
+                </p>
+                <p className="text-xs opacity-80 mb-2 font-light">
+                  {t("chain_selector.description")}
+                </p>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder={t("chain_selector.search") || "Search"}
+                    value={search}
+                    onChange={({ target }) => setSearch(target.value)}
+                    className="w-full bg-[#212529] border-[0.02rem] border-gray-300 rounded-lg placeholder:text-white placeholder:font-light placeholder:opacity-80 text-white pl-8 pr-5 py-3"
+                  />
+                  <CiSearch className="absolute text-base top-1/2 left-3 transform font-mediums -translate-y-1/2 text-white" />
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                {Object.keys(filteredChains).map((spec) => (
-                  <div key={spec}>
-                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
-                      .length > 0 && (
-                        <div className="flex items-center gap-3 whitespace-nowrap">
-                          <p className="text-[#808385] text-lg">
-                            {t(`chain_selector.${spec}`)}
-                          </p>
-                          <div className="h-[1px] w-full bg-[#343A40]" />
-                        </div>
-                      )}
-                    {filteredChains[spec as "mainnets" | "testnets" | "custom"]
-                      .filter(({ name }) =>
-                        name.toLowerCase().includes(search.toLowerCase())
-                      )
-                      .map((chain, index) => (
-                        <Menu.Item key={index.toString()}>
-                          {({ close }) => (
-                            <div
-                              className={`flex gap-2 cursor-pointer items-center hover:bg-${color}-primary hover:bg-opacity-40 py-2 px-4 rounded-xl`}
-                              onClick={() => {
-                                selecteNetwork(chain, close);
-                              }}
-                            >
-                              {
-                                isCustomChain(chain) ? (
-                                  <div
-                                    className="w-[30px] h-[30px] rounded-full flex justify-center items-center p-1 bg-gray-400"
-                                  >
-                                    <p className="text-black font-bold font-inter">{chain.name.substring(0, 2)}</p>
-                                  </div>
-                                ) : (
-                                  <img
-                                    src={chain.logo}
-                                    width={30}
-                                    height={30}
-                                    alt={chain.name}
-                                    className="object-cover rounded-full"
-                                  />
-
-                                )
-                              }
-                              {/* <div className="w-5 h-5 rounded-full bg-gray-400" /> */}
-                              <div className="flex gap-3 items-center">
-                                <p className="text-xl">{chain.name}</p>
-                                {chain.name === selectedChain?.name && (
-                                  <p className="text-[#56DF53]">
-                                    {t("chain_selector.connected")}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </Menu.Item>
+              <div className="flex flex-col gap-4 mt-4">
+                {chains.map((chainGroup) => (
+                  <div
+                    key={chainGroup.title}
+                    className="flex flex-col gap-3 relative"
+                  >
+                    <p className="text-base">{t(chainGroup.title)}</p>
+                    <div className="flex flex-col gap-3">
+                      {chainGroup.chains.map((chain) => (
+                        <ChainOption
+                          key={chain.id}
+                          chain={chain}
+                          status={chainStatus[chain.id] as ChainStatus}
+                          isSelected={Boolean(selectedChain[chain.id])}
+                          isDisabled={
+                            Object.keys(selectedChain).length === 1 &&
+                            Object.keys(selectedChain)[0] === chain.id
+                          }
+                          onClick={() =>
+                            updateSelectNetwork(
+                              chain.id,
+                              chain.type,
+                              chain.isTestnet
+                            )
+                          }
+                        />
                       ))}
+                    </div>
+
+                    {canShowTestnetToggle(chains, chainGroup) && (
+                      <ShowTestnets validateSwitch={validateTestnet()} />
+                    )}
                   </div>
                 ))}
               </div>
@@ -219,15 +146,6 @@ export const ChainSelector = () => {
           </Menu.Items>
         </Transition>
       </Menu>
-      <ConfirmChainChangeModal
-        isOpen={openModal}
-        onClose={onClose}
-        chainToChange={chainToChange}
-        onConfirm={() =>
-          needToCreateAccount ? navigate(CREATE_ACCOUNT) : changeChain()
-        }
-        needToCreateAccount={needToCreateAccount}
-      />
     </>
   );
 };

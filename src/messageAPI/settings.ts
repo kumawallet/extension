@@ -6,10 +6,10 @@ import { sendMessage } from ".";
 
 export const settingsMessages = {
   getGeneralSettings: () => {
-    return sendMessage("pri(settings.getGeneralSettings)", null);
+    return sendMessage("pri(settings.getGeneralSettings)");
   },
   getAdvancedSettings: () => {
-    return sendMessage("pri(settings.getAdvancedSettings)", null);
+    return sendMessage("pri(settings.getAdvancedSettings)");
   },
   getSetting: (params: RequestGetSetting) => {
     return sendMessage("pri(settings.getSetting)", params);

@@ -1,6 +1,4 @@
-import Auth from "@src/storage/Auth";
 import PolkadotKeyring from "@polkadot/ui-keyring";
-import { mnemonicValidate } from "@polkadot/util-crypto";
 import HDKeyring from "./HDKeyring";
 import { AccountType } from "@src/accounts/types";
 import { HDKeyPair, SupportedKeyring } from "../types";
@@ -12,32 +10,30 @@ export default class WASMKeyring extends HDKeyring {
     return `/${this.getAccountIndex()}`;
   }
 
-  isMnemonicValid(mnemonic: string): boolean {
-    return mnemonicValidate(mnemonic);
+  async getAddress(seed: string, path: number): Promise<string> {
+    const suri = seed + `//${path}`;
+    const wallet = PolkadotKeyring.createFromUri(suri);
+    return wallet.address;
   }
 
-  getAddress(path: string): string {
-    const wallet = PolkadotKeyring.addUri(
-      `${this.mnemonic}${path}`,
-      Auth.password
-    );
-    return wallet?.json?.address;
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
   }
 
   getKey(address: string): string {
     if (!this.keyPairs[address]) {
       throw new Error("Key pair not found");
     }
-    const { path } = this.keyPairs[address] as HDKeyPair;
-    return `${this.mnemonic}${path}`;
+    const { key, path } = this.keyPairs[address] as HDKeyPair;
+    return `${key}${path}`;
   }
 
   static fromJSON(json: SupportedKeyring): WASMKeyring {
     const { mnemonic, keyPairs } = json as HDKeyring;
     const keyring = new WASMKeyring(mnemonic);
     Object.keys(keyPairs).forEach((address) => {
-      const { path } = keyPairs[address];
-      keyring.addKeyPair(address, { path });
+      const { path, key } = keyPairs[address];
+      keyring.addKeyPair(address, { path, key });
     });
     return keyring;
   }

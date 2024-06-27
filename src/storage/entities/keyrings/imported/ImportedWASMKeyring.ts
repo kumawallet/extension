@@ -1,4 +1,3 @@
-import Auth from "@src/storage/Auth";
 import { AccountType } from "@src/accounts/types";
 import PolkadotKeyring from "@polkadot/ui-keyring";
 import ImportedKeyring from "./ImportedKeyring";
@@ -8,10 +7,19 @@ export default class ImportedWASMKeyring extends ImportedKeyring {
   type = AccountType.IMPORTED_WASM;
 
   async getImportedData(seed: string) {
-    const wallet = PolkadotKeyring.addUri(seed, Auth.password);
-    const { address } = wallet.pair || {};
+    const { address } = PolkadotKeyring.createFromUri(seed);
     const keyPair = { key: seed };
-    return { address, keyPair };
+    return { address, keyPair, isDerivable: true };
+  }
+
+  getAddress(seed: string, path: number = 0): string {
+    const suri = seed + `//${path}`;
+    const wallet = PolkadotKeyring.createFromUri(suri);
+    return wallet.address;
+  }
+
+  getDerivedPath(seed: string, path: number): string {
+    return `${seed}//${path}`;
   }
 
   static fromJSON(json: SupportedKeyring): ImportedWASMKeyring {

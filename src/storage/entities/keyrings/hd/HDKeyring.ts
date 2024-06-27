@@ -4,38 +4,35 @@ import { HDKeyPair } from "../types";
 
 export default abstract class HDKeyring extends Keyring {
   abstract type: AccountType;
-  readonly #mnemonic: string;
+  readonly mnemonic: string;
   keyPairs: { [address: string]: HDKeyPair };
 
   constructor(mnemonic: string) {
     super();
-    if (!this.isMnemonicValid(mnemonic)) {
-      throw new Error("Invalid mnemonic");
-    }
-    this.#mnemonic = mnemonic;
+    // if (!this.isMnemonicValid(mnemonic)) {
+    //   throw new Error("Invalid mnemonic");
+    // }
+    this.mnemonic = mnemonic;
     this.keyPairs = {};
   }
 
-  get mnemonic() {
-    return this.#mnemonic;
-  }
-
-  abstract isMnemonicValid(mnemonic: string): boolean;
+  // abstract isMnemonicValid(mnemonic: string): boolean;
 
   abstract getNextAccountPath(): string;
 
-  abstract getAddress(path: string): string;
+  abstract getAddress(seed: string, path?: number): Promise<string>;
 
-  deriveKeyPair(): string {
-    const path = this.getNextAccountPath();
-    const address = this.getAddress(path);
-    this.addKeyPair(address, { path });
+  abstract getDerivedPath(seed: string, path: number): string;
+
+  async deriveKeyPair(mnemonicOrSeed: string, path?: number): Promise<string> {
+    const address = await this.getAddress(mnemonicOrSeed, path);
+    this.addKeyPair(address, { key: mnemonicOrSeed });
     return address;
   }
 
   toJSON() {
     return {
-      mnemonic: this.#mnemonic,
+      mnemonic: this.mnemonic,
       keyPairs: this.keyPairs,
     };
   }

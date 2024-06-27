@@ -1,96 +1,56 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "@src/hooks";
-import { Loading } from "@src/components/common";
-import { RecordData, RecordStatus } from "@src/storage/entities/activity/types";
-import { BsArrowUpRight } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { Status } from "@src/components/common/TxStatus";
+import { Button, Loading } from "@src/components/common";
 import Contact from "@src/storage/entities/registry/Contact";
-import { formatDate } from "@src/utils/utils";
-import {
-  useNetworkContext,
-  useTxContext,
-  useAccountContext,
-  useThemeContext,
-} from "@src/providers";
-import { Chain } from "@src/storage/entities/Chains";
-import { FaChevronRight } from "react-icons/fa";
-import { NetworkIcon } from "./NetworkIcon";
+import { ACTIVITY_DETAIL } from "@src/routes/paths";
+import { useAccountContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
+import { HiOutlineInboxArrowDown } from "react-icons/hi2";
+import { SendIcon } from "@src/components/icons/SendIcon";
+import { BsChevronRight } from "react-icons/bs";
+import { stylesActivity } from "@src/pages/balance/components/style/activity";
+import { SwapIcon } from "@src/components/icons/SwapIcon";
+import { IoIosCloseCircle } from "react-icons/io";
+import { transformAddress } from "@src/utils/account-utils";
+import { RecordStatus } from "@src/storage/entities/activity/types";
+import { SelectAccountActivity } from "./SelectAccountActivity";
 
-const chipColor = {
-  [RecordStatus.FAIL]: "bg-red-600",
-  [RecordStatus.SUCCESS]: "bg-green-600",
-  [RecordStatus.PENDING]: "bg-yellow-600",
+const isSameAddress = (address1: string, address2: string) => {
+  return (
+    transformAddress(address1, undefined) ===
+    transformAddress(address2, undefined)
+  );
 };
 
 export const Activity = () => {
   const { t } = useTranslation("activity");
-  const { color } = useThemeContext();
+  const navigate = useNavigate();
 
   const {
-    state: { type, chains },
-  } = useNetworkContext();
-
-  const {
-    state: { selectedAccount },
+    state: { selectedAccount, accounts },
   } = useAccountContext();
-
-  const {
-    state: { activity },
-  } = useTxContext();
 
   const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("" as string);
-  const [networks, setNetworks] = useState({} as Chain[]);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
-  const { showErrorToast } = useToast();
-
-  useEffect(() => {
-    if (selectedAccount) {
-      Promise.all([getNetworks(), getContacts()]);
-    }
-  }, [selectedAccount.key]);
-
-  const getNetworks = async () => {
-    try {
-      setIsLoading(true);
-      const networks = await messageAPI.getAllChains()
-      setNetworks([...networks.mainnets, ...networks.testnets, ...networks.custom]);
-    } catch (error) {
-      setNetworks([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [transactions, setTransactions] = useState([] as any[]);
+  const [addressToSearch, setAddressToSearch] = useState("");
 
   const getContacts = async () => {
-    try {
-      setIsLoading(true);
-      const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
-      setContacts(contacts);
-      setOwnAccounts(ownAccounts);
-    } catch (error) {
-      setContacts([]);
-      showErrorToast(tCommon(error as string));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getLink = (network: string, hash: string) => {
-    const { explorer } =
-      networks
-        .find((chain) => chain.name.toLowerCase() === network.toLowerCase()) ||
-      {};
-    const { evm, wasm } = explorer || {};
-    if (type.toLowerCase() === "wasm") {
-      return `${wasm?.url}extrinsic/${hash}`;
-    } else {
-      return `${evm?.url}tx/${hash}`;
-    }
+    // try {
+    //   setIsLoading(true);
+    //   const { contacts, ownAccounts } = await messageAPI.getRegistryAddresses();
+    //   setContacts(contacts);
+    //   setOwnAccounts(ownAccounts);
+    // } catch (error) {
+    //   setContacts([]);
+    //   showErrorToast(tCommon(error as string));
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const getContactName = (address: string) => {
@@ -101,122 +61,221 @@ export const Activity = () => {
       : address.slice(0, 6) + "..." + address.slice(-4);
   };
 
-  const getValue = (data: RecordData) => {
+  const getAmount = (data: { value: string; symbol: string }) => {
     if (!data || !data.value) return "$0.0";
-    return data.symbol ? `${data.value} ${data.symbol}` : `$${data.value}`;
+    if (data.value.length > 7 && /^0+\.0*[0]{5}[1-9]*$/.test(data.value)) {
+      return `< 0.00001 ${data.symbol}`;
+    } else if (data.value.length > 7) {
+      const value = parseFloat(data.value);
+      const million = Math.floor(value / 1000000);
+      if (million >= 1) {
+        return `${million}M ${data.symbol}`;
+      } else {
+        return `${value.toFixed(2)} ${data.symbol}`;
+      }
+    }
+    return `${data.value} ${data.symbol}`;
   };
 
-  const getStatusColor = (status: RecordStatus) => {
-    switch (status) {
-      case RecordStatus.PENDING:
-        return "goldenrod";
-      case RecordStatus.SUCCESS:
-        return "#469999";
-      case RecordStatus.FAIL:
-        return "red";
-      default:
-        return "white";
+  const onSelectAccount = async (address: string) => {
+    try {
+      setIsLoading(true);
+
+      const account = accounts.find((a) => a.value?.address === address);
+      if (!account) return;
+
+      setAddressToSearch(address);
+
+      await messageAPI.setAccountToActivity({
+        address: address,
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const filteredRecords = useMemo(() => {
-    const _search = search.trim().toLocaleLowerCase();
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const { scrollTop, clientHeight, scrollHeight } =
+  //       document.documentElement;
+  //     if (
+  //       scrollTop + clientHeight >= scrollHeight - 20 &&
+  //       hasNextPage &&
+  //       !isLoadingTxs
+  //     ) {
+  //       loadMoreActivity();
+  //     }
+  //   };
 
-    if (!_search) return activity;
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [isLoadingTxs, hasNextPage]);
 
-    return activity
-      .filter(({ hash, reference, address }) => {
-        return (
-          hash.toLowerCase().includes(_search) ||
-          reference?.toLowerCase().includes(_search) ||
-          address.toLowerCase().includes(_search)
-        );
+  useEffect(() => {
+    if (selectedAccount) {
+      Promise.all([getContacts()]);
+    }
+  }, [selectedAccount?.key]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    messageAPI
+      .activitySubscribe((transactions) => {
+        setTransactions(transactions);
+        setIsLoading(false);
       })
-      .sort((a, b) => (b.lastUpdated as number) - (a.lastUpdated as number));
-  }, [search, activity]);
+      .then((transactions) => {
+        setTransactions(transactions);
+        setIsLoading(false);
+      });
+  }, []);
 
-  const allChains = [...chains.mainnets, ...chains.testnets, ...chains.custom];
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <>
-      <input
-        data-testid="search-input"
-        id="search"
-        placeholder={t("search") as string}
-        className="input-primary"
-        onChange={(e) => {
-          setSearch(e.target.value);
-        }}
-      />
-
-      <div className="flex flex-col my-5 overflow-y-auto h-full">
-        {activity.length === 0 && (
-          <div className="flex justify-center items-center mt-5">
-            <p className="text-lg font-medium">{t("empty")}</p>
-          </div>
-        )}
-        {filteredRecords.map(
-          ({
-            address,
-            status,
-            lastUpdated,
-            data,
-            network,
-            hash,
-            recipientNetwork,
-          }) => (
-            <div
-              key={hash}
-              className="mb-5 mr-1 bg-[#343A40] flex justify-between rounded-lg py-2 px-2 text-white cursor-pointer items-center gap-3 hover:bg-gray-400 hover:bg-opacity-30 transition overflow-auto"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <a
-                  className={`text-${color}-primary hover:bg-${color}-primary hover:bg-opacity-30 rounded-full p-1`}
-                  href={getLink(network, hash)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <BsArrowUpRight size={23} color={getStatusColor(status)} />
-                </a>
-                <div className="overflow-hidden text-ellipsis px-1">
-                  <p className="text-xs">{getContactName(address)}</p>
-                  <p className="text-xs">{`${formatDate(
-                    lastUpdated as number
-                  )}`}</p>
-                  <p
-                    className={`text-[10px] flex justify-center items-center m-1 font-medium py-1 px-2  rounded-full text-indigo-100  w-fit ${chipColor[status as RecordStatus]
-                      }`}
-                  >
-                    {status}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col text-lg px-1">
-                <p className="text-sm whitespace-nowrap mb-1 text-center">
-                  {getValue(data)}
-                </p>
-                <div className="flex justify-evenly items-center gap-1">
-                  <NetworkIcon
-                    networkName={network}
-                    width={16}
-                    chains={allChains}
-                  />
-                  <FaChevronRight size={14} />
-                  <NetworkIcon
-                    networkName={recipientNetwork}
-                    chains={allChains}
-                    width={16}
-                  />
-                </div>
-              </div>
-            </div>
-          )
-        )}
+      <div className={stylesActivity.containerGlobal}>
+        <SelectAccountActivity
+          selectedAddress={addressToSearch}
+          onChangeValue={onSelectAccount}
+        />
       </div>
+
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div
+          data-testid="activity-container"
+          className={stylesActivity.containerTx}
+        >
+          {transactions.length === 0 && (
+            <div
+              className={` ${stylesActivity.flexItemsCenter} ${stylesActivity.containerEmptyActivity}`}
+            >
+              <p className={stylesActivity.textEmptyActivity}>{t("empty")}</p>
+            </div>
+          )}
+          {transactions.map(
+            ({
+              isSwap,
+              hash,
+              sender,
+              asset,
+              recipient,
+              status,
+              amount,
+              fee,
+              originNetwork,
+              targetNetwork,
+              type,
+              tip,
+              version,
+              chainLogo,
+              link,
+              isXcm,
+            }) => (
+              <Button
+                variant="contained-little-gray"
+                key={hash}
+                classname={stylesActivity.TxButton}
+                onClick={() =>
+                  navigate(ACTIVITY_DETAIL, {
+                    state: {
+                      hash,
+                      status,
+                      originNetwork,
+                      targetNetwork,
+                      sender,
+                      recipient,
+                      fee,
+                      type,
+                      amount,
+                      asset,
+                      tip,
+                      version,
+                      link,
+                      isXcm,
+                    },
+                  })
+                }
+              >
+                <div
+                  className={`${stylesActivity.flexItemsCenter} ${stylesActivity.containerButton}`}
+                >
+                  <div className={stylesActivity.flexItemsCenter}>
+                    <div className={stylesActivity.explorer}>
+                      <div className={`relative ${stylesActivity.circleIcon}`}>
+                        {isSwap ? (
+                          <SwapIcon size="18" />
+                        ) : isSameAddress(addressToSearch, sender) ? (
+                          <SendIcon size="18" />
+                        ) : (
+                          <HiOutlineInboxArrowDown />
+                        )}
+                        <div className={stylesActivity.containerAssetIcon}>
+                          {!chainLogo ? (
+                            <IoIosCloseCircle
+                              className={stylesActivity.faildIcon}
+                            />
+                          ) : (
+                            <img
+                              src={chainLogo}
+                              alt="Logo"
+                              className="object-cover rounded-full"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={stylesActivity.containerText}>
+                      {isSwap ? (
+                        <p className={stylesActivity.textTxType}>{t("swap")}</p>
+                      ) : !isSameAddress(addressToSearch, recipient) ? (
+                        <p className={stylesActivity.textTxType}>{t("send")}</p>
+                      ) : (
+                        <p className={stylesActivity.textTxType}>
+                          {t("receive")}
+                        </p>
+                      )}
+                      <p className={stylesActivity.textAddress}>
+                        {getContactName(recipient)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <Status status={status as RecordStatus} classname="ml-2" />
+                <div className={stylesActivity.containerDivEnd}>
+                  <div className={stylesActivity.flexItemsCenter}>
+                    <div
+                      className={`${stylesActivity.containerText}${stylesActivity.containerAmounts}`}
+                    >
+                      <p
+                        className={`${getAmount({
+                          value: amount,
+                          symbol: asset,
+                        }).length > 10
+                          ? "text-[px] "
+                          : "text-[10px]"
+                          } font-bold`}
+                      >
+                        {getAmount({
+                          value: amount,
+                          symbol: asset,
+                        })}
+                      </p>
+                      <p className={stylesActivity.textFee}>{fee}</p>
+                    </div>
+                    <BsChevronRight className={stylesActivity.iconArrow} />
+                  </div>
+                </div>
+              </Button>
+            )
+          )}
+        </div>
+      )}
     </>
   );
 };
