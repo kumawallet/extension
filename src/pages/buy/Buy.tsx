@@ -22,7 +22,7 @@ export const Buy = () => {
 
   const [isChecked, setIsChecked] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | undefined>(selectedAccount?.value?.address || accounts[0].value?.address);
-  const [value, setValue] = useState<Chain>();
+  const [value, setValue] = useState<any>();
 
   const options = useMemo(() => {
     if (selectedAccount?.value) {
@@ -49,6 +49,7 @@ export const Buy = () => {
   useEffect(() => {
     console.log(options)
     setValue(options[0]);
+    console.log(options,"test")
   }, [options,selectedAccount?.key]);
 
   const handleCheckboxChange = () => {

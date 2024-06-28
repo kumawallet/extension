@@ -36,7 +36,6 @@ import {
   
     useEffect(() => {
       messageAPI.nftsSubscribe((nfts) => {
-        console.log(nfts, "NFTS")
         dispatch({
           type: "update-nfts",
           payload: {

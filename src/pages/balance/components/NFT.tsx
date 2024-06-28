@@ -9,7 +9,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { TfiClose } from "react-icons/tfi";
 import { SelectableAssetBuy } from "@src/pages/buy/components/SelectableAsset";
 import { useAccountContext, useNetworkContext } from "@src/providers";
-import { Chain } from "@src/types";
+//import { Chain } from "@src/types";
 import { messageAPI } from "@src/messageAPI/api";
 import { SelectAccount } from "@src/pages/send/components/SelectAccount";
 import { CiSearch } from "react-icons/ci";
@@ -18,7 +18,7 @@ import { getType } from "@src/utils/assets";
 export const NFT = () => {
   const { state: {selectedChain, chains}} = useNetworkContext()
   const [isOpen,setIsOpen] = useState(false);
-  const [value,setValue] = useState<Chain| undefined>();
+  const [value,setValue] = useState<any>();
   const {state: {nfts}} = useNFTContext();
   const { state: {selectedAccount, accounts}} = useAccountContext()
   const [input, setInput] = useState("");
@@ -28,18 +28,36 @@ export const NFT = () => {
 
   const collections  = useMemo(() => {
   const allChains = chains.map((_chains) => _chains.chains).flat()
-  console.log(selectedChain, "Selected")
-  const filters = allChains.filter((chain) => Object.keys(selectedChain).includes(chain.id))
+  const filters = allChains.filter((chain) => {
+    if(selectedAccount?.value){
+    if(Object.keys(selectedChain).includes(chain.id)&& getType(selectedAccount.type.toLowerCase()).toLowerCase() === chain.type){
+      return{
+        name: chain.name,
+        network:chain.id,
+        logo: chain.logo,
+        type: chain.type
+
+      }}
+      return
+    }
+    const _account = accounts.find((__account) => __account.value?.address === selectedAddress)
+    if(Object.keys(selectedChain).includes(chain.id)&&_account && getType(_account.type.toLowerCase()) === chain.type){
+      return{ 
+        name: chain.name,
+        network:chain.id,
+        logo: chain.logo,
+        type: chain.type
+
+      }}
+    })
   return filters;
-},[chains])
+},[chains,selectedAccount])
 
 const handlerInput = (event: any) => {
-  console.log(event, "handlerInput")
   setInput(event.target.value);
 }
 
 const handlerSearch = (event: any) => {
-  console.log(event, "handlerSearch")
   setSearch(event.target.value);
 }
 
@@ -50,24 +68,18 @@ const addCollection = async() => {
   if(selectedAccount?.value && value)
   {
     const address= selectedAccount?.value?.address
-    console.log(address, value, "address & value")
     const _collection = await messageAPI.getCollection({address,addressContract:input, idNetwork:value.id})
     console.log(_collection,"collection")
     return
   }
-  else{
-    const _account = accounts.find(
-      (_account) => _account.value?.address === selectedAddress
-    );
-    console.log(_account, "account")
-    //const _collection = await messageAPI.getCollection({,addressContract:input, idNetwork:value.id});
-    //console.log(_collection, "Collection");
+  if(selectedAddress && value){
+    const _collection = await messageAPI.getCollection({address: selectedAddress,addressContract:input, idNetwork:value.id});
+    console.log(_collection, "Collection");
 
   }
 }
 useEffect(() => {
   setValue(collections[0]);
-    console.log( nfts, selectedChain, collections)
 }, [ nfts])
 
   return (

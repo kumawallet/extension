@@ -1,6 +1,6 @@
 import { ApiPromise} from "@polkadot/api";
 import { ChainType } from "@src/types";
-import { BaseContract, Contract, JsonRpcProvider } from "ethers";
+import { Contract, JsonRpcProvider } from "ethers";
 import { BehaviorSubject } from "rxjs";
 import erc721  from "@src/constants/erc721_abi.json"
 import { nftContract, nftData} from "@src/types"
@@ -18,7 +18,6 @@ export class NFT {
         return  this.nfts;
     }
     public async getCollections(address: string,contractAddress: string, networkApi:api , type: ChainType){
-        console.log(address, contractAddress, networkApi, type)
         const _nfts = this.nfts.getValue()
         const nft : any = {}
         try{
@@ -71,9 +70,6 @@ export class NFT {
                 const tokenId = await contract.tokenOfOwnerByIndex(address, i); 
                 tokenIds.push(tokenId.toString());
         }
-
-        console.log(`Token IDs owned by ${address}: ${tokenIds}`);
-
         const data = await Promise.all(tokenIds.map(async(tokenId) => {
                         const uri = await contract.tokenURI(tokenId);
                         console.log(uri, "URI")
