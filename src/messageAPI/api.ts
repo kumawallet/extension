@@ -7,6 +7,7 @@ import { assetsMessages } from "./assets";
 import { settingsMessages } from "./settings";
 import { trustedSitesMessages } from "./trustedSites";
 import { sendMessages } from "./send";
+import { nftMessages } from "./nft"
 
 export const messageAPI = {
   ...accountMessages,
@@ -18,4 +19,5 @@ export const messageAPI = {
   ...settingsMessages,
   ...trustedSitesMessages,
   ...sendMessages,
+  ...nftMessages
 };

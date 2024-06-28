@@ -227,3 +227,28 @@ export enum ChainType {
   WASM = "wasm",
   OL = "ol",
 }
+
+type attributes = {
+  trait_type: string;
+  value: string;
+}
+
+export type nftData = {
+  tokenId?: string;
+  name?: string;
+  description?: string;
+  image?: string;
+  attributes?: attributes[];
+  external_url?: string;
+  animation_url?: string;
+  audio_url?: string; 
+
+}
+export interface nftContract {
+  contractAddress: string;
+  collectionName: string;
+  collectionSymbol: string;
+  balance: string;
+  isEnum?: boolean;
+  nftsData: nftData[] | [];
+}

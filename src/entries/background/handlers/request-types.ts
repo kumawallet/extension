@@ -7,6 +7,7 @@ import { NetworkStatus } from "@src/storage/entities/Provider";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Setting from "@src/storage/entities/settings/Setting";
+import { nftContract} from "@src/types"
 import {
   SettingKey,
   SettingType,
@@ -206,6 +207,12 @@ export interface RequestSetAccountToActivity {
   address: string;
 }
 
+export interface RequestGetCollection{
+  address: string
+  addressContract: string;
+  idNetwork: string;
+}
+
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
@@ -284,6 +291,8 @@ export interface Request {
       decimals: number;
     }[]
   ];
+  "pri(nft.getCollection)": [RequestGetCollection, void]
+  "pri(nft.subscription)": [null, nftContract[],nftContract[]]
 
   "pri(trustedSites.getTrustedSites)": [null, string[]];
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];

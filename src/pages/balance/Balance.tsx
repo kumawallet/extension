@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Assets, Header, Footer, TotalBalance, Actions, AccountSelected, Activity } from "./components";
 import { useLocation } from "react-router-dom";
 import { useNetworkContext } from "@src/providers";
+import { NFT } from "./components/NFT"
 
 const Bg = () => (
   <svg width="739" height="868" viewBox="0 0 739 868" fill="none" xmlns="http://www.w3.org/2000/svg" className="bottom-0 left-0 w-full h-[62%] md:h-2/3 object-cover z-0 fixed">
@@ -31,7 +32,7 @@ export const Balance = () => {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const TABS = [t("assets"), t("activity")];
+  const TABS = [t("assets"), t("activity"), "nft"];
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -56,7 +57,7 @@ export const Balance = () => {
           <Tab.Group
             selectedIndex={selectedIndex}
             onChange={setSelectedIndex}
-            defaultIndex={state?.tab === "activity" ? 1 : 0}
+            defaultIndex={state?.tab === "activity" ? 1 : state === "nft" ? 2 : 0}
           >
             <Tab.List
               className="flex space-x-1 p-1 mt-5"
@@ -81,6 +82,9 @@ export const Balance = () => {
               </Tab.Panel>
               <Tab.Panel key={1}>
                 <Activity />
+              </Tab.Panel>
+              <Tab.Panel key={2}>
+                <NFT />
               </Tab.Panel>
             </Tab.Panels>
 

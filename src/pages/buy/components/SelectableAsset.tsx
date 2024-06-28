@@ -3,8 +3,9 @@ import { useState } from "react";
 import { GoChevronDown } from "react-icons/go";
 import { BsCoin } from "react-icons/bs";
 import { Chain } from "../types";
+import { Chain as _chain } from "@src/types";
 
-interface SelectableAssetBuyProps<T extends Chain> {
+interface SelectableAssetBuyProps<T extends Chain | _chain> {
   buttonClassName?: string;
   containerClassName?: string;
   defaulValue: T;
@@ -32,7 +33,7 @@ const OptImage = ({ image }: { image: string }) => {
     />
   );
 };
-export const SelectableAssetBuy = <T extends Chain>({
+export const SelectableAssetBuy = <T extends Chain | _chain>({
   buttonClassName,
   containerClassName,
   defaulValue,
@@ -46,13 +47,12 @@ export const SelectableAssetBuy = <T extends Chain>({
   const filteredAsset =
     query === ""
       ? options
-      : options.filter((asset: Chain) =>
-          (asset?.network || "")
+      : options.filter((asset: Chain | _chain) =>
+          ( asset?.name|| "")
             ?.toLowerCase()
             .replace(/\s+/g, "")
             .includes(query.toLowerCase().replace(/\s+/g, ""))
         );
-
   return (
     <div
       className={`flex flex-col flex-1 relative ${containerClassName || ""}`}
@@ -100,9 +100,9 @@ export const SelectableAssetBuy = <T extends Chain>({
                       {opt.logo && <OptImage image={opt.logo} />}
                       <div className="flex flex-col">
                         <div className="flex gap-2 items-center">
-                          <span>{opt.symbol}</span>
+                          <span>{opt && !opt.id ? opt.symbol : opt.name}</span>
                           <span className="rounded-xl py-1 px-2 text-xs text-gray-500">
-                            {`( ${opt["network-name"]} )`}
+                            {!opt.id && `( ${opt.name} )` }
                           </span>
                         </div>
                       </div>

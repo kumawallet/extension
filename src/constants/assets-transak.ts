@@ -2,39 +2,39 @@ import { ASSETS_ICONS } from "./assets-icons";
 import { ChainType } from "@src/types"
 export const ASSETS_TRANSAK = [
     {
-        "network-name": "Ethereum",
-        network: "ethereum",
+        name: "Ethereum",
+        id: "ethereum",
         logo: ASSETS_ICONS["ETH"],
         symbol: "ETH",
         type: ChainType.EVM,
         isSupportSell: true
     },
     {
-        "network-name": "Ethereum",
-        network: "ethereum",
+        name: "Ethereum",
+        id: "ethereum",
         logo: ASSETS_ICONS["USDC"],
         symbol: "USDC",
         type: ChainType.EVM,
         isSupportSell: true
     },
     {
-        "network-name": "Ethereum",
-        network: "ethereum",
+        name: "Ethereum",
+        id: "ethereum",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
         type: ChainType.EVM,
         isSupportSell: true
     },
     {
-        "network-name": "Polygon",
-        network: "polygon",
+        name: "Polygon",
+        id: "polygon",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
         type: ChainType.EVM,
         isSupportSell: true
     },
     {
-        "network-name": "Binance",
+        name: "Binance",
         network: "bsc",
         logo: ASSETS_ICONS["USDT"],
         symbol: "USDT",
@@ -42,7 +42,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Binance",
+        name: "Binance",
         network: "bsc",
         logo:  ASSETS_ICONS["BNB"],
         symbol: "BNB",
@@ -50,7 +50,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: true
     },
     {
-        "network-name": "Binance",
+        name: "Binance",
         network: "bsc",
         logo: ASSETS_ICONS["USDC"],
         symbol: "USDC",
@@ -58,7 +58,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Polkadot",
+        name: "Polkadot",
         network: "mainnet",
         logo: ASSETS_ICONS["DOT"],
         symbol: "DOT",
@@ -67,7 +67,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Ethereum",
+        name: "Ethereum",
         network: "ethereum",
         logo: ASSETS_ICONS["WBTC"],
         symbol: "WBTC",
@@ -75,7 +75,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Polygon",
+        name: "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["WBTC"],
         symbol: "WBTC",
@@ -83,7 +83,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Polygon",
+        name: "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["MATIC"],
         symbol: "MATIC",
@@ -91,7 +91,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: true
     },
     {
-        "network-name": "Polygon",
+        name: "Polygon",
         network: "polygon",
         logo: ASSETS_ICONS["DAI"],
         symbol: "DAI",
@@ -99,7 +99,7 @@ export const ASSETS_TRANSAK = [
         isSupportSell: false
     },
     {
-        "network-name": "Kusama",
+        name: "Kusama",
         network: "mainnet",
         logo: ASSETS_ICONS["KSM"],
         symbol: "KSM",
@@ -107,7 +107,7 @@ export const ASSETS_TRANSAK = [
         type: ChainType.WASM,
         isSupportSell: false
     },
-    {   "network-name": "Astar",
+    {   name: "Astar",
         network: "astar",
         logo: ASSETS_ICONS["ASTR"],
         symbol: "ASTR",

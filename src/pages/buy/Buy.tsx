@@ -40,13 +40,14 @@ export const Buy = () => {
 
 
   const handlerTransak = async () => {
-    if (selectedAddress && value) {
+    if (selectedAddress && value && value.network && value.isSupportSell) {
       const url = await createOrder(value.symbol, selectedAddress, value.network, value.isSupportSell);
       window.open(url, "_blank");
     }
   };
 
   useEffect(() => {
+    console.log(options)
     setValue(options[0]);
   }, [options,selectedAccount?.key]);
 

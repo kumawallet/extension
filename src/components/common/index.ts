@@ -27,3 +27,4 @@ export * from "./styles/HeaderBack";
 export * from "./styles/TxStatus";
 export * from "./txInfo/AssetInfo";
 export * from "./txInfo/ChainInfo";
+export * from "./ShowCollection";

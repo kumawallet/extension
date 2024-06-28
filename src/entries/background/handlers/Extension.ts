@@ -16,6 +16,7 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
+import {NFT} from "../../../storage/entities/NFT"
 import {
   AccountKey,
   AccountType,
@@ -57,6 +58,7 @@ import {
   RequestShowKey,
   RequestUpdateTx,
   RequestSetAccountToActivity,
+  RequestGetCollection
 } from "./request-types";
 import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
@@ -88,6 +90,7 @@ export default class Extension {
   private chains = new BehaviorSubject<SelectedChain>({});
   private tx = new TransactionEntity();
   private transactionHistory = new TransactionHistory();
+  private nft = new NFT();
 
   constructor() {
     this.subscriptionStatusProvider();
@@ -803,6 +806,24 @@ export default class Extension {
     await Registry.removeContact(address);
   }
 
+  private async getCollection ({address,addressContract,idNetwork}: RequestGetCollection){
+    try{
+      const {provider, type} = this.provider.getProviderByChainId(idNetwork)
+      await this.nft.getCollections(address,addressContract,(provider as ApiPromise | JsonRpcProvider ), type)
+    }
+    catch(error){
+      throw  new Error("Error_getCollection");
+    }
+  }
+  private nftsSubscribe = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(nft.subscription)">(id, port);
+    const subscription = this.nft.getNFTS().subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.nft.getNFTS().getValue();
+  };
+
   private async updateContact({ address, name }: RequestUpdateContact) {
     await Registry.updateContact(address, name);
   }
@@ -1389,6 +1410,11 @@ export default class Extension {
         return this.updateContact(request as RequestUpdateContact);
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
+      case "pri(nft.getCollection)":
+        return this.getCollection(request as RequestGetCollection);
+      case "pri(nft.subscription)": 
+      return this.nftsSubscribe(id,port)
+
 
       case "pri(activity.activitySubscribe)":
         return this.activitySubscribe(id, port);

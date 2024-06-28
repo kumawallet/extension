@@ -52,7 +52,7 @@
     "aptos": "^1.21.0",
     "axios": "^1.7.2",
     "cross-fetch": "^4.0.0",
-    "ethers": "^6.13.1",
+    "ethers": "^6.12.2",
     "graphql-request": "^6.1.0",
     "i18next": "^23.11.5",
     "i18next-browser-languagedetector": "^7.2.1",
