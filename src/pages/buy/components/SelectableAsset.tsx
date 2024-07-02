@@ -32,6 +32,7 @@ const OptImage = ({ image }: { image: string }) => {
     />
   );
 };
+
 export const SelectableAssetBuy = <T extends Chain>({
   buttonClassName,
   containerClassName,
@@ -72,7 +73,7 @@ export const SelectableAssetBuy = <T extends Chain>({
                 open ? "border-[#E6007A]" : ""
               } border-[1.78px] hover:border-[#E6007A] items-center bg-[#040404] rounded-lg py-3 px-2 cursor-default outline outline-transparent focus:outline-primary-default hover:outline-primary-default ${buttonClassName}`}
               displayValue={(asset: Chain) =>
-                asset?.symbol?.toUpperCase() || ""
+                asset?.symbol?.toUpperCase() || asset.name
               }
               onChange={(e) => setQuery(e.target.value)}
               autoComplete="off"
@@ -99,9 +100,9 @@ export const SelectableAssetBuy = <T extends Chain>({
                       {opt.logo && <OptImage image={opt.logo} />}
                       <div className="flex flex-col">
                         <div className="flex gap-2 items-center">
-                          <span>{opt.symbol ? opt.symbol : opt.name}</span>
+                          <span>{opt.isSupportSell ? opt.symbol : opt.name}</span>
                           <span className="rounded-xl py-1 px-2 text-xs text-gray-500">
-                            {opt.symbol && `( ${opt.name} )` }
+                            {opt.isSupportSell && `( ${opt.name} )` }
                           </span>
                         </div>
                       </div>

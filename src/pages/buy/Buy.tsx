@@ -47,9 +47,7 @@ export const Buy = () => {
   };
 
   useEffect(() => {
-    console.log(options)
     setValue(options[0]);
-    console.log(options,"test")
   }, [options,selectedAccount?.key]);
 
   const handleCheckboxChange = () => {

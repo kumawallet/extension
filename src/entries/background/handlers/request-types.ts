@@ -7,7 +7,7 @@ import { NetworkStatus } from "@src/storage/entities/Provider";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Setting from "@src/storage/entities/settings/Setting";
-import { nftContract} from "@src/types"
+import { NFTInfo, NFT_Address} from "@src/types"
 import {
   SettingKey,
   SettingType,
@@ -21,6 +21,7 @@ import {
   SelectedChain,
   Transaction,
 } from "@src/types";
+import { JsonRpcProvider } from "ethers";
 
 export interface RequestSignUp {
   password: string;
@@ -209,8 +210,14 @@ export interface RequestSetAccountToActivity {
 
 export interface RequestGetCollection{
   address: string
-  addressContract: string;
-  idNetwork: string;
+  data: NFTInfo;
+  networkId: string;
+}
+
+export interface RequestContractAddressValidate {
+  address: string
+  contractAddress: string;
+  networkId: string;
 }
 
 export interface Request {
@@ -291,8 +298,9 @@ export interface Request {
       decimals: number;
     }[]
   ];
-  "pri(nft.getCollection)": [RequestGetCollection, void]
-  "pri(nft.subscription)": [null, nftContract[],nftContract[]]
+  "pri(nft.contractAddressValidate)" : [RequestContractAddressValidate, NFTInfo | boolean]
+  "pri(nft.getCollection)": [RequestGetCollection, boolean]
+  "pri(nft.subscription)": [null,NFT_Address ,NFT_Address]
 
   "pri(trustedSites.getTrustedSites)": [null, string[]];
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];

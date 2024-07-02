@@ -58,7 +58,8 @@ import {
   RequestShowKey,
   RequestUpdateTx,
   RequestSetAccountToActivity,
-  RequestGetCollection
+  RequestGetCollection,
+  RequestContractAddressValidate
 } from "./request-types";
 import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
@@ -66,7 +67,7 @@ import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { Chain, Transaction, SelectedChain, ChainType } from "@src/types";
+import { Chain, Transaction, SelectedChain, ChainType, NFT_Address, NFTContract } from "@src/types";
 import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
@@ -633,6 +634,17 @@ export default class Extension {
     });
     return this.chains.getValue();
   };
+  // private nftsSubscribe = (id: string, port: Port) => {
+  //   const cb = createSubscription<"pri(nft.subscription)">(id, port);
+  //   const subscription = this.nft.nfts.subscribe((data) => cb(data));
+  //   port.onDisconnect.addListener(() => {
+  //     subscription.unsubscribe();
+  //   });
+  //   port.onDisconnect.addListener(() => {
+  //      subscription.unsubscribe();
+  //     });
+  //   return this.nft.getNFTS().getValue();
+  // };
 
   private networksStatusSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(network.statusSubscription)">(id, port);
@@ -805,22 +817,74 @@ export default class Extension {
   private async removeContact({ address }: RequestRemoveContact) {
     await Registry.removeContact(address);
   }
-
-  private async getCollection ({address,addressContract,idNetwork}: RequestGetCollection){
+  private async contractAddressValidate({address,contractAddress,networkId}: RequestContractAddressValidate){
     try{
-      const {provider, type} = this.provider.getProviderByChainId(idNetwork)
-      await this.nft.getCollections(address,addressContract,(provider as ApiPromise | JsonRpcProvider ), type)
+      const { provider, type } = this.provider.getProviderByChainId(networkId);
+      if(address.length === 0) {
+        console.log("empty address") 
+        return false
+      }
+      if(!contractAddress) {
+        console.log("empty addressContract") 
+        return false
+      }
+      if(!networkId) {
+        console.log("empty networkId")
+        return false
+      }
+      switch(type){
+      case ChainType.EVM:{
+        const _nfts = this.nft.nfts.getValue()
+        if(_nfts[address] &&_nfts[address][networkId] ){
+          const exist = _nfts[address][networkId].contracts.find((_contract: NFTContract) => _contract.contractAddress === contractAddress);
+          if(exist) return  true
+      }
+        const validated = await this.nft.getContractInfoEVM(contractAddress, provider as JsonRpcProvider)
+        return validated
+      }
+      case ChainType.WASM: {
+        return {
+          contractAddress: "",
+          collectionName: "",
+          collectionSymbol: "",
+          isValidated: false,
+      }
+      }
+      default: {
+        return {
+          contractAddress: "",
+          collectionName: "",
+          collectionSymbol: "",
+          isValidated: false,
+      }
+      }
+    }
     }
     catch(error){
-      throw  new Error("Error_getCollection");
+      console.log(error, "Extension Error contractAddressValidate");
+      throw  new Error("Error_contractAddressValidate");
     }
   }
+  private async getCollection ({address,data,networkId}: RequestGetCollection){
+    try{
+      const {provider, type} = this.provider.getProviderByChainId(networkId)
+      const isSuccessful = await this.nft.getCollections(address,data,(provider as ApiPromise | JsonRpcProvider ), type,networkId)
+      return isSuccessful
+    }
+    catch(error){
+      throw  new Error("Extention: Error_getCollection");
+    }
+  }
+
   private nftsSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(nft.subscription)">(id, port);
-    const subscription = this.nft.getNFTS().subscribe((data) => cb(data));
+    const subscription = this.nft.nfts.subscribe((data:NFT_Address) => cb(data));
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
     });
+    port.onDisconnect.addListener(() => {
+       subscription.unsubscribe();
+      });
     return this.nft.getNFTS().getValue();
   };
 
@@ -1410,6 +1474,9 @@ export default class Extension {
         return this.updateContact(request as RequestUpdateContact);
       case "pri(contacts.removeContact)":
         return this.removeContact(request as RequestRemoveContact);
+
+      case "pri(nft.contractAddressValidate)":
+        return this.contractAddressValidate(request as RequestContractAddressValidate)        
       case "pri(nft.getCollection)":
         return this.getCollection(request as RequestGetCollection);
       case "pri(nft.subscription)": 

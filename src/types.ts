@@ -21,6 +21,9 @@ export type API = {
   [id: string]: Provider;
 };
 
+
+
+
 export type EVMFee = {
   gasLimit: bigint;
   "max fee per gas": bigint;
@@ -55,6 +58,12 @@ export interface AssetAccount {
   id: string;
 }
 
+export enum MessageNFT {
+  ENUM = "successful_operation_enum",
+  NOTENUM = "successful_operation_not_enum",
+  EXIST = " contract_already_exists",
+
+}
 export interface Asset {
   address?: string;
   amount: number | string;
@@ -228,12 +237,13 @@ export enum ChainType {
   OL = "ol",
 }
 
+
 type attributes = {
   trait_type: string;
   value: string;
 }
 
-export type nftData = {
+export type NFTData = {
   tokenId?: string;
   name?: string;
   description?: string;
@@ -244,11 +254,31 @@ export type nftData = {
   audio_url?: string; 
 
 }
-export interface nftContract {
+export interface NFTContract {
   contractAddress: string;
   collectionName: string;
   collectionSymbol: string;
-  balance: string;
+  owner: string;
+  balance: number;
   isEnum?: boolean;
-  nftsData: nftData[] | [];
+  nftsData: NFTData[] | [];
+}
+export interface Contract {
+  contracts: NFTContract[],
+  subscriber: any[], 
+  type: ChainType
+}
+
+export interface NFTInfo {
+  contractAddress: string,
+  collectionName?: string,
+  collectionSymbol?: string,
+  isValidated: boolean,
+}
+export interface NFT_Chain {
+  [chain: string]: Contract
+}
+
+export interface NFT_Address {
+  [address: string] : NFT_Chain
 }

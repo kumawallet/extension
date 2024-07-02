@@ -17,7 +17,7 @@ interface SelectAccountProps {
 
 export const SelectAccount: FC<SelectAccountProps> = ({
   onChangeValue,
-  selectedAddress,
+  selectedAddress
 }) => {
   const { t } = useTranslation("send");
   const {

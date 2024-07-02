@@ -1,10 +1,10 @@
-import { nftContract} from "@src/types";
+import { NFT_Address } from "@src/types";
 
 
 
 
 export interface InitialState {
-  nfts: nftContract[];
+  nfts: NFT_Address;
 }
 
 export interface NFTContext {

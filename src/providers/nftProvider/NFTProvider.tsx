@@ -10,7 +10,7 @@ import {
   import { messageAPI } from "@src/messageAPI/api";
   
   const initialState: InitialState = {
-    nfts: []
+    nfts: {}
   };
   
   const NFTContext = createContext({} as NFTContext);
