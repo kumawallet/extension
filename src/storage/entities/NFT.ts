@@ -2,7 +2,7 @@ import { ApiPromise} from "@polkadot/api";
 import { Contract, JsonRpcProvider} from "ethers";
 import { BehaviorSubject } from "rxjs";
 import erc721  from "@src/constants/erc721_abi.json"
-import { NFT_Address,NFTContract,ChainType, NFTInfo } from "@src/types";
+import { NFT_Address,NFTContract,ChainType, NFTInfo, NFTData } from "@src/types";
 
 
 //const ERC721EnumerableInterfaceId = '0x780e9d63';
@@ -103,7 +103,7 @@ export class NFT {
                             tokenId: tokenId,
                             ...data,
                             owner: data.owner ||  await contract.ownerOf(tokenId)
-                        }
+                        } as NFTData
                     }))
         return {data, isEnum: true }
     }
