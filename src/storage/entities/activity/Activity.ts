@@ -4,7 +4,7 @@ import { RecordStatus } from "./types";
 import { Transaction } from "@src/types";
 
 export default class Activity extends BaseEntity {
-  data: { [account: string]: { [hash: string]: Transaction } };
+  data: { [account: string]: { [hash: string]: Transaction} };
 
   constructor() {
     super();
@@ -36,16 +36,13 @@ export default class Activity extends BaseEntity {
   }: {
     address: string;
     networkNames: string[];
-  }): Promise<Transaction[]> {
+  }): Promise<(Transaction)[] > {
     const activity = await Activity.get<Activity>();
     if (!activity) return [];
 
     const records = Object.values(activity.data[address] || {});
-
-    return records.filter((r) =>
-      [r.originNetwork, r.targetNetwork].some((n) => networkNames.includes(n))
-    );
-  }
+    return records.filter((r) => [r.originNetwork, r.targetNetwork].some((n) => networkNames.includes(n)));}
+  
 
   static async updateRecordStatus(
     key: AccountKey,

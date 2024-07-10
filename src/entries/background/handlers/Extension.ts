@@ -57,9 +57,10 @@ import {
   RequestDeleteSelectNetwork,
   RequestShowKey,
   RequestUpdateTx,
+  RequestUpdateTxNFT,
   RequestSetAccountToActivity,
   RequestGetCollection,
-  RequestContractAddressValidate
+  RequestContractAddressValidate,
 } from "./request-types";
 import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
@@ -67,7 +68,7 @@ import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { Chain, Transaction, SelectedChain, ChainType, NFT_Address, NFTContract } from "@src/types";
+import { Chain, Transaction, SelectedChain, ChainType, NFT_Address } from "@src/types";
 import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
@@ -84,6 +85,7 @@ import {
 } from "@src/utils/account-utils";
 import { AddressOrPair } from "@polkadot/api/types";
 import { Browser } from "@src/utils/constants";
+import { getType } from "@src/utils/assets";
 
 export default class Extension {
   private provider = new Provider();
@@ -634,17 +636,6 @@ export default class Extension {
     });
     return this.chains.getValue();
   };
-  // private nftsSubscribe = (id: string, port: Port) => {
-  //   const cb = createSubscription<"pri(nft.subscription)">(id, port);
-  //   const subscription = this.nft.nfts.subscribe((data) => cb(data));
-  //   port.onDisconnect.addListener(() => {
-  //     subscription.unsubscribe();
-  //   });
-  //   port.onDisconnect.addListener(() => {
-  //      subscription.unsubscribe();
-  //     });
-  //   return this.nft.getNFTS().getValue();
-  // };
 
   private networksStatusSubscribe = (id: string, port: Port) => {
     const cb = createSubscription<"pri(network.statusSubscription)">(id, port);
@@ -817,13 +808,9 @@ export default class Extension {
   private async removeContact({ address }: RequestRemoveContact) {
     await Registry.removeContact(address);
   }
-  private async contractAddressValidate({address,contractAddress,networkId}: RequestContractAddressValidate){
+  private async contractAddressValidate({contractAddress,networkId}: RequestContractAddressValidate){
     try{
       const { provider, type } = this.provider.getProviderByChainId(networkId);
-      if(address.length === 0) {
-        console.log("empty address") 
-        return false
-      }
       if(!contractAddress) {
         console.log("empty addressContract") 
         return false
@@ -834,11 +821,9 @@ export default class Extension {
       }
       switch(type){
       case ChainType.EVM:{
-        const _nfts = this.nft.nfts.getValue()
-        if(_nfts[address] &&_nfts[address][networkId] ){
-          const exist = _nfts[address][networkId].contracts.find((_contract: NFTContract) => _contract.contractAddress === contractAddress);
-          if(exist) return  true
-      }
+        const contracts = this.nft.contracts.find((contract) =>  contract === contractAddress)
+        if(contracts) return  true
+      
         const validated = await this.nft.getContractInfoEVM(contractAddress, provider as JsonRpcProvider)
         return validated
       }
@@ -861,16 +846,26 @@ export default class Extension {
     }
     }
     catch(error){
-      console.log(error, "Extension Error contractAddressValidate");
       throw  new Error("Error_contractAddressValidate");
     }
   }
-  private async getCollection ({address,data,networkId}: RequestGetCollection){
+
+  private async getCollection ({data,networkId}: RequestGetCollection){
     try{
       const {provider, type} = this.provider.getProviderByChainId(networkId)
-      const isSuccessful = await this.nft.getCollections(address,data,(provider as ApiPromise | JsonRpcProvider ), type,networkId)
-      return isSuccessful
+      const allAccounts: any = await Accounts.get().catch(() => null)
+      const accounts: string[] = []
+      allAccounts && Object.keys(allAccounts.data).forEach((key) => {
+                                                             if(getType(allAccounts.data[key].type.toLowerCase()) !== ChainType.OL && getType(allAccounts.data[key].type.toLowerCase()) === type){
+                                                              accounts.push(allAccounts.data[key].value.address)
+                                                             }})
+      this.nft.contracts.push(data.contractAddress);
+      await Promise.all(
+        accounts.map((address) => this.nft.getCollections(address,data,(provider as ApiPromise | JsonRpcProvider ), type,networkId))
+      )
+      this.nft.nfts.next(this.nft._nfts)
     }
+    
     catch(error){
       throw  new Error("Extention: Error_getCollection");
     }
@@ -1043,10 +1038,55 @@ export default class Extension {
     });
   }
 
+  private async updateTxNFT({ tx }: RequestUpdateTxNFT) {
+    const providers = this.provider.getProviders();
+
+    const seed = await this.showKey({
+      address: tx.senderAddress,
+    });
+
+    let signer;
+
+    const provider = providers[tx.network.id];
+    switch(provider.type){
+      case ChainType.EVM: {
+        signer = Wallet.fromPhrase(
+          seed as string,
+          provider.provider as JsonRpcProvider
+        );
+        break;
+      }
+      case ChainType.WASM: {
+        signer = keyring.keyring.addFromMnemonic(seed as string);
+      } 
+    }
+    this.tx.updateTxNFT({
+      contractAddress: tx.contractAddress,
+      destinationAddress: tx.destinationAddress,
+      name: tx.name,
+      tokenId: tx.tokenId,
+      senderAddress: tx.owner,
+      originNetwork: tx.network,
+      targetNetwork: tx.network,
+      provider,
+      signer,
+    })
+  }
+
   private getFeeSubscribe(id: string, port: Port) {
     const cb = createSubscription<"pri(send.getFeeSubscribe)">(id, port);
     const subscription = this.tx.tx.subscribe(async () =>
       cb((await this.tx.getFee()).toString())
+    );
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+      this.tx.clear();
+    });
+  }
+  private getFeeNFTSubscribe(id: string, port: Port) {
+    const cb = createSubscription<"pri(send.getFeeNFTSubscribe)">(id, port);
+    const subscription = this.tx.txNFT.subscribe(async () =>
+      cb((await this.tx.getFeeNFT()).toString())
     );
     port.onDisconnect.addListener(() => {
       subscription.unsubscribe();
@@ -1214,6 +1254,82 @@ export default class Extension {
     }
   }
 
+  private async sendEVMNFT () {
+    try{
+      const {
+        signer,
+        senderAddress,
+        contractAddress,
+        tokenId,
+        destinationAddress,
+        name,
+        originNetwork,
+        targetNetwork,
+        provider
+      } = this.tx.txNFT.getValue();
+      const evmTxNFT = this.tx.evmTxNFT as TransactionRequest;
+      //const evmProvider = provider?.provider as unknown as JsonRpcProvider;
+      const tx = await (signer as Signer).sendTransaction(evmTxNFT);
+      const txHash = tx.hash;
+      const timestamp = Math.round(new Date().getTime() / 1000);
+  
+      const transaction = {
+        id: txHash,
+        tokenId: tokenId,
+        blockNumber: tx.blockNumber!,
+        hash: txHash,
+        originNetwork: originNetwork?.name as string,
+        targetNetwork: originNetwork?.name as string,
+        recipient: destinationAddress,
+        sender: senderAddress,
+        contractAddress: contractAddress,
+        name: name,
+        status: RecordStatus.PENDING,
+        type: RecordType.TRANSFER,
+        tip: "",
+        timestamp,
+        fee: "",
+      };
+      await this.addActivity({
+      senderAddress: senderAddress,
+      txHash,
+      record: transaction,
+       });
+      
+       this.transactionHistory.addTransactionToChain({
+         chainId: originNetwork?.id as string,
+         transaction,
+         originNetwork: originNetwork as Chain,
+         targetNetwork: targetNetwork as Chain
+      });
+  
+      const txReceipt = await (provider?.provider as JsonRpcProvider).getTransaction(txHash);
+  
+      const result = await txReceipt?.wait();
+  
+      const status = result?.status === 1 ? RecordStatus.SUCCESS : RecordStatus.FAIL;
+  
+      const fee = result?.fee.toString() || "0";
+  
+      await this.updateActivity({
+         senderAddress,
+         txHash,
+         status,
+         fee,
+       });
+       this.sendTxNotification({ title: `tx ${status}`, message: txHash });
+       this.transactionHistory.updateTransaction({
+         chainId: originNetwork?.id as string,
+         id: txHash,
+         status,
+         fee,
+       });
+      return true;
+    }
+    catch(error){
+      throw new Error("Error sendNFT")
+    }
+  }
   private async sendEvmTx() {
     try {
       const {
@@ -1480,7 +1596,7 @@ export default class Extension {
       case "pri(nft.getCollection)":
         return this.getCollection(request as RequestGetCollection);
       case "pri(nft.subscription)": 
-      return this.nftsSubscribe(id,port)
+      return this.nftsSubscribe(id,port);
 
 
       case "pri(activity.activitySubscribe)":
@@ -1508,6 +1624,13 @@ export default class Extension {
         return this.getFeeSubscribe(id, port);
       case "pri(send.sendTx)":
         return this.sendTx();
+
+        case "pri(send.updateTxNFT)":
+          return this.updateTxNFT(request as RequestUpdateTxNFT);
+        case "pri(send.getFeeNFTSubscribe)":
+          return this.getFeeNFTSubscribe(id, port);
+        case "pri(send.sendTxNFT)":
+          return this.sendEVMNFT();
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

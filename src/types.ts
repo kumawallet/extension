@@ -182,8 +182,11 @@ export interface OldChain {
 
 export interface Transaction {
   id: string;
-  amount: string;
-  asset: string;
+  amount?: string;
+  asset?: string;
+  contractAddress?: string;
+  tokenId?: string;
+  name?: string;
   blockNumber: number;
   fee: string;
   hash: string;
@@ -195,10 +198,26 @@ export interface Transaction {
   tip: string;
   timestamp: number;
   type: string;
-  isSwap: boolean;
+  isSwap?: boolean;
   version?: string;
   lastUpdated?: number;
 }
+
+// export interface TransactionNFT{
+//         id: string;
+//         tokenId: string;
+//         blockNumber: number;
+//         hash: string;
+//         network: string;
+//         recipient: string,
+//         sender: string;
+//         contractAddress: string;
+//         beforeOwner: string;
+//         status: string;
+//         type: string;
+//         timestamp: number;
+//         fee: string
+// }
 
 export interface FormattedTransaction extends Transaction {
   chainLogo: string;
@@ -244,23 +263,24 @@ type attributes = {
 }
 
 export type NFTData = {
-  tokenId?: string;
+  tokenId: string;
   name?: string;
   description?: string;
   image?: string;
   attributes?: attributes[];
   external_url?: string;
   animation_url?: string;
-  audio_url?: string; 
+  audio_url?: string;
+  owner: string;
 
 }
 export interface NFTContract {
   contractAddress: string;
   collectionName: string;
   collectionSymbol: string;
-  owner: string;
   balance: number;
   isEnum?: boolean;
+  network: string;
   nftsData: NFTData[] | [];
 }
 export interface Contract {

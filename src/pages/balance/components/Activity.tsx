@@ -131,6 +131,7 @@ export const Activity = () => {
         setTransactions(transactions);
         setIsLoading(false);
       });
+      
   }, []);
 
 
@@ -175,6 +176,9 @@ export const Activity = () => {
               chainLogo,
               link,
               isXcm,
+              contractAddress,
+              tokenId,
+              name,
             }) => (
               <Button
                 variant="contained-little-gray"
@@ -197,6 +201,9 @@ export const Activity = () => {
                       version,
                       link,
                       isXcm,
+                      contractAddress,
+                      tokenId,
+                      name,
                     },
                   })
                 }
@@ -252,7 +259,7 @@ export const Activity = () => {
                     <div
                       className={`${stylesActivity.containerText}${stylesActivity.containerAmounts}`}
                     >
-                      <p
+                     {amount && (<p
                         className={`${getAmount({
                           value: amount,
                           symbol: asset,
@@ -265,7 +272,7 @@ export const Activity = () => {
                           value: amount,
                           symbol: asset,
                         })}
-                      </p>
+                      </p>)}
                       <p className={stylesActivity.textFee}>{fee}</p>
                     </div>
                     <BsChevronRight className={stylesActivity.iconArrow} />

@@ -1,6 +1,7 @@
 import {
     RequestGetCollection,
-    RequestContractAddressValidate
+    RequestContractAddressValidate,
+    RequestTransactionEVM
   } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 import { NFT_Address } from "@src/types"
@@ -15,5 +16,8 @@ import { NFT_Address } from "@src/types"
     nftsSubscribe: (cb: (nfts: NFT_Address) => void) => {
         return sendMessage("pri(nft.subscription)", null, cb);
       },
+    nftTransationInfo: (params: RequestTransactionEVM) => {
+      return sendMessage("pri(nft.getTransaccionInfo)",params)
+    }
   };
   

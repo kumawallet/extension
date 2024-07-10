@@ -47,6 +47,10 @@ export const ActivityDetail = () => {
     tip,
     link,
     isXcm,
+    contractAddress,
+    tokenId,
+    name,
+
   } = location.state;
   const { Icon, copyToClipboard } = useCopyToClipboard(hash);
 
@@ -55,9 +59,10 @@ export const ActivityDetail = () => {
       Promise.all([getContacts()]);
     }
   }, [selectedAccount?.key]);
+  useEffect(() => {
+  }, [originNetwork])
 
   const allChains = chains.flatMap((c) => c.chains);
-
   const getContacts = async () => {
     // try {
     //   setIsLoading(true);
@@ -72,7 +77,8 @@ export const ActivityDetail = () => {
     // }
   };
 
-
+  const networks = chains.map((_chains) => _chains.chains).flat()
+  const network = networks.find((_network) => _network.name === originNetwork)
   const getContactName = (address: string) => {
     const contact = contacts.find((c) => c.address === address);
     const ownAccount = ownAccounts.find((c) => c.address === address);
@@ -100,6 +106,9 @@ export const ActivityDetail = () => {
         </button>
       </div>
     ),
+    ["Contract"] : contractAddress && getHash(contractAddress),
+    ["TokenId"]: tokenId && tokenId,
+    ["Token name"] : name && name,
     [t("type")]: type,
     [t("status.name")]: (
       <div className={styleAD.itemsValue}>
@@ -168,16 +177,18 @@ export const ActivityDetail = () => {
         />
       </div>
     ),
-    [t("amount")]: getValue({
+    [t("amount")]: amount && getValue({
       value: amount,
       symbol: asset,
     }),
     [t("estimeted_fee")]: fee,
     [t("tip")]: getTip({
       tip,
-      symbol: asset,
+      symbol: asset || network && network.symbol || "",
     }),
+   
   };
+
 
   return (
     <PageWrapper contentClassName="mt-1/2 ">

@@ -17,6 +17,7 @@ import {
 import erc20Abi from "@src/constants/erc20.abi.json";
 import { OlProvider } from "@src/services/ol/OlProvider";
 import { getEVMFee } from "@src/utils/transfer";
+import erc721  from "@src/constants/erc721_abi.json"
 
 export interface Tx {
   amount: string;
@@ -30,11 +31,23 @@ export interface Tx {
     decimals: number;
     balance: string;
     address?: string | undefined;
-  } | null;
+  } | null; 
   provider: api | null;
   signer: unknown;
   // evmTx?: providers.TransactionRequest;
   // extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
+}
+
+export interface TxNFT {
+  tokenId: string;
+  senderAddress: string;
+  destinationAddress: string;
+  originNetwork: Chain | null;
+  targetNetwork: Chain | null;
+  contractAddress: string;
+  name: string;
+  provider: api | null;
+  signer: unknown;
 }
 
 export class Transaction {
@@ -48,15 +61,35 @@ export class Transaction {
     provider: null,
     signer: null,
     tip: "0",
-  } as Tx);
+  } as Tx );
+
+  public txNFT = new BehaviorSubject({
+    tokenId: "",
+    destinationAddress: "",
+    senderAddress: "",
+    originNetwork: null,
+    targetNetwork: null,
+    contractAddress: "",
+    name: "",
+    provider: null,
+    signer: null,
+    tip: "0",
+  } as TxNFT );
+  
 
   tip = "0";
   isSwap = false;
   evmTx?: TransactionRequest | null = null;
   substrateTx?: SubmittableExtrinsic<"promise"> | null = null;
 
+  evmTxNFT ? : TransactionRequest | null =null;
+
+
   updateTx(tx: Tx) {
     this.tx.next(tx);
+  }
+  updateTxNFT(tx: TxNFT){
+    this.txNFT.next(tx);
   }
 
   async handleWasmTx() {
@@ -142,6 +175,36 @@ export class Transaction {
     this.substrateTx = extrinsic as SubmittableExtrinsic<"promise">;
 
     return estimatedFee;
+  }
+
+  async handleEvmTxNFT() {
+      try{
+        const {
+          tokenId,
+          senderAddress,
+          destinationAddress,
+          contractAddress,
+          provider,
+        } =this.txNFT.getValue();
+      const contract = new Contract(contractAddress,erc721,(provider?.provider as JsonRpcProvider))
+      const [feeData, gasLimit] = await Promise.all([
+          (provider?.provider as JsonRpcProvider).getFeeData(),
+          contract.safeTransferFrom.estimateGas(senderAddress, destinationAddress, tokenId)
+        ]);
+        const estimatedFee = getEVMFee({
+          feeData,
+          gasLimit,
+        }).toString();
+      const evmTxNFT = await contract.safeTransferFrom.populateTransaction(senderAddress, destinationAddress, tokenId);
+      this.evmTxNFT = evmTxNFT;
+      return estimatedFee
+  }
+  catch(error){
+    console.log("Error handleEvmTxNFT: ", error);
+    throw error
+      
+  }
+
   }
 
   async handleEvmTx() {
@@ -290,6 +353,23 @@ export class Transaction {
     }
 
     return "0";
+  }
+
+  async getFeeNFT() {
+    const {provider} = this.txNFT.getValue();
+    switch(provider?.type){
+    case ChainType.WASM:{
+      return "0";
+    } 
+    case ChainType.EVM: {
+      return this.handleEvmTxNFT().catch((error) => {
+        console.error("handleEvmTxNFT error:", error);
+        return "0";
+      });
+    }
+    default:
+    return "0";
+  }
   }
 
   clear() {

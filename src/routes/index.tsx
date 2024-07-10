@@ -13,7 +13,12 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
-  Buy
+  Buy,
+  ShowCollection,
+  NFTDetail,
+  SendNFT,
+  ConfirmTxNFT,
+  ShowGroupCollection
 } from "@src/pages";
 import {
   BugReport,
@@ -47,7 +52,12 @@ import {
   WELCOME,
   CHANGE_PASSWORD,
   SETTINGS_AUTOLOCK,
-  BUY
+  BUY,
+  SHOW_COLLECTION,
+  NFT_DETAILS,
+  SEND_NFT,
+  CONFIRM_TX_NFT,
+  SHOW_GROUP_COLLECTION
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -156,6 +166,11 @@ export const Routes = () => {
         <Route path={WELCOME} element={homeRoute} />
         <Route path={BALANCE} element={<Balance />} />
         <Route path={ACTIVITY_DETAIL} element={<ActivityDetail />} />
+        <Route path={SHOW_COLLECTION} element={<ShowCollection />} />
+        <Route path={SHOW_GROUP_COLLECTION} element={<ShowGroupCollection />} />
+        <Route path={NFT_DETAILS} element={<NFTDetail />} />
+        <Route path={SEND_NFT} element={<SendNFT />} />
+        <Route path={CONFIRM_TX_NFT} element={<ConfirmTxNFT />} />
         <Route path={SIGNIN} element={<SignIn />} />
         <Route path={FORGOT_PASS} element={<ForgotPass />} />
         <Route path={SEND} element={<Send />} />

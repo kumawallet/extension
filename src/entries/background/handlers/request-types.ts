@@ -203,21 +203,38 @@ export interface RequestUpdateTx {
     };
   };
 }
+export interface RequestUpdateTxNFT {
+  tx: {
+    tokenId: string;
+    senderAddress: string;
+    destinationAddress: string;
+    network: Chain;
+    contractAddress: string;
+    owner: string;
+    name: string;
+    };
+  }
 
 export interface RequestSetAccountToActivity {
   address: string;
 }
 
 export interface RequestGetCollection{
-  address: string
   data: NFTInfo;
   networkId: string;
 }
 
 export interface RequestContractAddressValidate {
-  address: string
   contractAddress: string;
   networkId: string;
+}
+
+export interface RequestTransactionEVM{
+  contractAddress: string;
+  networkId: Chain;
+  addressFrom: string;
+  addressTo: string;
+  tokenId: string;
 }
 
 export interface Request {
@@ -299,8 +316,9 @@ export interface Request {
     }[]
   ];
   "pri(nft.contractAddressValidate)" : [RequestContractAddressValidate, NFTInfo | boolean]
-  "pri(nft.getCollection)": [RequestGetCollection, boolean]
+  "pri(nft.getCollection)": [RequestGetCollection, void]
   "pri(nft.subscription)": [null,NFT_Address ,NFT_Address]
+  "pri(nft.getTransaccionInfo)": [RequestTransactionEVM, void]
 
   "pri(trustedSites.getTrustedSites)": [null, string[]];
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];
@@ -309,6 +327,9 @@ export interface Request {
   "pri(send.updateTx)": [RequestUpdateTx, string];
   "pri(send.getFeeSubscribe)": [null, void, string];
   "pri(send.sendTx)": [null, boolean];
+  "pri(send.updateTxNFT)": [RequestUpdateTxNFT, string];
+  "pri(send.getFeeNFTSubscribe)": [null, void, string];
+  "pri(send.sendTxNFT)": [null, boolean];
 }
 
 export type MessageTypes = keyof Request;
