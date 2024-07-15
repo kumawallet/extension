@@ -13,10 +13,13 @@ interface TotalBalanceProps {
   accountName?: string;
   // showBalance : boolean;
   // toggleBalance: () => void;
+  
+  showBalance: boolean;
+  toggleBalance: () => void;
 }
 
-export const TotalBalance: FC<TotalBalanceProps> = () => {
-  const [showBalance, setShowBalance] = useState(true);
+export const TotalBalance: FC<TotalBalanceProps> = ({toggleBalance,showBalance}) => {
+  //const [showBalance, setShowBalance] = useState(true);
   const [currencyLogo, setCurrencyLogo] = useState("$");
 
   const {
@@ -45,7 +48,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
       }, 0)
     }, 0)
   }
-  const toggleBalance = () => setShowBalance(!showBalance);
+  //const toggleBalance = () => setShowBalance(!showBalance);
 
   useEffect(() => {
     setCurrencyLogo(getCurrencyInfo().logo);
@@ -75,7 +78,7 @@ export const TotalBalance: FC<TotalBalanceProps> = () => {
           <p className="text-5xl" data-testid="balance">
             {showBalance
               ? totalBalance() || "0"
-              : "***"}
+              : "* * * *"}
           </p>
         </div>
 

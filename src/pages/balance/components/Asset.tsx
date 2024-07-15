@@ -8,9 +8,10 @@ import { Asset as IAsset } from "@src/types";
 
 interface AssetProps {
   asset: IAsset;
+  showBalance: boolean;
 }
 
-export const Asset: FC<AssetProps> = ({ asset }) => {
+export const Asset: FC<AssetProps> = ({ asset,showBalance }) => {
   const navigate = useNavigate();
 
   const hasMultiplesAccounts = Object.keys(asset.accounts || {})?.length > 0;
@@ -30,11 +31,11 @@ export const Asset: FC<AssetProps> = ({ asset }) => {
         <AssetIcon asset={asset} width={32} />
         <div className="flex flex-col">
           <div className="flex gap-1 items-center">
-            <p className="font-bold text-xl">{asset.balance}</p>
+            { showBalance ?(<p className="font-bold text-xl">{asset.balance}</p>) : "***"}
             <p className="tx-sm">{asset.symbol}</p>
           </div>
           <div className="text-xs text-gray-400 text-start">
-            {formatUSDAmount(Number(asset.amount) || 0)}
+            {showBalance ? formatUSDAmount(Number(asset.amount) || 0) : "***"}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo , FC} from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { MANAGE_ASSETS } from "@src/routes/paths";
@@ -10,7 +10,12 @@ import { CgOptions } from "react-icons/cg";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 import { AssetAccount, Asset as IAsset } from "@src/types";
 
-export const Assets = () => {
+interface AssetProps {
+  showBalance: boolean;
+}
+
+
+export const Assets: FC<AssetProps> = ({showBalance}) => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
@@ -129,7 +134,7 @@ export const Assets = () => {
       {isLoadingAssets && <Loading />}
 
       {filteredAsset.map((asset, index) => {
-        return <Asset asset={asset} key={index} />;
+        return <Asset asset={asset} key={index} showBalance={showBalance}/>;
       })}
 
       <div className="flex justify-center mt-2">

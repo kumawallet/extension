@@ -5,11 +5,13 @@ import { TotalBalance } from "./TotalBalance";
 import { act } from "react-dom/test-utils";
 import { AccountType } from "@src/accounts/types";
 import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
+import { useState } from "react";
 
 const renderComponent = () => {
+  const [showBalance, setShowBalance] = useState(true);
   return render(
     <I18nextProvider i18n={i18n}>
-      <TotalBalance />
+      <TotalBalance toggleBalance={() => setShowBalance(!showBalance)} showBalance={showBalance}/>
     </I18nextProvider>
   );
 };

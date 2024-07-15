@@ -73,7 +73,7 @@ export const ConfirmRecoveryPhrase = () => {
       />
       <div
         data-testid="words-to-select"
-        className="grid grid-cols-3 gap-x-10 mt-5"
+        className="grid grid-cols-3 gap-x-10 mt-[3rem]"
       >
         {wordsRemoved.map((word, index) => (
           <button
