@@ -1,14 +1,14 @@
+import { useEffect, useMemo, useState } from "react";
 import { Button, PageWrapper } from "@src/components/common";
 import { HeaderBack } from "@src/components/common/HeaderBack";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SelectableAssetBuy } from "./components/SelectableAsset";
 import { LinkUrl } from "./components/LinkUrl";
-import { useEffect, useMemo, useState } from "react";
 import { useAccountContext } from "@src/providers";
-import { getType } from "../../utils/assets";
+import { getType } from "@src/utils/assets";
 import { SelectAccount } from "../send/components/SelectAccount";
-import { transakLinks } from "../../utils/constants";
+import { transakLinks } from "@src/utils/constants";
 import useBuy from "./hook/useBuy"
 import { Chain } from "./types";
 
@@ -36,7 +36,7 @@ export const Buy = () => {
       const type = _account && getType(_account.type.toLowerCase());
       return chains.filter((chain) => chain.type === type);
     }
-  }, [selectedAccount, chains, accounts,selectedAddress])
+  }, [selectedAccount, chains, accounts, selectedAddress])
 
 
   const handlerTransak = async () => {
@@ -48,7 +48,7 @@ export const Buy = () => {
 
   useEffect(() => {
     setValue(options[0]);
-  }, [options,selectedAccount?.key]);
+  }, [options, selectedAccount?.key]);
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -56,13 +56,13 @@ export const Buy = () => {
 
   return (
     <PageWrapper
-      contentClassName="h-full flex-1 "
+      contentClassName="h-full flex-1"
       innerContentClassName="flex flex-col !bg-[#212529] gap-[2rem]"
     >
       <HeaderBack
         navigate={navigate}
         title={t("buy_title")}
-        classNameContainer=" !mb-2 "
+        classNameContainer="!mb-2"
       />
       <div className={`flex  flex-col w-full gap-[2rem]`}>
         {!selectedAccount?.value && (
@@ -73,7 +73,7 @@ export const Buy = () => {
         )}
         <div className="flex  flex-col w-full gap-2 ">
           {value && <SelectableAssetBuy
-            defaulValue={value ||  {} }
+            defaulValue={value || {}}
             options={options}
             label=""
             value={value || {}}
@@ -126,12 +126,13 @@ export const Buy = () => {
             onChange={handleCheckboxChange}
             className="w-5 h-5 border-[#636669] border-[2px] rounded-sm "
           />
-          <span className="font-medium text-sm text-[#3D8FEF] cursor-pointer" onClick={handleCheckboxChange}>
+          <span data-testid="checkbox-text" className="font-medium text-sm text-[#3D8FEF] cursor-pointer" onClick={handleCheckboxChange}>
             {t("yes_i_understand")}
           </span>
         </div>
       </div>
       <Button
+        data-testid="buy-button"
         onClick={handlerTransak}
         classname="w-full"
         isDisabled={!isChecked}

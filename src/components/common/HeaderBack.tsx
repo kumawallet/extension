@@ -3,6 +3,7 @@ import { FiChevronLeft } from "react-icons/fi";
 import { iconBack, textHeaderBack } from "@src/styles/general";
 import { ICON_SIZE } from "@src/constants/icons";
 import { styleHeaderBack } from "@src/components/common/styles/HeaderBack";
+
 interface HeaderProps {
   classname?: string;
   style?: CSSProperties;
@@ -10,7 +11,7 @@ interface HeaderProps {
   title: string;
   classNameContainer?: string;
   onBack?: () => void;
-  classnameText ?: string;
+  classnameText?: string;
 }
 
 export const HeaderBack: FC<HeaderProps> = ({
@@ -20,26 +21,32 @@ export const HeaderBack: FC<HeaderProps> = ({
   navigate,
   classNameContainer,
   onBack,
-  classnameText
+  classnameText,
 }) => {
-  const handlerClick = () =>{
-    if(typeof onBack === "function"){
-      onBack();
-    }
-    else{
-      navigate && navigate(-1)
-    }
 
-  }
+  const handlerClick = () => {
+    if (typeof onBack === "function") {
+      onBack();
+    } else {
+      navigate && navigate(-1);
+    }
+  };
+
   return (
     <div className={`${styleHeaderBack.container} ${classNameContainer} `}>
       <FiChevronLeft
+        data-testid="back-button"
         className={`${classname} ${iconBack}`}
         size={ICON_SIZE}
-        onClick={() => handlerClick()}
+        onClick={handlerClick}
         style={style}
       />
-      <p className={`${textHeaderBack} ${classnameText}`}  onClick={() => handlerClick()}>{title}</p>
+      <p
+        className={`${textHeaderBack} ${classnameText}`}
+        onClick={handlerClick}
+      >
+        {title}
+      </p>
     </div>
   );
 };

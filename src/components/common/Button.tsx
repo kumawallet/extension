@@ -59,7 +59,7 @@ export const Button: FC<ButtonProps & PropsWithChildren> = ({
 
   return (
     <button
-      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles} bg-`}
+      className={`${classname || ""} ${BASE_CLASSNAME} ${variantStyles}`}
       onClick={onClick}
       disabled={isDisabled || isLoading}
       style={style}
