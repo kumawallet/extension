@@ -11,11 +11,11 @@ import { formatAmountWithDecimals } from "@src/utils/assets";
 import { AssetAccount, Asset as IAsset } from "@src/types";
 
 interface AssetProps {
-  showBalance: boolean;
+  showBalance?: boolean;
 }
 
 
-export const Assets: FC<AssetProps> = ({showBalance}) => {
+export const Assets: FC<AssetProps> = ({showBalance = true}) => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {

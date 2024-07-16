@@ -14,11 +14,11 @@ interface TotalBalanceProps {
   // showBalance : boolean;
   // toggleBalance: () => void;
   
-  showBalance: boolean;
-  toggleBalance: () => void;
+  showBalance?: boolean;
+  toggleBalance?: () => void;
 }
 
-export const TotalBalance: FC<TotalBalanceProps> = ({toggleBalance,showBalance}) => {
+export const TotalBalance: FC<TotalBalanceProps> = ({toggleBalance = () => {},showBalance = true}) => {
   //const [showBalance, setShowBalance] = useState(true);
   const [currencyLogo, setCurrencyLogo] = useState("$");
 

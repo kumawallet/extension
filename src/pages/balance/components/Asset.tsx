@@ -8,10 +8,10 @@ import { Asset as IAsset } from "@src/types";
 
 interface AssetProps {
   asset: IAsset;
-  showBalance: boolean;
+  showBalance?: boolean;
 }
 
-export const Asset: FC<AssetProps> = ({ asset,showBalance }) => {
+export const Asset: FC<AssetProps> = ({ asset,showBalance = true }) => {
   const navigate = useNavigate();
 
   const hasMultiplesAccounts = Object.keys(asset.accounts || {})?.length > 0;

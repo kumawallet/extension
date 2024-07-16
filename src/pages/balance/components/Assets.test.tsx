@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { Assets } from "./Assets";
 import i18n from "@src/utils/i18n";
 import { I18nextProvider } from "react-i18next";
-import { useState } from "react";
 
 const MOCKS_ASSETS = [
   {
@@ -16,10 +15,9 @@ const MOCKS_ASSETS = [
 ];
 
 const renderComponent = () => {
-  const [showBalance, setShowBalance] = useState(true);
   return render(
     <I18nextProvider i18n={i18n}>
-      <Assets showBalance={showBalance}/>
+      <Assets/>
     </I18nextProvider>
   );
 };
