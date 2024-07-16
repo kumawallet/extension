@@ -1,6 +1,5 @@
 import { FC, PropsWithChildren } from "react"
-import { ColoredBackground, KumaLetters, Logo, PageWrapper } from "../common"
-import { GoChevronLeft } from "react-icons/go";
+import { ColoredBackground, HeaderBack, KumaLetters, Logo, PageWrapper } from "../common"
 import { useTranslation } from "react-i18next";
 
 interface AccountFormWrapperProps extends PropsWithChildren {
@@ -45,23 +44,15 @@ export const AccountFormWrapper: FC<AccountFormWrapperProps> = ({
 
         {topMessage}
 
-        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 md:pb-2 pt-5 pb-10 flex flex-col flex-1">
+        <div className="bg-[#171720] md:rounded-t-2xl px-4 md:px-12 md:pb-2 pt-4 pb-10 flex flex-col flex-1">
           {
             showBackButton && (
-              <div className="py-1 mb-1">
-                <button
-                  className="text-gray-300 text-sm font-light flex items-center gap-1"
-                  onClick={onBack}
-                >
-                  <GoChevronLeft className="inline" size={20} />
-                  <span>{t('back')}</span>
-                </button>
-              </div>
+              <HeaderBack title={t('back')} onBack={onBack} classNameContainer="ml-[-0.35rem] !mb-[1rem]"/>
             )
           }
-          <div className="flex-1 flex flex-col ">
+          <div className="flex-1 flex flex-col relative ">
             <div className={`flex flex-col gap-3 ${centerInnerTitle ? "text-center" : ""}`}>
-              {title && <h3 className="font-mediumm text-lg md:text-[1.5rem]">{title}</h3>}
+              {title && <h3 className="font-normal text-lg md:text-[1.5rem]">{title}</h3>}
               {description &&
                 <p className={`whitespace-pre-line leading-snug md:text-sm text-gray-300 ${descriptionClassName}`}>{description}</p>
               }

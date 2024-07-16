@@ -14,6 +14,7 @@ export const Actions = () => {
         Icon={Send}
         title={t("send")}
         onClick={() => navigate(SEND)}
+        classNameText=" mt-[1rem]"
       />
 
       <Action
@@ -26,6 +27,7 @@ export const Actions = () => {
         Icon={Buy}
         title={t("buy")}
         onClick={() => navigate(BUY)}
+        classNameText=" mt-[1rem]"
       />
     </div>
   );

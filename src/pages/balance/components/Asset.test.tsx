@@ -4,7 +4,6 @@ import i18n from "@src/utils/i18n";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Asset } from "./Asset";
-
 const functionMocks = {
   navigate: vi.fn(),
 }

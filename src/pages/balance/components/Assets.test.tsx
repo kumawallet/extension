@@ -17,7 +17,7 @@ const MOCKS_ASSETS = [
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <Assets />
+      <Assets/>
     </I18nextProvider>
   );
 };

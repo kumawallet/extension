@@ -30,7 +30,7 @@ export const Balance = () => {
   } = useNetworkContext();
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-
+  const [showBalance, setShowBalance] = useState(true);
   const TABS = [t("assets"), t("activity")];
 
   useEffect(() => {
@@ -43,12 +43,12 @@ export const Balance = () => {
   return (
     <>
       <Header />
-      <PageWrapper contentClassName="flex-1 !px-0" innerContentClassName=" !bg-[#0C0C0C]">
+      <PageWrapper contentClassName="flex-1 !px-0" innerContentClassName=" !bg-[#212529]">
         <Bg />
         <div className="flex flex-col pt-3 pb-16 relative">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col">
-              <TotalBalance />
+              <TotalBalance showBalance={showBalance} toggleBalance={() => setShowBalance(!showBalance)}/>
               <AccountSelected />
             </div>
             <Actions />
@@ -77,7 +77,7 @@ export const Balance = () => {
             </Tab.List>
             <Tab.Panels className="mt-2 px-4">
               <Tab.Panel key={0}>
-                <Assets />
+                <Assets showBalance={showBalance} />
               </Tab.Panel>
               <Tab.Panel key={1}>
                 <Activity />
