@@ -316,7 +316,7 @@ export const NFT = () => {
                 <Dialog.Panel
                   className={`relative w-[357px] transform overflow-auto rounded-b-2xl bg-[#171720] ${
                     selectedAccount?.value ? "pt-20 pb-7" : "py-7"
-                  }  px-4 text-left align-middle shadow-xl h-fit transition-all mt-[10%] p-7 h-[20rem] space-y-5`}
+                  }  px-4 text-left align-middle shadow-xl h-fit transition-all mt-[10%] p-7 h-[40rem] space-y-5`}
                 >
                   {value && (
                     <SelectableAssetBuy
