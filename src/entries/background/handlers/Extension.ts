@@ -16,7 +16,8 @@ import Chains from "@src/storage/entities/Chains";
 import Register from "@src/storage/entities/registry/Register";
 import Assets from "@src/storage/entities/Assets";
 import TrustedSites from "@src/storage/entities/TrustedSites";
-import {NFT} from "../../../storage/entities/NFT"
+import { NFT } from "../../../storage/entities/NFT";
+import Contract from "@src/storage/entities/Contracts"
 import {
   AccountKey,
   AccountType,
@@ -61,6 +62,7 @@ import {
   RequestSetAccountToActivity,
   RequestGetCollection,
   RequestContractAddressValidate,
+  RequestContractDelete
 } from "./request-types";
 import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
@@ -68,7 +70,7 @@ import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
 import { BN } from "@polkadot/util";
 import notificationIcon from "/icon-128.png";
-import { Chain, Transaction, SelectedChain, ChainType, NFT_Address } from "@src/types";
+import { Chain, Transaction, SelectedChain, ChainType, NFT_Address, _Contract } from "@src/types";
 import { Port } from "./types";
 import { BehaviorSubject } from "rxjs";
 import { createSubscription } from "./subscriptions";
@@ -87,10 +89,12 @@ import { AddressOrPair } from "@polkadot/api/types";
 import { Browser } from "@src/utils/constants";
 import { getType } from "@src/utils/assets";
 
+
 export default class Extension {
   private provider = new Provider();
   private assetsBalance = new AssetBalance();
   private chains = new BehaviorSubject<SelectedChain>({});
+  public contracts = new BehaviorSubject<_Contract[]>([]); 
   private tx = new TransactionEntity();
   private transactionHistory = new TransactionHistory();
   private nft = new NFT();
@@ -99,6 +103,7 @@ export default class Extension {
     this.subscriptionStatusProvider();
     this.initNetworks();
     this.initTransactionHistory();
+    this.initContracts();
   }
 
   get version() {
@@ -179,6 +184,32 @@ export default class Extension {
     }
   }
 
+  private async initContracts(){
+    Contract.getInstance();
+    const [selectedAccount, allAccounts] = await Promise.all([
+      SelectedAccount.get().catch(() => null),
+      Accounts.get().catch(() => null),
+    ]);
+    const contract = (await Contract.get().catch(() => null)) as Contract;
+    Network.getInstance()
+    const selectedChain : Network = await Network.get()
+    const provider = this.provider.getProviders();
+    this.contracts.next(contract.contracts);
+    
+    if((selectedAccount as Account).value){
+      await this.nft.loadCollection(selectedAccount as Account,provider,Object.keys(selectedChain.selectedChain) , contract.contracts)
+    }
+    else{
+      await Promise.all(
+        Object.keys((allAccounts as Accounts).data).map(
+          (accountKey) => this.nft.loadCollection((allAccounts as Accounts).data[accountKey as AccountTypes] as Account,provider,Object.keys(selectedChain.selectedChain) , contract.contracts)
+      )
+      )
+    }
+    
+    
+  }
+
   private async signUp({ password, privateKeyOrSeed }: RequestSignUp) {
     try {
       validatePasswordFormat(password);
@@ -228,6 +259,7 @@ export default class Extension {
     return true;
   }
 
+
   private subscriptionStatusProvider = () => {
     this.provider.statusNetwork.subscribe(async (data) => {
       if (Object.keys(data).length === 0) return;
@@ -237,17 +269,21 @@ export default class Extension {
         Accounts.get().catch(() => null),
       ]);
       if (!selectedAccount) return;
+
       const networksAssest = this.assetsBalance.getNetwork();
       const newNetwork = Object.keys(data).filter(
         (chain) =>
           !networksAssest.includes(chain) && data[chain] === "connected"
       );
+
       const deleteNetwork = networksAssest.filter(
         (network) =>
           Object.keys(data).includes(network) &&
           data[network] === "disconnected" &&
           !Object.keys(this.chains.getValue()).includes(network)
       );
+      Contract.getInstance()
+      const _contracts = (await Contract.get().catch(() => null)) as Contract;
       const provider = this.provider.getProviders();
       if (newNetwork.length !== 0) {
         if ((selectedAccount as Account).value) {
@@ -260,6 +296,9 @@ export default class Extension {
           await this.transactionHistory.addChain({
             chainId: newNetwork[0],
           });
+          await this.nft.loadCollection((selectedAccount as Account),provider,newNetwork, _contracts.contracts)
+         
+          
         } else {
           await Promise.all(
             Object.keys((allAccounts as Accounts).data).map((accountKey) => {
@@ -276,9 +315,27 @@ export default class Extension {
             })
           );
           this.assetsBalance.assets.next(this.assetsBalance._assets);
+          await Promise.all(
+            Object.keys((allAccounts as Accounts).data).map((accountKey) => this.nft.loadCollection((allAccounts as Accounts).data[
+              accountKey as AccountTypes
+            ] as Account,provider,newNetwork , _contracts.contracts
+          )
+          )
+          )
         }
+      
+        
       }
+      
+
       if (deleteNetwork.length !== 0) {
+        
+      const accounts :Account[] = []
+          Object.keys((allAccounts as Accounts).data).forEach((accountKey) =>{if( getType(((allAccounts as Accounts).data[accountKey as AccountTypes] as Account).type.toLocaleLowerCase()) !== ChainType.OL ){
+            accounts.push((allAccounts as Accounts).data[accountKey as AccountTypes] as Account)
+          }
+        })
+        const fliterContract = _contracts.contracts.filter((contracts) => deleteNetwork.includes(contracts.networkId))
         if ((selectedAccount as Account).value) {
           this.assetsBalance.deleteAsset(
             selectedAccount as Account,
@@ -286,6 +343,7 @@ export default class Extension {
             deleteNetwork
           );
           this.assetsBalance.assets.next(this.assetsBalance._assets);
+          await Promise.all( fliterContract.map((_contract) =>this.nft.desactiveorDeleteContract(_contract.contractAddress,_contract.networkId,_contract.type,[(selectedAccount as Account)])))
         } else {
           Object.keys((allAccounts as Accounts).data).forEach((accountKey) => {
             return this.assetsBalance.deleteAsset(
@@ -295,7 +353,14 @@ export default class Extension {
             );
           });
           this.assetsBalance.assets.next(this.assetsBalance._assets);
+          await Promise.all( fliterContract.map((_contract) =>this.nft.desactiveorDeleteContract(_contract.contractAddress,_contract.networkId,_contract.type,accounts)))
         }
+
+      
+
+      
+      
+      
       }
     });
   };
@@ -671,7 +736,17 @@ export default class Extension {
     const allAccounts = (await Accounts.get()) as Accounts;
     const provider = this.provider.getProviders();
     const selectedAccount = (await SelectedAccount.get()) as SelectedAccount;
-
+    Contract.getInstance();
+    const contracts = (await Contract.get().catch(() => null)) as Contract;
+    const accounts : Account[] = []
+      Object.keys((allAccounts as Accounts).data).forEach((key) => {
+        const _account = (allAccounts as Accounts).data[key as AccountTypes] as Account
+          if(_account.value && Object.keys(this.nft._nfts).includes(_account.value?.address)){
+            accounts.push((allAccounts as Accounts).data[
+              key as AccountTypes
+            ] as Account)
+          }
+      })
     if (!account && selectedAccount.value) {
       const filterAccount = Object.keys(allAccounts.data).filter(
         (_account) => ![selectedAccount.key].includes(_account as AccountKey)
@@ -686,6 +761,15 @@ export default class Extension {
         })
       );
       this.assetsBalance.assets.next(this.assetsBalance._assets);
+      await Promise.all(
+        Object.keys((allAccounts as Accounts).data).map((accountKey) => this.nft.loadCollection((allAccounts as Accounts).data[
+          accountKey as AccountTypes
+        ] as Account,provider,networkSelected, contracts.contracts
+      )
+      )
+      )
+
+
     } else if (account && !selectedAccount.value) {
       const filterAccount = Object.keys(allAccounts.data).filter(
         (_account) => _account !== account.key
@@ -701,6 +785,9 @@ export default class Extension {
         })
       );
       this.assetsBalance.assets.next(this.assetsBalance._assets);
+      await Promise.all( contracts.contracts.map((_cont) => this.nft.desactiveorDeleteContract(_cont.contractAddress,_cont.networkId,_cont.type,accounts)));
+      await this.nft.loadCollection(account,provider,networkSelected, contracts.contracts)
+      
     } else if (account && selectedAccount.value) {
       this.assetsBalance.deleteAsset(
         selectedAccount,
@@ -710,6 +797,9 @@ export default class Extension {
       );
       await this.assetsBalance.loadAssets(account, provider, networkSelected);
       this.assetsBalance.assets.next(this.assetsBalance._assets);
+      await Promise.all( contracts.contracts.map((_cont) => this.nft.desactiveorDeleteContract(_cont.contractAddress,_cont.networkId,_cont.type,accounts)));
+
+      await this.nft.loadCollection(account,provider,networkSelected, contracts.contracts)
     }
     this.transactionHistory.setAccount(account);
 
@@ -821,8 +911,10 @@ export default class Extension {
       }
       switch(type){
       case ChainType.EVM:{
-        const contracts = this.nft.contracts.find((contract) =>  contract === contractAddress)
-        if(contracts) return  true
+        const contracts = Contract.getInstance();
+        const allContracts = contracts.get()
+        const filterContracts = allContracts.find((contract) =>  contract.contractAddress === contractAddress)
+        if(filterContracts) return  true
       
         const validated = await this.nft.getContractInfoEVM(contractAddress, provider as JsonRpcProvider)
         return validated
@@ -834,6 +926,8 @@ export default class Extension {
           collectionSymbol: "",
           isValidated: false,
       }
+        // const validated = await this.nft.getContractInfoWASM(contractAddress,provider as ApiPromise);
+        // return validated;
       }
       default: {
         return {
@@ -852,18 +946,42 @@ export default class Extension {
 
   private async getCollection ({data,networkId}: RequestGetCollection){
     try{
-      const {provider, type} = this.provider.getProviderByChainId(networkId)
-      const allAccounts: any = await Accounts.get().catch(() => null)
-      const accounts: string[] = []
-      allAccounts && Object.keys(allAccounts.data).forEach((key) => {
-                                                             if(getType(allAccounts.data[key].type.toLowerCase()) !== ChainType.OL && getType(allAccounts.data[key].type.toLowerCase()) === type){
-                                                              accounts.push(allAccounts.data[key].value.address)
-                                                             }})
-      this.nft.contracts.push(data.contractAddress);
-      await Promise.all(
-        accounts.map((address) => this.nft.getCollections(address,data,(provider as ApiPromise | JsonRpcProvider ), type,networkId))
-      )
-      this.nft.nfts.next(this.nft._nfts)
+      const provider = this.provider.getProviderByChainId(networkId);
+
+      const [selectedAccount, allAccounts] = await Promise.all([
+        SelectedAccount.get().catch(() => null),
+        Accounts.get().catch(() => null),
+      ]);
+      
+      const newContract =  {
+        contractAddress : data.contractAddress,
+        networkId: networkId,
+        type: provider.type,
+        collectionName: data.collectionName,
+        collectionSymbol: data.collectionSymbol,
+      }
+
+
+      const contract = Contract.getInstance();
+      contract.setOne(newContract);
+      await Contract.set<Contract>(contract);
+
+      
+      const _provider = {
+        [networkId] : provider
+      }
+      if((selectedAccount as Account).value){
+        await this.nft.loadCollection((selectedAccount as Account),_provider,[networkId],[newContract]);
+      }
+      else{
+        await Promise.all(
+          Object.keys((allAccounts as Accounts).data).map((accountKey) => this.nft.loadCollection((allAccounts as Accounts).data[
+            accountKey as AccountTypes
+          ] as Account,_provider,[networkId] , [newContract]
+        )
+        )
+        )
+      }
     }
     
     catch(error){
@@ -882,6 +1000,25 @@ export default class Extension {
       });
     return this.nft.getNFTS().getValue();
   };
+
+  private async deleteContract ({contractAddress,networkId, type}: RequestContractDelete) {
+    try{
+      const account: any = await Accounts.get().catch(() => null)
+      const _accounts: any[] = []
+      Object.keys(account.data).forEach((key) =>  _accounts.push(account.data[key]))
+      const contract = Contract.getInstance();
+      const allContract = (await Contract.get().catch(() => null)) as Contract;
+      const newContracts = allContract.contracts.filter((contract) => contract.contractAddress !== contractAddress);
+      Contract.set(newContracts)
+      await Contract.set<Contract>(contract)
+
+      this.nft.desactiveorDeleteContract(contractAddress, networkId, type,_accounts)
+    }
+    catch(error){
+      throw new Error("Error Contract Delete")
+    }
+
+  }
 
   private async updateContact({ address, name }: RequestUpdateContact) {
     await Registry.updateContact(address, name);
@@ -1631,6 +1768,8 @@ export default class Extension {
           return this.getFeeNFTSubscribe(id, port);
         case "pri(send.sendTxNFT)":
           return this.sendEVMNFT();
+        case "pri(nft.deleteContract)":
+          return this.deleteContract(request as RequestContractDelete);
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

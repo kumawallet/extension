@@ -224,6 +224,12 @@ export interface RequestGetCollection{
   networkId: string;
 }
 
+export interface RequestContractDelete {
+  contractAddress: string;
+  networkId: string;
+  type: ChainType;
+}
+
 export interface RequestContractAddressValidate {
   contractAddress: string;
   networkId: string;
@@ -319,6 +325,7 @@ export interface Request {
   "pri(nft.getCollection)": [RequestGetCollection, void]
   "pri(nft.subscription)": [null,NFT_Address ,NFT_Address]
   "pri(nft.getTransaccionInfo)": [RequestTransactionEVM, void]
+  "pri(nft.deleteContract)": [RequestContractDelete, boolean];
 
   "pri(trustedSites.getTrustedSites)": [null, string[]];
   "pri(trustedSites.addTrustedSite)": [RequestAddTrustedSite, void];

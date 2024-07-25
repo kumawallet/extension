@@ -147,7 +147,7 @@ export const NFT = () => {
 
           const networkData = networks[network];
           networkData.contracts.forEach((contract) => {
-            const { contractAddress, balance, collectionName, isEnum } =
+            const { contractAddress, balance, collectionName, isEnum , network} =
               contract;
             if (!_nfts[network][contractAddress]) {
               _nfts[network][contractAddress] = {
@@ -156,6 +156,7 @@ export const NFT = () => {
                 name: collectionName,
                 isEnum: isEnum,
                 data: [],
+                network: network 
               };
             }
 
@@ -183,8 +184,18 @@ export const NFT = () => {
   }, [selectedAccount, selectedChain, chains, nfts]);
 
   const collections = useMemo(() => {
-    const allChains = chains.map((_chains) => _chains.chains).flat();
+    const allChains = chains.map((_chains) => {
+      if(_chains.title === "wasm_based"){
+        return _chains.chains.filter((chain) => ["astar","shiden"].includes(chain.id))
+      }
+      if(_chains.title === "wasm_based_testnets"){
+        return _chains.chains.filter((chain) => ["rococo","shibuya"].includes(chain.id))
+      }
+      return _chains.chains}).flat();
+
+
     const _filters: Chain[] = [];
+
     allChains.forEach((chain) => {
       let _chain: Chain;
       if (selectedAccount?.value) {
@@ -209,7 +220,7 @@ export const NFT = () => {
       if (
         Object.keys(selectedChain).includes(chain.id) &&
         _account &&
-        getType(_account.type.toLowerCase()) === chain.type
+        getType(_account.type.toLowerCase()) !== ChainType.OL
       ) {
         _chain = {
           name: chain.name,
@@ -326,7 +337,7 @@ export const NFT = () => {
                     <div className="w-full flex flex-col">
                       <input
                         type="text"
-                        className={`border-[1.5px] bg-transparent w-full h-[2rem] input  w-full mt-2 border-[#636669] text-base bg-transparent text-white px-2 py-4  !rounded-lg hasData ${
+                        className={`mt-[1rem] border-[1.5px] bg-transparent w-full h-[2rem] input  w-full mt-2 border-[#636669] text-base bg-transparent text-white px-2 py-4  !rounded-lg hasData ${
                           dataInfo.isValidated === false && "border-red-500"
                         }`}
                         onChange={(event) => {

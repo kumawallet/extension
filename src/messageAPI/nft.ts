@@ -1,7 +1,8 @@
 import {
     RequestGetCollection,
     RequestContractAddressValidate,
-    RequestTransactionEVM
+    RequestTransactionEVM,
+    RequestContractDelete
   } from "@src/entries/background/handlers/request-types";
 import { sendMessage } from ".";
 import { NFT_Address } from "@src/types"
@@ -18,6 +19,9 @@ import { NFT_Address } from "@src/types"
       },
     nftTransationInfo: (params: RequestTransactionEVM) => {
       return sendMessage("pri(nft.getTransaccionInfo)",params)
+    },
+    deleteContract: (params : RequestContractDelete) => {
+      return sendMessage("pri(nft.deleteContract)", params)
     }
   };
   

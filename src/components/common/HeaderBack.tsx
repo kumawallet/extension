@@ -1,10 +1,10 @@
-import { CSSProperties, FC } from "react";
+import { CSSProperties, FC , PropsWithChildren, HTMLAttributes } from "react";
 import { FiChevronLeft } from "react-icons/fi";
 import { iconBack, textHeaderBack } from "@src/styles/general";
 import { ICON_SIZE } from "@src/constants/icons";
 import { styleHeaderBack } from "@src/components/common/styles/HeaderBack";
 
-interface HeaderProps {
+interface HeaderProps extends PropsWithChildren {
   classname?: string;
   style?: CSSProperties;
   navigate?: (path: number) => void;
@@ -22,6 +22,7 @@ export const HeaderBack: FC<HeaderProps> = ({
   classNameContainer,
   onBack,
   classnameText,
+  children
 }) => {
 
   const handlerClick = () => {
@@ -47,6 +48,8 @@ export const HeaderBack: FC<HeaderProps> = ({
       >
         {title}
       </p>
+
+      {children}
     </div>
   );
 };

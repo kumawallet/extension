@@ -21,6 +21,13 @@ export type API = {
   [id: string]: Provider;
 };
 
+export interface _Contract {
+  contractAddress: string;
+  networkId: string;
+  type: ChainType;
+  collectionName?: string,
+  collectionSymbol?: string,
+}
 
 
 

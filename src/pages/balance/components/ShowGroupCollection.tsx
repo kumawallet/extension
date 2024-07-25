@@ -2,15 +2,39 @@ import { NFTContract } from "@src/types";
 import { useLocation, useNavigate } from "react-router-dom";
 import { HeaderBack } from "../../../components/common/HeaderBack";
 import { PageWrapper } from "@src/components/common";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { messageAPI } from "@src/messageAPI/api";
+import { useNetworkContext } from "@src/providers";
 
 export const ShowGroupCollection = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const groups = location.state;
+  const groups : any = location.state;
+  const {
+    state: { selectedChain },
+  } = useNetworkContext();
+
+  const deletecontract = async() => {
+    try{
+      await messageAPI.deleteContract({contractAddress:groups.contractAddress, networkId: groups.network, type: selectedChain[groups.network].type});
+      navigate(-1);
+    }
+    catch(error){
+      console.log("error: font",error)
+    }
+  }
   return (
     <PageWrapper contentClassName="mt-1/2 ">
       <div className="flex flex-col w-full">
-        <HeaderBack title={groups.name} navigate={navigate} />
+        <HeaderBack title={groups.name} navigate={navigate} classNameContainer="justify-between"> 
+          <button onClick={deletecontract}>
+          <RiDeleteBinLine
+                className="text-base"
+                color="#FF0202"
+                height="20px"
+              />
+          </button>
+        </HeaderBack>
         <div className="flex justify-between flex-wrap gap-5 relative h-auto">
           {groups.data.map((_contract: NFTContract, index: number) => (
             <div
