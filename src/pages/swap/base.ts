@@ -1,8 +1,8 @@
 export interface SwapAsset {
   symbol: string;
-  label: string;
+  label?: string;
   image: string;
-  id: string;
+  id: any;
   balance: string;
   decimals: number;
   network: string;

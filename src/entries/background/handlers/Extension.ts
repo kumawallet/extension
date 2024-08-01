@@ -57,6 +57,8 @@ import {
   RequestShowKey,
   RequestUpdateTx,
   RequestSetAccountToActivity,
+  RequestInitHydradx,
+  RequestGetFeeHydra
 } from "./request-types";
 import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise } from "@polkadot/api";
@@ -81,6 +83,7 @@ import {
 } from "@src/utils/account-utils";
 import { AddressOrPair } from "@polkadot/api/types";
 import { Browser } from "@src/utils/constants";
+import { HydraDx } from "@src/storage/HydraDx";
 
 export default class Extension {
   private provider = new Provider();
@@ -88,6 +91,7 @@ export default class Extension {
   private chains = new BehaviorSubject<SelectedChain>({});
   private tx = new TransactionEntity();
   private transactionHistory = new TransactionHistory();
+  private hydraDX = new HydraDx();
 
   constructor() {
     this.subscriptionStatusProvider();
@@ -225,7 +229,7 @@ export default class Extension {
   private subscriptionStatusProvider = () => {
     this.provider.statusNetwork.subscribe(async (data) => {
       if (Object.keys(data).length === 0) return;
-
+      console.log("Providerrrrrrss", data , "======================")
       const [selectedAccount, allAccounts] = await Promise.all([
         SelectedAccount.get().catch(() => null),
         Accounts.get().catch(() => null),
@@ -606,6 +610,45 @@ export default class Extension {
     await this.transactionHistory.addChain({ chainId: id });
 
     return chains;
+  }
+  private hydraSubscribeToSell = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(hydra.subscribeToSell)">(id, port);
+    const subscription = this.hydraDX.assetsToSell.subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.hydraDX.assetsToSell.getValue();
+  };
+  private hydraSubscribeToBuy = (id: string, port: Port) => {
+    const cb = createSubscription<"pri(hydra.subscribeToBuy)">(id, port);
+    const subscription = this.hydraDX.assetsToBuy.subscribe((data) => cb(data));
+    port.onDisconnect.addListener(() => {
+      subscription.unsubscribe();
+    });
+    return this.hydraDX.assetsToBuy.getValue();
+  };
+  private async initHydraDx({ account } : RequestInitHydradx){
+    try{
+      const statusProvider = this.provider.statusNetwork.getValue()
+        if(!Object.keys(statusProvider).includes("hydradx")|| statusProvider["hydradx"] !== "connected"){
+          console.log("entro en el if")
+          await this.setNetwork({id: "hydradx", type: ChainType.WASM, isTestnet: false})
+        }
+        const provider =  this.provider.getProviderByChainId("hydradx")
+        await this.hydraDX.init(provider.provider as ApiPromise, account)
+    }
+    catch(error){
+      console.log(error, "error initHydradx")
+    }
+  }
+
+  private async getFeetHydraDx ({assetToSell, assetToBuy, amount}: RequestGetFeeHydra) {
+    try{
+        await this.hydraDX.getFee(amount,assetToSell, assetToBuy)
+    }
+    catch(error){
+      console.log("error getFee")
+    }
   }
 
   private async deleteSelectNetwork({ id }: RequestDeleteSelectNetwork) {
@@ -1415,6 +1458,15 @@ export default class Extension {
         return this.getFeeSubscribe(id, port);
       case "pri(send.sendTx)":
         return this.sendTx();
+
+      case "pri(hydra.initHydraDX)": 
+        return this.initHydraDx(request as RequestInitHydradx)
+      case "pri(hydra.subscribeToSell)": 
+        return this.hydraSubscribeToSell(id,port);
+      case "pri(hydra.subscribeToBuy)": 
+        return this.hydraSubscribeToBuy(id,port);
+      case "pri(hydra.getFee)": 
+      return this.getFeetHydraDx(request as RequestGetFeeHydra)
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

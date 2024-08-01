@@ -1,4 +1,5 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
+import { SwapAsset } from "@src/pages/swap/base";
 import Account from "@src/storage/entities/Account";
 import { AssetBalance } from "@src/storage/entities/AssetBalance";
 import Chains from "@src/storage/entities/Chains";
@@ -7,6 +8,7 @@ import { NetworkStatus } from "@src/storage/entities/Provider";
 import { RecordStatus } from "@src/storage/entities/activity/types";
 import Contact from "@src/storage/entities/registry/Contact";
 import Setting from "@src/storage/entities/settings/Setting";
+import AccountEntity from "@src/storage/entities/Account";
 import {
   SettingKey,
   SettingType,
@@ -202,6 +204,15 @@ export interface RequestUpdateTx {
   };
 }
 
+export interface RequestInitHydradx{
+  account: Account
+}
+
+export interface RequestGetFeeHydra{
+  amount: number;
+  assetToSell: SwapAsset;
+  assetToBuy: SwapAsset;
+}
 export interface RequestSetAccountToActivity {
   address: string;
 }
@@ -292,6 +303,11 @@ export interface Request {
   "pri(send.updateTx)": [RequestUpdateTx, string];
   "pri(send.getFeeSubscribe)": [null, void, string];
   "pri(send.sendTx)": [null, boolean];
+
+  "pri(hydra.initHydraDX)": [RequestInitHydradx, { assetstosell : SwapAsset[], assetstobuy: SwapAsset[]}]
+  "pri(hydra.subscribeToSell)":  [null, SwapAsset[], SwapAsset[]];
+  "pri(hydra.subscribeToBuy)":  [null, SwapAsset[], SwapAsset[]];
+  "pri(hydra.getFee)": [RequestGetFeeHydra, void]
 }
 
 export type MessageTypes = keyof Request;

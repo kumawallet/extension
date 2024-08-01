@@ -153,7 +153,7 @@ export const ChainSelector = () => {
                             className="flex flex-col gap-3"
                           >
                             {chainGroup.chains.map((chain) => (
-                              <ChainOption
+                              (<ChainOption
                                 key={chain.id}
                                 chain={chain}
                                 status={chainStatus[chain.id] as ChainStatus}
@@ -169,7 +169,7 @@ export const ChainSelector = () => {
                                     chain.isTestnet
                                   )
                                 }
-                              />
+                              />)
                             ))}
                           </div>
 

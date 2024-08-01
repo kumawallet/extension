@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { ApiPromise,WsProvider} from "@polkadot/api"
 import {
   useAccountContext,
   useNetworkContext,
 } from "@src/providers";
 import { decodeAddress } from "@polkadot/util-crypto";
-import { BN } from "@polkadot/util";
 import { formatBN, transformAmountStringToBN } from "@src/utils/assets";
 import { useLoading, useToast } from "@src/hooks";
 import { captureError } from "@src/utils/error-handling";
@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 import { messageAPI } from "@src/messageAPI/api";
 import { getAccountType } from "@src/utils/account-utils";
 import Account from "@src/storage/entities/Account";
-import { Chain } from "@src/types";
+import { Chain, ChainType } from "@src/types";
 
 export interface TxInfoState {
   bridgeType: string;
@@ -70,6 +70,9 @@ export interface Tx {
 export const useSwap = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("swap");
+
+
+
 
   const {
     state: { selectedChain, chains },
@@ -190,8 +193,8 @@ export const useSwap = () => {
   const init = async (selectedAccount: Account) => {
     starLoading();
     try {
+      //stealhex
       const accountType = getAccountType(selectedAccount!.type)?.toLowerCase();
-
       const firstChainId = Object.keys(selectedChain).find((chainId) => {
         return selectedChain[chainId].type === accountType;
       });
@@ -223,7 +226,16 @@ export const useSwap = () => {
         setAssetsToBuy(pairs);
         setAssetToBuy(pairs[1]);
         setSwapper(_swapper);
+        
+    
+    
       }
+
+      //hydradx
+      if(!Object.keys(selectedChain).includes("hydradx")){
+      await messageAPI.setNetwork({id:"hydradx", type: ChainType.WASM, isTestnet: false});
+      }
+      
     } catch (error) {
       showErrorToast("Error fetching assets");
       captureError(error);
@@ -528,6 +540,53 @@ export const useSwap = () => {
       }));
     }
   }, [selectedAccount]);
+
+
+  useEffect(() => {
+    messageAPI.hydraSubscribeToSell((_assetsToSell) => {
+     setAssetsToSell((_assets) => [..._assets,..._assetsToSell])
+     setAssetToSell(_assetsToSell[0])
+    });
+  }, []);
+
+  const initAssetHydraDx = async() => {
+    try{
+      const asset =  selectedAccount && selectedAccount.value && await messageAPI.initHydraDX({account: selectedAccount}) || undefined
+      if(asset){
+        setAssetsToSell((_asset) => [..._asset, ...asset.assetstosell])
+        setAssetToSell(asset.assetstosell[0]);
+        setAssetsToBuy((_asset) => [..._asset, ...asset.assetstobuy]);
+        setAssetToBuy(asset.assetstobuy[0]);
+      }
+      return asset 
+    }
+    catch(error){
+      console.log("ERRROR", error)
+    }
+  }
+  useEffect(() => {
+    messageAPI.networkSubscribe((network) => {
+      if(Object.keys(network).includes("hydradx")){
+        
+        initAssetHydraDx()
+      }
+    });
+  }, []);
+
+
+
+  useEffect(() => {
+    messageAPI.hydraSubscribeToBuy((_assetsToBuy) => {
+     setAssetsToBuy((_assets) => [..._assets,..._assetsToBuy])
+     setAssetToBuy(_assetsToBuy[0])
+    
+    });
+    
+  }, []);
+
+  useEffect(() => {
+    assetsToBuy.length > 0 && assetsToSell.length > 0 && messageAPI.getFeeHydra({amount:1000, assetToSell:assetsToSell[0], assetToBuy:assetsToSell[1]})
+  }, [assetsToBuy, assetsToSell])
 
   return {
     amounts,
