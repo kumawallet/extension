@@ -198,7 +198,6 @@ export const Send = () => {
       !asset
     )
       return;
-
     if (
       !validateRecipientAddress(
         recipientAddress,
@@ -209,7 +208,7 @@ export const Send = () => {
     }
 
     if (amount === "0") return;
-
+    
     (async () => {
       try {
         setValue("isLoadingFee", true);
@@ -259,8 +258,8 @@ export const Send = () => {
         <Button
           data-testid="send-button"
           isLoading={isLoading}
-          isDisabled={isLoadingFees || !haveSufficientBalance}
-          classname="w-full py-4"
+          isDisabled={isLoadingFees /*|| !haveSufficientBalance*/}
+          classname="w-full py-4" 
           onClick={handleSubmit(onSubmit)}
         >
           {t("send_title")}

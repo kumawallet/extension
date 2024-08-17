@@ -48,7 +48,6 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
     }
 
     const { accountId } = transformAddress(address);
-
     return {
       pallet: XCM.pallets.X_TOKENS.NAME,
       method: XCM.pallets.X_TOKENS.methods.TRANSFER,
@@ -56,7 +55,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
         currencyId,
         amount,
         dest: {
-          [XCM_DEFAULT_VERSIONS[xcmPalletVersion]]: {
+          ["V4"]: {
             parents: 1,
             interior: {
               X2: [
@@ -65,7 +64,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
                 },
                 {
                   AccountId32: {
-                    network: "Any",
+                    network: null,
                     id: accountId,
                   },
                 },
@@ -73,7 +72,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
             },
           },
         },
-        destWeightLimit,
+        dest_weight_limit: "Unlimited",
       },
     };
   },
@@ -133,6 +132,60 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
       },
     };
   },
+  hydradx: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+    let currencyId = null;
+    let destWeightLimit: string | { Limited: number } = "Unlimited";
+    switch (assetSymbol?.toLowerCase()) {
+      case "aca" : {
+        currencyId = {
+          Token: "ACA",
+        };
+      }
+      break;
+      case "ldot": {
+        currencyId = {
+          Token: "LDOT",
+        };
+        destWeightLimit = {
+          Limited: 1_000_000_000,
+        };
+        break;
+      }
+      default:
+        throw new Error("Invalid asset symbol");
+    }
+
+    const { accountId } = transformAddress(address);
+
+    return {
+      pallet: XCM.pallets.X_TOKENS.NAME,
+      method: XCM.pallets.X_TOKENS.methods.TRANSFER,
+      extrinsicValues: {
+        currency_id: currencyId,
+        amount,
+        dest: {
+          [XCM_DEFAULT_VERSIONS[xcmPalletVersion]]: {
+            parents: 1,
+            interior: {
+              X2: [
+                {
+                  Parachain: POLKADOT_PARACHAINS.HYDRADX.id,
+                },
+                {
+                  AccountId32: {
+                    network: null,
+                    id: accountId,
+                  },
+                },
+              ],
+            },
+          },
+        } as unknown,
+        dest_weight_limit: "Unlimited",
+      },
+    };
+
+  }
 };
 
 enum ACALA_ASSETS {
@@ -140,10 +193,12 @@ enum ACALA_ASSETS {
   ACA = "ACA",
   ASTR = "ASTR",
   GLMR = "GLMR",
+  LDOT = "LDOT"
 }
 
 export const ACALA_ASSETS_MAPPING = {
   polkadot: [ACALA_ASSETS.DOT],
   astar: [ACALA_ASSETS.ACA, ACALA_ASSETS.ASTR],
   "moonbeam-evm": [ACALA_ASSETS.ACA, ACALA_ASSETS.GLMR],
+  hydradx: [ACALA_ASSETS.LDOT, ACALA_ASSETS.ACA]
 };

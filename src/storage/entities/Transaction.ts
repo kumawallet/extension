@@ -33,6 +33,9 @@ export interface Tx {
   } | null;
   provider: api | null;
   signer: unknown;
+  swapInfo ? : {
+      txHex: string
+    } 
   // evmTx?: providers.TransactionRequest;
   // extrinsicHash?: SubmittableExtrinsic<"promise"> | unknown;
 }
@@ -67,6 +70,7 @@ export class Transaction {
       originNetwork,
       targetNetwork,
       signer,
+      swapInfo
     } = this.tx.getValue();
 
     const provider = this.tx.getValue().provider!.provider as ApiPromise;
@@ -77,11 +81,14 @@ export class Transaction {
     let extrinsic: SubmittableExtrinsic<"promise"> | unknown;
     const bnAmount = transformAmountStringToBN(amount, asset!.decimals);
 
-    if (isXCM) {
+    if(swapInfo && originNetwork?.id === "hydradx"){
+      const { txHex } = swapInfo
+      extrinsic = provider.tx(txHex);
+    }
+    else if (isXCM) {
       const query = provider.query;
       const xcmPallet = query.polkadotXcm || query.xcmPallet;
       const xcmPalletVersion = await xcmPallet.palletVersion();
-
       const { method, pallet, extrinsicValues } = XCM_MAPPING[
         originNetwork!.id
       ][targetNetwork!.id]({
@@ -90,7 +97,6 @@ export class Transaction {
         assetSymbol: asset!.symbol,
         xcmPalletVersion: xcmPalletVersion.toString(),
       }) as MapResponseXCM;
-
       extrinsic = (provider as ApiPromise).tx[pallet][method](
         ...Object.keys(extrinsicValues)
           .filter(
@@ -132,11 +138,9 @@ export class Transaction {
         bnAmount
       );
     }
-
     const { partialFee } = await (
       extrinsic as SubmittableExtrinsic<"promise">
     ).paymentInfo(signer as KeyringPair);
-
     const estimatedFee = partialFee.toString();
 
     this.substrateTx = extrinsic as SubmittableExtrinsic<"promise">;
@@ -271,6 +275,7 @@ export class Transaction {
 
   async getFee() {
     const originNetwork = this.tx.getValue().originNetwork;
+    console.log(this.tx.getValue(), "________________POR AQUI________________________")
 
     if (originNetwork?.type === ChainType.WASM) {
       return this.handleWasmTx().catch((error) => {

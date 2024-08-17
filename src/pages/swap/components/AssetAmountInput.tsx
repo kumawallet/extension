@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
@@ -18,6 +18,7 @@ interface AssetAmountInputProps {
   selectableAsset: JSX.Element;
   showBalance?: boolean
   isPairValid?: boolean
+  type: "buy"| "sell"
 }
 
 export const AssetAmountInput: FC<AssetAmountInputProps> = ({
@@ -34,10 +35,10 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   onValueChange,
   selectableAsset,
   showBalance = true,
-  isPairValid
+  isPairValid,
+  type
 }) => {
   const { t } = useTranslation("swap");
-
 
   return (
     <div className={containerClassName}>
@@ -53,16 +54,17 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
       </div>
 
       <div className="flex">
+        {selectableAsset}
         <div className="flex-1 relative h-fit w-[60%]">
           <NumericFormat
-            className={`input-secondary py-3 rounded-lg pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-r-none`}
+            className={`input-secondary py-3 rounded-lg pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-l-none`}
             allowNegative={false}
             allowLeadingZeros={false}
             value={isLoading ? "" : amount}
             onValueChange={({ value }) => {
               onValueChange(value || "0");
             }}
-            disabled={isLoading || isDisabled || isReadOnly}
+            disabled={isLoading || isDisabled || isReadOnly || type==="buy"}
             allowedDecimalSeparators={["%"]}
             readOnly={isReadOnly}
           />
@@ -83,7 +85,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
           )}
         </div>
 
-        {selectableAsset}
+        
       </div>
       {minSellAmount && isPairValid && (
         <p>

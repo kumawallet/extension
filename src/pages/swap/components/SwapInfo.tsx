@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { TxInfoState } from "../hooks";
+import { TxInfoState, swapType } from "../hooks";
 import { useTranslation } from "react-i18next";
 import { cropAccount } from "@src/utils/account-utils";
 
@@ -17,7 +17,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   const { t } = useTranslation("swap");
 
   const _bridgeName = useMemo(() => {
-    if (bridgeName === "stealthex") {
+    if (bridgeName ===swapType.stealhex) {
       return (
 
         <a href="https://stealthex.io/" target="_blank" rel="noopener noreferrer">
@@ -25,6 +25,20 @@ export const SwapInfo: FC<SwapInfoProps> = ({
             className="bg-[#fde936] p-1"
             src="/images/stealthex.svg"
             alt="Stealthex"
+            width={90}
+          />
+        </a>
+      )
+        ;
+    }
+    else if(bridgeName ===swapType.hydradx){
+      return (
+
+        <a href="https://hydration.net/" target="_blank" rel="noopener noreferrer">
+          <img
+            className="p-1"
+            src="/icons/hydration.svg"
+            alt="hydradx"
             width={90}
           />
         </a>

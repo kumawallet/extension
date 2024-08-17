@@ -23,13 +23,14 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
   const tip = watch("tip");
 
   const haveSufficientBalance = useMemo(() => {
-    if (!asset || amount.trim() === "0") return false;
+    if (!asset || amount.endsWith(".") ||  amount.trim() === "0") return false;
 
     const isNativeAsset = originNetwork?.symbol === asset.symbol;
-
+ 
     let bnAmount = transformAmountStringToBN(amount, asset.decimals);
-
+ 
     if (isNativeAsset) {
+ 
       const bnFee = new BN(fee);
 
       if (isTipEnabled) {
@@ -37,23 +38,23 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
 
         bnAmount = bnAmount.add(new BN(bnTip));
       }
-
+    
       const totalBalance = bnAmount.add(bnFee);
+    
       const haveSufficientBalance = totalBalance.lte(new BN(asset.balance));
       setValue("haveSufficientBalance", haveSufficientBalance);
       return haveSufficientBalance;
     } else {
       let bnBalance = new BN(asset.balance);
-
+    
       if (isTipEnabled) {
         const bnTip = transformAmountStringToBN(tip || "0", asset.decimals);
 
         bnBalance = bnBalance.add(new BN(bnTip));
       }
-
-      const haveEnoughBalance = bnAmount.gte(new BN(amount));
+      
+      const haveEnoughBalance = bnAmount.gte(new BN(Number(amount)));
       const haveEnoughFee = bnBalance.gte(new BN(fee));
-
       const haveSufficientBalance = haveEnoughBalance && haveEnoughFee;
       setValue("haveSufficientBalance", haveSufficientBalance);
       return haveEnoughBalance && haveEnoughFee;

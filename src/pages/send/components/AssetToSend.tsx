@@ -202,25 +202,18 @@ export const AssetToSend = () => {
 
   const chainsToSelectFrom = useMemo(() => {
     if (!senderAddress) return [];
-
     const activeChainIds = Object.keys(selectedChain);
-
     const allChains = chains.map((chain) => chain.chains).flat();
-
     const chainsToSend = allChains.filter((chain) =>
       activeChainIds.includes(chain.id)
     );
-
     const account = accounts.find(
       (account) => account.value?.address === senderAddress
     );
-
     if (!account) return;
-
     const chainsByType = chainsToSend.filter(
       (chain) => chain.type === getType(account?.type?.toLowerCase()) && chainStatus[chain.id] === ChainStatus.CONNECTED
     );
-
     setValue("originNetwork", chainsByType[0]);
     return chainsByType;
   }, [chains, selectedChain, senderAddress, accounts, chainStatus]);
@@ -251,25 +244,21 @@ export const AssetToSend = () => {
     const keyIndex = Object.keys(assets).find((key) =>
       key.toLowerCase().includes(senderAddress.toLowerCase())
     );
-
     if (!keyIndex) return [];
-
+    //console.log(keyIndex, assets[keyIndex]?.[originNetwork.id as string], "por aquiii" )
     const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string];
 
     if (!_assetFromChain) return [];
-
     const availableAssets = _assetFromChain.assets || [];
 
     if (isXCM) {
       const xcmAssets =
         XCM_ASSETS_MAPPING[originNetwork?.id]?.[targetChain?.id] || [];
-
       const filteredAssets = availableAssets.filter(
         ({ symbol }, index, self) =>
           xcmAssets.includes(symbol) &&
           self.findIndex((s) => s.symbol === symbol) === index
       );
-
       const _assets =
         filteredAssets.length > 0 ? filteredAssets : availableAssets;
 
@@ -313,7 +302,7 @@ export const AssetToSend = () => {
     () => {
       setValue("amount", amount);
     },
-    300,
+    3000,
     [amount]
   );
 
@@ -366,6 +355,7 @@ export const AssetToSend = () => {
               setAmount(value);
             }}
             value={amount}
+            decimalSeparator="."
             thousandSeparator=","
           />
 

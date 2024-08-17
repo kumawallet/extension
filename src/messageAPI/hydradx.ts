@@ -1,13 +1,13 @@
 import {
-    RequestInitHydradx,
-    RequestGetFeeHydra
+    RequestGetFeeHydra,
+    RequestGetAssetBuyHydra
   } from "@src/entries/background/handlers/request-types";
   import { sendMessage } from ".";
 import { SwapAsset } from "@src/pages/swap/base";
   
   export const hydraDx = {
-    initHydraDX: (params: RequestInitHydradx) => {
-      return sendMessage("pri(hydra.initHydraDX)", params);
+    initHydraDX: () => {
+      return sendMessage("pri(hydra.initHydraDX)");
     },
     hydraSubscribeToSell: (cb: (assetsToSell: SwapAsset[]) => void) => {
         return sendMessage("pri(hydra.subscribeToSell)", null, cb);
@@ -17,5 +17,8 @@ import { SwapAsset } from "@src/pages/swap/base";
       },
     getFeeHydra:(params : RequestGetFeeHydra) => {
         return sendMessage("pri(hydra.getFee)",params);
+    },
+    getAssetsBuy : (params: RequestGetAssetBuyHydra) => {
+       return sendMessage("pri(hydra.getAssetsBuyHydra)", params)
     }
   };

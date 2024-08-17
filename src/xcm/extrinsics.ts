@@ -9,6 +9,7 @@ import {
   MOONRIVER_EXTRINSICS,
   ROCOCO_EXTRINSICS,
   ROCOCO_ASSET_HUB_EXTRINSICS,
+  HYDRADX_EXTRINSICS
 } from "./chains";
 
 export const XCM_MAPPING: IXCM_MAPPING = {
@@ -19,6 +20,7 @@ export const XCM_MAPPING: IXCM_MAPPING = {
   astar: ASTAR_EXTRINSICS,
   moonriver: MOONRIVER_EXTRINSICS,
   shiden: SHIDEN_EXTRINSICS,
+  hydradx: HYDRADX_EXTRINSICS,
 
   // testnest
   rococo: ROCOCO_EXTRINSICS,

@@ -16,7 +16,6 @@ const useBuy = () => {
         const prefix = CHAINS.find(
           (chain) => chain.symbol === symbol && chain.network === network
         )?.prefix;
-
         const params = {
           apiKey: import.meta.env.VITE_TRANSAK_API_KEY,
           defaultCryptoCurrency: symbol,

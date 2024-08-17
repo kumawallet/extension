@@ -34,6 +34,8 @@ const ETH = "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
 const BUSD = "https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png";
 const ENB = "https://s2.coinmarketcap.com/static/img/coins/64x64/7716.png";
 const $LIBRA = "/images/ol.png";
+const FOURPOOL = "https://chain-list-assets.subwallet.app/assets/chain-assets/hydradx_main-local-4pool.png";
+const TWOPOOL = "https://chain-list-assets.subwallet.app/assets/chain-assets/hydradx_main-local-2pool.png";
 
 export const ASSETS_ICONS: { [key: string]: string } = {
   BTC,
@@ -73,4 +75,6 @@ export const ASSETS_ICONS: { [key: string]: string } = {
   ENB,
   $LIBRA,
   OL: $LIBRA,
+  FOURPOOL,
+  TWOPOOL
 };

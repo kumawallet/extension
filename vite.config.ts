@@ -12,6 +12,7 @@ import rollupNodePolyFill from "rollup-plugin-polyfill-node";
 import { isChrome, isProduction } from "./src/utils/env";
 import { loadEnv } from "vite";
 import wasm from 'vite-plugin-wasm';
+import topLevelAwait from "vite-plugin-top-level-await";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");
@@ -92,7 +93,10 @@ export default ({ mode }: { mode: string }) => {
         buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
       },
     },
-    plugins: [react(), makeManifest(), copyContentStyle(),wasm()],
+    plugins: [react(), topLevelAwait({
+      promiseExportName: "__tla",
+      promiseImportName: i => `__tla_${i}`
+    }),makeManifest(), copyContentStyle(),wasm()],
     publicDir,
     build: {
       chunkSizeWarningLimit: 1000,

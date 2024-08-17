@@ -6,9 +6,9 @@ import {
   SelectableAsset,
   SwapInfo,
 } from "./components";
-import { HiMiniArrowsRightLeft } from "react-icons/hi2";
+// import { HiMiniArrowsRightLeft } from "react-icons/hi2";
 import { useAssetContext } from "@src/providers";
-import { useSwap } from "./hooks";
+import { swapType, TxInfoState, useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
@@ -56,17 +56,15 @@ export const Swap = () => {
     setSenderAddress,
   } = useSwap();
 
-  const canSend =
-    balanceIsSufficient && recipient.address !== "" && assetsToSell.length > 0;
+  const canSend = balanceIsSufficient && recipient.address !== "" && assetsToSell.length > 0 && assetToSell.type === swapType.stealhex|| balanceIsSufficient &&  assetsToSell.length > 0 && assetToSell.type === swapType.hydradx;
 
-  const debouncedHandleAmount = useCallback(debounce(handleAmounts, 300), [
+  const debouncedHandleAmount = useCallback(assetToSell && assetToSell.type === swapType.hydradx ? debounce(handleAmounts, 1000) : debounce(handleAmounts, 300) , [
     amounts,
     minSellAmount,
     assetToSell,
     assetToBuy,
   ]);
-
-
+  
   return (
     <PageWrapper
       contentClassName="h-full flex-1 "
@@ -84,12 +82,18 @@ export const Swap = () => {
 
           <div className="flex flex-col h-[inherit]">
             <div className="flex-1 mt-4">
-              <div className="flex justify-center items-center gap-3 pt-5">
+              {/*<div className="flex justify-center items-center gap-3 pt-5">
                 <SelectableAsset
                   buttonClassName={`border-prrimary-default`}
                   value={assetToSell as SwapAsset}
                   options={assetsToSell}
-                  onChange={(asset) => handleAssetChange("sell", asset)}
+                  onChange={(asset) =>
+                    {
+                      if(asset.type) {
+                        handleAssetChange("sell", asset, asset.type)
+                      }
+                      handleAssetChange("sell",asset)
+                    }}
                   defaulValue={assetToSell as SwapAsset}
                   label={t("transfer_from") as string}
                   position="left"
@@ -100,16 +104,22 @@ export const Swap = () => {
                 <SelectableAsset
                   value={assetToBuy as SwapAsset}
                   options={assetsToBuy}
-                  onChange={(asset) => handleAssetChange("buy", asset)}
+                  onChange={(asset) => 
+                    {
+                      if(asset.type) {
+                        handleAssetChange("buy", asset, asset.type)
+                      }
+                      handleAssetChange("buy",asset)
+                    }}
                   defaulValue={assetToBuy as SwapAsset}
                   label={t("transfer_to") as string}
                   isLoading={isLoading || isLoadingAssets}
                   position="right"
                   isReadOnly={isCreatingSwap}
                 />
-              </div>
+              </div>*/}
 
-              <div className="flex flex-col gap-3 mt-6">
+              <div className="flex flex-col gap-3">
                 <div>
                   <AssetAmountInput
                     minSellAmount={minSellAmount}
@@ -125,21 +135,29 @@ export const Swap = () => {
                     hasMaxOption
                     label={t("you_send") as string}
                     onMax={setMaxAmout}
-                    onValueChange={(val) => debouncedHandleAmount("sell", val)}
+                    onValueChange={(val) => {
+                      //setAmout(val)
+                        debouncedHandleAmount("sell", val)
+
+                    }}
                     isReadOnly={isCreatingSwap}
                     showBalance
                     isPairValid={isPairValid}
+                    type="sell"
                     selectableAsset={
                       <SelectableAsset
                         value={assetToSell as SwapAsset}
                         options={assetsToSell}
-                        onChange={(asset) => handleAssetChange("sell", asset)}
+                        onChange={(asset) =>{ 
+                          handleAssetChange("sell", asset)
+                        }}
                         isLoading={isLoading || isLoadingAssets}
                         defaulValue={assetToSell as SwapAsset}
                         containerClassName="flex-none w-[40%]"
-                        buttonClassName="rounded-l-none bg-[#343a40] border-none border-l-[0.1px] border-l-[#727e8b17]"
-                        position="right"
+                        buttonClassName="rounded-r-none bg-[#343a40] border-none border-r-[0.1px] border-r-[#727e8b17]"
+                        position="left"
                         isReadOnly={isCreatingSwap}
+                        type="sell"
                       />
                     }
                   />
@@ -166,9 +184,10 @@ export const Swap = () => {
                     4
                   )}
                   label={t("you_receive") as string}
-                  onValueChange={(asset) => debouncedHandleAmount("buy", asset)}
+                  onValueChange={(val) => assetToBuy?.type === swapType.stealhex && debouncedHandleAmount("buy", val)}
                   isReadOnly={isCreatingSwap}
                   showBalance={false}
+                  type="buy"
                   selectableAsset={
                     <SelectableAsset
                       value={assetToBuy as SwapAsset}
@@ -177,16 +196,17 @@ export const Swap = () => {
                       onChange={(asset) => handleAssetChange("buy", asset)}
                       defaulValue={assetToBuy as SwapAsset}
                       containerClassName="flex-none w-[40%]"
-                      buttonClassName="rounded-l-none bg-[#343a40] border-none border-l-[0.1px] border-l-[#727e8b17]"
-                      position="right"
+                      buttonClassName="rounded-r-none bg-[#343a40] border-none border-r-[0.1px] border-r-[#727e8b17]"
+                      position="left"
                       isReadOnly={isCreatingSwap}
+                      type="buy"
                     />
                   }
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <RecipientAddress
+               <div className={`flex flex-col gap-2 ${assetToSell && assetToSell.type === swapType.hydradx && "pt-4"}`}>
+               {assetToSell && assetToSell.type === swapType.stealhex &&<RecipientAddress
                   recipentAddressFormat={
                     showRecipientAddress ? assetToBuy?.label?.toUpperCase() : ""
                   }
@@ -202,8 +222,8 @@ export const Swap = () => {
                     handleRecipientChange("isNotOwnAddress", value)
                   }
                   infoTooltipMessage={swapInfoMessage}
-                />
-                <SwapInfo {...txInfo} />
+                />}
+                <SwapInfo {...txInfo as TxInfoState} />
               </div>
             </div>
 
