@@ -21,3 +21,4 @@ export * from "./TotalBalance";
 export * from "./Wallet";
 export * from "./style/activity";
 export * from "./style/activityDetails";
+export * from "./AssetNetwork";

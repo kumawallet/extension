@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Wallet } from "./Wallet";
 import { Footer } from "./Footer";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 export const BalanceAccounts = () => {
   const { t } = useTranslation("balance");
@@ -32,7 +33,7 @@ export const BalanceAccounts = () => {
                 name={account.value!.name}
                 type={account.type}
                 key={account.key}
-                _asset={asset.accounts?.[account.key]}
+                _asset={asset?.accounts?.[account.key]}
                 showBalanceforAsset={true}
               />
             ))}

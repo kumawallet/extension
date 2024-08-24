@@ -80,7 +80,7 @@ export class Transaction {
 
     let extrinsic: SubmittableExtrinsic<"promise"> | unknown;
     const bnAmount = transformAmountStringToBN(amount, asset!.decimals);
-
+    console.log("Esto se esta ejeccutando?")
     if(swapInfo && originNetwork?.id === "hydradx"){
       const { txHex } = swapInfo
       extrinsic = provider.tx(txHex);
@@ -89,6 +89,7 @@ export class Transaction {
       const query = provider.query;
       const xcmPallet = query.polkadotXcm || query.xcmPallet;
       const xcmPalletVersion = await xcmPallet.palletVersion();
+      console.log("originNetwork: ", originNetwork?.id, "targetNetwork: ", targetNetwork?.id, "asset!.symbol: ",asset!.symbol)
       const { method, pallet, extrinsicValues } = XCM_MAPPING[
         originNetwork!.id
       ][targetNetwork!.id]({
@@ -97,6 +98,7 @@ export class Transaction {
         assetSymbol: asset!.symbol,
         xcmPalletVersion: xcmPalletVersion.toString(),
       }) as MapResponseXCM;
+      console.log(extrinsicValues, "---------------------------------Params------------------")
       extrinsic = (provider as ApiPromise).tx[pallet][method](
         ...Object.keys(extrinsicValues)
           .filter(
@@ -158,7 +160,7 @@ export class Transaction {
       targetNetwork,
       signer,
     } = this.tx.getValue();
-
+    console.log("entra aqui", asset)
     const provider = this.tx.getValue().provider!.provider as JsonRpcProvider;
 
     const isXCM = originNetwork!.id !== targetNetwork!.id;
@@ -174,6 +176,7 @@ export class Transaction {
     };
 
     if (isXCM) {
+      console.log("deberia entrar aqui")
       const { method, abi, contractAddress, extrinsicValues } = XCM_MAPPING[
         originNetwork!.id
       ][targetNetwork!.id]({
@@ -182,13 +185,13 @@ export class Transaction {
         assetSymbol: asset!.symbol,
         xcmPalletVersion: "",
       }) as MapResponseEVM;
-
+      console.log( method, abi, contractAddress, extrinsicValues, "Esto es lo que retorna")
       const contract = new Contract(
         contractAddress,
         abi as string,
         signer as Wallet
       );
-
+      console.log("se instancio el contrato")
       const [feeData, gasLimit] = await Promise.all([
         provider.getFeeData(),
         contract[method]?.estimateGas(
@@ -200,7 +203,7 @@ export class Transaction {
           )
         ),
       ]);
-
+      console.log(feeData, gasLimit,"El este es el fee")
       estimatedFee = getEVMFee({
         feeData,
         gasLimit,
@@ -275,7 +278,6 @@ export class Transaction {
 
   async getFee() {
     const originNetwork = this.tx.getValue().originNetwork;
-    console.log(this.tx.getValue(), "________________POR AQUI________________________")
 
     if (originNetwork?.type === ChainType.WASM) {
       return this.handleWasmTx().catch((error) => {

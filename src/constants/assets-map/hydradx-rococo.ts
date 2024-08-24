@@ -14,11 +14,6 @@ export const HYDRADX_ASSETS_TESTNET = [{
     symbol:"USDT",
   },
   {
-    id: "0",
-    decimals: 12,
-    symbol: "HDX",
-  },
-  {
     id: "124",
     decimals: 18,
     symbol:"2-Pool",

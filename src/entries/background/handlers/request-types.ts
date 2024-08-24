@@ -236,6 +236,7 @@ export interface getTxInfoHydradx{
     amountBuy: string;
     swaps: any;
     txHex: string,
+    swapError: string;
 }
 }
 export interface amounts {
@@ -339,8 +340,9 @@ export interface Request {
   "pri(hydra.initHydraDX)": [null, void]
   "pri(hydra.subscribeToSell)":  [null, SwapAsset[], SwapAsset[]];
   "pri(hydra.subscribeToBuy)":  [null, SwapAsset[], SwapAsset[]];
-  "pri(hydra.getFee)": [RequestGetFeeHydra, getTxInfoHydradx],
-  "pri(hydra.getAssetsBuyHydra)": [ RequestGetAssetBuyHydra,getTxInfoHydradx]
+  "pri(hydra.getFee)": [RequestGetFeeHydra, getTxInfoHydradx];
+  "pri(hydra.getAssetsBuyHydra)": [ RequestGetAssetBuyHydra,getTxInfoHydradx];
+  "pri(hydra.clearHydradx)": [null,void];
 }
 
 export type MessageTypes = keyof Request;

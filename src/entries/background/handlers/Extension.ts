@@ -60,7 +60,7 @@ import {
   RequestGetFeeHydra,
   RequestGetAssetBuyHydra,
 } from "./request-types";
-import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
+import { JsonRpcProvider, Mnemonic, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise, Keyring } from "@polkadot/api";
 import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
@@ -994,7 +994,6 @@ export default class Extension {
     const seed = await this.showKey({
       address: tx.senderAddress,
     });
-
     let signer;
     if(tx.swapInfo){
       const swapInfo = tx.swapInfo
@@ -1014,17 +1013,22 @@ export default class Extension {
 
     const provider = providers[tx.originNetwork!.id];
 
-    if (tx.originNetwork?.type === ChainType.EVM) {
-      signer = Wallet.fromPhrase(
-        seed as string,
-        provider.provider as JsonRpcProvider
-      );
+    if (tx.originNetwork?.type === ChainType.EVM ) {
+      if(seed && seed?.length > 24){
+        signer = new Wallet(seed as string, provider.provider as JsonRpcProvider);
+      }
+      else if(seed){
+        signer = Wallet.fromPhrase(
+          seed as string,
+          provider.provider as JsonRpcProvider
+        );
+      }
+      
     } else if (tx.originNetwork?.type === ChainType.WASM) {
       signer = keyring.keyring.addFromMnemonic(seed as string);
     } else if (tx.originNetwork.type === ChainType.OL) {
       signer = seed;
     }
-
     this.tx.updateTx({
       ...tx,
       provider,
@@ -1198,6 +1202,9 @@ export default class Extension {
         message: "",
       });
     }
+  }
+  private clearHydradx(){
+    this.hydraDX.ClearAssets()
   }
 
   private async sendEvmTx() {
@@ -1496,7 +1503,9 @@ export default class Extension {
       case "pri(hydra.getFee)": 
       return this.getFeetHydraDx(request as RequestGetFeeHydra);
       case "pri(hydra.getAssetsBuyHydra)": 
-      return this.getAssetsBuyHydra(request as RequestGetAssetBuyHydra)
+      return this.getAssetsBuyHydra(request as RequestGetAssetBuyHydra);
+      case "pri(hydra.clearHydradx)":
+      return this.clearHydradx()
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

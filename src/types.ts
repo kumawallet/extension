@@ -53,6 +53,7 @@ export interface AssetAccount {
   symbol: string;
   decimals: number;
   id: string;
+  assets: any;
 }
 
 export interface Asset {
@@ -68,6 +69,8 @@ export interface Asset {
   accounts?: {
     [id: string]: AssetAccount;
   };
+  assetNumber ?: number,
+  network ?: string;
 }
 
 export type IAsset = Partial<Asset> & {

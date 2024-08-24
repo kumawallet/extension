@@ -20,5 +20,8 @@ import { SwapAsset } from "@src/pages/swap/base";
     },
     getAssetsBuy : (params: RequestGetAssetBuyHydra) => {
        return sendMessage("pri(hydra.getAssetsBuyHydra)", params)
+    },
+    clearHydradxTrade: () => {
+      return sendMessage("pri(hydra.clearHydradx)");
     }
   };

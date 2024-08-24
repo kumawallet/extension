@@ -1,7 +1,6 @@
 import {
   XCM,
   XCM_DEFAULT_VERSIONS,
-  getBeneficiary,
   getDest,
   transformAddress,
 } from "../utils";
@@ -32,58 +31,6 @@ export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
       dest_weight_limit: "Unlimited",
     },
   })},
-
-//   moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
-//     let assets = null;
-//     switch (assetSymbol?.toLowerCase()) {
-//       case "astr": {
-//         assets = getAssets({
-//           version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-//           fungible: amount,
-//         });
-//         break;
-//       }
-//       case "glmr": {
-//         assets = getAssets({
-//           version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-//           fungible: amount,
-//           interior: {
-//             X2: [
-//               {
-//                 Parachain: POLKADOT_PARACHAINS.MOONBEAM.id,
-//               },
-//               {
-//                 PalletInstance: 10,
-//               },
-//             ],
-//           },
-//         });
-//         break;
-//       }
-//       default:
-//         throw new Error("Invalid asset symbol");
-//     }
-//     return {
-//       pallet: XCM.pallets.POLKADOT_XCM.NAME,
-//       method: XCM.pallets.POLKADOT_XCM.methods.LIMITED_RESERVE_TRANSFER_ASSETS,
-//       extrinsicValues: {
-//         dest: getDest({
-//           parents: 1,
-//           parachainId: POLKADOT_PARACHAINS.MOONBEAM.id,
-//           version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-//         }),
-//         beneficiary: getBeneficiary({
-//           address,
-//           account: "AccountKey20",
-//           version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
-//         }),
-//         assets,
-//         feeAssetItem: 0,
-//         weightLimit: "Unlimited",
-//       },
-//     };
-//   },
-
   acala: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let currency_id = null;
     const { accountId } = transformAddress(address);
@@ -166,6 +113,43 @@ export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
         },
       };
   },
+  "moonbeam-evm": ({ address, amount,assetSymbol, xcmPalletVersion }) => {
+    let currency_id = null;
+    switch (assetSymbol?.toLowerCase()) {
+      case "glmr": currency_id = "16"
+      break;
+      case "dot": currency_id = "5"
+      break;
+      default:
+        throw new Error("Invalid asset symbol");
+    }
+    return {
+        pallet: XCM.pallets.X_TOKENS.NAME,
+        method : XCM.pallets.X_TOKENS.methods.TRANSFER,
+        extrinsicValues: {
+          currency_id,
+          amount,
+          dest: getDest({
+            parents: 1,
+            version: XCM_DEFAULT_VERSIONS[1],
+            interior: {
+              X2:[
+                  {
+                      Parachain: POLKADOT_PARACHAINS.MOONBEAM.id
+                  },
+                  {
+                    AccountKey20:{
+                          network:null,
+                          key:address
+                      }
+                  }
+              ]  
+          }
+          }),
+          dest_weight_limit:"Unlimited"
+        },
+      };
+  }
 };
 
 enum HYDRADX_ASSETS {
@@ -173,10 +157,12 @@ enum HYDRADX_ASSETS {
   ASTR = "ASTR",
   LDOT = "LDOT",
   ACA = "ACA",
+  GLMR = "GLMR"
 }
 
 export const HYDRADX_ASSETS_MAPPING = {
   polkadot: [HYDRADX_ASSETS.DOT],
   acala: [HYDRADX_ASSETS.LDOT, HYDRADX_ASSETS.ACA],
   astar: [HYDRADX_ASSETS.ASTR, HYDRADX_ASSETS.DOT],
+  "moonbeam-evm": [HYDRADX_ASSETS.GLMR, HYDRADX_ASSETS.DOT]
 };

@@ -245,7 +245,6 @@ export const AssetToSend = () => {
       key.toLowerCase().includes(senderAddress.toLowerCase())
     );
     if (!keyIndex) return [];
-    //console.log(keyIndex, assets[keyIndex]?.[originNetwork.id as string], "por aquiii" )
     const _assetFromChain = assets[keyIndex]?.[originNetwork.id as string];
 
     if (!_assetFromChain) return [];

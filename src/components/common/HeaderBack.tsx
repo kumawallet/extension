@@ -11,6 +11,7 @@ interface HeaderProps {
   title: string;
   classNameContainer?: string;
   onBack?: () => void;
+  onBackAsync ?: () => Promise<void>;
   classnameText?: string;
 }
 
@@ -21,6 +22,7 @@ export const HeaderBack: FC<HeaderProps> = ({
   navigate,
   classNameContainer,
   onBack,
+  onBackAsync,
   classnameText,
 }) => {
 
@@ -31,6 +33,11 @@ export const HeaderBack: FC<HeaderProps> = ({
       navigate && navigate(-1);
     }
   };
+
+  const onBackAsyn = async() => {
+    await onBackAsync
+    navigate && navigate(-1);
+  } 
 
   return (
     <div className={`${styleHeaderBack.container} ${classNameContainer} `}>
@@ -43,7 +50,7 @@ export const HeaderBack: FC<HeaderProps> = ({
       />
       <p
         className={`${textHeaderBack} ${classnameText}`}
-        onClick={handlerClick}
+        onClick={onBackAsync ? onBackAsyn : handlerClick}
       >
         {title}
       </p>

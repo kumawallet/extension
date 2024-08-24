@@ -173,6 +173,7 @@ export const XCM = {
       methods: {
         TRANSFER: "transfer",
         TRANSFER_MULTIASSET: "transferMultiasset",
+        TRANSFER_MULTICURRENCIES: "transferMulticurrencies"
       },
     },
   },

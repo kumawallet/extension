@@ -13,7 +13,8 @@ import {
   CreateWallet,
   ImportWallet,
   ChangePassword,
-  Buy
+  Buy,
+
 } from "@src/pages";
 import {
   BugReport,
@@ -23,6 +24,7 @@ import {
   Security,
   Settings,
 } from "@src/pages/settings";
+import { AssetNetwork } from "@src/pages/balance/components"
 import { AutoLock } from "@src/pages/settings/components/Security/AutoLock";
 import {
   BALANCE,
@@ -47,7 +49,8 @@ import {
   WELCOME,
   CHANGE_PASSWORD,
   SETTINGS_AUTOLOCK,
-  BUY
+  BUY,
+  ASSET_NETWORK
 } from "./paths";
 
 import { Loading } from "@src/components/common/Loading";
@@ -167,6 +170,7 @@ export const Routes = () => {
         <Route path={CREATE_ACCOUNT} element={<CreateWallet />} />
         <Route path={CHANGE_PASSWORD} element={<ChangePassword />} />
         <Route path={BALANCE_ACCOUNTS} element={<BalanceAccounts />} />
+        <Route path={ASSET_NETWORK} element={<AssetNetwork />} />
 
         {/* setting views */}
         <Route path={SETTINGS} element={<Settings />} />

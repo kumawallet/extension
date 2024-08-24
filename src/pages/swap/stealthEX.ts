@@ -18,7 +18,7 @@ interface StealthExToken {
   network: string;
 }
 
-const StealthEx_MAP_NATIVE_TOKENS: {
+export const StealthEx_MAP_NATIVE_TOKENS: {
   [key: string]: { realName: string; stealthExName: string; prefix?: number }[];
 } = {
   polkadot: [

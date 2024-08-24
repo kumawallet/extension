@@ -44,8 +44,8 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
       </div>
     ),
     [tSend('amount')]: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
-    [tSend('estimated_fee')]: `${formatFees(fee, tx.assetFrom.decimals)} ${tx.assetFrom.symbol}`,
-    [t('tx_confirm_info')]: t("tx_confirm_info_message", {
+    [tSend('estimated_fee')]: tx.chainFrom.name === "HydraDX" ? `${formatFees(fee, 12)} HDX` : `${formatFees(fee, tx.assetFrom.decimals)} ${tx.chainFrom.name === "hydradx" ? "HDX" :tx.assetFrom.symbol}`,
+    [t('tx_confirm_info')]: tx.chainFrom.name === "HydraDX" ? "" : t("tx_confirm_info_message", {
       address_to_transfer: tx.addressBridge,
       address_to_receive: tx.addressTo,
       receive_amount: tx.amountTo,

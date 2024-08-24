@@ -29,7 +29,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  "moonbeam-evm": ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let assets = null;
     switch (assetSymbol?.toLowerCase()) {
       case "astr": {

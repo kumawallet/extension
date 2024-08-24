@@ -77,7 +77,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
     };
   },
 
-  moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  "moonbeam-evm": ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let currencyId = null;
     let destWeightLimit: string | { Limited: number } = "Unlimited";
 

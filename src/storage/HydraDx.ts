@@ -1,7 +1,7 @@
 import { ApiPromise } from "@polkadot/api";
 import { BehaviorSubject } from "rxjs";
 import { SwapAsset } from "@src/pages/swap/base";
-import { BalanceClient, PoolService,  TradeRouter } from "@galacticcouncil/sdk";
+import { PoolError,Swap, PoolService,  TradeRouter,  } from "@galacticcouncil/sdk";
 import {  swapType } from "@src/pages";
 import { api } from "./entities/Provider";
 import { ASSETS_ICONS } from "../constants/assets-icons";
@@ -14,12 +14,25 @@ export enum ChainStatus {
   CONNECTING = "connecting",
 }
 
+
+export enum SwapErrorType {
+  ERROR_FETCHING_QUOTE = 'ERROR_FETCHING_QUOTE',
+  NOT_MEET_MIN_SWAP = 'NOT_MEET_MIN_SWAP',
+  UNKNOWN = 'UNKNOWN',
+  ASSET_NOT_SUPPORTED = 'ASSET_NOT_SUPPORTED',
+  QUOTE_TIMEOUT = 'QUOTE_TIMEOUT',
+  INVALID_RECIPIENT = 'INVALID_RECIPIENT',
+  SWAP_EXCEED_ALLOWANCE = 'SWAP_EXCEED_ALLOWANCE',
+  SWAP_NOT_ENOUGH_BALANCE = 'SWAP_NOT_ENOUGH_BALANCE',
+  NOT_ENOUGH_LIQUIDITY = 'NOT_ENOUGH_LIQUIDITY',
+  MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT = 'MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT',
+  AMOUNT_CANNOT_BE_ZERO = 'AMOUNT_CANNOT_BE_ZERO',
+}
 const SWAPTS_ASSETS = ["0","5", "9","16", "100", "20", "101", "1000099", "1000100"];
 export class HydraDx {
     assetsToBuy = new BehaviorSubject< SwapAsset[] | [] >([])
     assetsToSell =  new BehaviorSubject< SwapAsset[] | [] >([])
     tradeRouter: TradeRouter | undefined;
-    balanceClient: BalanceClient | undefined;
 
     constructor() {
         this.tradeRouter = undefined
@@ -92,7 +105,28 @@ export class HydraDx {
             
              const minReceive = _sellResult?.amountOut.times(1 - 0.001).integerValue();
              const txHex = _sellResult.toTx(minReceive).hex;
-           
+
+            const  swapRouter = this.getSwapPathErrors(_sellResult.swaps);
+            let swapError = ""
+            if(swapRouter.length > 0){
+              const defaultError = swapRouter[0];
+              switch (defaultError) {
+                case PoolError.InsufficientTradingAmount:
+                  swapError = SwapErrorType.SWAP_NOT_ENOUGH_BALANCE;
+                  break;
+                case PoolError.TradeNotAllowed:
+                  swapError = SwapErrorType.ERROR_FETCHING_QUOTE;
+                  break;
+                case PoolError.MaxInRatioExceeded:
+                  swapError = SwapErrorType.NOT_ENOUGH_LIQUIDITY;
+                  break;
+                case PoolError.UnknownError:
+                  swapError = SwapErrorType.ERROR_FETCHING_QUOTE;
+                  break;
+                case PoolError.MaxOutRatioExceeded:
+                  swapError = SwapErrorType.NOT_ENOUGH_LIQUIDITY;
+              }
+            }
             return {
               bridgeName: swapType.hydradx,
               bridgeFee: _sellResult.tradeFeePct.toString(),
@@ -105,6 +139,7 @@ export class HydraDx {
                 amountBuy: _sellResult.amountOut.toString(),
                 swaps:  _sellResult.swaps,
                 txHex: txHex,
+                swapError : swapError
               },
             }
         }
@@ -148,11 +183,18 @@ export class HydraDx {
       }
 
     }
+    private getSwapPathErrors (swapList: Swap[]): PoolError[] {
+      return swapList.reduce((prev, current) => {
+        return [
+          ...prev,
+          ...current.errors
+        ];
+      }, [] as PoolError[]);
+    }
 
     public ClearAssets (){
       this.assetsToBuy.next([]);
       this.assetsToSell.next([]);
       this.tradeRouter = undefined;
-      this.balanceClient = undefined;
     }
 }

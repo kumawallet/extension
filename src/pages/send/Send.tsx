@@ -202,17 +202,15 @@ export const Send = () => {
       !validateRecipientAddress(
         recipientAddress,
         originNetwork.type as "evm" | "wasm"
-      )
+      ) && originNetwork.id !== "moonbeam-evm"
     ) {
       return;
     }
-
     if (amount === "0") return;
-    
+
     (async () => {
       try {
         setValue("isLoadingFee", true);
-
         await messageAPI.updateTx({
           tx: {
             amount,
