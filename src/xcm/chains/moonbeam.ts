@@ -143,7 +143,7 @@ export const MOONBEAM_EXTRINSICS: { [key: string]: Map } = {
           abi: xTokensAbi,
           method: "transfer",
           extrinsicValues: {
-            currencyAddress: currency_address,
+            currency_address,
             amount: amount.toString(),
             destination: {
               parents : 1,

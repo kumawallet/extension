@@ -214,7 +214,7 @@ export interface RequestGetFeeHydra{
   amount: string;
   assetToSell: SwapAsset;
   assetToBuy: SwapAsset;
-  address: string;
+  slippage: number;
 }
 
 export interface RequestGetAssetBuyHydra{
@@ -235,6 +235,8 @@ export interface getTxInfoHydradx{
     amountSell : string,
     amountBuy: string;
     swaps: any;
+    aliveUntil: number;
+    slippage: number;
     txHex: string,
     swapError: string;
 }

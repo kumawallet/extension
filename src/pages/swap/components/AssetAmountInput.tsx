@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";

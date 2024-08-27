@@ -1,10 +1,24 @@
-import { FC, useEffect, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import { TxInfoState, swapType } from "../hooks";
 import { useTranslation } from "react-i18next";
 import { cropAccount } from "@src/utils/account-utils";
+import { AiOutlineEdit } from "react-icons/ai";
+import { SlippageModal } from "./SlippageModal"
+import { FormProvider, useForm } from "react-hook-form";
 
-type SwapInfoProps = TxInfoState;
-export const HYDRADX_ASSETS = {
+type SwapInfoProps =  TxInfoState & {
+                      setSlippage: (val:number) => void;
+
+                    };
+
+export const _slippage: {[key: string] : string} = {
+                      "0.001":"0.1%",
+                      "0.005": "0.5%",
+                      "0.01" : "1%",
+                      "0.03" : "3%"
+                    }
+
+export const HYDRADX_ASSETS: { [key: string]: string} = {
       "0": "HDX",
       "5": "DOT",
       "9": "ASTR",
@@ -63,6 +77,8 @@ interface swap{
   tradeFeePct: number
 }
 
+
+
 export const SwapInfo: FC<SwapInfoProps> = ({
   bridgeFee,
   bridgeName,
@@ -70,10 +86,18 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   gasFee,
   bridgeType,
   swapInfo,
+  setSlippage
 
 }) => {
   const { t } = useTranslation("swap");
-  
+
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  const methods = useForm({
+    defaultValues: {
+      slippage: "", 
+    },
+  });
 
   const _bridgeName = useMemo(() => {
     if (bridgeName ===swapType.stealhex) {
@@ -144,16 +168,17 @@ export const SwapInfo: FC<SwapInfoProps> = ({
   swapInfo && (
     <div className="flex justify-between items-center text-[#A3A3A3]">
       <p>{t("router_swap")}</p>
+      <div className="flex gap-2">
       {
         swapInfo.swaps.map((router: swap, index : number) => (
-          <div key={index} className="flex items-center gap-2">
+          <div key={index} className={`flex  items-center gap-1 ${swapInfo.swaps.length > 4 && "text-[10px]"}`}>
             {
               index === 0 ? 
               (
                 <>
                   <p>{HYDRADX_ASSETS[router.assetIn] || router.assetIn}</p> 
                   <p>{">"}</p>
-                  <p>{HYDRADX_ASSETS[router.assetOut ] || router.assetOut}</p>
+                  <p>{HYDRADX_ASSETS[router.assetOut] || router.assetOut}</p>
                 </>
               ) : 
               (
@@ -166,9 +191,40 @@ export const SwapInfo: FC<SwapInfoProps> = ({
           </div>
         ))
       }
+      </div>
+
+      
     </div>
   )
 }
+      {
+          swapInfo && swapInfo.slippage && (
+            <div  className="flex justify-between items-center text-[#A3A3A3]">
+                <p>{t("slippage")}</p>
+                <div className="flex gap-2">
+                    <p>
+                        {_slippage[String(swapInfo.slippage)] || `${swapInfo.slippage*100}%`}
+                    </p>
+                    <button data-testid="edit-button" onClick={() => setIsOpen(true)}>
+                        <AiOutlineEdit />
+                    </button>
+
+                    
+                </div>
+
+            </div>
+
+          )
+      }
+      {swapInfo && <FormProvider {...methods}>
+      <SlippageModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(!isOpen)}
+        setSlippage={(val: number) => setSlippage(val)}
+        slippag={swapInfo.slippage.toString()}
+      />
+    </FormProvider>
+      }
     </div>
   );
 };

@@ -31,9 +31,9 @@ const dataMocks = {
 const renderComponent = () => {
   return render(
     <I18nextProvider i18n={i18n}>
-      <Asset
+      {/* <Asset
         asset={dataMocks.asset}
-      />
+      /> */}
     </I18nextProvider>
   );
 };

@@ -21,7 +21,22 @@ export interface assetObj  {
     network: string;
   }[];
 }
-
+// export interface Asset {
+//   address?: string;
+//   amount: number | string;
+//   balance: string;
+//   decimals: number;
+//   id: string;
+//   price?: string;
+//   symbol: string;
+//   transferable?: string;
+//   usdPrice: number;
+//   accounts?: {
+//     [id: string]: AssetAccount;
+//   };
+//   assetNumber ?: number,
+//   network ?: string;
+// }
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
@@ -85,7 +100,7 @@ export const Assets = () => {
             3,
             asset[0].decimals
           ),
-          amount,
+          amount: amount.toString() as string,
           decimals: asset[0].decimals,
           accounts: accountKeysInfo,
           id: asset.find((_asset) => _asset.id === "-1")?.id || asset[0].id,

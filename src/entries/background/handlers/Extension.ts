@@ -60,7 +60,7 @@ import {
   RequestGetFeeHydra,
   RequestGetAssetBuyHydra,
 } from "./request-types";
-import { JsonRpcProvider, Mnemonic, Signer, TransactionRequest, Wallet } from "ethers";
+import { JsonRpcProvider, Signer, TransactionRequest, Wallet } from "ethers";
 import { ApiPromise, Keyring } from "@polkadot/api";
 import keyring from "@polkadot/ui-keyring";
 import { RecordStatus, RecordType } from "@src/storage/entities/activity/types";
@@ -644,9 +644,9 @@ export default class Extension {
     }
   }
 
-  private async getFeetHydraDx ({assetToSell, assetToBuy, amount}: RequestGetFeeHydra) {
+  private async getFeetHydraDx ({assetToSell, assetToBuy, amount, slippage}: RequestGetFeeHydra) {
     try{
-        const data = await this.hydraDX.getFee(amount,assetToSell, assetToBuy);
+        const data = await this.hydraDX.getFee(amount,assetToSell, assetToBuy, slippage);
         return data;
     }
     catch(error){

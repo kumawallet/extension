@@ -132,28 +132,7 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
       },
     };
   },
-  hydradx: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
-    let currencyId = null;
-    let destWeightLimit: string | { Limited: number } = "Unlimited";
-    switch (assetSymbol?.toLowerCase()) {
-      case "aca" : {
-        currencyId = {
-          Token: "ACA",
-        };
-      }
-      break;
-      case "ldot": {
-        currencyId = {
-          Token: "LDOT",
-        };
-        destWeightLimit = {
-          Limited: 1_000_000_000,
-        };
-        break;
-      }
-      default:
-        throw new Error("Invalid asset symbol");
-    }
+  hydradx: ({ address, amount, xcmPalletVersion }) => {
 
     const { accountId } = transformAddress(address);
 
@@ -161,7 +140,9 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
       pallet: XCM.pallets.X_TOKENS.NAME,
       method: XCM.pallets.X_TOKENS.methods.TRANSFER,
       extrinsicValues: {
-        currency_id: currencyId,
+        currency_id:{
+          Token: "ACA",
+        },
         amount,
         dest: {
           [XCM_DEFAULT_VERSIONS[xcmPalletVersion]]: {
@@ -193,12 +174,11 @@ enum ACALA_ASSETS {
   ACA = "ACA",
   ASTR = "ASTR",
   GLMR = "GLMR",
-  LDOT = "LDOT"
 }
 
 export const ACALA_ASSETS_MAPPING = {
   polkadot: [ACALA_ASSETS.DOT],
   astar: [ACALA_ASSETS.ACA, ACALA_ASSETS.ASTR],
   "moonbeam-evm": [ACALA_ASSETS.ACA, ACALA_ASSETS.GLMR],
-  hydradx: [ACALA_ASSETS.LDOT, ACALA_ASSETS.ACA]
+  hydradx: [ACALA_ASSETS.ACA]
 };

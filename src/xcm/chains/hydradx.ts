@@ -8,7 +8,7 @@ import { Map } from "../interfaces";
 import { POLKADOT_PARACHAINS } from "@src/constants/chains";
 
 export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
-  polkadot: ({ address, amount, xcmPalletVersion }) => {
+  polkadot: ({ address, amount }) => {
     const { accountId } = transformAddress(address);
     return({
     pallet: XCM.pallets.X_TOKENS.NAME,
@@ -31,7 +31,7 @@ export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
       dest_weight_limit: "Unlimited",
     },
   })},
-  acala: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  acala: ({ address, amount, assetSymbol }) => {
     let currency_id = null;
     const { accountId } = transformAddress(address);
     switch (assetSymbol?.toLowerCase()) {
@@ -74,7 +74,7 @@ export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
       }
     };
   },
-  astar: ({ address, amount,assetSymbol, xcmPalletVersion }) => {
+  astar: ({ address, amount,assetSymbol }) => {
     let currency_id = null;
     const { accountId } = transformAddress(address);
     switch (assetSymbol?.toLowerCase()) {
@@ -113,7 +113,7 @@ export const HYDRADX_EXTRINSICS: { [key: string]: Map } = {
         },
       };
   },
-  "moonbeam-evm": ({ address, amount,assetSymbol, xcmPalletVersion }) => {
+  "moonbeam-evm": ({ address, amount,assetSymbol }) => {
     let currency_id = null;
     switch (assetSymbol?.toLowerCase()) {
       case "glmr": currency_id = "16"
@@ -162,7 +162,7 @@ enum HYDRADX_ASSETS {
 
 export const HYDRADX_ASSETS_MAPPING = {
   polkadot: [HYDRADX_ASSETS.DOT],
-  acala: [HYDRADX_ASSETS.LDOT, HYDRADX_ASSETS.ACA],
+  acala: [HYDRADX_ASSETS.ACA],
   astar: [HYDRADX_ASSETS.ASTR, HYDRADX_ASSETS.DOT],
   "moonbeam-evm": [HYDRADX_ASSETS.GLMR, HYDRADX_ASSETS.DOT]
 };

@@ -58,7 +58,7 @@ export interface AssetAccount {
 
 export interface Asset {
   address?: string;
-  amount: number | string;
+  amount: string;
   balance: string;
   decimals: number;
   id: string;

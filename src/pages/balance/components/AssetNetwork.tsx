@@ -7,22 +7,21 @@ import { useAssetContext } from "@src/providers";
 import { useMemo } from "react";
 import { Asset } from "./Asset";
 import { formatAmountWithDecimals } from "@src/utils/assets";
-import { AssetAccount } from "@src/types";
-import { AccountsStore } from "@polkadot/extension-base/stores";
 
-
-
-export type assetNetwork =  {
-    balance: string | number;
-    amount: number;
+type asset = {
+    balance: string;
+    amount: string;
     symbol: string;
     decimals: number;
     id: string;
     accountKey: string;
     network: string;
     accounts ?: any;
+}
 
-  }[]
+export type assetNetwork =  asset[]
+
+
 
 export const AssetNetwork = () => {
   const { t } = useTranslation("balance");
@@ -32,13 +31,23 @@ export const AssetNetwork = () => {
     state: { asset },
   } = useLocation();
   const {
-    state: { assets, isLoadingAssets },
+    state: { assets },
   } = useAssetContext();
 
   const assetsForNetwork = useMemo(
     ()=> {
 
-    const outputObject:assetNetwork = [];
+    const outputObject:{
+        balance: number | string;
+        amount: number | string;
+        symbol: string;
+        decimals: number;
+        id: string;
+        accountKey: string;
+        network: string;
+        accounts ?: any;
+    
+      }[] = [];
 
     if (Object.keys(assets).length !== 0) {
       Object.keys(assets).forEach((accountKey) => {
@@ -71,17 +80,19 @@ export const AssetNetwork = () => {
           newAssets[index].amount += asset.amount;
           newAssets[index].accounts[asset.accountKey] = asset
         } else {
+            asset.balance = asset.balance.toString()
+            asset.amount = asset.amount.toString();
             const _asset = {
                 ...asset,
                 accounts: {
                     [asset.accountKey] : asset
                 }
             } 
-          newAssets.push(_asset);
+          newAssets.push(_asset as asset);
         }
         });
     newAssets.forEach((asset, index) => {
-        newAssets[index].balance = formatAmountWithDecimals((asset.balance as number),3,asset.decimals)
+        newAssets[index].balance = formatAmountWithDecimals(Number(asset.balance ),3,asset.decimals).toString()
     })
 
     newAssets = newAssets.sort((a, b) => {

@@ -1,15 +1,14 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { AssetIcon } from "@src/components/common";
 import { BALANCE_ACCOUNTS, SEND, ASSET_NETWORK } from "@src/routes/paths";
 import { formatUSDAmount } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa6";
-import { SUBSTRATE_CHAINS } from "../../../constants/chainsData/substrate"
 import { useNetworkContext } from "@src/providers";
 import { AssetAccount } from "@src/types";
 export interface IAsset {
   address?: string;
-  amount: number | string;
+  amount: string;
   balance: string;
   decimals: number;
   id: string;

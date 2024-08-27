@@ -45,7 +45,6 @@ export class HydraDx {
       this.tradeRouter = tradeRouter;
       const assets = await tradeRouter.getAllAssets()
     const assetsToSell : SwapAsset[]= []
-
     SWAPTS_ASSETS.forEach((asset) => {
       const find = assets.find((_asset) => _asset.id === asset);
       if(find){
@@ -95,15 +94,14 @@ export class HydraDx {
     this.assetsToBuy.next(assetsBuy);
     }
 
-    public async getFee ( amount: string, assetToSell: SwapAsset, assetToBuy: SwapAsset) {
+    public async getFee ( amount: string, assetToSell: SwapAsset, assetToBuy: SwapAsset, slippage: number) {
         try{
             const _sellResult = await this.tradeRouter?.getBestSell(assetToSell.id, assetToBuy.id,amount);
             
             if(!_sellResult){
               throw new Error("Error in _sellResult")
             }
-            
-             const minReceive = _sellResult?.amountOut.times(1 - 0.001).integerValue();
+             const minReceive = _sellResult?.amountOut.times(1 - slippage).integerValue();
              const txHex = _sellResult.toTx(minReceive).hex;
 
             const  swapRouter = this.getSwapPathErrors(_sellResult.swaps);
@@ -125,6 +123,7 @@ export class HydraDx {
                   break;
                 case PoolError.MaxOutRatioExceeded:
                   swapError = SwapErrorType.NOT_ENOUGH_LIQUIDITY;
+                  break;
               }
             }
             return {
@@ -137,7 +136,9 @@ export class HydraDx {
                 idAsseToBuy: assetToBuy.id,
                 amountSell : _sellResult.amountIn.toString(),
                 amountBuy: _sellResult.amountOut.toString(),
+                aliveUntil: Date.now() + 30000,
                 swaps:  _sellResult.swaps,
+                slippage: slippage || 0.001,
                 txHex: txHex,
                 swapError : swapError
               },
@@ -178,8 +179,7 @@ export class HydraDx {
         this.assetsToBuy.next(assetsBuy);
       }
       catch(error){
-        console.log(error)
-        throw error
+        throw new Error("Error in getAssetsToBuy")
       }
 
     }

@@ -22,6 +22,7 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
   const { t } = useTranslation("swap");
   const { t: tSend } = useTranslation("send")
   const [fee, setFee] = useState("0");
+  const [isAlive, setIsAlive] = useState<boolean>(true)
 
   useEffect(() => {
     messageAPI.getFee((fee) => {
@@ -30,6 +31,9 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
 
   }, [])
 
+  const getInfo =() =>{
+    return !isAlive ? "The quote has expired. Please request a new quote." : ""
+  }
 
   const transaction = {
     [tSend('sender')]: cropAccount(tx.addressFrom, 12),
@@ -45,13 +49,36 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
     ),
     [tSend('amount')]: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
     [tSend('estimated_fee')]: tx.chainFrom.name === "HydraDX" ? `${formatFees(fee, 12)} HDX` : `${formatFees(fee, tx.assetFrom.decimals)} ${tx.chainFrom.name === "hydradx" ? "HDX" :tx.assetFrom.symbol}`,
-    [t('tx_confirm_info')]: tx.chainFrom.name === "HydraDX" ? "" : t("tx_confirm_info_message", {
+    [t('tx_confirm_info')]: tx.chainFrom.name === "HydraDX" ? getInfo() : t("tx_confirm_info_message", {
       address_to_transfer: tx.addressBridge,
       address_to_receive: tx.addressTo,
       receive_amount: tx.amountTo,
       receive_asset: tx.assetTo.symbol
     })
   };
+
+
+  const Alive =(): boolean => {
+    const currentTime = Date.now(); 
+      
+    if (tx.aliveUntil && currentTime > tx.aliveUntil) {
+      console.log(tx.aliveUntil,currentTime, currentTime > tx.aliveUntil, "ASASASAASASASASAAASSAASA")
+      setIsAlive(false)
+      transaction[t('tx_confirm_info')] = "The quote has expired. Please request a new quote."
+      return false
+    }
+    setIsAlive(true)
+    return true;
+  }
+  useEffect(() => {
+    if(tx.aliveUntil){
+    const intervalId = setInterval(Alive, 1000); 
+    
+    return () => clearInterval(intervalId);
+    }
+
+    
+  }, [tx.aliveUntil]);
 
   return (
     <>
@@ -62,7 +89,13 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
       <div className="flex flex-1">
         <TxSummary tx={transaction} />
       </div>
+      {tx.chainFrom.name === "Hydration" &&
+        <div className="w-full text-base text-[#EBE212] text-center">
+          {getInfo()}
+        </div>
+      }
       <Button
+        isDisabled={!isAlive}
         classname={`font-medium text-base capitalize w-full py-2 mt-7 !mx-0`}
         onClick={onConfirm}
       >

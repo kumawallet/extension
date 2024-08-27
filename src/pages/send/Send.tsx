@@ -256,7 +256,7 @@ export const Send = () => {
         <Button
           data-testid="send-button"
           isLoading={isLoading}
-          isDisabled={isLoadingFees /*|| !haveSufficientBalance*/}
+          isDisabled={isLoadingFees || !haveSufficientBalance}
           classname="w-full py-4" 
           onClick={handleSubmit(onSubmit)}
         >

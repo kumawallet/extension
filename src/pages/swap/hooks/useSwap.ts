@@ -31,6 +31,8 @@ export interface TxInfoState {
     idAsseToBuy: string;
     amountSell : string,
     amountBuy: string;
+    slippage: number;
+    aliveUntil:number;
     swaps: any;
     txHex: string;
     swapError: string;
@@ -47,6 +49,8 @@ enum networkStatus {
   ERROR_TYPE = "error_type",
 
 }
+
+
 export interface Tx {
   addressBridge: string;
   addressFrom: string;
@@ -86,6 +90,7 @@ export interface Tx {
     estimatedTotal: string;
   };
   swapId: string;
+  aliveUntil ?: number;
 }
 
 export const useSwap = () => {
@@ -94,7 +99,7 @@ export const useSwap = () => {
 
 
 
-
+  const [slippage, setSlippage] = useState<number>(0.01)
   const {
     state: { selectedChain, chains },
   } = useNetworkContext();
@@ -217,6 +222,7 @@ export const useSwap = () => {
       amountSell : string,
       amountBuy: string;
       swaps: Swap;
+      aliveUntil: number;
       txHex: string;
       swapError: string;
   }
@@ -330,7 +336,7 @@ export const useSwap = () => {
     }));
   };
 
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   const handleAmounts = async (label: "sell" | "buy", value: string) => {
     try {
@@ -342,7 +348,6 @@ export const useSwap = () => {
               [label]: value,
             }));
             starLoadingBuyAsset();
-            
             const { estimatedAmount, minAmount } = await swapper!.getEstimatedAmount({
               from: (assetToSell.symbol || "")?.toLowerCase(),
               to: (assetToBuy.symbol || "")?.toLowerCase(),
@@ -368,11 +373,10 @@ export const useSwap = () => {
           if(Object.keys(assetToSell).length === 0 && Object.keys(assetToBuy).length === 0) return
 
           label === "sell" ? starLoadingBuyAsset() : starLoadingSellAsset();
-          await delay(1000)
+          //await delay(1000)
           if(assetToSell.id === assetToBuy.id) return
-          const info = await handlertxInfoHydradx(assetToSell as SwapAsset,assetToBuy as SwapAsset,value);
+          const info = await handlertxInfoHydradx(assetToSell as SwapAsset,assetToBuy as SwapAsset,value, slippage);
           if(!info){
-                showErrorToast("Error in handlerTxInfoHydradx")
                 return
           }
           setAmounts((prevState) => ({
@@ -619,6 +623,7 @@ export const useSwap = () => {
             estimatedFee: txInfo.gasFee,
             estimatedTotal: txInfo.gasFee
           },
+          aliveUntil: txInfo.swapInfo.aliveUntil
         };
         setTx(updateTx);
   
@@ -746,7 +751,7 @@ export const useSwap = () => {
   }, [assetToBuy?.label, assetToSell?.label]);
 
 
-  const handlertxInfoHydradx = async(assetSell: SwapAsset, assetBuy: SwapAsset, amount: string) => {
+  const handlertxInfoHydradx = async(assetSell: SwapAsset, assetBuy: SwapAsset, amount: string, slippage: number) => {
     try{
         if(
           assetSell.id && 
@@ -757,7 +762,7 @@ export const useSwap = () => {
                 amount:amount, 
                 assetToSell:assetSell, 
                 assetToBuy:assetBuy, 
-                address: selectedAccount?.value?.address ||  tx.addressFrom,
+                slippage: slippage
               })
               if(data.swapInfo.swapError.length > 0){
                 showErrorToast(data.swapInfo.swapError);
@@ -1018,6 +1023,8 @@ const setNetworkSwap = async(_network: string) => {
     setAssetToBuy,
     setAssetToSell,
     setMaxAmout,
+    setSlippage,
+    slippage,
     showRecipientAddress,
     swap,
     swapInfoMessage,

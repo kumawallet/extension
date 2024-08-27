@@ -10,8 +10,7 @@ import { useAssetContext } from "@src/providers";
 import { swapType, TxInfoState, useSwap } from "./hooks";
 import { formatBN } from "@src/utils/assets";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useRef } from "react";
-import debounce from "lodash.debounce";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SwapAsset } from "./base";
 import { SwapTxSummary } from "./components/SwapTxSummary";
 import { SelectAccount } from "../send/components/SelectAccount";
@@ -23,6 +22,9 @@ export const Swap = () => {
   const {
     state: { isLoadingAssets },
   } = useAssetContext();
+
+
+  const [values, setValues] = useState<{label:"sell"|"buy", amount:string}>({ label: "sell", amount: "0"});
 
   const {
     amounts,
@@ -46,6 +48,8 @@ export const Swap = () => {
     recipient,
     sellBalanceError,
     setMaxAmout,
+    setSlippage,
+    slippage,
     showRecipientAddress,
     swap,
     swapInfoMessage,
@@ -56,37 +60,32 @@ export const Swap = () => {
     setSenderAddress,
   } = useSwap();
 
-  const canSend = balanceIsSufficient && recipient.address !== "" && assetsToSell.length > 0 && assetToSell.type === swapType.stealhex|| balanceIsSufficient &&  assetsToSell.length > 0 && assetToSell.type === swapType.hydradx;
-  const clearExistingInterval = () => {
+  const canSend = balanceIsSufficient && recipient.address !== "" && assetsToSell.length > 0 && assetToSell.type === swapType.stealhex || balanceIsSufficient &&  assetsToSell.length > 0 && assetToSell.type === swapType.hydradx && txInfo.swapInfo && txInfo.swapInfo.swapError === "";
+  
+  const clearExistingInterval = useCallback( () => {
     if (intervalIdRef.current !== null) {
       clearInterval(intervalIdRef.current);
       intervalIdRef.current = null;
     }
-  };
+  },[]);
+  
   const intervalIdRef = useRef<number | null>(null);
-  const debouncedHandleAmount = useCallback((label: "sell" | "buy", amount: string) => {
   
-    
   
-    if (assetToSell && assetToSell.type === swapType.hydradx) {
-      handleAmounts(label, amount)
-  
-      clearExistingInterval();
-  
-      intervalIdRef.current = setInterval(() => {
-        handleAmounts(label, amount);
-      }, 30000)as unknown as number;
-    } else {
+  const startInterval = () => {
+    clearExistingInterval();
+    intervalIdRef.current = setInterval(() => {
+      handleAmounts(values.label, values.amount);
+    }, 30000) as unknown as number;
+  };
 
-      handleAmounts(label, amount);
-
-      clearExistingInterval();
-      
-      handleAmounts(label, amount)
+  useEffect(() => {
+    if (assetToSell && values.amount !== "0") {
+      handleAmounts(values.label, values.amount);
+      startInterval();
     }
     return () => clearExistingInterval();
-  }, [amounts, minSellAmount, assetToSell, assetToBuy]);
-
+  }, [values.amount, assetToSell, assetToBuy, slippage]);
 
   
   return (
@@ -125,7 +124,7 @@ export const Swap = () => {
                     onMax={setMaxAmout}
                     onValueChange={(val) => {
                         if(val.endsWith(".") || val.length === 0) return
-                        debouncedHandleAmount("sell", val)
+                        setValues({label: "sell", amount: val})
 
                     }}
                     isReadOnly={isCreatingSwap}
@@ -156,7 +155,7 @@ export const Swap = () => {
                       }
                     />
                   )}
-                  {!isPairValid && (
+                  {!isPairValid && assetToSell.type === swapType.stealhex && (
                     <InputErrorMessage
                       message={t("pair_not_supported") as string}
                     />
@@ -211,7 +210,7 @@ export const Swap = () => {
                   }
                   infoTooltipMessage={swapInfoMessage}
                 />}
-                <SwapInfo {...txInfo as TxInfoState} />
+                <SwapInfo {...txInfo as TxInfoState} setSlippage={(val: number) => setSlippage(val)} />
               </div>
             </div>
 
