@@ -62,7 +62,6 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
     const currentTime = Date.now(); 
       
     if (tx.aliveUntil && currentTime > tx.aliveUntil) {
-      console.log(tx.aliveUntil,currentTime, currentTime > tx.aliveUntil, "ASASASAASASASASAAASSAASA")
       setIsAlive(false)
       transaction[t('tx_confirm_info')] = "The quote has expired. Please request a new quote."
       return false

@@ -196,13 +196,17 @@ export const Send = () => {
       !recipientAddress ||
       !sender ||
       !asset
+      
     )
       return;
     if (
       !validateRecipientAddress(
         recipientAddress,
         originNetwork.type as "evm" | "wasm"
-      ) && originNetwork.id !== "moonbeam-evm"
+      ) && originNetwork.id !== "moonbeam-evm" || originNetwork.id === "moonbeam-evm" && !validateRecipientAddress(
+        recipientAddress,
+        targetNetwork.type as "evm" | "wasm"
+      )
     ) {
       return;
     }
@@ -256,7 +260,7 @@ export const Send = () => {
         <Button
           data-testid="send-button"
           isLoading={isLoading}
-          isDisabled={isLoadingFees || !haveSufficientBalance}
+          isDisabled={isLoadingFees || !haveSufficientBalance || recipientAddress.length === 0}
           classname="w-full py-4" 
           onClick={handleSubmit(onSubmit)}
         >

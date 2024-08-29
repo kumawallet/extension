@@ -5,51 +5,54 @@ import {
   useNetworkContext,
 } from "@src/providers";
 import { decodeAddress } from "@polkadot/util-crypto";
-import { formatAmountWithDecimals, formatBN,  transformAmountStringToBN } from "@src/utils/assets";
+import {
+  formatAmountWithDecimals,
+  formatBN,
+  transformAmountStringToBN,
+} from "@src/utils/assets";
 import { useLoading, useToast } from "@src/hooks";
 import { captureError } from "@src/utils/error-handling";
 import { StealthEX, StealthEx_MAP_NATIVE_TOKENS } from "../stealthEX";
-import {  SwapAsset, Swapper } from "../base";
+import { SwapAsset, Swapper } from "../base";
 import { useNavigate } from "react-router-dom";
 import { BALANCE } from "@src/routes/paths";
 import { useTranslation } from "react-i18next";
 import { messageAPI } from "@src/messageAPI/api";
-import { getAccountType } from "@src/utils/account-utils";
+import { getAccountType, transformAddress } from "@src/utils/account-utils";
 import Account from "@src/storage/entities/Account";
 import { Chain, ChainType } from "@src/types";
 import { BN } from "@polkadot/util";
 import debounce from "lodash.debounce";
 import { Swap } from "@galacticcouncil/sdk";
+import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 export interface TxInfoState {
   bridgeType: string;
   bridgeName: swapType;
   bridgeFee: string;
   gasFee: string | null;
   destinationAddress: string | null;
-  swapInfo ?: { 
+  swapInfo?: {
     idAssetToSell: string;
     idAsseToBuy: string;
-    amountSell : string,
+    amountSell: string;
     amountBuy: string;
     slippage: number;
-    aliveUntil:number;
+    aliveUntil: number;
     swaps: any;
     txHex: string;
     swapError: string;
-}
+  };
 }
 export enum swapType {
   stealhex = "stealHex",
-  hydradx = "hydraDx"
+  hydradx = "hydraDx",
 }
 
 enum networkStatus {
   CONECTED = "conected",
   NOT_CONNECTED = "no_connected",
   ERROR_TYPE = "error_type",
-
 }
-
 
 export interface Tx {
   addressBridge: string;
@@ -90,16 +93,14 @@ export interface Tx {
     estimatedTotal: string;
   };
   swapId: string;
-  aliveUntil ?: number;
+  aliveUntil?: number;
 }
 
 export const useSwap = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("swap");
 
-
-
-  const [slippage, setSlippage] = useState<number>(0.01)
+  const [slippage, setSlippage] = useState<number>(0.01);
   const {
     state: { selectedChain, chains },
   } = useNetworkContext();
@@ -108,9 +109,9 @@ export const useSwap = () => {
     state: { accounts, selectedAccount },
   } = useAccountContext();
 
-  const { state : { assets }} = useAssetContext()
-
-
+  const {
+    state: { assets },
+  } = useAssetContext();
 
   const { isLoading, starLoading, endLoading } = useLoading();
   const {
@@ -124,6 +125,11 @@ export const useSwap = () => {
     endLoading: endLoadingSellAsset,
   } = useLoading();
   const {
+    isLoading: isLoadingBalance,
+    starLoading: starLoadingBalance,
+    endLoading: endLoadingBalance,
+  } = useLoading();
+  const {
     isLoading: isCreatingSwap,
     starLoading: starCreatingSwap,
     endLoading: endCreatingSwap,
@@ -132,7 +138,7 @@ export const useSwap = () => {
   const { showErrorToast, showSuccessToast } = useToast();
 
   const [loadAssetsHydra, setLoadAssetsHydra] = useState(false);
-  const [amount , setAmout] = useState<string>("")
+  const [amount, setAmout] = useState<string>("");
 
   const [assetToSell, setAssetToSell] = useState<Partial<SwapAsset>>({
     label: "",
@@ -154,8 +160,7 @@ export const useSwap = () => {
     isNotOwnAddress: false,
     address: "",
   });
-  const [loadAssetHydra, setLoadAssetHydra] = useState<boolean>(false);
-  const [network,setNetwork] = useState<string>("")
+  const [network, setNetwork] = useState<string>("");
 
   const [txInfo, setTxInfo] = useState<TxInfoState>({
     bridgeType: "",
@@ -210,24 +215,23 @@ export const useSwap = () => {
     sell: "0",
     buy: "0",
   });
- interface TxInfoState {
+  interface TxInfoState {
     bridgeName: swapType;
     bridgeType: string;
     bridgeFee: string;
     gasFee: string;
     destinationAddress: string | null;
-    swapInfo?: { 
+    swapInfo?: {
       idAssetToSell: string;
-     idAsseToBuy: string;
-      amountSell : string,
+      idAsseToBuy: string;
+      amountSell: string;
       amountBuy: string;
       swaps: Swap;
       aliveUntil: number;
       txHex: string;
       swapError: string;
+    };
   }
-  }
-
 
   const [_pairs, setPair] = useState<SwapAsset[]>();
 
@@ -246,19 +250,16 @@ export const useSwap = () => {
     bridgeFee: "",
   });
 
-  
-
-  const init = async (selectedAccount: Account ) => {
+  const init = async (selectedAccount: Account) => {
     try {
       //stealhex
       starLoading();
-      const accountType = getAccountType(selectedAccount!.type)?.toLowerCase()
+      const accountType = getAccountType(selectedAccount!.type)?.toLowerCase();
       const allChains = chains.map((chain) => chain.chains).flat();
 
       const firstChainId = allChains.find((chain) => {
         return chain.type === accountType;
       })?.id;
-
 
       if (firstChainId) {
         const chainIds = allChains
@@ -270,66 +271,58 @@ export const useSwap = () => {
         const { nativeAssets, pairs } = await _swapper!.init({
           chainIds: chainIds,
         });
-        setPair(pairs)
+        setPair(pairs);
         setTxInfoStealHex({
           bridgeType: _swapper.type,
           bridgeFee: _swapper.bridgeFee,
-        })
-        if(accountType === "evm" )
-          setLoadAssetsHydra(false);
-          setTxInfo((prevState) => ({
-            ...prevState,
-            bridgeType: _swapper.type,
-            bridgeName: swapType.stealhex,
-            bridgeFee: _swapper.bridgeFee,
-          }));
-          //setAssets(nativeAssets);
-          setAssetToSell(nativeAssets[0]);
-          setAssetsToBuy(pairs);
-          setAssetToBuy(pairs[1]);
+        });
+        if (accountType === "evm") setAssetToSell(nativeAssets[0]);
+        setAssetToBuy(pairs[1]);
+        setTxInfo((prevState) => ({
+          ...prevState,
+          bridgeType: _swapper.type,
+          bridgeName: swapType.stealhex,
+          bridgeFee: _swapper.bridgeFee,
+        }));
+        //setAssets(nativeAssets);
 
-        
-
-        
-        
-
-        
+        setAssetsToBuy(pairs);
         setAssetsToSell(nativeAssets);
         setSwapper(_swapper);
-        
-    
-    
       }
-      if(accountType === "evm"){
+      if (accountType === "evm") {
         endLoading();
       }
-      if(accountType === "wasm" ){
-        if(Object.keys(assets[selectedAccount?.key]).includes("hydradx")){
-            await messageAPI.initHydraDX();
-            setTxInfo((prevState) => ({
-                  ...prevState,
-                    bridgeType: "Swapper",
-                    bridgeName: swapType.hydradx,
-                    bridgeFee:  "0.0%",
-            }));
-            
-      
+      if (accountType === "wasm") {
+        if (
+          Object.keys(assets[selectedAccount?.key]).includes("hydradx") &&
+          !loadAssetsHydra
+        ) {
+          await messageAPI.initHydraDX();
+          setTxInfo((prevState) => ({
+            ...prevState,
+            bridgeType: "Swapper",
+            bridgeName: swapType.hydradx,
+            bridgeFee: "0.0%",
+          }));
+        } else {
+          setLoadAssetsHydra(true);
+          await messageAPI.setNetwork({
+            id: "hydradx",
+            type: ChainType.WASM,
+            isTestnet: false,
+          });
         }
-        else{
-            setLoadAssetHydra(true);
-            await messageAPI.setNetwork({id:"hydradx", type: ChainType.WASM, isTestnet: false});
-        }
-
       }
-       
     } catch (error) {
+      if ((error as string).startsWith("Error: WebSocket is already connected"))
+        return;
       showErrorToast("Error fetching assets");
       captureError(error);
     }
   };
-  
+
   const handleRecipientChange = (label: string, value: unknown) => {
-    
     setRecipient((prevState) => ({
       ...prevState,
       [label]: value,
@@ -340,121 +333,121 @@ export const useSwap = () => {
 
   const handleAmounts = async (label: "sell" | "buy", value: string) => {
     try {
-      if(value !== "0" && tx.addressFrom){
+      if (value !== "0" && tx.addressFrom) {
         switch (txInfo.bridgeName) {
-          case  swapType.stealhex:{
-            setAmounts((prevState) => ({
-              ...prevState,
-              [label]: value,
-            }));
-            starLoadingBuyAsset();
-            const { estimatedAmount, minAmount } = await swapper!.getEstimatedAmount({
-              from: (assetToSell.symbol || "")?.toLowerCase(),
-              to: (assetToBuy.symbol || "")?.toLowerCase(),
-              amount: value,
-            });
-            setIsPairValid(estimatedAmount !== "0");
-      
-            setMinSellAmount(minAmount);
-            setAmounts((prevState) => ({
-              ...prevState,
-              ["buy"]: estimatedAmount,
-            }));
-      
-            label === "sell" ? endLoadingBuyAsset() : endLoadingSellAsset();
-          }  
-        break;
-        case swapType.hydradx :
-          {
-          setAmounts((prevState) => ({
-            ...prevState,
-            [label]: value,
-          }));
-          if(Object.keys(assetToSell).length === 0 && Object.keys(assetToBuy).length === 0) return
+          case swapType.stealhex:
+            {
+              setAmounts((prevState) => ({
+                ...prevState,
+                [label]: value,
+              }));
+              starLoadingBuyAsset();
+              const { estimatedAmount, minAmount } =
+                await swapper!.getEstimatedAmount({
+                  from: (assetToSell.symbol || "")?.toLowerCase(),
+                  to: (assetToBuy.symbol || "")?.toLowerCase(),
+                  amount: value,
+                });
+              setIsPairValid(estimatedAmount !== "0");
 
-          label === "sell" ? starLoadingBuyAsset() : starLoadingSellAsset();
-          //await delay(1000)
-          if(assetToSell.id === assetToBuy.id) return
-          const info = await handlertxInfoHydradx(assetToSell as SwapAsset,assetToBuy as SwapAsset,value, slippage);
-          if(!info){
-                return
-          }
-          setAmounts((prevState) => ({
+              setMinSellAmount(minAmount);
+              setAmounts((prevState) => ({
+                ...prevState,
+                ["buy"]: estimatedAmount,
+              }));
+
+              label === "sell" ? endLoadingBuyAsset() : endLoadingSellAsset();
+            }
+            break;
+          case swapType.hydradx:
+            {
+              setAmounts((prevState) => ({
+                ...prevState,
+                [label]: value,
+              }));
+              if (
+                Object.keys(assetToSell).length === 0 &&
+                Object.keys(assetToBuy).length === 0
+              )
+                return;
+
+              label === "sell" ? starLoadingBuyAsset() : starLoadingSellAsset();
+              //await delay(1000)
+              if (assetToSell?.id === assetToBuy?.id) return;
+              const info = await handlertxInfoHydradx(
+                assetToSell as SwapAsset,
+                assetToBuy as SwapAsset,
+                value,
+                slippage
+              );
+              if (!info) {
+                return;
+              }
+              setAmounts((prevState) => ({
                 ...prevState,
                 ["buy"]: String(
                   formatAmountWithDecimals(
-                    JSON.parse(
-                        info.amountBuy 
-                      ),
-                      10,
-                      assetToBuy.decimals 
-                      ))
-              }
-              ),
-              )
+                    JSON.parse(info.amountBuy),
+                    10,
+                    assetToBuy.decimals
+                  )
+                ),
+              }));
               label === "sell" ? endLoadingBuyAsset() : endLoadingSellAsset();
+            }
+            break;
+          default:
+            showErrorToast("Error in handlerAmount");
+            break;
         }
-        break;
-        default: 
-            showErrorToast("Error in handlerAmount")
-        break;
       }
-     }
     } catch (error) {
       showErrorToast("error_estimating_amount");
     }
   };
 
-
-  const handleAssetChange = async(label: "sell" | "buy", asset: SwapAsset) => {
+  const handleAssetChange = async (label: "sell" | "buy", asset: SwapAsset) => {
     if (label === "sell") {
-            starLoading()
-            setAssetToSell(asset);
+      starLoading();
+      setAssetToSell(asset);
 
-            if(asset.type === swapType.stealhex){
-              const find = assetsToSell.find((asset) => asset.type === swapType.hydradx)
-              find && _pairs && setAssetsToBuy(_pairs)
+      if (asset?.type === swapType.stealhex) {
+        const find = assetsToSell.find(
+          (asset) => asset.type === swapType.hydradx
+        );
+        find && _pairs && setAssetsToBuy(_pairs);
 
-              if (assetToBuy.type !== swapType.stealhex && _pairs) {
-                      setAssetToBuy(
-                        _pairs.find((a) => {
-                          return a.symbol !== asset.symbol.toLocaleLowerCase()}) as SwapAsset
-                      );
-                    }
-              setTxInfo((prevState) => ({
-                      ...prevState,
-                      bridgeType: txStealhex.bridgeType,
-                      bridgeName: swapType.stealhex,
-                      bridgeFee: txStealhex.bridgeFee,
-              }))
+        if (assetToBuy.type !== swapType.stealhex && _pairs) {
+          setAssetToBuy(
+            _pairs.find((a) => {
+              return a.symbol !== asset.symbol.toLocaleLowerCase();
+            }) as SwapAsset
+          );
+        }
+        setTxInfo((prevState) => ({
+          ...prevState,
+          bridgeType: txStealhex.bridgeType,
+          bridgeName: swapType.stealhex,
+          bridgeFee: txStealhex.bridgeFee,
+        }));
+      } else {
+        if (Object.keys(assetToBuy).length === 0) return;
+        await messageAPI.getAssetsBuy({ asset });
+        setTxInfo((prevState) => ({
+          ...prevState,
+          bridgeType: "Swapper",
+          bridgeName: swapType.hydradx,
+          bridgeFee: "0.0%",
+        }));
+      }
 
-            }
-            else{
-              
-              
-              if(Object.keys(assetToBuy).length === 0 ) return
-                    await messageAPI.getAssetsBuy({asset})
-                    setTxInfo((prevState) => ({
-                      ...prevState,
-                        bridgeType: "Swapper",
-                        bridgeName: swapType.hydradx,
-                        bridgeFee:  "0.0%",
-                  }));
-                  
-                  
-            }
-            
-            endLoading()
-      
-    } 
-    else {
-      starLoading()
+      endLoading();
+    } else {
+      starLoading();
       setAssetToBuy(asset);
-      endLoading() 
+      endLoading();
     }
   };
-
-  
 
   const setMaxAmout = () => {
     try {
@@ -472,10 +465,7 @@ export const useSwap = () => {
     }
   };
 
-
-
   const setSenderAddress = async (address: string) => {
-    
     setTx((prevState) => ({
       ...prevState,
       addressFrom: address,
@@ -485,20 +475,24 @@ export const useSwap = () => {
       (account) => account.value!.address === tx.addressFrom
     );
     if (!account) return;
-  }
-
+  };
 
   const swap = async () => {
     starCreatingSwap();
     try {
-      if(assetToSell.type === swapType.stealhex){
+      if (assetToSell.type === swapType.stealhex) {
+        const substrate = SUBSTRATE_CHAINS.find((chain) => {
+          return chain.symbol.toLocaleLowerCase() === assetToBuy.symbol;
+        });
         const { destination, fee, id } = await swapper!.createSwap({
           currencyFrom: assetToSell.symbol as string,
           currencyDecimals: assetToSell.decimals as number,
           currencyTo: assetToBuy.symbol as string,
           amountFrom: amounts.sell,
           addressFrom: tx.addressFrom,
-          addressTo: recipient.address,
+          addressTo: substrate
+            ? transformAddress(recipient.address, substrate.prefix)
+            : recipient.address,
           nativeAsset: {
             symbol: assetToSell.label as string,
             decimals: assetToSell.decimals as number,
@@ -513,13 +507,13 @@ export const useSwap = () => {
           showSuccessToast("Swap successful");
           return;
         }
-  
+
         const chainId = assetToSell.chainId as string;
-  
+
         const allChains = chains.map((chain) => chain.chains).flat();
-  
+
         const chain = allChains.find((chain) => chain.id === chainId) as Chain;
-  
+
         const updateTx: Tx = {
           swapId: id,
           addressBridge: destination,
@@ -558,7 +552,7 @@ export const useSwap = () => {
           fee,
         };
         setTx(updateTx);
-  
+
         await messageAPI.updateTx({
           tx: {
             amount: amounts.sell,
@@ -575,7 +569,7 @@ export const useSwap = () => {
             },
           },
         });
-  
+
         setMustConfirmTx(swapper!.mustConfirmTx());
         // clean amounts
         setMinSellAmount(null);
@@ -584,21 +578,26 @@ export const useSwap = () => {
           sell: "0",
           buy: "0",
         }));
-      }
-      else{
-        if(!txInfo.swapInfo?.amountSell) {
-          showErrorToast("Error in getTxHex")
-          return
+      } else {
+        if (!txInfo.swapInfo?.amountSell) {
+          showErrorToast("Error in getTxHex");
+          return;
         }
         const allChains = chains.map((chain) => chain.chains).flat();
-  
-        const chain = allChains.find((chain) => chain.id === assetToSell.network) as Chain;
+
+        const chain = allChains.find(
+          (chain) => chain.id === assetToSell.network
+        ) as Chain;
         const updateTx: Tx = {
           swapId: txInfo.swapInfo.txHex as string,
           addressBridge: selectedAccount?.value?.address || tx.addressFrom,
           addressFrom: selectedAccount?.value?.address || tx.addressFrom,
-          addressTo:selectedAccount?.value?.address || tx.addressFrom,
-          amountFrom: formatAmountWithDecimals(Number(txInfo.swapInfo.amountSell), 3, assetToSell.decimals).toString() ,
+          addressTo: selectedAccount?.value?.address || tx.addressFrom,
+          amountFrom: formatAmountWithDecimals(
+            Number(txInfo.swapInfo.amountSell),
+            3,
+            assetToSell.decimals
+          ).toString(),
           amountTo: txInfo.swapInfo.amountBuy,
           amountBridge: txInfo.swapInfo.amountSell,
           chainFrom: {
@@ -607,7 +606,7 @@ export const useSwap = () => {
           },
           chainTo: {
             name: chain.name as string,
-            image: chain.logo  as string,
+            image: chain.logo as string,
           },
           assetFrom: {
             symbol: (assetToSell.symbol || "").toLocaleUpperCase(),
@@ -621,12 +620,12 @@ export const useSwap = () => {
           },
           fee: {
             estimatedFee: txInfo.gasFee,
-            estimatedTotal: txInfo.gasFee
+            estimatedTotal: txInfo.gasFee,
           },
-          aliveUntil: txInfo.swapInfo.aliveUntil
+          aliveUntil: txInfo.swapInfo.aliveUntil,
         };
         setTx(updateTx);
-  
+
         await messageAPI.updateTx({
           tx: {
             amount: amounts.sell,
@@ -642,11 +641,11 @@ export const useSwap = () => {
               address: assetToSell.address || "",
             },
             swapInfo: {
-                txHex: txInfo.swapInfo.txHex
-            }
+              txHex: txInfo.swapInfo.txHex,
+            },
           },
         });
-  
+
         setMustConfirmTx(swapper!.mustConfirmTx());
         // clean amounts
         setMinSellAmount(null);
@@ -655,8 +654,7 @@ export const useSwap = () => {
           sell: "0",
           buy: "0",
         }));
-       
-          }
+      }
     } catch (error) {
       captureError(error);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -668,7 +666,6 @@ export const useSwap = () => {
   };
 
   const onBack = () => {
-    
     setMustConfirmTx(false);
   };
 
@@ -747,153 +744,197 @@ export const useSwap = () => {
   }, [swapper]);
 
   useEffect(() => {
-    handleAmounts("sell",amounts.sell);
+    handleAmounts("sell", amounts.sell);
   }, [assetToBuy?.label, assetToSell?.label]);
 
-
-  const handlertxInfoHydradx = async(assetSell: SwapAsset, assetBuy: SwapAsset, amount: string, slippage: number) => {
-    try{
-        if(
-          assetSell.id && 
-          assetBuy.id && amount !== "0" && 
-          assetSell.type === swapType.hydradx
-        ){
-              const data = await messageAPI.getFeeHydra({
-                amount:amount, 
-                assetToSell:assetSell, 
-                assetToBuy:assetBuy, 
-                slippage: slippage
-              })
-              if(data.swapInfo.swapError.length > 0){
-                showErrorToast(data.swapInfo.swapError);
-              }
-              setTxInfo((prevState) => ({
-                ...prevState,
-                gasFee: `${String(formatAmountWithDecimals(JSON.parse(data.gasFee),5,assetToBuy.decimals))} ${assetToBuy.symbol}`,
-                bridgeType: "protocol",
-                bridgeName: swapType.hydradx,
-                bridgeFee:  `${data.bridgeFee}%`,
-                swapInfo: data.swapInfo
-              }))
-              return data.swapInfo
+  const handlertxInfoHydradx = async (
+    assetSell: SwapAsset,
+    assetBuy: SwapAsset,
+    amount: string,
+    slippage: number
+  ) => {
+    try {
+      if (
+        assetSell?.id &&
+        assetBuy?.id &&
+        amount !== "0" &&
+        assetSell.type === swapType.hydradx
+      ) {
+        const data = await messageAPI.getFeeHydra({
+          amount: amount,
+          assetToSell: assetSell,
+          assetToBuy: assetBuy,
+          slippage: slippage,
+        });
+        if (data.swapInfo.swapError.length > 0) {
+          showErrorToast(data.swapInfo.swapError);
         }
-  }
-  catch(error){
-    showErrorToast(error);
-    
-  }
-
-  }
-  const assetWithBalance = async( asset: Partial<SwapAsset> ) => {
-    if(tx.addressFrom){
-        const account = accounts.find(
-          (account) => account.value!.address === tx.addressFrom
-        );
-        if (!account) {
-          showErrorToast("Error Account");
-          return asset
-        }
-        const key = account.key
-        if(!key){
-          console.log("Error in selectedAccount")
-          return asset
-        }
-        
-        if(asset.network && 
-        asset.type === swapType.hydradx &&
-        Object.keys(assets[key]).includes(asset.network)){
-
-          const assetInfo = assets[key][asset.network].assets.find((_asset ) => {
-              if(_asset.id === asset.id || _asset.symbol === "HDX" && asset.symbol === "HDX" || _asset.symbol == asset.symbol )
-                return _asset
-          })
-          if(!assetInfo){
-            showErrorToast("Error in getBalance")
-            return asset
-          }
-          if(asset.symbol === "HDX" && asset.id === "-1"){
-              asset.id = "0"
-              asset.balance = assetInfo.balance
-          return asset
-          }
-          asset.balance = assetInfo.balance
-          return asset 
+        setTxInfo((prevState) => ({
+          ...prevState,
+          gasFee: `${String(
+            formatAmountWithDecimals(
+              JSON.parse(data.gasFee),
+              5,
+              assetToBuy.decimals
+            )
+          )} ${assetToBuy.symbol}`,
+          bridgeType: "protocol",
+          bridgeName: swapType.hydradx,
+          bridgeFee: `${data.bridgeFee}%`,
+          swapInfo: data.swapInfo,
+        }));
+        return data.swapInfo;
+      }
+    } catch (error) {
+      showErrorToast(error);
     }
+  };
 
+  const assetWithBalance = (asset: Partial<SwapAsset>) => {
+    if (tx.addressFrom) {
+      const account = accounts.find(
+        (account) => account.value!.address === tx.addressFrom
+      );
+      if (!account) {
+        showErrorToast("Error Account");
+        return asset;
+      }
+      const key = account.key;
+      if (!key) {
+        showErrorToast("Error in selectedAccount");
+        return asset;
+      }
 
-    if(asset.type === swapType.stealhex ){
-          if(asset.network){
-              
-              const isAddNetworkSuccess = await setNetworkSwap(asset.network)
+      if (asset.type === swapType.hydradx && asset?.network) {
+        const assetInfo = assets[key][asset.network].assets.find((_asset) => {
+          if (
+            _asset.id === asset.id ||
+            (_asset.symbol === "HDX" && asset.symbol === "HDX") ||
+            _asset.symbol == asset.symbol
+          )
+            return _asset;
+        });
+        if (!assetInfo) {
+          showErrorToast("Error in getBalance");
+          return;
+        }
+        if (asset.symbol === "HDX") {
+          asset.id = "0";
+          asset.balance = assetInfo.balance;
+          setAssetToSell(asset);
+          endLoadingBalance();
+          return;
+        } else {
+          asset.balance = assetInfo.balance;
+          setAssetToSell(asset);
+          endLoadingBalance();
+          return;
+        }
+      }
 
-              if(isAddNetworkSuccess === networkStatus.ERROR_TYPE){
-                  showErrorToast(`Error in conect network ${asset.network}`)
-               }
-               if(isAddNetworkSuccess === networkStatus.NOT_CONNECTED) return asset;
-              if( Object.keys(assets[key]).includes(asset.network)){
-                
-                const assetInfo = assets[key][asset.network].assets.find((_asset ) => {
-                  const data = StealthEx_MAP_NATIVE_TOKENS[asset.network as string].find((assetStealhex) => assetStealhex.stealthExName === _asset.symbol)
-                  if( data?.realName == _asset.symbol ) return _asset
-            
-            })
-                if(assetInfo){
-                  asset.balance = assetInfo.balance
-                  asset.decimals = assetInfo.decimals
-                  setAssetToSell(asset);
-                  
-                  endLoading();
-                    
-                }
-                else{
-                  showErrorToast("Error in getBalance");
-                  endLoading();
-                }
-                
-              }
-              
+      if (asset.type === swapType?.stealhex) {
+        if (asset.network) {
+          const assetInfo = assets[key][asset.network].assets.find((_asset) => {
+            const data = StealthEx_MAP_NATIVE_TOKENS[
+              asset.network as string
+            ].find(
+              (assetStealhex) => assetStealhex.stealthExName === _asset.symbol
+            );
+            if (data?.realName == _asset.symbol) return _asset;
+          });
+          if (assetInfo) {
+            asset.balance = assetInfo.balance;
+            asset.decimals = assetInfo.decimals;
+            setAssetToSell(asset);
+            endLoadingBalance();
+            endLoading();
+          } else {
+            showErrorToast("Error in getBalance");
+            endLoading();
+          }
+        }
+      }
+    } else {
+      console.log("Balance error");
+    }
+  };
+
+  const networkVerification = async () => {
+    if (assetToSell?.network) {
+      const status = await setNetworkSwap(assetToSell.network);
+      if (status && status === networkStatus.CONECTED) {
+        assetWithBalance(assetToSell);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (assetToSell?.id) {
+      networkVerification();
+    }
+  }, [assetToSell]);
+  useEffect(() => {
+    if (tx.addressFrom) {
+      const account = accounts.find(
+        (account) => account.value!.address === tx.addressFrom
+      );
+
+      if (!account) {
+        showErrorToast("Error Account");
+        return;
+      }
+      const key = account.key;
+      if (!key) {
+        showErrorToast("Error in selectedAccount");
+        return;
+      }
+      if (assets && Object.keys(assets).length > 0) {
+        if (
+          assetToSell?.network &&
+          assets[key] &&
+          assets[key][assetToSell?.network]
+        ) {
+          assetWithBalance(assetToSell);
         }
       }
     }
-    console.log("Balance error");
-    
-  }
-const updateAssetToSell = async () => 
-  {
-  if (assetToSell.label !== "" && Object.keys(assetToSell).length > 0) {
-    starLoading();
-    await assetWithBalance(assetToSell);
-  }
-};
+  }, [JSON.stringify(assets)]);
 
-useEffect(() => {
-  updateAssetToSell()
-}, [assetToSell?.label,JSON.stringify(assets)]);
+  const setNetworkSwap = async (_network: string) => {
+    starLoadingBalance();
+    const allChains = chains.flatMap((chain) => chain.chains);
 
-const setNetworkSwap = async(_network: string) => {
-  const allChains = chains.flatMap((chain) => chain.chains);
-  if(!Object.keys(selectedChain).includes(_network)){
-    if(network.length > 0 && network !== _network && Object.keys(selectedChain).includes(network) ){
-      await messageAPI.deleteSelectChain({id:network});
-    }
-    if(network.length === 0 || network !== _network){
-      setNetwork(_network)
-    }
-    
-    const type = allChains.find((chain) => chain.id === _network)?.type;
-    if(!type){
-        showErrorToast("type Chain not found")
-        return networkStatus.ERROR_TYPE
-    }
-    await messageAPI.setNetwork({id:_network, type:type, isTestnet: false});
-    return networkStatus.NOT_CONNECTED
-  }
-  else
-  {
-    return networkStatus.CONECTED
-  }
+    if (!Object.keys(selectedChain).includes(_network)) {
+      if (
+        network.length > 0 &&
+        network !== _network &&
+        Object.keys(selectedChain).includes(network)
+      ) {
+        await messageAPI.deleteSelectChain({ id: network });
+      }
+      if (
+        (network.length === 0 && _network !== "hydradx") ||
+        (network !== _network && _network !== "hydradx")
+      ) {
+        setNetwork(_network);
+      }
 
-}
+      const type = allChains.find((chain) => chain.id === _network)?.type;
+      if (!type) {
+        showErrorToast("type Chain not found");
+        return networkStatus.ERROR_TYPE;
+      }
+      await messageAPI.setNetwork({
+        id: _network,
+        type: type,
+        isTestnet: false,
+      });
+
+      return networkStatus.NOT_CONNECTED;
+    } else {
+      return networkStatus.CONECTED;
+    }
+  };
 
   useEffect(() => {
     if (!tx.addressFrom) return;
@@ -906,11 +947,8 @@ const setNetworkSwap = async(_network: string) => {
     init(account);
   }, [tx.addressFrom, accounts]);
 
-
   useEffect(() => {
     if (selectedAccount?.value) {
-     
-      
       setTx((prevState) => ({
         ...prevState,
 
@@ -920,62 +958,65 @@ const setNetworkSwap = async(_network: string) => {
   }, [selectedAccount]);
 
   useEffect(() => {
+    let load = false;
     messageAPI.networkSubscribe((networks) => {
-      if(Object.keys(networks).includes("hydradx") && loadAssetHydra){
-        
-        debounce((async () => {
+      if (
+        Object.keys(networks).includes("hydradx") &&
+        !load &&
+        loadAssetsHydra
+      ) {
+        debounce(async () => {
           try {
             await messageAPI.initHydraDX();
+            load = true;
             setTxInfo((prevState) => ({
-                 ...prevState,
-                  bridgeType: "Swapper",
-                  bridgeName: swapType.hydradx,
-                  bridgeFee:  "0.0%",
-               }));
+              ...prevState,
+              bridgeType: "Swapper",
+              bridgeName: swapType.hydradx,
+              bridgeFee: "0.0%",
+            }));
           } catch (error) {
             console.error("Error al initHydraDX:", error);
           }
-        }), 1000)();
-        
+        }, 1000)();
       }
     });
 
-    messageAPI.hydraSubscribeToSell(async(_assetsToSell) => {
-        setAssetsToSell((oldAssetToSell) => [..._assetsToSell,...oldAssetToSell])
-        setAssetToSell(_assetsToSell[0]);
-      
-    })
-  }, [loadAssetHydra]);
-
+    messageAPI.hydraSubscribeToSell(async (_assetsToSell) => {
+      setAssetsToSell((oldAssetToSell) => {
+        const find = oldAssetToSell.find(
+          (asset) => asset.network === "hydradx"
+        );
+        if (!find) {
+          return [..._assetsToSell, ...oldAssetToSell];
+        }
+        return oldAssetToSell;
+      });
+      setAssetToSell(_assetsToSell[0]);
+    });
+  }, [loadAssetsHydra]);
 
   useEffect(() => {
- 
     messageAPI.hydraSubscribeToBuy((_assetsToBuy) => {
       setAssetsToBuy(_assetsToBuy);
-      setAssetToBuy(_assetsToBuy[0])
+      setAssetToBuy(_assetsToBuy[0]);
       endLoading();
-     });
+    });
+  }, []);
 
-    
-   
+  useEffect(() => {
+    if (
+      assetsToBuy.length > 0 &&
+      assetToSell?.type &&
+      assetsToBuy[0]?.type === swapType.hydradx &&
+      assetToSell?.type === swapType.hydradx
+    ) {
+      endLoading();
+    }
+  }, [assetsToBuy, assetToSell]);
 
-  }, [])
-
-
-  useEffect(
-    () => {
-      if(assetsToBuy.length > 0  && assetToSell.type && assetsToBuy[0].type === swapType.hydradx && assetToSell.type === swapType.hydradx){
-
-        endLoading()
-
-      }
-    }, [assetsToBuy,assetToSell]
-  )
-
-
-
-  const onBackBalance = async() => {
-    setLoadAssetHydra(false);
+  const onBackBalance = async () => {
+    setLoadAssetsHydra(false);
     setAssetsToSell([]);
     setAssetsToBuy([]);
     setAssetToBuy({
@@ -989,10 +1030,9 @@ const setNetworkSwap = async(_network: string) => {
       balance: new BN("0").toString(),
       decimals: 0,
       symbol: "",
-    })
-    await messageAPI.clearHydradxTrade()
-  } 
-
+    });
+    await messageAPI.clearHydradxTrade();
+  };
 
   return {
     amounts,
@@ -1032,5 +1072,6 @@ const setNetworkSwap = async(_network: string) => {
     txInfo,
     setSenderAddress,
     isPairValid,
+    isLoadingBalance,
   };
 };

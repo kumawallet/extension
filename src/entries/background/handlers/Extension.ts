@@ -83,7 +83,7 @@ import {
 } from "@src/utils/account-utils";
 import { AddressOrPair } from "@polkadot/api/types";
 import { Browser } from "@src/utils/constants";
-import { HydraDx } from "@src/storage/HydraDx";
+import { HydraDx } from "@src/storage/entities/HydraDx";
 
 export default class Extension {
   private provider = new Provider();
@@ -149,6 +149,7 @@ export default class Extension {
         const id = newChainFormat.id;
         const type = newChainFormat.type;
         const isTestnet = newChainFormat.isTestnet;
+        console.log("SE supone que aqui se setea", id)
         await this.setNetwork({ isTestnet, id, type });
       }
     }

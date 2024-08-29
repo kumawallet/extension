@@ -16,9 +16,10 @@ interface AssetAmountInputProps {
   onMax?: () => void;
   onValueChange: (amount: string) => void;
   selectableAsset: JSX.Element;
-  showBalance?: boolean
-  isPairValid?: boolean
-  type: "buy"| "sell"
+  showBalance?: boolean;
+  isPairValid?: boolean;
+  type: "buy"| "sell";
+  isLoadingBalance ?: boolean;
 }
 
 export const AssetAmountInput: FC<AssetAmountInputProps> = ({
@@ -36,7 +37,8 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   selectableAsset,
   showBalance = true,
   isPairValid,
-  type
+  type,
+  isLoadingBalance
 }) => {
   const { t } = useTranslation("swap");
 
@@ -46,9 +48,13 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
         <p className="font-inter font-medium md:text-lg">{label}</p>
         {
           showBalance && (
-            <p className="font-inter font-medium md:text-lg text-[#9CA3AF] capitalize">
-              {t("balance")}: {balance}
-            </p>
+            isLoadingBalance && isLoadingBalance ? 
+            (<div className="absolute right-5">
+                <Loading containerClass="py-0" iconClass="w-5 h-5" />
+            </div>)
+            : (<p className="font-inter font-medium md:text-lg text-[#9CA3AF] capitalize">
+                {t("balance")}: {balance}
+              </p>)
           )
         }
       </div>

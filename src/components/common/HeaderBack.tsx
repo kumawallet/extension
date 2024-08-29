@@ -34,9 +34,12 @@ export const HeaderBack: FC<HeaderProps> = ({
     }
   };
 
-  const onBackAsyn = async() => {
-    await onBackAsync
-    navigate && navigate(-1);
+  const _onBackAsyn = async() => {
+    if(onBackAsync) {
+      await onBackAsync()
+      navigate && navigate(-1);
+    }
+    
   } 
 
   return (
@@ -50,7 +53,7 @@ export const HeaderBack: FC<HeaderProps> = ({
       />
       <p
         className={`${textHeaderBack} ${classnameText}`}
-        onClick={onBackAsync ? onBackAsyn : handlerClick}
+        onClick={onBackAsync ? _onBackAsyn : handlerClick}
       >
         {title}
       </p>

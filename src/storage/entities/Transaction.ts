@@ -221,7 +221,6 @@ export class Transaction {
         feeData,
         gasLimit,
       }).toString();
-
       const evmTx = {
         ...partialTx,
         gasLimit,
