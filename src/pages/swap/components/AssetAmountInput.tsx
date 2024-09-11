@@ -3,7 +3,7 @@ import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 
-interface AssetAmountInputProps {
+export interface AssetAmountInputProps {
   amount: string;
   balance: string;
   containerClassName?: string;
@@ -41,7 +41,6 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   isLoadingBalance
 }) => {
   const { t } = useTranslation("swap");
-
   return (
     <div className={containerClassName}>
       <div className="flex justify-between mb-2">
@@ -73,6 +72,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
             disabled={isLoading || isDisabled || isReadOnly || type==="buy"}
             allowedDecimalSeparators={["%"]}
             readOnly={isReadOnly}
+            data-testid={type}
           />
 
           {hasMaxOption && (
@@ -86,7 +86,7 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
           {isLoading && (
             <div className="absolute top-1/2 -translate-y-1/2 left-5">
-              <Loading containerClass="py-0" iconClass="w-5 h-5s" />
+              <Loading containerClass="py-0" iconClass="w-5 h-5s" data-testid="loading"/>
             </div>
           )}
         </div>

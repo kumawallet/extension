@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Footer } from "./Footer";
 import { useTranslation } from "react-i18next";
 import { useAssetContext } from "@src/providers";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Asset } from "./Asset";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 
@@ -33,6 +33,8 @@ export const AssetNetwork = () => {
   const {
     state: { assets },
   } = useAssetContext();
+  
+
 
   const assetsForNetwork = useMemo(
     ()=> {

@@ -83,7 +83,7 @@ import {
 } from "@src/utils/account-utils";
 import { AddressOrPair } from "@polkadot/api/types";
 import { Browser } from "@src/utils/constants";
-import { HydraDx } from "@src/storage/entities/HydraDx";
+import  HydraDx  from "@src/storage/entities/HydraDx";
 
 export default class Extension {
   private provider = new Provider();
@@ -149,7 +149,6 @@ export default class Extension {
         const id = newChainFormat.id;
         const type = newChainFormat.type;
         const isTestnet = newChainFormat.isTestnet;
-        console.log("SE supone que aqui se setea", id)
         await this.setNetwork({ isTestnet, id, type });
       }
     }
@@ -1502,11 +1501,11 @@ export default class Extension {
       case "pri(hydra.subscribeToBuy)": 
         return this.hydraSubscribeToBuy(id,port);
       case "pri(hydra.getFee)": 
-      return this.getFeetHydraDx(request as RequestGetFeeHydra);
+        return this.getFeetHydraDx(request as RequestGetFeeHydra);
       case "pri(hydra.getAssetsBuyHydra)": 
-      return this.getAssetsBuyHydra(request as RequestGetAssetBuyHydra);
+        return this.getAssetsBuyHydra(request as RequestGetAssetBuyHydra);
       case "pri(hydra.clearHydradx)":
-      return this.clearHydradx()
+        return this.clearHydradx()
 
       default:
         throw new Error(`Unable to handle message of type ${type}`);

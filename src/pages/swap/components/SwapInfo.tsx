@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useMemo , useState } from "react";
 import { TxInfoState, swapType } from "../hooks";
 import { useTranslation } from "react-i18next";
 import { cropAccount } from "@src/utils/account-utils";
@@ -136,11 +136,11 @@ export const SwapInfo: FC<SwapInfoProps> = ({
       {bridgeType && (
         <>
           <div className="flex justify-between items-center text-[#A3A3A3]">
-            <p>{t(`${bridgeType}_name`)}:</p>
+            <p>{t(`${bridgeType}_name`.toLocaleLowerCase())}:</p>
             {_bridgeName}
           </div>
           <div className="flex justify-between items-center text-[#A3A3A3]">
-            <p>{t(`${bridgeType}_fee`)}:</p>
+            <p>{t(`${bridgeType}_fee`.toLocaleLowerCase())}:</p>
             <p>{bridgeFee}</p>
           </div>
         </>
@@ -161,7 +161,7 @@ export const SwapInfo: FC<SwapInfoProps> = ({
       )}
       {bridgeName === swapType.hydradx && swapInfo && (
         <div className="flex justify-between items-center text-[#A3A3A3]">
-          <p>{t("router_swap")}</p>
+          <p >{t("router_swap")}</p>
           <div className="flex gap-2">
             {swapInfo.swaps.map((router: swap, index: number) => (
               <div
@@ -208,6 +208,8 @@ export const SwapInfo: FC<SwapInfoProps> = ({
             onClose={() => setIsOpen(!isOpen)}
             setSlippage={(val: number) => setSlippage(val)}
             slippag={swapInfo.slippage.toString()}
+            data-testid="slippage-modal"
+
           />
         </FormProvider>
       )}

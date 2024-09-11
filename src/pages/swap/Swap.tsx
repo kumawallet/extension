@@ -86,6 +86,7 @@ export const Swap = () => {
     }
   }, []);
 
+
   const intervalIdRef = useRef<number | null>(null);
 
   const startInterval = () => {

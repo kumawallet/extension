@@ -40,7 +40,6 @@ export const AssetProvider: FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     messageAPI.getAssetsBalance((assets) => {
-      console.log(assets, "AQUI SE ACTUALIZAN LOS ASSETS")
       dispatch({
         type: "set-assets",
         payload: {

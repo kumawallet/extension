@@ -31,6 +31,7 @@ export enum SwapErrorType {
   NOT_ENOUGH_LIQUIDITY = "NOT_ENOUGH_LIQUIDITY",
   MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT = "MAKE_POOL_NOT_ENOUGH_EXISTENTIAL_DEPOSIT",
   AMOUNT_CANNOT_BE_ZERO = "AMOUNT_CANNOT_BE_ZERO",
+  TRADE_NOT_ALLOWED = "ASSET_NOT_ALLOWED"
 }
 const SWAPTS_ASSETS = [
   "0",
@@ -43,7 +44,7 @@ const SWAPTS_ASSETS = [
   "1000099",
   "1000100",
 ];
-export class HydraDx {
+export default class HydraDx {
   assetsToBuy = new BehaviorSubject<SwapAsset[] | []>([]);
   assetsToSell = new BehaviorSubject<SwapAsset[] | []>([]);
   tradeRouter: TradeRouter | undefined;
@@ -53,70 +54,76 @@ export class HydraDx {
   }
 
   public async init(provider: api) {
-    await (provider.provider as ApiPromise).isReady;
-    const poolService = new PoolService(provider.provider as ApiPromise);
-    const tradeRouter = new TradeRouter(poolService);
-    this.tradeRouter = tradeRouter;
-    const assets = await tradeRouter.getAllAssets();
-    const assetsToSell: SwapAsset[] = [];
-    SWAPTS_ASSETS.forEach((asset) => {
-      const find = assets.find((_asset) => _asset.id === asset);
-      if (find) {
-        const _assetToSell = {
-          id: find.id,
-          symbol: find.symbol as string,
-          label: find.symbol,
-          image:
-            ASSETS_ICONS[
-              find.symbol === "4-Pool"
-                ? "FOURPOOL"
-                : find.symbol === "2-Pool"
-                ? "TWOPOOL"
-                : find.symbol
-            ],
-          balance: "0",
-          decimals: Number(find.decimals),
-          network: "hydradx" as string,
-          name: find.name as string,
-          chainId: find.id as string,
-          type: swapType.hydradx,
-        };
-        assetsToSell.push(_assetToSell);
-      }
-    });
-
-    const _assetsBuy = await tradeRouter.getAssetPairs(assetsToSell[0].chainId);
-
-    const assetsBuy: SwapAsset[] = [];
-
-    SWAPTS_ASSETS.forEach((assetBuy) => {
-      const find = _assetsBuy.find((_asset) => _asset.id === assetBuy);
-      if (find) {
-        const _assetBuy = {
-          id: find.id,
-          symbol: find.symbol as string,
-          label: find.symbol,
-          image:
-            ASSETS_ICONS[
-              find.symbol === "4-Pool"
-                ? "FOURPOOL"
-                : find.symbol === "2-Pool"
-                ? "TWOPOOL"
-                : find.symbol
-            ],
-          balance: "0",
-          decimals: Number(find.decimals),
-          network: "hydradx" as string,
-          name: find.name as string,
-          chainId: find.id as string,
-          type: swapType.hydradx,
-        };
-        assetsBuy.push(_assetBuy);
-      }
-    });
-
-    this.assetsToSell.next(assetsToSell);
-    this.assetsToBuy.next(assetsBuy);
+    try{
+      await (provider.provider as ApiPromise).isReady;
+      const poolService = new PoolService(provider.provider as ApiPromise);
+      const tradeRouter = new TradeRouter(poolService);
+      this.tradeRouter = tradeRouter;
+      const assets = await tradeRouter.getAllAssets();
+      const assetsToSell: SwapAsset[] = [];
+      SWAPTS_ASSETS.forEach((asset) => {
+        const find = assets.find((_asset) => _asset.id === asset);
+        if (find) {
+          const _assetToSell = {
+            id: find.id,
+            symbol: find.symbol as string,
+            label: find.symbol,
+            image:
+              ASSETS_ICONS[
+                find.symbol === "4-Pool"
+                  ? "FOURPOOL"
+                  : find.symbol === "2-Pool"
+                  ? "TWOPOOL"
+                  : find.symbol
+              ],
+            balance: "0",
+            decimals: Number(find.decimals),
+            network: "hydradx" as string,
+            name: find.name as string,
+            chainId: find.id as string,
+            type: swapType.hydradx,
+          };
+          assetsToSell.push(_assetToSell);
+        }
+      });
+  
+      const _assetsBuy = await tradeRouter.getAssetPairs(assetsToSell[0].chainId);
+  
+      const assetsBuy: SwapAsset[] = [];
+  
+      SWAPTS_ASSETS.forEach((assetBuy) => {
+        const find = _assetsBuy.find((_asset) => _asset.id === assetBuy);
+        if (find) {
+          const _assetBuy = {
+            id: find.id,
+            symbol: find.symbol as string,
+            label: find.symbol,
+            image:
+              ASSETS_ICONS[
+                find.symbol === "4-Pool"
+                  ? "FOURPOOL"
+                  : find.symbol === "2-Pool"
+                  ? "TWOPOOL"
+                  : find.symbol
+              ],
+            balance: "0",
+            decimals: Number(find.decimals),
+            network: "hydradx" as string,
+            name: find.name as string,
+            chainId: find.id as string,
+            type: swapType.hydradx,
+          };
+          assetsBuy.push(_assetBuy);
+        }
+      });
+  
+      this.assetsToSell.next(assetsToSell);
+      this.assetsToBuy.next(assetsBuy);
+    }
+    catch(error){
+      throw new Error("Error in initHydradx")
+    }
+    
   }
 
   public async getFee(
@@ -138,7 +145,6 @@ export class HydraDx {
         .times(1 - slippage)
         .integerValue();
       const txHex = _sellResult.toTx(minReceive).hex;
-
       const swapRouter = this.getSwapPathErrors(_sellResult.swaps);
       let swapError = "";
       if (swapRouter.length > 0) {
@@ -148,7 +154,7 @@ export class HydraDx {
             swapError = SwapErrorType.SWAP_NOT_ENOUGH_BALANCE;
             break;
           case PoolError.TradeNotAllowed:
-            swapError = SwapErrorType.ERROR_FETCHING_QUOTE;
+            swapError = SwapErrorType.TRADE_NOT_ALLOWED;
             break;
           case PoolError.MaxInRatioExceeded:
             swapError = SwapErrorType.NOT_ENOUGH_LIQUIDITY;
@@ -161,7 +167,6 @@ export class HydraDx {
             break;
         }
       }
-
       return {
         bridgeName: swapType.hydradx,
         bridgeFee: _sellResult.tradeFeePct.toString(),

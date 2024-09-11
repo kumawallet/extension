@@ -1,6 +1,8 @@
 import { ASSETS_ICONS } from "@src/constants/assets-icons";
 import { swapType } from "@src/pages";
 import { ChainType } from "@src/types";
+import BigNumber from "bignumber.js";
+
 
 export const assetToSell = {
     id: "5",
@@ -29,6 +31,25 @@ export const assetToBuy = {
     type: swapType.hydradx
   
 }
+
+export const swapMock = [
+  {
+    poolAddress: '7L53bUTBbfuj14UpdCNPwmgzzHSsrsTWBHX5pys32mVWM3C1',
+    pool: 'Omnipool',
+    assetIn: '5',
+    assetOut: '9',
+    assetInDecimals: 10,
+    assetOutDecimals: 18,
+    amountIn: '500000000000',
+    calculatedOut: '3255498570963322337271',
+    amountOut: '3245238520245030700720',
+    spotPrice: '65120277207769065131',
+    tradeFeePct: 0.32,
+    tradeFeeRange: [0.3, 5.1],
+    priceImpactPct: -0.02,
+    errors: [] 
+  }
+]
 
 export const mockAssets = [
     { id: "5", symbol: "DOT", decimals: 18, name: "Polkadot" },
@@ -73,116 +94,13 @@ export const mockAssetsInit = [
  export const mockSwapResult = {
     type: 'Sell',
     amountIn: '500000000000',
-    amountOut: {
-      value: '3245238520245030700720',
-      times: 12345 // Asegúrate de que esto sea un número en lugar de una cadena
-    },
+    amountOut: new BigNumber('3245238520245030700720'),
     spotPrice: '65120277207769065131',
     tradeFee: '10260050718291636551',
     tradeFeePct: 0.32,
     tradeFeeRange: [0.3, 5.1],
     priceImpactPct: -0.02,
-    tx: {
-      hex: '0x123'
-    },
-    swaps: [
-      {
-        poolAddress: '7L53bUTBbfuj14UpdCNPwmgzzHSsrsTWBHX5pys32mVWM3C1',
-        pool: 'Omnipool',
-        assetIn: '5',
-        assetOut: '9',
-        assetInDecimals: 10,
-        assetOutDecimals: 18,
-        amountIn: '500000000000',
-        calculatedOut: '3255498570963322337271',
-        amountOut: '3245238520245030700720',
-        spotPrice: '65120277207769065131',
-        tradeFeePct: 0.32,
-        tradeFeeRange: [0.3, 5.1],
-        priceImpactPct: -0.02,
-        errors: [] // Asegúrate de que errors esté presente y sea un array vacío
-      }
-    ]
+    toTx: vi.fn().mockReturnValue({ hex: '0x123' }),
+    swaps: swapMock
   };
- 
- 
- 
- /* {*/
 
-//             bridgeName: swapType.hydradx,
-//             bridgeFee: { toString: () => "0.32" },
-//             gasFee: { toString: () => "10260050718291636551" },
-//             amount:{ toString: () => "3245238520245030700720"},
-//             swapInfo: expect.objectContaining({
-//                                 idAssetToSell: "5",
-//                                 idAsseToBuy: "9",
-//                                 amountSell: "500000000000",
-//                                 amountBuy: "3245238520245030700720",
-//                                 aliveUntil: Date.now() + 30000,
-//                                 slippage: 0.1,
-//                                 swaps: [
-//                                     {
-//                                         "poolAddress": "7L53bUTBbfuj14UpdCNPwmgzzHSsrsTWBHX5pys32mVWM3C1",
-//                                         "pool": "Omnipool",
-//                                         "assetIn": "5",
-//                                         "assetOut": "9",
-//                                         "assetInDecimals": 10,
-//                                         "assetOutDecimals": 18,
-//                                         "amountIn": "500000000000",
-//                                         "calculatedOut": "3255498570963322337271",
-//                                         "amountOut": "3245238520245030700720",
-//                                         "spotPrice": "65120277207769065131",
-//                                         "tradeFeePct": 0.32,
-//                                         "tradeFeeRange": [
-//                                             0.3,
-//                                             5.1
-//                                         ],
-//                                         "priceImpactPct": -0.02,
-//                                         "errors": []
-//                                     }
-//                                 ],
-//                                 txHex: "0x123",
-//                                 swapError: "",
-//           })
-//         };
-        
-
-// export const mockBestSell = {
-//     "type": "Sell",
-//     "amountIn": "500000000000",
-//     "amountOut": {
-//         value: '3245238520245030700720',
-//         times: vi.fn().mockReturnValue('12345')
-//       },
-//     "spotPrice": "65120277207769065131",
-//     "tradeFee": "10260050718291636551",
-//     "tradeFeePct": 0.32,
-//     "tradeFeeRange": [
-//         0.3,
-//         5.1
-//     ],
-//     "priceImpactPct": -0.02,
-//     "tx": vi.fn().mockReturnValue({ hex: '0x123' }),
-//     "swaps": [
-//         {
-//             "poolAddress": "7L53bUTBbfuj14UpdCNPwmgzzHSsrsTWBHX5pys32mVWM3C1",
-//             "pool": "Omnipool",
-//             "assetIn": "5",
-//             "assetOut": "9",
-//             "assetInDecimals": 10,
-//             "assetOutDecimals": 18,
-//             "amountIn": "500000000000",
-//             "calculatedOut": "3255498570963322337271",
-//             "amountOut": "3245238520245030700720",
-//             "spotPrice": "65120277207769065131",
-//             "tradeFeePct": 0.32,
-//             "tradeFeeRange": [
-//                 0.3,
-//                 5.1
-//             ],
-//             "priceImpactPct": -0.02,
-//             "errors": []
-//         }
-//     ]
-// }
-export const mockBestSellError = new Error("Mock error")

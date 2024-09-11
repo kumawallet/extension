@@ -32,7 +32,7 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
   }, [])
 
   const getInfo =() =>{
-    return !isAlive ? "The quote has expired. Please request a new quote." : ""
+    return !isAlive ? t("info_swap_hydradx") : ""
   }
 
   const transaction = {
@@ -81,9 +81,9 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
 
   return (
     <>
-      <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
-        <p className="text-lg" onClick={onBack}></p>
+      <div className="flex gap-3 items-center mb-7" >
+        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} data-testid="onBack-arrow"/>
+        <p className="text-lg" onClick={onBack} data-testid="onBack-text"></p>
       </div>
       <div className="flex flex-1">
         <TxSummary tx={transaction} />

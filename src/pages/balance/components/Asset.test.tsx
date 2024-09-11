@@ -50,8 +50,10 @@ describe("Asset", () => {
     useNavigate: () => functionMocks.navigate
   }))
 
-  vi.mock("@src/providers", () => ({
-        ...vi.importActual('@src/providers'),
+  vi.mock("@src/providers", async() => {
+    const actual = await vi.importActual('@src/providers');
+  return ({
+        ...actual,
         useNetworkContext: () => ({state: {
           chains: [
           {
@@ -181,7 +183,7 @@ describe("Asset", () => {
           },
           
         ]}
-  })}))
+  })})})
 
   it("should render the component", () => {
     const { container } = renderComponent();

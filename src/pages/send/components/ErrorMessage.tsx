@@ -18,7 +18,6 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
     state: { assets },
   } = useAssetContext();
   const { watch, setValue } = useFormContext<SendTxForm>();
-
   const amount = watch("amount");
   const asset = watch("asset");
   const fee = watch("fee");
@@ -33,7 +32,7 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
     const isNativeAsset = originNetwork?.symbol === asset.symbol;
  
     let bnAmount = transformAmountStringToBN(amount, asset.decimals);
- 
+    
     if (isNativeAsset) {
  
       const bnFee = new BN(fee);

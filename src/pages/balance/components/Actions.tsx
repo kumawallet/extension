@@ -9,8 +9,7 @@ import { getType } from "@src/utils/assets";
 export const Actions = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
-  const { state: {selectedAccount}} =useAccountContext()
-
+  const { state: { selectedAccount }} = useAccountContext()
   return (
     <div data-testid="actions-container" className="flex gap-5 justify-center">
       <Action

@@ -267,7 +267,6 @@ export const useSwap = () => {
           .map((chain) => chain.id);
 
         const _swapper = new StealthEX();
-
         const { nativeAssets, pairs } = await _swapper!.init({
           chainIds: chainIds,
         });
@@ -285,11 +284,11 @@ export const useSwap = () => {
           bridgeFee: _swapper.bridgeFee,
         }));
         //setAssets(nativeAssets);
-
         setAssetsToBuy(pairs);
         setAssetsToSell(nativeAssets);
         setSwapper(_swapper);
       }
+
       if (accountType === "evm") {
         endLoading();
       }
@@ -321,7 +320,6 @@ export const useSwap = () => {
       captureError(error);
     }
   };
-
   const handleRecipientChange = (label: string, value: unknown) => {
     setRecipient((prevState) => ({
       ...prevState,
@@ -329,14 +327,19 @@ export const useSwap = () => {
     }));
   };
 
-  //const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
   const handleAmounts = async (label: "sell" | "buy", value: string) => {
     try {
       if (value !== "0" && tx.addressFrom) {
         switch (txInfo.bridgeName) {
           case swapType.stealhex:
             {
+              if (
+                !assetToSell ||
+                !assetToBuy ||
+                (assetToSell?.type !== swapType.stealhex &&
+                  assetToBuy.type !== swapType?.stealhex)
+              )
+                return;
               setAmounts((prevState) => ({
                 ...prevState,
                 [label]: value,
@@ -361,6 +364,14 @@ export const useSwap = () => {
             break;
           case swapType.hydradx:
             {
+              if (
+                !assetToSell ||
+                !assetToBuy ||
+                (assetToSell.type !== swapType.hydradx &&
+                  assetToBuy.type !== swapType.hydradx)
+              )
+                return;
+              minSellAmount && setMinSellAmount(null);
               setAmounts((prevState) => ({
                 ...prevState,
                 [label]: value,
@@ -507,13 +518,11 @@ export const useSwap = () => {
           showSuccessToast("Swap successful");
           return;
         }
-
         const chainId = assetToSell.chainId as string;
 
         const allChains = chains.map((chain) => chain.chains).flat();
 
         const chain = allChains.find((chain) => chain.id === chainId) as Chain;
-
         const updateTx: Tx = {
           swapId: id,
           addressBridge: destination,
@@ -766,8 +775,9 @@ export const useSwap = () => {
           assetToBuy: assetBuy,
           slippage: slippage,
         });
-        if (data.swapInfo.swapError.length > 0) {
-          showErrorToast(data.swapInfo.swapError);
+        if (data?.swapInfo.swapError.length > 0) {
+          console.log(data.swapInfo.swapError);
+          showErrorToast(t(data.swapInfo.swapError.toLocaleLowerCase()));
         }
         setTxInfo((prevState) => ({
           ...prevState,
@@ -1031,7 +1041,13 @@ export const useSwap = () => {
       decimals: 0,
       symbol: "",
     });
-    await messageAPI.clearHydradxTrade();
+    if (network.length > 0) {
+      await messageAPI.deleteSelectChain({ id: network });
+    }
+    await Promise.all([
+      messageAPI.clearHydradxTrade(),
+      messageAPI.deleteSelectChain({ id: "hydradx" }),
+    ]);
   };
 
   return {

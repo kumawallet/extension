@@ -136,4 +136,42 @@ describe("FeeAndTip", () => {
     })
 
   })
+  it('should show loading animation when fee is loading', async () => {
+    const setValueMock = vi.fn();
+  
+    reactHookFormMocks.useFormContext.mockReturnValue({
+      watch: vi.fn((key: MOCK_WATCH_TYPE) => 
+        key === 'isLoadingFee' ? true : FORM_EVM_ERC20_TRANSFER_MOCK[key]
+      ),
+      getValues: vi.fn(() => false),
+      setValue: setValueMock,
+    });
+  
+    const { container } = renderComponent();
+  
+    await waitFor(() => {
+      const feeElement = container.querySelector('p.animate-pulse');
+      expect(feeElement).not.to.be.null;
+    });
+  });
+  
+  it("should hide tip input when tip is disabled", async () => {
+    const setValueMock = vi.fn();
+  
+    reactHookFormMocks.useFormContext.mockReturnValue({
+      watch: vi.fn((key: MOCK_WATCH_TYPE) => {
+        if (key === 'isTipEnabled') return false;
+        return FORM_EVM_ERC20_TRANSFER_MOCK[key];
+      }),
+      getValues: vi.fn(() => false),
+      setValue: setValueMock,
+    });
+  
+    const { queryByTestId } = renderComponent();
+  
+    await waitFor(() => {
+      expect(queryByTestId("tip")).toBeNull();
+    });
+  });
+  
 });

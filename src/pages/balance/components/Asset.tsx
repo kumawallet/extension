@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { AssetIcon } from "@src/components/common";
 import { BALANCE_ACCOUNTS, SEND, ASSET_NETWORK } from "@src/routes/paths";
 import { formatUSDAmount } from "@src/utils/assets";
@@ -42,6 +42,7 @@ export const Asset: FC<AssetProps> = ({ asset , isDetail = false}) => {
     if(asset.assetNumber && asset.assetNumber > 1  && !isDetail) return ASSET_NETWORK
     else return BALANCE_ACCOUNTS
   }
+
 
   return (
     <div className="bg-[#343A40] flex px-2 py-2 rounded-2xl  font-inter w-full outline-none justify-between"

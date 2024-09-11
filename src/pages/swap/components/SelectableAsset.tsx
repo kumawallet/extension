@@ -5,7 +5,7 @@ import { SwapAsset } from "../base";
 import { Loading } from "@src/components/common";
 import { GoChevronDown } from "react-icons/go";
 
-interface SelectableAssetProps<T extends SwapAsset> {
+export interface SelectableAssetProps<T extends SwapAsset> {
   buttonClassName?: string;
   containerClassName?: string;
   defaulValue: T;
@@ -19,10 +19,11 @@ interface SelectableAssetProps<T extends SwapAsset> {
   type: "sell"| "buy"
 }
 
-const OptImage = ({ image }: { image: string }) => {
+const OptImage = ({ image, id }: { image: string , id: string}) => {
   if (image) {
     return (
       <img
+        data-testid={id}
         src={image}
         width={30}
         height={30}
@@ -69,15 +70,15 @@ export const SelectableAsset = <T extends SwapAsset>({
       {label && (
         <p className="mb-2 font-medium font-inter text-xs absolute top-[-25px]">{label}</p>
       )}
-      <Combobox value={value} onChange={onChange} defaultValue={defaulValue}>
+      <Combobox value={value} onChange={onChange} defaultValue={defaulValue} data-testid="combobox">
         {({ open }) => (
           <div className="relative h-full">
             <Combobox.Label className="absolute top-1/2 -translate-y-1/2 ml-3">
-              {value?.image && <OptImage image={value?.image} />}
+              {value?.image && <OptImage image={value?.image} id={`default-${value?.id}-${value?.network}`}/>}
             </Combobox.Label>
 
             {isLoading && (
-              <div className="absolute top-1/2 -translate-y-1/2 left-5">
+              <div className="absolute top-1/2 -translate-y-1/2 left-5" data-testid="loading">
                 <Loading containerClass="py-0" iconClass="w-5 h-5" />
               </div>
             )}
@@ -93,7 +94,7 @@ export const SelectableAsset = <T extends SwapAsset>({
               aria-readonly={isLoading}
               readOnly={isLoading}
             />
-            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2" data-testid="button">
               <GoChevronDown
                 className="h-5 w-5 text-white"
                 aria-hidden="true"
@@ -108,11 +109,13 @@ export const SelectableAsset = <T extends SwapAsset>({
                     key={index.toString()}
                     value={opt}
                     className="px-2 hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-xl py-2"
+                    data-testid={`${opt.id}`}
                   >
                     <div
                       className="flex gap-2 items-center "
+                      data-testid={opt.id}
                     >
-                      {opt.image && <OptImage image={opt.image} />}
+                      {opt.image && <OptImage image={opt.image} id={`${value?.id}-${value?.network}`}/>}
                       <div className="flex flex-col">
                         <div className="flex items-start flex-col !w-[200%] sm:w-full">
                           <div className="flex space-x-2 w-[80%]">
