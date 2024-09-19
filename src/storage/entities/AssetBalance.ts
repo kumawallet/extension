@@ -75,7 +75,7 @@ export default class AssetsBalance {
             this.getNativeAsset(api, account, chain),
             this.getNonNativeAssets(api, account, chain),
           ]);
-
+          
         const subs = [..._unsubs, ...nativeUnsubs] || [];
 
         // @ts-expect-error --- *
@@ -86,7 +86,6 @@ export default class AssetsBalance {
             assets: [nativeAsset, ..._assets],
           },
         };
-
         const price = await this.getAssetsUSDPrice(
           this._assets[account.key][chainId].assets
         );

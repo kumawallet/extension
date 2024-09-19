@@ -28,7 +28,7 @@ const ASSETS_MOCK: AssetBalance = {
       assets: [
         {
           id: "-1",
-          amount: 10,
+          amount: "10",
           balance: "10",
           decimals: 10,
           symbol: "DOT",

@@ -1,13 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useToast } from "@src/hooks";
-import { Button, InputErrorMessage } from "@src/components/common";
+import { Button, HeaderBack, InputErrorMessage } from "@src/components/common";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string, number } from "yup";
@@ -169,13 +167,9 @@ export const ManageNetworks = () => {
 
   return (
     <PageWrapper>
+      
       <div className="flex items-center gap-3 mb-10">
-        <FiChevronLeft
-          className="cursor-pointer"
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className="font-medium text-2xl">{t("title")}</p>
+        <HeaderBack navigate={navigate} title={t("title")}/>
         {!isCreating && (
           <div className="flex-1 flex justify-end">
             <Button classname="text-sm font-medium" onClick={showCreateForm}>

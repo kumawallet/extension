@@ -11,6 +11,9 @@ import { RecordStatus } from "../../../storage/entities/activity/types";
 import { SUBSTRATE_CHAINS } from "@src/constants/chainsData";
 import { ChainType, Transaction } from "@src/types";
 import { BehaviorSubject } from "rxjs";
+import { swapType } from "@src/pages";
+import BigNumber from "bignumber.js";
+import {  assetToSell,assetToBuy, mockAssetsInit} from "../../../tests/mocks/hydradx-mock"
 
 const accountManageMock = {
   saveBackup: vi.fn(),
@@ -1067,3 +1070,186 @@ describe("Extension", () => {
     expect(removeSite).toHaveBeenCalled();
   });
 });
+
+  describe ("initHydraDx", () => {
+    it("should be initialized", async() => {
+      const _HydraDx = (
+        await import("../../../storage/entities/HydraDx")
+      ).default;
+  
+    const { Provider }= (
+        await import("../../../storage/entities/Provider")
+      )
+      const extension = new Extension();
+      const mockProvider =  vi.fn().mockReturnValue({
+        provider: {},
+        type: ChainType.WASM 
+      });
+      const init = vi.fn();
+  
+      Provider.prototype.getProviderByChainId = mockProvider
+      _HydraDx.prototype.init = init;
+  
+      await extension["initHydraDx"]();
+  
+      expect(mockProvider).toHaveBeenCalledWith("hydradx");
+      expect(init).toHaveBeenCalledWith({
+        provider: {},
+        type: ChainType.WASM 
+      })
+    })
+    it("should return Error", async() => {
+      const _HydraDx = (
+        await import("../../../storage/entities/HydraDx")
+      ).default;
+  
+    const { Provider }= (
+        await import("../../../storage/entities/Provider")
+      )
+      const extension = new Extension();
+      const mockProvider =  vi.fn().mockReturnValue({
+        provider: {},
+        type: ChainType.WASM 
+      });
+      const error = new Error("Init failed")
+      const init = vi.fn().mockRejectedValue(error);
+      const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+  
+      Provider.prototype.getProviderByChainId = mockProvider
+      _HydraDx.prototype.init = init;
+  
+      await extension["initHydraDx"]();
+
+      expect(init).toHaveBeenCalledWith({
+        provider: {},
+        type: ChainType.WASM 
+      })
+      expect(consoleLogSpy).toHaveBeenCalledWith(error, "error initHydradx");
+    })
+
+    describe("getFeeHydradx", () => {
+      it("should return fee data when called with valid parameters", async() => {
+        const _HydraDx = (
+          await import("../../../storage/entities/HydraDx")
+        ).default;
+  
+  
+        
+        const mockData = {
+          bridgeName: swapType.hydradx,
+          bridgeFee:  "0.32",
+          gasFee: "10260050718291636551",
+          amount: new BigNumber("3245238520245030700720").toString(),
+          swapInfo: {
+            idAssetToSell:"5",
+            idAsseToBuy: "9",
+            amountSell: "500000000000" ,
+            amountBuy: new BigNumber("3245238520245030700720").toString(),
+            aliveUntil: 30000,
+            swaps:  [
+              {
+                poolAddress: '7L53bUTBbfuj14UpdCNPwmgzzHSsrsTWBHX5pys32mVWM3C1',
+                pool: 'Omnipool',
+                assetIn: '5',
+                assetOut: '9',
+                assetInDecimals: 10,
+                assetOutDecimals: 18,
+                amountIn: '500000000000',
+                calculatedOut: '3255498570963322337271',
+                amountOut: '3245238520245030700720',
+                spotPrice: '65120277207769065131',
+                tradeFeePct: 0.32,
+                tradeFeeRange: [0.3, 5.1],
+                priceImpactPct: -0.02,
+                errors: [] 
+              }
+            ],
+            slippage: 0.1,
+            txHex: "0x123",
+            swapError: "",
+          },
+        }
+  
+        const request = {
+          assetToSell: assetToSell,
+          assetToBuy: assetToBuy,
+          amount: "50",
+          slippage: 0.1,
+        };
+  
+        const mockGetFee = vi.fn().mockReturnValue(mockData)
+  
+        _HydraDx.prototype.getFee =mockGetFee
+        const extension = new Extension();
+  
+        const result = await extension["getFeetHydraDx"](request);
+  
+        expect(mockGetFee).toHaveBeenCalledWith(request.amount, request.assetToSell, request.assetToBuy, request.slippage);
+        expect(result).toEqual(mockData);
+      })
+
+      it("should throw an error when getFee fails", async() => {
+        const _HydraDx = (
+          await import("../../../storage/entities/HydraDx")
+        ).default;
+        
+        const mockError = "Error in getfee Hydradx"
+  
+        const request = {
+          assetToSell: assetToSell,
+          assetToBuy: assetToBuy,
+          amount: "50",
+          slippage: 0.1,
+        };
+  
+        const mockGetFee = vi.fn().mockRejectedValue(new Error(mockError))
+  
+        _HydraDx.prototype.getFee =mockGetFee
+        const extension = new Extension();
+  
+        await expect(extension["getFeetHydraDx"](request)).rejects.toThrowError(mockError);
+        expect(mockGetFee).toHaveBeenCalledWith(request.amount, request.assetToSell, request.assetToBuy, request.slippage);
+      })
+  
+
+    })
+
+    it("clearHydradx", async () => {
+      const _HydraDx = (await import("../../../storage/entities/HydraDx")).default;
+      const extension = new Extension();
+    
+      const mockClearAssets = vi.fn();
+
+      _HydraDx.prototype.ClearAssets = mockClearAssets
+    
+      extension["clearHydradx"]();
+
+      expect(mockClearAssets).toHaveBeenCalled();
+
+    })
+
+    describe("getAssetsBuyHydra", () => {
+        it("should return getassetsBuy ", async() => {
+          const _HydraDx = (await import("../../../storage/entities/HydraDx")).default;
+          const extension = new Extension();
+          const mockGetAssetsBuy = vi.fn().mockResolvedValue(mockAssetsInit);
+          _HydraDx.prototype.getassetsBuy = mockGetAssetsBuy
+          await extension["getAssetsBuyHydra"]({ asset:assetToSell});
+          expect(mockGetAssetsBuy).toHaveBeenCalledWith(assetToSell);
+        })
+        it("should throw an error when getassetsBuy fails", async () => {
+          const _HydraDx = (await import("../../../storage/entities/HydraDx")).default;
+          const extension = new Extension();
+          const mockError = "Error";
+          const mockGetAssetsBuy = vi.fn().mockRejectedValue(new Error(mockError));
+          _HydraDx.prototype.getassetsBuy = mockGetAssetsBuy;
+          await expect(extension["getAssetsBuyHydra"]({ asset: assetToSell})).rejects.toThrowError(mockError);
+        });
+    })
+    
+
+
+})
+  
+
+  

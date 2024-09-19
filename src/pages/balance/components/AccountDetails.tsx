@@ -5,13 +5,11 @@ import { useCopyToClipboard } from "@src/hooks/common/useCopyToClipboard";
 import { useLoading, useToast } from "@src/hooks";
 import { messageAPI } from "@src/messageAPI/api";
 import { getHash } from "@src/utils/transactions-utils";
-import { Button } from "@src/components/common";
+import { Button, HeaderBack } from "@src/components/common";
 import Account from "@src/storage/entities/Account";
 import { ConfirmMessage } from "@src/components/common/ConfirmMessage";
 import { IoAlert } from "react-icons/io5";
 import { Key } from "@src/components/icons/Key";
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { PiEyeClosedThin, PiEyeClosed } from "react-icons/pi";
 import { AiOutlineFileSearch, AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -216,12 +214,7 @@ export const AccountDetails: FC<AccountDetailsProps> = ({
   return (
     <>
       <FormProvider {...methods}>
-        <div className="w-full">
-          <button className="flex items-center" onClick={onBack}>
-            <FiChevronLeft size={ICON_SIZE} />
-            <p className="text-base">{title}</p>
-          </button>
-        </div>
+        <HeaderBack title={title} onBack={onBack}/>
         <div className="flex flex-col mt-10 gap-y-4">
           <div className="flex justify-between items-center">
             <div className="flex gap-4 items center">

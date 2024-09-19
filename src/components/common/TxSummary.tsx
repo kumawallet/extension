@@ -14,7 +14,7 @@ export const TxSummary: FC<TxSummaryProps> = ({
     <div className='grid grid-cols-[32%_68%] gap-y-4 h-fit'>
       {
         Object.entries(tx).map(([key, value]) => (
-          <Fragment key={key}>
+          <Fragment key={key} data-testid={key.toLocaleLowerCase()}>
             <div className='text-sm'>{key}</div>
             <div className='text-sm text-[#9CA3AF] overflow-auto text-ellipsis'>{value}</div>
           </Fragment>

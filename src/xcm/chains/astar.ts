@@ -6,6 +6,7 @@ import {
   getBeneficiary,
   getDest,
   getXTokensAsset,
+  transformAddress,
 } from "../utils";
 import { Map } from "../interfaces";
 
@@ -28,7 +29,7 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  moonbeam: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  "moonbeam-evm": ({ address, amount, assetSymbol, xcmPalletVersion }) => {
     let assets = null;
     switch (assetSymbol?.toLowerCase()) {
       case "astr": {
@@ -134,6 +135,77 @@ export const ASTAR_EXTRINSICS: { [key: string]: Map } = {
       },
     };
   },
+  hydradx: ({ address, amount,assetSymbol, xcmPalletVersion }) => {
+    let assets = null;
+    let method = null;
+    switch (assetSymbol?.toLowerCase()) {
+      case "astr": {
+        assets = getAssets({
+          version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+          fungible: amount,
+        });
+        method = XCM.pallets.POLKADOT_XCM.methods.RESERVE_TRANSFER_ASSETS
+        return {
+          pallet: XCM.pallets.POLKADOT_XCM.NAME,
+          method,
+          extrinsicValues: {
+            dest: getDest({
+              parents: 1,
+              parachainId: POLKADOT_PARACHAINS.HYDRADX.id,
+              version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+              interior: {
+                X1: {
+                  Parachain: POLKADOT_PARACHAINS.HYDRADX.id
+                }
+              }
+            }),
+            beneficiary: getBeneficiary({
+              address,
+              account: "AccountId32",
+              version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+            }),
+            assets,
+            feeAssetItem: 0,
+          },
+        };
+      }
+      case "dot": {
+        const { accountId } = transformAddress(address);
+        
+        method= XCM.pallets.X_TOKENS.methods.TRANSFER;
+        
+        return {
+          pallet: XCM.pallets.X_TOKENS.NAME,
+          method,
+          extrinsicValues: {
+            currency_id: "340282366920938463463374607431768211455",
+            amount,
+            dest: getDest({
+              parents: 1,
+              version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+              interior: {
+                X2: [
+                      {
+                          Parachain:POLKADOT_PARACHAINS.HYDRADX.id
+                      },
+                      {
+                        AccountId32:{
+                              network:null,
+                              id: accountId
+                        }
+                      }
+                    ]
+                  }
+            }),
+            dest_weight_limit: "Unlimited",
+          },
+        };
+      }
+      default:
+        throw new Error("Invalid asset symbol");
+    }
+    
+  },
 };
 
 enum ASTAR_ASSETS {
@@ -147,4 +219,5 @@ export const ASTAR_ASSETS_MAPPING = {
   polkadot: [ASTAR_ASSETS.DOT],
   "moonbeam-evm": [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.GLMR],
   acala: [ASTAR_ASSETS.ASTR, ASTAR_ASSETS.ACA],
+  hydradx: [ASTAR_ASSETS.ASTR,ASTAR_ASSETS.DOT]
 };

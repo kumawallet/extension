@@ -374,7 +374,16 @@
   "tx_confirm_info": "Informazioni",
   "tx_confirm_info_message": "Dovrai trasferire a {{address_to_transfer}} fornito dal protocollo Stealthex, poi riceverai {{receive_amount}} {{receive_asset}} all'indirizzo che hai fornito: {{address_to_receive}}",
   "send_title": "Rivedi trasferimento",
-  "proceed": "Procedere"
+  "proceed": "Procedere",
+  "protocol_name": "Nome del fornitore",
+  "protocol_fee": "Percentuale della commissione",
+  "router_swap": "Miglior percorso",
+  "slippage": "Scivolamento",
+  "swap_not_enough_balance": "L'importo è troppo basso rispetto al limite minimo consentito per l'operazione",
+  "asset_not_allowed": "L'asset non è disponibile per il trading",
+  "not_enough_liquidity": "Il pool non ha liquidità sufficiente per eseguire l'operazione.",
+  "error_fetching_quote": "Errore nel recupero della quota",
+  "info_swap_hydradx": "La quotazione è scaduta. Richiedi una nuova quotazione."
 },
 "change_password": {
   "title": "Cambia la tua password",

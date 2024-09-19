@@ -9,6 +9,7 @@ export const enum PARACHAINS {
   SHIDEN = "Shiden",
   MOONRIVER = "Moonriver",
   ACALA = "Acala",
+  HYDRADX = "Hydration"
 }
 
 export const enum RELAY_CHAIN_TESTNETS {
@@ -32,6 +33,10 @@ export const POLKADOT_PARACHAINS = {
     name: PARACHAINS.MOONBEAM,
     id: 2004,
   },
+  HYDRADX: {
+    name: PARACHAINS.HYDRADX,
+    id: 2034
+  }
 };
 
 export const KUSAMA_PARACHAINS = {

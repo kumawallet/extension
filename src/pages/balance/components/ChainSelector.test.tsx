@@ -3,7 +3,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { ChainSelector } from "./ChainSelector";
 import { EVM_CHAINS, SUBSTRATE_CHAINS } from "@src/constants/chainsData";
-import { act } from "react-dom/test-utils";
 import { ChainStatus } from "@src/storage/entities/Provider";
 
 const renderComponent = () => {
@@ -57,14 +56,36 @@ describe("ChainSelector", () => {
 
     const button = getByTestId("chain-button");
 
-    act(() => {
-      fireEvent.click(button);
-    });
+    fireEvent.click(button);
 
     await waitFor(() => {
       const chain = getByAltText(SUBSTRATE_CHAINS[0].name);
       expect(chain).toBeDefined();
     });
   });
+
+  it("should filter chains", async () => {
+
+    const { getByTestId, getByAltText } = renderComponent();
+
+    const button = getByTestId("chain-button");
+
+    fireEvent.click(button);
+
+
+    await waitFor(() => {
+
+      const input = getByTestId("search-input");
+
+      fireEvent.change(input, { target: { value: "polkadot" } });
+    })
+
+
+    const chain = getByAltText(SUBSTRATE_CHAINS[0].name);
+
+    expect(chain).toBeDefined();
+
+  })
+
 
 });

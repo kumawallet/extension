@@ -144,7 +144,6 @@ export const formatStringAmountWithDecimals = (amount = "", decimals = 0) => {
 
 export const formatBN = (bn: string, decimals = 1, fixed?: null | number) => {
   let _number = bn;
-
   if (!decimals) return "0";
 
   if (_number.length < decimals) {
@@ -251,29 +250,31 @@ export const getWasmAssets = async (
     switch (chainId) {
       case "acala":
       case "mandala":
+      case "hydradx":
+      case "hydradx-rococo":
         balanceMethod = api.query.tokens.accounts;
         break;
       default:
         balanceMethod = api.query.assets?.account;
         break;
     }
-    if (!balanceMethod)
+    if (!balanceMethod){
       return {
         assets,
         unsubs,
-      };
+      };}
 
     const mappedAssets = SUBSTRATE_ASSETS_MAP[chainId] || [];
     const assetBalances = await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mappedAssets.map((asset: any) => {
+        mappedAssets.map((asset: any) => {
         const params = [];
-        if (["acala", "mandala"].includes(chainId.toLowerCase())) {
+        if (["acala", "mandala","hydradx", "hydradx-rococo"].includes(chainId.toLowerCase())) {
           params.push(address, asset.id);
         } else {
           params.push(asset.id, address);
         }
-
+        
         return balanceMethod?.(...params);
       })
     );
@@ -290,7 +291,7 @@ export const getWasmAssets = async (
     await Promise.all(
       assets.map(async (asset) => {
         const params = [];
-        if (["acala", "mandala"].includes(chainId.toLowerCase())) {
+        if (["acala", "mandala", "hydradx", "hydradx-rococo"].includes(chainId.toLowerCase())) {
           params.push(address, JSON.parse(asset.id));
         } else {
           params.push(asset.id, address);
@@ -379,7 +380,6 @@ export const getSubtrateNonNativeBalance = (
       transferable: BN0.toString(),
     };
   }
-
   const result = data.toJSON();
   let balance = BN0;
   let frozen = BN0;

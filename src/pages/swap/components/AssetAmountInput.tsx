@@ -3,7 +3,7 @@ import { Loading } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
 
-interface AssetAmountInputProps {
+export interface AssetAmountInputProps {
   amount: string;
   balance: string;
   containerClassName?: string;
@@ -16,8 +16,10 @@ interface AssetAmountInputProps {
   onMax?: () => void;
   onValueChange: (amount: string) => void;
   selectableAsset: JSX.Element;
-  showBalance?: boolean
-  isPairValid?: boolean
+  showBalance?: boolean;
+  isPairValid?: boolean;
+  type: "buy"| "sell";
+  isLoadingBalance ?: boolean;
 }
 
 export const AssetAmountInput: FC<AssetAmountInputProps> = ({
@@ -34,37 +36,43 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
   onValueChange,
   selectableAsset,
   showBalance = true,
-  isPairValid
+  isPairValid,
+  type,
+  isLoadingBalance
 }) => {
   const { t } = useTranslation("swap");
-
-
   return (
     <div className={containerClassName}>
       <div className="flex justify-between mb-2">
         <p className="font-inter font-medium md:text-lg">{label}</p>
         {
           showBalance && (
-            <p className="font-inter font-medium md:text-lg text-[#9CA3AF] capitalize">
-              {t("balance")}: {balance}
-            </p>
+            isLoadingBalance && isLoadingBalance ? 
+            (<div className="absolute right-5">
+                <Loading containerClass="py-0" iconClass="w-5 h-5" />
+            </div>)
+            : (<p className="font-inter font-medium md:text-lg text-[#9CA3AF] capitalize">
+                {t("balance")}: {balance}
+              </p>)
           )
         }
       </div>
 
       <div className="flex">
+        {selectableAsset}
         <div className="flex-1 relative h-fit w-[60%]">
           <NumericFormat
-            className={`input-secondary py-3 rounded-lg pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-r-none`}
+            className={`input-secondary py-3 rounded-lg pr-12 outline bg-[#343a40] border border-[#727e8b17] text-[#9CA3AF] font-bold outline-transparent focus:outline-primary-default hover:outline-primary-default rounded-l-none`}
             allowNegative={false}
             allowLeadingZeros={false}
             value={isLoading ? "" : amount}
             onValueChange={({ value }) => {
               onValueChange(value || "0");
             }}
-            disabled={isLoading || isDisabled || isReadOnly}
+            disabled={isLoading || isDisabled || isReadOnly || type==="buy"}
             allowedDecimalSeparators={["%"]}
             readOnly={isReadOnly}
+            data-testid={type}
           />
 
           {hasMaxOption && (
@@ -78,12 +86,12 @@ export const AssetAmountInput: FC<AssetAmountInputProps> = ({
 
           {isLoading && (
             <div className="absolute top-1/2 -translate-y-1/2 left-5">
-              <Loading containerClass="py-0" iconClass="w-5 h-5s" />
+              <Loading containerClass="py-0" iconClass="w-5 h-5s" data-testid="loading"/>
             </div>
           )}
         </div>
 
-        {selectableAsset}
+        
       </div>
       {minSellAmount && isPairValid && (
         <p>

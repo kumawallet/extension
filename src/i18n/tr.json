@@ -373,7 +373,16 @@
     "tx_confirm_info": "Bilgi",
     "tx_confirm_info_message": "Stealthex protokolü tarafından sağlanan {{address_to_transfer}} adresine transfer yapmanız ve ardından {{address_to_receive}} adresine {{receive_asset}} {{receive_amount}} almanız gerekecek",
     "send_title": "Transferi İncele",
-    "proceed": "İlerlemek"
+    "proceed": "İlerlemek",
+    "protocol_name": "Sağlayıcı adı",
+    "protocol_fee": "Komisyon yüzdesi",
+    "router_swap": "En iyi rota",
+    "slippage": "Kayma",
+    "swap_not_enough_balance": "Miktar, işlem için izin verilen minimum sınırın altındadır",
+    "asset_not_allowed": "Varlık işlem için uygun değil",
+    "not_enough_liquidity": "Havuzda işlemi gerçekleştirmek için yeterli likidite yok.",
+    "error_fetching_quote": "Teklif alma hatası",
+    "info_swap_hydradx": "Teklifin süresi doldu. Lütfen yeni bir teklif isteyin."
   },
   "change_password": {
     "title": "Şifrenizi Değiştirin",

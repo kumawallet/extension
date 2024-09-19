@@ -69,4 +69,23 @@ export const POLKADOT_EXTRINSICS: { [key: string]: Map } = {
       weightLimit: "Unlimited",
     },
   }),
+hydradx: ({ address, amount, xcmPalletVersion }) => ({
+  pallet: XCM.pallets.XCM_PALLET.NAME,
+  method: XCM.pallets.XCM_PALLET.methods.RESERVE_TRANSFER_ASSETS,
+  extrinsicValues: {
+    dest: getDest({
+      parachainId: POLKADOT_PARACHAINS.HYDRADX.id,
+      version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+    }) as unknown,
+    beneficiary: getBeneficiary({
+      address,
+      version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+    }) as unknown,
+    assets: getAssets({
+      fungible: amount,
+      version: XCM_DEFAULT_VERSIONS[xcmPalletVersion],
+    }) as unknown,
+    feeAssetItem: 0,
+  },
+}),
 };

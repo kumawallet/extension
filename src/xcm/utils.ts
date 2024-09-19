@@ -17,16 +17,20 @@ export const getDest = ({
   parents = 0,
   parachainId = null,
   version = "V2",
+  interior
+  //X2
 }: {
   parents?: number;
   parachainId?: number | null;
   version?: Version;
+  X2 ?: boolean
+  interior?: interior
 }) => {
   return {
     [version]: {
       parents,
-      interior: parachainId
-        ? {
+      interior: interior ? interior :
+       parachainId ? {
             X1: {
               Parachain: {
                 id: parachainId,
@@ -169,6 +173,7 @@ export const XCM = {
       methods: {
         TRANSFER: "transfer",
         TRANSFER_MULTIASSET: "transferMultiasset",
+        TRANSFER_MULTICURRENCIES: "transferMulticurrencies"
       },
     },
   },

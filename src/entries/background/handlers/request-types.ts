@@ -1,4 +1,5 @@
 import { AccountKey, AccountType } from "@src/accounts/types";
+import { SwapAsset } from "@src/pages/swap/base";
 import Account from "@src/storage/entities/Account";
 import { AssetBalance } from "@src/storage/entities/AssetBalance";
 import Chains from "@src/storage/entities/Chains";
@@ -20,7 +21,7 @@ import {
   SelectedChain,
   Transaction,
 } from "@src/types";
-
+import { swapType } from "@src/pages";
 export interface RequestSignUp {
   password: string;
   privateKeyOrSeed: string;
@@ -199,13 +200,59 @@ export interface RequestUpdateTx {
       balance: string;
       address?: string | undefined;
     };
+    swapInfo?: {
+      txHex: string
+    } 
   };
 }
 
+export interface RequestInitHydradx{
+  account: string
+}
+
+export interface RequestGetFeeHydra{
+  amount: string;
+  assetToSell: SwapAsset;
+  assetToBuy: SwapAsset;
+  slippage: number;
+}
+
+export interface RequestGetAssetBuyHydra{
+  asset: SwapAsset;
+}
 export interface RequestSetAccountToActivity {
   address: string;
 }
 
+export interface getTxInfoHydradx{
+  bridgeName: swapType,
+  bridgeFee: string,
+  gasFee: string,
+  amount: string,
+  swapInfo: { 
+    idAssetToSell: string;
+    idAsseToBuy: string;
+    amountSell : string,
+    amountBuy: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    swaps: any;
+    aliveUntil: number;
+    slippage: number;
+    txHex: string,
+    swapError: string;
+}
+}
+export interface amounts {
+  sell: string,
+  buy: string,
+}
+export interface RequestSwapHydraDx{
+  idAssetToSell: string;
+  idAssetToBuy: string;
+  amounts: amounts;
+  addressSell: string;
+
+}
 export interface Request {
   "pri(accounts.createAccounts)": [RequestCreateAccount, boolean];
   "pri(accounts.importAccount)": [RequestImportAccount, void];
@@ -292,6 +339,13 @@ export interface Request {
   "pri(send.updateTx)": [RequestUpdateTx, string];
   "pri(send.getFeeSubscribe)": [null, void, string];
   "pri(send.sendTx)": [null, boolean];
+
+  "pri(hydra.initHydraDX)": [null, void]
+  "pri(hydra.subscribeToSell)":  [null, SwapAsset[], SwapAsset[]];
+  "pri(hydra.subscribeToBuy)":  [null, SwapAsset[], SwapAsset[]];
+  "pri(hydra.getFee)": [RequestGetFeeHydra, getTxInfoHydradx];
+  "pri(hydra.getAssetsBuyHydra)": [ RequestGetAssetBuyHydra,getTxInfoHydradx];
+  "pri(hydra.clearHydradx)": [null,void];
 }
 
 export type MessageTypes = keyof Request;

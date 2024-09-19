@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Popover, Switch } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import { MdInfoOutline } from "react-icons/md";
 
-interface RecipientAddressProps {
+export interface RecipientAddressProps {
   address: string;
   containerClassName?: string;
   isNotOwnAddress: boolean;
@@ -53,7 +53,7 @@ export const RecipientAddress: FC<RecipientAddressProps> = ({
   infoTooltipMessage
 }) => {
   const { t } = useTranslation("swap");
-
+  
   return (
     <div className={containerClassName}>
       {

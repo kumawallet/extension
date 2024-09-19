@@ -51,7 +51,7 @@ export const SelectableOptionModal = <T,>({
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => null}>
+      <Dialog as="div" className="relative z-10" onClose={handleOnClose}>
         <Transition.Child as={Fragment}>
           <div className="fixed inset-0 bg-black/25" />
         </Transition.Child>

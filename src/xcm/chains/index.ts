@@ -5,6 +5,7 @@ export * from "./acala";
 export * from "./astar";
 export * from "./shiden";
 export * from "./moonriver";
+export * from "./hydradx";
 
 // testnests
 export * from "./rococo";

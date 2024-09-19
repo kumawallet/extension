@@ -53,11 +53,13 @@ export interface AssetAccount {
   symbol: string;
   decimals: number;
   id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  assets: any;
 }
 
 export interface Asset {
   address?: string;
-  amount: number | string;
+  amount: string;
   balance: string;
   decimals: number;
   id: string;
@@ -68,6 +70,8 @@ export interface Asset {
   accounts?: {
     [id: string]: AssetAccount;
   };
+  assetNumber ?: number,
+  network ?: string;
 }
 
 export type IAsset = Partial<Asset> & {

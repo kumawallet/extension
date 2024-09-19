@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 import { useLoading, useToast } from "@src/hooks";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
+import { HeaderBack } from "./HeaderBack";
 
 export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
   const { t } = useTranslation("re_enter_password");
@@ -46,7 +46,7 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
 
   return (
     <Transition appear show={showDialog} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={() => null}>
+      <Dialog as="div" className="relative z-50" onClose={() => setShowDialog(false)}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -75,14 +75,7 @@ export const ReEnterPassword = ({ cb }: { cb?: () => void }) => {
                   as="h3"
                   className="text-lg font-medium leading-6 "
                 >
-                  <div className="flex items-center gap-2">
-                    <FiChevronLeft
-                      size={26}
-                      className="cursor-pointer"
-                      onClick={() => navigate(-1)}
-                    />
-                    <span>{t("title")}</span>
-                  </div>
+                  <HeaderBack navigate={navigate} title={t("title")}/>
                 </Dialog.Title>
                 <div className="mt-4">
                   <label className="text-sm font-medium text-gray-400">

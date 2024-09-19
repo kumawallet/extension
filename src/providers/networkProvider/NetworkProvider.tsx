@@ -175,6 +175,7 @@ export const NetworkProvider: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     messageAPI.netwotkStatusSubscribe((networkStatus) => {
       dispatch({
+        
         type: "update-status",
         payload: {
           status: networkStatus,

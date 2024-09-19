@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Button, PageWrapper } from "@src/components/common";
+import { Button, HeaderBack, PageWrapper } from "@src/components/common";
 import { useTranslation } from "react-i18next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useAccountContext, useNetworkContext } from "@src/providers";
@@ -7,7 +7,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { object, string } from "yup";
 import { useLoading, useToast } from "@src/hooks";
 import { BALANCE } from "@src/routes/paths";
-import { FiChevronLeft } from "react-icons/fi";
 import { Chain, SelectedChain } from "@src/types";
 import { captureError } from "@src/utils/error-handling";
 import { messageAPI } from "@src/messageAPI/api";
@@ -197,24 +196,25 @@ export const Send = () => {
       !recipientAddress ||
       !sender ||
       !asset
+      
     )
       return;
-
     if (
       !validateRecipientAddress(
         recipientAddress,
         originNetwork.type as "evm" | "wasm"
+      ) && originNetwork.id !== "moonbeam-evm" || originNetwork.id === "moonbeam-evm" && !validateRecipientAddress(
+        recipientAddress,
+        targetNetwork.type as "evm" | "wasm"
       )
     ) {
       return;
     }
-
     if (amount === "0") return;
 
     (async () => {
       try {
         setValue("isLoadingFee", true);
-
         await messageAPI.updateTx({
           tx: {
             amount,
@@ -236,13 +236,7 @@ export const Send = () => {
       contentClassName="h-full flex-1"
       innerContentClassName="flex flex-col"
     >
-      <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={15} className="cursor-pointer" onClick={onBack} />
-        <p className="text-base font-medium">
-          {t(isConfirmingTx ? "review_transfer_title" : "send_title")}
-        </p>
-      </div>
-
+      <HeaderBack title={t(isConfirmingTx ? "review_transfer_title" : "send_title")} navigate={navigate} onBack={onBack}/>
       <FormProvider {...methods}>
         <div className="flex-1">
           {!isConfirmingTx ? (
@@ -266,8 +260,8 @@ export const Send = () => {
         <Button
           data-testid="send-button"
           isLoading={isLoading}
-          isDisabled={isLoadingFees || !haveSufficientBalance}
-          classname="w-full py-4"
+          isDisabled={isLoadingFees || !haveSufficientBalance || recipientAddress.length === 0}
+          classname="w-full py-4" 
           onClick={handleSubmit(onSubmit)}
         >
           {t("send_title")}

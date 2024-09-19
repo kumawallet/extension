@@ -1,5 +1,3 @@
-import { ICON_SIZE } from "@src/constants/icons";
-import { FiChevronLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@src/components/common/PageWrapper";
 import { useTranslation } from "react-i18next";
@@ -11,11 +9,10 @@ import {
   Language,
   SettingKey,
 } from "@src/storage/entities/settings/types";
-import { Loading } from "@src/components/common";
+import { HeaderBack, Loading } from "@src/components/common";
 import { captureError } from "@src/utils/error-handling";
 // import { useNetworkContext } from "@src/providers";
 import { messageAPI } from "@src/messageAPI/api";
-import { topbarText, topbarIcon, topbarContainer } from '../../style/style'
 
 export const General = () => {
   const { t, i18n } = useTranslation("general_settings");
@@ -100,14 +97,7 @@ export const General = () => {
 
   return (
     <PageWrapper>
-      <div className={topbarContainer}>
-        <FiChevronLeft
-          className={topbarIcon}
-          size={ICON_SIZE}
-          onClick={() => navigate(-1)}
-        />
-        <p className={topbarText}>{t("title")}</p>
-      </div>
+      <HeaderBack title={t("title")} navigate={navigate}/>
       <div className="flex flex-col px-4 pt-2 gap-5">
         {settings.map((setting, index) => {
           switch (setting.name) {

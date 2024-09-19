@@ -55,7 +55,7 @@ export const AddAddressModal: FC<AddAddressModalProps> = ({
 
   return (
     <Transition show={isOpen} as={Fragment}>
-      <Dialog onClose={() => null}>
+      <Dialog onClose={ onClose}>
         <Transition.Child as={Fragment}>
           <Dialog.Overlay className="fixed inset-0 backdrop-blur-sm backdrop-filter" />
         </Transition.Child>

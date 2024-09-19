@@ -11,6 +11,8 @@ import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfil
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
 import { isChrome, isProduction } from "./src/utils/env";
 import { loadEnv } from "vite";
+import wasm from 'vite-plugin-wasm';
+import topLevelAwait from "vite-plugin-top-level-await";
 
 const root = resolve(__dirname, "src");
 const entriesDir = resolve(root, "entries");
@@ -69,7 +71,6 @@ export default ({ mode }: { mode: string }) => {
           "**/src/components/wrapper/*",
           "**/src/pages/index.ts",
           "**/src/pages/callContract/**",
-          "**/src/pages/swap/**",
           "**/**/index.ts",
           "**/src/components/ui/**",
           "**/src/components/icons/**",
@@ -77,6 +78,7 @@ export default ({ mode }: { mode: string }) => {
           "**/src/pages/styles/**",
           "**/src/pages/settings/components/ManageNetworks.tsx",
           "**/src/pages/signMessage/**",
+          "**/src/pages/swap/base.ts",
         ],
       },
     },
@@ -91,11 +93,15 @@ export default ({ mode }: { mode: string }) => {
         buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
       },
     },
-    plugins: [react(), makeManifest(), copyContentStyle()],
+    plugins: [react(), topLevelAwait({
+      promiseExportName: "__tla",
+      promiseImportName: i => `__tla_${i}`
+    }),makeManifest(), copyContentStyle(),wasm()],
     publicDir,
     build: {
       chunkSizeWarningLimit: 1000,
       outDir,
+      target: "esnext",
       // sourcemap: process.env.__DEV__ === "true",
       rollupOptions: {
         input: {
@@ -127,8 +133,10 @@ export default ({ mode }: { mode: string }) => {
             process: true,
           }),
           NodeModulesPolyfillPlugin(),
+          
         ],
       },
+      
     },
   });
 };

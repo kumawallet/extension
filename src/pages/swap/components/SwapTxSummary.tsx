@@ -22,6 +22,7 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
   const { t } = useTranslation("swap");
   const { t: tSend } = useTranslation("send")
   const [fee, setFee] = useState("0");
+  const [isAlive, setIsAlive] = useState<boolean>(true)
 
   useEffect(() => {
     messageAPI.getFee((fee) => {
@@ -30,6 +31,9 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
 
   }, [])
 
+  const getInfo =() =>{
+    return !isAlive ? t("info_swap_hydradx") : ""
+  }
 
   const transaction = {
     [tSend('sender')]: cropAccount(tx.addressFrom, 12),
@@ -44,8 +48,8 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
       </div>
     ),
     [tSend('amount')]: `${tx.amountFrom} ${tx.assetFrom.symbol}`,
-    [tSend('estimated_fee')]: `${formatFees(fee, tx.assetFrom.decimals)} ${tx.assetFrom.symbol}`,
-    [t('tx_confirm_info')]: t("tx_confirm_info_message", {
+    [tSend('estimated_fee')]: tx.chainFrom.name === "HydraDX" ? `${formatFees(fee, 12)} HDX` : `${formatFees(fee, tx.assetFrom.decimals)} ${tx.chainFrom.name === "hydradx" ? "HDX" :tx.assetFrom.symbol}`,
+    [t('tx_confirm_info')]: tx.chainFrom.name === "HydraDX" ? getInfo() : t("tx_confirm_info_message", {
       address_to_transfer: tx.addressBridge,
       address_to_receive: tx.addressTo,
       receive_amount: tx.amountTo,
@@ -53,16 +57,44 @@ export const SwapTxSummary: FC<SwapTxSummaryProps> = ({
     })
   };
 
+
+  const Alive =(): boolean => {
+    const currentTime = Date.now(); 
+      
+    if (tx.aliveUntil && currentTime > tx.aliveUntil) {
+      setIsAlive(false)
+      transaction[t('tx_confirm_info')] = "The quote has expired. Please request a new quote."
+      return false
+    }
+    setIsAlive(true)
+    return true;
+  }
+  useEffect(() => {
+    if(tx.aliveUntil){
+    const intervalId = setInterval(Alive, 1000); 
+    
+    return () => clearInterval(intervalId);
+    }
+
+    
+  }, [tx.aliveUntil]);
+
   return (
     <>
-      <div className="flex gap-3 items-center mb-7">
-        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} />
-        <p className="text-lg">{t("send_title")}</p>
+      <div className="flex gap-3 items-center mb-7" >
+        <FiChevronLeft size={26} className="cursor-pointer" onClick={onBack} data-testid="onBack-arrow"/>
+        <p className="text-lg" onClick={onBack} data-testid="onBack-text"></p>
       </div>
       <div className="flex flex-1">
         <TxSummary tx={transaction} />
       </div>
+      {tx.chainFrom.name === "Hydration" &&
+        <div className="w-full text-base text-[#EBE212] text-center">
+          {getInfo()}
+        </div>
+      }
       <Button
+        isDisabled={!isAlive}
         classname={`font-medium text-base capitalize w-full py-2 mt-7 !mx-0`}
         onClick={onConfirm}
       >

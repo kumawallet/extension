@@ -23,3 +23,4 @@ export const SIGNIN = "/sign-in";
 export const SWAP = "/swap";
 export const BUY = "/buy";
 export const WELCOME = "/";
+export const ASSET_NETWORK = "/balance-network"

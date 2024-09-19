@@ -8,6 +8,7 @@ import {
 import { ActiveSwaps, InitProps, SwapAsset, Swapper } from "./base";
 
 import { transformAddress } from "@src/utils/account-utils";
+import { swapType } from "./hooks";
 
 interface StealthExToken {
   id: string;
@@ -17,7 +18,7 @@ interface StealthExToken {
   network: string;
 }
 
-const StealthEx_MAP_NATIVE_TOKENS: {
+export const StealthEx_MAP_NATIVE_TOKENS: {
   [key: string]: { realName: string; stealthExName: string; prefix?: number }[];
 } = {
   polkadot: [
@@ -143,12 +144,27 @@ const StealthEx_MAP_NATIVE_TOKENS: {
   ],
 };
 
+const networksNativeAssets: {[tokenNetworkId: string] : string} = {
+  "mainnet" : "polkadot",
+  "astr" : "astar",
+  "glmr": "moonbeam-evm",
+  "aca": "acala",
+  "polkadot" : "kusama",
+  "sdn": "shiden",
+  "eth" : "ethereum",
+  "polygon": "polygon",
+  "bnb": "binance",
+  "bep2" : "binance",
+  "bsc" : "binance",
+  "movr" :  "moonriver-evm"
+}
+
 export class StealthEX implements Swapper {
   private gqlClient: GraphQLClient;
   public protocol: string = "stealthex";
   public bridgeFee: string = "0.4%";
   public swap_info: string = "stealthex_swap_message";
-  private tokens: StealthExToken[] = [];
+  public tokens: StealthExToken[] = [];
   public type = "swapper";
   public chainId = "";
 
@@ -166,20 +182,19 @@ export class StealthEX implements Swapper {
           : (this.tokens as SwapAsset[]);
 
       this.tokens = tokens;
+      
 
       const nativeTokens =
         chainIds
           .filter((chainId) => StealthEx_MAP_NATIVE_TOKENS[chainId])
           .map((chainId) => StealthEx_MAP_NATIVE_TOKENS[chainId])
-          .flat() || [];
+          .flat() || []; 
 
       const pairs = tokens;
-
       const nativeAssets = nativeTokens.map((ntoken) => {
         const token = this.tokens.find(
           (token) => token.symbol === ntoken.stealthExName.toLocaleLowerCase()
         );
-
         return {
           name: token?.name || "",
           symbol: token?.symbol.toUpperCase() || "",
@@ -188,15 +203,15 @@ export class StealthEX implements Swapper {
           id: ntoken.stealthExName || token?.id,
           balance: "0",
           decimals: 0,
-          network: token?.network || "",
+          network: networksNativeAssets[token?.network.toLowerCase() || ""] as string || "",
           chainId: chainIds.find((chainId) =>
             StealthEx_MAP_NATIVE_TOKENS[chainId.toLowerCase()]?.some(
               (token) => token.stealthExName === ntoken.stealthExName
             )
           ),
+          type: swapType.stealhex
         } as SwapAsset;
       });
-
       return {
         nativeAssets,
         pairs,

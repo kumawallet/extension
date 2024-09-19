@@ -3,6 +3,8 @@ import { fireEvent, render } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Actions } from "./Actions";
 import { SEND, SWAP } from "@src/routes/paths";
+import '@testing-library/jest-dom'; 
+import { AccountType } from "@src/accounts/types";
 
 const functionMocks = {
   useNavigate: vi.fn(),
@@ -16,6 +18,20 @@ const renderComponent = () => {
   );
 };
 
+const useAccountContextMock = vi.hoisted(() => ({
+   
+    selectedAccount: {
+      key: "IMPORTED_WASM-EEgxDFmLS2",
+      type: "IMPORTED_WASM",
+      value: {
+        address: "EEgxDFmLS2",
+        isDerivable: true,
+        keyring: "IMPORTED_WASM",
+        name: "Account",
+      },
+  
+}}));
+
 describe("Actions", () => {
   beforeAll(() => {
     vi.mock("react-router-dom", () => ({
@@ -28,9 +44,12 @@ describe("Actions", () => {
           selectedChain: {
             id: "polkadot",
             type: "wasm",
-          },
+          } ,
         },
       })),
+      useAccountContext: () => ({
+        state: useAccountContextMock
+      }),
     }));
   });
 
@@ -59,11 +78,33 @@ describe("Actions", () => {
 
       const container = getByTestId("actions-container");
 
-      const sendAction = container.children[1] as HTMLElement;
+      const swapAction = container.children[1] as HTMLElement;
 
-      fireEvent.click(sendAction);
+      fireEvent.click(swapAction);
 
       expect(functionMocks.useNavigate).toHaveBeenCalledWith(SWAP);
     });
+
+    it("should disable the swap button when selectedAccount type is 'ol'", async() => {
+      useAccountContextMock.selectedAccount ={
+              key: "OL-82a42737759",
+              value: {
+                  address: "82a42737759",
+                  isDerivable: true,
+                  keyring: AccountType.OL,
+                  "name": "Account 6"
+              },
+            type: AccountType.OL
+          }
+      const { getByTestId } = renderComponent();
+      const container = getByTestId("actions-container");
+      const swapAction = container.children[1] as HTMLElement;
+      expect(swapAction).toHaveAttribute('disabled');
+
+      fireEvent.click(swapAction);
+      expect(functionMocks.useNavigate).not.toHaveBeenCalledWith(SWAP);
+    });
   });
 });
+
+

@@ -23,6 +23,7 @@
       "@styles/*": ["src/styles/*"],
       "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"]
+      
     }
   },
   "include": ["src", "utils", "vite.config.ts"],

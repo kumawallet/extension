@@ -377,7 +377,17 @@
     "tx_confirm_info": "Info",
     "tx_confirm_info_message": "You will have to transfer to {{address_to_transfer}} provided by Stealthex protocol, then you will receive {{receive_amount}} {{receive_asset}} in the address you provided: {{address_to_receive}}",
     "send_title": "Review Transfer",
-    "proceed": "Proceed"
+    "proceed": "Proceed",
+    "protocol_name": "Provider name",
+    "protocol_fee" : "Percentage fee",
+    "router_swap" : "Best route",
+    "slippage": "Slippage",
+    "swap_not_enough_balance": "The amount is too low for the minimum limit allowed for the trade",
+    "asset_not_allowed": "The asset is not available for trading",
+    "not_enough_liquidity": "The pool does not have sufficient liquidity to carry out the operation.",
+    "error_fetching_quote": "Error in getting the quota",
+    "info_swap_hydradx": "The quote has expired. Please request a new quote."
+
   },
   "change_password": {
     "title": "Change your password",

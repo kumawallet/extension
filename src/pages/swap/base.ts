@@ -1,15 +1,21 @@
+import { swapType } from "./hooks";
+
 export interface SwapAsset {
   symbol: string;
-  label: string;
+  label?: string;
   image: string;
-  id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  id: any;
   balance: string;
   decimals: number;
   network: string;
   name: string;
   address?: string;
   chainId: string;
+  alternativeSwapAsset ?: string;
+  type?: swapType;
 }
+
 
 export interface ActiveSwaps {
   addressFrom: string;
@@ -99,6 +105,6 @@ export abstract class Swapper {
 }
 
 export const SUPPORTED_CHAINS_FOR_SWAP = {
-  wasm: ["polkadot", "astar", "acala", "kusama", "shiden", "rococo"],
+  wasm: ["polkadot", "astar", "acala", "kusama", "shiden", "rococo", "hydradx"],
   evm: ["moonbeam-evm", "moonriver-evm", "ethereum", "polygon", "binance"],
 };
