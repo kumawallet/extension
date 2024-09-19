@@ -68,6 +68,7 @@ interface swap {
   assetOut: string;
   assetOutDecimals: number;
   calculatedOut: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errors: any[];
   pool: string;
   poolAddress: string;

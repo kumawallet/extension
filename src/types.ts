@@ -53,6 +53,7 @@ export interface AssetAccount {
   symbol: string;
   decimals: number;
   id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   assets: any;
 }
 

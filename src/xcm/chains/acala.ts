@@ -25,9 +25,8 @@ export const ACALA_EXTRINSICS: { [key: string]: Map } = {
     },
   }),
 
-  astar: ({ address, amount, assetSymbol, xcmPalletVersion }) => {
+  astar: ({ address, amount, assetSymbol }) => {
     let currencyId = null;
-    const destWeightLimit = "Unlimited";
 
     switch (assetSymbol?.toLowerCase()) {
       case "aca": {

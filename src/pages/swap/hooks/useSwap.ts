@@ -38,6 +38,7 @@ export interface TxInfoState {
     amountBuy: string;
     slippage: number;
     aliveUntil: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     swaps: any;
     txHex: string;
     swapError: string;

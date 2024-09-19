@@ -234,6 +234,7 @@ export interface getTxInfoHydradx{
     idAsseToBuy: string;
     amountSell : string,
     amountBuy: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     swaps: any;
     aliveUntil: number;
     slippage: number;

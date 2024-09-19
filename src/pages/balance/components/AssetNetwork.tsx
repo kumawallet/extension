@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Footer } from "./Footer";
 import { useTranslation } from "react-i18next";
 import { useAssetContext } from "@src/providers";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Asset } from "./Asset";
 import { formatAmountWithDecimals } from "@src/utils/assets";
 
@@ -16,6 +16,7 @@ type asset = {
     id: string;
     accountKey: string;
     network: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     accounts ?: any;
 }
 
@@ -47,6 +48,7 @@ export const AssetNetwork = () => {
         id: string;
         accountKey: string;
         network: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accounts ?: any;
     
       }[] = [];

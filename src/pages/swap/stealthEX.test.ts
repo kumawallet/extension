@@ -18,6 +18,7 @@ const mockEstimatedAmount = {
   };
 describe('StealthEX', () => {
   let stealthEx: StealthEX;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockGraphQLClient: any;
   beforeAll(
     () => {
@@ -34,6 +35,7 @@ describe('StealthEX', () => {
     mockGraphQLClient = {
       request: vi.fn(),
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (GraphQLClient as any).mockImplementation(() => mockGraphQLClient);
     stealthEx = new StealthEX();
   });

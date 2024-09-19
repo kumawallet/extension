@@ -3,9 +3,6 @@ import { mockAssets,mockProvider, assetToSell,assetToBuy, mockSwapResult, mockAs
 import BigNumber from 'bignumber.js';
 import { swapType } from "@src/pages";
 
-
-
-
 describe("HydraDx", () => {
   let hydraDx: HydraDx;
   const fixedTime = Date.now();
@@ -28,7 +25,6 @@ describe("HydraDx", () => {
               })),
               PoolService: vi.fn(),
             })});
-  
       }
   
     ),
@@ -108,6 +104,7 @@ describe("HydraDx", () => {
     
       const faultyHydraDx = new HydraDx();
     
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await expect(faultyHydraDx.init(brokenProvider as any)).rejects.toThrow(
         "Error in initHydradx"
       );

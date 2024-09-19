@@ -4,6 +4,7 @@ export interface SwapAsset {
   symbol: string;
   label?: string;
   image: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   id: any;
   balance: string;
   decimals: number;

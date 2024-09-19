@@ -59,6 +59,7 @@ export const mockAssets = [
 export const mockProvider = { 
     type: ChainType.WASM,
     provider: { isReady: Promise.resolve() }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
 
 export const mockAssetsInit = [

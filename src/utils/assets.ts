@@ -21,7 +21,6 @@ import {
   Provider,
   SubstrateBalance,
 } from "@src/types";
-import { hydraDx } from "@src/messageAPI/hydradx";
 
 export const getType = (type: string) => {
   if (type.includes("imported")) {
