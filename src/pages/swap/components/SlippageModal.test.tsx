@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { SlippageModal, SlippageForm } from "./SlippageModal";
 import { useForm, FormProvider } from "react-hook-form";
@@ -6,7 +7,7 @@ import i18n from "@src/utils/i18n";
 import '@testing-library/jest-dom'; 
 
 // Helper component to wrap the modal with react-hook-form context
-const Wrapper = ({ children }) => {
+const Wrapper = ({ children }: { children: ReactNode }) => {
   const methods = useForm<SlippageForm>({
     defaultValues: { slippage: "" },
   });
@@ -55,7 +56,7 @@ describe("SlippageModal", () => {
     const { getByText } = renderComponent(slippageProps);
 
     
-    expect( getByText((content, element) => content.includes("Slippage") && content.includes("1%"))).toBeInTheDocument();
+    expect( getByText((content) => content.includes("Slippage") && content.includes("1%"))).toBeInTheDocument();
   });
 
   it("should call onClose when clicking the close button", () => {
