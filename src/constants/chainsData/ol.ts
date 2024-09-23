@@ -5,7 +5,7 @@ export const OL_CHAINS: Chain[] = [
   {
     id: "ol",
     name: "Open Libra",
-    rpcs: ["http://rpc.openlibra.blockcoders.io:8080/v1"],
+    rpcs: ["https://rpc.0l.fyi"],
     symbol: "$LIBRA",
     decimals: 6,
     explorer: "https://0l.fyi",

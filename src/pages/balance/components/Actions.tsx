@@ -10,6 +10,8 @@ export const Actions = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const { state: { selectedAccount }} = useAccountContext()
+  const is0l = selectedAccount?.type && getType(selectedAccount.type.toLocaleLowerCase()) === "ol"? true : false
+  
   return (
     <div data-testid="actions-container" className="flex gap-5 justify-center">
       <Action
@@ -22,13 +24,14 @@ export const Actions = () => {
         Icon={Swap}
         title={t("swap")}
         onClick={() => navigate(SWAP)}
-        isDisabled={selectedAccount?.type && getType(selectedAccount.type.toLocaleLowerCase()) === "ol"? true : false}
+        isDisabled={is0l}
       />
 
       <Action
         Icon={Buy}
         title={t("buy")}
         onClick={() => navigate(BUY)}
+        isDisabled={is0l}
       />
     </div>
   );

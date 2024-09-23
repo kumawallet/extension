@@ -43,6 +43,7 @@ export const Assets = () => {
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
+  console.log("assets", assets);
 
   const [showAllAssets, setShowAllAssets] = useState(false);
 

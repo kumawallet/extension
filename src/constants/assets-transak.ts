@@ -114,6 +114,5 @@ export const ASSETS_TRANSAK = [
         prefix: 5,
         type: ChainType.WASM,
         isSupportSell: false
-
     }
 ]
