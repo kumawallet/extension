@@ -11,6 +11,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
   port: Port
   // extensionPortName = PORT_EXTENSION
 ) => {
+  console.log("entro en el handlerKuma")
   const { id, message, request } = data;
   // const isExtension = port.name === extensionPortName;
   // const sender = port.sender as chrome.runtime.MessageSender;
@@ -25,6 +26,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
 
   promise
     .then((response) => {
+      console.log("hndlerKUma")
       assert(port, "Port has been disconnected");
 
       try {
@@ -34,6 +36,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
           e instanceof Error &&
           e.message === "Attempting to use a disconnected port object"
         ) {
+          console.log("entro en el catch del handlerkumas")
           // this means that the user has done something like close the tab
           port.disconnect();
           return;
@@ -49,6 +52,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
         error instanceof Error &&
         error.message === "Attempting to use a disconnected port object"
       ) {
+        console.log("entro en el catch")
         // this means that the user has done something like close the tab
         port.disconnect();
         return;
@@ -56,6 +60,7 @@ const kumaHandler = <TMessageType extends MessageTypes>(
 
       // only send message back to port if it's still connected, unfortunately this check is not reliable in all browsers
       if (port) {
+        console.log("entro en el if del handlerkuma", port)
         try {
           if (["pub(eth.request)", "pri(eth.request)"].includes(message))
             port.postMessage({

@@ -86,6 +86,7 @@ export const Routes = () => {
 
   useEffect(() => {
     (async () => {
+      console.log("aqui se esta ejecutanso")
       const alreadySignedUp = await messageAPI.alreadySignedUp();
 
       if (!alreadySignedUp) {

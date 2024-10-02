@@ -22,10 +22,75 @@ interface Handler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscriber?: (data: any) => void;
 }
-
+let port : any | null
 type Handlers = Record<string, Handler>;
+function waitForBackground() {
+  return new Promise((resolve) => {
+    function ping() {
+      chrome.runtime.sendMessage("ping", (response) => {
+        console.log("se esta ejecutando el ping", response)
+        if (chrome.runtime.lastError) {
+          setTimeout(ping, 1000); 
+        } else {
+          
+          if (response && response.status === "ready") {
+            resolve(response); 
+          } else {
+            setTimeout(ping, 1000); 
+          }
+        }
+      });
+    }
+    ping(); 
+  });
+}
 
-const port = Browser.runtime.connect({ name: PORT_EXTENSION });
+waitForBackground()
+  .then((response) => {
+    console.log("El fondo está listo:", response);
+    port = Browser.runtime.connect({ name: PORT_EXTENSION });
+
+    port.onMessage.addListener((message) => {
+      console.log("Mensaje del background:", message);
+    });
+
+    port.onDisconnect.addListener(() => {
+      console.log("Conexión con el background perdida.");
+    });
+  })
+  .catch((error) => {
+    console.error("Error:", error);
+  });
+// const trySendMessage = async () => {
+//   Browser.runtime.getBackgroundPage(() => {
+//     console.log("AAAAAAAAAAAAAAAAAAAAAA")
+//   })
+//   return new Promise((resolve) => {
+//     Browser.runtime.sendMessage({ message: "checkBackground" }, (response) => {
+//       console.log("Se está ejecutando", response);
+//       if (chrome.runtime.lastError || !response) {
+//         setTimeout(() => resolve(trySendMessage()), 3000);
+//       } else {
+//         console.log("Background is ready, now connecting...");
+//         port = Browser.runtime.connect({ name: PORT_EXTENSION });
+//         resolve(response); // Resolvemos la promesa con la respuesta
+//       }
+//     });
+//   });
+// };
+
+// const init = async () => {
+//   const response = await trySendMessage();
+//   console.log("Respuesta del background:", response);
+//   // Aquí puedes continuar con la lógica, sabiendo que el port está montado
+// };
+
+// init();
+    // Browser.runtime.getBackgroundPage(() => {
+    //   console.log("Se esta ejecutando")
+    // })
+// const port = Browser.runtime.connect({ name: PORT_EXTENSION });
+console.log("se conecto el puerto?", port)
 const handlers: Handlers = {};
 
 export function sendMessage<TMessageType extends MessageTypesWithNullRequest>(
@@ -49,6 +114,7 @@ export function sendMessage<TMessageType extends MessageTypes>(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   subscriber?: (data: unknown) => void
 ): Promise<ResponseTypes[TMessageType]> {
+  console.log("aqui se ejecuta la funcion, del sendMessageapi")
   return new Promise((resolve, reject) => {
     const id = getId();
 
@@ -65,34 +131,9 @@ export function sendMessage<TMessageType extends MessageTypes>(
       request,
     };
 
-    port.postMessage(transportMessage);
+    port && port.postMessage(transportMessage);
+    console.log("aqui ya se envio el mensaje del send message api",port)
   });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-port.onMessage.addListener((data: any): void => {
-  const handler = handlers[data.id];
-
-  if (!handler) {
-    console.error(`Unknown response: ${JSON.stringify(data)}`);
-
-    return;
-  }
-
-  if (!handler.subscriber) {
-    delete handlers[data.id];
-  }
-
-  if (data.subscription) {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    (handler.subscriber as Function)(data.subscription);
-  } else if (data.error) {
-    handler.reject(new Error(data.error));
-  } else {
-    handler.resolve(data.response);
-  }
-});
-
-port.onDisconnect.addListener((port) => {
-  console.log("Disconnected from port", port);
-});

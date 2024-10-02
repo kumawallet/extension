@@ -13,6 +13,7 @@ inject();
 // read messages from injected object
 // messages MUST have origin: "kuma" atribute
 window.addEventListener("message", async function (e) {
+  console.log("Se esta ejecutando el istener del contect")
   const data = e.data;
   if (data["origin"] === "kuma") {
     const response = await Browser.runtime.sendMessage(data);
@@ -30,6 +31,7 @@ window.addEventListener("message", async function (e) {
 });
 
 Browser.runtime.onMessage.addListener((request) => {
+  console.log("se esta ejecutando el listener del onMessage")
   if (request.origin === "kuma") {
     if (request.method.endsWith("_response") && request.from === "bg") {
       window.postMessage({ ...request, from: "content" });
