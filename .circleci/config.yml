@@ -39,7 +39,7 @@ jobs:
           command: npm run test:cov
       - run:
           name: Run Build
-          command: npm run build
+          command: npm run build:chrome
       - coveralls/upload:
           path_to_lcov: coverage/lcov.info
           verbose: true
