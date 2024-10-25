@@ -76,7 +76,7 @@ export default class AssetsBalance {
             this.getNonNativeAssets(api, account, chain),
           ]);
           
-        const subs = [..._unsubs, ...nativeUnsubs] || [];
+        const subs = [..._unsubs, ...nativeUnsubs];
 
         // @ts-expect-error --- *
         this._assets[account.key] = {
