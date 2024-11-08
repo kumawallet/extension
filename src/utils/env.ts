@@ -1,6 +1,5 @@
 import pkg from "../../package.json";
 
-export const isChrome = process.env.BROWSER_TARGET === "CHROME";
 export const isProduction = process.env.NODE_ENV === "production";
 export const version = pkg.version || "0.0.0";
 

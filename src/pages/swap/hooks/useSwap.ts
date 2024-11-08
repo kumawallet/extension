@@ -777,7 +777,6 @@ export const useSwap = () => {
           slippage: slippage,
         });
         if (data?.swapInfo.swapError.length > 0) {
-          console.log(data.swapInfo.swapError);
           showErrorToast(t(data.swapInfo.swapError.toLocaleLowerCase()));
         }
         setTxInfo((prevState) => ({

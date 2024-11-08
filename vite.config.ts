@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /// <reference types="vitest" />
 
+import { nodeModulesPolyfillPlugin } from 'esbuild-plugins-node-modules-polyfill';
 import { defineConfig, configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import makeManifest from "./utils/plugins/make-manifest";
 import copyContentStyle from "./utils/plugins/copy-content-style";
-import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
-import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-polyfill-node";
-import { isChrome, isProduction } from "./src/utils/env";
+import { isProduction } from "./src/utils/env";
 import { loadEnv } from "vite";
 import wasm from 'vite-plugin-wasm';
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -20,7 +19,7 @@ const assetsDir = resolve(root, "assets");
 const hookDir = resolve(root, "hooks");
 const utilsDir = resolve(root, "utils");
 const stylesDir = resolve(root, "styles");
-const outDir = resolve(__dirname, `dist/${isChrome ? "chrome" : "firefox"}`);
+const outDir = resolve(__dirname, "dist/chrome");
 const publicDir = resolve(__dirname, "public");
 
 if (isProduction) {
@@ -102,15 +101,12 @@ export default ({ mode }: { mode: string }) => {
       chunkSizeWarningLimit: 1000,
       outDir,
       target: "esnext",
-      // sourcemap: process.env.__DEV__ === "true",
       rollupOptions: {
         input: {
           devtools: resolve(entriesDir, "devtools", "index.html"),
           panel: resolve(entriesDir, "panel", "index.html"),
           content: resolve(entriesDir, "content", "index.ts"),
-          background: isChrome
-            ? resolve(entriesDir, "background", "index.ts")
-            : resolve(entriesDir, "background", "index.html"),
+          background: resolve(entriesDir, "background", "index.ts"),
           popup: resolve(entriesDir, "popup", "index.html"),
           newtab: resolve(entriesDir, "newtab", "index.html"),
           options: resolve(entriesDir, "options", "index.html"),
@@ -128,12 +124,7 @@ export default ({ mode }: { mode: string }) => {
           global: "globalThis",
         },
         plugins: [
-          NodeGlobalsPolyfillPlugin({
-            buffer: true,
-            process: true,
-          }),
-          NodeModulesPolyfillPlugin(),
-          
+          nodeModulesPolyfillPlugin(),
         ],
       },
       

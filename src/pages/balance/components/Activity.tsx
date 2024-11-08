@@ -31,8 +31,6 @@ export const Activity = () => {
   const {
     state: { selectedAccount, accounts },
   } = useAccountContext();
-
-  const { t: tCommon } = useTranslation("common");
   const [isLoading, setIsLoading] = useState(true);
   const [contacts, setContacts] = useState([] as Contact[]);
   const [ownAccounts, setOwnAccounts] = useState([] as Contact[]);
@@ -93,25 +91,6 @@ export const Activity = () => {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const { scrollTop, clientHeight, scrollHeight } =
-  //       document.documentElement;
-  //     if (
-  //       scrollTop + clientHeight >= scrollHeight - 20 &&
-  //       hasNextPage &&
-  //       !isLoadingTxs
-  //     ) {
-  //       loadMoreActivity();
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, [isLoadingTxs, hasNextPage]);
 
   useEffect(() => {
     if (selectedAccount) {

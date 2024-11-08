@@ -1,5 +1,5 @@
 import pkg from "../package.json";
-import { isChrome, isProduction } from "./utils/env";
+import { isProduction } from "./utils/env";
 
 const commonManifest = {
   name: pkg.displayName,
@@ -55,18 +55,4 @@ const manifestV3: chrome.runtime.ManifestV3 = {
   },
 };
 
-const manifestV2: chrome.runtime.ManifestV2 = {
-  ...commonManifest,
-  manifest_version: 2,
-  browser_action: {
-    default_popup: POPUP,
-    default_title: "Open the popup",
-  },
-  background: {
-    page: "src/entries/background/index.html",
-    persistent: false,
-  },
-  content_security_policy: SECURITY,
-};
-
-export default isChrome ? manifestV3 : manifestV2;
+export default manifestV3;

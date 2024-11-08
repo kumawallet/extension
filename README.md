@@ -101,14 +101,8 @@ More bridges will be added in the future to support more chains.
 ```bash
 # Install dependencies
 npm ci
-# Build the extension for both Chrome and Firefox (in the dist/ folder)
-npm run build
-
 # Build the extension for Chrome (in the dist/chrome folder)
-npm run build:chrome
-
-# Build the extension for Firefox (in the dist/firefox folder)
-npm run build:firefox
+npm run build
 ```
 *Note: As Brave is based on Chromium, the extension can be built for both Chrome and Brave with the same command.*
 
@@ -120,8 +114,6 @@ npm run build:firefox
 npm ci
 # Build and watch for changes (Chrome)
 npm run dev
-# Build and watch for changes (Firefox)
-npm run dev:firefox
 ```
 
 *Note: As Brave is based on Chromium, the extension can be built for both Chrome and Brave with the same command.*
@@ -133,25 +125,9 @@ To load the extension in your browser, you need to enable developer mode and loa
 
 Go to `chrome://extensions` and enable developer mode.
 
-![developer-mode](./images/developer-mode.png)
-![developer-mode](./images/developer-mode-on.png)
-
 Then click on `Load unpacked` and select the `dist/chrome` folder.
 
 ![load-unpacked](./images/load-unpacked.png)
-
-You should now see the extension in your browser.
-
-### Firefox
-To load the extension in your browser, load the extension from the `dist/firefox` folder.
-
-Go to `about:debugging#/runtime/this-firefox` and click on `Load Temporary Add-on`.
-
-![load-temporary](./images/load-add-on.png)
-
-Then select the `manifest.json` file from the `dist/firefox` folder.
-
-![load-temporary](./images/load-add-on-2.png)
 
 You should now see the extension in your browser.
 
@@ -192,11 +168,7 @@ const signMessage = async (message: string) => {
   }
 }
 ```
-When attempting to sign a message in Kuma Wallet, a pop-up will appear requesting the user's confirmation. The first step in the confirmation process involves verifying that the site is secure.
-
-![trust-site](./images/trust-site.png)
-
-![sign-message](./images/sign-message.png)
+When attempting to sign a message in Kuma Wallet, a pop-up will appear requesting the user's confirmation. The first step in the confirmatio2n process involves verifying that the site is secure.
 
 ```javascript
 // Call a contract method
@@ -221,8 +193,6 @@ When attempting to call a contract method in Kuma Wallet, a pop-up will appear r
 * **string** (e.g. "0.1" Native Token)
 * **ethers.utils.parseEther("0.1")** (where "0.1" is the amount of Native Tokens to send on EVM chains)
 * **new BN("100000000000000000")** (where "100000000000000000" is the amount of Native Tokens to send on Wasm chains)
-
-![call-contract](./images/contract-call.png)
 
 ## XCM - Supported transactions
 

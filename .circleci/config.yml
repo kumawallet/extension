@@ -39,7 +39,7 @@ jobs:
           command: npm run test:cov
       - run:
           name: Run Build
-          command: npm run build:chrome
+          command: npm run build
       - coveralls/upload:
           path_to_lcov: coverage/lcov.info
           verbose: true
@@ -50,4 +50,4 @@ workflows:
       - test:
           matrix:
             parameters:
-              node-version: ['20.5', '18.12', '16.18']
+              node-version: ['22.10', '20.17', '18.20']

@@ -21,29 +21,13 @@ export interface assetObj  {
     network: string;
   }[];
 }
-// export interface Asset {
-//   address?: string;
-//   amount: number | string;
-//   balance: string;
-//   decimals: number;
-//   id: string;
-//   price?: string;
-//   symbol: string;
-//   transferable?: string;
-//   usdPrice: number;
-//   accounts?: {
-//     [id: string]: AssetAccount;
-//   };
-//   assetNumber ?: number,
-//   network ?: string;
-// }
+
 export const Assets = () => {
   const { t } = useTranslation("balance");
   const navigate = useNavigate();
   const {
     state: { assets, isLoadingAssets },
   } = useAssetContext();
-  console.log("assets", assets);
 
   const [showAllAssets, setShowAllAssets] = useState(false);
 

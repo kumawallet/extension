@@ -99,14 +99,8 @@ Se agregarán más puentes en el futuro para soportar más cadenas.
 ```bash
 # Instalar dependencias
 npm ci
-# Cree la extensión para Chrome y Firefox (en la carpeta dist/)
-npm run build
-
 # Cree la extensión para Chrome (en la carpeta dist/chrome)
-npm run build:chrome
-
-# Cree la extensión para Firefox (en la carpeta dist/firefox)
-npm run build:firefox
+npm run build
 ```
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
@@ -117,9 +111,8 @@ npm run build:firefox
 npm ci
 # Cree y observe los cambios (Chrome)
 npm run dev
-# Cree y observe los cambios (Firefox)
-npm run dev:firefox
 ```
+
 *Nota: como Brave se basa en Chromium, la extensión se puede crear tanto para Chrome como para Brave con el mismo comando.*
 
 ## Cargando la extensión
@@ -129,25 +122,9 @@ Para cargar la extensión en su navegador, debe habilitar el modo desarrollador 
 
 Vaya a `chrome://extensions` y habilite el modo desarrollador.
 
-![developer-mode](./images/developer-mode.png)
-![developer-mode](./images/developer-mode-on.png)
-
 Luego haga clic en `Cargar descomprimida` y seleccione la carpeta `dist/chrome`.
 
 ![load-unpacked](./images/load-unpacked.png)
-
-Ahora debería ver la extensión en su navegador.
-
-### Firefox
-Para cargar la extensión en su navegador, cargue la extensión desde la carpeta `dist/firefox`.
-
-Vaya `about:debugging#/runtime/this-firefox` y haga click en `Load Temporary Add-on`.
-
-![load-temporary](./images/load-add-on.png)
-
-Luego haga click en el archivo `manifest.json` en la carpeta `dist/firefox`.
-
-![load-temporary](./images/load-add-on-2.png)
 
 Ahora debería ver la extensión en su navegador.
 
@@ -190,10 +167,6 @@ const signMessage = async (message: string) => {
 
 Al intentar firmar un mensaje en Kuma Wallet, aparecerá una ventana emergente que solicitará la confirmación del usuario. El primer paso en el proceso de confirmación consiste en verificar que el sitio sea seguro.
 
-![trust-site](./images/trust-site.png)
-
-![sign-message](./images/sign-message.png)
-
 ```javascript
 // Llamar a un metodo de un contrato
 const res = await window.kuma.call({
@@ -217,8 +190,6 @@ Al intentar llamar a un metodo de un contrato en Kuma Wallet, aparecerá una ven
 * **string** (ej. "0.1" Token Nativo)
 * **ethers.utils.parseEther("0.1")** (donde "0.1" es la cantidad de Tokens Nativos a enviar en blockchains EVM)
 * **new BN("100000000000000000")** (donde "100000000000000000" es la cantidad de Tokens Nativos a enviar en blockchains Wasm)
-
-![call-contract](./images/contract-call.png)
 
 ## XCM - Transacciones Soportadas
 
