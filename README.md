@@ -29,7 +29,7 @@ Kuma Wallet is the first of its kind, a cross-chain wallet that offers seamless 
 
 - **Comprehensive user experience**: Kuma Wallet aims to cover more than 90% of its main functionalities to provide a comprehensive user experience, making it a one-stop solution for all cross-chain asset management needs.
 
-### Safesty comes first
+### Safety comes first
 
 Kuma Wallet is designed with security as its top priority. To ensure the safety of users' assets, we have implemented the Keyring concept from MetaMask, which is the core of the secret storing and account management system in MetaMask. This approach ensures that private keys are stored locally on users' devices, making them accessible only to the user.
 
